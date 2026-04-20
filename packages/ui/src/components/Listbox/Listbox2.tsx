@@ -10,7 +10,6 @@ import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
 import styleHandler from '../../lib/theme/styleHandler'
 import { cn } from '../../lib/utils/cn'
-import { useFormContext } from '../Form/FormContext'
 import { SelectContext } from './SelectContext'
 
 export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>, 'size'> {
@@ -70,24 +69,6 @@ function Listbox({
 
   const triggerRef = useRef<HTMLButtonElement>(null)
 
-  const { formContextOnChange, values, errors, handleBlur, touched, fieldLevelValidation } =
-    useFormContext()
-
-  if (values && !value) {
-    value = values[id || name]
-    defaultValue = values[id || name]
-  }
-
-  function handleBlurEvent(e: React.FocusEvent<HTMLButtonElement>) {
-    if (handleBlur) handleBlur(e)
-    if (onBlur) onBlur(e)
-  }
-
-  if (!error) {
-    if (errors && !error) error = errors[id || name]
-    error = touched && touched[id || name] ? error : undefined
-  }
-
   useEffect(() => {
     if (value !== undefined) {
       setSelected(value)
@@ -146,7 +127,7 @@ function Listbox({
       return
     } else if (defaultValue) {
       setSelected(defaultValue)
-      const node: any = findNode(selected)
+      const node: any = findNode(defaultValue)
       setSelectedNode(node?.props ? node.props : undefined)
       return
     } else {
@@ -161,28 +142,6 @@ function Listbox({
   function handleOnChange(value: any) {
     if (onChange) onChange(value)
     setSelected(value)
-
-    /*
-     * Create change event for formik
-     * formik expects an input change event
-     */
-    let event: any = {}
-    event.target = {
-      type: 'select',
-      name: name,
-      id: id,
-      value: value,
-      checked: undefined,
-      // outerHTML: undefined,
-      // options: undefined,
-      // multiple: undefined,
-    }
-
-    // update form
-    // Create a new 'change' event
-    if (formContextOnChange) formContextOnChange(event)
-    // run field level validation
-    if (validation) fieldLevelValidation(id, validation(value))
   }
 
   let selectClasses = [__styles.container, __styles.base, buttonClassName]
@@ -215,7 +174,7 @@ function Listbox({
             data-size={size}
             ref={triggerRef}
             className={cn(selectClasses)}
-            onBlur={handleBlurEvent}
+            onBlur={onBlur}
             onFocus={onFocus}
             name={name}
             id={id}

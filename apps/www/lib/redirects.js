@@ -3112,4 +3112,14 @@ module.exports = [
     destination: '/dashboard/redeem?code=:code',
     permanent: false,
   },
+  {
+    permanent: true,
+    source: '/docs/llms.txt',
+    destination: '/llms.txt',
+  },
+  {
+    permanent: true,
+    source: '/docs/llms-full.txt',
+    destination: '/llms-full.txt',
+  },
 ]

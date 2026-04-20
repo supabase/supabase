@@ -1,28 +1,28 @@
-import { ArrowRight, Check, User, X, ChevronRight } from 'lucide-react'
+import { useParams } from 'common'
+import { ArrowRight, Check, ChevronRight, User, X } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
-
-import { useParams } from 'common'
-import PartnerIcon from 'components/ui/PartnerIcon'
-import { ProfileImage } from 'components/ui/ProfileImage'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { OrganizationMember } from 'data/organizations/organization-members-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useProfile } from 'lib/profile'
 import {
   Badge,
+  cn,
+  HoverCard_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
-  HoverCard_Shadcn_,
   ScrollArea,
   TableCell,
   TableRow,
-  cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import { ProfileImage } from '@/components/ui/ProfileImage'
+import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
+import { OrganizationMember } from '@/data/organizations/organization-members-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useProfile } from '@/lib/profile'
 
 interface MemberRowProps {
   member: OrganizationMember

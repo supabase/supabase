@@ -19,7 +19,7 @@
     "@ionic/pwa-elements": "^3.4.0",
     "@ionic/vue": "^8.8.1",
     "@ionic/vue-router": "^8.8.1",
-    "@supabase/supabase-js": "^2.99.1",
+    "@supabase/supabase-js": "^2",
     "core-js": "^3.48.0",
     "vue": "^3.5.30",
     "vue-router": "^5.0.3"

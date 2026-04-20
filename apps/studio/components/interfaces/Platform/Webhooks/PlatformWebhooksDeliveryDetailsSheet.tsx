@@ -1,7 +1,4 @@
 import { Copy, RotateCcw } from 'lucide-react'
-
-import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import {
   AlertDialog,
   Badge,
@@ -21,8 +18,11 @@ import {
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
 import type { WebhookDelivery } from './PlatformWebhooks.types'
 import { formatDeliveryStatus, statusBadgeVariant } from './PlatformWebhooksView.utils'
+import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
 interface PlatformWebhooksDeliveryDetailsSheetProps {
   deliveryAttempt: number | null
@@ -192,7 +192,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
           <SheetFooter className="shrink-0">
             <Button
               type="default"
-              icon={<RotateCcw size={14} />}
+              icon={<RotateCcw />}
               onClick={() => onRetryDelivery(retryableDelivery.id)}
             >
               Retry delivery

@@ -1,7 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useForm } from 'react-hook-form'
 import { Card, Form_Shadcn_ } from 'ui'
 import {
@@ -15,6 +13,8 @@ import {
 import * as z from 'zod'
 
 import { HotkeyToggle } from './HotkeyToggle'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 const HotkeySchema = z.object({
   commandMenuEnabled: z.boolean(),
@@ -22,6 +22,7 @@ const HotkeySchema = z.object({
   inlineEditorEnabled: z.boolean(),
   copyMarkdownEnabled: z.boolean(),
   copyJsonEnabled: z.boolean(),
+  copyCsvEnabled: z.boolean(),
   downloadCsvEnabled: z.boolean(),
 })
 
@@ -46,6 +47,10 @@ export const HotkeySettings = () => {
     LOCAL_STORAGE_KEYS.HOTKEY_COPY_JSON,
     true
   )
+  const [copyCsvEnabled, setCopyCsvEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.HOTKEY_COPY_CSV,
+    true
+  )
   const [downloadCsvEnabled, setDownloadCsvEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.HOTKEY_DOWNLOAD_CSV,
     true
@@ -59,6 +64,7 @@ export const HotkeySettings = () => {
       inlineEditorEnabled: inlineEditorEnabled ?? true,
       copyMarkdownEnabled: copyMarkdownEnabled ?? true,
       copyJsonEnabled: copyJsonEnabled ?? true,
+      copyCsvEnabled: copyCsvEnabled ?? true,
       downloadCsvEnabled: downloadCsvEnabled ?? true,
     },
   })
@@ -87,14 +93,14 @@ export const HotkeySettings = () => {
               form={form}
               name="aiAssistantEnabled"
               keys={['Meta', 'i']}
-              label="AI Assistant Panel"
+              label="AI Assistant panel"
               onToggle={setAiAssistantEnabled}
             />
             <HotkeyToggle
               form={form}
               name="inlineEditorEnabled"
               keys={['Meta', 'e']}
-              label="Inline SQL Editor Panel"
+              label="Inline SQL Editor panel"
               onToggle={setInlineEditorEnabled}
             />
             <HotkeyToggle
@@ -110,6 +116,13 @@ export const HotkeySettings = () => {
               keys={['Shift', 'Meta', 'j']}
               label="Copy results as JSON"
               onToggle={setCopyJsonEnabled}
+            />
+            <HotkeyToggle
+              form={form}
+              name="copyCsvEnabled"
+              keys={['Shift', 'Meta', 'c']}
+              label="Copy results as CSV"
+              onToggle={setCopyCsvEnabled}
             />
             <HotkeyToggle
               form={form}

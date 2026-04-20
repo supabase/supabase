@@ -1,18 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
-import type { ChartHighlightAction } from 'components/ui/Charts/ChartHighlightActions'
-import { ComposedChart } from 'components/ui/Charts/ComposedChart'
-import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import { useChartHighlight } from 'components/ui/Charts/useChartHighlight'
-import type { AnalyticsInterval } from 'data/analytics/constants'
-import type { ReportConfig } from 'data/reports/v2/reports.types'
-import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { Card, CardContent, cn } from 'ui'
 
 import { ReportChartUpsell } from './ReportChartUpsell'
+import type { ChartHighlightAction } from '@/components/ui/Charts/ChartHighlightActions'
+import { ComposedChart } from '@/components/ui/Charts/ComposedChart'
+import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
+import { useChartHighlight } from '@/components/ui/Charts/useChartHighlight'
+import type { AnalyticsInterval } from '@/data/analytics/constants'
+import type { ReportConfig } from '@/data/reports/v2/reports.types'
+import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export interface ReportChartV2Props {
   report: ReportConfig

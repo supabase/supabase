@@ -1,8 +1,5 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useResetPasswordMutation } from 'data/misc/reset-password-mutation'
-import { BASE_PATH } from 'lib/constants'
-import { auth } from 'lib/gotrue'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -11,6 +8,10 @@ import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Sha
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+
+import { useResetPasswordMutation } from '@/data/misc/reset-password-mutation'
+import { BASE_PATH } from '@/lib/constants'
+import { auth } from '@/lib/gotrue'
 
 const forgotPasswordSchema = z.object({
   email: z.string().min(1, 'Please provide an email address').email('Must be a valid email'),

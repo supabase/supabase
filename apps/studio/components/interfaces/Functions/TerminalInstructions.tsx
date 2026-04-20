@@ -1,11 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import CommandRender from 'components/interfaces/Functions/CommandRender'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
 import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
@@ -17,7 +11,13 @@ import {
 } from 'ui'
 
 import type { Commands } from './Functions.types'
+import CommandRender from '@/components/interfaces/Functions/CommandRender'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useAccessTokensQuery } from '@/data/access-tokens/access-tokens-query'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
 
 interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible_Shadcn_> {
   closable?: boolean

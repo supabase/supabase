@@ -1,15 +1,15 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useMemo, useState } from 'react'
-
-import { Policies } from 'components/interfaces/Auth/Policies/Policies'
-import { PoliciesDataProvider } from 'components/interfaces/Auth/Policies/PoliciesDataContext'
-import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
-import AlertError from 'components/ui/AlertError'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { Policies } from '@/components/interfaces/Auth/Policies/Policies'
+import { PoliciesDataProvider } from '@/components/interfaces/Auth/Policies/PoliciesDataContext'
+import { PolicyEditorPanel } from '@/components/interfaces/Auth/Policies/PolicyEditorPanel'
+import AlertError from '@/components/ui/AlertError'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const RealtimePolicies = () => {
   const { data: project } = useSelectedProjectQuery()

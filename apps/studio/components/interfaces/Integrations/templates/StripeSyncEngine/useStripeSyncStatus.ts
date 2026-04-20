@@ -1,7 +1,4 @@
-import { useStripeSyncingState } from 'data/database-integrations/stripe/sync-state-query'
-import { SchemasVariables, useSchemasQuery } from 'data/database/schemas-query'
 import { useEffect } from 'react'
-import { checkDomainOfScale } from 'recharts/types/util/ChartUtils'
 import { getCurrentVersion, parseSchemaComment } from 'stripe-experiment-sync/supabase'
 
 import {
@@ -10,30 +7,14 @@ import {
   isInstalled,
   type StripeSyncStatusResult,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
+import { useStripeSyncingState } from '@/data/database-integrations/stripe/sync-state-query'
+import { Schema, useSchemasQuery } from '@/data/database/schemas-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 // Maximum time allowed for installation or uninstallation operations before the UI times out
 const OPERATION_TIME_OUT_MS: number = 5 * 60 * 1000 // 5 minutes
 
-/**
- * Unified hook for Stripe Sync installation status.
- *
- * This hook consolidates all schema querying, status parsing, and polling logic
- * into a single source of truth. It returns a discriminated union status that
- * makes impossible states unrepresentable.
- */
-export function useStripeSyncStatus({
-  projectRef,
-  connectionString,
-}: SchemasVariables): StripeSyncStatusResult {
-  const latestAvailableVersion = getCurrentVersion()
-
-  // Query schemas once
-  const {
-    data: schemas,
-    isLoading: isSchemasLoading,
-    refetch,
-  } = useSchemasQuery({ projectRef, connectionString }, { enabled: !!projectRef })
-
+export const getStripeSyncSchemaComment = (schemas: Schema[]) => {
   // Find and parse stripe schema status
   const stripeSchema = findStripeSchema(schemas)
   const rawSchemaComment = parseSchemaComment(stripeSchema?.comment)
@@ -59,8 +40,30 @@ export function useStripeSyncStatus({
         : rawSchemaComment.errorMessage
     : rawSchemaComment.errorMessage
 
-  const schemaComment = { ...rawSchemaComment, status, errorMessage }
+  return { ...rawSchemaComment, status, errorMessage, timedOut }
+}
 
+/**
+ * Unified hook for Stripe Sync installation status.
+ *
+ * This hook consolidates all schema querying, status parsing, and polling logic
+ * into a single source of truth. It returns a discriminated union status that
+ * makes impossible states unrepresentable.
+ */
+export function useStripeSyncStatus(): StripeSyncStatusResult {
+  const latestAvailableVersion = getCurrentVersion()
+  const { data: project } = useSelectedProjectQuery()
+  const { ref: projectRef, connectionString } = project || {}
+
+  // Query schemas once
+  const {
+    data: schemas,
+    isLoading: isSchemasLoading,
+    refetch,
+  } = useSchemasQuery({ projectRef, connectionString }, { enabled: !!projectRef })
+
+  const schemaComment = getStripeSyncSchemaComment(schemas ?? [])
+  const timedOut = schemaComment.timedOut
   const installed = isInstalled(schemaComment.status)
   const inProgress = isInProgress(schemaComment.status)
 

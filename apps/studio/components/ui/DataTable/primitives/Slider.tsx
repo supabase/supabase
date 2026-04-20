@@ -3,7 +3,6 @@
 
 import * as SliderPrimitive from '@radix-ui/react-slider'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef, Fragment } from 'react'
-
 import { cn } from 'ui'
 
 export const Slider = forwardRef<

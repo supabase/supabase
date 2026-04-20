@@ -1,4 +1,4 @@
-import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 
 export const logsKeys = {
   unifiedLogsInfinite: (

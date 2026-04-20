@@ -1,15 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { Button } from 'ui'
 
 import { ButtonTooltip } from './ButtonTooltip'
 import { RequestUpgradeToBillingOwners } from './RequestUpgradeToBillingOwners'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export const PLAN_REQUEST_EMPTY_PLACEHOLDER =
   '<Specify which plan to upgrade to: Pro | Team | Enterprise>'
@@ -25,6 +25,7 @@ interface UpgradePlanButtonProps {
   disabled?: boolean
   className?: string
   slug?: string
+  onClick?: () => void
 }
 
 /**
@@ -42,6 +43,7 @@ export const UpgradePlanButton = ({
   children,
   className,
   slug: slugParam,
+  onClick,
 }: PropsWithChildren<UpgradePlanButtonProps>) => {
   const { ref } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -120,7 +122,7 @@ export const UpgradePlanButton = ({
   }
 
   return (
-    <Button asChild type={variant} disabled={disabled} className={className}>
+    <Button asChild type={variant} disabled={disabled} className={className} onClick={onClick}>
       {link}
     </Button>
   )

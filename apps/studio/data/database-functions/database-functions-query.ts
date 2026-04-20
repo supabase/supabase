@@ -1,9 +1,10 @@
 import pgMeta from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { databaseKeys } from 'data/database/keys'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { z } from 'zod'
+
+import { databaseKeys } from '@/data/database/keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabaseFunctionsVariables = {
   projectRef?: string

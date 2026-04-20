@@ -1,8 +1,5 @@
 import { useParams } from 'common'
-import { useInfraMonitoringAttributesQuery } from 'data/analytics/infra-monitoring-query'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import dayjs from 'dayjs'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { cn } from 'ui'
@@ -18,6 +15,9 @@ import {
   parseConnectionsData,
   parseInfrastructureMetrics,
 } from './DatabaseInfrastructureSection.utils'
+import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
+import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 type DatabaseInfrastructureSectionProps = {
   interval: '1hr' | '1day' | '7day'

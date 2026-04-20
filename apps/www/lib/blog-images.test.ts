@@ -53,6 +53,25 @@ describe('blog image helpers', () => {
     ).toBe('https://supabase.com/images/blog/example/og.png')
   })
 
+  it('appends a cache-busting param to dynamic OG function URLs', () => {
+    const url = getAbsoluteBlogSocialImage(
+      {
+        imgSocial:
+          'https://zhfonblqamxferhoguzj.supabase.co/functions/v1/generate-og?template=announcement',
+      },
+      'https://supabase.com'
+    )
+    expect(url).toMatch(
+      /^https:\/\/zhfonblqamxferhoguzj\.supabase\.co\/functions\/v1\/generate-og\?template=announcement&v=.+$/
+    )
+  })
+
+  it('does not append a cache-busting param to static image URLs', () => {
+    expect(
+      getAbsoluteBlogSocialImage({ imgSocial: 'example/og.png' }, 'https://supabase.com')
+    ).toBe('https://supabase.com/images/blog/example/og.png')
+  })
+
   it('uses the placeholder when neither image is present', () => {
     expect(getBlogThumbnailImage({})).toBe(BLOG_PLACEHOLDER_IMAGE)
     expect(getBlogThumbnailImage({}, { fallbackToPlaceholder: false })).toBeUndefined()

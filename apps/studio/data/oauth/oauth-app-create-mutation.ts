@@ -1,11 +1,11 @@
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { oauthAppKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OAuthAppCreateVariables = {
   slug: string

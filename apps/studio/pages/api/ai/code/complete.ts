@@ -2,10 +2,14 @@ import pgMeta from '@supabase/pg-meta'
 import { generateText, ModelMessage, stepCountIs } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { getModel } from 'lib/ai/model'
-import { getOrgAIDetails } from 'lib/ai/org-ai-details'
+import { NextApiRequest, NextApiResponse } from 'next'
+import z from 'zod'
+
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { getOrgAIDetails } from '@/lib/ai/ai-details'
+import { getModel } from '@/lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import {
   EDGE_FUNCTION_PROMPT,
   GENERAL_PROMPT,
@@ -13,12 +17,10 @@ import {
   PG_BEST_PRACTICES,
   RLS_PROMPT,
   SECURITY_PROMPT,
-} from 'lib/ai/prompts'
-import { getTools } from 'lib/ai/tools'
-import apiWrapper from 'lib/api/apiWrapper'
-import { executeQuery } from 'lib/api/self-hosted/query'
-import { NextApiRequest, NextApiResponse } from 'next'
-import z from 'zod'
+} from '@/lib/ai/prompts'
+import { getTools } from '@/lib/ai/tools'
+import apiWrapper from '@/lib/api/apiWrapper'
+import { executeQuery } from '@/lib/api/self-hosted/query'
 
 export const maxDuration = 60
 
@@ -57,7 +59,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const { aiOptInLevel: orgAIOptInLevel } = await getOrgAIDetails({
         orgSlug,
         authorization,
-        projectRef,
       })
 
       aiOptInLevel = orgAIOptInLevel
@@ -65,13 +66,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // For code completion, we always use the limited model
     const {
-      model,
+      modelParams,
       error: modelError,
       promptProviderOptions,
-      providerOptions,
     } = await getModel({
       provider: 'openai',
-      routingKey: projectRef,
+      modelEntry: DEFAULT_COMPLETION_MODEL,
     })
 
     if (modelError) {
@@ -155,8 +155,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
 
     const { text } = await generateText({
-      model,
-      providerOptions,
+      ...modelParams,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
       tools,

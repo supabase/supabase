@@ -1,27 +1,24 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
-import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
-import { useProjectStatusQuery } from 'data/projects/project-status-query'
-import dayjs from 'dayjs'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { CheckCircle, Download, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
+import { useDownloadableBackupQuery } from '@/data/database/backup-query'
+import { useInvalidateProjectDetailsQuery } from '@/data/projects/project-detail-query'
+import { useProjectStatusQuery } from '@/data/projects/project-status-query'
+import { useLongRunningTransitionState } from '@/hooks/misc/useLongRunningTransitionState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
 import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogSection,
-  DialogSectionSeparator,
-  DialogTitle,
-  DialogTrigger,
-} from 'ui'
+  clearPersistedTransitionStartTime,
+  minutesToMilliseconds,
+} from '@/lib/project-transition-state'
+import { getRestoreLongRunningThresholdMinutes } from '@/lib/restore-estimate'
 
 export const RestoringState = () => {
   const { ref } = useParams()
@@ -29,10 +26,19 @@ export const RestoringState = () => {
 
   const [loading, setLoading] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
+  const restoreStateStartStorageKey = ref
+    ? LOCAL_STORAGE_KEYS.PROJECT_RESTORING_STARTED_AT(ref)
+    : null
 
   const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
   const logicalBackups = backups.filter((b) => !b.isPhysicalBackup)
+  const longRunningThresholdMinutes = getRestoreLongRunningThresholdMinutes(project?.volumeSizeGb)
+  const longRunningThresholdMs = minutesToMilliseconds(longRunningThresholdMinutes)
+  const isTakingLongerThanExpected = useLongRunningTransitionState({
+    storageKey: restoreStateStartStorageKey,
+    thresholdMs: longRunningThresholdMs,
+  })
 
   const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
@@ -42,13 +48,13 @@ export const RestoringState = () => {
       enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
       refetchInterval: (query) => {
         const data = query.state.data
-        return data?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
+        return data?.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
+          data?.status === PROJECT_STATUS.RESTORE_FAILED
+          ? false
+          : 4000
       },
     }
   )
-
-  const restoreInitiatedSinceMinutes = dayjs().diff(dayjs.utc(project?.updated_at), 'minute')
-  const showSupportCta = restoreInitiatedSinceMinutes >= 30
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
@@ -77,10 +83,26 @@ export const RestoringState = () => {
   }
 
   useEffect(() => {
-    if (isProjectStatusSuccess && projectStatusData.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+    if (!isProjectStatusSuccess) return
+
+    if (projectStatusData.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+      if (restoreStateStartStorageKey) {
+        clearPersistedTransitionStartTime(restoreStateStartStorageKey)
+      }
       setIsCompleted(true)
+    } else if (projectStatusData.status === PROJECT_STATUS.RESTORE_FAILED) {
+      if (restoreStateStartStorageKey) {
+        clearPersistedTransitionStartTime(restoreStateStartStorageKey)
+      }
+      if (ref) void invalidateProjectDetailsQuery(ref)
     }
-  }, [isProjectStatusSuccess, projectStatusData])
+  }, [
+    isProjectStatusSuccess,
+    projectStatusData,
+    restoreStateStartStorageKey,
+    ref,
+    invalidateProjectDetailsQuery,
+  ])
 
   return (
     <div className="flex items-center justify-center h-full">
@@ -118,47 +140,33 @@ export const RestoringState = () => {
                     size of your database. Your project will be offline while the restoration is
                     running.
                   </p>
+                  {isTakingLongerThanExpected && (
+                    <Admonition
+                      type="warning"
+                      title="This is taking longer than usual"
+                      layout="responsive"
+                      description="Contact support if this project remains in a restoring state."
+                      actions={
+                        <Button asChild type="default">
+                          <SupportLink
+                            queryParams={{
+                              category: SupportCategories.DATABASE_UNRESPONSIVE,
+                              projectRef: project?.ref ?? ref,
+                              subject: 'Project stuck in restoring state',
+                              message: `Project "${project?.name ?? 'Unknown project'}" (ref: ${project?.ref ?? ref ?? 'unknown'}) has remained in a restoring state for over ${longRunningThresholdMinutes} minutes.`,
+                            }}
+                          >
+                            Contact support
+                          </SupportLink>
+                        </Button>
+                      }
+                      className="!mt-5"
+                    />
+                  )}
                 </div>
               </div>
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
-              {showSupportCta && (
-                <Dialog>
-                  <DialogTrigger>
-                    <Button type="text" className="text-foreground-light">
-                      Taking longer than expected?
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent aria-describedby={undefined}>
-                    <DialogHeader>
-                      <DialogTitle>Restoration taking longer than expected?</DialogTitle>
-                    </DialogHeader>
-                    <DialogSectionSeparator />
-                    <DialogSection>
-                      <p className="text-sm">
-                        Restores may take from a minutes up to several hours depending on the size
-                        of your database. However, if the restoration process is taking far longer
-                        than expected for the size of your database, you may reach out to us via
-                        Support for help.
-                      </p>
-                    </DialogSection>
-                    <DialogFooter>
-                      <Button asChild type="default">
-                        <SupportLink
-                          queryParams={{
-                            category: SupportCategories.DATABASE_UNRESPONSIVE,
-                            projectRef: project?.ref,
-                            subject: 'Ongoing restoration for project',
-                          }}
-                        >
-                          Contact support
-                        </SupportLink>
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              )}
-
               <ButtonTooltip
                 type="default"
                 icon={<Download />}

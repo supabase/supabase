@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react'
 
-import { InlineLink } from 'components/ui/InlineLink'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 export const RESTRICTION_MESSAGES = {
   GRACE_PERIOD: {

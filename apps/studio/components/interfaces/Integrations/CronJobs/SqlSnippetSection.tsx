@@ -1,9 +1,9 @@
 import { UseFormReturn } from 'react-hook-form'
-
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { FormField_Shadcn_, SheetSection } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
 
 interface SqlSnippetSectionProps {
   form: UseFormReturn<CreateCronJobForm>

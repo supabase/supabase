@@ -1,45 +1,12 @@
 import type { Monaco } from '@monaco-editor/react'
+import { wrapWithRollback } from '@supabase/pg-meta/src/query'
 import { useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import {
-  isExplainQuery,
-  isExplainSql,
-  splitSqlStatements,
-} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
-import { GridFooter } from 'components/ui/GridFooter'
-import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
-import { constructHeaders, isValidConnString } from 'data/fetchers'
-import { lintKeys } from 'data/lint/keys'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { wrapWithRollback } from 'data/sql/utils/transaction'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { isError } from 'data/utils/error-check'
-import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { generateUuid } from 'lib/api/snippets.browser'
-import { BASE_PATH } from 'lib/constants'
-import { formatSql } from 'lib/formatSql'
-import { detectOS } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { ChevronUp, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import {
-  isRoleImpersonationEnabled,
-  useGetImpersonatedRoleState,
-} from 'state/role-impersonation-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Button,
   cn,
@@ -80,6 +47,39 @@ import {
 } from './SQLEditor.utils'
 import { useAddDefinitions } from './useAddDefinitions'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import {
+  isExplainQuery,
+  isExplainSql,
+  splitSqlStatements,
+} from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
+import { GridFooter } from '@/components/ui/GridFooter'
+import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
+import { constructHeaders, isValidConnString } from '@/data/fetchers'
+import { lintKeys } from '@/data/lint/keys'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { isError } from '@/data/utils/error-check'
+import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { generateUuid } from '@/lib/api/snippets.browser'
+import { BASE_PATH } from '@/lib/constants'
+import { formatSql } from '@/lib/formatSql'
+import { detectOS } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
+import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import {
+  isRoleImpersonationEnabled,
+  useGetImpersonatedRoleState,
+} from '@/state/role-impersonation-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })

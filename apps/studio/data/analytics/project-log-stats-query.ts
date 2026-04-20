@@ -1,9 +1,9 @@
 import { QueryClient, useQuery } from '@tanstack/react-query'
 import { operations } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { UseCustomQueryOptions } from 'types'
 
 import { analyticsKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { UseCustomQueryOptions } from '@/types'
 
 export type ProjectLogStatsVariables = {
   projectRef?: string

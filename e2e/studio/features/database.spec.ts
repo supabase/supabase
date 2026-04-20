@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test'
 
 import { env } from '../env.config.js'
+import { expectClipboardValue } from '../utils/clipboard.js'
 import { createTable, dropTable, query } from '../utils/db/index.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
@@ -39,13 +40,15 @@ test.describe('Database', () => {
       // copies schema definition to clipboard
       await page.getByRole('button', { name: 'Copy as SQL' }).click()
       await expect(page.getByTestId('copy-sql-ready')).toBeVisible()
-      const clipboardText = await page.evaluate(() => navigator.clipboard.readText())
-      expect(clipboardText).toContain(`CREATE TABLE public.${databaseTableName} (
+      await expectClipboardValue({
+        page,
+        value: `CREATE TABLE public.${databaseTableName} (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   created_at timestamp with time zone DEFAULT now(),
   ${databaseColumnName} text,
   CONSTRAINT ${databaseTableName}_pkey PRIMARY KEY (id)
-);`)
+);`,
+      })
 
       // downloads schema diagram when export is triggered
       const downloadPromise = page.waitForEvent('download')
@@ -86,11 +89,14 @@ test.describe('Database', () => {
       // validates table and column exists
       await expect(page.getByText(databaseTableName, { exact: true })).toBeVisible()
       // test we can edit the column
-      await page.getByText(`${databaseTableName} actions`).click()
-
-      await page.getByText(`${databaseTableName} actions`).click()
-      await expect(page.getByRole('menuitem', { name: 'Edit table' })).toBeVisible()
-      await page.getByRole('menuitem', { name: 'Edit table' }).click({ force: true })
+      const tableActionsButton = page.getByRole('button', {
+        name: `${databaseTableName} actions`,
+      })
+      await tableActionsButton.click()
+      const editTableMenuItem = page.getByRole('menuitem', { name: 'Edit table' })
+      await expect(editTableMenuItem).toBeVisible()
+      await editTableMenuItem.press('Enter')
+      await expect(editTableMenuItem).not.toBeVisible()
       const dialog = page.getByRole('dialog')
       await expect(dialog).toBeVisible()
       await expect(dialog.getByText('timestamptz')).toBeVisible()
@@ -100,9 +106,10 @@ test.describe('Database', () => {
       await expect(page.getByRole('dialog')).not.toBeVisible()
 
       // test the schema view has been refreshed
-      await page.getByText(`${databaseTableName} actions`).click()
-      await expect(page.getByRole('menuitem', { name: 'Edit table' })).toBeVisible()
-      await page.getByRole('menuitem', { name: 'Edit table' }).click()
+      await tableActionsButton.click()
+      await expect(editTableMenuItem).toBeVisible()
+      await editTableMenuItem.press('Enter')
+      await expect(editTableMenuItem).not.toBeVisible()
       await expect(page.getByRole('dialog')).toBeVisible()
       // FIXME: For some reason, the dialog is not stable and rerenders, sometimes preventing the description to be filled
       await page.waitForTimeout(500)
@@ -110,16 +117,19 @@ test.describe('Database', () => {
       await page.getByRole('button', { name: 'Cancel' }).click()
       await expect(page.getByRole('dialog')).not.toBeVisible()
 
-      await page.getByText(`${databaseTableName} actions`).click()
-      await expect(page.getByRole('menuitem', { name: 'Copy name' })).toBeVisible()
-      await page.getByRole('menuitem', { name: 'Copy name' }).click()
-      await page.waitForTimeout(500)
-      const copiedTableResult = await page.evaluateHandle(() => navigator.clipboard.readText())
-      expect(await copiedTableResult.jsonValue()).toBe(databaseTableName)
+      await tableActionsButton.click()
+      const copyTableNameMenuItem = page.getByRole('menuitem', { name: 'Copy name' })
+      await expect(copyTableNameMenuItem).toBeVisible()
+      await copyTableNameMenuItem.press('Enter')
+      await expect(copyTableNameMenuItem).not.toBeVisible()
+      await expectClipboardValue({ page, value: databaseTableName, exact: true })
 
-      await page.getByText(`${databaseTableName} actions`).click()
-      await expect(page.getByRole('menuitem', { name: 'View in Table Editor' })).toBeVisible()
-      await page.getByRole('menuitem', { name: 'View in Table Editor' }).click()
+      await tableActionsButton.click()
+      const viewInTableEditorMenuItem = page.getByRole('menuitem', {
+        name: 'View in Table Editor',
+      })
+      await expect(viewInTableEditorMenuItem).toBeVisible()
+      await viewInTableEditorMenuItem.press('Enter')
       await page.waitForURL(/.*\/editor\/\d+/)
       await expect(page.getByRole('tab', { name: databaseTableName })).toBeVisible()
     })
@@ -148,11 +158,13 @@ test.describe('Database', () => {
       await expect(page.getByText(databaseTableName, { exact: true })).toBeVisible()
       await expect(page.getByText(databaseColumnName, { exact: true })).toBeVisible()
       // test we can edit the column
-      await page
-        .getByText(`${databaseTableName} ${databaseColumnName} actions`)
-        .click({ force: true })
-      await expect(page.getByRole('menuitem', { name: 'Edit column' })).toBeVisible()
-      await page.getByRole('menuitem', { name: 'Edit column' }).click()
+      const columnActionsButton = page.getByRole('button', {
+        name: `${databaseTableName} ${databaseColumnName} actions`,
+      })
+      await columnActionsButton.click()
+      const editColumnMenuItem = page.getByRole('menuitem', { name: 'Edit column' })
+      await expect(editColumnMenuItem).toBeVisible()
+      await editColumnMenuItem.press('Enter')
       await page.getByLabel('Description').fill('Bazinga')
       await page.getByRole('button', { name: 'Save' }).click()
       await expect(
@@ -161,23 +173,18 @@ test.describe('Database', () => {
       await expect(page.getByRole('dialog')).not.toBeVisible()
 
       // test the schema view has been refreshed
-      await page
-        .getByText(`${databaseTableName} ${databaseColumnName} actions`)
-        .click({ force: true })
-      await expect(page.getByRole('menuitem', { name: 'Edit column' })).toBeVisible()
-      await page.getByRole('menuitem', { name: 'Edit column' }).click()
+      await columnActionsButton.click()
+      await expect(editColumnMenuItem).toBeVisible()
+      await editColumnMenuItem.press('Enter')
       await expect(page.getByLabel('Description')).toHaveValue('Bazinga')
       await page.getByRole('button', { name: 'Cancel' }).click()
       await expect(page.getByRole('dialog')).not.toBeVisible()
 
-      await page
-        .getByText(`${databaseTableName} ${databaseColumnName} actions`)
-        .click({ force: true })
-      await expect(page.getByRole('menuitem', { name: 'Copy name' })).toBeVisible()
-      await page.getByRole('menuitem', { name: 'Copy name' }).click()
-      await page.waitForTimeout(500)
-      const copiedTableResult = await page.evaluateHandle(() => navigator.clipboard.readText())
-      expect(await copiedTableResult.jsonValue()).toBe(databaseColumnName)
+      await columnActionsButton.click()
+      const copyColumnNameMenuItem = page.getByRole('menuitem', { name: 'Copy name' })
+      await expect(copyColumnNameMenuItem).toBeVisible()
+      await copyColumnNameMenuItem.press('Enter')
+      await expectClipboardValue({ page, value: databaseColumnName, exact: true })
     })
   })
 
@@ -206,11 +213,13 @@ test.describe('Database', () => {
       await expect(page.getByRole('button', { name: 'New table' })).toBeVisible()
 
       // validates database name is present and has accurate number of columns
-      const tableRow = page.getByRole('row', {
-        name: `${databaseTableName} No description`,
-      })
+      const tableRow = page
+        .getByRole('row')
+        .filter({ has: page.getByText(databaseTableName, { exact: true }) })
+        .first()
       await expect(tableRow).toContainText(databaseTableName)
-      await expect(tableRow).toContainText('3 columns')
+      await expect(tableRow.getByRole('cell').filter({ hasText: /^3$/ }).first()).toBeVisible()
+      await expect(tableRow.getByRole('link', { name: 'View columns' })).toBeVisible()
 
       // change schema -> auth
       await page.getByTestId('schema-selector').click()
@@ -362,14 +371,20 @@ test.describe('Database', () => {
         }
       )
 
+      const databaseWait = createApiResponseWaiter(
+        page,
+        'pg-meta',
+        ref,
+        'tables?include_columns=true&included_schemas=public'
+      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
 
       // Wait for database tables to be populated
-      await waitForDatabaseToLoad(page, ref)
+      await databaseWait
 
       // navigate to table columns
       const databaseRow = page.getByRole('row', { name: databaseTableName })
-      await databaseRow.getByRole('link', { name: '3 columns' }).click()
+      await databaseRow.getByRole('link', { name: 'View columns' }).click()
       await page.waitForURL(/.*\/database\/tables\/\d+/)
 
       // validate and display everything correctly
@@ -405,8 +420,7 @@ test.describe('Database', () => {
       await expect(columnDatabase2Row).toContainText('numeric')
 
       // update table column
-      await columnDatabase2Row.getByRole('button').click()
-      await page.getByRole('button', { name: 'Edit column' }).click()
+      await columnDatabase2Row.getByRole('button', { name: 'Edit' }).click()
       await page.getByLabel('name').fill(databaseColumnName3)
       const columnUpdateWait = createApiResponseWaiter(
         page,
@@ -428,8 +442,8 @@ test.describe('Database', () => {
 
       // delete table column
       const columnDatabase3Row = page.getByRole('row', { name: databaseColumnName3 })
-      await columnDatabase3Row.getByRole('button').click()
-      await page.getByRole('button', { name: 'Delete column' }).click()
+      await columnDatabase3Row.getByRole('button').last().click()
+      await page.getByRole('menuitem', { name: 'Delete column' }).click()
       await page.getByRole('checkbox', { name: 'Drop column with cascade?' }).check()
       const columnDeleteWait = createApiResponseWaiter(
         page,
@@ -709,7 +723,7 @@ test.describe('Database', () => {
       // delete role if exists
       const exists = (await page.getByRole('button', { name: databaseRoleName }).count()) > 0
       if (exists) {
-        await page.getByRole('button', { name: databaseRoleName }).getByRole('button').click()
+        await page.getByRole('button', { name: `${databaseRoleName} actions` }).click()
         await page.getByRole('menuitem', { name: 'Delete' }).click()
         await page.getByRole('button', { name: 'Submit' }).click()
         await expect(
@@ -731,7 +745,7 @@ test.describe('Database', () => {
       ).toBeVisible({ timeout: 50000 })
 
       // delete a role
-      await page.getByRole('button', { name: databaseRoleName }).getByRole('button').click()
+      await page.getByRole('button', { name: `${databaseRoleName} actions` }).click()
       await page.getByRole('menuitem', { name: 'Delete' }).click()
       const roleDeleteWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=roles-delete')
       await page.getByRole('button', { name: 'Submit' }).click()
@@ -741,6 +755,267 @@ test.describe('Database', () => {
         'Delete confirmation toast should be visible'
       ).toBeVisible({ timeout: 50000 })
     })
+  })
+})
+
+test.describe('Database Extensions', () => {
+  test.describe.configure({ mode: 'serial' })
+
+  const EXTENSION_NAME = 'pgtap'
+
+  test('can enable an extension', async ({ page, ref }) => {
+    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
+
+    const extensionsWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
+    await extensionsWait
+
+    await page.getByPlaceholder('Search for an extension').fill(EXTENSION_NAME)
+
+    const row = page.getByRole('row').filter({ hasText: EXTENSION_NAME }).first()
+    await expect(row, 'Extension row should be visible').toBeVisible()
+
+    await row.getByRole('switch').click()
+
+    const dialog = page.getByRole('dialog')
+    await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
+    await expect(
+      dialog.getByText(`Enable ${EXTENSION_NAME}`),
+      'Dialog title should match extension name'
+    ).toBeVisible()
+
+    const enableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=extension-create')
+    const refetchWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await dialog.getByRole('button', { name: 'Enable extension' }).click()
+    await enableWait
+    await refetchWait
+
+    await expect(
+      page.getByText(`Extension "${EXTENSION_NAME}" is now enabled`),
+      'Success toast should appear after enabling extension'
+    ).toBeVisible({ timeout: 15000 })
+
+    await expect(
+      row.getByRole('switch'),
+      'Extension switch should be checked after enabling'
+    ).toBeChecked()
+  })
+
+  test('can disable an extension', async ({ page, ref }) => {
+    const extensionsWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
+    await extensionsWait
+
+    await page.getByPlaceholder('Search for an extension').fill(EXTENSION_NAME)
+
+    const row = page.getByRole('row').filter({ hasText: EXTENSION_NAME }).first()
+    await expect(row, 'Extension row should be visible').toBeVisible()
+
+    await row.getByRole('switch').click()
+
+    const dialog = page.getByRole('dialog')
+    await expect(dialog, 'Disable confirmation dialog should be visible').toBeVisible()
+    await expect(
+      dialog.getByText('Confirm to disable extension'),
+      'Dialog title should be correct'
+    ).toBeVisible()
+
+    const disableWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      `query?key=extension-delete-${EXTENSION_NAME}`
+    )
+    const refetchWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await page.getByRole('button', { name: 'Disable' }).click()
+    await disableWait
+    await refetchWait
+
+    await expect(
+      page.getByText(`${EXTENSION_NAME} is off.`),
+      'Success toast should appear after disabling extension'
+    ).toBeVisible({ timeout: 15000 })
+
+    await expect(
+      row.getByRole('switch'),
+      'Extension switch should be unchecked after disabling'
+    ).not.toBeChecked()
+  })
+
+  test('can enable an extension in a different existing schema', async ({ page, ref }) => {
+    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
+
+    const extensionsWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
+    await extensionsWait
+
+    await page.getByPlaceholder('Search for an extension').fill(EXTENSION_NAME)
+
+    const row = page.getByRole('row').filter({ hasText: EXTENSION_NAME }).first()
+    await expect(row, 'Extension row should be visible').toBeVisible()
+    await row.getByRole('switch').click()
+
+    const dialog = page.getByRole('dialog')
+    await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
+
+    // Change schema to 'public'
+    await dialog.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'public', exact: true }).click()
+
+    const enableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=extension-create')
+    const refetchWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await dialog.getByRole('button', { name: 'Enable extension' }).click()
+    await enableWait
+    await refetchWait
+
+    await expect(
+      page.getByText(`Extension "${EXTENSION_NAME}" is now enabled`),
+      'Success toast should appear after enabling in public schema'
+    ).toBeVisible({ timeout: 15000 })
+
+    await expect(
+      row.getByRole('switch'),
+      'Extension switch should be checked after enabling in public schema'
+    ).toBeChecked()
+
+    // Cleanup
+    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
+  })
+
+  test('can enable an extension in a new schema', async ({ page, ref }) => {
+    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
+
+    const extensionsWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
+    await extensionsWait
+
+    await page.getByPlaceholder('Search for an extension').fill(EXTENSION_NAME)
+
+    const row = page.getByRole('row').filter({ hasText: EXTENSION_NAME }).first()
+    await expect(row, 'Extension row should be visible').toBeVisible()
+    await row.getByRole('switch').click()
+
+    const dialog = page.getByRole('dialog')
+    await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
+
+    // Select 'Create a new schema pgtap'
+    await dialog.getByRole('combobox').click()
+    await page.getByRole('option', { name: /Create a new schema/ }).click()
+
+    const enableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=extension-create')
+    const refetchWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await dialog.getByRole('button', { name: 'Enable extension' }).click()
+    await enableWait
+    await refetchWait
+
+    await expect(
+      page.getByText(`Extension "${EXTENSION_NAME}" is now enabled`),
+      'Success toast should appear after enabling in new schema'
+    ).toBeVisible({ timeout: 15000 })
+
+    await expect(
+      row.getByRole('switch'),
+      'Extension switch should be checked after enabling in new schema'
+    ).toBeChecked()
+
+    // Note: the created schema is owned by supabase_admin and cannot be dropped
+    // by the test query helper (runs as postgres). The schema is left empty after
+    // the extension is dropped and will be reused on subsequent runs via
+    // CREATE SCHEMA IF NOT EXISTS in the enable SQL.
+    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
+  })
+
+  test('cannot change the schema for extensions with a fixed default schema', async ({
+    page,
+    ref,
+  }) => {
+    const FIXED_SCHEMA_EXTENSION = 'pgmq'
+    const FIXED_SCHEMA = 'pgmq'
+
+    await query(`DROP EXTENSION IF EXISTS ${FIXED_SCHEMA_EXTENSION} CASCADE;`)
+
+    const extensionsWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
+    await extensionsWait
+
+    await page.getByPlaceholder('Search for an extension').fill(FIXED_SCHEMA_EXTENSION)
+
+    const row = page.getByRole('row').filter({ hasText: FIXED_SCHEMA_EXTENSION }).first()
+    await expect(row, 'Extension row should be visible').toBeVisible()
+    await row.getByRole('switch').click()
+
+    const dialog = page.getByRole('dialog')
+    await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
+
+    // Schema selector (combobox) should NOT be present for fixed-schema extensions
+    await expect(
+      dialog.getByRole('combobox'),
+      'Schema selector should not be present for extensions with a fixed default schema'
+    ).not.toBeVisible()
+
+    // A disabled input showing the fixed schema should be present instead
+    const schemaInput = dialog.getByRole('textbox')
+    await expect(schemaInput, 'Fixed schema input should be visible').toBeVisible()
+    await expect(schemaInput, 'Fixed schema input should be disabled').toBeDisabled()
+    await expect(
+      schemaInput,
+      'Fixed schema input should display the required schema name'
+    ).toHaveValue(FIXED_SCHEMA)
+
+    // Helper text confirming the schema is required
+    await expect(
+      dialog.getByText(`Extension must be installed in the "${FIXED_SCHEMA}" schema.`),
+      'Helper text should indicate the schema is required'
+    ).toBeVisible()
+
+    // Cancel without enabling
+    await dialog.getByRole('button', { name: 'Cancel' }).click()
+    await expect(dialog, 'Dialog should be closed after canceling').not.toBeVisible()
   })
 })
 

@@ -1,4 +1,3 @@
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { ReactNode, useMemo } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -9,6 +8,7 @@ import { DataTableResetButton } from './DataTableResetButton'
 import { DataTableViewOptions } from './DataTableViewOptions'
 import { Kbd } from './primitives/Kbd'
 import { useDataTable } from './providers/DataTableProvider'
+import { useHotKey } from '@/hooks/ui/useHotKey'
 
 interface DataTableToolbarProps {
   renderActions?: () => ReactNode

@@ -1,4 +1,7 @@
-import { Lint } from 'data/lint/lint-query'
+import { ReactNode } from 'react'
+
+import { Lint } from '@/data/lint/lint-query'
+
 export enum LINTER_LEVELS {
   ERROR = 'ERROR',
   WARN = 'WARN',
@@ -8,7 +11,7 @@ export enum LINTER_LEVELS {
 export type LintInfo = {
   name: string
   title: string
-  icon: JSX.Element
+  icon: ReactNode
   link: (args: { projectRef: string; metadata: Lint['metadata'] }) => string
   linkText: string
   docsLink: string

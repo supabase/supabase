@@ -1,12 +1,5 @@
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
-import {
-  convertResultsToCSV,
-  convertResultsToJSON,
-  convertResultsToMarkdown,
-} from 'components/interfaces/SQLEditor/UtilityPanel/Results.utils'
 import saveAs from 'file-saver'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { ChevronDown, Copy, Download, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -22,6 +15,14 @@ import {
   KeyboardShortcut,
 } from 'ui'
 
+import {
+  convertResultsToCSV,
+  convertResultsToJSON,
+  convertResultsToMarkdown,
+} from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useHotKey } from '@/hooks/ui/useHotKey'
+
 interface DownloadResultsButtonProps {
   iconOnly?: boolean
   type?: 'text' | 'default'
@@ -32,6 +33,7 @@ interface DownloadResultsButtonProps {
   onDownloadAsCSV?: () => void
   onCopyAsMarkdown?: () => void
   onCopyAsJSON?: () => void
+  onCopyAsCSV?: () => void
 }
 
 export const DownloadResultsButton = ({
@@ -44,12 +46,14 @@ export const DownloadResultsButton = ({
   onDownloadAsCSV,
   onCopyAsMarkdown,
   onCopyAsJSON,
+  onCopyAsCSV,
 }: DownloadResultsButtonProps) => {
   const { ref } = useParams()
   const pathname = usePathname()
   const isLogs = pathname?.includes?.('/logs') ?? false
   const [copyMarkdownEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COPY_MARKDOWN, true)
   const [copyJsonEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COPY_JSON, true)
+  const [copyCsvEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COPY_CSV, true)
   const [downloadCsvEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_DOWNLOAD_CSV, true)
 
   const isEmpty = useMemo(() => results.length === 0, [results])
@@ -91,6 +95,18 @@ export const DownloadResultsButton = ({
     })
   }
 
+  const copyAsCSV = () => {
+    const csv = convertResultsToCSV(results)
+    if (!csv) {
+      toast('Results are empty')
+      return
+    }
+    copyToClipboard(csv, () => {
+      toast.success('Copied CSV to clipboard')
+      onCopyAsCSV?.()
+    })
+  }
+
   useHotKey(
     (e) => {
       e.preventDefault()
@@ -107,6 +123,15 @@ export const DownloadResultsButton = ({
     },
     'j',
     { enabled: copyJsonEnabled ?? isEmpty, shift: true }
+  )
+
+  useHotKey(
+    (e) => {
+      e.preventDefault()
+      copyAsCSV()
+    },
+    'c',
+    { enabled: copyCsvEnabled ?? isEmpty, shift: true }
   )
 
   useHotKey(
@@ -142,7 +167,7 @@ export const DownloadResultsButton = ({
         )}
         <DropdownMenuItem onClick={copyAsMarkdown} className="gap-x-2">
           <Copy size={14} />
-          <p>Copy as markdown</p>
+          <p>Copy as Markdown</p>
           <span className="ml-auto">
             <KeyboardShortcut keys={['Shift', 'Meta', 'm']} />
           </span>
@@ -152,6 +177,13 @@ export const DownloadResultsButton = ({
           <p>Copy as JSON</p>
           <span className="ml-auto">
             <KeyboardShortcut keys={['Shift', 'Meta', 'j']} />
+          </span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={copyAsCSV} className="gap-x-2">
+          <Copy size={14} />
+          <p>Copy as CSV</p>
+          <span className="ml-auto">
+            <KeyboardShortcut keys={['Shift', 'Meta', 'c']} />
           </span>
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => downloadAsCSV()}>
