@@ -128,7 +128,11 @@ export default defineConfig(({ mode }) => {
       // and that ESM-wrapper gets picked, Rolldown botches the flattened UMD
       // body — "__extends is not a function" at SSR module evaluation time.
       // Inlining `tslib` lets the bundler reach the pure ESM entry directly.
-      noExternal: ['lodash', /^next(\/|$)/, 'tslib'],
+      // `react-use` ships a CJS entry that Vite's SSR externalizer emits as
+      // `import pkg from 'react-use'` + destructure. Works locally but
+      // Vercel's Node resolves it differently and fails at module instantiate
+      // (`ModuleJob._instantiate`). Inlining sidesteps the interop entirely.
+      noExternal: ['lodash', /^next(\/|$)/, 'tslib', 'react-use'],
     },
     plugins: [
       nextCompat(),
