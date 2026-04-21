@@ -15,7 +15,7 @@ export function BucketFilePickerExplorer({ onSelect }: { onSelect: (value: strin
   const { selectedItems, columns } = useBucketFilePickerStateSnapshot()
 
   return (
-    <div className="flex-1 min-h-0 px-6 ">
+    <div className="flex-1 min-h-0">
       <div className="bg-studio border rounded-md border-overlay flex h-full w-full flex-col">
         {selectedItems.length === 0 ? (
           <BucketFilePickerHeader />
