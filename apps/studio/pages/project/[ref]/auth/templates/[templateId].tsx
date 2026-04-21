@@ -42,7 +42,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from 'ui/src/components/shadcn/ui/breadcrumb'
-import { z } from 'zod'
+import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/AuthTemplatesValidation'
 import { slugifyTitle } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
@@ -127,9 +127,9 @@ const RedirectToTemplates = () => {
     defaultValues,
   })
 
-  const onSubmit = (values: any) => {
+  const onSubmit = (values: z.infer<typeof TemplateFormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
-    updateAuthConfig({ projectRef: projectRef, config: { ...values } })
+    updateAuthConfig({ projectRef: projectRef, config: { ...values }, skipInvalidation: true })
   }
 
   useEffect(() => {

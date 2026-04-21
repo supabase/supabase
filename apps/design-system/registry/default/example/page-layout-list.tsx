@@ -26,7 +26,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-export default function PageLayoutList(): React.JSX.Element {
+export default function PageLayoutList() {
   const functions = [
     {
       id: 1,

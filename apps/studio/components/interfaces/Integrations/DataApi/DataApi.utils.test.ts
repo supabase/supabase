@@ -13,7 +13,7 @@ const makeDatabase = (
 const makeLoadBalancer = (endpoint: string): Pick<LoadBalancer, 'endpoint'> => ({ endpoint })
 
 describe('getApiEndpoint', () => {
-  it('returns custom domain URL when custom domain is active and primary database is selected', () => {
+  it('returns custom domain URL with /rest/v1/ when custom domain is active and primary database is selected', () => {
     expect(
       getApiEndpoint({
         selectedDatabaseId: 'project-ref',
@@ -22,10 +22,10 @@ describe('getApiEndpoint', () => {
         loadBalancers: undefined,
         selectedDatabase: makeDatabase(
           'project-ref',
-          'https://project-ref.supabase.co/rest/v1'
+          'https://project-ref.supabase.co/rest/v1/'
         ) as Database,
       })
-    ).toBe('https://api.example.com')
+    ).toBe('https://api.example.com/rest/v1/')
   })
 
   it('returns database restUrl when custom domain is active but a replica is selected', () => {
@@ -37,13 +37,28 @@ describe('getApiEndpoint', () => {
         loadBalancers: undefined,
         selectedDatabase: makeDatabase(
           'replica-1',
+          'https://replica-1.supabase.co/rest/v1/'
+        ) as Database,
+      })
+    ).toBe('https://replica-1.supabase.co/rest/v1/')
+  })
+
+  it('normalizes a replica restUrl without a trailing slash', () => {
+    expect(
+      getApiEndpoint({
+        selectedDatabaseId: 'replica-1',
+        projectRef: 'project-ref',
+        resolvedEndpoint: undefined,
+        loadBalancers: undefined,
+        selectedDatabase: makeDatabase(
+          'replica-1',
           'https://replica-1.supabase.co/rest/v1'
         ) as Database,
       })
-    ).toBe('https://replica-1.supabase.co/rest/v1')
+    ).toBe('https://replica-1.supabase.co/rest/v1/')
   })
 
-  it('returns load balancer endpoint when load balancer is selected', () => {
+  it('returns load balancer endpoint with /rest/v1/ when load balancer is selected', () => {
     expect(
       getApiEndpoint({
         selectedDatabaseId: 'load-balancer',
@@ -52,7 +67,7 @@ describe('getApiEndpoint', () => {
         loadBalancers: [makeLoadBalancer('https://lb.supabase.co') as LoadBalancer],
         selectedDatabase: undefined,
       })
-    ).toBe('https://lb.supabase.co')
+    ).toBe('https://lb.supabase.co/rest/v1/')
   })
 
   it('returns empty string when load balancer is selected but none exist', () => {
@@ -76,10 +91,10 @@ describe('getApiEndpoint', () => {
         loadBalancers: undefined,
         selectedDatabase: makeDatabase(
           'replica-2',
-          'https://replica-2.supabase.co/rest/v1'
+          'https://replica-2.supabase.co/rest/v1/'
         ) as Database,
       })
-    ).toBe('https://replica-2.supabase.co/rest/v1')
+    ).toBe('https://replica-2.supabase.co/rest/v1/')
   })
 })
 

@@ -35,6 +35,7 @@ export const getStudioTools = () => ({
         .describe('Chart configuration for rendering the results'),
       isWriteQuery: z
         .boolean()
+        .default(false)
         .describe(
           'Whether the SQL statement performs a write operation of any kind instead of a read operation'
         ),
