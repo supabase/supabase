@@ -228,12 +228,16 @@ export const BucketFilePickerColumn = ({
       toast('You need additional permissions to upload files to this project')
       return
     }
+    if (!hostEndpoint) {
+      toast.error('Unable to upload files at this time. Please try again.')
+      return
+    }
 
     const files = Array.from(event.dataTransfer?.files ?? []) as File[]
     await uploadFilesToBucket({
       files,
       projectRef: projectRef!,
-      hostEndpoint: hostEndpoint!,
+      hostEndpoint: hostEndpoint,
       bucketName: bucket.name,
       bucketId: bucket.id,
       currentPath: columns.slice(0, index).join('/'),

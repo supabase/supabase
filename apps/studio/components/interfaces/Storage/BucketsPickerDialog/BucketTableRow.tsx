@@ -36,7 +36,6 @@ export const BucketTableEmptyState = ({ mode, filterString }: BucketTableEmptySt
 type BucketTableRowProps = {
   mode: BucketTableMode
   bucket: Bucket
-  projectRef: string
   onSelectBucket: (bucket: Bucket) => void
   allowedBucketType: AllowedBucketType
   formattedGlobalUploadLimit: string
@@ -49,8 +48,6 @@ export const BucketTableRow = ({
   allowedBucketType,
   formattedGlobalUploadLimit,
 }: BucketTableRowProps) => {
-  const { getPolicyCount } = useBucketPolicyCount()
-
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
 
@@ -148,7 +145,9 @@ export const BucketTableRow = ({
       </TooltipTrigger>
       {isDisabled && (
         <TooltipContent>
-          Private buckets are not selectable for this action. Please select a public bucket.
+          {allowedBucketType === 'public'
+            ? 'Private buckets are not selectable for this action. Please select a public bucket.'
+            : 'Public buckets are not selectable for this action. Please select a private bucket.'}
         </TooltipContent>
       )}
     </Tooltip>

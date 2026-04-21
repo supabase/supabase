@@ -153,20 +153,30 @@ export const BucketFilePickerHeader = () => {
   }
 
   const handleFilesUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    if (!hostEndpoint) {
+      console.error('Host endpoint not available')
+      return
+    }
     const files = Array.from(event.target.files || [])
-    await uploadFilesToBucket({
-      files,
-      projectRef: projectRef!,
-      hostEndpoint: hostEndpoint!,
-      bucketName: bucket.name,
-      bucketId: bucket.id,
-      currentPath: columns.join('/'),
-      queryClient,
-    })
-    queryClient.invalidateQueries({
-      queryKey: storageKeys.objects(projectRef!, bucket.id, columns.join('/')),
-    })
-    event.target.value = ''
+    try {
+      await uploadFilesToBucket({
+        files,
+        projectRef: projectRef!,
+        hostEndpoint,
+        bucketName: bucket.name,
+        bucketId: bucket.id,
+        currentPath: columns.join('/'),
+        queryClient,
+      })
+      queryClient.invalidateQueries({
+        queryKey: storageKeys.objects(projectRef!, bucket.id, columns.join('/')),
+      })
+    } catch (error) {
+      console.error('Failed to upload files:', error)
+      // Consider showing a toast notification to the user
+    } finally {
+      event.target.value = ''
+    }
   }
 
   /** Methods for searching */
@@ -188,8 +198,11 @@ export const BucketFilePickerHeader = () => {
   const refreshData = async () => {
     setIsRefreshing(true)
     const queryKey = storageKeys.objects(projectRef!, bucket.id, '').filter(Boolean)
-    await queryClient.refetchQueries({ queryKey: queryKey, type: 'active' })
-    setIsRefreshing(false)
+    try {
+      await queryClient.refetchQueries({ queryKey: queryKey, type: 'active' })
+    } finally {
+      setIsRefreshing(false)
+    }
   }
 
   return (
