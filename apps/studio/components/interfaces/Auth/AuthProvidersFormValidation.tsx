@@ -569,7 +569,8 @@ export const PROVIDER_PHONE = {
     SMS_TEMPLATE: {
       title: 'SMS Message',
       type: 'multiline-string',
-      description: 'To format the OTP code use `{{ .Code }}`',
+      description:
+        'To format the OTP code use `{{ .Code }}`. Supports newlines (press Enter). Newlines are required for the [WebOTP API](https://developer.mozilla.org/en-US/docs/Web/API/WebOTP_API) to auto-fill OTPs on supported devices.',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
