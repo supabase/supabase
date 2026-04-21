@@ -65,7 +65,11 @@ export function LogoPicker({ open, onOpenChange, onSelect }: StorageFilePickerPr
             )}
             <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col px-2 pb-3 pt-2">
               {selectedBucket ? (
-                <BucketFilePickerStateContextProvider bucket={selectedBucket} maxFiles={1}>
+                <BucketFilePickerStateContextProvider
+                  bucket={selectedBucket}
+                  maxFiles={1}
+                  acceptedFileExtensions={['.png', '.jpg', '.jpeg', '.svg']}
+                >
                   <BucketFilePickerExplorer onSelect={handleSelect} />
                 </BucketFilePickerStateContextProvider>
               ) : (
@@ -101,7 +105,11 @@ export function LogoPicker({ open, onOpenChange, onSelect }: StorageFilePickerPr
 
             <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-3">
               {selectedBucket ? (
-                <BucketFilePickerStateContextProvider bucket={selectedBucket} maxFiles={1}>
+                <BucketFilePickerStateContextProvider
+                  bucket={selectedBucket}
+                  maxFiles={1}
+                  acceptedFileExtensions={['.png', '.jpg', '.jpeg', '.svg']}
+                >
                   <BucketFilePickerExplorer onSelect={handleSelect} />
                 </BucketFilePickerStateContextProvider>
               ) : (

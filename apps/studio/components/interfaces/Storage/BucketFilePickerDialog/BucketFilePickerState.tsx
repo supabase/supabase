@@ -4,10 +4,19 @@ import { proxy, useSnapshot } from 'valtio'
 import { StorageItemWithColumn } from '@/components/interfaces/Storage/Storage.types'
 import type { Bucket } from '@/data/storage/buckets-query'
 
-function createBucketFilePickerState({ bucket, maxFiles }: { bucket: Bucket; maxFiles: number }) {
+function createBucketFilePickerState({
+  bucket,
+  maxFiles,
+  acceptedFileExtensions,
+}: {
+  bucket: Bucket
+  maxFiles: number
+  acceptedFileExtensions?: string[]
+}) {
   const state = proxy({
     bucket: bucket,
     maxFiles: maxFiles,
+    acceptedFileExtensions: acceptedFileExtensions,
 
     columns: [] as string[],
     popColumn: () => {
@@ -55,9 +64,14 @@ const BucketFilePickerStateContext = createContext<BucketFilePickerState>(
 export const BucketFilePickerStateContextProvider = ({
   bucket,
   maxFiles,
+  acceptedFileExtensions,
   children,
-}: PropsWithChildren<{ bucket: Bucket; maxFiles: number }>) => {
-  const state = useMemo(() => createBucketFilePickerState({ bucket, maxFiles }), [bucket, maxFiles])
+}: PropsWithChildren<{ bucket: Bucket; maxFiles: number; acceptedFileExtensions?: string[] }>) => {
+  const state = useMemo(
+    () => createBucketFilePickerState({ bucket, maxFiles, acceptedFileExtensions }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [bucket, maxFiles, acceptedFileExtensions?.join(',')]
+  )
 
   return (
     <BucketFilePickerStateContext.Provider value={state}>

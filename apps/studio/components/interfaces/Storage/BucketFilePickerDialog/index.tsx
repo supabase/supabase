@@ -45,7 +45,11 @@ export function BucketsFilePickerDialog({
               <SheetTitle className="min-w-0 flex-1 text-left">Choose a file</SheetTitle>
             </SheetHeader>
             <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col px-2 pb-3 pt-2">
-              <BucketFilePickerStateContextProvider bucket={selectedBucket} maxFiles={1}>
+              <BucketFilePickerStateContextProvider
+                bucket={selectedBucket}
+                maxFiles={1}
+                acceptedFileExtensions={acceptedFileExtensions}
+              >
                 <BucketFilePickerExplorer onSelect={handleSelect} />
               </BucketFilePickerStateContextProvider>
             </div>
@@ -61,7 +65,11 @@ export function BucketsFilePickerDialog({
               <DialogTitle className="min-w-0 flex-1">Choose a file</DialogTitle>
             </DialogHeader>
             <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-3">
-              <BucketFilePickerStateContextProvider bucket={selectedBucket} maxFiles={1}>
+              <BucketFilePickerStateContextProvider
+                bucket={selectedBucket}
+                maxFiles={1}
+                acceptedFileExtensions={acceptedFileExtensions}
+              >
                 <BucketFilePickerExplorer onSelect={handleSelect} />
               </BucketFilePickerStateContextProvider>
             </div>

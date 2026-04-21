@@ -48,6 +48,8 @@ export const BucketTableRow = ({
   allowedBucketType,
   formattedGlobalUploadLimit,
 }: BucketTableRowProps) => {
+  const { getPolicyCount } = useBucketPolicyCount()
+
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
 

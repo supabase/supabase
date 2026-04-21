@@ -55,6 +55,7 @@ interface BucketFilePickerRowProps {
   isSelected: boolean
   isPreviewed: boolean
   isOpened: boolean
+  isDisabled?: boolean
   hideCheckbox: boolean
   onCheck: (isShiftKeyHeld: boolean) => void
   onClick?: (event: MouseEvent<HTMLDivElement>) => void
@@ -69,6 +70,7 @@ export const BucketFilePickerRow = ({
   isSelected,
   isPreviewed,
   isOpened,
+  isDisabled = false,
   hideCheckbox,
   style,
 }: BucketFilePickerRowProps) => {
@@ -93,9 +95,10 @@ export const BucketFilePickerRow = ({
           `${isOpened ? 'bg-selection' : ''}`,
           `${isSelected ? 'bg-selection' : ''}`,
           `${isPreviewed ? 'bg-selection hover:bg-selection' : ''}`,
-          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`
+          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`,
+          isDisabled && 'cursor-not-allowed opacity-40 hover:bg-transparent'
         )}
-        onClick={onClick}
+        onClick={isDisabled ? undefined : onClick}
       >
         <div
           className={cn(

@@ -111,6 +111,7 @@ export const BucketFilePickerColumn = ({
     itemSearchString,
     bucket,
     maxFiles,
+    acceptedFileExtensions,
     pushColumnAtIndex,
     selectedItems,
     setSelectedItems,
@@ -119,6 +120,12 @@ export const BucketFilePickerColumn = ({
     setSelectedFilePreview,
     popColumnAtIndex,
   } = useBucketFilePickerStateSnapshot()
+
+  const isFileAccepted = (fileName: string) => {
+    if (!acceptedFileExtensions || acceptedFileExtensions.length === 0) return true
+    const ext = fileName.split('.').pop()?.toLowerCase() ?? ''
+    return acceptedFileExtensions.map((e) => e.replace(/^\./, '').toLowerCase()).includes(ext)
+  }
 
   const path = columns.slice(0, index).join('/')
   const selectedFolder = columns[index]
@@ -356,6 +363,9 @@ export const BucketFilePickerColumn = ({
                   isOpened={isOpened}
                   isSelected={!!props.selectedItems.find((i) => i.id === item.id)}
                   hideCheckbox={maxFiles === 1}
+                  isDisabled={
+                    item.type === STORAGE_ROW_TYPES.FILE && !isFileAccepted(item.name ?? '')
+                  }
                   onClick={(event) => {
                     event.stopPropagation()
                     event.preventDefault()
