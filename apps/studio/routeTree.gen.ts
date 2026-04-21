@@ -33,6 +33,7 @@ import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-pa
 import { Route as AppOrganizationsRouteImport } from './routes/_app/organizations'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as ApiConnectIndexRouteImport } from './routes/api/connect/index'
+import { Route as AppOrgIndexRouteImport } from './routes/_app/org/index'
 import { Route as ApiIntegrationsStripeSyncRouteImport } from './routes/api/integrations/stripe-sync'
 import { Route as ApiEdgeFunctionsTestRouteImport } from './routes/api/edge-functions/test'
 import { Route as ApiContentGraphqlRouteImport } from './routes/api/content/graphql'
@@ -235,6 +236,11 @@ const ApiConnectIndexRoute = ApiConnectIndexRouteImport.update({
   id: '/api/connect/',
   path: '/api/connect/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppOrgIndexRoute = AppOrgIndexRouteImport.update({
+  id: '/org/',
+  path: '/org/',
+  getParentRoute: () => AppRoute,
 } as any)
 const ApiIntegrationsStripeSyncRoute =
   ApiIntegrationsStripeSyncRouteImport.update({
@@ -738,6 +744,7 @@ export interface FileRoutesByFullPath {
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
   '/api/ai/code/complete': typeof ApiAiCodeCompleteRoute
   '/api/ai/feedback/classify': typeof ApiAiFeedbackClassifyRoute
@@ -844,6 +851,7 @@ export interface FileRoutesByTo {
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/org': typeof AppOrgIndexRoute
   '/api/connect': typeof ApiConnectIndexRoute
   '/api/ai/code/complete': typeof ApiAiCodeCompleteRoute
   '/api/ai/feedback/classify': typeof ApiAiFeedbackClassifyRoute
@@ -953,6 +961,7 @@ export interface FileRoutesById {
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/_app/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
   '/api/ai/code/complete': typeof ApiAiCodeCompleteRoute
   '/api/ai/feedback/classify': typeof ApiAiFeedbackClassifyRoute
@@ -1061,6 +1070,7 @@ export interface FileRouteTypes {
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/org/'
     | '/api/connect/'
     | '/api/ai/code/complete'
     | '/api/ai/feedback/classify'
@@ -1167,6 +1177,7 @@ export interface FileRouteTypes {
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/org'
     | '/api/connect'
     | '/api/ai/code/complete'
     | '/api/ai/feedback/classify'
@@ -1275,6 +1286,7 @@ export interface FileRouteTypes {
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/_app/org/'
     | '/api/connect/'
     | '/api/ai/code/complete'
     | '/api/ai/feedback/classify'
@@ -1618,6 +1630,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/connect/'
       preLoaderRoute: typeof ApiConnectIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/org/': {
+      id: '/_app/org/'
+      path: '/org'
+      fullPath: '/org/'
+      preLoaderRoute: typeof AppOrgIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/api/integrations/stripe-sync': {
       id: '/api/integrations/stripe-sync'
@@ -2211,11 +2230,13 @@ const AppAccountRouteWithChildren = AppAccountRoute._addFileChildren(
 interface AppRouteChildren {
   AppAccountRoute: typeof AppAccountRouteWithChildren
   AppOrganizationsRoute: typeof AppOrganizationsRoute
+  AppOrgIndexRoute: typeof AppOrgIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAccountRoute: AppAccountRouteWithChildren,
   AppOrganizationsRoute: AppOrganizationsRoute,
+  AppOrgIndexRoute: AppOrgIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
