@@ -43,7 +43,7 @@ interface CodeEditorProps {
   onInputChange?: (value?: string) => void
 }
 
-const CodeEditor = ({
+export const CodeEditor = ({
   id,
   language,
   defaultValue,

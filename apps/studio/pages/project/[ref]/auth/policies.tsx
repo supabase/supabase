@@ -25,6 +25,7 @@ import { PoliciesDataProvider } from '@/components/interfaces/Auth/Policies/Poli
 import { getGeneralPolicyTemplates } from '@/components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
 import { PolicyEditorPanel } from '@/components/interfaces/Auth/Policies/PolicyEditorPanel'
 import { generatePolicyUpdateSQL } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { RLSTesterSheet } from '@/components/interfaces/Auth/RLSTester/RLSTesterSheet'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -274,6 +275,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           </PageHeaderSummary>
           <PageHeaderAside>
             <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
+            <RLSTesterSheet />
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>

@@ -10,12 +10,14 @@ import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-st
 export interface RoleImpersonationSelectorProps {
   serviceRoleLabel?: string
   padded?: boolean
+  disallowServiceRoleOption?: boolean
   disallowAuthenticatedOption?: boolean
 }
 
 export const RoleImpersonationSelector = ({
   serviceRoleLabel,
   padded = true,
+  disallowServiceRoleOption = false,
   disallowAuthenticatedOption = false,
 }: RoleImpersonationSelectorProps) => {
   const state = useRoleImpersonationStateSnapshot()
@@ -68,13 +70,15 @@ export const RoleImpersonationSelector = ({
           }}
         >
           <fieldset className="flex gap-3">
-            <RoleImpersonationRadio
-              value="service_role"
-              isSelected={selectedOption === 'service_role'}
-              onSelectedChange={onSelectedChange}
-              label={serviceRoleLabel}
-              icon={<ServiceRoleIcon isSelected={selectedOption === 'service_role'} />}
-            />
+            {!disallowServiceRoleOption && (
+              <RoleImpersonationRadio
+                value="service_role"
+                isSelected={selectedOption === 'service_role'}
+                onSelectedChange={onSelectedChange}
+                label={serviceRoleLabel}
+                icon={<ServiceRoleIcon isSelected={selectedOption === 'service_role'} />}
+              />
+            )}
 
             <RoleImpersonationRadio
               value="anon"
@@ -127,7 +131,7 @@ export const RoleImpersonationSelector = ({
       {selectedOption === 'authenticated' && (
         <>
           <DropdownMenuSeparator />
-          <UserImpersonationSelector />
+          <UserImpersonationSelector disallowServiceRoleOption={disallowServiceRoleOption} />
         </>
       )}
     </>

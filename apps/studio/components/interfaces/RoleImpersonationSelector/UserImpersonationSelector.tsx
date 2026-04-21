@@ -34,7 +34,11 @@ import type { ResponseError } from '@/types'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 
-const UserImpersonationSelector = () => {
+const UserImpersonationSelector = ({
+  disallowServiceRoleOption,
+}: {
+  disallowServiceRoleOption: boolean
+}) => {
   const [searchText, setSearchText] = useState('')
   const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
   const [externalUserId, setExternalUserId] = useState('')
@@ -160,7 +164,11 @@ const UserImpersonationSelector = () => {
   }
 
   function stopImpersonating() {
-    state.setRole(undefined)
+    if (disallowServiceRoleOption) {
+      state.setRole({ type: 'postgrest', role: 'anon' })
+    } else {
+      state.setRole(undefined)
+    }
   }
 
   function toggleAalState() {
@@ -462,7 +470,7 @@ const BaseImpersonatingRow = ({
       </div>
 
       <Button type="default" onClick={onClick} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
+        {isImpersonating ? 'Stop impersonating' : 'Impersonate'}
       </Button>
     </div>
   )
@@ -558,7 +566,7 @@ const UserRow = ({ user, onClick, isImpersonating = false, isLoading = false }: 
       </div>
 
       <Button type="default" onClick={() => onClick(user)} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
+        {isImpersonating ? 'Stop impersonating' : 'Impersonate'}
       </Button>
     </div>
   )
