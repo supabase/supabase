@@ -3532,7 +3532,7 @@ functions:
           ```
 
   - id: rpc
-    title: 'Stored Procedures: rpc()'
+    title: 'Database Functions: rpc()'
     description: |
       Perform a function call.
 
@@ -5680,7 +5680,7 @@ functions:
         name: With rpc()
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .not('name', 'eq', 'Mordor');
@@ -7047,7 +7047,7 @@ functions:
         name: With rpc()
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .filter('name', 'in', '("Rohan","Mordor")');

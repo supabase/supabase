@@ -266,7 +266,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 ref={combinedRef}
               >
                 {showPausedState ? (
-                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center px-4">
                     <div className="w-full">
                       <ProjectPausedState product={product} />
                     </div>
