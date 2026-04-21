@@ -42,7 +42,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 - [x] `routes/_app.tsx` — AppLayout + DefaultLayout (reads `defaultLayoutHeaderTitle`/`hideMobileMenu` from leaf `staticData`)
 - [x] `routes/_app/account.tsx` — AccountLayout (reads `accountLayoutTitle` from leaf `staticData`)
-- [ ] `routes/_app/org/$slug.tsx` — OrganizationLayout + PageLayout
+- [x] `routes/_app/org.tsx` — OrganizationLayout (reads `orgLayoutTitle` from leaf `staticData`). **Delta vs plan:** placed at `_app/org.tsx` (wraps both `/org/` index and `/org/$slug/*`) instead of `_app/org/$slug.tsx`. PageLayout stays inline on `/org/$slug/index.tsx` since only that one route uses it.
 - [ ] `routes/_app/new.tsx` — WizardLayout (+ DefaultLayout hideMobileMenu override)
 - [ ] `routes/_app/integrations/vercel.tsx` — VercelIntegrationWindowLayout
 
@@ -76,37 +76,37 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 ### App shell — `/account/*`
 
 - [x] A `routes/_app/account/me.tsx` ← `pages/account/me.tsx`
-- [ ] `routes/_app/account/security.tsx` ← `pages/account/security.tsx`
-- [ ] `routes/_app/account/audit.tsx` ← `pages/account/audit.tsx`
-- [ ] `routes/_app/account/tokens/index.tsx` ← `pages/account/tokens.tsx`
-- [ ] `routes/_app/account/tokens/scoped.tsx` ← `pages/account/tokens/scoped.tsx`
+- [x] A `routes/_app/account/security.tsx` ← `pages/account/security.tsx`
+- [x] A `routes/_app/account/audit.tsx` ← `pages/account/audit.tsx`
+- [x] A `routes/_app/account/tokens/index.tsx` ← `pages/account/tokens.tsx`
+- [x] A `routes/_app/account/tokens/scoped.tsx` ← `pages/account/tokens/scoped.tsx`
 
 ### App shell — `/org/$slug/*`
 
-- [ ] `routes/_app/org/$slug/index.tsx` ← `pages/org/[slug]/index.tsx`
-- [ ] `routes/_app/org/$slug/apps.tsx` ← `pages/org/[slug]/apps.tsx`
-- [ ] `routes/_app/org/$slug/audit.tsx` ← `pages/org/[slug]/audit.tsx`
-- [ ] `routes/_app/org/$slug/billing.tsx` ← `pages/org/[slug]/billing.tsx`
-- [ ] `routes/_app/org/$slug/documents.tsx` ← `pages/org/[slug]/documents.tsx`
-- [ ] `routes/_app/org/$slug/general.tsx` ← `pages/org/[slug]/general.tsx`
-- [ ] `routes/_app/org/$slug/integrations.tsx` ← `pages/org/[slug]/integrations.tsx`
-- [ ] `routes/_app/org/$slug/security.tsx` ← `pages/org/[slug]/security.tsx`
-- [ ] `routes/_app/org/$slug/sso.tsx` ← `pages/org/[slug]/sso.tsx`
-- [ ] `routes/_app/org/$slug/team.tsx` ← `pages/org/[slug]/team.tsx`
-- [ ] `routes/_app/org/$slug/usage.tsx` ← `pages/org/[slug]/usage.tsx`
-- [ ] `routes/_app/org/$slug/private-apps/index.tsx` ← `pages/org/[slug]/private-apps/index.tsx`
-- [ ] `routes/_app/org/$slug/webhooks/index.tsx` ← `pages/org/[slug]/webhooks/index.tsx`
-- [ ] `routes/_app/org/$slug/webhooks/$endpointId.tsx` ← `pages/org/[slug]/webhooks/[endpointId].tsx`
-- [ ] `routes/_app/org/index.tsx` ← `pages/org/index.tsx` (redirect)
+- [x] A `routes/_app/org/$slug/index.tsx` ← `pages/org/[slug]/index.tsx`
+- [x] A `routes/_app/org/$slug/apps.tsx` ← `pages/org/[slug]/apps.tsx`
+- [x] A `routes/_app/org/$slug/audit.tsx` ← `pages/org/[slug]/audit.tsx`
+- [x] A `routes/_app/org/$slug/billing.tsx` ← `pages/org/[slug]/billing.tsx`
+- [x] A `routes/_app/org/$slug/documents.tsx` ← `pages/org/[slug]/documents.tsx`
+- [x] A `routes/_app/org/$slug/general.tsx` ← `pages/org/[slug]/general.tsx`
+- [x] A `routes/_app/org/$slug/integrations.tsx` ← `pages/org/[slug]/integrations.tsx`
+- [x] A `routes/_app/org/$slug/security.tsx` ← `pages/org/[slug]/security.tsx`
+- [x] A `routes/_app/org/$slug/sso.tsx` ← `pages/org/[slug]/sso.tsx`
+- [x] A `routes/_app/org/$slug/team.tsx` ← `pages/org/[slug]/team.tsx`
+- [x] A `routes/_app/org/$slug/usage.tsx` ← `pages/org/[slug]/usage.tsx`
+- [x] A `routes/_app/org/$slug/private-apps/index.tsx` ← `pages/org/[slug]/private-apps/index.tsx`
+- [x] A `routes/_app/org/$slug/webhooks/index.tsx` ← `pages/org/[slug]/webhooks/index.tsx`
+- [x] A `routes/_app/org/$slug/webhooks/$endpointId.tsx` ← `pages/org/[slug]/webhooks/[endpointId].tsx`
+- [x] A `routes/_app/org/index.tsx` ← `pages/org/index.tsx` (redirect)
 
 ### App shell — top-level pages
 
 - [x] A `routes/_app/organizations.tsx` ← `pages/organizations.tsx` (page default already withAuth-wrapped; PageLayout wraps body)
 - [ ] `routes/_app/new/index.tsx` ← `pages/new/index.tsx`
 - [ ] `routes/_app/new/$slug.tsx` ← `pages/new/[slug].tsx`
-- [ ] `routes/_app/aws-marketplace-onboarding.tsx` ← `pages/aws-marketplace-onboarding.tsx`
-- [ ] `routes/_app/claim-project.tsx` ← `pages/claim-project.tsx`
-- [ ] `routes/_app/join.tsx` ← `pages/join.tsx`
+- [x] A `routes/aws-marketplace-onboarding.tsx` ← `pages/aws-marketplace-onboarding.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses its own `LinkAwsMarketplaceLayout` and doesn't want `AppLayout` + `DefaultLayout` wrapping.
+- [x] A `routes/claim-project.tsx` ← `pages/claim-project.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses its own `<Head>` + `<main>` layout and doesn't want `AppLayout` + `DefaultLayout` wrapping.
+- [x] A `routes/join.tsx` ← `pages/join.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses a centered-div layout and doesn't want `AppLayout` + `DefaultLayout` wrapping.
 - [ ] `routes/_app/support/new.tsx` ← `pages/support/new.tsx` (+ withAuth → beforeLoad)
 - [ ] `routes/_app/support/link.tsx` ← `pages/support/link.tsx`
 
@@ -302,10 +302,10 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Standalone (no shared shell)
 
-- [ ] `routes/authorize.tsx` ← `pages/authorize.tsx` (APIAuthorizationLayout)
-- [ ] `routes/redeem.tsx` ← `pages/redeem.tsx` (RedeemCreditsLayout)
-- [ ] `routes/logout.tsx` ← `pages/logout.tsx`
-- [ ] `routes/maintenance.tsx` ← `pages/maintenance.tsx`
+- [x] A `routes/authorize.tsx` ← `pages/authorize.tsx` (APIAuthorizationLayout)
+- [x] A `routes/redeem.tsx` ← `pages/redeem.tsx` (RedeemCreditsLayout)
+- [x] A `routes/logout.tsx` ← `pages/logout.tsx`
+- [x] A `routes/maintenance.tsx` ← `pages/maintenance.tsx`
 
 ### Error pages (handled at root)
 
