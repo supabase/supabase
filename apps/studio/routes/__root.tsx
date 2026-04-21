@@ -26,15 +26,31 @@ import type { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
+import { FeatureFlagProvider, getFlags } from 'common'
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
-import type { ErrorInfo, ReactNode } from 'react'
+import { useCallback, type ComponentProps, type ErrorInfo, type ReactNode } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { AuthProvider } from '@/lib/auth'
+import { API_URL, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 
 interface RouterContext {
   queryClient: QueryClient
+}
+
+const FeatureFlagProviderWithOrgContext = ({
+  children,
+  ...props
+}: ComponentProps<typeof FeatureFlagProvider>) => {
+  const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
+
+  return (
+    <FeatureFlagProvider {...props} organizationSlug={selectedOrganization?.slug ?? undefined}>
+      {children}
+    </FeatureFlagProvider>
+  )
 }
 
 const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
@@ -70,11 +86,27 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootComponent() {
+  const cloudProvider = useDefaultProvider()
+
+  const getConfigCatFlags = useCallback(
+    (userEmail?: string) => {
+      const customAttributes = cloudProvider ? { cloud_provider: cloudProvider } : undefined
+      return getFlags(userEmail, customAttributes)
+    },
+    [cloudProvider]
+  )
+
   return (
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
       <NuqsAdapter>
         <AuthProvider>
-          <Outlet />
+          <FeatureFlagProviderWithOrgContext
+            API_URL={API_URL}
+            enabled={IS_PLATFORM}
+            getConfigCatFlags={getConfigCatFlags}
+          >
+            <Outlet />
+          </FeatureFlagProviderWithOrgContext>
         </AuthProvider>
       </NuqsAdapter>
     </ErrorBoundary>
