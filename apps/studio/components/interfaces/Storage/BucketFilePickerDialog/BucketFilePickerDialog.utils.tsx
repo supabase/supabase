@@ -38,7 +38,7 @@ export async function uploadFilesToBucket({
 
   if (successCount > 0) {
     toast.success(`Successfully uploaded ${successCount} file${successCount > 1 ? 's' : ''}`)
-    const queryKey = storageKeys.objects(projectRef, bucketId, '').filter(Boolean)
+    const queryKey = storageKeys.objects(projectRef, bucketId, '')
     await queryClient.refetchQueries({ queryKey, type: 'active' })
   }
 }

@@ -52,6 +52,7 @@ export function LogoPicker({ open, onOpenChange, onSelect }: StorageFilePickerPr
                   size="tiny"
                   icon={<ChevronLeft size={16} />}
                   className="shrink-0"
+                  onClick={() => setSelectedBucket(null)}
                 >
                   Buckets
                 </Button>

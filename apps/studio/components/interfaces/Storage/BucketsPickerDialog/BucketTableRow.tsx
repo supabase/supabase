@@ -67,9 +67,9 @@ export const BucketTableRow = ({
   }
 
   const handleRowKeyDown: KeyboardEventHandler<HTMLTableRowElement> = (e) => {
-    e.preventDefault()
     if (isDisabled) return
     if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
       onSelectBucket(bucket)
     }
   }

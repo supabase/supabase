@@ -44,7 +44,16 @@ export const storageKeys = {
       sortColumn?: string
       sortOrder?: string
     } = {}
-  ) => ['projects', projectRef, 'buckets', bucketId, 'objects', path, params] as const,
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'buckets',
+      bucketId,
+      'objects',
+      ...(path ? [path] : []),
+      ...(params ? [params] : []),
+    ] as const,
   icebergNamespaces: ({ projectRef, warehouse }: { projectRef?: string; warehouse?: string }) =>
     [projectRef, 'warehouse', warehouse, 'namespaces'] as const,
   icebergNamespace: ({

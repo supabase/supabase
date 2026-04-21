@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { compact, find, get, sum, uniqBy } from 'lodash'
+import { compact, get, sum, uniqBy } from 'lodash'
 import { Upload } from 'lucide-react'
 import { DragEventHandler, useCallback, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -11,7 +11,7 @@ import { Checkbox, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
-import type { StorageItem, StorageItemWithColumn } from '../Storage.types'
+import type { StorageItem } from '../Storage.types'
 import { formatFolderItems } from '../StorageExplorer/StorageExplorer.utils'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
 import { uploadFilesToBucket } from './BucketFilePickerDialog.utils'
@@ -23,6 +23,7 @@ import { useBucketObjectsInfiniteQuery } from '@/data/storage/bucket-objects-inf
 import { storageKeys } from '@/data/storage/keys'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
+import { noop } from '@/lib/void'
 
 const SelectAllCheckbox = ({
   columnFiles,
@@ -204,53 +205,6 @@ export const BucketFilePickerColumn = ({
     }
   }
 
-  const selectRangeItems = (columnIndex: number, toItemIndex: number) => {
-    const toItem = columnItems[toItemIndex]
-    const selectedItemIds = selectedItems.map((item) => item.id)
-    const lastSelectedItemId = selectedItemIds[selectedItemIds.length - 1]
-    const lastSelectedItemIndex = columnItems.findIndex((item) => item.id === lastSelectedItemId)
-
-    // Get the start and end index of the range to select
-    const start = Math.min(toItemIndex, lastSelectedItemIndex)
-    const end = Math.max(toItemIndex, lastSelectedItemIndex)
-
-    // Get the range to select and reverse the order if necessary
-    const rangeToSelect = columnItems
-      .slice(start, end + 1)
-      // we need `columnIndex` in all item of `selectedItems`
-      .map((item) => ({ ...item, columnIndex }))
-    if (toItemIndex < lastSelectedItemIndex) {
-      rangeToSelect.reverse()
-    }
-
-    if (selectedItemIds.includes(toItem.id)) {
-      const rangeToDeselectIds = rangeToSelect.map((item) => item.id)
-      // Deselect all items within the selection range
-      setSelectedItems(
-        selectedItems.filter(
-          (item) => item.id === toItem.id || !rangeToDeselectIds.includes(item.id)
-        )
-      )
-    } else {
-      // Select items within the range
-      setSelectedItems(uniqBy(selectedItems.concat(rangeToSelect), 'id'))
-    }
-  }
-
-  const onCheckItem = (itemIndex: number, item: StorageItemWithColumn, isShiftKeyHeld: boolean) => {
-    // Select a range if shift is held down
-    if (isShiftKeyHeld && selectedItems.length !== 0) {
-      selectRangeItems(index, itemIndex)
-      return
-    }
-    if (find(selectedItems, (selectedItem) => selectedItem.id === item.id) !== undefined) {
-      setSelectedItems(selectedItems.filter((selectedItem) => item.id !== selectedItem.id))
-    } else {
-      setSelectedItems([...selectedItems, item])
-    }
-    setSelectedFilePreview(undefined)
-  }
-
   const onSelectColumnEmptySpace = (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
     setSelectedFilePreview(undefined)
@@ -393,7 +347,7 @@ export const BucketFilePickerColumn = ({
               return (
                 <BucketFilePickerRow
                   {...props}
-                  onCheck={(isShiftKeyHeld) => onCheckItem(index, item, isShiftKeyHeld)}
+                  onCheck={noop}
                   isPreviewed={isPreviewed}
                   isOpened={isOpened}
                   isSelected={!!props.selectedItems.find((i) => i.id === item.id)}

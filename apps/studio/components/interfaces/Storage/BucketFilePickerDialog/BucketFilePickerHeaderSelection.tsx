@@ -12,6 +12,7 @@ export const BucketFilePickerHeaderSelection = () => {
         icon={<X size={16} strokeWidth={2} />}
         type="text"
         onClick={() => clearSelectedItems()}
+        aria-label="Clear selected items"
       />
       <div className="ml-1 flex items-center space-x-3">
         <p className="mb-0 text-sm text-foreground">
