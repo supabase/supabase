@@ -116,11 +116,7 @@ export const CodeEditor = ({
               // @ts-ignore
               identifier: 'add-placeholder',
               range: new monaco.Range(1, 1, 1, 1),
-              text: (placeholder ?? '')
-                .split('\n\n')
-                .join('\n')
-                .replaceAll('*', '')
-                .replaceAll('&nbsp;', ' '),
+              text: (placeholder ?? '').split('\n\n').join('\n').replaceAll('&nbsp;', ' '),
             },
           ])
         },

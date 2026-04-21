@@ -34,11 +34,7 @@ import type { ResponseError } from '@/types'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 
-const UserImpersonationSelector = ({
-  disallowServiceRoleOption,
-}: {
-  disallowServiceRoleOption: boolean
-}) => {
+const UserImpersonationSelector = () => {
   const [searchText, setSearchText] = useState('')
   const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
   const [externalUserId, setExternalUserId] = useState('')
@@ -164,11 +160,7 @@ const UserImpersonationSelector = ({
   }
 
   function stopImpersonating() {
-    if (disallowServiceRoleOption) {
-      state.setRole({ type: 'postgrest', role: 'anon' })
-    } else {
-      state.setRole(undefined)
-    }
+    state.setRole(undefined)
   }
 
   function toggleAalState() {

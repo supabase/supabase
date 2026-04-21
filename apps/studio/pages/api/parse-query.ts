@@ -46,9 +46,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` })
   }
 
-  const { sql } = req.body
-  const tables = await getTablesInQuery(sql)
-  const operation = await getOperation(sql)
-
-  return res.status(200).json({ tables, operation })
+  try {
+    const { sql } = req.body
+    const tables = await getTablesInQuery(sql)
+    const operation = await getOperation(sql)
+    return res.status(200).json({ tables, operation })
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ error: (error as unknown as { sqlDetails: { message: string } }).sqlDetails.message })
+  }
 }

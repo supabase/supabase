@@ -1,5 +1,5 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
-import { Check, ChevronDown, Edit, Loader2, X } from 'lucide-react'
+import { type PostgresPolicy } from '@supabase/postgres-meta'
+import { Check, ChevronDown, Edit, X } from 'lucide-react'
 import { useMemo } from 'react'
 import {
   Collapsible_Shadcn_,
@@ -9,50 +9,23 @@ import {
 } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
-import { type ParseSQLQueryResponse } from '@/data/misc/parse-query-mutation'
-import { useTableQuery } from '@/data/tables/table-retrieve-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface RLSTableCardProps {
-  schema: string
-  table: string
+  table: { schema: string; name: string; isRLSEnabled: boolean }
   role?: string
-  operation: ParseSQLQueryResponse['operation']
+  policies: PostgresPolicy[]
   handleSelectEditPolicy: (policy: PostgresPolicy) => void
 }
 
 export const RLSTableCard = ({
-  schema,
   table,
   role,
-  operation,
+  policies,
   handleSelectEditPolicy,
 }: RLSTableCardProps) => {
-  const { data: project } = useSelectedProjectQuery()
-
-  const { data, isLoading: isLoadingTable } = useTableQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema,
-    name: table,
-  })
-
-  const { data: policies = [] } = useDatabasePoliciesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const isRLSEnabled = data?.rls_enabled
-  const tablePolicies = policies.filter(
-    (x) =>
-      x.schema === schema &&
-      x.table === table &&
-      x.roles.includes(role ?? '') &&
-      x.command === operation
-  )
-  const trueOnlyPolicy = tablePolicies.find((x) => x.definition === 'true')
-  const noPolicies = isRLSEnabled && tablePolicies.length === 0
+  const { schema, name, isRLSEnabled } = table
+  const trueOnlyPolicy = policies.find((x) => x.definition === 'true')
+  const noPolicies = isRLSEnabled && policies.length === 0
 
   const tableAccessDescription = useMemo(() => {
     if (!isRLSEnabled) {
@@ -84,10 +57,9 @@ export const RLSTableCard = ({
           </p>
         ) : (
           <p>
-            {tablePolicies.length} {tablePolicies.length > 1 ? 'policies apply' : 'policy applies'}{' '}
-            for the <code className="text-code-inline">{role}</code> role on this table. Only rows
-            that match {tablePolicies.length > 1 ? 'these conditions' : 'this condition'} are
-            returned.
+            {policies.length} {policies.length > 1 ? 'policies apply' : 'policy applies'} for the{' '}
+            <code className="text-code-inline">{role}</code> role on this table. Only rows that
+            match {policies.length > 1 ? 'these conditions' : 'this condition'} are returned.
           </p>
         )}
 
@@ -95,13 +67,13 @@ export const RLSTableCard = ({
           Evaluated policies
         </p>
         <ul className="border rounded">
-          {tablePolicies.map((policy) => (
+          {policies.map((policy) => (
             <li key={policy.id} className="px-3 py-2 flex justify-between items-center">
               <div>
                 <p>{policy.name}</p>
                 <p className="text-foreground-lighter">
                   Show rows where:{' '}
-                  <span className="text-foreground font-mono text-xs">{policy.definition}</span>
+                  <code className="text-code-inline text-foreground">{policy.definition}</code>
                 </p>
               </div>
               <ButtonTooltip
@@ -118,16 +90,14 @@ export const RLSTableCard = ({
         </ul>
       </>
     )
-  }, [isRLSEnabled, noPolicies, trueOnlyPolicy, role, tablePolicies, handleSelectEditPolicy])
+  }, [isRLSEnabled, noPolicies, trueOnlyPolicy, role, policies, handleSelectEditPolicy])
 
   return (
     <Collapsible_Shadcn_ className="border rounded">
       <CollapsibleTrigger_Shadcn_ className="flex items-center justify-between px-3 py-2 w-full [&[data-state=open]>div>svg]:!-rotate-180">
         <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-x-2">
-            {isLoadingTable ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : !isRLSEnabled ? (
+            {!isRLSEnabled ? (
               <WarningIcon />
             ) : noPolicies ? (
               <X size={16} className="text-destructive" />
@@ -135,17 +105,17 @@ export const RLSTableCard = ({
               <Check size={16} className="text-brand" />
             )}
             <p className="text-xs font-mono">
-              {schema}.{table}
+              {schema}.{name}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-x-2">
           <p className="text-xs text-foreground-light w-max">
             {noPolicies
-              ? 'No rows returned'
+              ? 'Returns no rows'
               : !isRLSEnabled || !!trueOnlyPolicy
-                ? 'All rows returned'
-                : 'Some rows returned'}
+                ? 'Returns all rows'
+                : null}
           </p>
           <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
         </div>

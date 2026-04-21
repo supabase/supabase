@@ -12,6 +12,7 @@ export interface RoleImpersonationPopoverProps {
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   align?: 'center' | 'start' | 'end'
   disallowAuthenticatedOption?: boolean
+  title?: string
 }
 
 export const RoleImpersonationPopover = ({
@@ -19,6 +20,7 @@ export const RoleImpersonationPopover = ({
   variant = 'regular',
   align = 'end',
   disallowAuthenticatedOption = false,
+  title,
 }: RoleImpersonationPopoverProps) => {
   const state = useRoleImpersonationStateSnapshot()
 
@@ -60,6 +62,7 @@ export const RoleImpersonationPopover = ({
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 overflow-hidden w-min" side="bottom" align={align}>
         <RoleImpersonationSelector
+          title={title}
           serviceRoleLabel={serviceRoleLabel}
           disallowAuthenticatedOption={disallowAuthenticatedOption}
         />

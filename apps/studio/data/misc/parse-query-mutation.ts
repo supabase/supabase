@@ -22,6 +22,7 @@ export async function parseSQLQuery({ sql }: ParseSQLQueryVariables) {
       body: JSON.stringify({ sql }),
     }).then((res) => res.json())
 
+    if (response.error) throw new Error(response.error)
     return response as ParseSQLQueryResponse
   } catch (error) {
     throw error

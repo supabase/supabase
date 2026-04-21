@@ -10,15 +10,15 @@ import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-st
 export interface RoleImpersonationSelectorProps {
   serviceRoleLabel?: string
   padded?: boolean
-  disallowServiceRoleOption?: boolean
   disallowAuthenticatedOption?: boolean
+  title?: string
 }
 
 export const RoleImpersonationSelector = ({
   serviceRoleLabel,
   padded = true,
-  disallowServiceRoleOption = false,
   disallowAuthenticatedOption = false,
+  title = 'Database role settings',
 }: RoleImpersonationSelectorProps) => {
   const state = useRoleImpersonationStateSnapshot()
 
@@ -61,7 +61,7 @@ export const RoleImpersonationSelector = ({
   return (
     <>
       <div className={cn('flex flex-col gap-3', padded ? 'p-5' : 'pb-5')}>
-        <p className="text-foreground text-base">Database role settings</p>
+        <p className="text-foreground text-base">{title}</p>
 
         <form
           onSubmit={(e) => {
@@ -70,15 +70,13 @@ export const RoleImpersonationSelector = ({
           }}
         >
           <fieldset className="flex gap-3">
-            {!disallowServiceRoleOption && (
-              <RoleImpersonationRadio
-                value="service_role"
-                isSelected={selectedOption === 'service_role'}
-                onSelectedChange={onSelectedChange}
-                label={serviceRoleLabel}
-                icon={<ServiceRoleIcon isSelected={selectedOption === 'service_role'} />}
-              />
-            )}
+            <RoleImpersonationRadio
+              value="service_role"
+              isSelected={selectedOption === 'service_role'}
+              onSelectedChange={onSelectedChange}
+              label={serviceRoleLabel}
+              icon={<ServiceRoleIcon isSelected={selectedOption === 'service_role'} />}
+            />
 
             <RoleImpersonationRadio
               value="anon"
@@ -131,7 +129,7 @@ export const RoleImpersonationSelector = ({
       {selectedOption === 'authenticated' && (
         <>
           <DropdownMenuSeparator />
-          <UserImpersonationSelector disallowServiceRoleOption={disallowServiceRoleOption} />
+          <UserImpersonationSelector />
         </>
       )}
     </>
