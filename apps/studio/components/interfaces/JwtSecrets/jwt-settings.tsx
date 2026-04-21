@@ -384,40 +384,68 @@ const JWTSettings = () => {
                   <p className="text-sm text-foreground-light">
                     {disableLegacyJwtSecretRotation ? (
                       <>
-                        Rotating the legacy JWT secret is no longer supported — it forces downtime
-                        and invalidates your <code>anon</code> and <code>service_role</code> keys.
-                        Migrate to the new publishable (<code>sb_publishable_...</code>) and secret
-                        (<code>sb_secret_...</code>) API keys instead: they can be rotated
-                        independently with zero downtime, and the transition is reversible.
+                        Migrate to the new publishable and secret API keys to enable rotation with
+                        zero downtime. Combined with JWT Signing Keys, you can rotate each piece
+                        independently without signing users out, and the change stays reversible
+                        until you revoke the legacy secret.
                       </>
                     ) : (
                       'Instead of changing the legacy JWT secret use a combination of the JWT Signing Keys and API keys features. Consider these advantages:'
                     )}
                   </p>
                   {disableLegacyJwtSecretRotation ? (
-                    <ol className="text-sm text-foreground-light list-decimal list-inside space-y-1">
-                      <li>
-                        On the API Keys page, create a publishable key for client-side use and one
-                        or more secret keys for your backend components.
-                      </li>
-                      <li>
-                        Gradually roll out the new keys across your applications. The legacy{' '}
-                        <code>anon</code> and <code>service_role</code> keys stay active during the
-                        transition, so there is no downtime.
-                      </li>
-                      <li>
-                        Watch the <em className="not-italic text-foreground">last used</em>{' '}
-                        indicators on the legacy keys to confirm no traffic still depends on them.
-                      </li>
-                      <li>
-                        Deactivate the legacy <code>anon</code> and <code>service_role</code> keys
-                        from the API Keys page. You can re-activate them if you need to roll back.
-                      </li>
-                      <li>
-                        Optionally, use JWT Signing Keys to rotate the underlying signing key for
-                        any remaining legacy JWT consumers.
-                      </li>
-                    </ol>
+                    <>
+                      <ol className="text-sm text-foreground-light list-decimal list-inside space-y-2">
+                        <li>
+                          <span className="text-foreground">Migrate your legacy JWT secret</span> on
+                          the JWT Signing Keys page. Your project keeps using its existing symmetric
+                          secret while Supabase prepares it for asymmetric JWTs and generates a
+                          standby key pair.
+                        </li>
+                        <li>
+                          <span className="text-foreground">Create new API keys</span> — publishable
+                          (<code>sb_publishable_...</code>) and secret (<code>sb_secret_...</code>)
+                          — and roll them out in place of <code>anon</code> and{' '}
+                          <code>service_role</code>. Use the{' '}
+                          <em className="not-italic text-foreground">last used</em> indicators to
+                          confirm no traffic still depends on the legacy keys.
+                        </li>
+                        <li>
+                          <span className="text-foreground">Rotate to asymmetric JWTs</span> on the
+                          JWT Signing Keys page. Supabase Auth starts signing new JWTs with the new
+                          private key; existing <code>anon</code>, <code>service_role</code>, and
+                          active user JWTs remain valid.
+                          <p className="mt-1 text-xs">
+                            Before rotating, switch any code that verifies JWTs directly against the
+                            legacy secret (e.g. <code>jose</code>, <code>jsonwebtoken</code>) to{' '}
+                            <code>supabase.auth.getClaims()</code> or a JWKS-based verifier, and
+                            disable the <em className="not-italic text-foreground">Verify JWT</em>{' '}
+                            setting on any affected Edge Functions.
+                          </p>
+                        </li>
+                        <li>
+                          <span className="text-foreground">Revoke the legacy JWT secret</span> once
+                          you've verified everything works. JWTs signed with the old secret —
+                          including legacy <code>anon</code> and <code>service_role</code> — will
+                          then be rejected.
+                          <p className="mt-1 text-xs">
+                            Wait at least one full access-token expiry window (e.g. 1 hour 15
+                            minutes for the default 1-hour expiry) before revoking so active users
+                            aren't signed out. Revoke immediately only during an active security
+                            incident.
+                          </p>
+                        </li>
+                      </ol>
+                      <Link
+                        href="https://supabase.com/docs/guides/auth/signing-keys#getting-started"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm text-foreground-light hover:text-foreground inline-flex items-center gap-1"
+                      >
+                        Read the full migration guide
+                        <ExternalLink className="size-3" />
+                      </Link>
+                    </>
                   ) : (
                     <ul className="text-sm text-foreground-light list-disc list-inside">
                       <li>Zero-downtime, reversible change.</li>
