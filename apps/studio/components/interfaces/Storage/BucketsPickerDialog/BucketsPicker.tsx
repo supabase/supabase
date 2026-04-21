@@ -15,7 +15,9 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { CreateBucketModal } from '../CreateBucketModal'
 import { EmptyBucketState } from '../EmptyBucketState'
+import { CreateBucketButton } from '../NewBucketButton'
 import { STORAGE_BUCKET_SORT } from '../Storage.constants'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
 import { BucketsTable } from './BucketsTable'
@@ -35,6 +37,7 @@ export const BucketsPicker = ({
   allowedBucketType?: AllowedBucketType
 }) => {
   const { ref: projectRef } = useParams()
+  const [createBucketShown, showCreateBucket] = useState(false)
   const { sortBucket, setSortBucket } = useStoragePreference(projectRef!)
 
   const [filterString, setFilterString] = useState('')
@@ -96,38 +99,41 @@ export const BucketsPicker = ({
       {isSuccessBuckets && (
         <>
           {hasNoBuckets ? (
-            <EmptyBucketState bucketType="files" />
+            <EmptyBucketState bucketType="files" onCreateBucket={() => showCreateBucket(true)} />
           ) : (
             <>
-              <div className="flex items-center gap-x-2">
-                <Input
-                  size="tiny"
-                  className="flex-grow lg:flex-grow-0 w-52"
-                  placeholder="Search for a bucket"
-                  value={filterString}
-                  onChange={(e) => setFilterString(e.target.value)}
-                  icon={<Search />}
-                />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button type="default" icon={<ArrowDownNarrowWide />}>
-                      Sorted by {sortBucket === 'alphabetical' ? 'name' : 'created at'}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-40">
-                    <DropdownMenuRadioGroup
-                      value={sortBucket}
-                      onValueChange={(value) => setSortBucket(value as STORAGE_BUCKET_SORT)}
-                    >
-                      <DropdownMenuRadioItem value="alphabetical">
-                        Sort by name
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="created_at">
-                        Sort by created at
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-x-2">
+                  <Input
+                    size="tiny"
+                    className="flex-grow lg:flex-grow-0 w-52"
+                    placeholder="Search for a bucket"
+                    value={filterString}
+                    onChange={(e) => setFilterString(e.target.value)}
+                    icon={<Search />}
+                  />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button type="default" icon={<ArrowDownNarrowWide />}>
+                        Sorted by {sortBucket === 'alphabetical' ? 'name' : 'created at'}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-40">
+                      <DropdownMenuRadioGroup
+                        value={sortBucket}
+                        onValueChange={(value) => setSortBucket(value as STORAGE_BUCKET_SORT)}
+                      >
+                        <DropdownMenuRadioItem value="alphabetical">
+                          Sort by name
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="created_at">
+                          Sort by created at
+                        </DropdownMenuRadioItem>
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <CreateBucketButton onClick={() => showCreateBucket(true)} />
               </div>
 
               <Card className="min-h-0 flex-1 overflow-hidden">
@@ -149,6 +155,7 @@ export const BucketsPicker = ({
           )}
         </>
       )}
+      <CreateBucketModal open={createBucketShown} onOpenChange={showCreateBucket} />
     </div>
   )
 }

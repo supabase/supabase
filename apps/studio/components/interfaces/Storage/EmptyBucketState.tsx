@@ -7,7 +7,7 @@ import { BUCKET_TYPES } from './Storage.constants'
 interface EmptyBucketStateProps {
   bucketType: keyof typeof BUCKET_TYPES
   className?: string
-  onCreateBucket?: () => void
+  onCreateBucket: () => void
 }
 
 export const EmptyBucketState = ({
@@ -24,7 +24,7 @@ export const EmptyBucketState = ({
       description={config.valueProp}
       className={className}
     >
-      {onCreateBucket ? <CreateBucketButton onClick={onCreateBucket} /> : null}
+      <CreateBucketButton onClick={onCreateBucket} />
     </EmptyStatePresentational>
   )
 }
