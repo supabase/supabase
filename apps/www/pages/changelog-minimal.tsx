@@ -32,7 +32,7 @@ function ChangelogV3Page({ changelogIndex }: PageProps) {
         description="New updates and improvements to Supabase"
         openGraph={{
           title: 'Changelog',
-          url: 'https://supabase.com/changelog-v3',
+          url: 'https://supabase.com/changelog-minimal',
           type: 'article',
         }}
       />
@@ -55,7 +55,7 @@ function ChangelogV3Page({ changelogIndex }: PageProps) {
               <ChangelogV3TimelineList
                 items={visible}
                 mode="link"
-                hrefFor={(item) => `/changelog-v3/${item.number}`}
+                hrefFor={(item) => `/changelog-minimal/${item.number}`}
               />
             )}
           </section>
