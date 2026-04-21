@@ -75,6 +75,7 @@ export type FeatureKey =
   | 'security.logDrain'
   | 'security.metricsEndpoint'
   | 'security.soc2'
+  | 'security.iso27001'
   | 'security.hipaa'
   | 'security.privateLink'
   | 'security.sso'
