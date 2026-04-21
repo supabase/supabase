@@ -39,10 +39,13 @@ import { Route as ApiEdgeFunctionsTestRouteImport } from './routes/api/edge-func
 import { Route as ApiContentGraphqlRouteImport } from './routes/api/content/graphql'
 import { Route as ApiAiDocsRouteImport } from './routes/api/ai/docs'
 import { Route as AuthCliLoginRouteImport } from './routes/_auth/cli/login'
+import { Route as AppAccountSecurityRouteImport } from './routes/_app/account/security'
 import { Route as AppAccountMeRouteImport } from './routes/_app/account/me'
+import { Route as AppAccountAuditRouteImport } from './routes/_app/account/audit'
 import { Route as ApiPlatformProjectsIndexRouteImport } from './routes/api/platform/projects/index'
 import { Route as ApiPlatformProfileIndexRouteImport } from './routes/api/platform/profile/index'
 import { Route as ApiPlatformOrganizationsIndexRouteImport } from './routes/api/platform/organizations/index'
+import { Route as AppAccountTokensIndexRouteImport } from './routes/_app/account/tokens/index'
 import { Route as ApiPlatformTelemetryEventRouteImport } from './routes/api/platform/telemetry/event'
 import { Route as ApiPlatformIntegrationsSlugRouteImport } from './routes/api/platform/integrations/$slug'
 import { Route as ApiAiSqlTitleV2RouteImport } from './routes/api/ai/sql/title-v2'
@@ -55,6 +58,7 @@ import { Route as ApiAiOnboardingDesignRouteImport } from './routes/api/ai/onboa
 import { Route as ApiAiFeedbackRateRouteImport } from './routes/api/ai/feedback/rate'
 import { Route as ApiAiFeedbackClassifyRouteImport } from './routes/api/ai/feedback/classify'
 import { Route as ApiAiCodeCompleteRouteImport } from './routes/api/ai/code/complete'
+import { Route as AppAccountTokensScopedRouteImport } from './routes/_app/account/tokens/scoped'
 import { Route as ApiPlatformProjectsRefIndexRouteImport } from './routes/api/platform/projects/$ref/index'
 import { Route as ApiV1ProjectsRefApiKeysRouteImport } from './routes/api/v1/projects/$ref/api-keys'
 import { Route as ApiPlatformPropsOrgSlugRouteImport } from './routes/api/platform/props/org/$slug'
@@ -268,9 +272,19 @@ const AuthCliLoginRoute = AuthCliLoginRouteImport.update({
   path: '/cli/login',
   getParentRoute: () => AuthRoute,
 } as any)
+const AppAccountSecurityRoute = AppAccountSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => AppAccountRoute,
+} as any)
 const AppAccountMeRoute = AppAccountMeRouteImport.update({
   id: '/me',
   path: '/me',
+  getParentRoute: () => AppAccountRoute,
+} as any)
+const AppAccountAuditRoute = AppAccountAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
   getParentRoute: () => AppAccountRoute,
 } as any)
 const ApiPlatformProjectsIndexRoute =
@@ -290,6 +304,11 @@ const ApiPlatformOrganizationsIndexRoute =
     path: '/api/platform/organizations/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AppAccountTokensIndexRoute = AppAccountTokensIndexRouteImport.update({
+  id: '/tokens/',
+  path: '/tokens/',
+  getParentRoute: () => AppAccountRoute,
+} as any)
 const ApiPlatformTelemetryEventRoute =
   ApiPlatformTelemetryEventRouteImport.update({
     id: '/api/platform/telemetry/event',
@@ -351,6 +370,11 @@ const ApiAiCodeCompleteRoute = ApiAiCodeCompleteRouteImport.update({
   id: '/api/ai/code/complete',
   path: '/api/ai/code/complete',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppAccountTokensScopedRoute = AppAccountTokensScopedRouteImport.update({
+  id: '/tokens/scoped',
+  path: '/tokens/scoped',
+  getParentRoute: () => AppAccountRoute,
 } as any)
 const ApiPlatformProjectsRefIndexRoute =
   ApiPlatformProjectsRefIndexRouteImport.update({
@@ -738,7 +762,9 @@ export interface FileRoutesByFullPath {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
+  '/account/security': typeof AppAccountSecurityRoute
   '/cli/login': typeof AuthCliLoginRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
@@ -746,6 +772,7 @@ export interface FileRoutesByFullPath {
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
   '/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
+  '/account/tokens/scoped': typeof AppAccountTokensScopedRoute
   '/api/ai/code/complete': typeof ApiAiCodeCompleteRoute
   '/api/ai/feedback/classify': typeof ApiAiFeedbackClassifyRoute
   '/api/ai/feedback/rate': typeof ApiAiFeedbackRateRoute
@@ -758,6 +785,7 @@ export interface FileRoutesByFullPath {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/account/tokens/': typeof AppAccountTokensIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile/': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
@@ -845,7 +873,9 @@ export interface FileRoutesByTo {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
+  '/account/security': typeof AppAccountSecurityRoute
   '/cli/login': typeof AuthCliLoginRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
@@ -853,6 +883,7 @@ export interface FileRoutesByTo {
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
   '/org': typeof AppOrgIndexRoute
   '/api/connect': typeof ApiConnectIndexRoute
+  '/account/tokens/scoped': typeof AppAccountTokensScopedRoute
   '/api/ai/code/complete': typeof ApiAiCodeCompleteRoute
   '/api/ai/feedback/classify': typeof ApiAiFeedbackClassifyRoute
   '/api/ai/feedback/rate': typeof ApiAiFeedbackRateRoute
@@ -865,6 +896,7 @@ export interface FileRoutesByTo {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/account/tokens': typeof AppAccountTokensIndexRoute
   '/api/platform/organizations': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects': typeof ApiPlatformProjectsIndexRoute
@@ -955,7 +987,9 @@ export interface FileRoutesById {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/_app/account/audit': typeof AppAccountAuditRoute
   '/_app/account/me': typeof AppAccountMeRoute
+  '/_app/account/security': typeof AppAccountSecurityRoute
   '/_auth/cli/login': typeof AuthCliLoginRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
@@ -963,6 +997,7 @@ export interface FileRoutesById {
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
   '/_app/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
+  '/_app/account/tokens/scoped': typeof AppAccountTokensScopedRoute
   '/api/ai/code/complete': typeof ApiAiCodeCompleteRoute
   '/api/ai/feedback/classify': typeof ApiAiFeedbackClassifyRoute
   '/api/ai/feedback/rate': typeof ApiAiFeedbackRateRoute
@@ -975,6 +1010,7 @@ export interface FileRoutesById {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/_app/account/tokens/': typeof AppAccountTokensIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile/': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
@@ -1064,7 +1100,9 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/status-override'
+    | '/account/audit'
     | '/account/me'
+    | '/account/security'
     | '/cli/login'
     | '/api/ai/docs'
     | '/api/content/graphql'
@@ -1072,6 +1110,7 @@ export interface FileRouteTypes {
     | '/api/integrations/stripe-sync'
     | '/org/'
     | '/api/connect/'
+    | '/account/tokens/scoped'
     | '/api/ai/code/complete'
     | '/api/ai/feedback/classify'
     | '/api/ai/feedback/rate'
@@ -1084,6 +1123,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/account/tokens/'
     | '/api/platform/organizations/'
     | '/api/platform/profile/'
     | '/api/platform/projects/'
@@ -1171,7 +1211,9 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/status-override'
+    | '/account/audit'
     | '/account/me'
+    | '/account/security'
     | '/cli/login'
     | '/api/ai/docs'
     | '/api/content/graphql'
@@ -1179,6 +1221,7 @@ export interface FileRouteTypes {
     | '/api/integrations/stripe-sync'
     | '/org'
     | '/api/connect'
+    | '/account/tokens/scoped'
     | '/api/ai/code/complete'
     | '/api/ai/feedback/classify'
     | '/api/ai/feedback/rate'
@@ -1191,6 +1234,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/account/tokens'
     | '/api/platform/organizations'
     | '/api/platform/profile'
     | '/api/platform/projects'
@@ -1280,7 +1324,9 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/status-override'
+    | '/_app/account/audit'
     | '/_app/account/me'
+    | '/_app/account/security'
     | '/_auth/cli/login'
     | '/api/ai/docs'
     | '/api/content/graphql'
@@ -1288,6 +1334,7 @@ export interface FileRouteTypes {
     | '/api/integrations/stripe-sync'
     | '/_app/org/'
     | '/api/connect/'
+    | '/_app/account/tokens/scoped'
     | '/api/ai/code/complete'
     | '/api/ai/feedback/classify'
     | '/api/ai/feedback/rate'
@@ -1300,6 +1347,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/_app/account/tokens/'
     | '/api/platform/organizations/'
     | '/api/platform/profile/'
     | '/api/platform/projects/'
@@ -1673,11 +1721,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCliLoginRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_app/account/security': {
+      id: '/_app/account/security'
+      path: '/security'
+      fullPath: '/account/security'
+      preLoaderRoute: typeof AppAccountSecurityRouteImport
+      parentRoute: typeof AppAccountRoute
+    }
     '/_app/account/me': {
       id: '/_app/account/me'
       path: '/me'
       fullPath: '/account/me'
       preLoaderRoute: typeof AppAccountMeRouteImport
+      parentRoute: typeof AppAccountRoute
+    }
+    '/_app/account/audit': {
+      id: '/_app/account/audit'
+      path: '/audit'
+      fullPath: '/account/audit'
+      preLoaderRoute: typeof AppAccountAuditRouteImport
       parentRoute: typeof AppAccountRoute
     }
     '/api/platform/projects/': {
@@ -1700,6 +1762,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/platform/organizations/'
       preLoaderRoute: typeof ApiPlatformOrganizationsIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/account/tokens/': {
+      id: '/_app/account/tokens/'
+      path: '/tokens'
+      fullPath: '/account/tokens/'
+      preLoaderRoute: typeof AppAccountTokensIndexRouteImport
+      parentRoute: typeof AppAccountRoute
     }
     '/api/platform/telemetry/event': {
       id: '/api/platform/telemetry/event'
@@ -1784,6 +1853,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/ai/code/complete'
       preLoaderRoute: typeof ApiAiCodeCompleteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/account/tokens/scoped': {
+      id: '/_app/account/tokens/scoped'
+      path: '/tokens/scoped'
+      fullPath: '/account/tokens/scoped'
+      preLoaderRoute: typeof AppAccountTokensScopedRouteImport
+      parentRoute: typeof AppAccountRoute
     }
     '/api/platform/projects/$ref/': {
       id: '/api/platform/projects/$ref/'
@@ -2216,11 +2292,19 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppAccountRouteChildren {
+  AppAccountAuditRoute: typeof AppAccountAuditRoute
   AppAccountMeRoute: typeof AppAccountMeRoute
+  AppAccountSecurityRoute: typeof AppAccountSecurityRoute
+  AppAccountTokensScopedRoute: typeof AppAccountTokensScopedRoute
+  AppAccountTokensIndexRoute: typeof AppAccountTokensIndexRoute
 }
 
 const AppAccountRouteChildren: AppAccountRouteChildren = {
+  AppAccountAuditRoute: AppAccountAuditRoute,
   AppAccountMeRoute: AppAccountMeRoute,
+  AppAccountSecurityRoute: AppAccountSecurityRoute,
+  AppAccountTokensScopedRoute: AppAccountTokensScopedRoute,
+  AppAccountTokensIndexRoute: AppAccountTokensIndexRoute,
 }
 
 const AppAccountRouteWithChildren = AppAccountRoute._addFileChildren(
