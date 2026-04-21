@@ -22,13 +22,21 @@ import { Route as ApiGenerateAttachmentUrlRouteImport } from './routes/api/gener
 import { Route as ApiEnabledFeaturesOverridesRouteImport } from './routes/api/enabled-features-overrides'
 import { Route as ApiCliReleaseVersionRouteImport } from './routes/api/cli-release-version'
 import { Route as ApiCheckCnameRouteImport } from './routes/api/check-cname'
+import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
+import { Route as AuthSignInSsoRouteImport } from './routes/_auth/sign-in-sso'
+import { Route as AuthSignInPartnerRouteImport } from './routes/_auth/sign-in-partner'
+import { Route as AuthSignInMfaRouteImport } from './routes/_auth/sign-in-mfa'
 import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
+import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
+import { Route as AuthForgotPasswordMfaRouteImport } from './routes/_auth/forgot-password-mfa'
+import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as ApiConnectIndexRouteImport } from './routes/api/connect/index'
 import { Route as ApiIntegrationsStripeSyncRouteImport } from './routes/api/integrations/stripe-sync'
 import { Route as ApiEdgeFunctionsTestRouteImport } from './routes/api/edge-functions/test'
 import { Route as ApiContentGraphqlRouteImport } from './routes/api/content/graphql'
 import { Route as ApiAiDocsRouteImport } from './routes/api/ai/docs'
+import { Route as AuthCliLoginRouteImport } from './routes/_auth/cli/login'
 import { Route as AppAccountMeRouteImport } from './routes/_app/account/me'
 import { Route as ApiPlatformProjectsIndexRouteImport } from './routes/api/platform/projects/index'
 import { Route as ApiPlatformProfileIndexRouteImport } from './routes/api/platform/profile/index'
@@ -70,6 +78,7 @@ import { Route as ApiPlatformAuthRefRecoverRouteImport } from './routes/api/plat
 import { Route as ApiPlatformAuthRefOtpRouteImport } from './routes/api/platform/auth/$ref/otp'
 import { Route as ApiPlatformAuthRefMagiclinkRouteImport } from './routes/api/platform/auth/$ref/magiclink'
 import { Route as ApiPlatformAuthRefInviteRouteImport } from './routes/api/platform/auth/$ref/invite'
+import { Route as AuthPartnersStripeProjectsLoginRouteImport } from './routes/_auth/partners/stripe/projects/login'
 import { Route as ApiV1ProjectsRefFunctionsIndexRouteImport } from './routes/api/v1/projects/$ref/functions/index'
 import { Route as ApiPlatformStorageRefBucketsIndexRouteImport } from './routes/api/platform/storage/$ref/buckets/index'
 import { Route as ApiPlatformPropsProjectRefIndexRouteImport } from './routes/api/platform/props/project/$ref/index'
@@ -171,9 +180,44 @@ const ApiCheckCnameRoute = ApiCheckCnameRouteImport.update({
   path: '/api/check-cname',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthSignUpRoute = AuthSignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSignInSsoRoute = AuthSignInSsoRouteImport.update({
+  id: '/sign-in-sso',
+  path: '/sign-in-sso',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSignInPartnerRoute = AuthSignInPartnerRouteImport.update({
+  id: '/sign-in-partner',
+  path: '/sign-in-partner',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSignInMfaRoute = AuthSignInMfaRouteImport.update({
+  id: '/sign-in-mfa',
+  path: '/sign-in-mfa',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthSignInRoute = AuthSignInRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthForgotPasswordMfaRoute = AuthForgotPasswordMfaRouteImport.update({
+  id: '/forgot-password-mfa',
+  path: '/forgot-password-mfa',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => AuthRoute,
 } as any)
 const AppAccountRoute = AppAccountRouteImport.update({
@@ -206,6 +250,11 @@ const ApiAiDocsRoute = ApiAiDocsRouteImport.update({
   id: '/api/ai/docs',
   path: '/api/ai/docs',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCliLoginRoute = AuthCliLoginRouteImport.update({
+  id: '/cli/login',
+  path: '/cli/login',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AppAccountMeRoute = AppAccountMeRouteImport.update({
   id: '/me',
@@ -438,6 +487,12 @@ const ApiPlatformAuthRefInviteRoute =
     path: '/api/platform/auth/$ref/invite',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthPartnersStripeProjectsLoginRoute =
+  AuthPartnersStripeProjectsLoginRouteImport.update({
+    id: '/partners/stripe/projects/login',
+    path: '/partners/stripe/projects/login',
+    getParentRoute: () => AuthRoute,
+  } as any)
 const ApiV1ProjectsRefFunctionsIndexRoute =
   ApiV1ProjectsRefFunctionsIndexRouteImport.update({
     id: '/api/v1/projects/$ref/functions/',
@@ -652,7 +707,14 @@ const ApiPlatformStorageRefBucketsIdObjectsDownloadRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AppAccountRouteWithChildren
+  '/forgot-password': typeof AuthForgotPasswordRoute
+  '/forgot-password-mfa': typeof AuthForgotPasswordMfaRoute
+  '/reset-password': typeof AuthResetPasswordRoute
   '/sign-in': typeof AuthSignInRoute
+  '/sign-in-mfa': typeof AuthSignInMfaRoute
+  '/sign-in-partner': typeof AuthSignInPartnerRoute
+  '/sign-in-sso': typeof AuthSignInSsoRoute
+  '/sign-up': typeof AuthSignUpRoute
   '/api/check-cname': typeof ApiCheckCnameRoute
   '/api/cli-release-version': typeof ApiCliReleaseVersionRoute
   '/api/enabled-features-overrides': typeof ApiEnabledFeaturesOverridesRoute
@@ -664,6 +726,7 @@ export interface FileRoutesByFullPath {
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/account/me': typeof AppAccountMeRoute
+  '/cli/login': typeof AuthCliLoginRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
@@ -684,6 +747,7 @@ export interface FileRoutesByFullPath {
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile/': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
+  '/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
   '/api/platform/auth/$ref/invite': typeof ApiPlatformAuthRefInviteRoute
   '/api/platform/auth/$ref/magiclink': typeof ApiPlatformAuthRefMagiclinkRoute
   '/api/platform/auth/$ref/otp': typeof ApiPlatformAuthRefOtpRoute
@@ -748,7 +812,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AppAccountRouteWithChildren
+  '/forgot-password': typeof AuthForgotPasswordRoute
+  '/forgot-password-mfa': typeof AuthForgotPasswordMfaRoute
+  '/reset-password': typeof AuthResetPasswordRoute
   '/sign-in': typeof AuthSignInRoute
+  '/sign-in-mfa': typeof AuthSignInMfaRoute
+  '/sign-in-partner': typeof AuthSignInPartnerRoute
+  '/sign-in-sso': typeof AuthSignInSsoRoute
+  '/sign-up': typeof AuthSignUpRoute
   '/api/check-cname': typeof ApiCheckCnameRoute
   '/api/cli-release-version': typeof ApiCliReleaseVersionRoute
   '/api/enabled-features-overrides': typeof ApiEnabledFeaturesOverridesRoute
@@ -760,6 +831,7 @@ export interface FileRoutesByTo {
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/account/me': typeof AppAccountMeRoute
+  '/cli/login': typeof AuthCliLoginRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
@@ -780,6 +852,7 @@ export interface FileRoutesByTo {
   '/api/platform/organizations': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects': typeof ApiPlatformProjectsIndexRoute
+  '/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
   '/api/platform/auth/$ref/invite': typeof ApiPlatformAuthRefInviteRoute
   '/api/platform/auth/$ref/magiclink': typeof ApiPlatformAuthRefMagiclinkRoute
   '/api/platform/auth/$ref/otp': typeof ApiPlatformAuthRefOtpRoute
@@ -847,7 +920,14 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
   '/_app/account': typeof AppAccountRouteWithChildren
+  '/_auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/_auth/forgot-password-mfa': typeof AuthForgotPasswordMfaRoute
+  '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/sign-in': typeof AuthSignInRoute
+  '/_auth/sign-in-mfa': typeof AuthSignInMfaRoute
+  '/_auth/sign-in-partner': typeof AuthSignInPartnerRoute
+  '/_auth/sign-in-sso': typeof AuthSignInSsoRoute
+  '/_auth/sign-up': typeof AuthSignUpRoute
   '/api/check-cname': typeof ApiCheckCnameRoute
   '/api/cli-release-version': typeof ApiCliReleaseVersionRoute
   '/api/enabled-features-overrides': typeof ApiEnabledFeaturesOverridesRoute
@@ -859,6 +939,7 @@ export interface FileRoutesById {
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/_app/account/me': typeof AppAccountMeRoute
+  '/_auth/cli/login': typeof AuthCliLoginRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
@@ -879,6 +960,7 @@ export interface FileRoutesById {
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile/': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
+  '/_auth/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
   '/api/platform/auth/$ref/invite': typeof ApiPlatformAuthRefInviteRoute
   '/api/platform/auth/$ref/magiclink': typeof ApiPlatformAuthRefMagiclinkRoute
   '/api/platform/auth/$ref/otp': typeof ApiPlatformAuthRefOtpRoute
@@ -945,7 +1027,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/account'
+    | '/forgot-password'
+    | '/forgot-password-mfa'
+    | '/reset-password'
     | '/sign-in'
+    | '/sign-in-mfa'
+    | '/sign-in-partner'
+    | '/sign-in-sso'
+    | '/sign-up'
     | '/api/check-cname'
     | '/api/cli-release-version'
     | '/api/enabled-features-overrides'
@@ -957,6 +1046,7 @@ export interface FileRouteTypes {
     | '/api/incident-status'
     | '/api/status-override'
     | '/account/me'
+    | '/cli/login'
     | '/api/ai/docs'
     | '/api/content/graphql'
     | '/api/edge-functions/test'
@@ -977,6 +1067,7 @@ export interface FileRouteTypes {
     | '/api/platform/organizations/'
     | '/api/platform/profile/'
     | '/api/platform/projects/'
+    | '/partners/stripe/projects/login'
     | '/api/platform/auth/$ref/invite'
     | '/api/platform/auth/$ref/magiclink'
     | '/api/platform/auth/$ref/otp'
@@ -1041,7 +1132,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/account'
+    | '/forgot-password'
+    | '/forgot-password-mfa'
+    | '/reset-password'
     | '/sign-in'
+    | '/sign-in-mfa'
+    | '/sign-in-partner'
+    | '/sign-in-sso'
+    | '/sign-up'
     | '/api/check-cname'
     | '/api/cli-release-version'
     | '/api/enabled-features-overrides'
@@ -1053,6 +1151,7 @@ export interface FileRouteTypes {
     | '/api/incident-status'
     | '/api/status-override'
     | '/account/me'
+    | '/cli/login'
     | '/api/ai/docs'
     | '/api/content/graphql'
     | '/api/edge-functions/test'
@@ -1073,6 +1172,7 @@ export interface FileRouteTypes {
     | '/api/platform/organizations'
     | '/api/platform/profile'
     | '/api/platform/projects'
+    | '/partners/stripe/projects/login'
     | '/api/platform/auth/$ref/invite'
     | '/api/platform/auth/$ref/magiclink'
     | '/api/platform/auth/$ref/otp'
@@ -1139,7 +1239,14 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_auth'
     | '/_app/account'
+    | '/_auth/forgot-password'
+    | '/_auth/forgot-password-mfa'
+    | '/_auth/reset-password'
     | '/_auth/sign-in'
+    | '/_auth/sign-in-mfa'
+    | '/_auth/sign-in-partner'
+    | '/_auth/sign-in-sso'
+    | '/_auth/sign-up'
     | '/api/check-cname'
     | '/api/cli-release-version'
     | '/api/enabled-features-overrides'
@@ -1151,6 +1258,7 @@ export interface FileRouteTypes {
     | '/api/incident-status'
     | '/api/status-override'
     | '/_app/account/me'
+    | '/_auth/cli/login'
     | '/api/ai/docs'
     | '/api/content/graphql'
     | '/api/edge-functions/test'
@@ -1171,6 +1279,7 @@ export interface FileRouteTypes {
     | '/api/platform/organizations/'
     | '/api/platform/profile/'
     | '/api/platform/projects/'
+    | '/_auth/partners/stripe/projects/login'
     | '/api/platform/auth/$ref/invite'
     | '/api/platform/auth/$ref/magiclink'
     | '/api/platform/auth/$ref/otp'
@@ -1421,11 +1530,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCheckCnameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth/sign-up': {
+      id: '/_auth/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof AuthSignUpRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/sign-in-sso': {
+      id: '/_auth/sign-in-sso'
+      path: '/sign-in-sso'
+      fullPath: '/sign-in-sso'
+      preLoaderRoute: typeof AuthSignInSsoRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/sign-in-partner': {
+      id: '/_auth/sign-in-partner'
+      path: '/sign-in-partner'
+      fullPath: '/sign-in-partner'
+      preLoaderRoute: typeof AuthSignInPartnerRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/sign-in-mfa': {
+      id: '/_auth/sign-in-mfa'
+      path: '/sign-in-mfa'
+      fullPath: '/sign-in-mfa'
+      preLoaderRoute: typeof AuthSignInMfaRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/sign-in': {
       id: '/_auth/sign-in'
       path: '/sign-in'
       fullPath: '/sign-in'
       preLoaderRoute: typeof AuthSignInRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/reset-password': {
+      id: '/_auth/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/forgot-password-mfa': {
+      id: '/_auth/forgot-password-mfa'
+      path: '/forgot-password-mfa'
+      fullPath: '/forgot-password-mfa'
+      preLoaderRoute: typeof AuthForgotPasswordMfaRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/forgot-password': {
+      id: '/_auth/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_app/account': {
@@ -1469,6 +1627,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/ai/docs'
       preLoaderRoute: typeof ApiAiDocsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_auth/cli/login': {
+      id: '/_auth/cli/login'
+      path: '/cli/login'
+      fullPath: '/cli/login'
+      preLoaderRoute: typeof AuthCliLoginRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_app/account/me': {
       id: '/_app/account/me'
@@ -1757,6 +1922,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPlatformAuthRefInviteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth/partners/stripe/projects/login': {
+      id: '/_auth/partners/stripe/projects/login'
+      path: '/partners/stripe/projects/login'
+      fullPath: '/partners/stripe/projects/login'
+      preLoaderRoute: typeof AuthPartnersStripeProjectsLoginRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/api/v1/projects/$ref/functions/': {
       id: '/api/v1/projects/$ref/functions/'
       path: '/api/v1/projects/$ref/functions'
@@ -2028,11 +2200,29 @@ const AppRouteChildren: AppRouteChildren = {
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface AuthRouteChildren {
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
+  AuthForgotPasswordMfaRoute: typeof AuthForgotPasswordMfaRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignInRoute: typeof AuthSignInRoute
+  AuthSignInMfaRoute: typeof AuthSignInMfaRoute
+  AuthSignInPartnerRoute: typeof AuthSignInPartnerRoute
+  AuthSignInSsoRoute: typeof AuthSignInSsoRoute
+  AuthSignUpRoute: typeof AuthSignUpRoute
+  AuthCliLoginRoute: typeof AuthCliLoginRoute
+  AuthPartnersStripeProjectsLoginRoute: typeof AuthPartnersStripeProjectsLoginRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
+  AuthForgotPasswordMfaRoute: AuthForgotPasswordMfaRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignInRoute: AuthSignInRoute,
+  AuthSignInMfaRoute: AuthSignInMfaRoute,
+  AuthSignInPartnerRoute: AuthSignInPartnerRoute,
+  AuthSignInSsoRoute: AuthSignInSsoRoute,
+  AuthSignUpRoute: AuthSignUpRoute,
+  AuthCliLoginRoute: AuthCliLoginRoute,
+  AuthPartnersStripeProjectsLoginRoute: AuthPartnersStripeProjectsLoginRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

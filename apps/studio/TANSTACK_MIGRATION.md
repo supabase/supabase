@@ -290,15 +290,15 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 ### Auth shell — `/sign-in`, `/sign-up`, etc.
 
 - [x] A `routes/_auth/sign-in.tsx` ← `pages/sign-in.tsx`
-- [ ] `routes/_auth/sign-up.tsx` ← `pages/sign-up.tsx`
-- [ ] `routes/_auth/sign-in-sso.tsx` ← `pages/sign-in-sso.tsx`
-- [ ] `routes/_auth/sign-in-partner.tsx` ← `pages/sign-in-partner.tsx`
-- [ ] `routes/_auth/sign-in-mfa.tsx` ← `pages/sign-in-mfa.tsx`
-- [ ] `routes/_auth/forgot-password.tsx` ← `pages/forgot-password.tsx`
-- [ ] `routes/_auth/forgot-password-mfa.tsx` ← `pages/forgot-password-mfa.tsx`
-- [ ] `routes/_auth/reset-password.tsx` ← `pages/reset-password.tsx`
-- [ ] `routes/_auth/cli/login.tsx` ← `pages/cli/login.tsx`
-- [ ] `routes/_auth/partners/stripe/projects/login.tsx` ← `pages/partners/stripe/projects/login.tsx`
+- [x] A `routes/_auth/sign-up.tsx` ← `pages/sign-up.tsx`
+- [x] A `routes/_auth/sign-in-sso.tsx` ← `pages/sign-in-sso.tsx`
+- [x] A `routes/_auth/sign-in-partner.tsx` ← `pages/sign-in-partner.tsx`
+- [x] A `routes/_auth/sign-in-mfa.tsx` ← `pages/sign-in-mfa.tsx` (page inlines SignInLayout)
+- [x] A `routes/_auth/forgot-password.tsx` ← `pages/forgot-password.tsx`
+- [x] A `routes/_auth/forgot-password-mfa.tsx` ← `pages/forgot-password-mfa.tsx` (page inlines ForgotPasswordLayout)
+- [x] A `routes/_auth/reset-password.tsx` ← `pages/reset-password.tsx` (page default already withAuth-wrapped)
+- [x] A `routes/_auth/cli/login.tsx` ← `pages/cli/login.tsx` (page inlines APIAuthorizationLayout, withAuth)
+- [x] A `routes/_auth/partners/stripe/projects/login.tsx` ← `pages/partners/stripe/projects/login.tsx` (page inlines APIAuthorizationLayout, withAuth)
 
 ### Standalone (no shared shell)
 
