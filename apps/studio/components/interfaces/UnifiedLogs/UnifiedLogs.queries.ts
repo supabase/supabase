@@ -335,7 +335,7 @@ const getEdgeFunctionLogsQuery = () => {
       COALESCE(function_logs_agg.last_event_message, '') as event_message,
       fel_request.method as method,
       function_logs_agg.function_log_count as log_count,
-      function_logs_agg.logs as logs
+      null as logs
     from function_edge_logs as fel
     cross join unnest(metadata) as fel_metadata
     cross join unnest(fel_metadata.response) as fel_response
@@ -344,8 +344,7 @@ const getEdgeFunctionLogsQuery = () => {
     SELECT
         fl_metadata.execution_id,
         COUNT(fl.id) as function_log_count,
-        ANY_VALUE(fl.event_message) as last_event_message,
-        ARRAY_AGG(STRUCT(fl.id, fl.timestamp, fl.event_message, fl_metadata.level, fl_metadata.event_type)) as logs
+        ANY_VALUE(fl.event_message) as last_event_message
     FROM function_logs as fl
     CROSS JOIN UNNEST(fl.metadata) as fl_metadata
     WHERE fl_metadata.execution_id IS NOT NULL
