@@ -538,16 +538,20 @@ ${facet}_count AS (
 export const getUnifiedLogsCountCTE = () => {
   return `
 WITH unified_logs AS (
-    -- Edge logs (non-rest, non-storage)
-    select 
+    -- Single scan of edge_logs covering edge gateway, postgrest, and storage
+    select
       id,
-      'edge' as log_type,
+      CASE
+        WHEN edge_logs_request.path LIKE '%/rest/%' THEN 'postgrest'
+        WHEN edge_logs_request.path LIKE '%/storage/%' THEN 'storage'
+        ELSE 'edge'
+      END as log_type,
       CAST(edge_logs_response.status_code AS STRING) as status,
       CASE
-          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN edge_logs_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
+        WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
+        WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+        WHEN edge_logs_response.status_code >= 500 THEN 'error'
+        ELSE 'success'
       END as level,
       edge_logs_request.path as pathname,
       edge_logs_request.method as method
@@ -555,62 +559,39 @@ WITH unified_logs AS (
     cross join unnest(metadata) as edge_logs_metadata
     cross join unnest(edge_logs_metadata.request) as edge_logs_request
     cross join unnest(edge_logs_metadata.response) as edge_logs_response
-    WHERE edge_logs_request.path NOT LIKE '%/rest/%'
-    AND edge_logs_request.path NOT LIKE '%/storage/%'
-    
+
     union all
-    
-    -- Postgrest logs
-    select 
-      id,
-      'postgrest' as log_type,
-      CAST(edge_logs_response.status_code AS STRING) as status,
-      CASE
-          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN edge_logs_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
-      END as level,
-      edge_logs_request.path as pathname,
-      edge_logs_request.method as method
-    from edge_logs as el
-    cross join unnest(metadata) as edge_logs_metadata
-    cross join unnest(edge_logs_metadata.request) as edge_logs_request
-    cross join unnest(edge_logs_metadata.response) as edge_logs_response
-    WHERE edge_logs_request.path LIKE '%/rest/%'
-    
-    union all
-    
+
     -- Postgres logs
-    select 
+    select
       id,
       'postgres' as log_type,
       CAST(pgl_parsed.sql_state_code AS STRING) as status,
       CASE
-          WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
-          WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
-          WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
-          WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
-          ELSE null
+        WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
+        WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
+        WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
+        WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
+        ELSE null
       END as level,
       null as pathname,
       null as method
     from postgres_logs as pgl
     cross join unnest(pgl.metadata) as pgl_metadata
     cross join unnest(pgl_metadata.parsed) as pgl_parsed
-    
+
     union all
-    
+
     -- Edge function logs
-    select 
-      id,
+    select
+      fel.id,
       'edge function' as log_type,
       CAST(fel_response.status_code AS STRING) as status,
       CASE
-          WHEN fel_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN fel_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN fel_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
+        WHEN fel_response.status_code BETWEEN 200 AND 299 THEN 'success'
+        WHEN fel_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+        WHEN fel_response.status_code >= 500 THEN 'error'
+        ELSE 'success'
       END as level,
       fel_request.pathname as pathname,
       fel_request.method as method
@@ -618,54 +599,33 @@ WITH unified_logs AS (
     cross join unnest(metadata) as fel_metadata
     cross join unnest(fel_metadata.response) as fel_response
     cross join unnest(fel_metadata.request) as fel_request
-    
+
     union all
-    
+
     -- Auth logs
     select
-      al.id as id,
+      el_in_al.id as id,
       'auth' as log_type,
       CAST(el_in_al_response.status_code AS STRING) as status,
       CASE
-          WHEN el_in_al_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN el_in_al_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN el_in_al_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
+        WHEN el_in_al_response.status_code BETWEEN 200 AND 299 THEN 'success'
+        WHEN el_in_al_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+        WHEN el_in_al_response.status_code >= 500 THEN 'error'
+        ELSE 'success'
       END as level,
       el_in_al_request.path as pathname,
       el_in_al_request.method as method
     from auth_logs as al
-    cross join unnest(metadata) as al_metadata 
+    cross join unnest(metadata) as al_metadata
     left join (
     edge_logs as el_in_al
-        cross join unnest (metadata) as el_in_al_metadata 
-        cross join unnest (el_in_al_metadata.response) as el_in_al_response 
-        cross join unnest (el_in_al_response.headers) as el_in_al_response_headers 
-        cross join unnest (el_in_al_metadata.request) as el_in_al_request
+      cross join unnest(metadata) as el_in_al_metadata
+      cross join unnest(el_in_al_metadata.response) as el_in_al_response
+      cross join unnest(el_in_al_response.headers) as el_in_al_response_headers
+      cross join unnest(el_in_al_metadata.request) as el_in_al_request
     )
     on al_metadata.request_id = el_in_al_response_headers.cf_ray
     WHERE al_metadata.request_id is not null
-    
-    union all
-    
-    -- Storage logs
-    select 
-      id,
-      'storage' as log_type,
-      CAST(edge_logs_response.status_code AS STRING) as status,
-      CASE
-          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN edge_logs_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
-      END as level,
-      edge_logs_request.path as pathname,
-      edge_logs_request.method as method
-    from edge_logs as el
-    cross join unnest(metadata) as edge_logs_metadata
-    cross join unnest(edge_logs_metadata.request) as edge_logs_request
-    cross join unnest(edge_logs_metadata.response) as edge_logs_response
-    WHERE edge_logs_request.path LIKE '%/storage/%'
 )
   `
 }
