@@ -48,6 +48,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { AuthProvider } from '@/lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { ProfileProvider } from '@/lib/profile'
+import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 
 interface RouterContext {
   queryClient: QueryClient
@@ -186,10 +187,9 @@ function buildRootHead() {
 
 function DynamicTitle() {
   const { appTitle } = useCustomContent(['app:title'])
-  useEffect(() => {
-    if (appTitle && typeof document !== 'undefined') document.title = appTitle
-  }, [appTitle])
-  return null
+  if (!appTitle) return null
+
+  return <title>{appTitle}</title>
 }
 
 const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
@@ -243,7 +243,9 @@ function RootComponent() {
                   disableTransitionOnChange
                 >
                   <DevToolbarProvider apiUrl={API_URL}>
-                    <Outlet />
+                    <AiAssistantStateContextProvider>
+                      <Outlet />
+                    </AiAssistantStateContextProvider>
                     <DevToolbar extraTabs={devToolbarExtraTabs} />
                     <DevToolbarTrigger />
                   </DevToolbarProvider>
