@@ -6,7 +6,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "vite dev --port ${STUDIO_PORT:-8082}",
-    "build": "vite build",
+    "build": "vite build && tsx scripts/patch-vercel-config.ts",
     "start": "vite preview --port 8082",
     "dev:next": "next dev -p ${STUDIO_PORT:-8082}",
     "build:next": "next build && if [ \"$SKIP_ASSET_UPLOAD\" != \"1\" ]; then ./../../scripts/upload-static-assets.sh; fi",
