@@ -10,8 +10,15 @@ const path = '.vercel/output/config.json'
 const config = JSON.parse(readFileSync(path, 'utf-8'))
 
 config.routes = [
-  { src: '/dashboard/organizations', dest: '/dashboard/_shell.html' },
+  {
+    src: `${base}/assets/(.*)`,
+    headers: { 'cache-control': 'public, max-age=31536000, immutable' },
+  },
+  { src: `${base}/api/(.*)`, dest: '/__server' },
+  { src: `${base}/_serverFn/(.*)`, dest: '/__server' },
   { handle: 'filesystem' },
+  { handle: 'miss' },
+  { src: `${base}(/.*)?`, dest: `${base}/_shell.html`, check: true },
 ]
 
 writeFileSync(path, JSON.stringify(config, null, 2))
