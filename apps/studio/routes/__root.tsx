@@ -54,6 +54,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { AuthProvider } from '@/lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { ProfileProvider } from '@/lib/profile'
+import { Toaster } from '@/lib/toaster'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 
 interface RouterContext {
@@ -259,6 +260,7 @@ function RootComponent() {
                           <FeaturePreviewModal />
                           <UpdateBillingAddressModal />
                         </FeaturePreviewContextProvider>
+                        <Toaster />
                       </CommandProvider>
                     </AiAssistantStateContextProvider>
                     <DevToolbar extraTabs={devToolbarExtraTabs} />
