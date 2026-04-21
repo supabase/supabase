@@ -5,7 +5,7 @@ import {
   JwtSecretUpdateProgress,
   JwtSecretUpdateStatus,
 } from '@supabase/shared-types/out/events'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import {
   AlertCircle,
   ChevronDown,
@@ -90,6 +90,8 @@ const customJwtSecretFormId = 'custom-jwt-secret-form'
 
 const JWTSettings = () => {
   const { ref: projectRef } = useParams()
+
+  const disableLegacyJwtSecretRotation = useFlag('disableLegacyJwtSecretRotation')
 
   const [customToken, setCustomToken] = useState<string>('')
   const [isCreatingKey, setIsCreatingKey] = useState<boolean>(false)
@@ -374,30 +376,70 @@ const JWTSettings = () => {
 
               <div className="flex flex-col gap-6 border rounded-md bg p-6">
                 <div className="flex flex-col gap-2">
-                  <h4 className="text-sm">How to change your JWT secret?</h4>
+                  <h4 className="text-sm">
+                    {disableLegacyJwtSecretRotation
+                      ? 'How to migrate to the new API keys'
+                      : 'How to change your JWT secret?'}
+                  </h4>
                   <p className="text-sm text-foreground-light">
-                    Instead of changing the legacy JWT secret use a combination of the JWT Signing
-                    Keys and API keys features. Consider these advantages:
+                    {disableLegacyJwtSecretRotation ? (
+                      <>
+                        Rotating the legacy JWT secret is no longer supported — it forces downtime
+                        and invalidates your <code>anon</code> and <code>service_role</code> keys.
+                        Migrate to the new publishable (<code>sb_publishable_...</code>) and secret
+                        (<code>sb_secret_...</code>) API keys instead: they can be rotated
+                        independently with zero downtime, and the transition is reversible.
+                      </>
+                    ) : (
+                      'Instead of changing the legacy JWT secret use a combination of the JWT Signing Keys and API keys features. Consider these advantages:'
+                    )}
                   </p>
-                  <ul className="text-sm text-foreground-light list-disc list-inside">
-                    <li>Zero-downtime, reversible change.</li>
-                    <li>Users remain signed in and bad actors out.</li>
-                    <li>
-                      Create multiple secret API keys that are immediately revocable and fully
-                      covered by audit logs.
-                    </li>
-                    <li>
-                      Private keys and shared secrets are no longer visible by organization members,
-                      so they can't leak.
-                    </li>
-                    <li>
-                      Maintain tighter alignment with SOC2 and other security compliance frameworks.
-                    </li>
-                    <li>
-                      Improve app's performance by using public keys to verify JWTs instead of
-                      calling <code>getUser()</code>.
-                    </li>
-                  </ul>
+                  {disableLegacyJwtSecretRotation ? (
+                    <ol className="text-sm text-foreground-light list-decimal list-inside space-y-1">
+                      <li>
+                        On the API Keys page, create a publishable key for client-side use and one
+                        or more secret keys for your backend components.
+                      </li>
+                      <li>
+                        Gradually roll out the new keys across your applications. The legacy{' '}
+                        <code>anon</code> and <code>service_role</code> keys stay active during the
+                        transition, so there is no downtime.
+                      </li>
+                      <li>
+                        Watch the <em className="not-italic text-foreground">last used</em>{' '}
+                        indicators on the legacy keys to confirm no traffic still depends on them.
+                      </li>
+                      <li>
+                        Deactivate the legacy <code>anon</code> and <code>service_role</code> keys
+                        from the API Keys page. You can re-activate them if you need to roll back.
+                      </li>
+                      <li>
+                        Optionally, use JWT Signing Keys to rotate the underlying signing key for
+                        any remaining legacy JWT consumers.
+                      </li>
+                    </ol>
+                  ) : (
+                    <ul className="text-sm text-foreground-light list-disc list-inside">
+                      <li>Zero-downtime, reversible change.</li>
+                      <li>Users remain signed in and bad actors out.</li>
+                      <li>
+                        Create multiple secret API keys that are immediately revocable and fully
+                        covered by audit logs.
+                      </li>
+                      <li>
+                        Private keys and shared secrets are no longer visible by organization
+                        members, so they can't leak.
+                      </li>
+                      <li>
+                        Maintain tighter alignment with SOC2 and other security compliance
+                        frameworks.
+                      </li>
+                      <li>
+                        Improve app's performance by using public keys to verify JWTs instead of
+                        calling <code>getUser()</code>.
+                      </li>
+                    </ul>
+                  )}
                 </div>
 
                 <div className="flex flex-row gap-4">
@@ -412,45 +454,49 @@ const JWTSettings = () => {
                     </Link>
                   </Button>
 
-                  <div className="grow" />
+                  {!disableLegacyJwtSecretRotation && (
+                    <>
+                      <div className="grow" />
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <ButtonTooltip
-                        disabled={!canGenerateNewJWTSecret}
-                        type="default"
-                        iconRight={<ChevronDown size={14} />}
-                        loading={isUpdatingJwtSecret}
-                        tooltip={{
-                          content: {
-                            side: 'bottom',
-                            text: !canGenerateNewJWTSecret
-                              ? 'You need additional permissions to generate a new JWT secret'
-                              : undefined,
-                          },
-                        }}
-                      >
-                        Change legacy JWT secret
-                      </ButtonTooltip>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" side="bottom">
-                      <DropdownMenuItem
-                        className="space-x-2"
-                        onClick={() => setIsGeneratingKey(true)}
-                      >
-                        <RefreshCw size={16} />
-                        <p>Generate a random secret</p>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="space-x-2"
-                        onClick={() => setIsCreatingKey(true)}
-                      >
-                        <PenTool size={16} />
-                        <p>Create my own secret</p>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <ButtonTooltip
+                            disabled={!canGenerateNewJWTSecret}
+                            type="default"
+                            iconRight={<ChevronDown size={14} />}
+                            loading={isUpdatingJwtSecret}
+                            tooltip={{
+                              content: {
+                                side: 'bottom',
+                                text: !canGenerateNewJWTSecret
+                                  ? 'You need additional permissions to generate a new JWT secret'
+                                  : undefined,
+                              },
+                            }}
+                          >
+                            Change legacy JWT secret
+                          </ButtonTooltip>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" side="bottom">
+                          <DropdownMenuItem
+                            className="space-x-2"
+                            onClick={() => setIsGeneratingKey(true)}
+                          >
+                            <RefreshCw size={16} />
+                            <p>Generate a random secret</p>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="space-x-2"
+                            onClick={() => setIsCreatingKey(true)}
+                          >
+                            <PenTool size={16} />
+                            <p>Create my own secret</p>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </>
+                  )}
                 </div>
               </div>
             </>
@@ -461,7 +507,7 @@ const JWTSettings = () => {
       <TextConfirmModal
         variant="destructive"
         size="large"
-        visible={isRegeneratingKey}
+        visible={isRegeneratingKey && !disableLegacyJwtSecretRotation}
         title="Confirm legacy JWT secret change"
         confirmString="I understand and wish to proceed"
         confirmLabel={customToken ? 'Apply custom secret' : 'Generate random secret'}
@@ -553,7 +599,7 @@ const JWTSettings = () => {
 
       <Modal
         header="Pick a new JWT secret"
-        visible={isCreatingKey}
+        visible={isCreatingKey && !disableLegacyJwtSecretRotation}
         size="medium"
         variant="danger"
         onCancel={() => {
