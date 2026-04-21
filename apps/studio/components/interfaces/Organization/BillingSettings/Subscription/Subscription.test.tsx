@@ -1,13 +1,11 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import Subscription from './Subscription'
-import { MANAGED_BY } from '@/lib/constants/infrastructure'
-import { createMockOrganization, render } from '@/tests/helpers'
+import { render } from '@/tests/helpers'
 
-const { mockSelectedOrganization, mockSubscription, mockSetPanelKey } = vi.hoisted(() => ({
-  mockSelectedOrganization: vi.fn(),
+const { mockSubscription, mockSetPanelKey } = vi.hoisted(() => ({
   mockSubscription: vi.fn(),
   mockSetPanelKey: vi.fn(),
 }))
@@ -20,10 +18,6 @@ vi.mock('common', async (importOriginal) => {
     useFlag: () => false,
   }
 })
-
-vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
-  useSelectedOrganizationQuery: () => ({ data: mockSelectedOrganization() }),
-}))
 
 vi.mock('@/data/subscriptions/org-subscription-query', () => ({
   useOrgSubscriptionQuery: () => mockSubscription(),
@@ -54,14 +48,6 @@ vi.mock('./PlanUpdateSidePanel', () => ({
 describe('Subscription', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockSelectedOrganization.mockReturnValue(
-      createMockOrganization({
-        slug: 'stripe-org',
-        billing_partner: null,
-        integration_source: 'stripe_projects',
-        managed_by: MANAGED_BY.STRIPE_PROJECTS,
-      })
-    )
     mockSubscription.mockReturnValue({
       data: {
         plan: { id: 'free', name: 'Free' },
@@ -74,32 +60,34 @@ describe('Subscription', () => {
     })
   })
 
-  it('shows a Stripe-managed plan notice instead of the plan-change CTA', () => {
+  it('shows the plan-change CTA and opens the side panel when clicked', () => {
+    render(<Subscription />)
+    const button = screen.getByRole('button', { name: 'Change subscription plan' })
+    expect(button).toBeInTheDocument()
+    expect(mockSetPanelKey).not.toHaveBeenCalled()
+
+    fireEvent.click(button)
+
+    expect(mockSetPanelKey).toHaveBeenCalledWith('subscriptionPlan')
+  })
+
+  it('shows the support fallback when plan changes are not available', () => {
+    mockSubscription.mockReturnValue({
+      data: {
+        plan: { id: 'enterprise', name: 'Enterprise' },
+        usage_billing_enabled: true,
+      },
+      error: null,
+      isPending: false,
+      isError: false,
+      isSuccess: true,
+    })
+
     render(<Subscription />)
 
-    expect(screen.getByText('Organization plans are managed by Stripe.')).toBeInTheDocument()
-    expect(
-      screen.getByRole('link', { name: 'Change Plan in Stripe Dashboard' })
-    ).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'Change subscription plan' })
     ).not.toBeInTheDocument()
-    expect(mockSetPanelKey).not.toHaveBeenCalled()
-  })
-
-  it('continues to show the self-serve plan-change CTA for non-Stripe orgs', () => {
-    mockSelectedOrganization.mockReturnValue(
-      createMockOrganization({
-        slug: 'self-serve-org',
-        billing_partner: null,
-        integration_source: null,
-        managed_by: MANAGED_BY.SUPABASE,
-      })
-    )
-
-    render(<Subscription />)
-
-    expect(screen.getByRole('button', { name: 'Change subscription plan' })).toBeInTheDocument()
-    expect(screen.queryByText('Organization plans are managed by Stripe.')).not.toBeInTheDocument()
+    expect(screen.getByText('Unable to update plan from Enterprise')).toBeInTheDocument()
   })
 })
