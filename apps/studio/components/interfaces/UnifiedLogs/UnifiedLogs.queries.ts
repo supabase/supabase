@@ -630,11 +630,12 @@ WITH unified_logs AS (
 }
 
 export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
+  const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
   const logTypeWhere = buildFacetWhere(search, 'log_type') || 'WHERE log_type IS NOT NULL'
   const levelWhere = buildFacetWhere(search, 'level') || 'WHERE level IS NOT NULL'
 
   const sql = `
-${getUnifiedLogsCountCTE()},
+${getUnifiedLogsCTE(effectiveLogTypes)},
 
 -- Single COUNTIF pass for all log_type buckets + total (no GROUP BY / sort needed)
 log_type_counts AS (
