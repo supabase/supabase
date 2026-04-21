@@ -1,5 +1,6 @@
 import {
   useLocation,
+  useMatches,
   useParams,
   useSearch,
   useRouter as useTanStackRouter,
@@ -7,13 +8,22 @@ import {
 
 import { getRouterEventsProxy } from '../_router-events'
 
+// See note in ../router.ts: pages-router semantics expose `pathname` as
+// the route pattern, not the resolved URL. Convert TanStack's `$param`
+// route id to Next's `[param]` so legacy consumers keep working.
+function toNextPathPattern(routeId: string) {
+  return routeId.replace(/\$([a-zA-Z0-9_]+)/g, '[$1]')
+}
+
 export function useRouter() {
   const router = useTanStackRouter()
   const location = useLocation()
+  const matches = useMatches()
   const params = useParams({ strict: false })
   const search = useSearch({ strict: false })
+  const leafRouteId = matches[matches.length - 1]?.routeId ?? location.pathname
   return {
-    pathname: location.pathname,
+    pathname: toNextPathPattern(leafRouteId),
     query: { ...params, ...search },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     push: (path: string) => router.navigate({ to: path as any }),

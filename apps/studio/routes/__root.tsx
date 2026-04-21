@@ -60,6 +60,7 @@ import { StudioCommandProvider as CommandProvider } from '@/components/interface
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
+import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
 import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
@@ -277,31 +278,33 @@ function RootComponent() {
             <ProfileProvider>
               <DynamicTitle />
               <TooltipProvider delayDuration={0}>
-                <ThemeProvider
-                  defaultTheme="system"
-                  themes={['dark', 'light', 'classic-dark']}
-                  enableSystem
-                  disableTransitionOnChange
-                >
-                  <DevToolbarProvider apiUrl={API_URL}>
-                    <AiAssistantStateContextProvider>
-                      <CommandProvider>
-                        <FeaturePreviewContextProvider>
-                          <MainScrollContainerProvider>
-                            <Outlet />
-                          </MainScrollContainerProvider>
-                          <StudioCommandMenu />
-                          <FeaturePreviewModal />
-                          <UpdateBillingAddressModal />
-                        </FeaturePreviewContextProvider>
-                        <Toaster />
-                        <MonacoThemeProvider />
-                      </CommandProvider>
-                    </AiAssistantStateContextProvider>
-                    <DevToolbar extraTabs={devToolbarExtraTabs} />
-                    <DevToolbarTrigger />
-                  </DevToolbarProvider>
-                </ThemeProvider>
+                <RouteValidationWrapper>
+                  <ThemeProvider
+                    defaultTheme="system"
+                    themes={['dark', 'light', 'classic-dark']}
+                    enableSystem
+                    disableTransitionOnChange
+                  >
+                    <DevToolbarProvider apiUrl={API_URL}>
+                      <AiAssistantStateContextProvider>
+                        <CommandProvider>
+                          <FeaturePreviewContextProvider>
+                            <MainScrollContainerProvider>
+                              <Outlet />
+                            </MainScrollContainerProvider>
+                            <StudioCommandMenu />
+                            <FeaturePreviewModal />
+                            <UpdateBillingAddressModal />
+                          </FeaturePreviewContextProvider>
+                          <Toaster />
+                          <MonacoThemeProvider />
+                        </CommandProvider>
+                      </AiAssistantStateContextProvider>
+                      <DevToolbar extraTabs={devToolbarExtraTabs} />
+                      <DevToolbarTrigger />
+                    </DevToolbarProvider>
+                  </ThemeProvider>
+                </RouteValidationWrapper>
               </TooltipProvider>
               <Telemetry />
             </ProfileProvider>
