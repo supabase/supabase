@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { compact, find, get, sum, uniqBy } from 'lodash'
 import { Upload } from 'lucide-react'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { DragEventHandler, useCallback, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Checkbox, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -42,7 +42,17 @@ const SelectAllCheckbox = ({
   />
 )
 
-const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
+const DragOverOverlay = ({
+  isOpen,
+  onDragLeave,
+  onDrop,
+  folderIsEmpty,
+}: {
+  isOpen: boolean
+  onDragLeave: () => void
+  onDrop: () => void
+  folderIsEmpty: boolean
+}) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -247,7 +257,7 @@ export const BucketFilePickerColumn = ({
     clearSelectedItems()
   }
 
-  const onDragOver = (event: any) => {
+  const onDragOver: DragEventHandler<HTMLDivElement> = (event) => {
     if (event) {
       event.stopPropagation()
       event.preventDefault()
@@ -257,7 +267,7 @@ export const BucketFilePickerColumn = ({
     }
   }
 
-  const onDrop = async (event: any) => {
+  const onDrop: DragEventHandler<HTMLDivElement> = async (event) => {
     onDragOver(event)
 
     if (!canUpdateStorage) {
