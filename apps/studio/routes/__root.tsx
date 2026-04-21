@@ -31,6 +31,7 @@ import { FeatureFlagProvider, getFlags } from 'common'
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import { useCallback, useEffect, type ComponentProps, type ErrorInfo, type ReactNode } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { TooltipProvider } from 'ui'
 
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
@@ -196,7 +197,9 @@ function RootComponent() {
           >
             <ProfileProvider>
               <DynamicTitle />
-              <Outlet />
+              <TooltipProvider delayDuration={0}>
+                <Outlet />
+              </TooltipProvider>
             </ProfileProvider>
           </FeatureFlagProviderWithOrgContext>
         </AuthProvider>
