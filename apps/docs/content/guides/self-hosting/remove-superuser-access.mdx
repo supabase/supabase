@@ -21,9 +21,9 @@ This guide explains how to align your self-hosted Supabase instance with the sec
 
 ## Changing the configuration
 
-### Step 1: Run the ownership migration script
+### Step 1: Update database object ownership
 
-Execute the script that reassigns ownership of database objects in the `public` schema from `supabase_admin` to `postgres`:
+Use the provided script to reassign ownership of database objects in the `public` schema from `supabase_admin` to `postgres`. From the project directory containing `docker-compose.yml`, run:
 
 ```sh
 sh utils/reassign-owner.sh
@@ -31,7 +31,7 @@ sh utils/reassign-owner.sh
 
 <Admonition type="tip">
 
-This script updates ownership only for database objects in the public schema. Supabase-managed schemas or any custom schemas are not affected.
+This script only updates ownership for database objects in the `public` schema. Supabase-managed and custom schemas are not affected.
 
 </Admonition>
 
