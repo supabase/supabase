@@ -35,6 +35,7 @@ import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalEr
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { AuthProvider } from '@/lib/auth'
 import { API_URL, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
+import { ProfileProvider } from '@/lib/profile'
 
 interface RouterContext {
   queryClient: QueryClient
@@ -105,7 +106,9 @@ function RootComponent() {
             enabled={IS_PLATFORM}
             getConfigCatFlags={getConfigCatFlags}
           >
-            <Outlet />
+            <ProfileProvider>
+              <Outlet />
+            </ProfileProvider>
           </FeatureFlagProviderWithOrgContext>
         </AuthProvider>
       </NuqsAdapter>
