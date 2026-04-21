@@ -45,6 +45,7 @@ import { TooltipProvider } from 'ui'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
@@ -254,6 +255,7 @@ function RootComponent() {
                             <Outlet />
                           </MainScrollContainerProvider>
                           <StudioCommandMenu />
+                          <FeaturePreviewModal />
                         </FeaturePreviewContextProvider>
                       </CommandProvider>
                     </AiAssistantStateContextProvider>
