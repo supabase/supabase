@@ -31,6 +31,7 @@ import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-pass
 import { Route as AuthForgotPasswordMfaRouteImport } from './routes/_auth/forgot-password-mfa'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AppOrganizationsRouteImport } from './routes/_app/organizations'
+import { Route as AppOrgRouteImport } from './routes/_app/org'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as ApiConnectIndexRouteImport } from './routes/api/connect/index'
 import { Route as AppOrgIndexRouteImport } from './routes/_app/org/index'
@@ -45,6 +46,7 @@ import { Route as AppAccountAuditRouteImport } from './routes/_app/account/audit
 import { Route as ApiPlatformProjectsIndexRouteImport } from './routes/api/platform/projects/index'
 import { Route as ApiPlatformProfileIndexRouteImport } from './routes/api/platform/profile/index'
 import { Route as ApiPlatformOrganizationsIndexRouteImport } from './routes/api/platform/organizations/index'
+import { Route as AppOrgSlugIndexRouteImport } from './routes/_app/org/$slug/index'
 import { Route as AppAccountTokensIndexRouteImport } from './routes/_app/account/tokens/index'
 import { Route as ApiPlatformTelemetryEventRouteImport } from './routes/api/platform/telemetry/event'
 import { Route as ApiPlatformIntegrationsSlugRouteImport } from './routes/api/platform/integrations/$slug'
@@ -58,8 +60,20 @@ import { Route as ApiAiOnboardingDesignRouteImport } from './routes/api/ai/onboa
 import { Route as ApiAiFeedbackRateRouteImport } from './routes/api/ai/feedback/rate'
 import { Route as ApiAiFeedbackClassifyRouteImport } from './routes/api/ai/feedback/classify'
 import { Route as ApiAiCodeCompleteRouteImport } from './routes/api/ai/code/complete'
+import { Route as AppOrgSlugUsageRouteImport } from './routes/_app/org/$slug/usage'
+import { Route as AppOrgSlugTeamRouteImport } from './routes/_app/org/$slug/team'
+import { Route as AppOrgSlugSsoRouteImport } from './routes/_app/org/$slug/sso'
+import { Route as AppOrgSlugSecurityRouteImport } from './routes/_app/org/$slug/security'
+import { Route as AppOrgSlugIntegrationsRouteImport } from './routes/_app/org/$slug/integrations'
+import { Route as AppOrgSlugGeneralRouteImport } from './routes/_app/org/$slug/general'
+import { Route as AppOrgSlugDocumentsRouteImport } from './routes/_app/org/$slug/documents'
+import { Route as AppOrgSlugBillingRouteImport } from './routes/_app/org/$slug/billing'
+import { Route as AppOrgSlugAuditRouteImport } from './routes/_app/org/$slug/audit'
+import { Route as AppOrgSlugAppsRouteImport } from './routes/_app/org/$slug/apps'
 import { Route as AppAccountTokensScopedRouteImport } from './routes/_app/account/tokens/scoped'
 import { Route as ApiPlatformProjectsRefIndexRouteImport } from './routes/api/platform/projects/$ref/index'
+import { Route as AppOrgSlugWebhooksIndexRouteImport } from './routes/_app/org/$slug/webhooks/index'
+import { Route as AppOrgSlugPrivateAppsIndexRouteImport } from './routes/_app/org/$slug/private-apps/index'
 import { Route as ApiV1ProjectsRefApiKeysRouteImport } from './routes/api/v1/projects/$ref/api-keys'
 import { Route as ApiPlatformPropsOrgSlugRouteImport } from './routes/api/platform/props/org/$slug'
 import { Route as ApiPlatformProjectsRefSettingsRouteImport } from './routes/api/platform/projects/$ref/settings'
@@ -85,6 +99,7 @@ import { Route as ApiPlatformAuthRefOtpRouteImport } from './routes/api/platform
 import { Route as ApiPlatformAuthRefMagiclinkRouteImport } from './routes/api/platform/auth/$ref/magiclink'
 import { Route as ApiPlatformAuthRefInviteRouteImport } from './routes/api/platform/auth/$ref/invite'
 import { Route as AuthPartnersStripeProjectsLoginRouteImport } from './routes/_auth/partners/stripe/projects/login'
+import { Route as AppOrgSlugWebhooksEndpointIdRouteImport } from './routes/_app/org/$slug/webhooks/$endpointId'
 import { Route as ApiV1ProjectsRefFunctionsIndexRouteImport } from './routes/api/v1/projects/$ref/functions/index'
 import { Route as ApiPlatformStorageRefBucketsIndexRouteImport } from './routes/api/platform/storage/$ref/buckets/index'
 import { Route as ApiPlatformPropsProjectRefIndexRouteImport } from './routes/api/platform/props/project/$ref/index'
@@ -231,6 +246,11 @@ const AppOrganizationsRoute = AppOrganizationsRouteImport.update({
   path: '/organizations',
   getParentRoute: () => AppRoute,
 } as any)
+const AppOrgRoute = AppOrgRouteImport.update({
+  id: '/org',
+  path: '/org',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAccountRoute = AppAccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -242,9 +262,9 @@ const ApiConnectIndexRoute = ApiConnectIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppOrgIndexRoute = AppOrgIndexRouteImport.update({
-  id: '/org/',
-  path: '/org/',
-  getParentRoute: () => AppRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppOrgRoute,
 } as any)
 const ApiIntegrationsStripeSyncRoute =
   ApiIntegrationsStripeSyncRouteImport.update({
@@ -304,6 +324,11 @@ const ApiPlatformOrganizationsIndexRoute =
     path: '/api/platform/organizations/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AppOrgSlugIndexRoute = AppOrgSlugIndexRouteImport.update({
+  id: '/$slug/',
+  path: '/$slug/',
+  getParentRoute: () => AppOrgRoute,
+} as any)
 const AppAccountTokensIndexRoute = AppAccountTokensIndexRouteImport.update({
   id: '/tokens/',
   path: '/tokens/',
@@ -371,6 +396,56 @@ const ApiAiCodeCompleteRoute = ApiAiCodeCompleteRouteImport.update({
   path: '/api/ai/code/complete',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppOrgSlugUsageRoute = AppOrgSlugUsageRouteImport.update({
+  id: '/$slug/usage',
+  path: '/$slug/usage',
+  getParentRoute: () => AppOrgRoute,
+} as any)
+const AppOrgSlugTeamRoute = AppOrgSlugTeamRouteImport.update({
+  id: '/$slug/team',
+  path: '/$slug/team',
+  getParentRoute: () => AppOrgRoute,
+} as any)
+const AppOrgSlugSsoRoute = AppOrgSlugSsoRouteImport.update({
+  id: '/$slug/sso',
+  path: '/$slug/sso',
+  getParentRoute: () => AppOrgRoute,
+} as any)
+const AppOrgSlugSecurityRoute = AppOrgSlugSecurityRouteImport.update({
+  id: '/$slug/security',
+  path: '/$slug/security',
+  getParentRoute: () => AppOrgRoute,
+} as any)
+const AppOrgSlugIntegrationsRoute = AppOrgSlugIntegrationsRouteImport.update({
+  id: '/$slug/integrations',
+  path: '/$slug/integrations',
+  getParentRoute: () => AppOrgRoute,
+} as any)
+const AppOrgSlugGeneralRoute = AppOrgSlugGeneralRouteImport.update({
+  id: '/$slug/general',
+  path: '/$slug/general',
+  getParentRoute: () => AppOrgRoute,
+} as any)
+const AppOrgSlugDocumentsRoute = AppOrgSlugDocumentsRouteImport.update({
+  id: '/$slug/documents',
+  path: '/$slug/documents',
+  getParentRoute: () => AppOrgRoute,
+} as any)
+const AppOrgSlugBillingRoute = AppOrgSlugBillingRouteImport.update({
+  id: '/$slug/billing',
+  path: '/$slug/billing',
+  getParentRoute: () => AppOrgRoute,
+} as any)
+const AppOrgSlugAuditRoute = AppOrgSlugAuditRouteImport.update({
+  id: '/$slug/audit',
+  path: '/$slug/audit',
+  getParentRoute: () => AppOrgRoute,
+} as any)
+const AppOrgSlugAppsRoute = AppOrgSlugAppsRouteImport.update({
+  id: '/$slug/apps',
+  path: '/$slug/apps',
+  getParentRoute: () => AppOrgRoute,
+} as any)
 const AppAccountTokensScopedRoute = AppAccountTokensScopedRouteImport.update({
   id: '/tokens/scoped',
   path: '/tokens/scoped',
@@ -381,6 +456,17 @@ const ApiPlatformProjectsRefIndexRoute =
     id: '/api/platform/projects/$ref/',
     path: '/api/platform/projects/$ref/',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const AppOrgSlugWebhooksIndexRoute = AppOrgSlugWebhooksIndexRouteImport.update({
+  id: '/$slug/webhooks/',
+  path: '/$slug/webhooks/',
+  getParentRoute: () => AppOrgRoute,
+} as any)
+const AppOrgSlugPrivateAppsIndexRoute =
+  AppOrgSlugPrivateAppsIndexRouteImport.update({
+    id: '/$slug/private-apps/',
+    path: '/$slug/private-apps/',
+    getParentRoute: () => AppOrgRoute,
   } as any)
 const ApiV1ProjectsRefApiKeysRoute = ApiV1ProjectsRefApiKeysRouteImport.update({
   id: '/api/v1/projects/$ref/api-keys',
@@ -528,6 +614,12 @@ const AuthPartnersStripeProjectsLoginRoute =
     id: '/partners/stripe/projects/login',
     path: '/partners/stripe/projects/login',
     getParentRoute: () => AuthRoute,
+  } as any)
+const AppOrgSlugWebhooksEndpointIdRoute =
+  AppOrgSlugWebhooksEndpointIdRouteImport.update({
+    id: '/$slug/webhooks/$endpointId',
+    path: '/$slug/webhooks/$endpointId',
+    getParentRoute: () => AppOrgRoute,
   } as any)
 const ApiV1ProjectsRefFunctionsIndexRoute =
   ApiV1ProjectsRefFunctionsIndexRouteImport.update({
@@ -743,6 +835,7 @@ const ApiPlatformStorageRefBucketsIdObjectsDownloadRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AppAccountRouteWithChildren
+  '/org': typeof AppOrgRouteWithChildren
   '/organizations': typeof AppOrganizationsRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/forgot-password-mfa': typeof AuthForgotPasswordMfaRoute
@@ -773,6 +866,16 @@ export interface FileRoutesByFullPath {
   '/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
   '/account/tokens/scoped': typeof AppAccountTokensScopedRoute
+  '/org/$slug/apps': typeof AppOrgSlugAppsRoute
+  '/org/$slug/audit': typeof AppOrgSlugAuditRoute
+  '/org/$slug/billing': typeof AppOrgSlugBillingRoute
+  '/org/$slug/documents': typeof AppOrgSlugDocumentsRoute
+  '/org/$slug/general': typeof AppOrgSlugGeneralRoute
+  '/org/$slug/integrations': typeof AppOrgSlugIntegrationsRoute
+  '/org/$slug/security': typeof AppOrgSlugSecurityRoute
+  '/org/$slug/sso': typeof AppOrgSlugSsoRoute
+  '/org/$slug/team': typeof AppOrgSlugTeamRoute
+  '/org/$slug/usage': typeof AppOrgSlugUsageRoute
   '/api/ai/code/complete': typeof ApiAiCodeCompleteRoute
   '/api/ai/feedback/classify': typeof ApiAiFeedbackClassifyRoute
   '/api/ai/feedback/rate': typeof ApiAiFeedbackRateRoute
@@ -786,9 +889,11 @@ export interface FileRoutesByFullPath {
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
   '/account/tokens/': typeof AppAccountTokensIndexRoute
+  '/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile/': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
+  '/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
   '/api/platform/auth/$ref/invite': typeof ApiPlatformAuthRefInviteRoute
   '/api/platform/auth/$ref/magiclink': typeof ApiPlatformAuthRefMagiclinkRoute
@@ -814,6 +919,8 @@ export interface FileRoutesByFullPath {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/org/$slug/private-apps/': typeof AppOrgSlugPrivateAppsIndexRoute
+  '/org/$slug/webhooks/': typeof AppOrgSlugWebhooksIndexRoute
   '/api/platform/projects/$ref/': typeof ApiPlatformProjectsRefIndexRoute
   '/api/platform/organizations/$slug/billing/subscription': typeof ApiPlatformOrganizationsSlugBillingSubscriptionRoute
   '/api/platform/projects/$ref/analytics/log-drains': typeof ApiPlatformProjectsRefAnalyticsLogDrainsRouteWithChildren
@@ -884,6 +991,16 @@ export interface FileRoutesByTo {
   '/org': typeof AppOrgIndexRoute
   '/api/connect': typeof ApiConnectIndexRoute
   '/account/tokens/scoped': typeof AppAccountTokensScopedRoute
+  '/org/$slug/apps': typeof AppOrgSlugAppsRoute
+  '/org/$slug/audit': typeof AppOrgSlugAuditRoute
+  '/org/$slug/billing': typeof AppOrgSlugBillingRoute
+  '/org/$slug/documents': typeof AppOrgSlugDocumentsRoute
+  '/org/$slug/general': typeof AppOrgSlugGeneralRoute
+  '/org/$slug/integrations': typeof AppOrgSlugIntegrationsRoute
+  '/org/$slug/security': typeof AppOrgSlugSecurityRoute
+  '/org/$slug/sso': typeof AppOrgSlugSsoRoute
+  '/org/$slug/team': typeof AppOrgSlugTeamRoute
+  '/org/$slug/usage': typeof AppOrgSlugUsageRoute
   '/api/ai/code/complete': typeof ApiAiCodeCompleteRoute
   '/api/ai/feedback/classify': typeof ApiAiFeedbackClassifyRoute
   '/api/ai/feedback/rate': typeof ApiAiFeedbackRateRoute
@@ -897,9 +1014,11 @@ export interface FileRoutesByTo {
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
   '/account/tokens': typeof AppAccountTokensIndexRoute
+  '/org/$slug': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects': typeof ApiPlatformProjectsIndexRoute
+  '/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
   '/api/platform/auth/$ref/invite': typeof ApiPlatformAuthRefInviteRoute
   '/api/platform/auth/$ref/magiclink': typeof ApiPlatformAuthRefMagiclinkRoute
@@ -925,6 +1044,8 @@ export interface FileRoutesByTo {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/org/$slug/private-apps': typeof AppOrgSlugPrivateAppsIndexRoute
+  '/org/$slug/webhooks': typeof AppOrgSlugWebhooksIndexRoute
   '/api/platform/projects/$ref': typeof ApiPlatformProjectsRefIndexRoute
   '/api/platform/organizations/$slug/billing/subscription': typeof ApiPlatformOrganizationsSlugBillingSubscriptionRoute
   '/api/platform/projects/$ref/analytics/log-drains': typeof ApiPlatformProjectsRefAnalyticsLogDrainsRouteWithChildren
@@ -968,6 +1089,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
   '/_app/account': typeof AppAccountRouteWithChildren
+  '/_app/org': typeof AppOrgRouteWithChildren
   '/_app/organizations': typeof AppOrganizationsRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/forgot-password-mfa': typeof AuthForgotPasswordMfaRoute
@@ -998,6 +1120,16 @@ export interface FileRoutesById {
   '/_app/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
   '/_app/account/tokens/scoped': typeof AppAccountTokensScopedRoute
+  '/_app/org/$slug/apps': typeof AppOrgSlugAppsRoute
+  '/_app/org/$slug/audit': typeof AppOrgSlugAuditRoute
+  '/_app/org/$slug/billing': typeof AppOrgSlugBillingRoute
+  '/_app/org/$slug/documents': typeof AppOrgSlugDocumentsRoute
+  '/_app/org/$slug/general': typeof AppOrgSlugGeneralRoute
+  '/_app/org/$slug/integrations': typeof AppOrgSlugIntegrationsRoute
+  '/_app/org/$slug/security': typeof AppOrgSlugSecurityRoute
+  '/_app/org/$slug/sso': typeof AppOrgSlugSsoRoute
+  '/_app/org/$slug/team': typeof AppOrgSlugTeamRoute
+  '/_app/org/$slug/usage': typeof AppOrgSlugUsageRoute
   '/api/ai/code/complete': typeof ApiAiCodeCompleteRoute
   '/api/ai/feedback/classify': typeof ApiAiFeedbackClassifyRoute
   '/api/ai/feedback/rate': typeof ApiAiFeedbackRateRoute
@@ -1011,9 +1143,11 @@ export interface FileRoutesById {
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
   '/_app/account/tokens/': typeof AppAccountTokensIndexRoute
+  '/_app/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile/': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
+  '/_app/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/_auth/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
   '/api/platform/auth/$ref/invite': typeof ApiPlatformAuthRefInviteRoute
   '/api/platform/auth/$ref/magiclink': typeof ApiPlatformAuthRefMagiclinkRoute
@@ -1039,6 +1173,8 @@ export interface FileRoutesById {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/_app/org/$slug/private-apps/': typeof AppOrgSlugPrivateAppsIndexRoute
+  '/_app/org/$slug/webhooks/': typeof AppOrgSlugWebhooksIndexRoute
   '/api/platform/projects/$ref/': typeof ApiPlatformProjectsRefIndexRoute
   '/api/platform/organizations/$slug/billing/subscription': typeof ApiPlatformOrganizationsSlugBillingSubscriptionRoute
   '/api/platform/projects/$ref/analytics/log-drains': typeof ApiPlatformProjectsRefAnalyticsLogDrainsRouteWithChildren
@@ -1081,6 +1217,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/account'
+    | '/org'
     | '/organizations'
     | '/forgot-password'
     | '/forgot-password-mfa'
@@ -1111,6 +1248,16 @@ export interface FileRouteTypes {
     | '/org/'
     | '/api/connect/'
     | '/account/tokens/scoped'
+    | '/org/$slug/apps'
+    | '/org/$slug/audit'
+    | '/org/$slug/billing'
+    | '/org/$slug/documents'
+    | '/org/$slug/general'
+    | '/org/$slug/integrations'
+    | '/org/$slug/security'
+    | '/org/$slug/sso'
+    | '/org/$slug/team'
+    | '/org/$slug/usage'
     | '/api/ai/code/complete'
     | '/api/ai/feedback/classify'
     | '/api/ai/feedback/rate'
@@ -1124,9 +1271,11 @@ export interface FileRouteTypes {
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
     | '/account/tokens/'
+    | '/org/$slug/'
     | '/api/platform/organizations/'
     | '/api/platform/profile/'
     | '/api/platform/projects/'
+    | '/org/$slug/webhooks/$endpointId'
     | '/partners/stripe/projects/login'
     | '/api/platform/auth/$ref/invite'
     | '/api/platform/auth/$ref/magiclink'
@@ -1152,6 +1301,8 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/org/$slug/private-apps/'
+    | '/org/$slug/webhooks/'
     | '/api/platform/projects/$ref/'
     | '/api/platform/organizations/$slug/billing/subscription'
     | '/api/platform/projects/$ref/analytics/log-drains'
@@ -1222,6 +1373,16 @@ export interface FileRouteTypes {
     | '/org'
     | '/api/connect'
     | '/account/tokens/scoped'
+    | '/org/$slug/apps'
+    | '/org/$slug/audit'
+    | '/org/$slug/billing'
+    | '/org/$slug/documents'
+    | '/org/$slug/general'
+    | '/org/$slug/integrations'
+    | '/org/$slug/security'
+    | '/org/$slug/sso'
+    | '/org/$slug/team'
+    | '/org/$slug/usage'
     | '/api/ai/code/complete'
     | '/api/ai/feedback/classify'
     | '/api/ai/feedback/rate'
@@ -1235,9 +1396,11 @@ export interface FileRouteTypes {
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
     | '/account/tokens'
+    | '/org/$slug'
     | '/api/platform/organizations'
     | '/api/platform/profile'
     | '/api/platform/projects'
+    | '/org/$slug/webhooks/$endpointId'
     | '/partners/stripe/projects/login'
     | '/api/platform/auth/$ref/invite'
     | '/api/platform/auth/$ref/magiclink'
@@ -1263,6 +1426,8 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/org/$slug/private-apps'
+    | '/org/$slug/webhooks'
     | '/api/platform/projects/$ref'
     | '/api/platform/organizations/$slug/billing/subscription'
     | '/api/platform/projects/$ref/analytics/log-drains'
@@ -1305,6 +1470,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_auth'
     | '/_app/account'
+    | '/_app/org'
     | '/_app/organizations'
     | '/_auth/forgot-password'
     | '/_auth/forgot-password-mfa'
@@ -1335,6 +1501,16 @@ export interface FileRouteTypes {
     | '/_app/org/'
     | '/api/connect/'
     | '/_app/account/tokens/scoped'
+    | '/_app/org/$slug/apps'
+    | '/_app/org/$slug/audit'
+    | '/_app/org/$slug/billing'
+    | '/_app/org/$slug/documents'
+    | '/_app/org/$slug/general'
+    | '/_app/org/$slug/integrations'
+    | '/_app/org/$slug/security'
+    | '/_app/org/$slug/sso'
+    | '/_app/org/$slug/team'
+    | '/_app/org/$slug/usage'
     | '/api/ai/code/complete'
     | '/api/ai/feedback/classify'
     | '/api/ai/feedback/rate'
@@ -1348,9 +1524,11 @@ export interface FileRouteTypes {
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
     | '/_app/account/tokens/'
+    | '/_app/org/$slug/'
     | '/api/platform/organizations/'
     | '/api/platform/profile/'
     | '/api/platform/projects/'
+    | '/_app/org/$slug/webhooks/$endpointId'
     | '/_auth/partners/stripe/projects/login'
     | '/api/platform/auth/$ref/invite'
     | '/api/platform/auth/$ref/magiclink'
@@ -1376,6 +1554,8 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/_app/org/$slug/private-apps/'
+    | '/_app/org/$slug/webhooks/'
     | '/api/platform/projects/$ref/'
     | '/api/platform/organizations/$slug/billing/subscription'
     | '/api/platform/projects/$ref/analytics/log-drains'
@@ -1665,6 +1845,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOrganizationsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/org': {
+      id: '/_app/org'
+      path: '/org'
+      fullPath: '/org'
+      preLoaderRoute: typeof AppOrgRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/account': {
       id: '/_app/account'
       path: '/account'
@@ -1681,10 +1868,10 @@ declare module '@tanstack/react-router' {
     }
     '/_app/org/': {
       id: '/_app/org/'
-      path: '/org'
+      path: '/'
       fullPath: '/org/'
       preLoaderRoute: typeof AppOrgIndexRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppOrgRoute
     }
     '/api/integrations/stripe-sync': {
       id: '/api/integrations/stripe-sync'
@@ -1762,6 +1949,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/platform/organizations/'
       preLoaderRoute: typeof ApiPlatformOrganizationsIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/org/$slug/': {
+      id: '/_app/org/$slug/'
+      path: '/$slug'
+      fullPath: '/org/$slug/'
+      preLoaderRoute: typeof AppOrgSlugIndexRouteImport
+      parentRoute: typeof AppOrgRoute
     }
     '/_app/account/tokens/': {
       id: '/_app/account/tokens/'
@@ -1854,6 +2048,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAiCodeCompleteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/org/$slug/usage': {
+      id: '/_app/org/$slug/usage'
+      path: '/$slug/usage'
+      fullPath: '/org/$slug/usage'
+      preLoaderRoute: typeof AppOrgSlugUsageRouteImport
+      parentRoute: typeof AppOrgRoute
+    }
+    '/_app/org/$slug/team': {
+      id: '/_app/org/$slug/team'
+      path: '/$slug/team'
+      fullPath: '/org/$slug/team'
+      preLoaderRoute: typeof AppOrgSlugTeamRouteImport
+      parentRoute: typeof AppOrgRoute
+    }
+    '/_app/org/$slug/sso': {
+      id: '/_app/org/$slug/sso'
+      path: '/$slug/sso'
+      fullPath: '/org/$slug/sso'
+      preLoaderRoute: typeof AppOrgSlugSsoRouteImport
+      parentRoute: typeof AppOrgRoute
+    }
+    '/_app/org/$slug/security': {
+      id: '/_app/org/$slug/security'
+      path: '/$slug/security'
+      fullPath: '/org/$slug/security'
+      preLoaderRoute: typeof AppOrgSlugSecurityRouteImport
+      parentRoute: typeof AppOrgRoute
+    }
+    '/_app/org/$slug/integrations': {
+      id: '/_app/org/$slug/integrations'
+      path: '/$slug/integrations'
+      fullPath: '/org/$slug/integrations'
+      preLoaderRoute: typeof AppOrgSlugIntegrationsRouteImport
+      parentRoute: typeof AppOrgRoute
+    }
+    '/_app/org/$slug/general': {
+      id: '/_app/org/$slug/general'
+      path: '/$slug/general'
+      fullPath: '/org/$slug/general'
+      preLoaderRoute: typeof AppOrgSlugGeneralRouteImport
+      parentRoute: typeof AppOrgRoute
+    }
+    '/_app/org/$slug/documents': {
+      id: '/_app/org/$slug/documents'
+      path: '/$slug/documents'
+      fullPath: '/org/$slug/documents'
+      preLoaderRoute: typeof AppOrgSlugDocumentsRouteImport
+      parentRoute: typeof AppOrgRoute
+    }
+    '/_app/org/$slug/billing': {
+      id: '/_app/org/$slug/billing'
+      path: '/$slug/billing'
+      fullPath: '/org/$slug/billing'
+      preLoaderRoute: typeof AppOrgSlugBillingRouteImport
+      parentRoute: typeof AppOrgRoute
+    }
+    '/_app/org/$slug/audit': {
+      id: '/_app/org/$slug/audit'
+      path: '/$slug/audit'
+      fullPath: '/org/$slug/audit'
+      preLoaderRoute: typeof AppOrgSlugAuditRouteImport
+      parentRoute: typeof AppOrgRoute
+    }
+    '/_app/org/$slug/apps': {
+      id: '/_app/org/$slug/apps'
+      path: '/$slug/apps'
+      fullPath: '/org/$slug/apps'
+      preLoaderRoute: typeof AppOrgSlugAppsRouteImport
+      parentRoute: typeof AppOrgRoute
+    }
     '/_app/account/tokens/scoped': {
       id: '/_app/account/tokens/scoped'
       path: '/tokens/scoped'
@@ -1867,6 +2131,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/platform/projects/$ref/'
       preLoaderRoute: typeof ApiPlatformProjectsRefIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/org/$slug/webhooks/': {
+      id: '/_app/org/$slug/webhooks/'
+      path: '/$slug/webhooks'
+      fullPath: '/org/$slug/webhooks/'
+      preLoaderRoute: typeof AppOrgSlugWebhooksIndexRouteImport
+      parentRoute: typeof AppOrgRoute
+    }
+    '/_app/org/$slug/private-apps/': {
+      id: '/_app/org/$slug/private-apps/'
+      path: '/$slug/private-apps'
+      fullPath: '/org/$slug/private-apps/'
+      preLoaderRoute: typeof AppOrgSlugPrivateAppsIndexRouteImport
+      parentRoute: typeof AppOrgRoute
     }
     '/api/v1/projects/$ref/api-keys': {
       id: '/api/v1/projects/$ref/api-keys'
@@ -2042,6 +2320,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/partners/stripe/projects/login'
       preLoaderRoute: typeof AuthPartnersStripeProjectsLoginRouteImport
       parentRoute: typeof AuthRoute
+    }
+    '/_app/org/$slug/webhooks/$endpointId': {
+      id: '/_app/org/$slug/webhooks/$endpointId'
+      path: '/$slug/webhooks/$endpointId'
+      fullPath: '/org/$slug/webhooks/$endpointId'
+      preLoaderRoute: typeof AppOrgSlugWebhooksEndpointIdRouteImport
+      parentRoute: typeof AppOrgRoute
     }
     '/api/v1/projects/$ref/functions/': {
       id: '/api/v1/projects/$ref/functions/'
@@ -2311,16 +2596,55 @@ const AppAccountRouteWithChildren = AppAccountRoute._addFileChildren(
   AppAccountRouteChildren,
 )
 
+interface AppOrgRouteChildren {
+  AppOrgIndexRoute: typeof AppOrgIndexRoute
+  AppOrgSlugAppsRoute: typeof AppOrgSlugAppsRoute
+  AppOrgSlugAuditRoute: typeof AppOrgSlugAuditRoute
+  AppOrgSlugBillingRoute: typeof AppOrgSlugBillingRoute
+  AppOrgSlugDocumentsRoute: typeof AppOrgSlugDocumentsRoute
+  AppOrgSlugGeneralRoute: typeof AppOrgSlugGeneralRoute
+  AppOrgSlugIntegrationsRoute: typeof AppOrgSlugIntegrationsRoute
+  AppOrgSlugSecurityRoute: typeof AppOrgSlugSecurityRoute
+  AppOrgSlugSsoRoute: typeof AppOrgSlugSsoRoute
+  AppOrgSlugTeamRoute: typeof AppOrgSlugTeamRoute
+  AppOrgSlugUsageRoute: typeof AppOrgSlugUsageRoute
+  AppOrgSlugIndexRoute: typeof AppOrgSlugIndexRoute
+  AppOrgSlugWebhooksEndpointIdRoute: typeof AppOrgSlugWebhooksEndpointIdRoute
+  AppOrgSlugPrivateAppsIndexRoute: typeof AppOrgSlugPrivateAppsIndexRoute
+  AppOrgSlugWebhooksIndexRoute: typeof AppOrgSlugWebhooksIndexRoute
+}
+
+const AppOrgRouteChildren: AppOrgRouteChildren = {
+  AppOrgIndexRoute: AppOrgIndexRoute,
+  AppOrgSlugAppsRoute: AppOrgSlugAppsRoute,
+  AppOrgSlugAuditRoute: AppOrgSlugAuditRoute,
+  AppOrgSlugBillingRoute: AppOrgSlugBillingRoute,
+  AppOrgSlugDocumentsRoute: AppOrgSlugDocumentsRoute,
+  AppOrgSlugGeneralRoute: AppOrgSlugGeneralRoute,
+  AppOrgSlugIntegrationsRoute: AppOrgSlugIntegrationsRoute,
+  AppOrgSlugSecurityRoute: AppOrgSlugSecurityRoute,
+  AppOrgSlugSsoRoute: AppOrgSlugSsoRoute,
+  AppOrgSlugTeamRoute: AppOrgSlugTeamRoute,
+  AppOrgSlugUsageRoute: AppOrgSlugUsageRoute,
+  AppOrgSlugIndexRoute: AppOrgSlugIndexRoute,
+  AppOrgSlugWebhooksEndpointIdRoute: AppOrgSlugWebhooksEndpointIdRoute,
+  AppOrgSlugPrivateAppsIndexRoute: AppOrgSlugPrivateAppsIndexRoute,
+  AppOrgSlugWebhooksIndexRoute: AppOrgSlugWebhooksIndexRoute,
+}
+
+const AppOrgRouteWithChildren =
+  AppOrgRoute._addFileChildren(AppOrgRouteChildren)
+
 interface AppRouteChildren {
   AppAccountRoute: typeof AppAccountRouteWithChildren
+  AppOrgRoute: typeof AppOrgRouteWithChildren
   AppOrganizationsRoute: typeof AppOrganizationsRoute
-  AppOrgIndexRoute: typeof AppOrgIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAccountRoute: AppAccountRouteWithChildren,
+  AppOrgRoute: AppOrgRouteWithChildren,
   AppOrganizationsRoute: AppOrganizationsRoute,
-  AppOrgIndexRoute: AppOrgIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
