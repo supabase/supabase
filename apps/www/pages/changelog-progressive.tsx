@@ -290,7 +290,7 @@ function ChangelogProgressiveContent({ featured, restIndex }: PageProps) {
             </div>
 
             {restIndex.length > 0 && (
-              <section aria-label="Earlier changelog entries" className="pb-8">
+              <section aria-label="Earlier changelog entries" className="lg:pb-28">
                 <ChangelogV3TimelineList
                   items={restIndex}
                   mode="action"
@@ -299,7 +299,7 @@ function ChangelogProgressiveContent({ featured, restIndex }: PageProps) {
                 />
               </section>
             )}
-            <div className="grid">
+            <div className="hidden lg:grid">
               <div className="col-span-12 -ml-8 mb-8 lg:mb-0 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32">
                 <div className="flex w-full items-baseline border-b pb-4 lg:gap-4 lg:border-none lg:pb-0">
                   <Link

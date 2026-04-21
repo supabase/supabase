@@ -94,7 +94,7 @@ function TimelineRow({
   )
 
   const rowClass =
-    'group border-default flex w-full flex-col gap-0.5 border-b py-3 text-left scroll-mt-8'
+    'group border-default flex w-full flex-col gap-0.5 border-b py-3 text-left scroll-mt-16'
 
   if (mode === 'link' && href) {
     return (
@@ -108,6 +108,7 @@ function TimelineRow({
   return (
     <button
       type="button"
+      id={item.number.toString()}
       onClick={() => onSelect?.(item)}
       className={`${rowClass} cursor-pointer bg-transparent`}
     >
