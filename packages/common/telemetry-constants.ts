@@ -368,14 +368,14 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     tableEditorApiAccessToggleEnabled?: boolean
     /**
-     * Raw checkbox state for "Default privileges for new entities" at submission.
+     * Raw checkbox state for "Automatically expose new tables and functions" at submission.
      * true = default privileges are granted on new entities (current behaviour)
      * false = revoke SQL ran; user must manually grant access per entity
      */
     dataApiDefaultPrivilegesGranted?: boolean
     /**
      * Whether the dataApiRevokeOnCreateDefault PostHog flag was enabled for this user.
-     * Controls only the default checkbox state of "Default privileges for new entities"
+     * Controls only the default checkbox state of "Automatically expose new tables and functions"
      * at project creation. Tracking it lets us correlate flag cohort with user choice.
      * true = user is in the staged rollout cohort (checkbox defaulted to unchecked)
      * false = user is outside the rollout (checkbox defaulted to checked)

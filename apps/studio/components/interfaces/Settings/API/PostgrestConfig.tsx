@@ -426,15 +426,8 @@ export const PostgrestConfig = () => {
                             <FormItem_Shadcn_>
                               <FormItemLayout
                                 layout="flex-row-reverse"
-                                label="Default privileges for new entities"
-                                description={
-                                  <>
-                                    When enabled, new tables and functions in the{' '}
-                                    <code>public</code> schema are automatically accessible via the
-                                    Data API. We recommend disabling this and manually granting
-                                    access to each new entity.
-                                  </>
-                                }
+                                label="Automatically expose new tables and functions"
+                                description="Grants privileges to Data API roles by default, exposing new tables and functions. We recommend disabling this to control access manually."
                               >
                                 <FormControl_Shadcn_>
                                   <div>

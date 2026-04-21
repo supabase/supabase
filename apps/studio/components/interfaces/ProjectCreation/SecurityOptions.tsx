@@ -101,14 +101,14 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
                   <FormLabel_Shadcn_
                     className={cn('text-sm text-foreground', !dataApi && 'text-foreground-muted')}
                   >
-                    Default privileges for new entities
+                    Automatically expose new tables and functions
                   </FormLabel_Shadcn_>
                   <FormDescription_Shadcn_ className="text-foreground-lighter">
-                    When enabled, new tables and functions in the <code>public</code> schema are
-                    automatically accessible via the Data API.
+                    Grants privileges to Data API roles by default, exposing new tables and
+                    functions.
                     <br />
                     <strong className="font-medium text-foreground-light">
-                      We recommend disabling this and manually granting access to each new entity.
+                      We recommend disabling this to control access manually.
                     </strong>
                   </FormDescription_Shadcn_>
                 </div>

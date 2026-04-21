@@ -317,8 +317,8 @@ const CreateProject = () => {
       <div className="py-2 pb-4">
         <Checkbox
           name="dataApiDefaultPrivileges"
-          label="Default privileges for new entities"
-          description="When enabled, new tables and functions in the public schema are automatically accessible via the Data API. We recommend disabling this and manually granting access to each new entity."
+          label="Automatically expose new tables and functions"
+          description="Grants privileges to Data API roles by default, exposing new tables and functions. We recommend disabling this to control access manually."
           checked={dataApiDefaultPrivileges}
           onChange={(e) => setDataApiDefaultPrivileges(e.target.checked)}
         />
