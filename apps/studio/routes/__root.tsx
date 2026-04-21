@@ -43,6 +43,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
+import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -246,7 +247,9 @@ function RootComponent() {
                   <DevToolbarProvider apiUrl={API_URL}>
                     <AiAssistantStateContextProvider>
                       <CommandProvider>
-                        <Outlet />
+                        <FeaturePreviewContextProvider>
+                          <Outlet />
+                        </FeaturePreviewContextProvider>
                       </CommandProvider>
                     </AiAssistantStateContextProvider>
                     <DevToolbar extraTabs={devToolbarExtraTabs} />
