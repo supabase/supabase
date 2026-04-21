@@ -23,6 +23,7 @@ const nextShims: Record<string, string> = {
   'next/navigation': path.join(compatRoot, 'navigation.ts'),
   'next/router': path.join(compatRoot, 'router.ts'),
   'next/script': path.join(compatRoot, 'script.tsx'),
+  'next/server': path.join(compatRoot, 'server.ts'),
 }
 
 // Combined compat + migration guard:
