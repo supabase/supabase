@@ -13,9 +13,13 @@ const { mockSelectedOrganization, mockSelectedProject, mockSelectorProject } = v
 
 const mockPush = vi.hoisted(() => vi.fn())
 
-vi.mock('common', () => ({
-  useParams: () => ({ ref: 'proj_1' }),
-}))
+vi.mock('common', async (importOriginal) => {
+  const original = (await importOriginal()) as typeof import('common')
+  return {
+    ...original,
+    useParams: () => ({ ref: 'proj_1' }),
+  }
+})
 
 vi.mock('next/router', () => ({
   useRouter: () => ({

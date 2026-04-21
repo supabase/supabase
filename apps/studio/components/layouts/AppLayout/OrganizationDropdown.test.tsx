@@ -1,9 +1,9 @@
 import { screen, within } from '@testing-library/react'
-import { createMockOrganization, render } from 'tests/helpers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { OrganizationDropdown } from './OrganizationDropdown'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { createMockOrganization, render } from '@/tests/helpers'
 
 const { mockUseIsFeatureEnabled, mockUseOrganizationsQuery, mockUseSelectedOrganizationQuery } =
   vi.hoisted(() => ({
@@ -12,19 +12,19 @@ const { mockUseIsFeatureEnabled, mockUseOrganizationsQuery, mockUseSelectedOrgan
     mockUseSelectedOrganizationQuery: vi.fn(),
   }))
 
-vi.mock('hooks/misc/useIsFeatureEnabled', () => ({
+vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: mockUseIsFeatureEnabled,
 }))
 
-vi.mock('data/organizations/organizations-query', () => ({
+vi.mock('@/data/organizations/organizations-query', () => ({
   useOrganizationsQuery: mockUseOrganizationsQuery,
 }))
 
-vi.mock('hooks/misc/useSelectedOrganization', () => ({
+vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: mockUseSelectedOrganizationQuery,
 }))
 
-vi.mock('components/ui/PartnerIcon', () => ({
+vi.mock('@/components/ui/PartnerIcon', () => ({
   default: ({ organization }: { organization: { managed_by: string } }) =>
     organization.managed_by === MANAGED_BY.SUPABASE ? null : <div data-testid="partner-icon" />,
 }))
@@ -39,6 +39,7 @@ describe('OrganizationDropdown', () => {
         createMockOrganization({ slug: 'org-two', name: 'Org Two' }),
       ],
       isPending: false,
+      isError: false,
     })
   })
 

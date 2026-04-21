@@ -1,8 +1,8 @@
-import { render } from 'tests/helpers'
 import { describe, expect, it } from 'vitest'
 
 import PartnerIcon, { getDefaultPartnerTooltipText, getPartnerTooltipText } from './PartnerIcon'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { render } from '@/tests/helpers'
 import type { Organization } from '@/types'
 
 describe('PartnerIcon tooltip copy', () => {

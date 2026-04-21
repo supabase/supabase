@@ -1,10 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { createMockOrganization, render } from 'tests/helpers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import OrganizationLayout from './OrganizationLayout'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { createMockOrganization, render } from '@/tests/helpers'
 
 const {
   mockUseAwsRedirectQuery,
@@ -24,27 +24,27 @@ const {
   mockUseVercelRedirectQuery: vi.fn(),
 }))
 
-vi.mock('hooks/misc/useSelectedOrganization', () => ({
+vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: mockUseSelectedOrganizationQuery,
 }))
 
-vi.mock('data/integrations/vercel-redirect-query', () => ({
+vi.mock('@/data/integrations/vercel-redirect-query', () => ({
   useVercelRedirectQuery: mockUseVercelRedirectQuery,
 }))
 
-vi.mock('data/integrations/aws-redirect-query', () => ({
+vi.mock('@/data/integrations/aws-redirect-query', () => ({
   useAwsRedirectQuery: mockUseAwsRedirectQuery,
 }))
 
-vi.mock('hooks/misc/useLocalStorage', () => ({
+vi.mock('@/hooks/misc/useLocalStorage', () => ({
   useLocalStorageQuery: mockUseLocalStorageQuery,
 }))
 
-vi.mock('hooks/custom-content/useCustomContent', () => ({
+vi.mock('@/hooks/custom-content/useCustomContent', () => ({
   useCustomContent: mockUseCustomContent,
 }))
 
-vi.mock('hooks/misc/withAuth', () => ({
+vi.mock('@/hooks/misc/withAuth', () => ({
   withAuth: (Component: any) => Component,
 }))
 
@@ -52,7 +52,7 @@ vi.mock('./OrganizationLayout/useRegisterOrgMenu', () => ({
   useRegisterOrgMenu: mockUseRegisterOrgMenu,
 }))
 
-vi.mock('components/ui/PartnerIcon', () => ({
+vi.mock('@/components/ui/PartnerIcon', () => ({
   default: () => <div data-testid="partner-icon" />,
 }))
 

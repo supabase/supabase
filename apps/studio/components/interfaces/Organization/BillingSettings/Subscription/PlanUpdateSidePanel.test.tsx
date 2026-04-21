@@ -8,9 +8,13 @@ import { createMockOrganization, render } from '@/tests/helpers'
 const mockSelectedOrganization = vi.hoisted(() => vi.fn())
 const mockPush = vi.hoisted(() => vi.fn())
 
-vi.mock('common', () => ({
-  useParams: () => ({ slug: 'stripe-org' }),
-}))
+vi.mock('common', async (importOriginal) => {
+  const original = (await importOriginal()) as typeof import('common')
+  return {
+    ...original,
+    useParams: () => ({ slug: 'stripe-org' }),
+  }
+})
 
 vi.mock('next/router', () => ({
   useRouter: () => ({
