@@ -88,7 +88,17 @@ export default defineConfig(({ mode }) => {
       .map(([key, value]) => [`process.env.${key}`, JSON.stringify(value)])
   )
 
-  console.log('publicEnvDefines:', publicEnvDefines)
+  // Vercel auto-populates `NEXT_PUBLIC_VERCEL_*` for Next.js projects but not
+  // for other frameworks. Mirror that behaviour by re-exposing the unprefixed
+  // system vars under their `NEXT_PUBLIC_VERCEL_*` names so call sites that
+  // predate the TanStack migration keep working.
+  const vercelPublicVars = ['VERCEL_ENV', 'VERCEL_BRANCH_URL'] as const
+  for (const key of vercelPublicVars) {
+    const value = env[key]
+    if (value !== undefined) {
+      publicEnvDefines[`process.env.NEXT_PUBLIC_${key}`] = JSON.stringify(value)
+    }
+  }
 
   // Mirror Next's `basePath` via NEXT_PUBLIC_BASE_PATH. Unlike Next, TanStack
   // Start has no single knob — the prefix has to be declared in three places
