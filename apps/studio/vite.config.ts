@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
+import { nitro } from 'nitro/vite'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url))
@@ -51,6 +52,31 @@ function nextCompat(): Plugin {
   }
 }
 
+// Replace our `components/interfaces/GraphQL/GraphiQL` module with a no-op
+// React component in SSR builds only.
+//
+// `@graphiql/react` transitively loads a codemirror addon that touches
+// `document` at module-evaluation time. During Nitro's prerender (which boots
+// a real Node server and fetches `/`), that hard-crashes with
+// "document is not defined" as soon as the graphiql chunk gets loaded.
+//
+// Stubbing `@graphiql/react` directly would require enumerating its 30+ named
+// exports so Rolldown's static analysis is satisfied. Easier to stub the one
+// internal consumer — `GraphiQL.tsx` only exposes a default-export component,
+// and no SSR-reachable route renders it (the GraphiQL tab is client-only).
+function ssrStubGraphiql(): Plugin {
+  return {
+    name: 'studio-ssr-stub-graphiql',
+    enforce: 'pre',
+    transform(_code, id, options) {
+      if (!options?.ssr) return
+      if (id.endsWith('/components/interfaces/GraphQL/GraphiQL.tsx')) {
+        return { code: 'export default function GraphiQLStub() { return null }', map: null }
+      }
+    },
+  }
+}
+
 export default defineConfig(({ mode }) => {
   // Inline NEXT_PUBLIC_* env vars at build time so `process.env.NEXT_PUBLIC_*`
   // works in the browser bundle (mirrors Next.js behaviour). loadEnv reads the
@@ -75,16 +101,36 @@ export default defineConfig(({ mode }) => {
       // `next/*` must be bundled so our nextCompat shim wins — otherwise Vite's
       // SSR externalizer leaves `next/router` as a runtime package import and
       // Node resolves it to Next's real module.
-      noExternal: ['lodash', /^next(\/|$)/],
+      // `tslib` gets inlined at build time so the external-trace copy pass
+      // doesn't have to ship a package whose `exports` field points at
+      // `modules/index.js` — a CJS-interop wrapper Rolldown doesn't bundle
+      // cleanly, and which wouldn't be present in the copied output anyway
+      // once `exportConditions` redirects Nitro to the pure-ESM entry.
+      noExternal: ['lodash', /^next(\/|$)/, 'tslib'],
     },
     plugins: [
       nextCompat(),
+      ssrStubGraphiql(),
       devtools(),
       tanstackStart({
         srcDirectory: './',
         spa: {
           enabled: true,
         },
+      }),
+      nitro({
+        // `tslib`'s Node ESM entry (`modules/index.js`) destructures from a
+        // default-imported CJS file (`tslib.js`). When Nitro's external-tracer
+        // resolves packages like `@ai-sdk/amazon-bedrock` that `import … from
+        // "tslib"`, it picks up that ESM-wrapper which Rolldown then botches
+        // when flattening the UMD body — producing "__extends is not a
+        // function" at SSR module evaluation time (configcat-common hits this
+        // too). Preferring the `module` export condition makes the resolver
+        // select the pure ESM `tslib.es6.mjs` directly, and forcing `tslib`
+        // inline keeps its runtime resolution (which would still look for
+        // `modules/index.js` via `package.json#exports`) out of the picture.
+        exportConditions: ['module'],
+        noExternals: ['tslib'],
       }),
       viteReact(),
     ],
