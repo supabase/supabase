@@ -5,7 +5,7 @@ description: 'Authentication patterns for Supabase Edge Functions.'
 subtitle: 'Authentication patterns for Edge Functions'
 ---
 
-<Admonition type="warning">
+<Admonition type="caution">
 
 The patterns in this guide assume your project uses the new [JWT signing keys](/docs/guides/auth/signing-keys) and the new [API keys](https://github.com/orgs/supabase/discussions/29260). If you're still on legacy JWTs, see the [Legacy JWT Secret guide](/docs/guides/functions/auth-legacy-jwt).
 
@@ -15,7 +15,7 @@ Every request to an Edge Function passes through two layers of auth. First, a pl
 
 ## Understanding authorization headers
 
-Edge Functions care about two request headers. Sending the right credential in the right header is the most common source of 401s.
+Edge Functions care about two request headers. Sending the wrong credential in the wrong header is the most common source of 401s.x
 
 | Header          | Value                                   | Used for                               |
 | --------------- | --------------------------------------- | -------------------------------------- |
@@ -91,10 +91,7 @@ Deno.serve((req) => {
     return Response.json({ error: 'forbidden' }, { status: 401 })
   }
 
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SECRET_KEY')!
-  )
+  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SECRET_KEY')!)
 
   // your business logic. queries run with the service role
   return Response.json({ ok: true })
@@ -152,7 +149,7 @@ Deno.serve(async (req) => {
 
 The [`@supabase/server`](https://github.com/supabase/server) package wraps your handler, checks the caller's credentials against a declared `allow` mode, and hands you a pre-configured Supabase client on `ctx`. The same patterns above, written against the SDK, look like this.
 
-| `allow` mode      | Accepts                                    |
+| Mode              | Accepts                                    |
 | ----------------- | ------------------------------------------ |
 | `'user'`          | A valid user JWT on `Authorization`        |
 | `'secret:<name>'` | A named secret key on `apikey`             |
@@ -266,10 +263,7 @@ export default {
   fetch: async (req: Request) => {
     const { data: ctx, error } = await createSupabaseContext(req, { allow: 'user' })
     if (error) {
-      return Response.json(
-        { message: error.message, code: error.code },
-        { status: error.status }
-      )
+      return Response.json({ message: error.message, code: error.code }, { status: error.status })
     }
     return Response.json({ message: `hello ${ctx.userClaims?.email}` })
   },
