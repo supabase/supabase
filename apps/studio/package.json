@@ -6,7 +6,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "vite dev --port ${STUDIO_PORT:-8082}",
-    "build": "vite build && tsx scripts/patch-vercel-config.ts",
+    "build": "vite build",
     "start": "vite preview --port 8082",
     "dev:next": "next dev -p ${STUDIO_PORT:-8082}",
     "build:next": "next build && if [ \"$SKIP_ASSET_UPLOAD\" != \"1\" ]; then ./../../scripts/upload-static-assets.sh; fi",
@@ -116,7 +116,6 @@
     "monaco-editor": "0.52.2",
     "next": "catalog:",
     "next-themes": "^0.3.0",
-    "nitro": "3.0.260415-beta",
     "nuqs": "2.7.1",
     "openai": "^4.104.0",
     "openapi-fetch": "0.12.4",

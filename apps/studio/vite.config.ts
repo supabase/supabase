@@ -5,7 +5,6 @@ import { fileURLToPath } from 'node:url'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
-import { nitro } from 'nitro/vite'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url))
@@ -104,7 +103,6 @@ export default defineConfig(({ mode }) => {
   // Start has no single knob — the prefix has to be declared in three places
   // (see BASE_PATH_REDIRECT_GUIDE.md):
   //   - Vite `base`      — bakes the prefix into asset URLs in the built bundle
-  //   - Nitro `baseURL`  — mounts the production server at that path
   //   - Router `basepath` — makes client-side navigation match the prefix
   // The router layer is set in router.tsx off the same env var (inlined via
   // `define` above). Leaving the var empty keeps the app at `/` as today.
@@ -139,44 +137,6 @@ export default defineConfig(({ mode }) => {
         srcDirectory: './',
         spa: {
           enabled: true,
-        },
-      }),
-      nitro({
-        // `tslib`'s Node ESM entry (`modules/index.js`) destructures from a
-        // default-imported CJS file (`tslib.js`). When Nitro's external-tracer
-        // resolves packages like `@ai-sdk/amazon-bedrock` that `import … from
-        // "tslib"`, it picks up that ESM-wrapper which Rolldown then botches
-        // when flattening the UMD body — producing "__extends is not a
-        // function" at SSR module evaluation time (configcat-common hits this
-        // too). Preferring the `module` export condition makes the resolver
-        // select the pure ESM `tslib.es6.mjs` directly, and forcing `tslib`
-        // inline keeps its runtime resolution (which would still look for
-        // `modules/index.js` via `package.json#exports`) out of the picture.
-        exportConditions: ['module'],
-        noExternals: ['tslib'],
-        // See the `basePath` comment above — Nitro's own mount point needs the
-        // same prefix as Vite/router. `routeRules` paths are matched AFTER
-        // baseURL is stripped, so if we add redirects later they should be
-        // written relative to the base.
-        ...(basePath && { baseURL: basePath }),
-        vercel: {
-          config: {
-            version: 3,
-            routes: [
-              // Cache static assets aggressively
-              {
-                src: '/assets/(.*)',
-                headers: { 'cache-control': 'public, max-age=31536000, immutable' },
-              },
-              // Serve any file that exists on disk (shell, prerendered pages, favicons, etc.)
-              { handle: 'filesystem' },
-              // Route API and server function requests to the Vercel function
-              { src: '/api/(.*)', dest: '/__server' },
-              { src: '/_serverFn/(.*)', dest: '/__server' },
-              // Everything else: SPA shell, served statically — no function invocation
-              { src: '/(.*)', dest: '/_shell.html' },
-            ],
-          },
         },
       }),
       viteReact(),
