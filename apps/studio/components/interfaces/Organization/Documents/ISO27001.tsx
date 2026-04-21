@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -13,6 +12,7 @@ import {
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
 import NoPermission from '@/components/ui/NoPermission'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { getDocument } from '@/data/documents/document-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -76,11 +76,12 @@ export const ISO27001 = () => {
           <NoPermission resourceText="access our ISO 27001 certificate" />
         ) : !hasAccessToISO27001 ? (
           <div className="@lg:flex items-center justify-center h-full">
-            <Button asChild type="default">
-              <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=iso27001`}>
-                Upgrade to Team
-              </Link>
-            </Button>
+            <UpgradePlanButton
+              variant="default"
+              plan="Team"
+              source="org-documents-iso27001"
+              featureProposition="download the ISO 27001 certificate"
+            />
           </div>
         ) : (
           <div className="@lg:flex items-center justify-center h-full">
