@@ -1,4 +1,3 @@
-import { useBreakpoint } from 'common'
 import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
 import {
   ChangelogV3TimelineFlatList,
@@ -16,6 +15,7 @@ import {
 import { discussionDisplayDate, githubChangelogLabelFilterUrl } from '~/lib/changelog.utils'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
+import { useBreakpoint } from 'common'
 import dayjs from 'dayjs'
 import { GitCommit, ListFilter, X } from 'lucide-react'
 import type { GetServerSideProps } from 'next'
@@ -25,7 +25,7 @@ import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import {
   Badge,
   Button,
@@ -69,9 +69,7 @@ const CHANGELOG_PRODUCT_TAGS = [
 
 type ChangelogProductSlug = (typeof CHANGELOG_PRODUCT_TAGS)[number]['slug']
 
-const CHANGELOG_PRODUCT_SLUG_SET = new Set<string>(
-  CHANGELOG_PRODUCT_TAGS.map((t) => t.slug)
-)
+const CHANGELOG_PRODUCT_SLUG_SET = new Set<string>(CHANGELOG_PRODUCT_TAGS.map((t) => t.slug))
 
 function isChangelogProductSlug(value: string): value is ChangelogProductSlug {
   return CHANGELOG_PRODUCT_SLUG_SET.has(value)
@@ -96,7 +94,6 @@ type ModalPayload = {
 type PageProps = {
   featured: FeaturedEntry[]
   restIndex: ChangelogTimelineIndexItem[]
-  /** Full sorted index (visible only), for client-side filtering. */
   allIndex: ChangelogTimelineIndexItem[]
 }
 
@@ -186,7 +183,7 @@ function ChangelogDiscussionArticle({
   payload: ModalPayload | null
 }) {
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-2 md:px-5">
+    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 md:px-5">
       {loading && <GenericSkeletonLoader className="py-2" />}
       {!loading && payload?.source && (
         <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
@@ -207,7 +204,10 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
     parseAsInteger.withOptions(nuqsUrlOptions)
   )
 
-  const [querySearch, setQuerySearch] = useQueryState('q', parseAsString.withOptions(nuqsUrlOptions))
+  const [querySearch, setQuerySearch] = useQueryState(
+    'q',
+    parseAsString.withOptions(nuqsUrlOptions)
+  )
   const [queryTags, setQueryTags] = useQueryState(
     'tags',
     parseAsArrayOf(parseAsString).withOptions(nuqsUrlOptions)
@@ -236,6 +236,14 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
   useEffect(() => {
     if (hasNuqsFilters) setFilterPanelOpen(true)
   }, [hasNuqsFilters])
+
+  /** Hash anchors (e.g. year deep-links) scroll the page behind the dialog/sheet; drop hash when opening a discussion. */
+  useLayoutEffect(() => {
+    if (discussion == null) return
+    const { pathname, search, hash } = window.location
+    if (!hash) return
+    window.history.replaceState(window.history.state, '', `${pathname}${search}`)
+  }, [discussion])
 
   const filteredIndex = useMemo(() => {
     const q = filterSearch
@@ -339,6 +347,10 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
   const displayDateIso = preview?.dateIso ?? payload?.created_at
 
   const handleSelectFromList = (item: ChangelogTimelineIndexItem) => {
+    const { pathname, search, hash } = window.location
+    if (hash) {
+      window.history.replaceState(window.history.state, '', `${pathname}${search}`)
+    }
     void setDiscussion(item.number)
   }
 
@@ -445,12 +457,38 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
           {filteredIndex != null ? (
             <section aria-label="Filtered changelog entries" className="min-w-0">
               {filteredIndex.length === 0 ? (
-                <p className="text-foreground-lighter text-sm">No entries match your filters.</p>
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-foreground-lighter text-sm">No entries match your filters.</p>
+                  {!filterPanelOpen && (
+                    <Button
+                      type="text"
+                      size="tiny"
+                      className="shrink-0"
+                      icon={<X className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
+                      onClick={clearFilters}
+                    >
+                      Clear filters
+                    </Button>
+                  )}
+                </div>
               ) : (
                 <>
-                  <p className="text-foreground-lighter mb-3 text-sm">
-                    {filteredIndex.length} {filteredIndex.length === 1 ? 'result' : 'results'}
-                  </p>
+                  <div className="text-foreground-lighter mb-3 flex flex-wrap items-center justify-between gap-2 text-sm">
+                    <p>
+                      {filteredIndex.length} {filteredIndex.length === 1 ? 'result' : 'results'}
+                    </p>
+                    {!filterPanelOpen && (
+                      <Button
+                        type="text"
+                        size="tiny"
+                        className="shrink-0"
+                        icon={<X className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
+                        onClick={clearFilters}
+                      >
+                        Clear filters
+                      </Button>
+                    )}
+                  </div>
                   <ChangelogV3TimelineFlatList
                     items={filteredIndex}
                     mode="action"
@@ -569,11 +607,22 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
               <div className="px-4 pb-3 pt-4 pr-12 md:px-5 md:pr-14">
                 <h2 className="text-foreground text-left text-xl">{displayTitle}</h2>
                 <div className="text-foreground-lighter flex flex-col gap-2 text-left">
-                  {displayDateIso && (
-                    <p className="font-mono text-xs">
-                      {dayjs(displayDateIso).format('MMM D, YYYY')}
-                    </p>
-                  )}
+                  <div className="flex items-center flex-wrap gap-1.5">
+                    {displayDateIso && (
+                      <p className="font-mono text-xs">
+                        {dayjs(displayDateIso).format('MMM D, YYYY')}{' '}
+                        <span className="text-foreground-lighter text-xs">—</span>
+                      </p>
+                    )}
+                    <Link
+                      href={preview?.url ?? ''}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-foreground-lighter hover:text-foreground-light hover:underline text-sm"
+                    >
+                      View on GitHub
+                    </Link>
+                  </div>
                   {error && <span className="text-destructive-600 text-sm">{error}</span>}
                 </div>
               </div>
@@ -591,11 +640,22 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
                 <DialogTitle className="pr-8 text-left text-xl">{displayTitle}</DialogTitle>
                 <DialogDescription asChild>
                   <div className="text-foreground-lighter flex flex-col gap-2 text-left">
-                    {displayDateIso && (
-                      <p className="font-mono text-xs">
-                        {dayjs(displayDateIso).format('MMM D, YYYY')}
-                      </p>
-                    )}
+                    <div className="flex items-center flex-wrap gap-1.5">
+                      {displayDateIso && (
+                        <p className="font-mono text-xs">
+                          {dayjs(displayDateIso).format('MMM D, YYYY')}{' '}
+                          <span className="text-foreground-lighter text-xs">—</span>
+                        </p>
+                      )}
+                      <Link
+                        href={preview?.url ?? ''}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-foreground-lighter hover:text-foreground-light hover:underline text-sm"
+                      >
+                        View on GitHub
+                      </Link>
+                    </div>
                     {error && <span className="text-destructive-600 text-sm">{error}</span>}
                   </div>
                 </DialogDescription>
