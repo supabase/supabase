@@ -10,16 +10,7 @@ const path = '.vercel/output/config.json'
 const config = JSON.parse(readFileSync(path, 'utf-8'))
 
 config.routes = [
-  {
-    src: `${base}/assets/(.*)`,
-    headers: { 'cache-control': 'public, max-age=31536000, immutable' },
-  },
-  { src: `${base}/api/(.*)`, dest: '/__server' },
-  { src: `${base}/_serverFn/(.*)`, dest: '/__server' },
-  // Explicitly exclude assets with a separate rule BEFORE the catch-all
-  { src: `${base}/assets/(.*)`, dest: `${base}/assets/$1` },
-  // Catch-all — no negative lookahead needed since assets is handled above
-  { src: `${base}(/.*)?`, dest: `${base}/_shell.html` },
+  { src: '/dashboard/organizations', dest: '/dashboard/_shell.html' },
   { handle: 'filesystem' },
 ]
 
