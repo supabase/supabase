@@ -20,7 +20,6 @@ import { useBucketFilePickerStateSnapshot } from './BucketFilePickerState'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useBucketObjectsInfiniteQuery } from '@/data/storage/bucket-objects-infinite-query'
-import { listBucketObjects } from '@/data/storage/bucket-objects-list-mutation'
 import { storageKeys } from '@/data/storage/keys'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
@@ -242,12 +241,6 @@ export const BucketFilePickerColumn = ({
     setSelectedFilePreview(undefined)
   }
 
-  const onSelectFile = async (item: StorageItemWithColumn) => {
-    setSelectedFilePreview(item)
-    setSelectedFolder(null)
-    clearSelectedItems()
-  }
-
   const onSelectColumnEmptySpace = (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
     setSelectedFilePreview(undefined)
@@ -399,9 +392,15 @@ export const BucketFilePickerColumn = ({
                     event.stopPropagation()
                     event.preventDefault()
                     if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
-                      item.type === STORAGE_ROW_TYPES.FOLDER
-                        ? setSelectedFolder(item.path ?? null)
-                        : onSelectFile(item)
+                      if (item.type === STORAGE_ROW_TYPES.FOLDER) {
+                        setSelectedFilePreview(undefined)
+                        setSelectedFolder(item.name)
+                      } else {
+                        setSelectedFilePreview(item)
+                        // deselect all folders when previewing a file
+                        popColumnAtIndex(index)
+                        clearSelectedItems()
+                      }
                     }
                   }}
                 />

@@ -15,10 +15,10 @@ function createBucketFilePickerState({ bucket, maxFiles }: { bucket: Bucket; max
       state.columns = state.columns.slice(0, lastColumnIndex)
     },
     popColumnAtIndex: (index: number) => {
-      state.columns = state.columns.slice(0, index + 1)
+      state.columns = state.columns.slice(0, index)
     },
     pushColumnAtIndex: (column: string, index: number) => {
-      state.columns = state.columns.slice(0, index + 1).concat([column])
+      state.columns = state.columns.slice(0, index).concat([column])
     },
 
     selectedItems: [] as StorageItemWithColumn[],
