@@ -7,7 +7,7 @@ import { routes, type VercelConfig } from '@vercel/config/v1'
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 export const config: VercelConfig = {
-  framework: 'tanstack-start',
+  framework: null,
   outputDirectory: 'dist/client',
   cleanUrls: true,
   rewrites: [
