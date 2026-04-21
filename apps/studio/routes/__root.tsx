@@ -21,6 +21,7 @@ import 'ui-patterns/ShimmeringLoader/index.css'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 
+import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/react'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'
@@ -46,6 +47,7 @@ import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
@@ -100,6 +102,19 @@ const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
       },
     ]
   : []
+
+// [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
+// locally. We're however, only storing the assets which we need (based on what the network tab loads
+// while using monaco). If we end up facing more effort trying to maintain this, probably to either
+// use cloudflare or find some way to pull all the files from a CDN via a CLI, rather than tracking individual files
+// The alternative was to import * as monaco from 'monaco-editor' but i couldn't get it working
+loader.config({
+  paths: {
+    vs: IS_PLATFORM
+      ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs'
+      : `${BASE_PATH}/monaco-editor`,
+  },
+})
 
 const FAVICON_ROUTE = '/favicon'
 const THEME_COLOR = '1E1E1E'
@@ -261,6 +276,7 @@ function RootComponent() {
                           <UpdateBillingAddressModal />
                         </FeaturePreviewContextProvider>
                         <Toaster />
+                        <MonacoThemeProvider />
                       </CommandProvider>
                     </AiAssistantStateContextProvider>
                     <DevToolbar extraTabs={devToolbarExtraTabs} />
