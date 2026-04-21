@@ -1,4 +1,10 @@
-import { useLocation, useMatches, useRouter as useTanStackRouter } from '@tanstack/react-router'
+import {
+  useLocation,
+  useMatches,
+  useParams,
+  useSearch,
+  useRouter as useTanStackRouter,
+} from '@tanstack/react-router'
 
 import { getRouterEventsProxy } from './_router-events'
 
@@ -14,9 +20,12 @@ export function useRouter() {
   const router = useTanStackRouter()
   const location = useLocation()
   const matches = useMatches()
+  const params = useParams({ strict: false })
+  const search = useSearch({ strict: false })
   const leafRouteId = matches[matches.length - 1]?.routeId ?? location.pathname
   return {
     pathname: toNextPathPattern(leafRouteId),
+    query: { ...params, ...search },
     asPath: location.href,
     basePath: router.basepath ?? '',
     events: getRouterEventsProxy(router),

@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dynamic from 'next/dynamic'
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, type ComponentType } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type {
@@ -106,6 +106,27 @@ function useConnectionStringPooler(): ConnectionStringPooler {
   )
 }
 
+// Vite needs `import.meta.glob` to statically discover the step content
+// modules because the `${filePath}` template can span multiple directory
+// segments (`flask/supabasepy`, `steps/shadcn/explore`, ...) which Vite's
+// dynamic-import-vars plugin can't analyze. Skip the glob on the SSR bundle
+// — Vite replaces `import.meta.env.SSR` at build time and tree-shakes the
+// call so the 37 content modules stay out of the server graph (pulling them
+// in reshuffles chunks enough to surface latent circular-dep bugs in
+// unrelated modules). Next/webpack doesn't know about `import.meta.glob`
+// either; the try/catch lets that branch fall through to the webpack-friendly
+// `import()` below.
+let contentModules: Record<string, () => Promise<unknown>> = {}
+if (!import.meta.env?.SSR) {
+  try {
+    contentModules = import.meta.glob('./content/**/content.{tsx,ts}')
+  } catch {
+    // webpack build: import.meta.glob is undefined, keep empty map
+  }
+}
+
+type StepContentModule = { default: ComponentType<StepContentProps> }
+
 /**
  * Dynamically loads and renders a content component from the content directory.
  * All step content uses this unified loader - no built-in component registry needed.
@@ -126,7 +147,16 @@ function StepContent({
 
   // Dynamically import the content component
   const ContentComponent = useMemo(() => {
-    return dynamic<StepContentProps>(() => import(`./content/${filePath}/content`), {
+    const viteLoader =
+      contentModules[`./content/${filePath}/content.tsx`] ??
+      contentModules[`./content/${filePath}/content.ts`]
+
+    const loader = viteLoader
+      ? (viteLoader as () => Promise<StepContentModule>)
+      : () =>
+          import(/* @vite-ignore */ `./content/${filePath}/content`) as Promise<StepContentModule>
+
+    return dynamic<StepContentProps>(loader, {
       loading: () => (
         <div className="p-4 min-h-[200px]">
           <GenericSkeletonLoader />
