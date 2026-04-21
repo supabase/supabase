@@ -16,8 +16,10 @@ config.routes = [
   },
   { src: `${base}/api/(.*)`, dest: '/__server' },
   { src: `${base}/_serverFn/(.*)`, dest: '/__server' },
-  // Rewrite all non-asset paths under the base to the shell, then let filesystem serve it
-  { src: `${base}/((?!assets/).*)`, dest: `${base}/_shell.html` },
+  // Explicitly exclude assets with a separate rule BEFORE the catch-all
+  { src: `${base}/assets/(.*)`, dest: `${base}/assets/$1` },
+  // Catch-all — no negative lookahead needed since assets is handled above
+  { src: `${base}(/.*)?`, dest: `${base}/_shell.html` },
   { handle: 'filesystem' },
 ]
 
