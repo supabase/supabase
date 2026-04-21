@@ -56,6 +56,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { AuthProvider } from '@/lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { ProfileProvider } from '@/lib/profile'
+import { Telemetry } from '@/lib/telemetry'
 import { Toaster } from '@/lib/toaster'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 
@@ -284,6 +285,7 @@ function RootComponent() {
                   </DevToolbarProvider>
                 </ThemeProvider>
               </TooltipProvider>
+              <Telemetry />
             </ProfileProvider>
           </FeatureFlagProviderWithOrgContext>
         </AuthProvider>
