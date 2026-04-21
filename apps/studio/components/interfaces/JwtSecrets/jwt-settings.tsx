@@ -397,24 +397,28 @@ const JWTSettings = () => {
                     <>
                       <ol className="text-sm text-foreground-light list-decimal list-inside space-y-2">
                         <li>
-                          <span className="text-foreground">Migrate your legacy JWT secret</span> on
-                          the JWT Signing Keys page. Your project keeps using its existing symmetric
-                          secret while Supabase prepares it for asymmetric JWTs and generates a
-                          standby key pair.
+                          <span className="text-foreground">
+                            Click <em className="not-italic">Migrate JWT secret</em>
+                          </span>{' '}
+                          on the JWT Signing Keys page. This imports your legacy secret into the new
+                          system and generates a standby asymmetric key.
                         </li>
                         <li>
-                          <span className="text-foreground">Create new API keys</span> — publishable
-                          (<code>sb_publishable_...</code>) and secret (<code>sb_secret_...</code>)
-                          — and roll them out in place of <code>anon</code> and{' '}
-                          <code>service_role</code>. Use the{' '}
+                          <span className="text-foreground">Create and roll out new API keys.</span>{' '}
+                          On the API Keys page, create a publishable key (
+                          <code>sb_publishable_...</code>) and secret keys (
+                          <code>sb_secret_...</code>), then swap them into your apps in place of{' '}
+                          <code>anon</code> and <code>service_role</code>. Watch the{' '}
                           <em className="not-italic text-foreground">last used</em> indicators to
                           confirm no traffic still depends on the legacy keys.
                         </li>
                         <li>
-                          <span className="text-foreground">Rotate to asymmetric JWTs</span> on the
-                          JWT Signing Keys page. Supabase Auth starts signing new JWTs with the new
-                          private key; existing <code>anon</code>, <code>service_role</code>, and
-                          active user JWTs remain valid.
+                          <span className="text-foreground">
+                            Click <em className="not-italic">Rotate keys</em>
+                          </span>{' '}
+                          on the JWT Signing Keys page to start signing new JWTs with the standby
+                          key. Existing <code>anon</code>, <code>service_role</code>, and active
+                          user JWTs stay valid.
                           <p className="mt-1 text-xs">
                             Before rotating, switch any code that verifies JWTs directly against the
                             legacy secret (e.g. <code>jose</code>, <code>jsonwebtoken</code>) to{' '}
@@ -424,10 +428,8 @@ const JWTSettings = () => {
                           </p>
                         </li>
                         <li>
-                          <span className="text-foreground">Revoke the legacy JWT secret</span> once
-                          you've verified everything works. JWTs signed with the old secret —
-                          including legacy <code>anon</code> and <code>service_role</code> — will
-                          then be rejected.
+                          <span className="text-foreground">Revoke the legacy JWT secret</span> from
+                          the JWT Signing Keys page once everything is working.
                           <p className="mt-1 text-xs">
                             Wait at least one full access-token expiry window (e.g. 1 hour 15
                             minutes for the default 1-hour expiry) before revoking so active users
