@@ -1,49 +1,25 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { PauseCircle } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { AWS_REGIONS, CloudProvider } from 'shared-data'
-import { toast } from 'sonner'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
   cn,
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogSection,
-  DialogTitle,
-  Form_Shadcn_,
-  FormField_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { z } from 'zod'
 
 import { PauseDisabledState } from './PauseDisabledState'
-import {
-  extractPostgresVersionDetails,
-  PostgresVersionSelector,
-} from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { ResumeProjectButton } from '@/components/interfaces/Project/ResumeProjectButton'
 import AlertError from '@/components/ui/AlertError'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
-import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
-import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectPauseStatusQuery } from '@/data/projects/project-pause-status-query'
-import { useProjectRestoreMutation } from '@/data/projects/project-restore-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePHFlag } from '@/hooks/ui/useFlag'
@@ -57,12 +33,8 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { setProjectStatus } = useSetProjectStatus()
 
-  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const enableProBenefitWording = usePHFlag('proBenefitWording')
-
-  const region = Object.values(AWS_REGIONS).find((x) => x.code === project?.region)
 
   const orgSlug = selectedOrganization?.slug
   const {
@@ -80,64 +52,6 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const isFreePlan = selectedOrganization?.plan?.id === 'free'
   const isRestoreDisabled = isPauseStatusSuccess && !pauseStatus.can_restore
-
-  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
-    { slug: orgSlug },
-    { enabled: isFreePlan }
-  )
-
-  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
-  const [showConfirmRestore, setShowConfirmRestore] = useState(false)
-  const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
-
-  const { mutate: restoreProject, isPending: isRestoring } = useProjectRestoreMutation({
-    onSuccess: (_, variables) => {
-      setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.RESTORING })
-      toast.success('Restoring project, project will be ready in a few minutes')
-    },
-  })
-
-  const { can: canResumeProject } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_jobs.projects.initialize_or_resume'
-  )
-
-  const onSelectRestore = () => {
-    if (!canResumeProject) {
-      toast.error('You do not have the required permissions to restore this project')
-    } else if (hasMembersExceedingFreeTierLimit) setShowFreeProjectLimitWarning(true)
-    else setShowConfirmRestore(true)
-  }
-
-  const onConfirmRestore = async (values: z.infer<typeof FormSchema>) => {
-    if (!project) {
-      return toast.error('Unable to restore: project is required')
-    }
-
-    if (!showPostgresVersionSelector) {
-      restoreProject({ ref: project.ref })
-    } else {
-      const { postgresVersionSelection } = values
-
-      const postgresVersionDetails = extractPostgresVersionDetails(postgresVersionSelection)
-
-      restoreProject({
-        ref: project.ref,
-        releaseChannel: postgresVersionDetails.releaseChannel,
-        postgresEngine: postgresVersionDetails.postgresEngine,
-      })
-    }
-  }
-
-  const FormSchema = z.object({
-    postgresVersionSelection: z.string(),
-  })
-
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    mode: 'onChange',
-    defaultValues: { postgresVersionSelection: '' },
-  })
 
   return (
     <>
@@ -236,22 +150,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
         {isPauseStatusSuccess && !isRestoreDisabled && (
           <CardFooter className="flex flex-wrap justify-end items-center gap-2">
-            <ButtonTooltip
-              size="tiny"
-              type="default"
-              disabled={!canResumeProject}
-              onClick={onSelectRestore}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canResumeProject
-                    ? 'You need additional permissions to resume this project'
-                    : undefined,
-                },
-              }}
-            >
-              Resume project
-            </ButtonTooltip>
+            <ResumeProjectButton size="tiny" type="default" />
 
             {isFreePlan ? (
               <Button asChild type="primary">
@@ -271,90 +170,6 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
         {isPauseStatusSuccess && isRestoreDisabled && <PauseDisabledState />}
       </Card>
-
-      <ConfirmationModal
-        visible={showConfirmRestore}
-        size="small"
-        title="Resume this project"
-        onCancel={() => setShowConfirmRestore(false)}
-        onConfirm={() => form.handleSubmit(onConfirmRestore)()}
-        loading={isRestoring}
-        confirmLabel="Resume"
-        confirmLabelLoading="Resuming"
-        cancelLabel="Cancel"
-      >
-        <div className={cn(showPostgresVersionSelector && 'flex flex-col gap-y-4')}>
-          <p className="text-sm">
-            {isFreePlan
-              ? 'Your project’s data will be restored to when it was initially paused.'
-              : 'Your project’s data will be restored and billing will resume based on compute size and hours active.'}
-          </p>
-          <Form_Shadcn_ {...form}>
-            <form onSubmit={form.handleSubmit(onConfirmRestore)}>
-              {showPostgresVersionSelector && (
-                <div className="space-y-2">
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="postgresVersionSelection"
-                    render={({ field }) => (
-                      <PostgresVersionSelector
-                        field={field}
-                        form={form}
-                        type="unpause"
-                        label="Postgres version"
-                        layout="vertical"
-                        dbRegion={region?.displayName ?? ''}
-                        cloudProvider={(project?.cloud_provider ?? 'AWS') as CloudProvider}
-                        organizationSlug={selectedOrganization?.slug}
-                      />
-                    )}
-                  />
-                </div>
-              )}
-            </form>
-          </Form_Shadcn_>
-        </div>
-      </ConfirmationModal>
-
-      <Dialog
-        open={showFreeProjectLimitWarning}
-        onOpenChange={() => setShowFreeProjectLimitWarning(false)}
-      >
-        <DialogContent size="medium" className="gap-0 pb-0">
-          <DialogHeader className="border-b">
-            <DialogTitle className="leading-normal">
-              Your organization has members who have exceeded their free project limits
-            </DialogTitle>
-          </DialogHeader>
-          <DialogSection className="text-sm">
-            <p className="text-foreground-light">
-              The following members have reached their maximum limits for the number of active free
-              plan projects within organizations where they are an administrator or owner:
-            </p>
-            <ul className="my-4 list-disc list-inside">
-              {(membersExceededLimit || []).map((member, idx: number) => (
-                <li key={`member-${idx}`}>
-                  {member.username || member.primary_email} (Limit: {member.free_project_limit} free
-                  projects)
-                </li>
-              ))}
-            </ul>
-            <p className="text-foreground-light">
-              These members will need to either delete, pause, or upgrade one or more of these
-              projects before you're able to resume this project.
-            </p>
-          </DialogSection>
-          <DialogFooter>
-            <Button
-              htmlType="button"
-              type="default"
-              onClick={() => setShowFreeProjectLimitWarning(false)}
-            >
-              Understood
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   )
 }
