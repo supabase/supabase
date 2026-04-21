@@ -37,9 +37,7 @@ type DefaultPrivilegesExposureOptions =
  * either cohort. Deduplicated via ref so re-renders and mid-session flag flips
  * don't re-fire.
  */
-export const useTrackDefaultPrivilegesExposure = (
-  options: DefaultPrivilegesExposureOptions
-) => {
+export const useTrackDefaultPrivilegesExposure = (options: DefaultPrivilegesExposureOptions) => {
   const track = useTrack()
   const flag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
   const hasTracked = useRef(false)

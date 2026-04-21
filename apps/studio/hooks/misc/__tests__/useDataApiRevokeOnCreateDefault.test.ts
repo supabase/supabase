@@ -1,13 +1,13 @@
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { usePHFlag } from '@/hooks/ui/useFlag'
-import * as constants from '@/lib/constants'
-import { useTrack } from '@/lib/telemetry/track'
 import {
   useDataApiRevokeOnCreateDefaultEnabled,
   useTrackDefaultPrivilegesExposure,
 } from '../useDataApiRevokeOnCreateDefault'
+import { usePHFlag } from '@/hooks/ui/useFlag'
+import * as constants from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 vi.mock('@/hooks/ui/useFlag', () => ({
   usePHFlag: vi.fn(),
