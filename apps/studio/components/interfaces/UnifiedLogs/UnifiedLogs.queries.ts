@@ -228,8 +228,9 @@ const calculateChartBucketing = (search: SearchParamsType | Record<string, any>)
  */
 const getEdgeLogsQuery = () => {
   return `
-    select 
+    select
       id,
+      null as source_id,
       el.timestamp as timestamp,
       'edge' as log_type,
       CAST(edge_logs_response.status_code AS STRING) as status,
@@ -261,8 +262,9 @@ const getEdgeLogsQuery = () => {
 // WHERE pathname includes `/rest/`
 const getPostgrestLogsQuery = () => {
   return `
-    select 
+    select
       id,
+      null as source_id,
       el.timestamp as timestamp,
       'postgrest' as log_type,
       CAST(edge_logs_response.status_code AS STRING) as status,
@@ -292,8 +294,9 @@ const getPostgrestLogsQuery = () => {
  */
 const getPostgresLogsQuery = () => {
   return `
-    select 
+    select
       id,
+      null as source_id,
       pgl.timestamp as timestamp,
       'postgres' as log_type,
       CAST(pgl_parsed.sql_state_code AS STRING) as status,
@@ -320,8 +323,9 @@ const getPostgresLogsQuery = () => {
  */
 const getEdgeFunctionLogsQuery = () => {
   return `
-    select 
-      id, 
+    select
+      id,
+      null as source_id,
       fel.timestamp as timestamp,
       'edge function' as log_type,
       CAST(fel_response.status_code AS STRING) as status,
@@ -359,8 +363,9 @@ const getEdgeFunctionLogsQuery = () => {
 const getAuthLogsQuery = () => {
   return `
     select
-      al.id as id, 
-      el_in_al.timestamp as timestamp, 
+      el_in_al.id as id,
+      al.id as source_id,
+      el_in_al.timestamp as timestamp,
       'auth' as log_type,
       CAST(el_in_al_response.status_code AS STRING) as status,
       CASE
@@ -393,8 +398,9 @@ const getAuthLogsQuery = () => {
  */
 const getSupabaseStorageLogsQuery = () => {
   return `
-    select 
+    select
       id,
+      null as source_id,
       el.timestamp as timestamp,
       'storage' as log_type,
       CAST(edge_logs_response.status_code AS STRING) as status,
@@ -456,6 +462,7 @@ export const getUnifiedLogsQuery = (search: QuerySearchParamsType): string => {
 ${getUnifiedLogsCTE(effectiveLogTypes)}
 SELECT
     id,
+    source_id,
     timestamp,
     log_type,
     status,
