@@ -2,10 +2,13 @@ import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-q
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export const useIsEnterpriseOrSupabaseOrg = () => {
-  const { data: org } = useSelectedOrganizationQuery()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-  const isEnterprise = subscription?.plan?.id === 'enterprise'
-  const isSupabaseOrg = org?.id === 1
+  const { data: org, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
+  const { data: subscription, isLoading: isSubscriptionLoading } = useOrgSubscriptionQuery({
+    orgSlug: org?.slug,
+  })
 
-  return isEnterprise || isSupabaseOrg
+  const isLoading = isOrgLoading || (org !== undefined && isSubscriptionLoading)
+  const isEligible = subscription?.plan?.id === 'enterprise' || org?.id === 1
+
+  return { isLoading, isEligible }
 }

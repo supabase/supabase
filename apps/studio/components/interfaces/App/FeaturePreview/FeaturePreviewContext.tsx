@@ -88,7 +88,7 @@ export const useUnifiedLogsPreview = () => {
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
   const unifiedLogsEnabled = useFlag('unifiedLogs')
 
-  const isEnterpriseOrSupabaseOrg = useIsEnterpriseOrSupabaseOrg()
+  const { isEligible: isEnterpriseOrSupabaseOrg, isLoading } = useIsEnterpriseOrSupabaseOrg()
 
   const isEligible = unifiedLogsEnabled && isEnterpriseOrSupabaseOrg
   const isEnabled = isEligible && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
@@ -96,7 +96,7 @@ export const useUnifiedLogsPreview = () => {
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
 
-  return { isEnabled, isEligible, enable, disable }
+  return { isEnabled, isEligible, isLoading, enable, disable }
 }
 
 export const useIsPgDeltaDiffEnabled = () => {

@@ -17,7 +17,7 @@ export type FeaturePreview = {
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const isEnterpriseOrSupabaseOrg = useIsEnterpriseOrSupabaseOrg()
+  const { isEligible: isEnterpriseOrSupabaseOrg } = useIsEnterpriseOrSupabaseOrg()
 
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
