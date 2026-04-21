@@ -189,6 +189,8 @@ extension ContextExtension on BuildContext {
 
 Notice that we have a `showSnackBar` extension method that we will use to show snack bars in the app. You could define this method in a separate file and import it where needed, but for simplicity, we will define it here.
 
+When a user opens the magic link, Supabase may redirect back to your app with a `code` in the URL. The client exchanges this code for a session, which then triggers `onAuthStateChange`. If you need to handle the redirect flow manually, use `exchangeCodeForSession` with the returned code.
+
 ### Set up a login page
 
 Let's create a Flutter widget to manage logins and sign ups. We will use Magic Links, so users can sign in with their email without using passwords.
