@@ -387,12 +387,6 @@ export const PerformanceSettingsForm = () => {
                               <FormInputGroupInput
                                 type="number"
                                 {...field}
-                                min={chosenUnit === 'percent' ? 1 : 3}
-                                max={
-                                  chosenUnit === 'percent'
-                                    ? 100
-                                    : Math.floor(maxConnectionLimit * 0.8)
-                                }
                                 disabled={!canUpdateConfig || promptUpgrade}
                               />
                               <InputGroupAddon align="inline-end">
