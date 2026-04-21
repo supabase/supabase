@@ -101,7 +101,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### App shell — top-level pages
 
-- [ ] `routes/_app/organizations.tsx` ← `pages/organizations.tsx`
+- [x] A `routes/_app/organizations.tsx` ← `pages/organizations.tsx` (page default already withAuth-wrapped; PageLayout wraps body)
 - [ ] `routes/_app/new/index.tsx` ← `pages/new/index.tsx`
 - [ ] `routes/_app/new/$slug.tsx` ← `pages/new/[slug].tsx`
 - [ ] `routes/_app/aws-marketplace-onboarding.tsx` ← `pages/aws-marketplace-onboarding.tsx`

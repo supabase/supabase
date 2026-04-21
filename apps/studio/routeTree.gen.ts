@@ -30,6 +30,7 @@ import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthForgotPasswordMfaRouteImport } from './routes/_auth/forgot-password-mfa'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
+import { Route as AppOrganizationsRouteImport } from './routes/_app/organizations'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as ApiConnectIndexRouteImport } from './routes/api/connect/index'
 import { Route as ApiIntegrationsStripeSyncRouteImport } from './routes/api/integrations/stripe-sync'
@@ -219,6 +220,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
   getParentRoute: () => AuthRoute,
+} as any)
+const AppOrganizationsRoute = AppOrganizationsRouteImport.update({
+  id: '/organizations',
+  path: '/organizations',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppAccountRoute = AppAccountRouteImport.update({
   id: '/account',
@@ -707,6 +713,7 @@ const ApiPlatformStorageRefBucketsIdObjectsDownloadRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AppAccountRouteWithChildren
+  '/organizations': typeof AppOrganizationsRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/forgot-password-mfa': typeof AuthForgotPasswordMfaRoute
   '/reset-password': typeof AuthResetPasswordRoute
@@ -812,6 +819,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AppAccountRouteWithChildren
+  '/organizations': typeof AppOrganizationsRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/forgot-password-mfa': typeof AuthForgotPasswordMfaRoute
   '/reset-password': typeof AuthResetPasswordRoute
@@ -920,6 +928,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
   '/_app/account': typeof AppAccountRouteWithChildren
+  '/_app/organizations': typeof AppOrganizationsRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/forgot-password-mfa': typeof AuthForgotPasswordMfaRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
@@ -1027,6 +1036,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/account'
+    | '/organizations'
     | '/forgot-password'
     | '/forgot-password-mfa'
     | '/reset-password'
@@ -1132,6 +1142,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/account'
+    | '/organizations'
     | '/forgot-password'
     | '/forgot-password-mfa'
     | '/reset-password'
@@ -1239,6 +1250,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_auth'
     | '/_app/account'
+    | '/_app/organizations'
     | '/_auth/forgot-password'
     | '/_auth/forgot-password-mfa'
     | '/_auth/reset-password'
@@ -1585,6 +1597,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/forgot-password'
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRoute
+    }
+    '/_app/organizations': {
+      id: '/_app/organizations'
+      path: '/organizations'
+      fullPath: '/organizations'
+      preLoaderRoute: typeof AppOrganizationsRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/account': {
       id: '/_app/account'
@@ -2191,10 +2210,12 @@ const AppAccountRouteWithChildren = AppAccountRoute._addFileChildren(
 
 interface AppRouteChildren {
   AppAccountRoute: typeof AppAccountRouteWithChildren
+  AppOrganizationsRoute: typeof AppOrganizationsRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAccountRoute: AppAccountRouteWithChildren,
+  AppOrganizationsRoute: AppOrganizationsRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
