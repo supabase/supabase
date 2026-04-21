@@ -28,7 +28,19 @@ import type { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { FeatureFlagProvider, getFlags, ThemeProvider, useThemeSandbox } from 'common'
+import {
+  FeatureFlagProvider,
+  getFlags,
+  TelemetryTagManager,
+  ThemeProvider,
+  useThemeSandbox,
+} from 'common'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import duration from 'dayjs/plugin/duration'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
 import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import {
@@ -59,6 +71,12 @@ import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { Toaster } from '@/lib/toaster'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
+
+dayjs.extend(customParseFormat)
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(relativeTime)
+dayjs.extend(duration)
 
 interface RouterContext {
   queryClient: QueryClient
@@ -290,6 +308,7 @@ function RootComponent() {
           </FeatureFlagProviderWithOrgContext>
         </AuthProvider>
       </NuqsAdapter>
+      <TelemetryTagManager />
     </ErrorBoundary>
   )
 }
