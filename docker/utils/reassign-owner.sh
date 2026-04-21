@@ -1,4 +1,5 @@
 #!/bin/sh
+
 set -e
 
 if ! docker compose version >/dev/null 2>&1; then

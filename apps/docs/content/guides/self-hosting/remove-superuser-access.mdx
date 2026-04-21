@@ -45,7 +45,7 @@ This script only updates ownership for database objects in the `public` schema. 
       POSTGRES_USER_READ_WRITE: postgres
   ```
 
-- As the next step, locate the `meta` service environment variables. Change the `PG_META_DB_USER` environment variable from `supabase_admin` to `postgres`:
+- Locate the `meta` service environment variables and change the `PG_META_DB_USER` environment variable from `supabase_admin` to `postgres`:
 
   ```yml name=docker-compose.yml
   meta:
