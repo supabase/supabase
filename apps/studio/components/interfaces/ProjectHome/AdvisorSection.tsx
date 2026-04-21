@@ -146,7 +146,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                 item.source === 'signal' ? item.summary : isLint ? item.original.detail : ''
               const cardClasses =
                 item.severity === 'critical'
-                  ? 'border-destructive-400'
+                  ? 'bg-destructive-200 border-destructive-400'
                   : item.severity === 'warning'
                     ? 'border-warning-400'
                     : ''

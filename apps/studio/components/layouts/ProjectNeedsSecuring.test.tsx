@@ -1,0 +1,221 @@
+import { screen } from '@testing-library/react'
+import { mockAnimationsApi } from 'jsdom-testing-mocks'
+import type { MouseEventHandler, ReactNode } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { ProjectNeedsSecuring } from './ProjectNeedsSecuring'
+import { render } from '@/tests/helpers'
+
+const {
+  mockUseProjectLintsQuery,
+  mockUseSelectedProjectQuery,
+  mockUseTablesQuery,
+  mockUseProjectPostgrestConfigQuery,
+  mockUseTablePrivilegesQuery,
+  mockUseLocalStorageQuery,
+  mockUseAsyncCheckPermissions,
+  mockUseTableUpdateMutation,
+  mockUseRouter,
+} = vi.hoisted(() => ({
+  mockUseProjectLintsQuery: vi.fn(),
+  mockUseSelectedProjectQuery: vi.fn(),
+  mockUseTablesQuery: vi.fn(),
+  mockUseProjectPostgrestConfigQuery: vi.fn(),
+  mockUseTablePrivilegesQuery: vi.fn(),
+  mockUseLocalStorageQuery: vi.fn(),
+  mockUseAsyncCheckPermissions: vi.fn(),
+  mockUseTableUpdateMutation: vi.fn(),
+  mockUseRouter: vi.fn(),
+}))
+
+vi.mock('common', async () => {
+  const actual = await vi.importActual<typeof import('common')>('common')
+
+  return {
+    ...actual,
+    useParams: () => ({ ref: 'project-ref' }),
+  }
+})
+
+vi.mock('next/router', () => ({
+  useRouter: () => mockUseRouter(),
+}))
+
+vi.mock('next/link', () => ({
+  default: ({
+    href,
+    children,
+    onClick,
+  }: {
+    href: string
+    children: ReactNode
+    onClick?: MouseEventHandler<HTMLAnchorElement>
+  }) => (
+    <a href={href} onClick={onClick}>
+      {children}
+    </a>
+  ),
+}))
+
+vi.mock('@/data/lint/lint-query', () => ({
+  useProjectLintsQuery: mockUseProjectLintsQuery,
+}))
+
+vi.mock('@/hooks/misc/useSelectedProject', () => ({
+  useSelectedProjectQuery: mockUseSelectedProjectQuery,
+}))
+
+vi.mock('@/data/tables/tables-query', () => ({
+  useTablesQuery: mockUseTablesQuery,
+}))
+
+vi.mock('@/data/config/project-postgrest-config-query', () => ({
+  parseDbSchemaString: vi.fn((value: string) => value.split(',').map((schema) => schema.trim())),
+  useProjectPostgrestConfigQuery: mockUseProjectPostgrestConfigQuery,
+}))
+
+vi.mock('@/data/privileges/table-privileges-query', () => ({
+  useTablePrivilegesQuery: mockUseTablePrivilegesQuery,
+}))
+
+vi.mock('@/hooks/misc/useLocalStorage', () => ({
+  useLocalStorageQuery: mockUseLocalStorageQuery,
+}))
+
+vi.mock('@/hooks/misc/useCheckPermissions', () => ({
+  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+}))
+
+vi.mock('@/data/tables/table-update-mutation', () => ({
+  useTableUpdateMutation: mockUseTableUpdateMutation,
+}))
+
+vi.mock('sonner', () => ({
+  toast: {
+    error: vi.fn(),
+  },
+}))
+
+const issueLint = {
+  cache_key: 'lint-1',
+  name: 'rls_disabled_in_public',
+  detail: 'RLS is disabled on public.invoices',
+  description: 'RLS disabled',
+  level: 'ERROR',
+  categories: ['SECURITY'],
+  metadata: {
+    schema: 'public',
+    name: 'invoices',
+  },
+}
+
+const tables = [
+  {
+    id: 1,
+    name: 'invoices',
+    schema: 'public',
+    rls_enabled: false,
+  },
+]
+
+const tablePrivileges = [
+  {
+    schema: 'public',
+    name: 'invoices',
+    privileges: [
+      {
+        grantee: 'anon',
+        privilege_type: 'SELECT',
+      },
+    ],
+  },
+]
+
+describe('ProjectNeedsSecuring', () => {
+  beforeEach(() => {
+    mockAnimationsApi()
+    mockUseRouter.mockReturnValue({ pathname: '/project/[ref]/database/tables' })
+    mockUseSelectedProjectQuery.mockReturnValue({
+      data: { connectionString: 'postgresql://example' },
+    })
+    mockUseProjectLintsQuery.mockReturnValue({
+      data: [issueLint],
+      isPending: false,
+      isError: false,
+    })
+    mockUseTablesQuery.mockReturnValue({
+      data: tables,
+      isPending: false,
+      isError: false,
+    })
+    mockUseProjectPostgrestConfigQuery.mockReturnValue({
+      data: 'public',
+      isPending: false,
+      isError: false,
+    })
+    mockUseTablePrivilegesQuery.mockReturnValue({
+      data: tablePrivileges,
+      isPending: false,
+      isError: false,
+    })
+    mockUseLocalStorageQuery.mockReturnValue([null, vi.fn(), { isLoading: false }])
+    mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
+    mockUseTableUpdateMutation.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    })
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
+    window.localStorage.clear()
+  })
+
+  it('renders the security gate when an exposed table has RLS disabled and the project has not been dismissed', () => {
+    render(
+      <ProjectNeedsSecuring>
+        <div data-testid="project-children">Project content</div>
+      </ProjectNeedsSecuring>
+    )
+
+    expect(screen.getByText('Your project needs securing')).toBeInTheDocument()
+    expect(screen.getByText('Review and fix')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Enable RLS' })).toBeInTheDocument()
+    expect(screen.getByText('Skip to home')).toBeInTheDocument()
+    expect(screen.queryByTestId('project-children')).not.toBeInTheDocument()
+  })
+
+  it('renders the project content when the security gate has been dismissed', () => {
+    mockUseLocalStorageQuery.mockReturnValue([
+      '2026-04-21T00:00:00.000Z',
+      vi.fn(),
+      { isLoading: false },
+    ])
+
+    render(
+      <ProjectNeedsSecuring>
+        <div data-testid="project-children">Project content</div>
+      </ProjectNeedsSecuring>
+    )
+
+    expect(screen.queryByText('Your project needs securing')).not.toBeInTheDocument()
+    expect(screen.getByTestId('project-children')).toBeInTheDocument()
+  })
+
+  it('renders the project content when there are no RLS issues', () => {
+    mockUseProjectLintsQuery.mockReturnValue({
+      data: [],
+      isPending: false,
+      isError: false,
+    })
+
+    render(
+      <ProjectNeedsSecuring>
+        <div data-testid="project-children">Project content</div>
+      </ProjectNeedsSecuring>
+    )
+
+    expect(screen.queryByText('Your project needs securing')).not.toBeInTheDocument()
+    expect(screen.getByTestId('project-children')).toBeInTheDocument()
+  })
+})

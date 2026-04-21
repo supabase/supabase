@@ -47,6 +47,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
         id="advisor-center-trigger"
         className={cn(
           'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group',
+          hasCriticalIssues && 'bg-destructive-200 border-destructive-500',
           isOpen && 'bg-foreground text-background'
         )}
         onClick={handleClick}
