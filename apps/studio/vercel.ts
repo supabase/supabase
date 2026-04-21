@@ -11,28 +11,31 @@ export const config: VercelConfig = {
   outputDirectory: 'dist/client',
   cleanUrls: true,
   rewrites: [
-    // API + server-function passthrough. Both funnel through the single
-    // `/api/server` Vercel Function that TanStack Start generates. These
-    // must come before the asset rule so that extensioned API paths like
-    // `/api/foo.json` still hit the function instead of a filesystem lookup.
-    // The destination is un-prefixed because the function is registered at
-    // `/api/server` regardless of the app's base path.
-    routes.rewrite(`${basePath}/api/(.*)`, '/api/server'),
-    routes.rewrite(`${basePath}/_serverFn/(.*)`, '/api/server'),
-    // Asset passthrough. Matches anything ending in `.ext` (e.g.
-    // `/foo/assets/bundle.abc.js`) and rewrites to the un-prefixed path so
-    // Vercel finds it in `dist/client/`. If the file doesn't exist Vercel
-    // 404s — important, otherwise missing JS would fall through to the
-    // shell rule below and the browser would get HTML where JS was
-    // expected.
-    routes.rewrite(`${basePath}/(.*\\.\\w+)`, '/$1'),
-    // SPA fallback. Every remaining path (including the base path itself)
-    // gets served the prerendered shell, which boots the client router. The
-    // destination is `/_shell` (no extension) because `cleanUrls: true`
-    // makes Vercel key static assets by their clean URL — `_shell.html`
-    // lives at `/_shell` in the asset map, so `/_shell.html` wouldn't
-    // resolve.
-    routes.rewrite(`${basePath}/(.*)`, '/_shell'),
+    // Prefixed rules — only emitted when a base path is configured. Vite
+    // bakes `${basePath}/assets/*` URLs into the HTML, so anything hitting
+    // a prefixed path needs to be stripped back to its filesystem location
+    // (or routed to the /api/server function).
+    ...(basePath
+      ? [
+          routes.rewrite(`${basePath}/api/(.*)`, '/api/server'),
+          routes.rewrite(`${basePath}/_serverFn/(.*)`, '/api/server'),
+          routes.rewrite(`${basePath}/(.*\\.\\w+)`, '/$1'),
+          routes.rewrite(`${basePath}/(.*)`, '/_shell'),
+        ]
+      : []),
+    // Root-level rules — always emitted. These serve the app at `/` and
+    // also cover any paths that don't carry the base-path prefix (handy for
+    // health checks, bare-domain hits, or links that forget the prefix).
+    //
+    // Order matters: API + server-function passthrough first so extensioned
+    // API paths (`/api/foo.json`) don't get caught by the asset rule. Asset
+    // rule next — it's an identity rewrite that also guards missing files
+    // from falling through to the shell (a missing `.js` should 404, not
+    // serve HTML). Shell rule last, catching everything else.
+    routes.rewrite('/api/(.*)', '/api/server'),
+    routes.rewrite('/_serverFn/(.*)', '/api/server'),
+    routes.rewrite('/(.*\\.\\w+)', '/$1'),
+    routes.rewrite('/(.*)', '/_shell'),
   ],
 }
 
