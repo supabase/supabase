@@ -22,6 +22,7 @@ import InvoiceStatusBadge from '@/components/interfaces/Billing/InvoiceStatusBad
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
+import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { getInvoice } from '@/data/invoices/invoice-query'
 import { getInvoiceReceipt } from '@/data/invoices/invoice-receipt-query'
 import { useInvoicesCountQuery } from '@/data/invoices/invoices-count-query'
@@ -52,13 +53,16 @@ export const InvoicesSettings = () => {
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const slug = selectedOrganization?.slug
+  const isPartnerBilledOrganization = isPartnerBillingOrganization(
+    selectedOrganization?.billing_partner
+  )
   const offset = (page - 1) * PAGE_LIMIT
 
   const { data: count, isError: isErrorCount } = useInvoicesCountQuery(
     {
       slug,
     },
-    { enabled: selectedOrganization?.managed_by === 'supabase' }
+    { enabled: !isPartnerBilledOrganization }
   )
   const {
     data,
@@ -71,7 +75,7 @@ export const InvoicesSettings = () => {
       offset,
       limit: PAGE_LIMIT,
     },
-    { enabled: selectedOrganization?.managed_by === 'supabase' }
+    { enabled: !isPartnerBilledOrganization }
   )
   const invoices = data || []
 
@@ -99,10 +103,7 @@ export const InvoicesSettings = () => {
     }
   }
 
-  if (
-    selectedOrganization?.managed_by !== undefined &&
-    selectedOrganization?.managed_by !== 'supabase'
-  ) {
+  if (selectedOrganization && isPartnerBilledOrganization) {
     return (
       <PartnerManagedResource
         managedBy={selectedOrganization?.managed_by}

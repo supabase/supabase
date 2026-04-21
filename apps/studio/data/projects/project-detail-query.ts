@@ -8,7 +8,10 @@ import { get, handleError, isValidConnString } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ProjectDetailVariables = { ref?: string }
-export type ProjectDetail = components['schemas']['ProjectDetailResponse']
+type ProjectDetailIntegrationSource = 'stripe_projects' | null
+export type ProjectDetail = components['schemas']['ProjectDetailResponse'] & {
+  integration_source?: ProjectDetailIntegrationSource
+}
 export interface Project extends Omit<ProjectDetail, 'status'> {
   /**
    * postgrestStatus is available on client side only.

@@ -25,10 +25,7 @@ export async function getOrgSubscription(
   })
 
   if (error) handleError(error)
-  return {
-    ...data,
-    billing_partner: 'stripe_projects' as any, // temporary DEPR-425 override
-  }
+  return data
 }
 
 export type OrgSubscriptionData = Awaited<ReturnType<typeof getOrgSubscription>>

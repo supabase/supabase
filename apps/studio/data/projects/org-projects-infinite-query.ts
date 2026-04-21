@@ -21,8 +21,15 @@ interface GetOrgProjectsInfiniteVariables {
   statuses?: string[]
 }
 
-export type OrgProjectsResponse = components['schemas']['OrganizationProjectsResponse']
-export type OrgProject = OrgProjectsResponse['projects'][number]
+type OrganizationProjectsResponseBase = components['schemas']['OrganizationProjectsResponse']
+type OrgProjectIntegrationSource = 'stripe_projects' | null
+
+export type OrgProject = OrganizationProjectsResponseBase['projects'][number] & {
+  integration_source?: OrgProjectIntegrationSource
+}
+export type OrgProjectsResponse = Omit<OrganizationProjectsResponseBase, 'projects'> & {
+  projects: OrgProject[]
+}
 
 export async function getOrganizationProjects(
   {
@@ -49,7 +56,7 @@ export async function getOrganizationProjects(
   })
 
   if (error) handleError(error)
-  return data
+  return data as OrgProjectsResponse
 }
 
 export type OrgProjectsInfiniteData = Awaited<ReturnType<typeof getOrganizationProjects>>

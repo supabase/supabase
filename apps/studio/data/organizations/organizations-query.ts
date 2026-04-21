@@ -7,16 +7,16 @@ import { get, handleError } from '@/data/fetchers'
 import { useProfile } from '@/lib/profile'
 import type { Organization, ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type OrganizationBase = components['schemas']['OrganizationResponse']
+type OrganizationIntegrationSource = 'stripe_projects' | null
+export type OrganizationBase = components['schemas']['OrganizationResponse'] & {
+  integration_source?: OrganizationIntegrationSource
+}
 
 export function castOrganizationResponseToOrganization(org: OrganizationBase): Organization {
-  const forcedBillingPartner = 'stripe_projects' as any // temporary DEPR-425 override
-
   return {
     ...org,
-    billing_partner: forcedBillingPartner,
     billing_email: org.billing_email ?? 'Unknown',
-    managed_by: getManagedByFromOrganizationPartner(forcedBillingPartner),
+    managed_by: getManagedByFromOrganizationPartner(org.billing_partner, org.integration_source),
     partner_id: org.slug.startsWith('vercel_') ? org.slug.replace('vercel_', '') : undefined,
   }
 }

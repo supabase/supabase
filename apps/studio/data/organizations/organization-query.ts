@@ -7,19 +7,17 @@ import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrganizationVariables = { slug?: string }
-export type OrganizationDetail = components['schemas']['OrganizationSlugResponse']
+type OrganizationIntegrationSource = 'stripe_projects' | null
+export type OrganizationDetail = components['schemas']['OrganizationSlugResponse'] & {
+  integration_source?: OrganizationIntegrationSource
+}
 export type OrganizationPlanID = OrganizationDetail['plan']['id']
 
-function castOrganizationSlugResponseToOrganization(
-  org: components['schemas']['OrganizationSlugResponse']
-) {
-  const forcedBillingPartner = 'stripe_projects' as any // temporary DEPR-425 override
-
+export function castOrganizationSlugResponseToOrganization(org: OrganizationDetail) {
   return {
     ...org,
-    billing_partner: forcedBillingPartner,
     billing_email: org.billing_email ?? 'Unknown',
-    managed_by: getManagedByFromOrganizationPartner(forcedBillingPartner),
+    managed_by: getManagedByFromOrganizationPartner(org.billing_partner, org.integration_source),
     partner_id: org.slug.startsWith('vercel_') ? org.slug.replace('vercel_', '') : undefined,
   }
 }
