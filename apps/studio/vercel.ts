@@ -27,8 +27,12 @@ export const config: VercelConfig = {
     // expected.
     routes.rewrite(`${basePath}/(.*\\.\\w+)`, '/$1'),
     // SPA fallback. Every remaining path (including the base path itself)
-    // gets served the prerendered shell, which boots the client router.
-    routes.rewrite(`${basePath}/(.*)`, '/_shell.html'),
+    // gets served the prerendered shell, which boots the client router. The
+    // destination is `/_shell` (no extension) because `cleanUrls: true`
+    // makes Vercel key static assets by their clean URL — `_shell.html`
+    // lives at `/_shell` in the asset map, so `/_shell.html` wouldn't
+    // resolve.
+    routes.rewrite(`${basePath}/(.*)`, '/_shell'),
   ],
 }
 
