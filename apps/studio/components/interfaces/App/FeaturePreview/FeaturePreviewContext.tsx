@@ -86,10 +86,13 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 
 export const useUnifiedLogsPreview = () => {
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
+  const { hasLoaded: flagsHaveLoaded } = useContext(FeatureFlagContext)
   const unifiedLogsEnabled = useFlag('unifiedLogs')
 
-  const { isEligible: isEnterpriseOrSupabaseOrg, isLoading } = useIsEnterpriseOrSupabaseOrg()
+  const { isEligible: isEnterpriseOrSupabaseOrg, isLoading: isOrgLoading } =
+    useIsEnterpriseOrSupabaseOrg()
 
+  const isLoading = !flagsHaveLoaded || isOrgLoading
   const isEligible = unifiedLogsEnabled && isEnterpriseOrSupabaseOrg
   const isEnabled = isEligible && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
