@@ -38,10 +38,6 @@ We'll create a database table called `todos` for storing tasks. This creates a c
         id serial primary key,
         task text
       );
-
-      -- Enable Data API access
-      -- Allow read-only access for anonymous clients
-      grant select on public.todos to anon;
       ```
 
       </TabPanel>
@@ -52,7 +48,6 @@ We'll create a database table called `todos` for storing tasks. This creates a c
       3. Click **Save**.
       4. Click **New Column** and create a column with the name `task` and type `text`.
       5. Click **Save**.
-      6. In the [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard, expose the `todos` table. To automatically grant access for new tables and functions in `public`, enable **Default privileges for new entities**.
 
       </TabPanel>
       </Tabs>
@@ -62,17 +57,54 @@ We'll create a database table called `todos` for storing tasks. This creates a c
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Enable Data API access to Anon Role">
 
-    <StepHikeCompact.Details title="Allow public access">
+    Expose the `todos` table through the Data API so it can be queried over HTTP.
 
-    Let's turn on Row Level Security for this table, create the required policies, and then grant any write access.
+    For more control over which tables and functions are exposed, see [Expose specific tables and functions](/docs/guides/database/data-api#expose-specific-tables-and-functions-recommended).
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      <Tabs
+        scrollable
+        size="small"
+        type="underlined"
+        defaultActiveId="sql"
+        queryGroup="database-method"
+      >
+      <TabPanel id="sql" label="SQL">
+
+      ```sql
+      -- Allow read-only access for anonymous clients
+      grant select on public.todos to anon;
+      ```
+
+      </TabPanel>
+      <TabPanel id="dashboard" label="Dashboard">
+
+      Go to [**Integrations > Data API > Settings**](/dashboard/project/_/integrations/data_api/settings). Under **Exposed schemas**, make sure `public` is included, then under **Exposed tables**, toggle on access for the `todos` table.
+
+      </TabPanel>
+      </Tabs>
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Configure RLS">
+
+    Turn on Row Level Security for this table and create the policies that control who can read and write rows.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```sql
-      -- Turn on security
+      -- Turn on RLS
       alter table "todos"
       enable row level security;
 
@@ -90,7 +122,22 @@ We'll create a database table called `todos` for storing tasks. This creates a c
         to authenticated
         using (true)
         with check (true);
+      ```
 
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Enable Data API access for authenticated and service roles">
+
+    Now that RLS is in place, grant write access to the `authenticated` and `service_role` roles.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sql
       -- Grant write access only after RLS and policies are in place
       grant select, insert, update, delete on public.todos to authenticated;
       grant select, insert, update, delete on public.todos to service_role;
@@ -100,7 +147,7 @@ We'll create a database table called `todos` for storing tasks. This creates a c
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={3}>
+  <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Insert some dummy data">
 
     Now we can add some data to our table which we can access through our API.
@@ -122,7 +169,7 @@ We'll create a database table called `todos` for storing tasks. This creates a c
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={4}>
+  <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Fetch the data">
 
     Find your API URL and Keys in your Dashboard [API Settings](/dashboard/project/_/settings/api). You can now query your "todos" table by appending `/rest/v1/todos` to the API URL.
