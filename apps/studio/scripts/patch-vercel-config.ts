@@ -8,10 +8,13 @@ config.routes = [
     src: '/assets/(.*)',
     headers: { 'cache-control': 'public, max-age=31536000, immutable' },
   },
-  { handle: 'filesystem' },
+  // API and server functions go to the function (before filesystem so they short-circuit)
   { src: '/api/(.*)', dest: '/__server' },
   { src: '/_serverFn/(.*)', dest: '/__server' },
-  { src: '/(.*)', dest: '/_shell.html' },
+  // Rewrite all other paths to the shell BEFORE filesystem check
+  // so the filesystem then serves _shell.html as a static file
+  { src: '/((?!assets/).*)', dest: '/_shell.html' },
+  { handle: 'filesystem' },
 ]
 
 writeFileSync(path, JSON.stringify(config, null, 2))
