@@ -931,6 +931,9 @@ importers:
       '@sentry/nextjs':
         specifier: 'catalog:'
         version: 10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@16.2.3(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.77.4))(react@19.2.5)(supports-color@8.1.1)(webpack@5.105.4(esbuild@0.25.2))
+      '@sentry/react':
+        specifier: ^10.27.0
+        version: 10.27.0(react@19.2.5)
       '@std/path':
         specifier: npm:@jsr/std__path@^1.0.8
         version: '@jsr/std__path@1.0.8'

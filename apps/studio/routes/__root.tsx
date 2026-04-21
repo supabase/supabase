@@ -20,15 +20,32 @@ import 'ui-patterns/ShimmeringLoader/index.css'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 
+import * as Sentry from '@sentry/react'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import type { ReactNode } from 'react'
+import type { ErrorInfo, ReactNode } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
+
+import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 
 interface RouterContext {
   queryClient: QueryClient
+}
+
+const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
+  Sentry.withScope(function (scope) {
+    scope.setTag('globalErrorBoundary', true)
+    const eventId = Sentry.captureException(error)
+    // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
+    if (eventId && error && typeof error === 'object') {
+      ;(error as any).sentryId = eventId
+    }
+  })
+
+  console.error(error.stack)
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -51,7 +68,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootComponent() {
-  return <Outlet />
+  return (
+    <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
+      <Outlet />
+    </ErrorBoundary>
+  )
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
