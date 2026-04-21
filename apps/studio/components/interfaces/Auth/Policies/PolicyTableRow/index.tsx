@@ -19,10 +19,11 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { usePoliciesData } from '../PoliciesDataContext'
 import { PolicyRow } from './PolicyRow'
 import type { PolicyTable } from './PolicyTableRow.types'
+import { getTableAdmonitionMessage, getTableDataApiStatus } from './PolicyTableRow.utils'
 import { PolicyTableRowHeader } from './PolicyTableRowHeader'
 import AlertError from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useTablesRolesAccessQuery } from '@/data/tables/tables-roles-access-query'
+import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export interface PolicyTableRowProps {
@@ -52,57 +53,48 @@ const PolicyTableRowComponent = ({
     [getPoliciesForTable, table.schema, table.name]
   )
 
-  // [Joshen] Changes here are so that warnings are more accurate and granular instead of purely relying if RLS is disabled or enabled
-  // The following scenarios are technically okay if the table has RLS disabled, in which it won't be publicly readable / writable
-  // - If the schema is not exposed through the API via Postgrest
-  // - If the anon and authenticated roles do not have access to the table
-  // Ideally we should just rely on the security lints as the source of truth, but the security lints currently have limitations
-  // - They only consider the public schema
-  // - They do not consider roles
-  // Eventually if the security lints are able to cover those, we can look to using them as the source of truth instead then
-  const isRLSEnabled = table.rls_enabled
-  const isTableExposedThroughAPI = useMemo(
-    () => exposedSchemas.has(table.schema),
-    [exposedSchemas, table.schema]
+  // [Joshen] Classification is more granular than "RLS on/off" alone — it also considers
+  // schema exposure and whether anon/authenticated/service_role actually have grants.
+  // Ideally we'd rely on the security lints, but they only look at the public schema and
+  // ignore roles. Once the lints cover both, we can switch to them as the source of truth.
+  const tableNames = useMemo(() => [table.name], [table.name])
+  const {
+    data: apiAccessMap,
+    isPending: isLoadingRolesAccess,
+    isError: isRolesAccessError,
+  } = useTableApiAccessQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schemaName: table.schema,
+    tableNames,
+  })
+
+  const status = useMemo(
+    () =>
+      getTableDataApiStatus({
+        isSchemaExposed: exposedSchemas.has(table.schema),
+        apiAccessData: apiAccessMap?.[table.name],
+        isRLSEnabled: table.rls_enabled,
+        policiesCount: policies.length,
+      }),
+    [exposedSchemas, apiAccessMap, table.schema, table.name, table.rls_enabled, policies.length]
   )
 
-  const { data: tablesWithAnonAuthAccess = new Set(), isLoading: isLoadingRolesAccess } =
-    useTablesRolesAccessQuery({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      schema: table.schema,
-    })
+  const hasApiAccess =
+    status === 'publicly-readable' || status === 'locked-by-rls' || status === 'secured'
+  const isPubliclyReadable = status === 'publicly-readable'
 
-  const hasAnonAuthenticatedRolesAccess = tablesWithAnonAuthAccess.has(table.name)
-  const hasApiAccess = isTableExposedThroughAPI && hasAnonAuthenticatedRolesAccess
-  const isPubliclyReadableWritable = !isRLSEnabled && hasApiAccess
-  const rlsEnabledNoPolicies = isRLSEnabled && hasApiAccess && policies.length === 0
-  const isApiDisabledDueToRoles = isTableExposedThroughAPI && !hasAnonAuthenticatedRolesAccess
   const isRealtimeSchema = table.schema === 'realtime'
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
 
   const showPolicies = !isPoliciesLoading && !isPoliciesError && !isLoadingRolesAccess
 
-  const shouldHideHeaderBorder =
-    isPubliclyReadableWritable ||
-    rlsEnabledNoPolicies ||
-    !isTableExposedThroughAPI ||
-    isApiDisabledDueToRoles
-
-  const admonitionMessage = useMemo(() => {
-    if (isPubliclyReadableWritable) {
-      return 'This table can be accessed by anyone via the Data API as RLS is disabled.'
-    }
-    if (isApiDisabledDueToRoles) {
-      return 'This table cannot be accessed via the Data API as no permissions exist for the anon or authenticated roles.'
-    }
-    return 'This table can be accessed via the Data API but no RLS policies exist so no data will be returned.'
-  }, [isPubliclyReadableWritable, isApiDisabledDueToRoles])
+  const admonitionMessage = useMemo(() => getTableAdmonitionMessage(status), [status])
 
   return (
-    <Card className={cn(isPubliclyReadableWritable && 'border-warning-500')}>
-      <CardHeader className={cn('py-3 px-4', shouldHideHeaderBorder && 'border-b-0')}>
+    <Card className={cn(isPubliclyReadable && 'border-warning-500')}>
+      <CardHeader className={cn('py-3 px-4', status !== 'secured' && 'border-b-0')}>
         <PolicyTableRowHeader
           table={table}
           isLocked={isLocked}
@@ -113,7 +105,7 @@ const PolicyTableRowComponent = ({
         />
       </CardHeader>
 
-      {!isLoadingRolesAccess && !isTableExposedThroughAPI && (
+      {!isLoadingRolesAccess && !isRolesAccessError && status === 'schema-not-exposed' && (
         <Admonition
           showIcon={false}
           type="warning"
@@ -130,17 +122,15 @@ const PolicyTableRowComponent = ({
         </Admonition>
       )}
 
-      {!isLoadingRolesAccess &&
-        (isPubliclyReadableWritable || rlsEnabledNoPolicies || isApiDisabledDueToRoles) &&
-        isTableExposedThroughAPI && (
-          <Admonition
-            showIcon={false}
-            type={isPubliclyReadableWritable ? 'warning' : 'default'}
-            className="border-0 border-y rounded-none min-h-12 flex items-center"
-          >
-            <p>{admonitionMessage}</p>
-          </Admonition>
-        )}
+      {!isLoadingRolesAccess && !isRolesAccessError && admonitionMessage !== null && (
+        <Admonition
+          showIcon={false}
+          type={isPubliclyReadable ? 'warning' : 'default'}
+          className="border-0 border-y rounded-none min-h-12 flex items-center"
+        >
+          <p>{admonitionMessage}</p>
+        </Admonition>
+      )}
 
       {(isPoliciesLoading || isLoadingRolesAccess) && (
         <CardContent>
