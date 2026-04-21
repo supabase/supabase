@@ -12,7 +12,7 @@ Self-hosted Supabase ships with Postgres 15 by default. This guide covers two sc
 ## Before you begin
 
 - Complete the [Self-Hosting with Docker](/docs/guides/self-hosting/docker) setup
-- Your current database image should be `supabase/postgres:15.x` (check with `docker inspect supabase-db --format '{{.Config.Image}}'`)
+- Your current database image should be `supabase/postgres:15.x`
 
 ## New deployment with Postgres 17
 
@@ -24,7 +24,7 @@ docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
 
 This uses the `docker-compose.pg17.yml` override file which swaps the database image:
 
-```yaml
+```yaml name=docker-compose.pg17.yml
 services:
   db:
     image: supabase/postgres:17.6.1.084
@@ -32,11 +32,11 @@ services:
 
 <Admonition type="tip">
 
-Always include both compose files when running commands. If you omit the override, Docker Compose falls back to the Postgres 15 image defined in `docker-compose.yml`.
+If you use the override file, remember to include both compose files when running commands. Alternatively, you can update the image tag directly in `docker-compose.yml` instead of using an override.
 
 </Admonition>
 
-The rest of the setup is the same as the standard Docker guide. All init scripts (`roles.sql`, `jwt.sql`, `webhooks.sql`, etc.) are compatible with Postgres 17.
+The rest of the setup is the same as for Postgres 15 (see the Docker install [guide](/docs/guides/self-hosting/docker)).
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 If the new Postgres 17 container fails to start, make sure to check for an old `db-config` Docker volume. See [Postgres 17 fails to start with a leftover db-config volume](#postgres-17-fails-to-start-with-a-leftover-db-config-volume) for details.
@@ -136,7 +136,9 @@ docker compose -f docker-compose.yml -f docker-compose.pg17.yml exec db psql -U 
 The original Postgres 15 data is preserved at `./volumes/db/data.bak.pg15`. The pgsodium root key is saved as `./volumes/db/pgsodium_root.key.bak.pg15`. The upgrade binaries tarball is cached at `./volumes/db/pg17_upgrade_bin_*.tar.gz`. Once you have verified that everything works, you can reclaim disk space:
 
 ```sh
-rm -rf ./volumes/db/data.bak.pg15 ./volumes/db/pgsodium_root.key.bak.pg15 ./volumes/db/pg17_upgrade_bin_*.tar.gz
+rm -rf ./volumes/db/data.bak.pg15 \
+./volumes/db/pgsodium_root.key.bak.pg15 \
+./volumes/db/pg17_upgrade_bin_*.tar.gz
 ```
 
 <Admonition type="caution">
@@ -274,7 +276,7 @@ If you run out of space mid-upgrade, the safest path is to roll back and free up
 
 ### Postgres 17 fails to start with a leftover db-config volume
 
-If you are starting a **fresh** Postgres 17 deployment (not upgrading from Postgres 15) and the container fails to start, the most likely cause is a leftover `db-config` volume from a previous Postgres 15 installation. Try to start the containers without the `-d` option and/or check the logs for errors about `postgresql.conf` or other configuration mismatch.
+If you are starting a **fresh** Postgres 17 deployment (not using the upgrade script) and the container fails to start, the most likely cause is a leftover `db-config` volume from a previous Postgres 15 installation. Start the containers without the `-d` option or check the logs for errors about `postgresql.conf` or other configuration mismatch.
 
 To fix, remove the old volume and let Postgres 17 initialize a clean configuration:
 

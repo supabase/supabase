@@ -14,7 +14,7 @@ Docker is the easiest way to get started with self-hosted Supabase. It should ta
 3. [Installing Supabase](#installing-supabase)
 4. [Configuring and securing Supabase](#configuring-and-securing-supabase)
 5. [Starting and stopping](#starting-and-stopping)
-6. [Accessing Supabase services](#accessing-supabase-services)
+6. [Accessing Supabase services](#accessing-supabase-studio-dashboard)
 7. [Updating](#updating)
 8. [Uninstalling](#uninstalling)
 9. [Advanced topics](#advanced-topics)
@@ -27,7 +27,7 @@ This guide assumes you're comfortable with:
 - Docker and Docker Compose
 - Networking fundamentals (ports, DNS, firewalls)
 
-If you're new to these topics, consider starting with managed [Supabase platform](/dashboard) for free.
+If you're new to these topics, consider starting with the managed [Supabase platform](/dashboard) for free.
 
 You need the following installed on your system:
 
@@ -37,6 +37,9 @@ You need the following installed on your system:
   - **Linux desktop**: Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/linux/)
   - **macOS**: Install [Docker Desktop](https://docs.docker.com/desktop/install/mac-install/)
   - **Windows**: Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/)
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+- OpenSSL and Node.js 16+ (when switching to the [new API keys](/docs/guides/self-hosting/self-hosted-auth-keys) and new auth)
+
 
 ## System requirements
 
@@ -133,105 +136,89 @@ While we provided example placeholder passwords and keys in the `.env.example` f
 
 <Admonition type="danger">
 
-  Review the configuration options below and ensure you set all secrets before starting the services.
+  Review the configuration steps below and ensure you set all secrets properly before starting the services.
 
 </Admonition>
 
-### Quick setup (experimental)
+### Quick setup
 
-To generate and apply all secrets at once you can run:
+To generate secure passwords and secrets, run:
 
 ```sh
-sh ./utils/generate-keys.sh
+sh utils/generate-keys.sh
 ```
 
-Review the output before proceeding and also check `.env` after it's updated by the script. Alternatively, configure all secrets manually as follows.
+As the **next step**, use the following script to add the new API keys and asymmetric key pair:
 
-### Configure database password
+```sh
+sh utils/add-new-auth-keys.sh
+```
 
-Change the placeholder password in the `.env` file **before** starting Supabase for the first time.
+Review the output of both scripts and check the `.env` file **before proceeding** to configure [Supabase URLs](#configure-supabase-urls).
 
-- `POSTGRES_PASSWORD`: the password for the `postgres` and `supabase_admin` database roles
+For a description of all secrets refer to the [related section](#configuring-secrets) in the "Advanced topics" below. If you'd like to learn more about how the new API keys and asymmetric JWT signing work in a self-hosted Supabase setup, make sure to read the detailed [how-to guide](/docs/guides/self-hosting/self-hosted-auth-keys).
 
-Follow the [password guidelines](/docs/guides/database/postgres/roles#passwords) for choosing a secure password. For easier configuration, **use only letters and numbers** to avoid URL encoding issues in connection strings.
+### Configure Supabase URLs
 
-### Generate and configure API keys
+Review and change URL configuration variables:
 
-Use the key generator below to obtain and configure the following secure keys in `.env`:
-
-- `JWT_SECRET`: Used by Auth, PostgREST, and other services to sign and verify JWTs.
-- `ANON_KEY`: Client-side API key with limited permissions (`anon` role). Use this in your frontend applications.
-- `SERVICE_ROLE_KEY`: Server-side API key with full database access (`service_role` role). **Never expose this in client code.**
-<JwtGeneratorSimple />
-
-1. Copy the generated value and update `JWT_SECRET` in the `.env` file. Do not share this secret publicly or commit it to version control.
-2. Copy the generated value and update `ANON_KEY` in the `.env` file.
-3. Copy the generated value and update `SERVICE_ROLE_KEY` in the `.env` file.
-
-The generated keys expire in 5 years. You can verify them at [jwt.io](https://jwt.io) using the saved value of `JWT_SECRET`.
-
-### Configure other keys, and important URLs
-
-Edit the following settings in the `.env` file:
-
-- `SECRET_KEY_BASE`: encryption key for securing Realtime and Supavisor communications. (Must be at least 64 characters; generate with `openssl rand -base64 48`)
-- `VAULT_ENC_KEY`: encryption key used by Supavisor for storing encrypted configuration. (Must be exactly 32 characters; generate with `openssl rand -hex 16`)
-- `PG_META_CRYPTO_KEY`: encryption key for securing connection strings used by Studio against postgres-meta. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
-- `LOGFLARE_PUBLIC_ACCESS_TOKEN`: API token for log ingestion and querying. Used by Vector and Studio to send and query logs. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
-- `LOGFLARE_PRIVATE_ACCESS_TOKEN`: API token for Logflare management operations. Used by Studio for administrative tasks. Never expose client-side. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
-- `S3_PROTOCOL_ACCESS_KEY_ID`: Access key ID (username-like) for [accessing](/docs/guides/self-hosting/self-hosted-s3) the S3 protocol endpoint in Storage. (Generate with `openssl rand -hex 16`)
-- `S3_PROTOCOL_ACCESS_KEY_SECRET`: Secret key (password-like) used with S3_PROTOCOL_ACCESS_KEY_ID. (Generate with `openssl rand -hex 32`)
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-- `MINIO_ROOT_PASSWORD`: Root administrator password for the [MinIO server](/docs/guides/self-hosting/self-hosted-s3#using-minio). (Must be 8+ characters; generate with `openssl rand -hex 16`)
-
-Review and change URL environment variables:
-
-- `SUPABASE_PUBLIC_URL`: base URL for accessing Supabase from the Internet (Dashboard, API, Storage, etc.), e.g, `http://example.com:8000`
-- `API_EXTERNAL_URL`: base URL of the Auth service as seen externally, e.g., `http://example.com:8000`
+- `SUPABASE_PUBLIC_URL`: base URL for accessing Supabase from the Internet (Dashboard, API, Storage, etc.), e.g., `http://example.com:8000`
+- `API_EXTERNAL_URL`: used by the Auth service to configure callback URLs, e.g., `http://example.com:8000`
 - `SITE_URL`: default [redirect URL](/docs/guides/auth/redirect-urls) for Auth, e.g., `http://example.com:3000`
 
-<Admonition type="tip">
+<Admonition type="note" label="What your-domain means in the docs">
 
-    If you are only using self-hosted Supabase locally, you can use `localhost`.
+  Throughout the self-hosting guides, `<your-domain>` stands for the host where your Supabase instance is reachable: your domain name, your server's IP, or `localhost`, depending on your setup.
+
+  - **Default setup:** Kong listens on port `8000`, so the full URL is `http://<your-domain>:8000`.
+  - **Behind a [reverse proxy](/docs/guides/self-hosting/self-hosted-proxy-https):** the proxy terminates TLS on port `443`, so the URL becomes `https://<your-domain>`.
 
 </Admonition>
+
+### Where to find your credentials
+
+The generated secrets and password are written to the `.env` file. The ones you are most likely to need when connecting your application to self-hosted Supabase are:
+
+- `POSTGRES_PASSWORD`: database password used in Postgres connection strings and by `psql`
+- `SUPABASE_PUBLISHABLE_KEY`: publishable API key for client-side use (e.g., in your frontend)
+- `SUPABASE_SECRET_KEY`: secret API key for server-side use. Never expose this in client code
+- `SUPABASE_PUBLIC_URL`: base URL you pass as `supabaseUrl` to the client libraries
+
+If you are still using the [legacy API keys](#configuring-legacy-api-keys), look for `ANON_KEY` and `SERVICE_ROLE_KEY` instead of the new publishable and secret API keys above.
 
 ### Studio authentication
 
-Access to Studio dashboard and internal API is protected with **HTTP basic authentication**.
+Access to Studio (Dashboard) is protected with **HTTP basic authentication**.
 
 <Admonition type="danger">
 
-    The default password MUST be changed before starting Supabase.
+    A secure password MUST be set before starting Supabase. The password must include at least one letter - do not use numbers only or any special characters.
 
 </Admonition>
 
-The password must include at least one letter: do not use numbers only and do not use any special characters.
-
-Change the password in the `.env` file:
-
-- `DASHBOARD_PASSWORD`: password for Studio / dashboard
-
-Optionally change the user:
-
-- `DASHBOARD_USERNAME`: username for Studio / dashboard
+In the `.env` file, edit `DASHBOARD_PASSWORD` to change the password, and optionally `DASHBOARD_USERNAME` to change the username.
 
 ## Starting and stopping
 
-You can start all services by using the following command in the same directory as your `docker-compose.yml` file:
+You can start Supabase by using the following command in the same directory as your `docker-compose.yml` file:
 
 ```sh
-# Start the services (in detached mode)
 docker compose up -d
 ```
 
-After all the services have started you can see them running in the background:
+Check the status of the services:
 
 ```sh
 docker compose ps
 ```
 
-After a minute or less, all services should have a status `Up [...] (healthy)`. If you see a status such as `created` but not `Up`, try inspecting the Docker logs for a specific container, e.g.,
+After a minute or less, all services should have a status `Up [...] (healthy)`. If you see a status such as `created` but not `Up`, run the test script to determine what the problem might be:
+
+```sh
+sh tests/test-container-logs.sh
+```
+
+Then try inspecting the Docker logs for a specific container, e.g.,
 
 ```sh
 docker compose logs analytics
@@ -243,21 +230,17 @@ To stop Supabase, use:
 docker compose down
 ```
 
-## Accessing Supabase services
+## Accessing Supabase Studio (Dashboard)
 
-After the Supabase services are configured and running, you can access the dashboard, connect to the database, and use edge functions.
+By default, you can access the dashboard through the API gateway on port `8000`.
 
-### Accessing Supabase Studio
+For example: `http://<your-domain>:8000`, or `http://<your-ip>:8000` (or `localhost:8000` if you are running Docker Compose locally).
 
-You can access Supabase Studio through the API gateway on port `8000`.
+You will be prompted for a username and password. See the [Studio authentication](#studio-authentication) section for details.
 
-For example: `http://example.com:8000`, or `http://<your-ip>:8000` (or `localhost:8000` if you are running Docker Compose locally).
+## Accessing Postgres
 
-You will be prompted for a username and password. Use the credentials that you set up earlier in [Studio authentication](#studio-authentication).
-
-### Accessing Postgres
-
-By default, the Supabase stack provides the [Supavisor](https://supabase.github.io/supavisor/development/docs/) connection pooler for accessing Postgres and managing database connections.
+The self-hosted Supabase stack provides the [Supavisor](https://supabase.github.io/supavisor/development/docs/) connection pooler for accessing Postgres and managing database connections.
 
 You can connect to the Postgres database via Supavisor using the methods described below. Use your domain name, your server IP, or `localhost` depending on whether you are running self-hosted Supabase on a VPS, or locally.
 
@@ -281,13 +264,23 @@ If you need to configure Postgres to be directly accessible from the Internet, r
 
 To change the database password, read [Changing database password](#changing-database-password).
 
-### Accessing Edge Functions
+## Accessing Edge Functions
 
-Edge Functions are stored in `volumes/functions`. The default setup has a `hello` function that you can invoke on `http://<your-domain>:8000/functions/v1/hello`.
+Edge Functions live in `volumes/functions`. The default setup includes a `hello` function you can invoke with `curl`:
 
-You can add new Functions as `volumes/functions/<FUNCTION_NAME>/index.ts`. Restart the `functions` service to pick up the changes: `docker compose restart functions --no-deps`
+```sh
+curl http://<your-domain>:8000/functions/v1/hello
+```
 
-### Accessing the APIs
+Add new functions at `volumes/functions/<FUNCTION_NAME>/index.ts`, then restart the service to pick them up:
+
+```sh
+docker compose restart functions --no-deps
+```
+
+See the [self-hosted Edge Functions guide](/docs/guides/self-hosting/self-hosted-functions) for more details.
+
+## Accessing APIs
 
 Each of the APIs is available through the same API gateway:
 
@@ -296,9 +289,15 @@ Each of the APIs is available through the same API gateway:
 - Storage: `http://<your-domain>:8000/storage/v1/`
 - Realtime: `http://<your-domain>:8000/realtime/v1/`
 
+## Configuring HTTPS
+
+By default, Supabase is accessible over HTTP. For production deployments, especially when using OAuth providers, you need HTTPS with a valid TLS certificate. The recommended approach is to place a reverse proxy (such as Caddy or Nginx) in front of Kong.
+
+See the [Configure HTTPS](/docs/guides/self-hosting/self-hosted-proxy-https) guide for detailed setup instructions.
+
 ## Updating
 
-We publish stable releases of the Docker Compose setup approximately once a month. To update, apply the latest changes from the repository and restart the services. If you want to run different versions of individual services, you can change the image tags in the Docker Compose file, but compatibility is not guaranteed. All Supabase images are available on [Docker Hub](https://hub.docker.com/u/supabase).
+We publish stable releases of the Docker Compose setup approximately once a month. The versions in each release are tested together, so they may lag behind the latest images on Docker Hub. To update, apply the latest changes from the repository and restart the services. If you want to run different versions of individual services, you can change the image tags in the Docker Compose file, but compatibility is **not guaranteed**. All Supabase images are available on [Docker Hub](https://hub.docker.com/u/supabase).
 
 To follow the changes and updates, refer to the self-hosted Supabase [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md).
 
@@ -320,10 +319,11 @@ You'd like to update or rollback the Studio image. Follow the steps below:
 
 </Admonition>
 
-To uninstall, stop Supabase (while in the same directory as your `docker-compose.yml` file):
+To uninstall, stop Supabase (while in the same directory as your `docker-compose.yml` file).
+
+Stop the containers and remove volumes:
 
 ```sh
-# Stop docker and remove volumes:
 docker compose down -v
 ```
 
@@ -345,9 +345,10 @@ Everything beyond this point in the guide helps you understand how the system wo
 
 ### Architecture
 
-Supabase is a combination of open source tools specifically developed for enterprise-readiness.
+Supabase is built from open source tools, each chosen or developed for production use.
 
-If the tools and communities already exist, with an MIT, Apache 2, or equivalent open source license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves.
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
+If the tools and communities already exist, with an MIT, Apache 2, PostgreSQL, or equivalent open source license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves.
 
 <Image
   alt="Diagram showing the architecture of Supabase. The Kong API gateway sits in front of 7 services: GoTrue, PostgREST, Realtime, Storage, pg_meta, Functions, and pg_graphql. All the services talk to a single Postgres instance."
@@ -369,7 +370,6 @@ If the tools and communities already exist, with an MIT, Apache 2, or equivalent
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 - **[imgproxy](https://github.com/imgproxy/imgproxy)** - Fast and secure image processing server
 - **[postgres-meta](https://github.com/supabase/postgres-meta)** - RESTful API for managing Postgres (fetch tables, add roles, run queries)
-{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 - **[Postgres](https://github.com/supabase/postgres)** - Object-relational database with over 30 years of active development
 - **[Edge Runtime](https://github.com/supabase/edge-runtime)** - Web server based on Deno runtime for running JavaScript, TypeScript, and WASM services
 - **[Logflare](https://github.com/Logflare/logflare)** - Log management and event analytics platform
@@ -378,9 +378,55 @@ If the tools and communities already exist, with an MIT, Apache 2, or equivalent
 
 Multiple services require specific configuration within the Postgres database. Refer to the documentation describing the [default roles](/docs/guides/database/postgres/roles#supabase-roles) to learn more.
 
-You can find all the default extensions inside the [schema migration scripts repo](https://github.com/supabase/postgres/tree/develop/migrations). These scripts are mounted at `/docker-entrypoint-initdb.d` to run automatically when starting the database container.
+You can find all the default extensions inside the [schema migration scripts repo](https://github.com/supabase/postgres/tree/develop/migrations). These scripts are mounted at `/docker-entrypoint-initdb.d` to run automatically when starting the Postgres container.
 
-### Configuring services
+### Setting database password
+
+The `generate-keys.sh` script creates a secure random database password. If you want to use your own, you can change `POSTGRES_PASSWORD` in the `.env` file **before** starting Supabase for the first time.
+
+Follow the [password guidelines](/docs/guides/database/postgres/roles#passwords) for choosing a secure password. For easier configuration, **use only letters and numbers** to avoid URL encoding issues in connection strings.
+
+### Changing database password
+
+To change the database password after the initial setup, run:
+
+```sh
+sh utils/db-passwd.sh
+```
+
+The script generates a new password, updates all database roles, and modifies your `.env` file. After running it, restart the services with `docker compose up -d --force-recreate`.
+
+### Configuring legacy API keys
+
+Use the key generator below to obtain and configure the following secure keys in `.env`:
+
+- `JWT_SECRET`: Used by Auth, PostgREST, and other services to sign and verify JWTs.
+- `ANON_KEY`: Client-side API key with limited permissions (`anon` role). Use this in your frontend applications.
+- `SERVICE_ROLE_KEY`: Server-side API key with full database access (`service_role` role). **Never expose this in client code.**
+
+<JwtGeneratorSimple />
+
+1. Copy the generated value and update `JWT_SECRET` in the `.env` file. Do not share this secret publicly or commit it to version control.
+2. Copy the generated value and update `ANON_KEY` in the `.env` file.
+3. Copy the generated value and update `SERVICE_ROLE_KEY` in the `.env` file.
+
+The generated keys expire in 5 years. You can verify them at [jwt.io](https://jwt.io) using the saved value of `JWT_SECRET`.
+
+### Configuring secrets
+
+The `generate-keys.sh` script sets the following secrets automatically. You can also configure them manually in the `.env` file if needed:
+
+- `SECRET_KEY_BASE`: encryption key for securing Realtime and Supavisor communications. (Must be at least 64 characters; generate with `openssl rand -base64 48`)
+- `VAULT_ENC_KEY`: encryption key used by Supavisor for storing encrypted configuration. (Must be exactly 32 characters; generate with `openssl rand -hex 16`)
+- `PG_META_CRYPTO_KEY`: encryption key for securing connection strings used by Studio against postgres-meta. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
+- `LOGFLARE_PUBLIC_ACCESS_TOKEN`: API token for log ingestion and querying. Used by Vector and Studio to send and query logs. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
+- `LOGFLARE_PRIVATE_ACCESS_TOKEN`: API token for Logflare management operations. Used by Studio for administrative tasks. Never expose client-side. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
+- `S3_PROTOCOL_ACCESS_KEY_ID`: Access key ID (username-like) for [accessing](/docs/guides/self-hosting/self-hosted-s3) the S3 protocol endpoint in Storage. (Generate with `openssl rand -hex 16`)
+- `S3_PROTOCOL_ACCESS_KEY_SECRET`: Secret key (password-like) used with S3_PROTOCOL_ACCESS_KEY_ID. (Generate with `openssl rand -hex 32`)
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+- `MINIO_ROOT_PASSWORD`: Root administrator password for the [MinIO server](/docs/guides/self-hosting/self-hosted-s3#using-minio). (Must be 8+ characters; generate with `openssl rand -hex 16`)
+
+### Configuring Supabase services
 
 Each service has a number of configuration options you can find in the related documentation.
 
@@ -396,22 +442,26 @@ services:
       PGRST_JWT_SECRET: ${JWT_SECRET}
 ```
 
-```bash name=.env
+```sh name=.env
 ## Never check your secrets into version control
 JWT_SECRET=${JWT_SECRET}
 ```
 
 </$CodeTabs>
 
-### Common configuration tasks
+### Configuring social login (OAuth) providers
 
-You can configure each Supabase service separately through environment variables and configuration files. Below are the most common configuration options.
+See the [Configure Social Login (OAuth) Providers](/docs/guides/self-hosting/self-hosted-oauth) guide for setup instructions.
 
-#### Configuring an email server
+### Configuring phone login, SMS, and MFA
+
+See the [Configure Phone Login & MFA](/docs/guides/self-hosting/self-hosted-phone-mfa) guide for SMS provider setup, OTP settings, and multi-factor authentication configuration.
+
+### Configuring an email server
 
 You will need to use a production-ready SMTP server for sending emails. You can configure the SMTP server by updating the following environment variables in the `.env` file:
 
-```sh .env
+```sh name=.env
 SMTP_ADMIN_EMAIL=
 SMTP_HOST=
 SMTP_PORT=
@@ -422,35 +472,17 @@ SMTP_SENDER_NAME=
 
 We recommend using [AWS SES](https://aws.amazon.com/ses/). It's affordable and reliable. Restart all services to pick up the new configuration.
 
-#### Configuring S3 Storage
+### Configuring S3 Storage
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-By default all files are stored locally on the server. You can connect Storage to an S3-compatible backend (AWS S3, MinIO, Cloudflare R2), enable the S3 protocol endpoint for tools like `rclone`, or both. These are independent features.
+By default, all files are stored locally on the server. You can connect Storage to an S3-compatible backend (AWS S3, RustFS, MinIO, Cloudflare R2), enable the S3 protocol endpoint for tools like `rclone`, or both. These are independent features.
 
 See the [Configure S3 Storage](/docs/guides/self-hosting/self-hosted-s3) guide for detailed setup instructions.
 
-#### Configuring HTTPS
-
-By default, Supabase is accessible over HTTP. For production deployments, especially when using OAuth providers, you need HTTPS with a valid TLS certificate. The recommended approach is to place a reverse proxy (such as Caddy or Nginx) in front of Kong.
-
-See the [Configure HTTPS](/docs/guides/self-hosting/self-hosted-proxy-https) guide for setup instructions.
-
-#### Configuring social login (OAuth) providers
-
-See the [Configure Social Login (OAuth) Providers](/docs/guides/self-hosting/self-hosted-oauth) guide for setup instructions.
-
-#### Configuring phone login, SMS, and MFA
-
-See the [Configure Phone Login & MFA](/docs/guides/self-hosting/self-hosted-phone-mfa) guide for SMS provider setup, OTP settings, and multi-factor authentication configuration.
-
-#### Configuring Supabase AI Assistant
+### Configuring Supabase AI Assistant
 
 Configuring the Supabase AI Assistant is optional. By adding **your own** `OPENAI_API_KEY` to `.env` you can enable AI services, which help with writing SQL queries, statements, and policies.
 
-#### Setting log_min_messages in Postgres
-
-By default, the database's `log_min_messages` configuration is set to `fatal` in [docker-compose.yml](https://github.com/supabase/supabase/blob/df8729a82b1847e2989c14ede27965612761d503/docker/docker-compose.yml#L466) to prevent redundant logs generated by Realtime. You can configure `log_min_messages` using any of the Postgres [Severity Levels](https://www.postgresql.org/docs/current/runtime-config-logging.html#RUNTIME-CONFIG-SEVERITY-LEVELS).
-
-#### Accessing Postgres through Supavisor
+### Accessing Postgres through Supavisor
 
 By default, Postgres connections go through the Supavisor connection pooler for efficient connection management. Two ports are available:
 
@@ -459,7 +491,7 @@ By default, Postgres connections go through the Supavisor connection pooler for 
 
 For more information on configuring and using Supavisor, see the [Supavisor documentation](https://supabase.github.io/supavisor/).
 
-#### Exposing your Postgres database
+### Exposing your Postgres database
 
 By default, Postgres is only accessible through Supavisor. If you need direct access to the database (bypassing the connection pooler), you need to disable Supavisor and expose the Postgres port.
 
@@ -474,7 +506,7 @@ Edit `docker-compose.yml`:
 1. **Disable Supavisor** - Comment out or remove the entire `supavisor` service section
 2. **Expose Postgres port** - Add the port mapping to the `db` service, it should look like the example below:
 
-```yaml docker-compose.yml
+```yaml name=docker-compose.yml
 db:
   ports:
     - ${POSTGRES_PORT}:${POSTGRES_PORT}
@@ -487,23 +519,18 @@ After restarting, you can connect to the database directly using a standard Post
 postgres://postgres:[POSTGRES_PASSWORD]@[your-server-ip]:5432/[POSTGRES_DB]
 ```
 
-### Changing database password
+### Setting log_min_messages in Postgres
 
-To change the database password after initial setup, run:
+By default, the database's `log_min_messages` configuration is set to `fatal` in [docker-compose.yml](https://github.com/supabase/supabase/blob/df8729a82b1847e2989c14ede27965612761d503/docker/docker-compose.yml#L466) to prevent redundant logs generated by Realtime. You can configure `log_min_messages` using any of the Postgres [Severity Levels](https://www.postgresql.org/docs/current/runtime-config-logging.html#RUNTIME-CONFIG-SEVERITY-LEVELS).
 
-```sh
-sh ./utils/db-passwd.sh
-```
+### Using file backend in Storage on macOS
 
-The script generates a new password, updates all database roles, and modifies your `.env` file. After running it, restart the services with `docker compose up -d --force-recreate`.
-
-#### File storage backend on macOS
-
-By default, Storage backend is set to `file`, which is to use local files as the storage backend. If using Docker Desktop on a Mac, choose `VirtioFS` as the Docker container file sharing implementation (in **Preferences** > **General**).
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+By default, the Storage backend uses local files via a bind mount. On macOS, Docker Desktop bind mounts have known limitations (missing xattr support, permission issues) that can prevent Storage from working correctly. Change the [bind mount](https://github.com/supabase/supabase/blob/a5f4a59e0e262394b345600e8d8a2241d6ac3b64/docker/docker-compose.yml#L391) to a named Docker volume instead.
 
 ## Managing your secrets
 
-Many components inside Supabase use secure secrets and passwords. These are kept in the `.env` file, but we strongly recommend using a secrets manager when deploying to production.
+Many components inside Supabase rely on secrets and passwords being kept securely. By default, all secrets are in the `.env` file, but we strongly recommend using a secrets manager when deploying to production.
 
 Some suggested systems include:
 
