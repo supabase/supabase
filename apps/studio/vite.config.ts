@@ -88,6 +88,16 @@ export default defineConfig(({ mode }) => {
       .map(([key, value]) => [`process.env.${key}`, JSON.stringify(value)])
   )
 
+  // Mirror Next's `basePath` via NEXT_PUBLIC_BASE_PATH. Unlike Next, TanStack
+  // Start has no single knob — the prefix has to be declared in three places
+  // (see BASE_PATH_REDIRECT_GUIDE.md):
+  //   - Vite `base`      — bakes the prefix into asset URLs in the built bundle
+  //   - Nitro `baseURL`  — mounts the production server at that path
+  //   - Router `basepath` — makes client-side navigation match the prefix
+  // The router layer is set in router.tsx off the same env var (inlined via
+  // `define` above). Leaving the var empty keeps the app at `/` as today.
+  const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
+
   return {
     server: {
       port: 3000,
@@ -95,6 +105,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       tsconfigPaths: true,
     },
+    ...(basePath && { base: basePath }),
     define: publicEnvDefines,
     ssr: {
       // `lodash` is CJS; its named-export interop fails in Node ESM unless bundled.
@@ -131,6 +142,11 @@ export default defineConfig(({ mode }) => {
         // `modules/index.js` via `package.json#exports`) out of the picture.
         exportConditions: ['module'],
         noExternals: ['tslib'],
+        // See the `basePath` comment above — Nitro's own mount point needs the
+        // same prefix as Vite/router. `routeRules` paths are matched AFTER
+        // baseURL is stripped, so if we add redirects later they should be
+        // written relative to the base.
+        ...(basePath && { baseURL: basePath }),
       }),
       viteReact(),
     ],

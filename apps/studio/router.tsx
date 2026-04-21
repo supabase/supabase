@@ -23,6 +23,10 @@ export function getRouter() {
     context,
     scrollRestoration: true,
     defaultPreload: 'intent',
+    // Inlined via Vite's `define` at build time; stays undefined (= app at `/`)
+    // unless NEXT_PUBLIC_BASE_PATH is set. Must agree with Vite `base` and
+    // Nitro `baseURL` — see vite.config.ts.
+    basepath: process.env.NEXT_PUBLIC_BASE_PATH || undefined,
   })
 
   setupRouterSsrQueryIntegration({ router, queryClient: context.queryClient })
