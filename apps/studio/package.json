@@ -188,6 +188,7 @@
     "@types/uuid": "^8.3.4",
     "@types/zxcvbn": "^4.4.1",
     "@typescript-eslint/utils": "8.48.0",
+    "@vercel/config": "^0.2.1",
     "@vitejs/plugin-react": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",

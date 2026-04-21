@@ -1313,6 +1313,9 @@ importers:
       '@typescript-eslint/utils':
         specifier: 8.48.0
         version: 8.48.0(eslint@9.37.0(jiti@2.6.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.2)
+      '@vercel/config':
+        specifier: ^0.2.1
+        version: 0.2.1
       '@vitejs/plugin-react':
         specifier: 'catalog:'
         version: 6.0.1(vite@8.0.8(@types/node@22.13.14)(esbuild@0.25.2)(jiti@2.6.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.3))
@@ -1360,7 +1363,7 @@ importers:
         version: 2.11.3(@types/node@22.13.14)(typescript@6.0.2)
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@16.2.3(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.77.4))(react@19.2.5)
+        version: 0.9.13(next@16.2.3(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.77.4))(react@19.2.5)
       node-mocks-http:
         specifier: ^1.17.2
         version: 1.17.2(@types/node@22.13.14)
@@ -2313,7 +2316,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@16.2.3(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.77.4))(react@19.2.5)
+        version: 0.9.13(next@16.2.3(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.77.4))(react@19.2.5)
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
@@ -2870,7 +2873,7 @@ importers:
         version: link:../api-types
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@16.2.3(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.77.4))(react@19.2.5)
+        version: 0.9.13(next@16.2.3(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.77.4))(react@19.2.5)
       tsx:
         specifier: 'catalog:'
         version: 4.20.3
@@ -9769,6 +9772,10 @@ packages:
   '@usercentrics/cmp-browser-sdk@4.42.0':
     resolution: {integrity: sha512-/cik01TdeiYUV1+EasK83Ip05TDqmowM5tmWGfRDdaOrneSic5BedBdJHKya4pP2vwiYAtzDYVJe4BwPt2M16g==}
 
+  '@vercel/config@0.2.1':
+    resolution: {integrity: sha512-MWLB1WjVqj2z7oMBzhQez+uMr1JjK3Gq50tZ1EgcJpOua1Dyt2ITLNjh+nNyO0Z8VXdurszFeXvaDnswJRgSgQ==}
+    hasBin: true
+
   '@vercel/functions@1.6.0':
     resolution: {integrity: sha512-R6FKQrYT5MZs5IE1SqeCJWxMuBdHawFcCZboKKw8p7s+6/mcd55Gx6tWmyKnQTyrSEA04NH73Tc9CbqpEle8RA==}
     engines: {node: '>= 16'}
@@ -9799,6 +9806,9 @@ packages:
   '@vercel/oidc@3.1.0':
     resolution: {integrity: sha512-Fw28YZpRnA3cAHHDlkt7xQHiJ0fcL+NRcIqsocZQUSmbzeIKRpwttJjik5ZGanXP+vlA4SbTg+AbA3bP363l+w==}
     engines: {node: '>= 20'}
+
+  '@vercel/routing-utils@6.1.1':
+    resolution: {integrity: sha512-kUJn6CRuLvua5xvDZTJu1rC8GLdniC8D5VIzoJKm0dUdcUxv3LEx+pi8dokxWS+YM7cIs1Z3Y8ms/BDW1iBzzA==}
 
   '@vitejs/plugin-react@6.0.1':
     resolution: {integrity: sha512-l9X/E3cDb+xY3SWzlG1MOGt2usfEHGMNIaegaUGFsLkb3RCn/k8/TOXBcab+OndDI4TBtktT8/9BwwW8Vi9KUQ==}
@@ -15761,6 +15771,9 @@ packages:
   path-to-regexp@0.1.13:
     resolution: {integrity: sha512-A/AGNMFN3c8bOlvV9RreMdrv7jsmF9XIfDeCd87+I8RNg6s78BhJxMu69NEMHBSJFxKidViTEdruRwEk/WIKqA==}
 
+  path-to-regexp@6.1.0:
+    resolution: {integrity: sha512-h9DqehX3zZZDCEm+xbfU0ZmwCGFCAAraPJWMXJ4+v32NjZJilVg3k1TcKsRgIb8IQ/izZSaydDc1OhJCZvs2Dw==}
+
   path-to-regexp@6.3.0:
     resolution: {integrity: sha512-Yhpw4T9C6hPpgPeA28us07OJeqZ5EzQTkbfwuhsUg0c237RomFoETJgmp2sa3F/41gfLE6G5cqcYwznmeEeOlQ==}
 
@@ -16211,6 +16224,10 @@ packages:
   pretty-bytes@7.1.0:
     resolution: {integrity: sha512-nODzvTiYVRGRqAOvE84Vk5JDPyyxsVk0/fbA/bq7RqlnhksGpset09XTxbpvLTIjoaF7K8Z8DG8yHtKGTPSYRw==}
     engines: {node: '>=20'}
+
+  pretty-cache-header@1.0.0:
+    resolution: {integrity: sha512-xtXazslu25CdnGnUkByU1RoOjK55TqwatJkjjJLg5ZAdz2Lngko/mmaUgeET36P2GMlNwh3fdM7FWBO717pNcw==}
+    engines: {node: '>=12.13'}
 
   pretty-format@27.5.1:
     resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}
@@ -17856,6 +17873,10 @@ packages:
   timeout-signal@2.0.0:
     resolution: {integrity: sha512-YBGpG4bWsHoPvofT6y/5iqulfXIiIErl5B0LdtHT1mGXDFTAhhRrbUpTvBgYbovr+3cKblya2WAOcpoy90XguA==}
     engines: {node: '>=16'}
+
+  timestring@6.0.0:
+    resolution: {integrity: sha512-wMctrWD2HZZLuIlchlkE2dfXJh7J2KDI9Dwl+2abPYg0mswQHfOAyQW3jJg1pY5VfttSINZuKcXoB3FGypVklA==}
+    engines: {node: '>=8'}
 
   tiny-inflate@1.0.3:
     resolution: {integrity: sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==}
@@ -27670,6 +27691,12 @@ snapshots:
       lz-string: 1.5.0
       uuid: 9.0.1
 
+  '@vercel/config@0.2.1':
+    dependencies:
+      '@vercel/routing-utils': 6.1.1
+      pretty-cache-header: 1.0.0
+      zod: 3.25.76
+
   '@vercel/functions@1.6.0(@aws-sdk/credential-provider-web-identity@3.830.0)':
     optionalDependencies:
       '@aws-sdk/credential-provider-web-identity': 3.830.0
@@ -27704,6 +27731,13 @@ snapshots:
       yoga-wasm-web: 0.3.3
 
   '@vercel/oidc@3.1.0': {}
+
+  '@vercel/routing-utils@6.1.1':
+    dependencies:
+      path-to-regexp: 6.1.0
+      path-to-regexp-updated: path-to-regexp@6.3.0
+    optionalDependencies:
+      ajv: 6.14.0
 
   '@vitejs/plugin-react@6.0.1(vite@8.0.8(@types/node@22.13.14)(esbuild@0.25.2)(jiti@2.6.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.3))':
     dependencies:
@@ -34118,7 +34152,7 @@ snapshots:
     dependencies:
       js-yaml-loader: 1.2.2
 
-  next-router-mock@0.9.13(next@16.2.3(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.77.4))(react@19.2.5):
+  next-router-mock@0.9.13(next@16.2.3(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.77.4))(react@19.2.5):
     dependencies:
       next: 16.2.3(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.77.4)
       react: 19.2.5
@@ -35132,6 +35166,8 @@ snapshots:
 
   path-to-regexp@0.1.13: {}
 
+  path-to-regexp@6.1.0: {}
+
   path-to-regexp@6.3.0: {}
 
   path-to-regexp@8.4.1: {}
@@ -35558,6 +35594,10 @@ snapshots:
   prettier@3.8.1: {}
 
   pretty-bytes@7.1.0: {}
+
+  pretty-cache-header@1.0.0:
+    dependencies:
+      timestring: 6.0.0
 
   pretty-format@27.5.1:
     dependencies:
@@ -37655,6 +37695,8 @@ snapshots:
   through@2.3.8: {}
 
   timeout-signal@2.0.0: {}
+
+  timestring@6.0.0: {}
 
   tiny-inflate@1.0.3: {}
 

@@ -1,0 +1,25 @@
+import type { VercelConfig } from '@vercel/config/v1'
+
+// Vite's `base` bakes the prefix into asset URLs but leaves the filesystem
+// layout at `dist/client/...`. On Vercel we strip the prefix for file lookups
+// and fall through to the SPA shell. When NEXT_PUBLIC_BASE_PATH is empty
+// these rules collapse to identity rewrites plus the shell fallback.
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
+// eslint-disable-next-line no-restricted-exports
+export default {
+  framework: null,
+  outputDirectory: 'dist/client',
+  rewrites: [
+    // Asset passthrough. Matches anything ending in `.ext` (e.g.
+    // `/foo/assets/bundle.abc.js`) and rewrites to the un-prefixed path so
+    // Vercel finds it in `dist/client/`. If the file doesn't exist Vercel
+    // 404s — important, otherwise missing JS would fall through to the
+    // shell rule below and the browser would get HTML where JS was
+    // expected.
+    { source: `${basePath}/(.*\\.\\w+)`, destination: '/$1' },
+    // SPA fallback. Every remaining path (including the base path itself)
+    // gets served the prerendered shell, which boots the client router.
+    { source: `${basePath}/(.*)`, destination: '/_shell.html' },
+  ],
+} satisfies VercelConfig
