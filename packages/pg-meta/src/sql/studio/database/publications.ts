@@ -1,8 +1,10 @@
 import { ident } from '../../../pg-format'
 
 export const getCreatePublicationSQL = ({
+  name,
   tables,
 }: {
+  name: string
   tables: { schema: string; name: string }[]
 }) => {
   const query =
