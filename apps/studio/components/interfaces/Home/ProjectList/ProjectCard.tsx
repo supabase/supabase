@@ -16,8 +16,8 @@ import { ProjectCardStatus } from './ProjectCardStatus'
 import CardButton from '@/components/ui/CardButton'
 import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
 import PartnerIcon from '@/components/ui/PartnerIcon'
-import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
 import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
+import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
@@ -60,7 +60,10 @@ export const ProjectCard = ({
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
-  const projectManagedBy = getManagedByFromOrganizationPartner(undefined, project.integration_source)
+  const projectManagedBy = getManagedByFromOrganizationPartner(
+    undefined,
+    project.integration_source
+  )
   const projectStatus = inferProjectStatus(project.status)
 
   return (

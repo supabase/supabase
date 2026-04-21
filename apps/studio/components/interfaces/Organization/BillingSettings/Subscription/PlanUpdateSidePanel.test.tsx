@@ -67,7 +67,12 @@ vi.mock('@/data/subscriptions/org-subscription-query', () => ({
 
 vi.mock('@/data/subscriptions/org-plans-query', () => ({
   useOrgPlansQuery: () => ({
-    data: { plans: [{ id: 'free', price: 0 }, { id: 'pro', price: 25 }] },
+    data: {
+      plans: [
+        { id: 'free', price: 0 },
+        { id: 'pro', price: 25 },
+      ],
+    },
     isPending: false,
   }),
 }))

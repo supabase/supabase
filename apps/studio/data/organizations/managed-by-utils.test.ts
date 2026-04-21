@@ -8,9 +8,9 @@ import { MANAGED_BY } from '@/lib/constants/infrastructure'
 
 describe('managed-by-utils', () => {
   it('prefers billing_partner over integration_source when both are present', () => {
-    expect(
-      getManagedByFromOrganizationPartner('aws_marketplace', 'stripe_projects')
-    ).toBe(MANAGED_BY.AWS_MARKETPLACE)
+    expect(getManagedByFromOrganizationPartner('aws_marketplace', 'stripe_projects')).toBe(
+      MANAGED_BY.AWS_MARKETPLACE
+    )
   })
 
   it('maps stripe integration_source to Stripe display state', () => {

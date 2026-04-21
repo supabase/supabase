@@ -19,8 +19,8 @@ import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
 import PartnerIcon from '@/components/ui/PartnerIcon'
-import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
 import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
+import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
 import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
 import { BASE_PATH } from '@/lib/constants'
@@ -54,7 +54,10 @@ export const ProjectTableRow = ({
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
-  const projectManagedBy = getManagedByFromOrganizationPartner(undefined, project.integration_source)
+  const projectManagedBy = getManagedByFromOrganizationPartner(
+    undefined,
+    project.integration_source
+  )
   const hasPartnerIcon = projectManagedBy !== MANAGED_BY.SUPABASE
   const handleNavigation = createNavigationHandler(url, router)
 
