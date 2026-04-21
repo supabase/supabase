@@ -38,17 +38,21 @@ We'll create a database table called `todos` for storing tasks. This creates a c
         id serial primary key,
         task text
       );
+
+      -- Enable Data API access
+      -- Allow read-only access for anonymous clients
+      grant select on public.todos to anon;
       ```
 
       </TabPanel>
       <TabPanel id="dashboard" label="Dashboard">
 
-      <video width="99%" muted playsInline controls={true}>
-        <source
-          src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-create-table-sm.mp4"
-          type="video/mp4"
-        />
-      </video>
+      1. Go to the [**Table editor**](/dashboard/project/_/editor) section in the Dashboard.
+      2. Click **New Table** and create a table with the name `todos`.
+      3. Click **Save**.
+      4. Click **New Column** and create a column with the name `task` and type `text`.
+      5. Click **Save**.
+      6. In the [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard, expose the `todos` table. To automatically grant access for new tables and functions in `public`, enable **Default privileges for new entities**.
 
       </TabPanel>
       </Tabs>
@@ -61,7 +65,7 @@ We'll create a database table called `todos` for storing tasks. This creates a c
 
     <StepHikeCompact.Details title="Allow public access">
 
-    Let's turn on Row Level Security for this table and allow public access.
+    Let's turn on Row Level Security for this table, create the required policies, and then grant any write access.
 
     </StepHikeCompact.Details>
 
@@ -78,6 +82,18 @@ We'll create a database table called `todos` for storing tasks. This creates a c
         for select
         to anon
         using (true);
+
+      -- Allow authenticated users to read and modify todos
+      create policy "Allow authenticated users to manage todos"
+        on todos
+        for all
+        to authenticated
+        using (true)
+        with check (true);
+
+      -- Grant write access only after RLS and policies are in place
+      grant select, insert, update, delete on public.todos to authenticated;
+      grant select, insert, update, delete on public.todos to service_role;
       ```
 
     </StepHikeCompact.Code>

@@ -343,6 +343,61 @@ test.describe('SQL Editor', () => {
     }
   })
 
+  test('does not warn on CREATE FUNCTION with plpgsql SELECT..INTO variable assignment', async ({
+    ref,
+  }) => {
+    // Regression for the parser false-positive where `select ... into var`
+    // inside a $$...$$ plpgsql body was mistaken for SELECT..INTO creating
+    // a new table, firing the CREATE-TABLE-without-RLS warning modal.
+    const fnName = 'pw_rls_regression_fn'
+
+    // Clean up any leftover function from a previous run
+    await query(`drop function if exists public.${fnName}()`)
+
+    try {
+      await expect(page.getByText('Loading...')).not.toBeVisible()
+      await page.locator('.view-lines').click()
+      await page.keyboard.press('ControlOrMeta+KeyA')
+      await page.keyboard.type(
+        `create or replace function ${fnName}() returns jsonb language plpgsql as $$ declare ret jsonb; begin select jsonb_build_object('ok', true) into ret; return ret; end; $$;`
+      )
+
+      const sqlMutationPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+        method: 'POST',
+      })
+      await page.getByTestId('sql-run-button').click()
+      await sqlMutationPromise
+
+      // If the warning modal had fired, the query would have been blocked and
+      // the waiter above would have timed out. Belt-and-braces check that the
+      // modal is not visible.
+      await expect(
+        page.getByRole('heading', { name: 'Potential issue detected with' }),
+        'RLS warning should not fire on CREATE FUNCTION with plpgsql SELECT..INTO'
+      ).not.toBeVisible()
+
+      // Confirm the function was actually created
+      const rows = await query<{ exists: boolean }>(
+        `select exists (
+           select 1 from pg_proc p
+           join pg_namespace n on n.oid = p.pronamespace
+           where n.nspname = 'public' and p.proname = $1
+         ) as exists`,
+        [fnName]
+      )
+      expect(rows[0]?.exists, 'Function should have been created').toBe(true)
+    } finally {
+      await query(`drop function if exists public.${fnName}()`)
+
+      // clear SQL snippet
+      if (!isCLI()) {
+        await deleteSqlSnippet(page, ref, newSqlSnippetName)
+      } else {
+        await page.reload()
+      }
+    }
+  })
+
   test('should not show warning modal for safe alter database statement', async ({ ref }) => {
     await expect(page.getByText('Loading...')).not.toBeVisible()
     await page.locator('.view-lines').click()

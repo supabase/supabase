@@ -35,7 +35,7 @@ interface UpgradePlanButtonProps {
  */
 export const UpgradePlanButton = ({
   source,
-  variant = 'primary',
+  variant: type = 'primary',
   plan = 'Pro',
   addon,
   featureProposition,
@@ -97,6 +97,7 @@ export const UpgradePlanButton = ({
         addon={addon}
         featureProposition={featureProposition}
         className={className}
+        type={type}
       >
         {children}
       </RequestUpgradeToBillingOwners>
@@ -107,7 +108,7 @@ export const UpgradePlanButton = ({
     return (
       <ButtonTooltip
         disabled
-        type={variant}
+        type={type}
         className={className}
         tooltip={{
           content: {
@@ -122,7 +123,7 @@ export const UpgradePlanButton = ({
   }
 
   return (
-    <Button asChild type={variant} disabled={disabled} className={className} onClick={onClick}>
+    <Button asChild type={type} disabled={disabled} className={className} onClick={onClick}>
       {link}
     </Button>
   )
