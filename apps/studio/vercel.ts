@@ -11,6 +11,14 @@ export default {
   framework: null,
   outputDirectory: 'dist/client',
   rewrites: [
+    // API + server-function passthrough. Both funnel through the single
+    // `/api/server` Vercel Function that TanStack Start generates. These
+    // must come before the asset rule so that extensioned API paths like
+    // `/api/foo.json` still hit the function instead of a filesystem lookup.
+    // The destination is un-prefixed because the function is registered at
+    // `/api/server` regardless of the app's base path.
+    { source: `${basePath}/api/(.*)`, destination: '/api/server' },
+    { source: `${basePath}/_serverFn/(.*)`, destination: '/api/server' },
     // Asset passthrough. Matches anything ending in `.ext` (e.g.
     // `/foo/assets/bundle.abc.js`) and rewrites to the un-prefixed path so
     // Vercel finds it in `dist/client/`. If the file doesn't exist Vercel
