@@ -79,16 +79,7 @@ async function verifyProjectAccess(callerToken: string, projectRef: string): Pro
 
 export async function POST(request: Request) {
   try {
-    const { prompt, projectRef } = await request.json()
-
-    if (!prompt) {
-      return NextResponse.json({ message: 'Prompt is required.' }, { status: 400 })
-    }
-    if (!projectRef) {
-      return NextResponse.json({ message: 'projectRef is required.' }, { status: 400 })
-    }
-
-    // Verify the requesting user is authenticated via their Supabase Management API token
+    // Extract Bearer token from the incoming request
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
@@ -98,7 +89,16 @@ export async function POST(request: Request) {
     }
     const callerToken = authHeader.slice(7)
 
-    // Verify the caller has access to the requested project using their own token
+    const { prompt, projectRef } = await request.json()
+
+    if (!prompt) {
+      return NextResponse.json({ message: 'Prompt is required.' }, { status: 400 })
+    }
+    if (!projectRef) {
+      return NextResponse.json({ message: 'projectRef is required.' }, { status: 400 })
+    }
+
+    // Verify the caller has access to the requested project
     const hasAccess = await verifyProjectAccess(callerToken, projectRef)
     if (!hasAccess) {
       return NextResponse.json(
