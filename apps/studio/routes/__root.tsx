@@ -71,6 +71,7 @@ import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/const
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { Toaster } from '@/lib/toaster'
+import Error404 from '@/pages/404'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 
 dayjs.extend(customParseFormat)
@@ -247,10 +248,15 @@ const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
   console.error(error.stack)
 }
 
+function NotFound() {
+  return <Error404 />
+}
+
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: buildRootHead,
   component: RootComponent,
   shellComponent: RootDocument,
+  notFoundComponent: NotFound,
 })
 
 function RootComponent() {
