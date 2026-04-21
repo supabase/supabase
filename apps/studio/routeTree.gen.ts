@@ -9,6 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RedeemRouteImport } from './routes/redeem'
+import { Route as MaintenanceRouteImport } from './routes/maintenance'
+import { Route as LogoutRouteImport } from './routes/logout'
+import { Route as JoinRouteImport } from './routes/join'
+import { Route as ClaimProjectRouteImport } from './routes/claim-project'
+import { Route as AwsMarketplaceOnboardingRouteImport } from './routes/aws-marketplace-onboarding'
+import { Route as AuthorizeRouteImport } from './routes/authorize'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
@@ -136,6 +143,42 @@ import { Route as ApiPlatformStorageRefBucketsIdObjectsMoveRouteImport } from '.
 import { Route as ApiPlatformStorageRefBucketsIdObjectsListRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/list'
 import { Route as ApiPlatformStorageRefBucketsIdObjectsDownloadRouteImport } from './routes/api/platform/storage/$ref/buckets/$id/objects/download'
 
+const RedeemRoute = RedeemRouteImport.update({
+  id: '/redeem',
+  path: '/redeem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaintenanceRoute = MaintenanceRouteImport.update({
+  id: '/maintenance',
+  path: '/maintenance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogoutRoute = LogoutRouteImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClaimProjectRoute = ClaimProjectRouteImport.update({
+  id: '/claim-project',
+  path: '/claim-project',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AwsMarketplaceOnboardingRoute =
+  AwsMarketplaceOnboardingRouteImport.update({
+    id: '/aws-marketplace-onboarding',
+    path: '/aws-marketplace-onboarding',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthorizeRoute = AuthorizeRouteImport.update({
+  id: '/authorize',
+  path: '/authorize',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRouteImport,
@@ -834,6 +877,13 @@ const ApiPlatformStorageRefBucketsIdObjectsDownloadRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/authorize': typeof AuthorizeRoute
+  '/aws-marketplace-onboarding': typeof AwsMarketplaceOnboardingRoute
+  '/claim-project': typeof ClaimProjectRoute
+  '/join': typeof JoinRoute
+  '/logout': typeof LogoutRoute
+  '/maintenance': typeof MaintenanceRoute
+  '/redeem': typeof RedeemRoute
   '/account': typeof AppAccountRouteWithChildren
   '/org': typeof AppOrgRouteWithChildren
   '/organizations': typeof AppOrganizationsRoute
@@ -960,6 +1010,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/authorize': typeof AuthorizeRoute
+  '/aws-marketplace-onboarding': typeof AwsMarketplaceOnboardingRoute
+  '/claim-project': typeof ClaimProjectRoute
+  '/join': typeof JoinRoute
+  '/logout': typeof LogoutRoute
+  '/maintenance': typeof MaintenanceRoute
+  '/redeem': typeof RedeemRoute
   '/account': typeof AppAccountRouteWithChildren
   '/organizations': typeof AppOrganizationsRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
@@ -1088,6 +1145,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
+  '/authorize': typeof AuthorizeRoute
+  '/aws-marketplace-onboarding': typeof AwsMarketplaceOnboardingRoute
+  '/claim-project': typeof ClaimProjectRoute
+  '/join': typeof JoinRoute
+  '/logout': typeof LogoutRoute
+  '/maintenance': typeof MaintenanceRoute
+  '/redeem': typeof RedeemRoute
   '/_app/account': typeof AppAccountRouteWithChildren
   '/_app/org': typeof AppOrgRouteWithChildren
   '/_app/organizations': typeof AppOrganizationsRoute
@@ -1216,6 +1280,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/authorize'
+    | '/aws-marketplace-onboarding'
+    | '/claim-project'
+    | '/join'
+    | '/logout'
+    | '/maintenance'
+    | '/redeem'
     | '/account'
     | '/org'
     | '/organizations'
@@ -1342,6 +1413,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/authorize'
+    | '/aws-marketplace-onboarding'
+    | '/claim-project'
+    | '/join'
+    | '/logout'
+    | '/maintenance'
+    | '/redeem'
     | '/account'
     | '/organizations'
     | '/forgot-password'
@@ -1469,6 +1547,13 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/_auth'
+    | '/authorize'
+    | '/aws-marketplace-onboarding'
+    | '/claim-project'
+    | '/join'
+    | '/logout'
+    | '/maintenance'
+    | '/redeem'
     | '/_app/account'
     | '/_app/org'
     | '/_app/organizations'
@@ -1598,6 +1683,13 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  AuthorizeRoute: typeof AuthorizeRoute
+  AwsMarketplaceOnboardingRoute: typeof AwsMarketplaceOnboardingRoute
+  ClaimProjectRoute: typeof ClaimProjectRoute
+  JoinRoute: typeof JoinRoute
+  LogoutRoute: typeof LogoutRoute
+  MaintenanceRoute: typeof MaintenanceRoute
+  RedeemRoute: typeof RedeemRoute
   ApiCheckCnameRoute: typeof ApiCheckCnameRoute
   ApiCliReleaseVersionRoute: typeof ApiCliReleaseVersionRoute
   ApiEnabledFeaturesOverridesRoute: typeof ApiEnabledFeaturesOverridesRoute
@@ -1691,6 +1783,55 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/redeem': {
+      id: '/redeem'
+      path: '/redeem'
+      fullPath: '/redeem'
+      preLoaderRoute: typeof RedeemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maintenance': {
+      id: '/maintenance'
+      path: '/maintenance'
+      fullPath: '/maintenance'
+      preLoaderRoute: typeof MaintenanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/logout': {
+      id: '/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/claim-project': {
+      id: '/claim-project'
+      path: '/claim-project'
+      fullPath: '/claim-project'
+      preLoaderRoute: typeof ClaimProjectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aws-marketplace-onboarding': {
+      id: '/aws-marketplace-onboarding'
+      path: '/aws-marketplace-onboarding'
+      fullPath: '/aws-marketplace-onboarding'
+      preLoaderRoute: typeof AwsMarketplaceOnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/authorize': {
+      id: '/authorize'
+      path: '/authorize'
+      fullPath: '/authorize'
+      preLoaderRoute: typeof AuthorizeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_auth': {
       id: '/_auth'
       path: ''
@@ -2696,6 +2837,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  AuthorizeRoute: AuthorizeRoute,
+  AwsMarketplaceOnboardingRoute: AwsMarketplaceOnboardingRoute,
+  ClaimProjectRoute: ClaimProjectRoute,
+  JoinRoute: JoinRoute,
+  LogoutRoute: LogoutRoute,
+  MaintenanceRoute: MaintenanceRoute,
+  RedeemRoute: RedeemRoute,
   ApiCheckCnameRoute: ApiCheckCnameRoute,
   ApiCliReleaseVersionRoute: ApiCliReleaseVersionRoute,
   ApiEnabledFeaturesOverridesRoute: ApiEnabledFeaturesOverridesRoute,
