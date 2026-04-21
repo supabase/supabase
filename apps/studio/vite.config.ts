@@ -15,6 +15,7 @@ const compatRoot = path.resolve(rootDir, 'compat/next')
 // needed by app source.
 const nextShims: Record<string, string> = {
   'next/compat/router': path.join(compatRoot, 'compat/router.ts'),
+  'next/dynamic': path.join(compatRoot, 'dynamic.tsx'),
   'next/head': path.join(compatRoot, 'head.tsx'),
   'next/image': path.join(compatRoot, 'image.tsx'),
   'next/link': path.join(compatRoot, 'link.tsx'),

@@ -28,8 +28,17 @@ import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { FeatureFlagProvider, getFlags, ThemeProvider, useThemeSandbox } from 'common'
+import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
-import { useCallback, useEffect, type ComponentProps, type ErrorInfo, type ReactNode } from 'react'
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  type ComponentProps,
+  type ErrorInfo,
+  type ReactNode,
+} from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 
@@ -56,6 +65,33 @@ const FeatureFlagProviderWithOrgContext = ({
     </FeatureFlagProvider>
   )
 }
+
+// Keep dev-only components out of the production bundle.
+const IS_DEV_TOOLBAR_ENABLED =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+
+const ResourceWarningsTab = IS_DEV_TOOLBAR_ENABLED
+  ? lazy(() =>
+      import('@/components/ui/DevToolbar/ResourceWarningsTab').then((m) => ({
+        default: m.ResourceWarningsTab,
+      }))
+    )
+  : () => null
+
+const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
+  ? [
+      {
+        id: 'warnings',
+        label: 'Warnings',
+        content: (
+          <Suspense fallback={null}>
+            <ResourceWarningsTab />
+          </Suspense>
+        ),
+      },
+    ]
+  : []
 
 const FAVICON_ROUTE = '/favicon'
 const THEME_COLOR = '1E1E1E'
@@ -206,7 +242,11 @@ function RootComponent() {
                   enableSystem
                   disableTransitionOnChange
                 >
-                  <Outlet />
+                  <DevToolbarProvider apiUrl={API_URL}>
+                    <Outlet />
+                    <DevToolbar extraTabs={devToolbarExtraTabs} />
+                    <DevToolbarTrigger />
+                  </DevToolbarProvider>
                 </ThemeProvider>
               </TooltipProvider>
             </ProfileProvider>
