@@ -22,7 +22,7 @@ import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
-import { parseAsInteger, useQueryState } from 'nuqs'
+import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -61,6 +61,16 @@ const CHANGELOG_PRODUCT_TAGS = [
   { slug: 'dashboard', label: 'Dashboard' },
   { slug: 'docs', label: 'Docs' },
 ] as const
+
+type ChangelogProductSlug = (typeof CHANGELOG_PRODUCT_TAGS)[number]['slug']
+
+const CHANGELOG_PRODUCT_SLUG_SET = new Set<string>(
+  CHANGELOG_PRODUCT_TAGS.map((t) => t.slug)
+)
+
+function isChangelogProductSlug(value: string): value is ChangelogProductSlug {
+  return CHANGELOG_PRODUCT_SLUG_SET.has(value)
+}
 
 type FeaturedEntry = {
   number: number
@@ -153,7 +163,7 @@ function itemMatchesSearch(item: ChangelogTimelineIndexItem, q: string) {
 
 function itemMatchesSelectedTags(
   item: ChangelogTimelineIndexItem,
-  selected: Set<(typeof CHANGELOG_PRODUCT_TAGS)[number]['slug']>
+  selected: Set<ChangelogProductSlug>
 ) {
   if (selected.size === 0) return true
   const labelNames = new Set(item.labels.map((l) => l.name.toLowerCase()))
@@ -163,10 +173,18 @@ function itemMatchesSelectedTags(
   return false
 }
 
+const nuqsUrlOptions = { shallow: true, history: 'push' as const }
+
 function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProps) {
   const [discussion, setDiscussion] = useQueryState(
     'discussion',
-    parseAsInteger.withOptions({ shallow: true, history: 'push' })
+    parseAsInteger.withOptions(nuqsUrlOptions)
+  )
+
+  const [querySearch, setQuerySearch] = useQueryState('q', parseAsString.withOptions(nuqsUrlOptions))
+  const [queryTags, setQueryTags] = useQueryState(
+    'tags',
+    parseAsArrayOf(parseAsString).withOptions(nuqsUrlOptions)
   )
 
   const [payload, setPayload] = useState<ModalPayload | null>(null)
@@ -174,10 +192,24 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
   const [loading, setLoading] = useState(false)
 
   const [filterPanelOpen, setFilterPanelOpen] = useState(false)
-  const [filterSearch, setFilterSearch] = useState('')
-  const [selectedTags, setSelectedTags] = useState<
-    Set<(typeof CHANGELOG_PRODUCT_TAGS)[number]['slug']>
-  >(() => new Set())
+
+  const filterSearch = querySearch ?? ''
+  const selectedTags = useMemo(() => {
+    const next = new Set<ChangelogProductSlug>()
+    for (const raw of queryTags ?? []) {
+      if (isChangelogProductSlug(raw)) next.add(raw)
+    }
+    return next
+  }, [queryTags])
+
+  const hasNuqsFilters = useMemo(
+    () => filterSearch.trim().length > 0 || selectedTags.size > 0,
+    [filterSearch, selectedTags]
+  )
+
+  useEffect(() => {
+    if (hasNuqsFilters) setFilterPanelOpen(true)
+  }, [hasNuqsFilters])
 
   const filteredIndex = useMemo(() => {
     const q = filterSearch
@@ -189,18 +221,16 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
       .sort((a, b) => dayjs(b.sortDate).diff(dayjs(a.sortDate)))
   }, [allIndex, filterSearch, selectedTags])
 
-  const toggleProductTag = (slug: (typeof CHANGELOG_PRODUCT_TAGS)[number]['slug']) => {
-    setSelectedTags((prev) => {
-      const next = new Set(prev)
-      if (next.has(slug)) next.delete(slug)
-      else next.add(slug)
-      return next
-    })
+  const toggleProductTag = (slug: ChangelogProductSlug) => {
+    const current = (queryTags ?? []).filter(isChangelogProductSlug)
+    const has = current.includes(slug)
+    const next = has ? current.filter((t) => t !== slug) : [...current, slug]
+    void setQueryTags(next.length > 0 ? next : null)
   }
 
   const clearFilters = () => {
-    setFilterSearch('')
-    setSelectedTags(new Set())
+    void setQuerySearch(null)
+    void setQueryTags(null)
   }
 
   const preview = useMemo(() => {
@@ -323,7 +353,10 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
                       <ListFilter className="h-4 w-4" strokeWidth={1.5} aria-hidden />
                     )
                   }
-                  onClick={() => setFilterPanelOpen((o) => !o)}
+                  onClick={() => {
+                    if (filterPanelOpen) setFilterPanelOpen(false)
+                    else setFilterPanelOpen(true)
+                  }}
                 >
                   {filterPanelOpen ? 'Hide filters' : 'Filter changelog'}
                 </Button>
@@ -344,7 +377,10 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
                     size="small"
                     placeholder="Search changelog..."
                     value={filterSearch}
-                    onChange={(e) => setFilterSearch(e.target.value)}
+                    onChange={(e) => {
+                      const v = e.target.value
+                      void setQuerySearch(v.length === 0 ? null : v)
+                    }}
                   />
                   {(filterSearch.trim().length > 0 || selectedTags.size > 0) && (
                     <Button
