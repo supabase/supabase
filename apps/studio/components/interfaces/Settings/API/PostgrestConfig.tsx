@@ -15,10 +15,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   FormItem_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Skeleton,
   Switch,
@@ -426,15 +426,8 @@ export const PostgrestConfig = () => {
                             <FormItem_Shadcn_>
                               <FormItemLayout
                                 layout="flex-row-reverse"
-                                label="Default privileges for new entities"
-                                description={
-                                  <>
-                                    When enabled, new tables and functions in the{' '}
-                                    <code>public</code> schema are automatically accessible via the
-                                    Data API. We recommend disabling this and manually granting
-                                    access to each new entity.
-                                  </>
-                                }
+                                label="Automatically expose new tables and functions"
+                                description="Grants privileges to Data API roles by default, exposing new tables and functions. We recommend disabling this to control access manually."
                               >
                                 <FormControl_Shadcn_>
                                   <div>
@@ -469,7 +462,7 @@ export const PostgrestConfig = () => {
                           <FormItem_Shadcn_>
                             <FormItemLayout
                               label="Exposed schemas"
-                              description="The schemas to expose in your API. Tables, views and stored procedures in
+                              description="The schemas to expose in your API. Tables, views and functions in
                           these schemas will get API endpoints."
                               layout="flex-row-reverse"
                             >
@@ -607,20 +600,20 @@ export const PostgrestConfig = () => {
                           <FormItemLayout
                             layout="flex-row-reverse"
                             label="Max rows"
-                            description="The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests."
+                            description="The maximum number of rows returned from a view, table, or function. Limits payload size for accidental or malicious requests."
                           >
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupAddon align="inline-end">
-                                  <InputGroupText>rows</InputGroupText>
-                                </InputGroupAddon>
-                                <InputGroupInput
+                                <FormInputGroupInput
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig}
                                   {...field}
                                   type="number"
                                   onChange={(e) => field.onChange(Number(e.target.value))}
                                 />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>rows</InputGroupText>
+                                </InputGroupAddon>
                               </InputGroup>
                             </FormControl_Shadcn_>
                           </FormItemLayout>
@@ -641,10 +634,7 @@ export const PostgrestConfig = () => {
                           >
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupAddon align="inline-end">
-                                  <InputGroupText>connections</InputGroupText>
-                                </InputGroupAddon>
-                                <InputGroupInput
+                                <FormInputGroupInput
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig}
                                   {...field}
@@ -657,6 +647,9 @@ export const PostgrestConfig = () => {
                                   }
                                   value={field.value === null ? '' : field.value}
                                 />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>connections</InputGroupText>
+                                </InputGroupAddon>
                               </InputGroup>
                             </FormControl_Shadcn_>
                           </FormItemLayout>

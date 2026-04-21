@@ -1,5 +1,7 @@
-export const getIndexesSQL = ({ schema }: { schema: string }) => {
-  const sql = /* SQL */ `
+import { literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
+
+export const getIndexesSQL = ({ schema }: { schema: string }): SafeSqlFragment => {
+  return safeSql`
 SELECT
   n.nspname        AS schema,
   t.relname        AS "table",
@@ -17,7 +19,7 @@ JOIN LATERAL unnest(idx.indkey) WITH ORDINALITY AS k(attnum, ord) ON TRUE
 LEFT JOIN pg_attribute a
   ON a.attrelid = t.oid
  AND a.attnum   = k.attnum
-WHERE n.nspname = '${schema}'
+WHERE n.nspname = ${literal(schema)}
 GROUP BY
   n.nspname,
   t.relname,
@@ -25,7 +27,5 @@ GROUP BY
   idx.indexrelid
 ORDER BY
   schema, "table", name;
-`.trim()
-
-  return sql
+`
 }

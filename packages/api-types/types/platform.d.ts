@@ -670,6 +670,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/integrations/partners/{ref}/{listing_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Creates a partner integration and returns the redirect URL */
+    post: operations['PartnerIntegrationsController_createIntegration']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/integrations/private-link/{slug}': {
     parameters: {
       query?: never
@@ -1347,6 +1364,23 @@ export interface paths {
      * @description Results are cached per organization for up to 24 hours. Signed status may not reflect immediately after a document is completed.
      */
     get: operations['OrgDocumentsController_getDpaSignedStatus']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/documents/iso27001-certificate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get ISO 27001 certificate URL */
+    get: operations['OrgDocumentsController_getIso27001CertificateUrl']
     put?: never
     post?: never
     delete?: never
@@ -4692,6 +4726,7 @@ export interface components {
       billing_name?: string
       /** @enum {boolean} */
       clear_tax_id?: true
+      dry_run?: boolean
       tax_id?: {
         country?: string
         type: string
@@ -4764,7 +4799,6 @@ export interface components {
       payment_intent_id: string
       size?: string
     }
-    ConfirmRequestDto: Record<string, never>
     ConfirmResponseDto: {
       organization_slug: string
       success: boolean
@@ -5057,6 +5091,8 @@ export interface components {
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
+        | 'analytics_config:read'
+        | 'analytics_config:write'
         | 'auth:read'
         | 'auth:write'
         | 'database:read'
@@ -6261,6 +6297,8 @@ export interface components {
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
+        | 'analytics_config:read'
+        | 'analytics_config:write'
         | 'auth:read'
         | 'auth:write'
         | 'database:read'
@@ -7242,6 +7280,7 @@ export interface components {
             | 'security.audit_logs_days'
             | 'security.questionnaire'
             | 'security.soc2_report'
+            | 'security.iso27001_certificate'
             | 'security.private_link'
             | 'security.enforce_mfa'
             | 'log.retention_days'
@@ -7566,6 +7605,8 @@ export interface components {
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
+        | 'analytics_config:read'
+        | 'analytics_config:write'
         | 'auth:read'
         | 'auth:write'
         | 'database:read'
@@ -7911,6 +7952,23 @@ export interface components {
     OverdueInvoiceCount: {
       organization_id: number
       overdue_invoice_count: number
+    }
+    PartnerIntegrationsResponse: {
+      /**
+       * Format: date-time
+       * @description When the integration link expires (1 hour from creation). The user must begin the flow before this time.
+       */
+      expiresAt: string
+      /**
+       * Format: uuid
+       * @description Unique identifier for the integration record
+       */
+      integrationId: string
+      /**
+       * Format: uri
+       * @description URL to redirect the user's browser to
+       */
+      redirectUrl: string
     }
     PauseStatusResponse: {
       can_restore: boolean
@@ -9927,6 +9985,7 @@ export interface components {
           usage: number
         }[]
         description: string
+        item_name: string
         metadata?: {
           is_branch?: boolean
           is_read_replica?: boolean
@@ -9996,6 +10055,15 @@ export interface components {
         usage_original?: number
       }[]
       subscription_id: string
+      tax: {
+        currency: string
+        tax_amount: number
+        tax_rate_percentage: number
+        total_amount_excluding_tax: number
+        total_amount_including_tax: number
+      } | null
+      /** @enum {string} */
+      tax_status: 'calculated' | 'not_applicable' | 'failed'
     }
     UpdateAddonBody: {
       /** @enum {string} */
@@ -13194,6 +13262,65 @@ export interface operations {
       }
     }
   }
+  PartnerIntegrationsController_createIntegration: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The id of the listing in the marketplace database */
+        listing_id: string
+        /** @description Supabase project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PartnerIntegrationsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Project or listing not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve listing or project, or failed to create partner integration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   PrivateLinkController_getPrivateLinkConfig: {
     parameters: {
       query?: never
@@ -15280,6 +15407,49 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['DocumentSignedStatusResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgDocumentsController_getIso27001CertificateUrl: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrgDocumentUrlResponse']
         }
       }
       /** @description Unauthorized */
@@ -26429,11 +26599,7 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ConfirmRequestDto']
-      }
-    }
+    requestBody?: never
     responses: {
       200: {
         headers: {

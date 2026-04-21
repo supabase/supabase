@@ -13,10 +13,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   FormMessage_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Switch,
 } from 'ui'
@@ -278,15 +278,15 @@ export const RealtimeSettings = () => {
                           >
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupAddon align="inline-end">
-                                  <InputGroupText>connections</InputGroupText>
-                                </InputGroupAddon>
-                                <InputGroupInput
+                                <FormInputGroupInput
                                   {...field}
                                   type="number"
                                   disabled={!canUpdateConfig}
                                   value={field.value || ''}
                                 />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>connections</InputGroupText>
+                                </InputGroupAddon>
                               </InputGroup>
                             </FormControl_Shadcn_>
                           </FormItemLayout>
@@ -314,15 +314,15 @@ export const RealtimeSettings = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>clients</InputGroupText>
-                              </InputGroupAddon>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!canUpdateConfig}
                                 value={field.value || ''}
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>clients</InputGroupText>
+                              </InputGroupAddon>
                             </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
@@ -341,15 +341,15 @@ export const RealtimeSettings = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>events/s</InputGroupText>
-                              </InputGroupAddon>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>events/s</InputGroupText>
+                              </InputGroupAddon>
                             </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
@@ -395,15 +395,15 @@ export const RealtimeSettings = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>events/s</InputGroupText>
-                              </InputGroupAddon>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>events/s</InputGroupText>
+                              </InputGroupAddon>
                             </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
@@ -449,15 +449,15 @@ export const RealtimeSettings = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>KB</InputGroupText>
-                              </InputGroupAddon>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>KB</InputGroupText>
+                              </InputGroupAddon>
                             </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>

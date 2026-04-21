@@ -108,7 +108,7 @@ vi.mock(import('@/lib/breadcrumbs'), async (importOriginal) => {
 
 let createSupportStorageClientMock: ReturnType<typeof vi.fn>
 let getBreadcrumbSnapshotMock: ReturnType<typeof vi.fn>
-let generateAttachmentUrlSpy: ReturnType<typeof vi.fn>
+let generateAttachmentUrlSpy: ReturnType<typeof vi.fn<(...args: any[]) => any>>
 
 // Mock sonner toast
 vi.mock('sonner', () => ({

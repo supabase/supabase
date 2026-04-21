@@ -101,6 +101,7 @@ export const SubscriptionPlanUpdateDialog = ({
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
   const paymentMethodSelectionRef = useRef<{
     createPaymentMethod: PaymentMethodElementRef['createPaymentMethod']
+    validateBillingProfile: () => Promise<boolean>
   }>(null)
 
   const billingViaPartner = subscription?.billing_via_partner === true
@@ -179,6 +180,14 @@ export const SubscriptionPlanUpdateDialog = ({
     if (!selectedTier) return console.error('Selected plan is required')
 
     setPaymentConfirmationLoading(true)
+
+    if (paymentMethodSelectionRef.current) {
+      const isValid = await paymentMethodSelectionRef.current.validateBillingProfile()
+      if (!isValid) {
+        setPaymentConfirmationLoading(false)
+        return
+      }
+    }
 
     const result = await paymentMethodSelectionRef.current?.createPaymentMethod()
     if (result) {
@@ -653,7 +662,7 @@ export const SubscriptionPlanUpdateDialog = ({
                 (it) =>
                   it.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
                   it.status === PROJECT_STATUS.COMING_UP
-              ).length === 5 &&
+              ).length === 0 &&
                 subscriptionPreview?.plan_change_type !== 'downgrade' && (
                   <div className="pb-2">
                     <Admonition title="Empty organization" type="warning">

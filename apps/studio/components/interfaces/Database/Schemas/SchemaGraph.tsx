@@ -22,6 +22,15 @@ import '@xyflow/react/dist/style.css'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { toast } from 'sonner'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
   Button,
   copyToClipboard,
   DropdownMenu,
@@ -38,6 +47,7 @@ import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { EdgeData, TableNodeData } from './Schemas.constants'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
+import { useExportSchemaToImage } from './useExportSchemaToImage'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import SchemaSelector from '@/components/ui/SchemaSelector'
@@ -61,6 +71,7 @@ export const SchemaGraph = () => {
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [selectedTable, setSelectedTable] = useState<PostgresTable | null>(null)
   const snap = useTableEditorStateSnapshot()
+  const { isDownloading, exportSchemaToImage } = useExportSchemaToImage()
 
   const [copied, setCopied] = useState(false)
   useEffect(() => {
@@ -68,8 +79,6 @@ export const SchemaGraph = () => {
       setTimeout(() => setCopied(false), 2000)
     }
   }, [copied])
-
-  const [isDownloading, setIsDownloading] = useState(false)
 
   const miniMapNodeColor = '#111318'
   const miniMapMaskColor = resolvedTheme?.includes('dark')
@@ -130,7 +139,7 @@ export const SchemaGraph = () => {
 
   const canAddTables = canUpdateTables && !isSchemaLocked
 
-  const resetLayout = () => {
+  const resetLayout = async () => {
     const nodes = reactFlowInstance.getNodes()
     const edges = reactFlowInstance.getEdges()
 
@@ -140,7 +149,12 @@ export const SchemaGraph = () => {
     )
     reactFlowInstance.setNodes(nodes)
     reactFlowInstance.setEdges(edges)
-    setTimeout(() => reactFlowInstance.fitView({}))
+    await new Promise<void>((resolve) =>
+      setTimeout(async () => {
+        await reactFlowInstance.fitView({})
+        resolve()
+      })
+    )
     saveNodePositions()
   }
 
@@ -161,72 +175,28 @@ export const SchemaGraph = () => {
     (params: OnSelectionChangeParams<Node<TableNodeData>, Edge<EdgeData>>) => {
       if (params.edges.length === 1) {
         setSelectedEdge(params.edges[0])
-        return
+      } else {
+        setSelectedEdge(undefined)
       }
-      setSelectedEdge(undefined)
+
+      const selectedNodeIds = new Set(params.nodes.map((n) => n.id))
+      reactFlowInstance.setEdges(
+        reactFlowInstance.getEdges().map((edge) => ({
+          ...edge,
+          animated:
+            selectedNodeIds.size > 0 &&
+            (selectedNodeIds.has(edge.source) || selectedNodeIds.has(edge.target)),
+        }))
+      )
     }
   )
 
-  const downloadImage = (format: 'png' | 'svg') => {
+  const downloadImage = async (format: 'png' | 'svg') => {
     const reactflowViewport = document.querySelector('.react-flow__viewport') as HTMLElement
     if (!reactflowViewport) return
-
-    setIsDownloading(true)
-    const width = reactflowViewport.clientWidth
-    const height = reactflowViewport.clientHeight
+    if (!ref) return
     const { x, y, zoom } = reactFlowInstance.getViewport()
-
-    if (format === 'svg') {
-      toSvg(reactflowViewport, {
-        backgroundColor: 'white',
-        width,
-        height,
-        style: {
-          width: width.toString(),
-          height: height.toString(),
-          transform: `translate(${x}px, ${y}px) scale(${zoom})`,
-        },
-      })
-        .then((data) => {
-          const a = document.createElement('a')
-          a.setAttribute('download', `supabase-schema-${ref}.svg`)
-          a.setAttribute('href', data)
-          a.click()
-          toast.success('Successfully downloaded as SVG')
-        })
-        .catch((error) => {
-          console.error('Failed to download:', error)
-          toast.error('Failed to download current view:', error.message)
-        })
-        .finally(() => {
-          setIsDownloading(false)
-        })
-    } else if (format === 'png') {
-      toPng(reactflowViewport, {
-        backgroundColor: 'white',
-        width,
-        height,
-        style: {
-          width: width.toString(),
-          height: height.toString(),
-          transform: `translate(${x}px, ${y}px) scale(${zoom})`,
-        },
-      })
-        .then((data) => {
-          const a = document.createElement('a')
-          a.setAttribute('download', `supabase-schema-${ref}.png`)
-          a.setAttribute('href', data)
-          a.click()
-          toast.success('Successfully downloaded as PNG')
-        })
-        .catch((error) => {
-          console.error('Failed to download:', error)
-          toast.error('Failed to download current view:', error.message)
-        })
-        .finally(() => {
-          setIsDownloading(false)
-        })
-    }
+    exportSchemaToImage({ element: reactflowViewport, format, x, y, zoom, projectRef: ref })
   }
 
   const isFirstLoad = useRef(true)
@@ -254,7 +224,7 @@ export const SchemaGraph = () => {
     selectedSchema,
   ])
 
-  const schemaGraphPanelEditorContext = useMemo<SchemaGraphContextType>(
+  const schemaGraphContext = useMemo<SchemaGraphContextType>(
     () => ({
       selectedEdge,
       isDownloading,
@@ -286,9 +256,7 @@ export const SchemaGraph = () => {
           <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
         )}
 
-        {isErrorSchemas && (
-          <AlertError error={errorSchemas as any} subject="Failed to retrieve schemas" />
-        )}
+        {isErrorSchemas && <AlertError error={errorSchemas} subject="Failed to retrieve schemas" />}
 
         {isSuccessSchemas && (
           <>
@@ -347,18 +315,33 @@ export const SchemaGraph = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <ButtonTooltip
-                  type="default"
-                  onClick={resetLayout}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: 'Automatically arrange the layout of all nodes',
-                    },
-                  }}
-                >
-                  Auto layout
-                </ButtonTooltip>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <ButtonTooltip
+                      type="default"
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: 'Automatically arrange the layout of all nodes',
+                        },
+                      }}
+                    >
+                      Auto layout
+                    </ButtonTooltip>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm to rearrange all nodes</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Auto layout will rearrange all nodes in the graph. This cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={resetLayout}>Apply</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             )}
           </>
@@ -400,7 +383,7 @@ export const SchemaGraph = () => {
               </Admonition>
             </div>
           ) : (
-            <SchemaGraphContextProvider value={schemaGraphPanelEditorContext}>
+            <SchemaGraphContextProvider value={schemaGraphContext}>
               <div className="w-full h-full">
                 <ReactFlow<Node<TableNodeData>, Edge<EdgeData>>
                   // FIXME: https://github.com/xyflow/xyflow/issues/4876
@@ -409,7 +392,7 @@ export const SchemaGraph = () => {
                   defaultEdges={[]}
                   defaultEdgeOptions={{
                     type: 'default',
-                    animated: true,
+                    animated: false,
                     deletable: false,
                   }}
                   nodeTypes={nodeTypes}

@@ -1,16 +1,17 @@
 import { format } from 'date-fns'
 import { CalendarIcon, ExternalLink } from 'lucide-react'
-import { type Control } from 'react-hook-form'
+import { useEffect } from 'react'
+import { useFormContext, type Control } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import {
   Button,
   Calendar,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -40,6 +41,7 @@ interface FormFieldProps {
   control: Control
   hasAccess: boolean
   disabled?: boolean
+  readOnly?: boolean
 }
 
 const FormField = ({
@@ -50,7 +52,9 @@ const FormField = ({
   control,
   hasAccess,
   disabled: disabledProp,
+  readOnly,
 }: FormFieldProps) => {
+  const { setValue } = useFormContext()
   const { description: originalDescription } = properties
   let description = originalDescription
 
@@ -77,6 +81,12 @@ const FormField = ({
     disabled: properties.show == null,
   })
 
+  useEffect(() => {
+    if (properties.show?.key != null && !showValue && fieldValue !== '') {
+      setValue(name, '', { shouldDirty: true })
+    }
+  }, [fieldValue, name, properties.show?.key, setValue, showValue])
+
   if (properties.show) {
     if (properties.show.matches) {
       if (!properties.show.matches.includes(showValue)) {
@@ -95,7 +105,7 @@ const FormField = ({
             <FormField_Shadcn_
               control={control}
               name={name}
-              disabled={disabled}
+              disabled={disabled || readOnly}
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
@@ -160,9 +170,16 @@ const FormField = ({
                 >
                   <FormControl_Shadcn_ className="col-span-6">
                     {properties.isSecret ? (
-                      <DataInput {...field} id={name} size="small" copy reveal />
+                      <DataInput
+                        {...field}
+                        id={name}
+                        size="small"
+                        copy
+                        reveal
+                        readOnly={readOnly}
+                      />
                     ) : (
-                      <Input_Shadcn_ {...field} id={name} />
+                      <Input_Shadcn_ {...field} id={name} readOnly={readOnly} />
                     )}
                   </FormControl_Shadcn_>
                 </FormItemLayout>
@@ -198,6 +215,7 @@ const FormField = ({
                       rows={4}
                       placeholder="Enter multi-line text"
                       className="resize-none"
+                      readOnly={readOnly}
                     />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
@@ -229,24 +247,30 @@ const FormField = ({
                   <FormControl_Shadcn_ className="col-span-6">
                     {properties.units ? (
                       <InputGroup>
+                        <FormInputGroupInput
+                          {...field}
+                          id={name}
+                          type="number"
+                          onChange={(e) =>
+                            field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                          }
+                          readOnly={readOnly}
+                        />
                         <InputGroupAddon align="inline-end">
                           <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
                             {properties.units}
                           </ReactMarkdown>
                         </InputGroupAddon>
-                        <InputGroupInput
-                          {...field}
-                          id={name}
-                          type="number"
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                        />
                       </InputGroup>
                     ) : (
                       <Input_Shadcn_
                         {...field}
                         id={name}
                         type="number"
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                        }
+                        readOnly={readOnly}
                       />
                     )}
                   </FormControl_Shadcn_>
@@ -265,7 +289,7 @@ const FormField = ({
             <FormField_Shadcn_
               control={control}
               name={name}
-              disabled={disabled}
+              disabled={disabled || readOnly}
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
@@ -308,26 +332,24 @@ const FormField = ({
             <FormField_Shadcn_
               control={control}
               name={name}
-              disabled={disabled}
+              disabled={disabled || readOnly}
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
                   label={properties.title}
                   description={
                     description ? (
-                      <ReactMarkdown
-                        unwrapDisallowed
-                        disallowedElements={['p']}
-                        className="form-field-markdown"
-                      >
-                        {description}
-                      </ReactMarkdown>
+                      <div className="form-field-markdown">
+                        <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                          {description}
+                        </ReactMarkdown>
+                      </div>
                     ) : null
                   }
                 >
                   <FormControl_Shadcn_ className="col-span-6">
                     <Select_Shadcn_
-                      defaultValue={properties.enum[0]}
+                      defaultValue={properties.enum[0]?.value}
                       value={field.value}
                       onValueChange={field.onChange}
                     >

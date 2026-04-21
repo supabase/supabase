@@ -1,7 +1,8 @@
+import type { ReactNode } from 'react'
 import { Badge, Card } from 'ui'
 
 export const ActionCard = (card: {
-  icon: JSX.Element
+  icon: ReactNode
   title: string
   description: string
   bgColor: string
