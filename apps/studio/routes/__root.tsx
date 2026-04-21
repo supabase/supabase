@@ -27,7 +27,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { FeatureFlagProvider, getFlags } from 'common'
+import { FeatureFlagProvider, getFlags, ThemeProvider, useThemeSandbox } from 'common'
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import { useCallback, useEffect, type ComponentProps, type ErrorInfo, type ReactNode } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -176,6 +176,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootComponent() {
+  useThemeSandbox()
+
   const cloudProvider = useDefaultProvider()
 
   const getConfigCatFlags = useCallback(
@@ -198,7 +200,14 @@ function RootComponent() {
             <ProfileProvider>
               <DynamicTitle />
               <TooltipProvider delayDuration={0}>
-                <Outlet />
+                <ThemeProvider
+                  defaultTheme="system"
+                  themes={['dark', 'light', 'classic-dark']}
+                  enableSystem
+                  disableTransitionOnChange
+                >
+                  <Outlet />
+                </ThemeProvider>
               </TooltipProvider>
             </ProfileProvider>
           </FeatureFlagProviderWithOrgContext>
@@ -210,7 +219,10 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en">
+    // suppressHydrationWarning is for next-themes: it writes data-theme and
+    // color-scheme onto <html> from localStorage pre-hydration, which the
+    // prerendered shell can't know. Scoped to this element only.
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
