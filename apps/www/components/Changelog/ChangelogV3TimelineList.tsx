@@ -1,5 +1,5 @@
 import type { ChangelogLabel, ChangelogTimelineIndexItem } from '~/lib/changelog-github'
-import { githubChangelogLabelFilterUrl, githubLabelHex } from '~/lib/changelog.utils'
+import { githubChangelogLabelFilterUrl } from '~/lib/changelog.utils'
 import dayjs from 'dayjs'
 import { GitCommit } from 'lucide-react'
 import Link from 'next/link'
@@ -24,7 +24,6 @@ function LabelBadges({
 }: {
   labels: ChangelogLabel[]
   onBadgeClick?: (e: MouseEvent) => void
-  /** Minimal chip for dense list rows */
   tiny?: boolean
 }) {
   if (labels.length === 0) return null
@@ -63,13 +62,18 @@ function TimelineRow({
   mode,
   href,
   onSelect,
+  dateFormat = 'month-day',
 }: {
   item: ChangelogTimelineIndexItem
   mode: 'link' | 'action'
   href?: string
   onSelect?: (item: ChangelogTimelineIndexItem) => void
+  dateFormat?: 'month-day' | 'full'
 }) {
-  const dateNoYear = dayjs(item.sortDate).format('MMM D')
+  const dateLabel =
+    dateFormat === 'full'
+      ? dayjs(item.sortDate).format('MMM D, YYYY')
+      : dayjs(item.sortDate).format('MMM D')
   const labels = item.labels ?? []
 
   const titleBlock =
@@ -87,7 +91,7 @@ function TimelineRow({
         dateTime={item.sortDate}
         className="text-foreground-lighter group-hover:text-foreground-light text-xs tracking-normal"
       >
-        {dateNoYear}
+        {dateLabel}
       </time>
       <LabelBadges labels={labels} onBadgeClick={(e) => e.stopPropagation()} />
     </div>
@@ -118,12 +122,34 @@ function TimelineRow({
   )
 }
 
+export function ChangelogV3TimelineFlatList(props: {
+  items: ChangelogTimelineIndexItem[]
+  mode: 'action'
+  onSelect: (item: ChangelogTimelineIndexItem) => void
+  showFullDate?: boolean
+}) {
+  const { items, onSelect, showFullDate } = props
+  const dateFormat = showFullDate ? 'full' : 'month-day'
+  return (
+    <div className="min-w-0 [&>*:last-child]:border-b-0" role="list">
+      {items.map((item) => (
+        <TimelineRow
+          key={item.number}
+          item={item}
+          mode="action"
+          onSelect={onSelect}
+          dateFormat={dateFormat}
+        />
+      ))}
+    </div>
+  )
+}
+
 type Props =
   | {
       items: ChangelogTimelineIndexItem[]
       mode: 'link'
       hrefFor: (item: ChangelogTimelineIndexItem) => string
-      /** When true, no left border / offset — use when an ancestor already draws the timeline line. */
       omitOuterTimelineBorder?: boolean
     }
   | {
@@ -152,7 +178,7 @@ export function ChangelogV3TimelineList(props: Props) {
         >
           <h2
             id={`changelog-year-${year}`}
-            className="border-default bg-default text-foreground-light sticky top-28 z-20 border-b py-2 pl-0 font-mono text-sm tracking-wide lg:hidden"
+            className="border-default bg-default text-foreground-light sticky top-[65px] z-20 border-b py-2 pl-0 font-mono text-sm tracking-wide lg:hidden"
           >
             {year}
           </h2>
