@@ -394,54 +394,42 @@ const JWTSettings = () => {
                     )}
                   </p>
                   {disableLegacyJwtSecretRotation ? (
-                    <>
-                      <ol className="text-sm text-foreground-light list-decimal list-inside space-y-2">
-                        <li>
-                          <span className="text-foreground">
-                            Click <em className="not-italic">Migrate JWT secret</em>
-                          </span>{' '}
-                          on the JWT Signing Keys page. This imports your legacy secret into the new
-                          system and generates a standby asymmetric key.
-                        </li>
-                        <li>
-                          <span className="text-foreground">Create and roll out new API keys.</span>{' '}
-                          On the API Keys page, create a publishable key (
-                          <code>sb_publishable_...</code>) and secret keys (
-                          <code>sb_secret_...</code>), then swap them into your apps in place of{' '}
-                          <code>anon</code> and <code>service_role</code>. Watch the{' '}
-                          <em className="not-italic text-foreground">last used</em> indicators to
-                          confirm no traffic still depends on the legacy keys.
-                        </li>
-                        <li>
-                          <span className="text-foreground">
-                            Click <em className="not-italic">Rotate keys</em>
-                          </span>{' '}
-                          on the JWT Signing Keys page to start signing new JWTs with the standby
-                          key. Existing <code>anon</code>, <code>service_role</code>, and active
-                          user JWTs stay valid. Before rotating, switch any code that verifies JWTs
-                          directly against the legacy secret (e.g. <code>jose</code>,{' '}
-                          <code>jsonwebtoken</code>) to <code>supabase.auth.getClaims()</code> or a
-                          JWKS-based verifier, and disable the{' '}
-                          <em className="not-italic text-foreground">Verify JWT</em> setting on any
-                          affected Edge Functions.
-                        </li>
-                        <li>
-                          <span className="text-foreground">
-                            Optionally, revoke the legacy JWT secret
-                          </span>{' '}
-                          from the JWT Signing Keys page once you're sure it's no longer in use.
-                        </li>
-                      </ol>
-                      <Link
-                        href="https://supabase.com/docs/guides/auth/signing-keys#getting-started"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-sm text-foreground-light hover:text-foreground inline-flex items-center gap-1"
-                      >
-                        Read the full migration guide
-                        <ExternalLink className="size-3" />
-                      </Link>
-                    </>
+                    <ol className="text-sm text-foreground-light list-decimal list-inside space-y-2">
+                      <li>
+                        <span className="text-foreground">
+                          Click <em className="not-italic">Migrate JWT secret</em>
+                        </span>{' '}
+                        on the JWT Signing Keys page. This imports your legacy secret into the new
+                        system and generates a standby asymmetric key.
+                      </li>
+                      <li>
+                        <span className="text-foreground">Create and roll out new API keys.</span>{' '}
+                        On the API Keys page, create a publishable key (
+                        <code>sb_publishable_...</code>) and secret keys (<code>sb_secret_...</code>
+                        ), then swap them into your apps in place of <code>anon</code> and{' '}
+                        <code>service_role</code>. Watch the{' '}
+                        <em className="not-italic text-foreground">last used</em> indicators to
+                        confirm no traffic still depends on the legacy keys.
+                      </li>
+                      <li>
+                        <span className="text-foreground">
+                          Click <em className="not-italic">Rotate keys</em>
+                        </span>{' '}
+                        on the JWT Signing Keys page to start signing new JWTs with the standby key.
+                        Existing <code>anon</code>, <code>service_role</code>, and active user JWTs
+                        stay valid. Before rotating, switch any code that verifies JWTs directly
+                        against the legacy secret (e.g. <code>jose</code>, <code>jsonwebtoken</code>
+                        ) to <code>supabase.auth.getClaims()</code> or a JWKS-based verifier, and
+                        disable the <em className="not-italic text-foreground">Verify JWT</em>{' '}
+                        setting on any affected Edge Functions.
+                      </li>
+                      <li>
+                        <span className="text-foreground">
+                          Optionally, revoke the legacy JWT secret
+                        </span>{' '}
+                        from the JWT Signing Keys page once you're sure it's no longer in use.
+                      </li>
+                    </ol>
                   ) : (
                     <ul className="text-sm text-foreground-light list-disc list-inside">
                       <li>Zero-downtime, reversible change.</li>
@@ -477,6 +465,18 @@ const JWTSettings = () => {
                       Go to JWT Signing Keys
                     </Link>
                   </Button>
+
+                  {disableLegacyJwtSecretRotation && (
+                    <Button type="default" icon={<ExternalLink className="size-4" />} asChild>
+                      <Link
+                        href="https://supabase.com/docs/guides/auth/signing-keys#getting-started"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Read the full migration guide
+                      </Link>
+                    </Button>
+                  )}
 
                   {!disableLegacyJwtSecretRotation && (
                     <>
