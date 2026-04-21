@@ -179,10 +179,13 @@ export const TableNode = ({
                               await copyToClipboard(formattedSchema, () => {
                                 toast.success('Table schema copied to clipboard', { id: toastId })
                               })
-                            } catch (err: any) {
-                              toast.error('Failed to copy schema: ' + (err.message || err), {
-                                id: toastId,
-                              })
+                            } catch (err) {
+                              toast.error(
+                                'Failed to copy schema: ' + ((err as Error).message || err),
+                                {
+                                  id: toastId,
+                                }
+                              )
                             }
                           }}
                         >
@@ -200,8 +203,10 @@ export const TableNode = ({
                               await copyToClipboard(markdown, () => {
                                 toast.success('Table schema copied to clipboard')
                               })
-                            } catch (err: any) {
-                              toast.error('Failed to copy schema: ' + (err.message || err))
+                            } catch (err) {
+                              toast.error(
+                                'Failed to copy schema: ' + ((err as Error).message || err)
+                              )
                             }
                           }}
                         >
