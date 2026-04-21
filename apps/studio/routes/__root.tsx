@@ -70,7 +70,17 @@ const APPLE_TOUCH_ICON_SIZES = [
   '144x144',
   '152x152',
 ]
-const FAVICON_PNG_SIZES = ['16x16', '32x32', '48x48', '96x96', '128x128', '180x180', '196x196']
+// The 128 variant ships as `favicon-128.png` (no dimensions in the filename);
+// the rest follow `favicon-<size>.png`.
+const FAVICON_PNG_VARIANTS: Array<{ sizes: string; file: string }> = [
+  { sizes: '16x16', file: 'favicon-16x16.png' },
+  { sizes: '32x32', file: 'favicon-32x32.png' },
+  { sizes: '48x48', file: 'favicon-48x48.png' },
+  { sizes: '96x96', file: 'favicon-96x96.png' },
+  { sizes: '128x128', file: 'favicon-128.png' },
+  { sizes: '180x180', file: 'favicon-180x180.png' },
+  { sizes: '196x196', file: 'favicon-196x196.png' },
+]
 
 function buildRootHead() {
   const meta: Array<Record<string, string>> = [
@@ -114,11 +124,11 @@ function buildRootHead() {
       sizes: size,
       href: `${BASE_PATH}${FAVICON_ROUTE}/apple-icon-${size}.png`,
     })),
-    ...FAVICON_PNG_SIZES.map((size) => ({
+    ...FAVICON_PNG_VARIANTS.map(({ sizes, file }) => ({
       rel: 'icon',
       type: 'image/png',
-      sizes: size,
-      href: `${BASE_PATH}${FAVICON_ROUTE}/favicon-${size}.png`,
+      sizes,
+      href: `${BASE_PATH}${FAVICON_ROUTE}/${file}`,
     })),
     { rel: 'shortcut icon', href: `${BASE_PATH}${FAVICON_ROUTE}/favicon.ico` },
     { rel: 'icon', type: 'image/x-icon', href: `${BASE_PATH}${FAVICON_ROUTE}/favicon.ico` },
