@@ -31,6 +31,7 @@ import type { ErrorInfo, ReactNode } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { AuthProvider } from '@/lib/auth'
 
 interface RouterContext {
   queryClient: QueryClient
@@ -72,7 +73,9 @@ function RootComponent() {
   return (
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
       <NuqsAdapter>
-        <Outlet />
+        <AuthProvider>
+          <Outlet />
+        </AuthProvider>
       </NuqsAdapter>
     </ErrorBoundary>
   )
