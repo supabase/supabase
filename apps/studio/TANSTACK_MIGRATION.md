@@ -354,6 +354,8 @@ per-file items only when a subtree has special cases.
 - [x] `routes/api/v1/**` — except `body.ts` (streaming rewrite)
 - [ ] `routes/api/v1/projects/$ref/functions/$slug/body.ts` — rewrite with Web streams
 - [ ] `routes/api/mcp/index.ts` — needs MCP SDK Web-fetch transport (investigate)
+- [x] `routes/api/incident-banner.ts`, `routes/api/incident-status.ts` — App
+      Router routes under `app/api/**` (already Web-native, direct re-export)
 
 ---
 

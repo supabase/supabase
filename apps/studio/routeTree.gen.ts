@@ -13,6 +13,8 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
+import { Route as ApiIncidentStatusRouteImport } from './routes/api/incident-status'
+import { Route as ApiIncidentBannerRouteImport } from './routes/api/incident-banner'
 import { Route as ApiGetUtcTimeRouteImport } from './routes/api/get-utc-time'
 import { Route as ApiGetIpAddressRouteImport } from './routes/api/get-ip-address'
 import { Route as ApiGetDeploymentCommitRouteImport } from './routes/api/get-deployment-commit'
@@ -120,6 +122,16 @@ const IndexRoute = IndexRouteImport.update({
 const ApiStatusOverrideRoute = ApiStatusOverrideRouteImport.update({
   id: '/api/status-override',
   path: '/api/status-override',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiIncidentStatusRoute = ApiIncidentStatusRouteImport.update({
+  id: '/api/incident-status',
+  path: '/api/incident-status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiIncidentBannerRoute = ApiIncidentBannerRouteImport.update({
+  id: '/api/incident-banner',
+  path: '/api/incident-banner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiGetUtcTimeRoute = ApiGetUtcTimeRouteImport.update({
@@ -648,6 +660,8 @@ export interface FileRoutesByFullPath {
   '/api/get-deployment-commit': typeof ApiGetDeploymentCommitRoute
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
+  '/api/incident-banner': typeof ApiIncidentBannerRoute
+  '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/account/me': typeof AppAccountMeRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
@@ -742,6 +756,8 @@ export interface FileRoutesByTo {
   '/api/get-deployment-commit': typeof ApiGetDeploymentCommitRoute
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
+  '/api/incident-banner': typeof ApiIncidentBannerRoute
+  '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/account/me': typeof AppAccountMeRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
@@ -839,6 +855,8 @@ export interface FileRoutesById {
   '/api/get-deployment-commit': typeof ApiGetDeploymentCommitRoute
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
+  '/api/incident-banner': typeof ApiIncidentBannerRoute
+  '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/_app/account/me': typeof AppAccountMeRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
@@ -935,6 +953,8 @@ export interface FileRouteTypes {
     | '/api/get-deployment-commit'
     | '/api/get-ip-address'
     | '/api/get-utc-time'
+    | '/api/incident-banner'
+    | '/api/incident-status'
     | '/api/status-override'
     | '/account/me'
     | '/api/ai/docs'
@@ -1029,6 +1049,8 @@ export interface FileRouteTypes {
     | '/api/get-deployment-commit'
     | '/api/get-ip-address'
     | '/api/get-utc-time'
+    | '/api/incident-banner'
+    | '/api/incident-status'
     | '/api/status-override'
     | '/account/me'
     | '/api/ai/docs'
@@ -1125,6 +1147,8 @@ export interface FileRouteTypes {
     | '/api/get-deployment-commit'
     | '/api/get-ip-address'
     | '/api/get-utc-time'
+    | '/api/incident-banner'
+    | '/api/incident-status'
     | '/api/status-override'
     | '/_app/account/me'
     | '/api/ai/docs'
@@ -1220,6 +1244,8 @@ export interface RootRouteChildren {
   ApiGetDeploymentCommitRoute: typeof ApiGetDeploymentCommitRoute
   ApiGetIpAddressRoute: typeof ApiGetIpAddressRoute
   ApiGetUtcTimeRoute: typeof ApiGetUtcTimeRoute
+  ApiIncidentBannerRoute: typeof ApiIncidentBannerRoute
+  ApiIncidentStatusRoute: typeof ApiIncidentStatusRoute
   ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
   ApiAiDocsRoute: typeof ApiAiDocsRoute
   ApiContentGraphqlRoute: typeof ApiContentGraphqlRoute
@@ -1330,6 +1356,20 @@ declare module '@tanstack/react-router' {
       path: '/api/status-override'
       fullPath: '/api/status-override'
       preLoaderRoute: typeof ApiStatusOverrideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/incident-status': {
+      id: '/api/incident-status'
+      path: '/api/incident-status'
+      fullPath: '/api/incident-status'
+      preLoaderRoute: typeof ApiIncidentStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/incident-banner': {
+      id: '/api/incident-banner'
+      path: '/api/incident-banner'
+      fullPath: '/api/incident-banner'
+      preLoaderRoute: typeof ApiIncidentBannerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/get-utc-time': {
@@ -2023,6 +2063,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiGetDeploymentCommitRoute: ApiGetDeploymentCommitRoute,
   ApiGetIpAddressRoute: ApiGetIpAddressRoute,
   ApiGetUtcTimeRoute: ApiGetUtcTimeRoute,
+  ApiIncidentBannerRoute: ApiIncidentBannerRoute,
+  ApiIncidentStatusRoute: ApiIncidentStatusRoute,
   ApiStatusOverrideRoute: ApiStatusOverrideRoute,
   ApiAiDocsRoute: ApiAiDocsRoute,
   ApiContentGraphqlRoute: ApiContentGraphqlRoute,
