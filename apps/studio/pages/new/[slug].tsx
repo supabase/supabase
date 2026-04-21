@@ -268,6 +268,7 @@ const Wizard: NextPageWithLayout = () => {
       track(
         'project_creation_simple_version_submitted',
         {
+          surface: 'main',
           instanceSize: form.getValues('instanceSize'),
           enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
           dataApiEnabled: form.getValues('dataApi'),
