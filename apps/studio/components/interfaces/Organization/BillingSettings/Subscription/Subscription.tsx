@@ -8,6 +8,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
 import { Restriction } from '../Restriction'
 import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
+import { STRIPE_DASHBOARD_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import {
   ScaffoldSection,
@@ -16,14 +17,20 @@ import {
 } from '@/components/layouts/Scaffold'
 import AlertError from '@/components/ui/AlertError'
 import NoPermission from '@/components/ui/NoPermission'
+import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const Subscription = () => {
   const { slug } = useParams()
   const snap = useOrgSettingsPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const isStripeManagedOrganization =
+    selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
   const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -83,7 +90,17 @@ const Subscription = () => {
                   </div>
 
                   <div>
-                    {canChangeTier && (
+                    {isStripeManagedOrganization ? (
+                      <PartnerManagedResource
+                        managedBy={MANAGED_BY.STRIPE_PROJECTS}
+                        resource="Organization plans"
+                        title="Organization plans are managed by Stripe."
+                        cta={{
+                          overrideUrl: STRIPE_DASHBOARD_URL,
+                          message: 'Change Plan in Stripe Dashboard',
+                        }}
+                      />
+                    ) : canChangeTier ? (
                       <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                         <Button
                           type="default"

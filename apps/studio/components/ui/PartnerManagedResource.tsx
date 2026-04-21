@@ -9,6 +9,7 @@ import { MANAGED_BY, ManagedBy } from '@/lib/constants/infrastructure'
 interface PartnerManagedResourceProps {
   managedBy: ManagedBy
   resource: string
+  title?: string
   cta?: {
     installationId?: string
     organizationSlug?: string
@@ -25,7 +26,7 @@ export const PARTNER_TO_NAME = {
   [MANAGED_BY.SUPABASE]: 'Supabase',
 } as const
 
-function PartnerManagedResource({ managedBy, resource, cta }: PartnerManagedResourceProps) {
+function PartnerManagedResource({ managedBy, resource, title, cta }: PartnerManagedResourceProps) {
   const ctaEnabled = cta !== undefined
   const supportsRedirectCta =
     managedBy === MANAGED_BY.VERCEL_MARKETPLACE || managedBy === MANAGED_BY.AWS_MARKETPLACE
@@ -61,11 +62,12 @@ function PartnerManagedResource({ managedBy, resource, cta }: PartnerManagedReso
   const redirectBaseUrl = selectedRedirectQuery?.data?.url
   const ctaUrl =
     cta?.overrideUrl ?? (redirectBaseUrl ? `${redirectBaseUrl}${cta?.path ?? ''}` : undefined)
-  const showCta = ctaEnabled && supportsRedirectCta && Boolean(ctaUrl)
+  const showCta = ctaEnabled && Boolean(ctaUrl)
   const partnerHeading =
-    managedBy === MANAGED_BY.STRIPE_PROJECTS
+    title ??
+    (managedBy === MANAGED_BY.STRIPE_PROJECTS
       ? `${resource} are connected to Stripe`
-      : `${resource} are managed by ${PARTNER_TO_NAME[managedBy]}`
+      : `${resource} are managed by ${PARTNER_TO_NAME[managedBy]}`)
 
   return (
     <Alert_Shadcn_ className="flex flex-col items-center gap-y-2 border-0 rounded-none bg-none">

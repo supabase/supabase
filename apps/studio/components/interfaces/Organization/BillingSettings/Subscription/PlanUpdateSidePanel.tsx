@@ -16,6 +16,7 @@ import { ExitSurveyModal } from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
+import { STRIPE_DASHBOARD_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
 import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
@@ -59,6 +60,8 @@ export const PlanUpdateSidePanel = () => {
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
     selectedOrganization?.billing_partner
   )
+  const isStripeManagedOrganization =
+    selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
   const { mutate: sendEvent } = useSendEventMutation()
 
   const originalPlanRef = useRef<string>()
@@ -208,13 +211,24 @@ export const PlanUpdateSidePanel = () => {
           </div>
         }
       >
-        {selectedOrganization && isPartnerBilledOrganization && (
-          <PartnerManagedResource
-            managedBy={selectedOrganization.managed_by}
-            resource="Organization plans"
-            cta={getPartnerManagedResourceCta(selectedOrganization)}
-          />
-        )}
+        {selectedOrganization &&
+          (isStripeManagedOrganization ? (
+            <PartnerManagedResource
+              managedBy={MANAGED_BY.STRIPE_PROJECTS}
+              resource="Organization plans"
+              title="Organization plans are managed by Stripe."
+              cta={{
+                overrideUrl: STRIPE_DASHBOARD_URL,
+                message: 'Change Plan in Stripe Dashboard',
+              }}
+            />
+          ) : isPartnerBilledOrganization ? (
+            <PartnerManagedResource
+              managedBy={selectedOrganization.managed_by}
+              resource="Organization plans"
+              cta={getPartnerManagedResourceCta(selectedOrganization)}
+            />
+          ) : null)}
         <SidePanel.Content>
           <div className="py-6 grid grid-cols-12 gap-3">
             {subscriptionsPlans.map((plan) => {

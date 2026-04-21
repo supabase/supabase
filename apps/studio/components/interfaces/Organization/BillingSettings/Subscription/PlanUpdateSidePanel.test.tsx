@@ -129,8 +129,8 @@ describe('PlanUpdateSidePanel', () => {
   it('does not treat Stripe-connected orgs as partner-billed', () => {
     render(<PlanUpdateSidePanel />)
 
-    expect(screen.queryByTestId('partner-managed-resource')).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Upgrade to Pro' })).toBeInTheDocument()
+    expect(screen.getByTestId('partner-managed-resource')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Upgrade to Pro' })).toBeDisabled()
   })
 
   it('still shows partner-managed messaging for billing-partner orgs', () => {
