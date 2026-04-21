@@ -1,3 +1,4 @@
+import { getCreatePublicationSQL } from '@supabase/pg-meta'
 import { ident } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -20,19 +21,10 @@ async function createPublication(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const query =
-    tables.length > 0
-      ? `FOR TABLE ONLY ${tables.map(({ schema, name }) => `${ident(schema)}.${ident(name)}`).join(', ')} `
-      : ''
+  const sql = getCreatePublicationSQL({ tables })
+  const { result } = await executeSql({ projectRef, connectionString, sql }, signal)
 
-  await executeSql(
-    {
-      projectRef,
-      connectionString,
-      sql: `CREATE PUBLICATION ${ident(name)} ${query}WITH (publish_via_partition_root = true)`,
-    },
-    signal
-  )
+  return result
 }
 
 type CreatePublicationData = Awaited<ReturnType<typeof createPublication>>
