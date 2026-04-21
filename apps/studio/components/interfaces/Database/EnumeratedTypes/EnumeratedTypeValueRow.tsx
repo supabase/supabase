@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, Trash } from 'lucide-react'
-import { Control } from 'react-hook-form'
+import type { Control, FieldPath, FieldValues } from 'react-hook-form'
 import {
   Button,
   FormControl_Shadcn_,
@@ -12,23 +12,26 @@ import {
   Input_Shadcn_,
 } from 'ui'
 
-interface EnumeratedTypeValueRowProps {
-  control: Control<any>
+interface EnumeratedTypeValueRowProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> {
+  control: Control<TFieldValues>
   index: number
   id: string
-  name: string
+  name: TName
   isDisabled?: boolean
   onRemoveValue: () => void
 }
 
-const EnumeratedTypeValueRow = ({
+const EnumeratedTypeValueRow = <TFieldValues extends FieldValues>({
   control,
   index,
   id,
   name,
   isDisabled = false,
   onRemoveValue,
-}: EnumeratedTypeValueRowProps) => {
+}: EnumeratedTypeValueRowProps<TFieldValues>) => {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition } =
     useSortable({
       disabled: isDisabled,

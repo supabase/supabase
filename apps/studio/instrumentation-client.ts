@@ -97,7 +97,7 @@ Sentry.init({
   debug: false,
 
   // Enable performance monitoring
-  tracesSampleRate: 1.0, // Capture 100% of transactions for performance monitoring
+  tracesSampleRate: 0.02,
 
   integrations: (() => {
     const thirdPartyErrorFilterIntegration = (Sentry as any).thirdPartyErrorFilterIntegration
@@ -105,7 +105,7 @@ Sentry.init({
 
     // Tag errors whose stack trace only contains third-party frames (browser extensions,
     // injected scripts, etc.). This uses build-time code annotation via the applicationKey
-    // in next.config.js to reliably distinguish our code from third-party code.
+    // in next.config.ts to reliably distinguish our code from third-party code.
     // We use 'apply-tag' instead of 'drop' so that beforeSend can exempt error boundary
     // crashes — these may originate in third-party code but are caused by first-party bugs.
     return [

@@ -17,9 +17,9 @@ You can configure either feature independently. For example, you can enable the 
 
 The S3 protocol endpoint at `/storage/v1/s3` allows standard S3 clients to interact with your self-hosted Storage instance. It works with any storage backend, including the default file-based storage - you do not need to configure an S3 backend first. The Supabase REST API and SDK do not use the S3 protocol.
 
-Make sure to check that `REGION`, `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` are properly configured in you `.env` file. Read more about the secrets and passwords in [Configuring and securing Supabase](/docs/guides/self-hosting/docker#configuring-and-securing-supabase).
+Make sure to check that `REGION`, `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` are properly configured in your `.env` file. Read more about the secrets and passwords in [Configuring and securing Supabase](/docs/guides/self-hosting/docker#configuring-and-securing-supabase).
 
-```yaml
+```yaml name=docker-compose.yml
 storage:
   environment:
     # ... existing variables ...
@@ -30,7 +30,7 @@ storage:
 
 ### Test with the AWS CLI
 
-```bash
+```sh
 ( set -a && \
 source .env > /dev/null 2>&1 && \
 echo "" && \
@@ -46,7 +46,7 @@ s3://your-storage-bucket )
 
 ### Test with rclone
 
-```bash
+```sh
 ( set -a && \
 source .env > /dev/null 2>&1 && \
 echo "" && \
@@ -65,7 +65,7 @@ Use `aws login` and `rclone config` for persistent configuration.
 
 In general, the following configuration variables define S3 backend configuration for Storage in `docker-compose.yml`:
 
-```yaml
+```yaml name=docker-compose.yml
 storage:
   environment:
     # ... existing variables ...
@@ -80,17 +80,38 @@ storage:
 ```
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-Depending on your setup, you may need to adjust these values - for example, to use a local S3-compatible service like MinIO or a cloud provider like AWS.
+Depending on your setup, you may need to adjust these values - for example, to use a local S3-compatible service like RustFS, MinIO or a cloud provider like AWS.
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+
+### Using RustFS
+
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+An overlay `docker-compose.rustfs.yml` configuration can be added to enable RustFS container and provide an S3-compatible API for Storage backend:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.rustfs.yml up -d
+```
+
+Make sure to review the Storage section in your `.env` file for related configuration options.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 
 ### Using MinIO
 
+<Admonition type="note">
+
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+MinIO no longer publishes open source Docker images or maintains their open source repository. The MinIO configuration is provided for backward compatibility and uses images built by [Chainguard](https://images.chainguard.dev/directory/image/minio/overview) (`cgr.dev/chainguard/minio`). For new deployments, consider using [RustFS](#using-rustfs) instead.
+
+</Admonition>
+
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 An overlay `docker-compose.s3.yml` configuration can be added to enable MinIO container and provide an S3-compatible API for Storage backend:
 
-```bash
+```sh
 docker compose -f docker-compose.yml -f docker-compose.s3.yml up -d
 ```
 
@@ -100,7 +121,7 @@ Make sure to review the Storage section in your `.env` file for related configur
 
 Create an S3 bucket and an IAM user with access to it. Then configure the storage service:
 
-```yaml docker-compose.yml
+```yaml name=docker-compose.yml
 storage:
   environment:
     # ... existing variables ...
@@ -118,7 +139,7 @@ For AWS S3, you do not need `GLOBAL_S3_ENDPOINT` or `GLOBAL_S3_FORCE_PATH_STYLE`
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 Use the same configuration as MinIO, but point to your provider's endpoint, e.g.:
 
-```yaml
+```yaml name=docker-compose.yml
 storage:
   environment:
     # ... existing variables ...
@@ -173,6 +194,8 @@ const client = new S3Client({
 ### Signature mismatch errors
 
 S3 clients sign requests using the access key ID and secret. If you see `SignatureDoesNotMatch`, verify that the `REGION`, `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` in your `.env` file match what your S3 client is using.
+
+**If you use a custom reverse proxy**: with the [new API keys and auth](/docs/guides/self-hosting/self-hosted-auth-keys) configuration, requests to Storage should be forwarded to the API gateway (Kong) for proper handling. If you are still using legacy API keys and proxy directly to Storage, make sure your proxy sets the `X-Forwarded-Prefix` header to `/storage/v1` so that signed URLs are generated correctly. In both cases, `STORAGE_PUBLIC_URL` must be [set properly](https://github.com/supabase/supabase/blob/a5f4a59e0e262394b345600e8d8a2241d6ac3b64/docker/docker-compose.yml#L369) in `docker-compose.yml`.
 
 ### TUS upload errors on Cloudflare R2
 

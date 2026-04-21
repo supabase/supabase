@@ -28,7 +28,6 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
-import { useIsBranching2Enabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useBranchQuery } from '@/data/branches/branch-query'
@@ -236,7 +235,6 @@ const PreviewBranchActions = ({
   onSelectDeleteBranch: () => void
   generateCreatePullRequestURL: (branchName?: string) => string
 }) => {
-  const gitlessBranching = useIsBranching2Enabled()
   const queryClient = useQueryClient()
   const { project_ref: branchRef, parent_project_ref: projectRef } = branch
 
@@ -321,33 +319,30 @@ const PreviewBranchActions = ({
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" side="bottom" align="end">
-          {/* Edit Branch (gitless) */}
-          {gitlessBranching && (
-            <DropdownMenuItemTooltip
-              className="gap-x-2"
-              disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdatingBranch}
-              onSelect={(e) => {
-                e.stopPropagation()
-                setShowEditBranchModal(true)
-              }}
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowEditBranchModal(true)
-              }}
-              tooltip={{
-                content: {
-                  side: 'left',
-                  text: !canUpdateBranches
-                    ? 'You need additional permissions to edit branches'
-                    : !isBranchActiveHealthy
-                      ? 'Branch is still initializing. Please wait for it to become healthy before editing.'
-                      : undefined,
-                },
-              }}
-            >
-              <Pencil size={14} /> Edit branch
-            </DropdownMenuItemTooltip>
-          )}
+          <DropdownMenuItemTooltip
+            className="gap-x-2"
+            disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdatingBranch}
+            onSelect={(e) => {
+              e.stopPropagation()
+              setShowEditBranchModal(true)
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowEditBranchModal(true)
+            }}
+            tooltip={{
+              content: {
+                side: 'left',
+                text: !canUpdateBranches
+                  ? 'You need additional permissions to edit branches'
+                  : !isBranchActiveHealthy
+                    ? 'Branch is still initializing. Please wait for it to become healthy before editing.'
+                    : undefined,
+              },
+            }}
+          >
+            <Pencil size={14} /> Edit branch
+          </DropdownMenuItemTooltip>
 
           {!branch.deletion_scheduled_at && (
             <DropdownMenuItemTooltip

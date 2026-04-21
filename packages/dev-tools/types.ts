@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 export interface DevTelemetryEvent {
   id: string
@@ -23,6 +23,12 @@ export interface ServerTelemetryEvent {
 
 export interface DevToolbarConfig {
   apiUrl: string
+}
+
+export interface ExtraTab {
+  id: string
+  label: string
+  content: ReactNode
 }
 
 export interface DevTelemetryToolbarContextType {

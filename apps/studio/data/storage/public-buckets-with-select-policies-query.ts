@@ -20,10 +20,11 @@ export type PublicBucketSelectPolicy = {
 }
 
 /**
- * For the given public bucket, checks whether any SELECT policy on storage.objects
- * references this bucket's ID in its qual expression. This combination means anyone
- * can enumerate all objects in the bucket, which is usually unintentional — public
- * buckets don't require SELECT policies for object access by URL.
+ * For the given public bucket, checks whether any permissive SELECT or ALL policy
+ * on storage.objects broadly allows listing for API roles. This combination means
+ * clients can enumerate all objects in the bucket, which is usually unintentional.
+ * Public buckets don't require SELECT policies for object access by URL. Policies
+ * with additional object, path, or user constraints are excluded from this warning.
  *
  * Scoped to a single bucket so the query is a point-lookup rather than a full scan.
  */
@@ -41,10 +42,26 @@ async function getPublicBucketsWithSelectPolicies({
       JOIN pg_policies p
         ON p.schemaname = 'storage'
         AND p.tablename = 'objects'
-        AND p.cmd = 'SELECT'
+        AND p.cmd IN ('SELECT', 'ALL')
+        AND p.permissive = 'PERMISSIVE'
+        AND p.roles && ARRAY['public'::name, 'anon'::name, 'authenticated'::name]
       WHERE b.public = true
         AND b.id = ${literal(bucketId)}
-        AND p.qual ~* ('bucket_id\\s*=\\s*' || quote_literal(b.id))
+        AND (
+          p.qual IS NULL
+          OR replace(replace(replace(lower(p.qual), ' ', ''), E'\\n', ''), E'\\t', '')
+            IN ('true', '(true)', '1=1', '(1=1)')
+          OR EXISTS (
+            SELECT 1
+            FROM regexp_match(
+              p.qual,
+              $re$\\A\\s*\\(*\\s*bucket_id\\s*=\\s*('(?:[^']|'')*')(\\s*::\\s*[[:alnum:]_\\.]+)?\\s*\\)*\\s*\\Z$re$,
+              'i'
+            ) AS bucket_match(matches)
+            WHERE bucket_match.matches[1] = '''' || replace(b.id, '''', '''''') || ''''
+          )
+        )
+      ORDER BY p.policyname
     `,
   })
 

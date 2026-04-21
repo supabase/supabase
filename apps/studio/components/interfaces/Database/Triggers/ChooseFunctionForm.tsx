@@ -1,11 +1,16 @@
-import { Transition } from '@headlessui/react'
 import { useParams } from 'common'
 import { map as lodashMap, uniqBy } from 'lodash'
-import { ChevronDown, HelpCircle, Terminal } from 'lucide-react'
+import { HelpCircle, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { Button, SidePanel } from 'ui'
+import {
+  Accordion_Shadcn_,
+  AccordionContent_Shadcn_,
+  AccordionItem_Shadcn_,
+  AccordionTrigger_Shadcn_,
+  Button,
+  SidePanel,
+} from 'ui'
 
 import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import InformationBox from '@/components/ui/InformationBox'
@@ -145,40 +150,31 @@ export interface FunctionProps {
 }
 
 const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
-  const [visible, setVisible] = useState(false)
   return (
     <div className="cursor-pointer rounded p-3 px-6 hover:bg-studio" onClick={() => onClick(id)}>
-      <div className="flex items-center justify-between space-x-3">
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center justify-center rounded bg-foreground p-1 text-background">
-            <Terminal strokeWidth={2} size={14} />
+      <Accordion_Shadcn_ type="single" collapsible>
+        <AccordionItem_Shadcn_ value="definition" className="border-none">
+          <div className="flex items-center justify-between space-x-3">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center justify-center rounded bg-foreground p-1 text-background">
+                <Terminal strokeWidth={2} size={14} />
+              </div>
+              <p className="mb-0 text-sm">{name}</p>
+            </div>
+            <AccordionTrigger_Shadcn_
+              onClick={(e) => e.stopPropagation()}
+              className="py-0 text-xs font-normal text-foreground-light hover:no-underline"
+            >
+              View definition
+            </AccordionTrigger_Shadcn_>
           </div>
-          <p className="mb-0 text-sm">{name}</p>
-        </div>
-        <Button
-          type="text"
-          onClick={(e) => {
-            e.stopPropagation()
-            setVisible(!visible)
-          }}
-          icon={<ChevronDown className={visible ? 'rotate-180 transform' : 'rotate-0 transform'} />}
-        >
-          {visible ? 'Hide definition' : 'View definition'}
-        </Button>
-      </div>
-      <Transition
-        show={visible}
-        enter="transition ease-out duration-300"
-        enterFrom="transform opacity-0"
-        enterTo="transform opacity-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100"
-        leaveTo="transform opacity-0"
-      >
-        <div className="mt-4 h-64 border border-default">
-          <SqlEditor defaultValue={completeStatement} readOnly={true} contextmenu={false} />
-        </div>
-      </Transition>
+          <AccordionContent_Shadcn_ className="[&>div]:pb-0" onClick={(e) => e.stopPropagation()}>
+            <div className="mt-4 h-64 border border-default">
+              <SqlEditor defaultValue={completeStatement} readOnly={true} contextmenu={false} />
+            </div>
+          </AccordionContent_Shadcn_>
+        </AccordionItem_Shadcn_>
+      </Accordion_Shadcn_>
     </div>
   )
 }

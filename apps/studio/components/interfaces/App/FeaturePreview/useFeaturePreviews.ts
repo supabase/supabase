@@ -32,15 +32,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isDefaultOptIn: false,
     },
     {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
-      name: 'Branching via dashboard',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/branching-2-0',
-      enabled: true,
-      isNew: false,
-      isPlatformOnly: true,
-      isDefaultOptIn: false,
-    },
-    {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES,
       name: 'Disable Advisor rules',
       discussionsUrl: undefined,
@@ -85,15 +76,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isNew: false,
       isPlatformOnly: false,
       isDefaultOptIn: false,
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR,
-      name: 'New Table Filter Bar',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/42461',
-      enabled: true,
-      isNew: true,
-      isPlatformOnly: false,
-      isDefaultOptIn: true,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR,

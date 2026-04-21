@@ -361,8 +361,15 @@ export const SidePanelEditor = ({
       const isNewRecord = false
       const configuration = { identifiers, rowIdx: row.idx }
 
-      saveRow(value, isNewRecord, configuration, () => {})
-    } catch (error) {}
+      await saveRow(value, isNewRecord, configuration, (error) => {
+        if (error) {
+          toast.error(`Failed to save row: ${error?.message ?? 'Unknown error'}`)
+        }
+      })
+    } catch (error: any) {
+      toast.error(`Failed to save row: ${error?.message ?? 'Unknown error'}`)
+      Sentry.captureException(error, { tags: { workflow: 'save-foreign-row' } })
+    }
   }
 
   const saveColumn = async (

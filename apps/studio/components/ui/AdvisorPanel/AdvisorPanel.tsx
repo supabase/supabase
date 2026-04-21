@@ -1,52 +1,25 @@
-import dayjs from 'dayjs'
 import { useMemo, useRef } from 'react'
 
 import { AdvisorDetail } from './AdvisorDetail'
 import { AdvisorFilters } from './AdvisorFilters'
 import type { AdvisorItem } from './AdvisorPanel.types'
+import {
+  createAdvisorLintItems,
+  createAdvisorNotificationItems,
+  sortAdvisorItems,
+} from './AdvisorPanel.utils'
 import { AdvisorPanelBody } from './AdvisorPanelBody'
 import { AdvisorPanelHeader } from './AdvisorPanelHeader'
+import { useAdvisorSignals } from './useAdvisorSignals'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { Lint, useProjectLintsQuery } from '@/data/lint/lint-query'
-import {
-  Notification,
-  NotificationData,
-  useNotificationsV2Query,
-} from '@/data/notifications/notifications-v2-query'
+import { useProjectLintsQuery } from '@/data/lint/lint-query'
+import { Notification, useNotificationsV2Query } from '@/data/notifications/notifications-v2-query'
 import { useNotificationsV2UpdateMutation } from '@/data/notifications/notifications-v2-update-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
-import { AdvisorSeverity, AdvisorTab, useAdvisorStateSnapshot } from '@/state/advisor-state'
+import { AdvisorTab, useAdvisorStateSnapshot } from '@/state/advisor-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-
-const severityOrder: Record<AdvisorSeverity, number> = {
-  critical: 0,
-  warning: 1,
-  info: 2,
-}
-
-const lintLevelToSeverity = (level: Lint['level']): AdvisorSeverity => {
-  switch (level) {
-    case 'ERROR':
-      return 'critical'
-    case 'WARN':
-      return 'warning'
-    default:
-      return 'info'
-  }
-}
-
-const notificationPriorityToSeverity = (priority: string | null | undefined): AdvisorSeverity => {
-  switch (priority) {
-    case 'Critical':
-      return 'critical'
-    case 'Warning':
-      return 'warning'
-    default:
-      return 'info'
-  }
-}
 
 export const AdvisorPanel = () => {
   const track = useTrack()
@@ -70,15 +43,18 @@ export const AdvisorPanel = () => {
   const isSidebarOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
   const markedRead = useRef<string[]>([])
   const hasProjectRef = !!project?.ref
+  const shouldLoadProjectAdvisorData = isSidebarOpen && hasProjectRef && activeTab !== 'messages'
 
   const {
     data: lintData,
     isPending: isLintsLoading,
     isError: isLintsError,
-  } = useProjectLintsQuery(
-    { projectRef: project?.ref },
-    { enabled: isSidebarOpen && hasProjectRef && activeTab !== 'messages' }
-  )
+  } = useProjectLintsQuery({ projectRef: project?.ref }, { enabled: shouldLoadProjectAdvisorData })
+
+  const { data: signalItems, isPending: isSignalsPending } = useAdvisorSignals({
+    projectRef: project?.ref,
+    enabled: shouldLoadProjectAdvisorData,
+  })
 
   // Notifications should always load when sidebar is open (shown in both 'all' and 'messages' tabs)
   const shouldLoadNotifications = isSidebarOpen && IS_PLATFORM
@@ -126,61 +102,17 @@ export const AdvisorPanel = () => {
   }
 
   const lintItems = useMemo<AdvisorItem[]>(() => {
-    if (!lintData) return []
-
-    return lintData
-      .map((lint): AdvisorItem | null => {
-        const categories = lint.categories || []
-        const tab = categories.includes('SECURITY')
-          ? ('security' as const)
-          : categories.includes('PERFORMANCE')
-            ? ('performance' as const)
-            : undefined
-
-        if (!tab) return null
-
-        return {
-          id: lint.cache_key,
-          title: lint.detail,
-          severity: lintLevelToSeverity(lint.level),
-          createdAt: undefined,
-          tab,
-          source: 'lint' as const,
-          original: lint,
-        }
-      })
-      .filter((item): item is AdvisorItem => item !== null)
+    return createAdvisorLintItems(lintData)
   }, [lintData])
 
   const notificationItems = useMemo<AdvisorItem[]>(() => {
     if (!IS_PLATFORM) return []
-    return notifications?.map((notification): AdvisorItem => {
-      const data = notification.data as NotificationData
-      return {
-        id: notification.id,
-        title: data.title,
-        severity: notificationPriorityToSeverity(notification.priority),
-        createdAt: dayjs(notification.inserted_at).valueOf(),
-        tab: 'messages' as const,
-        source: 'notification' as const,
-        original: notification,
-      }
-    })
+    return createAdvisorNotificationItems(notifications)
   }, [notifications])
 
   const combinedItems = useMemo<AdvisorItem[]>(() => {
-    const all = [...lintItems, ...notificationItems]
-
-    return all.sort((a, b) => {
-      const severityDiff = severityOrder[a.severity] - severityOrder[b.severity]
-      if (severityDiff !== 0) return severityDiff
-
-      const createdDiff = (b.createdAt ?? 0) - (a.createdAt ?? 0)
-      if (createdDiff !== 0) return createdDiff
-
-      return a.title.localeCompare(b.title)
-    })
-  }, [lintItems, notificationItems])
+    return sortAdvisorItems([...lintItems, ...signalItems, ...notificationItems])
+  }, [lintItems, signalItems, notificationItems])
 
   const filteredItems = useMemo<AdvisorItem[]>(() => {
     return combinedItems.filter((item) => {
@@ -223,10 +155,13 @@ export const AdvisorPanel = () => {
   const isDetailView = !!selectedItem
 
   // Only show loading state if the query is actually enabled
-  const isLintsActuallyLoading =
-    isSidebarOpen && hasProjectRef && activeTab !== 'messages' && isLintsLoading
+  const isLintsActuallyLoading = shouldLoadProjectAdvisorData && isLintsLoading
   const isNotificationsActuallyLoading = shouldLoadNotifications && isNotificationsLoading
-  const isLoading = isLintsActuallyLoading || isNotificationsActuallyLoading
+  const isSignalsActuallyLoading = shouldLoadProjectAdvisorData && isSignalsPending
+  const isLoading =
+    isLintsActuallyLoading || isNotificationsActuallyLoading || isSignalsActuallyLoading
+
+  // [Joshen] Opting to ignore error state of advisor signals for now - render lints irregardless of banned ips
   const isError = isLintsError || isNotificationsError
 
   const handleTabChange = (tab: string) => {
@@ -255,17 +190,28 @@ export const AdvisorPanel = () => {
     }
 
     const advisorCategory =
-      item.source === 'lint' && 'categories' in item.original
-        ? item.original.categories[0]
-        : undefined
-    const advisorLevel =
-      item.source === 'lint' && 'level' in item.original ? item.original.level : undefined
+      item.source === 'lint'
+        ? item.original.categories.includes('SECURITY')
+          ? 'SECURITY'
+          : item.original.categories.includes('PERFORMANCE')
+            ? 'PERFORMANCE'
+            : undefined
+        : item.source === 'signal'
+          ? 'SECURITY'
+          : undefined
+    const advisorType =
+      item.source === 'signal'
+        ? item.type
+        : item.source === 'lint'
+          ? item.original.name
+          : item.title
+    const advisorLevel = item.source === 'lint' ? item.original.level : undefined
 
     track('advisor_detail_opened', {
       origin: 'advisor_panel',
       advisorCategory,
       advisorSource: item.source,
-      advisorType: item.original.name,
+      advisorType,
       advisorLevel,
     })
   }
