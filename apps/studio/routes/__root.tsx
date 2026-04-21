@@ -42,6 +42,7 @@ import {
 import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 
+import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
@@ -252,6 +253,7 @@ function RootComponent() {
                           <MainScrollContainerProvider>
                             <Outlet />
                           </MainScrollContainerProvider>
+                          <StudioCommandMenu />
                         </FeaturePreviewContextProvider>
                       </CommandProvider>
                     </AiAssistantStateContextProvider>
