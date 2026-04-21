@@ -6,9 +6,8 @@ import { routes, type VercelConfig } from '@vercel/config/v1'
 // these rules collapse to identity rewrites plus the shell fallback.
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
-// eslint-disable-next-line no-restricted-exports
-export default {
-  framework: null,
+export const config: VercelConfig = {
+  framework: 'tanstack-start',
   outputDirectory: 'dist/client',
   cleanUrls: true,
   rewrites: [
@@ -31,4 +30,10 @@ export default {
     // gets served the prerendered shell, which boots the client router.
     routes.rewrite(`${basePath}/(.*)`, '/_shell.html'),
   ],
-} satisfies VercelConfig
+}
+
+// Belt-and-braces: local @vercel/config CLI reads module.default, but the
+// docs claim Vercel's platform looks for a named `config` export. Export
+// both so whichever path runs wins.
+// eslint-disable-next-line no-restricted-exports
+export default config
