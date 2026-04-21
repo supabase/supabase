@@ -410,8 +410,8 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
                     id={entry.number.toString()}
                     className="grid pb-12 lg:grid-cols-12 lg:gap-8 lg:pb-36 scroll-mt-32"
                   >
-                    <div className="col-span-12 lg:-ml-[31px] mb-8 lg:mb-0 self-start lg:sticky lg:top-32 lg:col-span-4">
-                      <div className="flex w-full items-baseline border-b pb-4 lg:gap-4 lg:border-none lg:pb-0">
+                    <div className="col-span-12 lg:-ml-[31px] mb-8 lg:mb-0 self-start z-10 sticky top-[65px] lg:top-32 lg:col-span-4">
+                      <div className="flex w-full items-baseline relative bg-background pt-4 lg:pt-0 border-b pb-4 lg:gap-4 lg:border-none lg:pb-0">
                         <div className="hidden lg:flex bg-border border-muted text-foreground-lighter -ml-2.5 h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
                           <GitCommit size={14} strokeWidth={1.5} />
                         </div>
