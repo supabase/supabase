@@ -50,9 +50,9 @@ const Switch = React.forwardRef<React.ElementRef<typeof SwitchPrimitives.Root>, 
   ({ className, size, ...props }, ref) => (
     <SwitchPrimitives.Root
       className={cn(switchRootVariants({ size }), className)}
+      tabIndex={0}
       {...props}
       ref={ref}
-      tabIndex={0}
     >
       <SwitchPrimitives.Thumb className={cn(switchThumbVariants({ size }))} />
     </SwitchPrimitives.Root>
