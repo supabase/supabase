@@ -1,3 +1,4 @@
+import { useBreakpoint } from 'common'
 import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
 import {
   ChangelogV3TimelineFlatList,
@@ -37,6 +38,10 @@ import {
   IconYCombinator,
   Input,
   Input_Shadcn_,
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTitle,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -173,9 +178,30 @@ function itemMatchesSelectedTags(
   return false
 }
 
+function ChangelogDiscussionArticle({
+  loading,
+  payload,
+}: {
+  loading: boolean
+  payload: ModalPayload | null
+}) {
+  return (
+    <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-2 md:px-5">
+      {loading && <GenericSkeletonLoader className="py-2" />}
+      {!loading && payload?.source && (
+        <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
+          <MDXRemote {...payload.source} components={mdxComponents('blog')} />
+        </article>
+      )}
+    </div>
+  )
+}
+
 const nuqsUrlOptions = { shallow: true, history: 'push' as const }
 
 function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProps) {
+  const isMobile = useBreakpoint('lg')
+
   const [discussion, setDiscussion] = useQueryState(
     'discussion',
     parseAsInteger.withOptions(nuqsUrlOptions)
@@ -520,12 +546,28 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
         <CTABanner />
       </DefaultLayout>
 
-      <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="flex max-h-[min(90vh,900px)] max-w-3xl flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl">
-          <div className="bg-dash-sidebar sticky top-0 shrink-0 border-b border-default">
-            <DialogHeader className="border-0">
-              <DialogTitle className="pr-8 text-left text-xl">{displayTitle}</DialogTitle>
-              <DialogDescription asChild>
+      {open && isMobile && (
+        <Sheet open={open} onOpenChange={handleOpenChange}>
+          <SheetContent
+            side="bottom"
+            size="content"
+            showClose={false}
+            className="flex h-[85dvh] max-h-[85dvh] flex-col gap-0 overflow-hidden rounded-t-lg border-0 p-0"
+          >
+            <SheetTitle className="sr-only">{displayTitle}</SheetTitle>
+            <div className="bg-dash-sidebar sticky top-0 z-10 shrink-0 border-b border-default">
+              <SheetClose
+                className={cn(
+                  'text-foreground ring-offset-background hover:opacity-100',
+                  'absolute right-3 top-3 z-20 rounded-sm p-1 opacity-70 transition-opacity',
+                  'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
+                )}
+              >
+                <X className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                <span className="sr-only">Close</span>
+              </SheetClose>
+              <div className="px-4 pb-3 pt-4 pr-12 md:px-5 md:pr-14">
+                <h2 className="text-foreground text-left text-xl">{displayTitle}</h2>
                 <div className="text-foreground-lighter flex flex-col gap-2 text-left">
                   {displayDateIso && (
                     <p className="font-mono text-xs">
@@ -534,20 +576,35 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
                   )}
                   {error && <span className="text-destructive-600 text-sm">{error}</span>}
                 </div>
-              </DialogDescription>
-            </DialogHeader>
-          </div>
+              </div>
+            </div>
+            <ChangelogDiscussionArticle loading={loading} payload={payload} />
+          </SheetContent>
+        </Sheet>
+      )}
 
-          <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-2 md:px-5">
-            {loading && <GenericSkeletonLoader className="py-2" />}
-            {!loading && payload?.source && (
-              <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
-                <MDXRemote {...payload.source} components={mdxComponents('blog')} />
-              </article>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      {open && !isMobile && (
+        <Dialog open={open} onOpenChange={handleOpenChange}>
+          <DialogContent className="flex max-h-[min(90vh,900px)] max-w-3xl flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl">
+            <div className="bg-dash-sidebar sticky top-0 shrink-0 border-b border-default">
+              <DialogHeader className="border-0">
+                <DialogTitle className="pr-8 text-left text-xl">{displayTitle}</DialogTitle>
+                <DialogDescription asChild>
+                  <div className="text-foreground-lighter flex flex-col gap-2 text-left">
+                    {displayDateIso && (
+                      <p className="font-mono text-xs">
+                        {dayjs(displayDateIso).format('MMM D, YYYY')}
+                      </p>
+                    )}
+                    {error && <span className="text-destructive-600 text-sm">{error}</span>}
+                  </div>
+                </DialogDescription>
+              </DialogHeader>
+            </div>
+            <ChangelogDiscussionArticle loading={loading} payload={payload} />
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   )
 }
