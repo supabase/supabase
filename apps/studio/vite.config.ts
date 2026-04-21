@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig, loadEnv, type Plugin } from 'vite'
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url))
 const compatRoot = path.resolve(rootDir, 'compat/next')
@@ -48,29 +48,42 @@ function nextCompat(): Plugin {
   }
 }
 
-export default defineConfig({
-  server: {
-    port: 3000,
-  },
-  resolve: {
-    tsconfigPaths: true,
-  },
-  ssr: {
-    // `lodash` is CJS; its named-export interop fails in Node ESM unless bundled.
-    // `next/*` must be bundled so our nextCompat shim wins — otherwise Vite's
-    // SSR externalizer leaves `next/router` as a runtime package import and
-    // Node resolves it to Next's real module.
-    noExternal: ['lodash', /^next(\/|$)/],
-  },
-  plugins: [
-    nextCompat(),
-    devtools(),
-    tanstackStart({
-      srcDirectory: './',
-      spa: {
-        enabled: true,
-      },
-    }),
-    viteReact(),
-  ],
+export default defineConfig(({ mode }) => {
+  // Inline NEXT_PUBLIC_* env vars at build time so `process.env.NEXT_PUBLIC_*`
+  // works in the browser bundle (mirrors Next.js behaviour). loadEnv reads the
+  // standard .env file hierarchy and merges with process.env.
+  const env = loadEnv(mode, rootDir, '')
+  const publicEnvDefines = Object.fromEntries(
+    Object.entries(env)
+      .filter(([key]) => key.startsWith('NEXT_PUBLIC_'))
+      .map(([key, value]) => [`process.env.${key}`, JSON.stringify(value)])
+  )
+
+  return {
+    server: {
+      port: 3000,
+    },
+    resolve: {
+      tsconfigPaths: true,
+    },
+    define: publicEnvDefines,
+    ssr: {
+      // `lodash` is CJS; its named-export interop fails in Node ESM unless bundled.
+      // `next/*` must be bundled so our nextCompat shim wins — otherwise Vite's
+      // SSR externalizer leaves `next/router` as a runtime package import and
+      // Node resolves it to Next's real module.
+      noExternal: ['lodash', /^next(\/|$)/],
+    },
+    plugins: [
+      nextCompat(),
+      devtools(),
+      tanstackStart({
+        srcDirectory: './',
+        spa: {
+          enabled: true,
+        },
+      }),
+      viteReact(),
+    ],
+  }
 })
