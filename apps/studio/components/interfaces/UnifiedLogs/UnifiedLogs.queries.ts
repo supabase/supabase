@@ -423,6 +423,7 @@ const getSupabaseStorageLogsQuery = () => {
 }
 
 const LOG_TYPE_QUERIES: Record<string, () => string> = {
+  edge: getEdgeLogsQuery,
   postgrest: getPostgrestLogsQuery,
   postgres: getPostgresLogsQuery,
   'edge function': getEdgeFunctionLogsQuery,
