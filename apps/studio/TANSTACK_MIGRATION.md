@@ -314,11 +314,53 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ---
 
+## API routes
+
+**Strategy — shim + re-export.** `compat/next/api.ts` exposes
+`toWebHandler(nextHandler)` that adapts a `(req, res) => …` Next.js handler
+into a TanStack Start Web-fetch handler. Each `routes/api/...` file imports
+the default export from `pages/api/...`, wraps with `toWebHandler`, and
+registers via `createFileRoute(...).server.handlers`. `apiWrapper` and
+`apiAuthenticate` stay untouched — they run inside the shim, seeing a
+NextApiRequest-shaped `req` and a proxy `res`.
+
+**Path conventions** — `pages/api/foo/[bar]/baz.ts` → `routes/api/foo/$bar/baz.ts`;
+`pages/api/foo/[[...slug]].ts` → `routes/api/foo/$.ts`.
+
+**Shim limitations** — body is buffered, not streamed. 3 routes need bespoke
+treatment instead:
+
+- `pages/api/mcp/index.ts` — `StreamableHTTPServerTransport.handleRequest` expects
+  Node req/res. Investigate whether the MCP SDK has a Web-fetch transport.
+- `pages/api/v1/projects/[ref]/functions/[slug]/body.ts` — pipes `fs.createReadStream`
+  into `res`. Rewrite with a Web `ReadableStream`.
+- `pages/api/ai/docs.ts` — already edge-runtime + Web `Response`. Direct re-export
+  as `GET`/`POST` handlers; no shim needed.
+
+Tracking below is coarse — each bullet is a `pages/api/**` subtree. Check off
+once every file in the subtree has a `routes/api/**` counterpart. Expand into
+per-file items only when a subtree has special cases.
+
+- [x] `routes/api/get-ip-address.ts` — canary port (validates the shim)
+- [x] `routes/api/**` — root-level simple endpoints (`check-cname`,
+      `cli-release-version`, `enabled-features-overrides`, `generate-attachment-url`,
+      `get-deployment-commit`, `get-utc-time`, `status-override`)
+- [x] `routes/api/ai/**` — AI endpoints (`docs.ts` direct-ported as Web-native)
+- [x] `routes/api/connect/**`
+- [x] `routes/api/content/**`
+- [x] `routes/api/edge-functions/**`
+- [x] `routes/api/integrations/**`
+- [x] `routes/api/platform/**` (60 files, scripted port)
+- [x] `routes/api/v1/**` — except `body.ts` (streaming rewrite)
+- [ ] `routes/api/v1/projects/$ref/functions/$slug/body.ts` — rewrite with Web streams
+- [ ] `routes/api/mcp/index.ts` — needs MCP SDK Web-fetch transport (investigate)
+
+---
+
 ## Deferred / revisit
 
 - `pages/org/_/[[...routeSlug]].tsx` — catch-all placeholder; revisit after all `/org/*` pages are migrated
 - `pages/project/_/[[...routeSlug]].tsx` — catch-all placeholder; revisit after all `/project/*` pages are migrated
-- `pages/api/**` — Next API routes, out of scope here
 - Remove `RouteValidationWrapper` + `next/router` compat shim once no page under `pages/` remains
 - Remove `compat/next/` directory entirely once all Next imports are gone from workspace source
 - Delete this file
