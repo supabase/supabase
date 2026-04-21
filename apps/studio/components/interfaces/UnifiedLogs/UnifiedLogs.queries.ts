@@ -207,8 +207,6 @@ const calculateChartBucketing = (search: SearchParamsType | Record<string, any>)
   const hourDiff = endTime.diff(startTime, 'hour')
   const dayDiff = endTime.diff(startTime, 'day')
 
-  console.log(`Time difference: ${minuteDiff} minutes, ${hourDiff} hours, ${dayDiff} days`)
-
   // Adjust bucketing based on time range
   if (dayDiff >= 2) {
     truncationLevel = 'DAY'
@@ -631,47 +629,54 @@ WITH unified_logs AS (
 }
 
 export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
-  const { finalWhere } = buildQueryConditions(search)
+  const logTypeWhere = buildFacetWhere(search, 'log_type') || 'WHERE log_type IS NOT NULL'
+  const levelWhere = buildFacetWhere(search, 'level') || 'WHERE level IS NOT NULL'
 
-  // Create a count query using the same unified logs CTE
   const sql = `
 ${getUnifiedLogsCountCTE()},
-${getFacetCountCTE({ search, facet: 'log_type' })},
+
+-- Single COUNTIF pass for all log_type buckets + total (no GROUP BY / sort needed)
+log_type_counts AS (
+  SELECT
+    COUNT(*) AS total,
+    COUNTIF(log_type = 'edge') AS edge_count,
+    COUNTIF(log_type = 'postgrest') AS postgrest_count,
+    COUNTIF(log_type = 'storage') AS storage_count,
+    COUNTIF(log_type = 'postgres') AS postgres_count,
+    COUNTIF(log_type = 'edge function') AS edge_function_count,
+    COUNTIF(log_type = 'auth') AS auth_count
+  FROM unified_logs
+  ${logTypeWhere}
+),
+
+-- Single COUNTIF pass for all level buckets
+level_counts AS (
+  SELECT
+    COUNTIF(level = 'success') AS success_count,
+    COUNTIF(level = 'warning') AS warning_count,
+    COUNTIF(level = 'error') AS error_count
+  FROM unified_logs
+  ${levelWhere}
+),
+
+-- Variable facets: open-ended values still need GROUP BY
 ${getFacetCountCTE({ search, facet: 'method' })},
-${getFacetCountCTE({ search, facet: 'level' })},
 ${getFacetCountCTE({ search, facet: 'status' })},
 ${getFacetCountCTE({ search, facet: 'pathname' })}
 
--- Get total count
-SELECT 'total' as dimension, 'all' as value, COUNT(*) as count
-FROM unified_logs
-${finalWhere}
-
-UNION ALL
-
--- Get counts by log_type (exclude log_type filter to avoid self-filtering)
-SELECT dimension, value, count from log_type_count
-
-UNION ALL
-
--- Get counts by method (exclude method filter to avoid self-filtering)  
-SELECT dimension, value, count from method_count
-
-UNION ALL
-
--- Get counts by level (exclude level filter to avoid self-filtering)
-SELECT dimension, value, count from level_count
-
-UNION ALL
-
--- Get counts by status (exclude status filter to avoid self-filtering)
-SELECT dimension, value, count from status_count
-
-UNION ALL
-
--- Get counts by pathname (exclude pathname filter to avoid self-filtering)
-SELECT dimension, value, count from pathname_count
-
+SELECT 'total' AS dimension, 'all' AS value, total AS count FROM log_type_counts
+UNION ALL SELECT 'log_type', 'edge', edge_count FROM log_type_counts
+UNION ALL SELECT 'log_type', 'postgrest', postgrest_count FROM log_type_counts
+UNION ALL SELECT 'log_type', 'storage', storage_count FROM log_type_counts
+UNION ALL SELECT 'log_type', 'postgres', postgres_count FROM log_type_counts
+UNION ALL SELECT 'log_type', 'edge function', edge_function_count FROM log_type_counts
+UNION ALL SELECT 'log_type', 'auth', auth_count FROM log_type_counts
+UNION ALL SELECT 'level', 'success', success_count FROM level_counts
+UNION ALL SELECT 'level', 'warning', warning_count FROM level_counts
+UNION ALL SELECT 'level', 'error', error_count FROM level_counts
+UNION ALL SELECT dimension, value, count FROM method_count
+UNION ALL SELECT dimension, value, count FROM status_count
+UNION ALL SELECT dimension, value, count FROM pathname_count
 `
 
   return sql
