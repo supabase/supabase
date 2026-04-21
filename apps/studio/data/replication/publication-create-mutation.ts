@@ -21,7 +21,7 @@ async function createPublication(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const sql = getCreatePublicationSQL({ tables })
+  const sql = getCreatePublicationSQL({ name, tables })
   const { result } = await executeSql({ projectRef, connectionString, sql }, signal)
 
   return result
