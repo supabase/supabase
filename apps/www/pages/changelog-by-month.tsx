@@ -1,4 +1,5 @@
-import { ChangelogV6Explorer } from '~/components/Changelog/ChangelogV6Explorer'
+import { ChangelogMonthTabExplorer } from '~/components/Changelog/ChangelogMonthTabExplorer'
+import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import type { ChangelogTimelineIndexItem } from '~/lib/changelog-github'
@@ -22,7 +23,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
   }
 }
 
-export default function ChangelogV6Page({ changelogIndex }: PageProps) {
+export default function ChangelogV4MonthTabsPage({ changelogIndex }: PageProps) {
   return (
     <>
       <NextSeo
@@ -30,14 +31,24 @@ export default function ChangelogV6Page({ changelogIndex }: PageProps) {
         description="New updates and improvements to Supabase"
         openGraph={{
           title: 'Changelog',
-          url: 'https://supabase.com/changelog-v6',
+          url: 'https://supabase.com/changelog-v4',
           type: 'article',
         }}
       />
       <DefaultLayout>
         <NuqsAdapter>
-          <div className="container mx-auto max-w-2xl px-4 py-10 sm:px-16 xl:px-20">
-            <ChangelogV6Explorer items={changelogIndex} />
+          <div className="container mx-auto max-w-5xl flex flex-col gap-6 px-4 py-10 sm:px-16 xl:px-20">
+            <div>
+              <h1 className="h1">Changelog</h1>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-foreground-lighter text-lg">
+                  New updates and product improvements
+                </p>
+                <ChangelogRssButton />
+              </div>
+            </div>
+
+            <ChangelogMonthTabExplorer items={changelogIndex} />
           </div>
         </NuqsAdapter>
         <CTABanner />

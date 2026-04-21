@@ -4,9 +4,27 @@
       <link>https://supabase.com/changelog</link>
       <description>Product updates and improvements from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 09 Apr 2026 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Mon, 20 Apr 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/changelog-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://github.com/orgs/supabase/discussions/45071</guid>
+  <title>Automatic PostgREST retries for transient errors</title>
+  <link>https://github.com/orgs/supabase/discussions/45071</link>
+  <pubDate>Mon, 20 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://github.com/orgs/supabase/discussions/44968</guid>
+  <title>Upcoming: Tax Collection on Supabase Invoices</title>
+  <link>https://github.com/orgs/supabase/discussions/44968</link>
+  <pubDate>Fri, 17 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://github.com/orgs/supabase/discussions/44938</guid>
+  <title>[Public Alpha] Declarative Schema Management with pg-delta</title>
+  <link>https://github.com/orgs/supabase/discussions/44938</link>
+  <pubDate>Thu, 16 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://github.com/orgs/supabase/discussions/44713</guid>
   <title>Developer Update - April 2026</title>
   <link>https://github.com/orgs/supabase/discussions/44713</link>

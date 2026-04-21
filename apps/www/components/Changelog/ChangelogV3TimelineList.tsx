@@ -93,11 +93,12 @@ function TimelineRow({
     </div>
   )
 
-  const rowClass = 'group border-default flex w-full flex-col gap-0.5 border-b py-3 text-left'
+  const rowClass =
+    'group border-default flex w-full flex-col gap-0.5 border-b py-3 text-left scroll-mt-8'
 
   if (mode === 'link' && href) {
     return (
-      <div className={rowClass}>
+      <div className={rowClass} id={item.number.toString()}>
         <div className="min-w-0">{titleBlock}</div>
         {meta}
       </div>
@@ -121,24 +122,36 @@ type Props =
       items: ChangelogTimelineIndexItem[]
       mode: 'link'
       hrefFor: (item: ChangelogTimelineIndexItem) => string
+      /** When true, no left border / offset — use when an ancestor already draws the timeline line. */
+      omitOuterTimelineBorder?: boolean
     }
   | {
       items: ChangelogTimelineIndexItem[]
       mode: 'action'
       onSelect: (item: ChangelogTimelineIndexItem) => void
+      omitOuterTimelineBorder?: boolean
     }
 
 export function ChangelogV3TimelineList(props: Props) {
-  const { items, mode } = props
+  const { items, mode, omitOuterTimelineBorder } = props
   const yearGroups = groupChangelogIndexByYear(items)
 
   return (
-    <div className="border-muted relative lg:border-l lg:ml-2 lg:pl-8">
+    <div
+      className={
+        omitOuterTimelineBorder ? 'relative' : 'border-muted relative lg:border-l lg:ml-2 lg:pl-8'
+      }
+    >
       {yearGroups.map(([year, yearItems], yearIndex) => (
-        <section key={year} aria-labelledby={`changelog-year-${year}`} className="relative">
+        <section
+          key={year}
+          id={year.toString()}
+          aria-labelledby={`changelog-year-${year}`}
+          className="relative scroll-mt-20"
+        >
           <h2
             id={`changelog-year-${year}`}
-            className="border-default bg-default text-foreground-light sticky top-[65px] z-20 border-b py-2.5 pl-0 font-mono text-sm tracking-wide lg:hidden"
+            className="border-default bg-default text-foreground-light sticky top-28 z-20 border-b py-2 pl-0 font-mono text-sm tracking-wide lg:hidden"
           >
             {year}
           </h2>
@@ -151,7 +164,7 @@ export function ChangelogV3TimelineList(props: Props) {
             }
           >
             <div className="relative hidden lg:col-span-2 lg:block">
-              <div className="-ml-[42px] text-foreground lg:sticky lg:top-[calc(65px+1rem)] lg:py-3">
+              <div className="-ml-[42px] text-foreground lg:sticky lg:top-[calc(65px+1rem)] lg:pt-4">
                 <div className="text-foreground-light mb-1 flex items-center gap-2">
                   <div className="bg-border border-muted flex h-5 w-5 shrink-0 items-center justify-center rounded border drop-shadow-sm">
                     <GitCommit size={14} strokeWidth={1.5} />

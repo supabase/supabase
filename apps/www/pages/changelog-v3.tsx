@@ -28,10 +28,10 @@ function ChangelogV3Page({ changelogIndex }: PageProps) {
   return (
     <>
       <NextSeo
-        title="Changelog (v3 — list + page)"
-        description="Changelog index with full-page entries and breadcrumbs"
+        title="Changelog"
+        description="New updates and improvements to Supabase"
         openGraph={{
-          title: 'Changelog (v3)',
+          title: 'Changelog',
           url: 'https://supabase.com/changelog-v3',
           type: 'article',
         }}
@@ -41,7 +41,9 @@ function ChangelogV3Page({ changelogIndex }: PageProps) {
           <div>
             <h1 className="h1">Changelog</h1>
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
+              <p className="text-foreground-lighter text-lg">
+                New updates and product improvements
+              </p>
               <ChangelogRssButton />
             </div>
           </div>

@@ -1,5 +1,4 @@
-import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
-import { ChangelogMonthTabExplorer } from '~/components/Changelog/ChangelogMonthTabExplorer'
+import { ChangelogV6Explorer } from '~/components/Changelog/ChangelogV6Explorer'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import type { ChangelogTimelineIndexItem } from '~/lib/changelog-github'
@@ -23,30 +22,22 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
   }
 }
 
-export default function ChangelogV4MonthTabsPage({ changelogIndex }: PageProps) {
+export default function ChangelogV6Page({ changelogIndex }: PageProps) {
   return (
     <>
       <NextSeo
-        title="Changelog (v4 — month tabs)"
-        description="Experimental month tabs with sticky tab strip"
+        title="Changelog"
+        description="New updates and improvements to Supabase"
         openGraph={{
-          title: 'Changelog (v4 month tabs)',
-          url: 'https://supabase.com/changelog-v4',
+          title: 'Changelog',
+          url: 'https://supabase.com/changelog-v6',
           type: 'article',
         }}
       />
       <DefaultLayout>
         <NuqsAdapter>
-          <div className="container mx-auto max-w-5xl flex flex-col gap-6 px-4 py-10 sm:px-16 xl:px-20">
-            <div>
-              <h1 className="h1">Changelog</h1>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
-                <ChangelogRssButton />
-              </div>
-            </div>
-
-            <ChangelogMonthTabExplorer items={changelogIndex} />
+          <div className="container mx-auto max-w-3xl px-4 py-10 sm:px-16 xl:px-20">
+            <ChangelogV6Explorer items={changelogIndex} />
           </div>
         </NuqsAdapter>
         <CTABanner />

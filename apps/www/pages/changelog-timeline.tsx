@@ -29,7 +29,7 @@ export default function ChangelogV5TimelinePage({ changelogIndex }: PageProps) {
         title="Changelog"
         description="New updates and improvements to Supabase"
         openGraph={{
-          title: 'Changelog (v5 bottom timeline)',
+          title: 'Changelog',
           url: 'https://supabase.com/changelog-v5',
           type: 'article',
         }}

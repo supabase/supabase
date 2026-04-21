@@ -359,7 +359,7 @@ interface ChangelogV2PageProps {
 function ChangelogV2Page({ changelogIndex, changelog, pageInfo, restPage }: ChangelogV2PageProps) {
   const { endCursor: end, hasNextPage, hasPreviousPage } = pageInfo
 
-  const TITLE = 'Changelog (v2 experiment)'
+  const TITLE = 'Changelog'
   const DESCRIPTION = 'New updates and improvements to Supabase'
 
   const visibleIndex = changelogIndex.filter((item) => !item.title.includes('[d]'))
@@ -387,7 +387,9 @@ function ChangelogV2Page({ changelogIndex, changelog, pageInfo, restPage }: Chan
           <div className="pb-4">
             <h1 className="h1">Changelog</h1>
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
+              <p className="text-foreground-lighter text-lg">
+                New updates and product improvements
+              </p>
               <ChangelogRssButton />
             </div>
           </div>
