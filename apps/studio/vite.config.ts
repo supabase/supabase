@@ -159,6 +159,25 @@ export default defineConfig(({ mode }) => {
         // baseURL is stripped, so if we add redirects later they should be
         // written relative to the base.
         ...(basePath && { baseURL: basePath }),
+        vercel: {
+          config: {
+            version: 3,
+            routes: [
+              // Cache static assets aggressively
+              {
+                src: '/assets/(.*)',
+                headers: { 'cache-control': 'public, max-age=31536000, immutable' },
+              },
+              // Serve any file that exists on disk (shell, prerendered pages, favicons, etc.)
+              { handle: 'filesystem' },
+              // Route API and server function requests to the Vercel function
+              { src: '/api/(.*)', dest: '/__server' },
+              { src: '/_serverFn/(.*)', dest: '/__server' },
+              // Everything else: SPA shell, served statically — no function invocation
+              { src: '/(.*)', dest: '/_shell.html' },
+            ],
+          },
+        },
       }),
       viteReact(),
     ],
