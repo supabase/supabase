@@ -1,14 +1,10 @@
-import { getEvaluatedPoliciesForQuery } from '@supabase/pg-meta'
-import { ChevronsUpDown, Code, ListTodo } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { PostgresPolicy } from '@supabase/postgres-meta'
+import { Code, ListTodo } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import {
   Button,
   DialogSectionSeparator,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -17,13 +13,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Admonition } from 'ui-patterns'
 
-import { RoleImpersonationSelector } from '../../RoleImpersonationSelector'
+import { RoleImpersonationPopover } from '../../RoleImpersonationSelector/RoleImpersonationPopover'
 import { checkIfAppendLimitRequired, suffixWithLimit } from '../../SQLEditor/SQLEditor.utils'
-import Results from '../../SQLEditor/UtilityPanel/Results'
-import { getDisplayName } from '../Users/Users.utils'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { Results } from '../../SQLEditor/UtilityPanel/Results'
+import { RLSTableCard } from './RLSTableCard'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import {
+  useParseSQLQueryMutation,
+  type ParseSQLQueryResponse,
+} from '@/data/misc/parse-query-mutation'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useHotKey } from '@/hooks/ui/useHotKey'
@@ -39,7 +39,13 @@ import {
  * Just spiking the UX for now
  */
 
-export const RLSTesterSheet = () => {
+interface RLSTesterSheetProps {
+  handleSelectEditPolicy: (policy: PostgresPolicy) => void
+}
+
+const limit = 100
+
+export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { role, setRole } = useRoleImpersonationStateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
@@ -49,6 +55,8 @@ export const RLSTesterSheet = () => {
   const [value, setValue] = useState<string>('')
   const [results, setResults] = useState<Object[]>([])
   const [autoLimit, setAutoLimit] = useState(false)
+  const [queryRole, setQueryRole] = useState<string>()
+  const [parseQueryResults, setParseQueryResults] = useState<ParseSQLQueryResponse>()
 
   const {
     mutate: executeSql,
@@ -58,6 +66,15 @@ export const RLSTesterSheet = () => {
     onSuccess: (data, vars) => {
       setResults(data.result)
       setAutoLimit(!!vars.autoLimit)
+    },
+  })
+
+  const { mutate: parseQuery } = useParseSQLQueryMutation({
+    onSuccess: (data) => {
+      console.log('PARSE', data)
+      setParseQueryResults(data)
+
+      // With this data, check if the table has RLS enabled
     },
   })
 
@@ -71,52 +88,14 @@ export const RLSTesterSheet = () => {
     { enabled: open }
   )
 
-  const currentRole = role?.role
-  const authenticatedUserLabel = useMemo(() => {
-    if (role?.type !== 'postgrest' || role.role !== 'authenticated') return undefined
-
-    const userType = role.userType
-
-    if (userType === 'native' && role.user) {
-      const user = role.user
-      return getDisplayName(user, user.email ?? user.phone ?? user.id ?? 'Unknown')
-    } else if (userType === 'external' && role.externalAuth) {
-      return role.externalAuth.sub
-    } else {
-      return undefined
-    }
-  }, [role])
-
-  const roleLabel =
-    currentRole === 'anon' ? (
-      <>
-        Anonymous
-        <span className="text-foreground-lighter ml-2">Not logged in</span>
-      </>
-    ) : (
-      <>
-        {authenticatedUserLabel}
-        <span className="text-foreground-lighter ml-2">
-          {role?.type === 'postgrest' && role.role === 'authenticated' && role?.aal === 'aal2'
-            ? 'AAL2'
-            : 'AAL1'}
-        </span>
-      </>
-    )
-
   const onRunQuery = () => {
     if (!project) return console.error('Project is required')
 
-    const limit = 100
     const { appendAutoLimit } = checkIfAppendLimitRequired(value, limit)
     const formattedSql = suffixWithLimit(value, limit)
 
-    const xxx =
-      role?.type === 'postgrest' && role.role !== 'service_role'
-        ? getEvaluatedPoliciesForQuery({ sql: value, role: role.role })
-        : undefined
-    console.log(xxx)
-
+    setQueryRole(role?.role)
+    parseQuery({ sql: formattedSql })
     executeSql({
       projectRef: project.ref,
       connectionString: project.connectionString,
@@ -151,42 +130,18 @@ export const RLSTesterSheet = () => {
         </SheetHeader>
 
         <div className="grow">
-          <SheetSection className="px-0 pb-0 pt-3">
-            <FormItemLayout isReactForm={false} label="Query" className="[&>*>label]:px-5">
-              <div className="h-44">
-                <CodeEditor
-                  id="rls-tester"
-                  language="pgsql"
-                  value={value}
-                  onInputChange={(val) => setValue(val ?? '')}
-                />
-              </div>
-            </FormItemLayout>
-          </SheetSection>
-
-          <SheetSection className="pb-5">
-            <div className="flex flex-col gap-y-4">
-              <FormItemLayout isReactForm={false} label="Run the query as">
-                <Popover_Shadcn_ modal>
-                  <PopoverTrigger_Shadcn_ asChild>
-                    <Button
-                      type="default"
-                      size="small"
-                      className="w-full justify-between"
-                      iconRight={<ChevronsUpDown />}
-                    >
-                      {roleLabel}
-                    </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_
-                    className="p-0 overflow-hidden w-[540px]"
-                    side="bottom"
-                    align="end"
-                  >
-                    <RoleImpersonationSelector disallowServiceRoleOption />
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
-              </FormItemLayout>
+          <SheetSection className="px-0 py-0">
+            <div className="flex items-center justify-between px-5 py-2">
+              <p className="text-sm">Query</p>
+              <RoleImpersonationPopover />
+            </div>
+            <div className="h-56">
+              <CodeEditor
+                id="rls-tester"
+                language="pgsql"
+                value={value}
+                onInputChange={(val) => setValue(val ?? '')}
+              />
             </div>
           </SheetSection>
 
@@ -202,18 +157,51 @@ export const RLSTesterSheet = () => {
             </div>
           ) : (
             <>
-              <div>
-                <p className="px-5 py-3 text-sm">Results</p>
-                <div className="flex flex-col h-56 border-t">
-                  <Results rows={results} />
-                </div>
-                <div className="px-5 py-2 border-y font-mono text-xs text-foreground-light">
-                  {results.length} rows{autoLimit && ' (Limited to only 100 rows)'}
-                </div>
+              <div className="p-5 pt-4">
+                <p className="text-sm mb-4">Summary</p>
+                {queryRole === undefined ? (
+                  <Admonition
+                    showIcon={false}
+                    type="default"
+                    title="Query was ran as the Postgres role"
+                    description="Role has admin privileges and bypasses all RLS policies, all rows will be returned"
+                  />
+                ) : (
+                  <>
+                    <p className="text-xs font-mono uppercase tracking-tight text-foreground-light mb-2">
+                      Table access
+                    </p>
+                    <div className="flex flex-col gap-y-2">
+                      {parseQueryResults?.tables.map((x) => {
+                        const [schema, table] = x.includes('.') ? x.split('.') : ['public', x]
+
+                        return (
+                          <RLSTableCard
+                            key={x}
+                            schema={schema}
+                            table={table}
+                            role={queryRole}
+                            operation={parseQueryResults.operation}
+                            handleSelectEditPolicy={handleSelectEditPolicy}
+                          />
+                        )
+                      })}
+                    </div>
+                  </>
+                )}
               </div>
-              <div className="px-5 py-3">
-                <p className="text-sm">Policies evaluated</p>
-                <p>asd</p>
+
+              <DialogSectionSeparator />
+
+              <div className="px-5 py-3 text-sm flex items-center justify-between">
+                <span>Results</span>
+                <span className="font-mono text-xs text-foreground-light">
+                  {results.length} row{results.length > 1 ? 's' : ''}
+                  {autoLimit && results.length >= limit && ` (Limited to only ${limit} rows)`}
+                </span>
+              </div>
+              <div className="flex flex-col h-56 border-t">
+                <Results rows={results} />
               </div>
             </>
           )}

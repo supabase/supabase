@@ -275,7 +275,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           </PageHeaderSummary>
           <PageHeaderAside>
             <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
-            <RLSTesterSheet />
+            <RLSTesterSheet handleSelectEditPolicy={handleSelectEditPolicy} />
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
