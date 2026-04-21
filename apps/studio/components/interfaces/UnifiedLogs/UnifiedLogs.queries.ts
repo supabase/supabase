@@ -342,14 +342,14 @@ const getEdgeFunctionLogsQuery = () => {
     cross join unnest(fel_metadata.request) as fel_request
     left join (
     SELECT
-        fl_metadata.execution_id,
+        fl_metadata.request_id,
         COUNT(fl.id) as function_log_count,
         ANY_VALUE(fl.event_message) as last_event_message
     FROM function_logs as fl
     CROSS JOIN UNNEST(fl.metadata) as fl_metadata
-    WHERE fl_metadata.execution_id IS NOT NULL
-    GROUP BY fl_metadata.execution_id
-    ) as function_logs_agg on fel_metadata.execution_id = function_logs_agg.execution_id
+    WHERE fl_metadata.request_id IS NOT NULL
+    GROUP BY fl_metadata.request_id
+    ) as function_logs_agg on fel_metadata.request_id = function_logs_agg.request_id
   `
 }
 
