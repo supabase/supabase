@@ -6,10 +6,6 @@ import { IS_PLATFORM } from '@/lib/constants'
 // `redirects()` rules in next.config.ts: platform sends users to `/org`
 // (or `/new/new-project` when deep-linked with `?next=new-project`),
 // self-hosted sends them straight to `/project/default`.
-//
-// Kept as a route (rather than a Nitro `routeRule`) so the redirect works
-// in both `vite dev` and prod — `routeRules` only fire under Nitro — and
-// so the query-param branch has somewhere to run.
 export const Route = createFileRoute('/')({
   validateSearch: (search: Record<string, unknown>) => ({
     next: typeof search.next === 'string' ? search.next : undefined,

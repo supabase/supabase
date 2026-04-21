@@ -55,9 +55,9 @@ function nextCompat(): Plugin {
 // React component in SSR builds only.
 //
 // `@graphiql/react` transitively loads a codemirror addon that touches
-// `document` at module-evaluation time. During Nitro's prerender (which boots
-// a real Node server and fetches `/`), that hard-crashes with
-// "document is not defined" as soon as the graphiql chunk gets loaded.
+// `document` at module-evaluation time. During the SPA shell prerender,
+// that hard-crashes with "document is not defined" as soon as the graphiql
+// chunk gets loaded.
 //
 // Stubbing `@graphiql/react` directly would require enumerating its 30+ named
 // exports so Rolldown's static analysis is satisfied. Easier to stub the one
@@ -122,11 +122,12 @@ export default defineConfig(({ mode }) => {
       // `next/*` must be bundled so our nextCompat shim wins — otherwise Vite's
       // SSR externalizer leaves `next/router` as a runtime package import and
       // Node resolves it to Next's real module.
-      // `tslib` gets inlined at build time so the external-trace copy pass
-      // doesn't have to ship a package whose `exports` field points at
-      // `modules/index.js` — a CJS-interop wrapper Rolldown doesn't bundle
-      // cleanly, and which wouldn't be present in the copied output anyway
-      // once `exportConditions` redirects Nitro to the pure-ESM entry.
+      // `tslib`'s Node ESM entry (`modules/index.js`) destructures from a
+      // default-imported CJS wrapper (`tslib.js`). When consumers like
+      // `@ai-sdk/amazon-bedrock` / `configcat-common` `import … from "tslib"`
+      // and that ESM-wrapper gets picked, Rolldown botches the flattened UMD
+      // body — "__extends is not a function" at SSR module evaluation time.
+      // Inlining `tslib` lets the bundler reach the pure ESM entry directly.
       noExternal: ['lodash', /^next(\/|$)/, 'tslib'],
     },
     plugins: [
