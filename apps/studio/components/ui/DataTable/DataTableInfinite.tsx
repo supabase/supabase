@@ -9,7 +9,8 @@ import { Button, cn } from 'ui'
 import { formatCompactNumber } from './DataTable.utils'
 import { useDataTable } from './providers/DataTableProvider'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table'
-import { useHotKey } from '@/hooks/ui/useHotKey'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 // TODO: add a possible chartGroupBy
 export interface DataTableInfiniteProps<TData, TValue, TMeta> {
@@ -64,10 +65,10 @@ export function DataTableInfinite<TData, TValue, TMeta>({
     [fetchNextPage, isFetching, totalRows, totalRowsFetched]
   )
 
-  useHotKey(() => {
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS, () => {
     setColumnOrder([])
     setColumnVisibility(defaultColumnVisibility)
-  }, 'u')
+  })
 
   return (
     <Table ref={tableRef} onScroll={onScroll}>
