@@ -14,7 +14,7 @@ export const DOCS_MENU = [
   { name: 'Connect', key: API_DOCS_CATEGORIES.INTRODUCTION },
   { name: 'User Management', key: API_DOCS_CATEGORIES.USER_MANAGEMENT },
   { name: 'Tables & Views', key: API_DOCS_CATEGORIES.ENTITIES },
-  { name: 'Stored Procedures', key: API_DOCS_CATEGORIES.STORED_PROCEDURES },
+  { name: 'Database Functions', key: API_DOCS_CATEGORIES.STORED_PROCEDURES },
   { name: 'Storage', key: API_DOCS_CATEGORIES.STORAGE },
   { name: 'Edge Functions', key: API_DOCS_CATEGORIES.EDGE_FUNCTIONS },
   { name: 'Realtime', key: API_DOCS_CATEGORIES.REALTIME },
@@ -471,13 +471,13 @@ const { data, error } = await supabase
   \`)
     `,
   },
-  // Stored Procedures
+  // Database Functions
   storedProceduresIntroduction: {
     key: 'stored-procedures-introduction',
     category: API_DOCS_CATEGORIES.STORED_PROCEDURES,
     title: 'Introduction',
     description: `
-All of your database stored procedures are available on your API. This means you can build your logic directly into the database (if you're brave enough)!
+All of your database functions are available on your API. This means you can build your logic directly into the database (if you're brave enough)!
 
 The API endpoint supports POST (and in some cases GET) to execute the function.
 `,

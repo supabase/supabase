@@ -4896,6 +4896,7 @@ export interface components {
             | 'security.audit_logs_days'
             | 'security.questionnaire'
             | 'security.soc2_report'
+            | 'security.iso27001_certificate'
             | 'security.private_link'
             | 'security.enforce_mfa'
             | 'log.retention_days'

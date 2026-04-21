@@ -92,7 +92,7 @@
     "file-saver": "^2.0.5",
     "framer-motion": "^11.18.2",
     "generate-password-browser": "^1.1.0",
-    "html-to-image": "^1.10.8",
+    "html-to-image": "^1.11.13",
     "http-status": "^2.1.0",
     "icons": "workspace:*",
     "idb": "^8.0.2",
