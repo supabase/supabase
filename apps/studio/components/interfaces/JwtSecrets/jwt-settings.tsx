@@ -418,24 +418,18 @@ const JWTSettings = () => {
                           </span>{' '}
                           on the JWT Signing Keys page to start signing new JWTs with the standby
                           key. Existing <code>anon</code>, <code>service_role</code>, and active
-                          user JWTs stay valid.
-                          <p className="mt-1 text-xs">
-                            Before rotating, switch any code that verifies JWTs directly against the
-                            legacy secret (e.g. <code>jose</code>, <code>jsonwebtoken</code>) to{' '}
-                            <code>supabase.auth.getClaims()</code> or a JWKS-based verifier, and
-                            disable the <em className="not-italic text-foreground">Verify JWT</em>{' '}
-                            setting on any affected Edge Functions.
-                          </p>
+                          user JWTs stay valid. Before rotating, switch any code that verifies JWTs
+                          directly against the legacy secret (e.g. <code>jose</code>,{' '}
+                          <code>jsonwebtoken</code>) to <code>supabase.auth.getClaims()</code> or a
+                          JWKS-based verifier, and disable the{' '}
+                          <em className="not-italic text-foreground">Verify JWT</em> setting on any
+                          affected Edge Functions.
                         </li>
                         <li>
-                          <span className="text-foreground">Revoke the legacy JWT secret</span> from
-                          the JWT Signing Keys page once everything is working.
-                          <p className="mt-1 text-xs">
-                            Wait at least one full access-token expiry window (e.g. 1 hour 15
-                            minutes for the default 1-hour expiry) before revoking so active users
-                            aren't signed out. Revoke immediately only during an active security
-                            incident.
-                          </p>
+                          <span className="text-foreground">
+                            Optionally, revoke the legacy JWT secret
+                          </span>{' '}
+                          from the JWT Signing Keys page once you're sure it's no longer in use.
                         </li>
                       </ol>
                       <Link
