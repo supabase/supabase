@@ -37,21 +37,16 @@ export const config: VercelConfig = {
     routes.rewrite('/(.*\\.\\w+)', '/$1'),
     routes.rewrite('/(.*)', '/_shell'),
   ],
-  // Vercel defaults every response to `public, max-age=0, must-revalidate`
-  // when no Cache-Control is set, which is fine for the SPA shell but wrong
-  // for dynamic API responses (we don't want CDNs holding onto them). Force
-  // `private, no-store` on anything that terminates at the /api/server
-  // function. Individual handlers can still opt out by setting their own
-  // Cache-Control on the Response.
+  // TEMPORARY (testing): force `private, no-store` on every response so
+  // nothing (CDN or browser) caches stale content while we iterate. Once
+  // the deploy is stable, narrow this back to just the /api/* and
+  // /_serverFn/* paths and let the SPA shell + hashed assets take
+  // appropriate public cache headers.
   headers: [
     ...(basePath
-      ? [
-          routes.cacheControl(`${basePath}/api/(.*)`, { private: true, noStore: true }),
-          routes.cacheControl(`${basePath}/_serverFn/(.*)`, { private: true, noStore: true }),
-        ]
+      ? [routes.cacheControl(`${basePath}/(.*)`, { private: true, noStore: true })]
       : []),
-    routes.cacheControl('/api/(.*)', { private: true, noStore: true }),
-    routes.cacheControl('/_serverFn/(.*)', { private: true, noStore: true }),
+    routes.cacheControl('/(.*)', { private: true, noStore: true }),
   ],
 }
 
