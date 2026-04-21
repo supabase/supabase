@@ -88,6 +88,8 @@ export default defineConfig(({ mode }) => {
       .map(([key, value]) => [`process.env.${key}`, JSON.stringify(value)])
   )
 
+  console.log('publicEnvDefines:', publicEnvDefines)
+
   // Mirror Next's `basePath` via NEXT_PUBLIC_BASE_PATH. Unlike Next, TanStack
   // Start has no single knob — the prefix has to be declared in three places
   // (see BASE_PATH_REDIRECT_GUIDE.md):
