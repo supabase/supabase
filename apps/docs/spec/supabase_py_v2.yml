@@ -4154,11 +4154,11 @@ functions:
       - name: fn
         isOptional: false
         type: callable
-        description: The stored procedure call to be executed.
+        description: The database function call to be executed.
       - name: params
         isOptional: true
         type: dict of any
-        description: Parameters passed into the stored procedure call.
+        description: Parameters passed into the database function call.
       - name: get
         isOptional: true
         type: dict of any

@@ -309,7 +309,7 @@ allow_list = [
     "PostGIS",
     "PostQUEL",
     "PostgREST",
-    "Postgres",
+    "[Pp]ostgres",
     "postgres-meta",
     # We prefer Postgres, but check for vocabulary preference in a separate rule
     "PostgreSQL",
