@@ -1,19 +1,19 @@
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { useParams } from 'common'
 import { AlertCircle, Loader } from 'lucide-react'
 import { PropsWithChildren } from 'react'
-
-import { useParams } from 'common'
-import Panel from 'components/ui/Panel'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { Input } from 'ui'
 
-const DisplayConfigSettings = () => {
+import Panel from '@/components/ui/Panel'
+import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+
+export const DisplayConfigSettings = () => {
   const { ref: projectRef } = useParams()
   const {
     data: settings,
-    isLoading: isProjectSettingsLoading,
+    isPending: isProjectSettingsLoading,
     isError: isProjectSettingsError,
   } = useProjectSettingsV2Query({
     projectRef,
@@ -23,7 +23,7 @@ const DisplayConfigSettings = () => {
   const {
     data,
     isError: isJwtSecretUpdateStatusError,
-    isLoading: isJwtSecretUpdateStatusLoading,
+    isPending: isJwtSecretUpdateStatusLoading,
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
   const isNotUpdatingJwtSecret =
@@ -90,8 +90,6 @@ const DisplayConfigSettings = () => {
     </ConfigContentWrapper>
   )
 }
-
-export default DisplayConfigSettings
 
 const ConfigContentWrapper = ({ children }: PropsWithChildren<{}>) => {
   return (

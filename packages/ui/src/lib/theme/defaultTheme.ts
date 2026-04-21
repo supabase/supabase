@@ -35,10 +35,11 @@ const defaults = {
   `,
   size: {
     // buttons, inputs, input labels use these sizes
+    // text-base on mobile (below md) to avoid zoom on focus
     text: {
       tiny: 'text-xs',
-      small: 'text-sm leading-4',
-      medium: 'text-sm',
+      small: 'text-base md:text-sm leading-4',
+      medium: 'text-base md:text-sm',
       large: 'text-base',
       xlarge: 'text-base',
     },
@@ -70,6 +71,14 @@ const default__padding_and_text = {
   medium: `${defaults.size.text.medium} ${defaults.size.padding.medium}`,
   large: `${defaults.size.text.large} ${defaults.size.padding.large}`,
   xlarge: `${defaults.size.text.xlarge} ${defaults.size.padding.xlarge}`,
+}
+
+const with_icon_spacing_sizes = {
+  tiny: 'pl-7',
+  small: 'pl-8',
+  medium: 'pl-8',
+  large: 'pl-10',
+  xlarge: 'pl-11',
 }
 
 /*
@@ -446,7 +455,7 @@ export default {
        `,
     },
     container: 'relative',
-    with_icon: 'pl-10',
+    with_icon: with_icon_spacing_sizes,
     size: {
       ...default__padding_and_text,
     },
@@ -492,7 +501,7 @@ export default {
        `,
     },
     container: 'relative',
-    with_icon: 'pl-10',
+    with_icon: with_icon_spacing_sizes,
     size: {
       ...default__padding_and_text,
     },
@@ -500,50 +509,6 @@ export default {
     actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 mr-5 flex items-center',
     chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
     chevron: 'h-5 w-5 text-foreground-lighter',
-  },
-
-  /*
-   * Input Number
-   */
-
-  inputNumber: {
-    base: `
-      block
-      box-border
-      w-full
-      rounded-md
-      shadow-sm
-      transition-all
-      text-foreground
-      border
-      focus-visible:shadow-md
-      ${defaults.focus}
-      focus-visible:border-foreground-muted
-      focus-visible:ring-background-control
-      ${defaults.placeholder}
-
-      appearance-none
-      bg-none
-    `,
-    variants: {
-      standard: `
-        bg-control
-        border border-strong
-      `,
-      error: `
-        bg-destructive-200
-        border border-destructive-500
-        focus:ring-destructive-400
-        placeholder:text-destructive-400
-       `,
-    },
-    disabled: 'opacity-50',
-    container: 'relative',
-    with_icon: 'pl-10',
-    size: {
-      ...default__padding_and_text,
-    },
-    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
   },
 
   /*
@@ -803,8 +768,8 @@ export default {
             tiny: `pl-6`,
             small: `pl-6`,
             medium: `pl-7`,
-            large: `pl-10`,
-            xlarge: `pl-10`,
+            large: `pl-7`,
+            xlarge: `pl-7`,
           },
           align: {
             vertical: 'flex flex-col space-y-1',
@@ -859,8 +824,9 @@ export default {
       shadow-xl
     `,
     header: `
+      flex items-center
       space-y-1 py-4 px-4 bg-dash-sidebar sm:px-6
-      border-b
+      border-b h-[var(--header-height)]
     `,
     contents: `
       relative
@@ -1054,8 +1020,8 @@ export default {
     },
     size: {
       tiny: 'text-xs',
-      small: 'text-sm leading-4',
-      medium: 'text-sm',
+      small: 'text-base md:text-sm leading-4',
+      medium: 'text-base md:text-sm',
       large: 'text-base',
       xlarge: 'text-base',
     },
@@ -1182,20 +1148,16 @@ export default {
           rounded: `rounded-md`,
         },
         pills: {
-          base: `
-            px-3 py-1
-          `,
+          base: `px-3 py-1`,
           normal: `
             font-normal
             border-default
             group-hover:border-foreground-muted`,
           active: `
             font-semibold
-            bg-surface-200
+            bg-sidebar-accent
             text-foreground-lighter
-            z-10
-
-            rounded-md
+            z-10 rounded-md
           `,
         },
       },
@@ -1387,7 +1349,7 @@ export default {
   inputIconContainer: {
     base: `
     absolute inset-y-0
-    left-0 pl-3 flex
+    left-0 pl-2 flex
     items-center pointer-events-none
     text-foreground-light
     [&_svg]:stroke-[1.5]
@@ -1396,10 +1358,10 @@ export default {
       tiny: '[&_svg]:h-[14px] [&_svg]:w-[14px]',
       small: '[&_svg]:h-[18px] [&_svg]:w-[18px]',
       medium: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
-      large: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
-      xlarge: '[&_svg]:h-[24px] [&_svg]:w-[24px]',
-      xxlarge: '[&_svg]:h-[30px] [&_svg]:w-[30px]',
-      xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px]',
+      large: '[&_svg]:h-[20px] [&_svg]:w-[20px] pl-3',
+      xlarge: '[&_svg]:h-[24px] [&_svg]:w-[24px] pl-3',
+      xxlarge: '[&_svg]:h-[30px] [&_svg]:w-[30px] pl-3',
+      xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px] pl-3',
     },
   },
 

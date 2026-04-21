@@ -1,8 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+
 import { jwtSigningKeysKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type JWTSigningKey = components['schemas']['SigningKeyResponse']
 
@@ -31,13 +32,11 @@ export type JWTSigningKeysData = Awaited<ReturnType<typeof getJWTSigningKeys>>
 
 export const useJWTSigningKeysQuery = <TData = JWTSigningKeysData>(
   { projectRef }: JWTSigningKeysVariables,
-  { enabled, ...options }: UseQueryOptions<JWTSigningKeysData, ResponseError, TData> = {}
+  { enabled, ...options }: UseCustomQueryOptions<JWTSigningKeysData, ResponseError, TData> = {}
 ) =>
-  useQuery<JWTSigningKeysData, ResponseError, TData>(
-    jwtSigningKeysKeys.list(projectRef),
-    ({ signal }) => getJWTSigningKeys({ projectRef }, signal),
-    {
-      enabled: enabled && !!projectRef,
-      ...options,
-    }
-  )
+  useQuery<JWTSigningKeysData, ResponseError, TData>({
+    queryKey: jwtSigningKeysKeys.list(projectRef),
+    queryFn: ({ signal }) => getJWTSigningKeys({ projectRef }, signal),
+    enabled: enabled && !!projectRef,
+    ...options,
+  })

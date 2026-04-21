@@ -1,27 +1,26 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { organizationKeys } from 'data/organization-members/keys'
-import { useOrganizationMemberAssignRoleMutation } from 'data/organization-members/organization-member-role-assign-mutation'
-import { useOrganizationMemberUnassignRoleMutation } from 'data/organization-members/organization-member-role-unassign-mutation'
-import { useOrganizationMemberUpdateRoleMutation } from 'data/organization-members/organization-member-role-update-mutation'
-import {
-  OrganizationRole,
-  useOrganizationRolesV2Query,
-} from 'data/organization-members/organization-roles-query'
-import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
-import { OrganizationMember } from 'data/organizations/organization-members-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import {
-  ProjectRoleConfiguration,
   deriveChanges,
   deriveRoleChangeActions,
   formatMemberRoleToProjectRoleConfiguration,
+  ProjectRoleConfiguration,
 } from './UpdateRolesPanel.utils'
+import { organizationKeys } from '@/data/organization-members/keys'
+import { useOrganizationMemberAssignRoleMutation } from '@/data/organization-members/organization-member-role-assign-mutation'
+import { useOrganizationMemberUnassignRoleMutation } from '@/data/organization-members/organization-member-role-unassign-mutation'
+import { useOrganizationMemberUpdateRoleMutation } from '@/data/organization-members/organization-member-role-update-mutation'
+import {
+  OrganizationRole,
+  useOrganizationRolesV2Query,
+} from '@/data/organization-members/organization-roles-query'
+import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
+import { OrganizationMember } from '@/data/organizations/organization-members-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface UpdateRolesConfirmationModal {
   visible: boolean
@@ -39,9 +38,8 @@ export const UpdateRolesConfirmationModal = ({
   const { slug } = useParams()
   const queryClient = useQueryClient()
   const { data: organization } = useSelectedOrganizationQuery()
+
   const { data: allRoles } = useOrganizationRolesV2Query({ slug: organization?.slug })
-  const { data } = useProjectsQuery()
-  const projects = data?.projects ?? []
 
   // [Joshen] Separate saving state instead of using RQ due to several successive steps
   const [saving, setSaving] = useState(false)
@@ -56,16 +54,9 @@ export const UpdateRolesConfirmationModal = ({
     org_scoped_roles: [],
     project_scoped_roles: [],
   }
-  const orgProjects = (projects ?? []).filter((p) => p.organization_id === organization?.id)
   const originalConfiguration =
-    allRoles !== undefined
-      ? formatMemberRoleToProjectRoleConfiguration(member, allRoles, projects ?? [])
-      : []
-  const changesToRoles = deriveChanges(
-    originalConfiguration,
-    projectsRoleConfiguration,
-    projects ?? []
-  )
+    allRoles !== undefined ? formatMemberRoleToProjectRoleConfiguration(member, allRoles) : []
+  const changesToRoles = deriveChanges(originalConfiguration, projectsRoleConfiguration)
 
   const onConfirmUpdateMemberRoles = async () => {
     if (slug === undefined) return console.error('Slug is required')
@@ -77,6 +68,7 @@ export const UpdateRolesConfirmationModal = ({
         return [...org_scoped_roles, ...project_scoped_roles].find((r) => r.id === id)
       })
       .filter(Boolean) as OrganizationRole[]
+
     const isChangeWithinOrgScope =
       projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0].ref === undefined
 
@@ -102,32 +94,32 @@ export const UpdateRolesConfirmationModal = ({
     const { toRemove, toAssign, toUpdate } = deriveRoleChangeActions(existingRoles, changesToRoles)
 
     try {
-      for (const { roleId, projectIds } of toAssign) {
+      for (const { roleId, refs } of toAssign) {
         await assignRole({
           slug,
           gotrueId,
           roleId,
-          projects: projectIds.map((id) => projects?.find((p) => p.id === id)?.ref) as string[],
+          projects: refs,
           skipInvalidation: true,
         })
       }
       for (const roleId of toRemove) {
         await removeRole({ slug, gotrueId, roleId, skipInvalidation: true })
       }
-      for (const { roleId, projectIds } of toUpdate) {
+      for (const { roleId, refs } of toUpdate) {
         await updateRole({
           slug,
           gotrueId,
           roleId,
           roleName: project_scoped_roles.find((r) => r.id === roleId)?.name as string,
-          projects: projectIds.map((id) => projects?.find((p) => p.id === id)?.ref) as string[],
+          projects: refs,
           skipInvalidation: true,
         })
       }
 
       await Promise.all([
-        queryClient.invalidateQueries(organizationKeys.rolesV2(slug)),
-        queryClient.invalidateQueries(organizationKeysV1.members(slug)),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.rolesV2(slug) }),
+        queryClient.invalidateQueries({ queryKey: organizationKeysV1.members(slug) }),
       ])
       toast.success(`Successfully updated role for ${member.username}`)
       onClose(true)
@@ -168,15 +160,12 @@ export const UpdateRolesConfirmationModal = ({
                   const role =
                     org_scoped_roles.find((y) => y.id === x.roleId) ??
                     project_scoped_roles.find((y) => y.id === x.roleId)
-                  const project = orgProjects.find((y) => y.ref === x.ref)
                   const roleName = (role?.name ?? 'Unknown').split('_')[0]
 
                   return (
                     <li key={`update-${i}`} className="text-sm text-foreground-light">
                       <span className="text-foreground">{roleName}</span> on{' '}
-                      <span className={project !== undefined ? 'text-foreground' : ''}>
-                        {project?.name ?? 'organization'}
-                      </span>
+                      <span className="text-foreground">{x?.name ?? 'organization'}</span>
                     </li>
                   )
                 })}
@@ -192,13 +181,10 @@ export const UpdateRolesConfirmationModal = ({
               <ul className="list-disc pl-6">
                 {changesToRoles.added.map((x, i) => {
                   const role = availableRoles.find((y) => y.id === x.roleId)
-                  const project = orgProjects.find((y) => y.ref === x.ref)
                   return (
                     <li key={`update-${i}`} className="text-sm text-foreground-light">
                       <span className="text-foreground">{role?.name}</span> on{' '}
-                      <span className={project !== undefined ? 'text-foreground' : ''}>
-                        {project?.name ?? 'organization'}
-                      </span>
+                      <span className="text-foreground">{x?.name ?? 'organization'}</span>
                     </li>
                   )
                 })}
@@ -217,16 +203,13 @@ export const UpdateRolesConfirmationModal = ({
                     org_scoped_roles.find((y) => y.id === x.originalRole) ??
                     project_scoped_roles.find((y) => y.id === x.originalRole)
                   const updatedRole = org_scoped_roles.find((y) => y.id === x.updatedRole)
-                  const project = orgProjects.find((y) => y.ref === x.ref)
                   const originalRoleName = (originalRole?.name ?? 'Unknown').split('_')[0]
 
                   return (
                     <li key={`update-${i}`} className="text-sm text-foreground-light">
                       From <span className="text-foreground">{originalRoleName}</span> to{' '}
                       <span className="text-foreground">{updatedRole?.name ?? 'Unknown'}</span> on{' '}
-                      <span className={project !== undefined ? 'text-foreground' : ''}>
-                        {project?.name ?? 'organization'}
-                      </span>
+                      <span className="text-foreground">{x?.name ?? 'organization'}</span>
                     </li>
                   )
                 })}

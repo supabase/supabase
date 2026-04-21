@@ -58,6 +58,7 @@ const FunctionLink = memo(function FunctionLink({
          */
         onClick={(e) => {
           e.preventDefault()
+          menuState.setMenuActiveRefId(id)
           history.pushState({}, '', url)
           const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
           document.getElementById(slug)?.scrollIntoView({

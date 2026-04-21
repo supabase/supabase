@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "tsconfig/nextjs.json",
+  "compilerOptions": {
+    "paths": {
+      // @deprecated: Don't import directly without suffix. Use @/ always.
+      "*": ["./*"],
+      "@/*": ["./*"],
+      "@ui/*": ["./../../packages/ui/src/*"], // handle ui package paths
+      "contentlayer/generated": ["./.contentlayer/generated"]
+    },
+    "plugins": [{ "name": "next" }],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": false
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".contentlayer/generated"
+  ],
+  "exclude": ["node_modules", "./scripts/build-registry.mts"]
+}

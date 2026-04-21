@@ -1,5 +1,6 @@
 import { Table } from '@tanstack/react-table'
-import { DataTableFilterField } from 'components/ui/DataTable/DataTable.types'
+
+import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 
 /**
  * Service Flow Type Definitions

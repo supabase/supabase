@@ -1,11 +1,9 @@
+import { BoxPlus } from 'icons'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
-
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   Button,
   Card,
-  cn,
   Skeleton,
   Table,
   TableBody,
@@ -14,40 +12,16 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { ShimmeringCard } from './ShimmeringCard'
+import { EmptyStatePresentational } from 'ui-patterns'
 
-export const NoFilterResults = ({
-  filterStatus,
-  resetFilterStatus,
-  className,
-}: {
-  filterStatus: string[]
-  resetFilterStatus?: () => void
-  className?: string
-}) => {
+import { ShimmeringCard } from './ShimmeringCard'
+import { HomeIcon } from '@/components/layouts/Navigation/LayoutHeader/HomeIcon'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+
+export const Header = () => {
   return (
-    <div
-      className={cn(
-        'bg-surface-100 px-4 md:px-6 py-4 rounded flex items-center justify-between border border-default',
-        className
-      )}
-    >
-      <div className="space-y-1">
-        {/* [Joshen] Just keeping it simple for now unless we decide to extend this to other statuses */}
-        <p className="text-sm text-foreground">
-          {filterStatus.length === 0
-            ? `No projects found`
-            : `No ${filterStatus[0] === 'INACTIVE' ? 'paused' : 'active'} projects found`}
-        </p>
-        <p className="text-sm text-foreground-light">
-          Your search for projects with the specified status did not return any results
-        </p>
-      </div>
-      {resetFilterStatus !== undefined && (
-        <Button type="default" onClick={() => resetFilterStatus()}>
-          Reset filter
-        </Button>
-      )}
+    <div className="flex items-center border-default border-b px-4 py-3.5">
+      <HomeIcon />
     </div>
   )
 }
@@ -104,17 +78,29 @@ export const NoProjectsState = ({ slug }: { slug: string }) => {
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   return (
-    <div className="col-span-4 space-y-4 rounded-lg border border-dashed p-6 text-center">
-      <div className="space-y-1">
-        <p>No projects</p>
-        <p className="text-sm text-foreground-light">Get started by creating a new project.</p>
-      </div>
-
+    <EmptyStatePresentational
+      icon={BoxPlus}
+      title="Create a project"
+      description="Launch a complete backend built on Postgres."
+    >
       {projectCreationEnabled && (
-        <Button asChild icon={<Plus />}>
-          <Link href={`/new/${slug}`}>New Project</Link>
+        <Button size="tiny" type="default" asChild icon={<Plus />}>
+          <Link href={`/new/${slug}`}>New project</Link>
         </Button>
       )}
-    </div>
+    </EmptyStatePresentational>
+  )
+}
+
+export const NoOrganizationsState = () => {
+  return (
+    <EmptyStatePresentational
+      title="Create an organization"
+      description="Manage your team and projects in one place."
+    >
+      <Button size="tiny" type="primary" asChild icon={<Plus />}>
+        <Link href="/new">New organization</Link>
+      </Button>
+    </EmptyStatePresentational>
   )
 }

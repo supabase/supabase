@@ -1,9 +1,11 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { literal } from '@supabase/pg-meta/src/pg-format'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
+import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueMessageDeleteVariables = {
   projectRef: string
@@ -18,10 +20,16 @@ export async function deleteDatabaseQueueMessage({
   queueName,
   messageId,
 }: DatabaseQueueMessageDeleteVariables) {
+  if (!isQueueNameValid(queueName)) {
+    throw new Error(
+      'Invalid queue name: must contain only alphanumeric characters, underscores, and hyphens'
+    )
+  }
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `SELECT * FROM pgmq.delete('${queueName}', ${messageId})`,
+    sql: `SELECT * FROM pgmq.delete(${literal(queueName)}, ${literal(messageId)})`,
     queryKey: databaseQueuesKeys.create(),
   })
 
@@ -35,7 +43,7 @@ export const useDatabaseQueueMessageDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     DatabaseQueueMessageDeleteData,
     ResponseError,
     DatabaseQueueMessageDeleteVariables
@@ -48,12 +56,13 @@ export const useDatabaseQueueMessageDeleteMutation = ({
     DatabaseQueueMessageDeleteData,
     ResponseError,
     DatabaseQueueMessageDeleteVariables
-  >((vars) => deleteDatabaseQueueMessage(vars), {
+  >({
+    mutationFn: (vars) => deleteDatabaseQueueMessage(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, queueName } = variables
-      await queryClient.invalidateQueries(
-        databaseQueuesKeys.getMessagesInfinite(projectRef, queueName)
-      )
+      await queryClient.invalidateQueries({
+        queryKey: databaseQueuesKeys.getMessagesInfinite(projectRef, queueName),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

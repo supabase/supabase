@@ -1,23 +1,22 @@
-import { Loader2 } from 'lucide-react'
+import dayjs from 'dayjs'
+import { List, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
-import { cn, WarningIcon } from 'ui'
+import { Card, cn, WarningIcon } from 'ui'
 
-import Panel from 'components/ui/Panel'
-import { ComposedChart } from './ComposedChart'
-
-import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
-import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
-import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
-import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
-import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useChartHighlight } from './useChartHighlight'
-
-import dayjs from 'dayjs'
-import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
+import type { ChartHighlightAction } from './ChartHighlightActions'
 import type { ChartData } from './Charts.types'
+import { ComposedChart } from './ComposedChart'
 import { MultiAttribute } from './ComposedChart.utils'
+import { useChartHighlight } from './useChartHighlight'
+import Panel from '@/components/ui/Panel'
+import { AnalyticsInterval, DataPoint } from '@/data/analytics/constants'
+import { useInfraMonitoringQueries } from '@/data/analytics/infra-monitoring-queries'
+import { InfraMonitoringAttribute } from '@/data/analytics/infra-monitoring-query'
+import { useProjectDailyStatsQueries } from '@/data/analytics/project-daily-stats-queries'
+import { ProjectDailyStatsAttribute } from '@/data/analytics/project-daily-stats-query'
+import type { UpdateDateRange } from '@/pages/project/[ref]/observability/database'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export interface ComposedChartHandlerProps {
   id?: string
@@ -25,11 +24,11 @@ export interface ComposedChartHandlerProps {
   attributes: MultiAttribute[]
   startDate: string
   endDate: string
-  interval: string
+  interval?: string
   customDateFormat?: string
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hideChartType?: boolean
-  data?: ChartData
+  data?: ChartData | DataPoint[]
   isLoading?: boolean
   format?: string
   highlightedValue?: string | number
@@ -38,6 +37,7 @@ export interface ComposedChartHandlerProps {
   showLegend?: boolean
   showTotal?: boolean
   showMaxValue?: boolean
+  normalizeVisibleStackToPercent?: boolean
   updateDateRange?: UpdateDateRange
   valuePrecision?: number
   isVisible?: boolean
@@ -133,12 +133,12 @@ const ComposedChartHandler = ({
     endDate,
     interval as AnalyticsInterval,
     databaseIdentifier,
-    data,
+    Array.isArray(data) ? undefined : data,
     isVisible
   )
 
   const combinedData = useMemo(() => {
-    if (data) return data
+    if (data) return Array.isArray(data) ? data : data.data
 
     const isLoading = attributeQueries.some((query: any) => query.isLoading)
     if (isLoading) return undefined
@@ -231,20 +231,33 @@ const ComposedChartHandler = ({
           : (firstData.data[firstData.data.length - 1] as any)?.[firstAttr.attribute]
   }, [highlightedValue, attributes, attributeQueries])
 
+  const highlightActions: ChartHighlightAction[] = useMemo(() => {
+    return [
+      {
+        id: 'open-logs',
+        label: 'Open in Postgres Logs',
+        icon: <List size={12} />,
+        onSelect: ({ start, end }) => {
+          const projectRef = ref as string
+          if (!projectRef) return
+          const url = `/project/${projectRef}/logs/postgres-logs?its=${start}&ite=${end}`
+          router.push(url)
+        },
+      },
+    ]
+  }, [ref])
+
   if (loading) {
     return (
-      <Panel
+      <Card
         className={cn(
           'flex min-h-[280px] w-full flex-col items-center justify-center gap-y-2',
           className
         )}
-        wrapWithLoading={false}
-        noMargin
-        noHideOverflow
       >
         <Loader2 size={18} className="animate-spin text-border-strong" />
         <p className="text-xs text-foreground-lighter">Loading data for {label}</p>
-      </Panel>
+      </Card>
     )
   }
 
@@ -288,6 +301,7 @@ const ComposedChartHandler = ({
           valuePrecision={valuePrecision}
           hideChartType={hideChartType}
           syncId={syncId}
+          highlightActions={highlightActions}
           {...otherProps}
         />
       </Panel.Content>
@@ -328,8 +342,6 @@ const useAttributeQueries = (
     ref,
     startDate,
     endDate,
-    interval,
-    databaseIdentifier,
     data,
     isVisible
   )

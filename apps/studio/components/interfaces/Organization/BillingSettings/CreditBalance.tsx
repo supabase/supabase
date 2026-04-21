@@ -1,29 +1,32 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { useParams } from 'common'
+
+import { CreditCodeRedemption } from './CreditCodeRedemption'
+import { CreditTopUp } from './CreditTopUp'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
-import NoPermission from 'components/ui/NoPermission'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { CreditTopUp } from './CreditTopUp'
+} from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import { FormPanel } from '@/components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
+import NoPermission from '@/components/ui/NoPermission'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 const CreditBalance = () => {
   const { slug } = useParams()
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
-    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
 
   const {
     data: subscription,
     error,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canReadSubscriptions })
@@ -53,7 +56,16 @@ const CreditBalance = () => {
         {isPermissionsLoaded && !canReadSubscriptions ? (
           <NoPermission resourceText="view this organization's credits" />
         ) : (
-          <FormPanel footer={<CreditTopUp slug={slug} />}>
+          <FormPanel
+            footer={
+              subscription?.billing_via_partner ? undefined : (
+                <div className="flex justify-end items-center py-4 px-8 gap-x-2">
+                  <CreditCodeRedemption slug={slug} />
+                  <CreditTopUp slug={slug} />
+                </div>
+              )
+            }
+          >
             <FormSection>
               <FormSectionContent fullWidth loading={isLoading}>
                 {isError && (

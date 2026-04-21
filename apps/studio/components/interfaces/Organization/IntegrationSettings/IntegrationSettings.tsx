@@ -1,10 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useRouter } from 'next/router'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
+import { GenericSkeletonLoader } from 'ui-patterns'
 
-import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
-import { Markdown } from 'components/interfaces/Markdown'
-import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
+import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
+import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
+import { EmptyIntegrationConnection } from '@/components/interfaces/Integrations/VercelGithub/IntegrationPanels'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { VercelSection } from '@/components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
 import {
   ScaffoldContainer,
   ScaffoldContainerLegacy,
@@ -13,24 +17,21 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
   ScaffoldTitle,
-} from 'components/layouts/Scaffold'
-import NoPermission from 'components/ui/NoPermission'
-import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
-import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH } from 'lib/constants'
+} from '@/components/layouts/Scaffold'
+import NoPermission from '@/components/ui/NoPermission'
+import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
+import { useGitHubConnectionDeleteMutation } from '@/data/integrations/github-connection-delete-mutation'
+import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH } from '@/lib/constants'
 import {
   GITHUB_INTEGRATION_INSTALLATION_URL,
   GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL,
-} from 'lib/github'
-import { useRouter } from 'next/router'
-import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
-import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
+} from '@/lib/github'
+import { useSidePanelsStateSnapshot } from '@/state/side-panels'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -42,21 +43,19 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   )
 }
 
-const IntegrationSettings = () => {
+export const IntegrationSettings = () => {
   const router = useRouter()
   const { data: org } = useSelectedOrganizationQuery()
 
   const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
 
-  const canReadGithubConnection = useCheckPermissions(
-    PermissionAction.READ,
-    'integrations.github_connections'
-  )
-  const canCreateGitHubConnection = useCheckPermissions(
+  const { can: canReadGithubConnection, isLoading: isLoadingPermissions } =
+    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.github_connections')
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'integrations.github_connections'
   )
-  const canUpdateGitHubConnection = useCheckPermissions(
+  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'integrations.github_connections'
   )
@@ -121,7 +120,9 @@ The GitHub app will watch for changes in your repository such as file changes, b
           <IntegrationImageHandler title="github" />
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadGithubConnection ? (
+          {isLoadingPermissions ? (
+            <GenericSkeletonLoader />
+          ) : !canReadGithubConnection ? (
             <NoPermission resourceText="view this organization's GitHub connections" />
           ) : (
             <>
@@ -192,5 +193,3 @@ The GitHub app will watch for changes in your repository such as file changes, b
     </>
   )
 }
-
-export default IntegrationSettings

@@ -1,6 +1,6 @@
 import { X } from 'lucide-react'
-
 import { Button } from 'ui'
+
 import type { DataTableFilterField } from '../DataTable.types'
 import { useDataTable } from '../providers/DataTableProvider'
 
@@ -24,7 +24,7 @@ export function DataTableFilterResetButton<TData>({ value: _value }: DataTableFi
       }}
       onKeyDown={(e) => {
         e.stopPropagation()
-        if (e.code === 'Enter') {
+        if (e.code === 'Enter' || e.code === 'NumpadEnter') {
           column?.setFilterValue(undefined)
         }
       }}

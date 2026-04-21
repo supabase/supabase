@@ -1,11 +1,11 @@
-import Link from 'next/link'
-import { PropsWithChildren, ReactNode, forwardRef } from 'react'
-import { LoadingLine, cn } from 'ui'
-
-import { withAuth } from 'hooks/misc/withAuth'
-import { BASE_PATH } from 'lib/constants'
-import { ScaffoldContainer } from '../Scaffold'
 import { Book, LifeBuoy, X } from 'lucide-react'
+import Link from 'next/link'
+import { forwardRef, PropsWithChildren, ReactNode } from 'react'
+import { cn, LoadingLine } from 'ui'
+
+import { ScaffoldContainer } from '../Scaffold'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { BASE_PATH } from '@/lib/constants'
 
 export type IntegrationWindowLayoutProps = {
   title: string
@@ -87,7 +87,7 @@ const Header = ({ title, integrationIcon }: HeaderProps) => {
 const maxWidthClasses = 'mx-auto w-full max-w-[1600px]'
 const paddingClasses = 'px-6 lg:px-14 xl:px-28 2xl:px-32'
 
-const IntegrationScaffoldContainer = forwardRef<
+export const IntegrationScaffoldContainer = forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
@@ -95,5 +95,3 @@ const IntegrationScaffoldContainer = forwardRef<
 })
 
 IntegrationScaffoldContainer.displayName = 'IntegrationScaffoldContainer'
-
-export { IntegrationScaffoldContainer }

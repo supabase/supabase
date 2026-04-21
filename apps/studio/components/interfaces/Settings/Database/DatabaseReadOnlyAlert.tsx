@@ -2,19 +2,21 @@ import { useParams } from 'common'
 import { AlertTriangle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ConfirmDisableReadOnlyModeModal from './DatabaseSettings/ConfirmDisableReadOnlyModal'
+import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 export const DatabaseReadOnlyAlert = () => {
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  const { data: resourceWarnings } = useResourceWarningsQuery()
-
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
+  // [Joshen Cleanup] JFYI this can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
+  // No longer need to filter by ref on the client side
   const isReadOnlyMode =
     (resourceWarnings ?? [])?.find((warning) => warning.project === projectRef)
       ?.is_readonly_mode_enabled ?? false
@@ -62,7 +64,7 @@ export const DatabaseReadOnlyAlert = () => {
             </Button>
             <Button asChild type="default" icon={<ExternalLink />}>
               <a
-                href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
+                href={`${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`}
                 target="_blank"
                 rel="noreferrer"
               >

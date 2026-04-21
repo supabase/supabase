@@ -63,6 +63,9 @@ typings/
 # TypeScript cache
 *.tsbuildinfo
 
+# Next.js declaration files (auto-generated)
+next-env.d.ts
+
 # Optional npm cache directory
 .npm
 
@@ -113,6 +116,15 @@ typings/
 .idea
 .vercel
 
+# AI assistant local files
+.claude/*
+!.claude/settings.json
+!.claude/scripts/
+!.claude/skills/
+.claude/skills/me-*
+CLAUDE.md
+!.claude/CLAUDE.md
+
 #include template .env file for docker-compose
 !docker/.env
 !docker/supabase/.env
@@ -143,3 +155,14 @@ gcloud.json
 **/.sentryclirc
 
 keys.json
+
+# Playwright MCP
+.playwright-mcp/*
+
+# Application
+**/.superset/**
+
+# examples
+examples/**/package-lock.json
+examples/**/yarn.lock
+examples/**/pnpm-lock.yaml

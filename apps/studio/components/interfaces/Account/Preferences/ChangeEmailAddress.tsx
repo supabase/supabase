@@ -3,10 +3,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { InlineLink } from 'components/ui/InlineLink'
-import { useEmailUpdateMutation } from 'data/profile/profile-update-email-mutation'
 import {
   Button,
   DialogFooter,
@@ -17,6 +13,10 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useEmailUpdateMutation } from '@/data/profile/profile-update-email-mutation'
 
 export const GitHubChangeEmailAddress = () => {
   return (
@@ -66,7 +66,7 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
     defaultValues: { email: '' },
   })
 
-  const { mutate: updateEmail, isLoading } = useEmailUpdateMutation({
+  const { mutate: updateEmail, isPending } = useEmailUpdateMutation({
     onSuccess: (_, vars) => {
       toast.success(
         `A confirmation email has been sent to ${vars.email}. Please confirm the change within 10 minutes.`
@@ -121,10 +121,10 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
         </DialogSection>
 
         <DialogFooter>
-          <Button type="default" disabled={isLoading} onClick={onClose}>
+          <Button type="default" disabled={isPending} onClick={onClose}>
             Cancel
           </Button>
-          <Button htmlType="submit" loading={isLoading} disabled={isLoading}>
+          <Button htmlType="submit" loading={isPending} disabled={isPending}>
             Confirm
           </Button>
         </DialogFooter>

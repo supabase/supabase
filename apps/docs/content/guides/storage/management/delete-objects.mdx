@@ -26,6 +26,12 @@ const supabase = createClient('your_project_url', 'your_supabase_api_key')
 await supabase.storage.from('bucket').remove(['object-path-2', 'folder/avatar2.png'])
 ```
 
+<Admonition type="note">
+
+When deleting objects, there is a limit of 1000 objects at a time using the `remove` method.
+
+</Admonition>
+
 ## RLS
 
 To delete an object, the user must have the `delete` permission on the object. For example:

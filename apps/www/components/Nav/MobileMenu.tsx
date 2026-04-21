@@ -1,23 +1,20 @@
-import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Dispatch, SetStateAction } from 'react'
-
-import { Accordion, Button, TextLink } from 'ui'
-import { DEFAULT_EASE } from '~/lib/animations'
-import MenuItem from './MenuItem'
+'use client'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
-import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import SupabaseWordmark from './SupabaseWordmark'
+import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
-import { useKey } from 'react-use'
-import staticContent from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
-import ProductModulesData from '~/data/ProductModules'
+import Link from 'next/link'
+import { useEffect } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import { Accordion, Button } from 'ui'
+import { TextLink } from 'ui-patterns/TextLink'
 
-import { useSendTelemetryEvent } from '~/lib/telemetry'
-
-const { jobsCount } = staticContent
+import MenuItem from './MenuItem'
+import staticContent from '@/.generated/staticContent/_index.json'
+import ProductModulesData from '@/data/ProductModules'
+import { DEFAULT_EASE } from '@/lib/animations'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 interface Props {
   open: boolean
@@ -29,6 +26,8 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const { jobsCount } = staticContent
+
   const container = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { duration: 0.15, staggerChildren: 0.05, ease: DEFAULT_EASE } },
@@ -41,7 +40,15 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
     exit: { opacity: 0, transition: { duration: 0.05 } },
   }
 
-  useKey('Escape', () => setOpen(false))
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [setOpen])
 
   const AccordionMenuItem = ({ menuItem }: any) => (
     <>
@@ -210,22 +217,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                 as="/"
                 className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
               >
-                <Image
-                  src={supabaseLogoWordmarkLight}
-                  width={124}
-                  height={24}
-                  alt="Supabase Logo"
-                  className="dark:hidden"
-                  priority
-                />
-                <Image
-                  src={supabaseLogoWordmarkDark}
-                  width={124}
-                  height={24}
-                  alt="Supabase Logo"
-                  className="hidden dark:block"
-                  priority
-                />
+                <SupabaseWordmark />
               </Link>
               <button
                 onClick={() => setOpen(false)}
@@ -284,7 +276,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                         </Button>
                       </Link>
                       <Link
-                        href="https://supabase.com/dashboard"
+                        href="https://supabase.com/dashboard/sign-up"
                         passHref
                         legacyBehavior
                         onClick={() =>

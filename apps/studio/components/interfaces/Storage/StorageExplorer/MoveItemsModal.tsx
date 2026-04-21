@@ -1,7 +1,7 @@
 import { noop } from 'lodash'
 import { useEffect, useState } from 'react'
-
 import { Button, Input, Modal } from 'ui'
+
 import { StorageItemWithColumn } from '../Storage.types'
 
 interface MoveItemsModalProps {
@@ -12,7 +12,7 @@ interface MoveItemsModalProps {
   onSelectMove: (path: string) => void
 }
 
-const MoveItemsModal = ({
+export const MoveItemsModal = ({
   bucketName = '',
   visible = false,
   selectedItemsToMove = [],
@@ -87,5 +87,3 @@ const MoveItemsModal = ({
     </Modal>
   )
 }
-
-export default MoveItemsModal

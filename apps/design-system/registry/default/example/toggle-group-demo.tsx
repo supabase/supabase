@@ -1,5 +1,4 @@
 import { Bold, Italic, Underline } from 'lucide-react'
-
 import { ToggleGroup, ToggleGroupItem } from 'ui'
 
 export default function ToggleGroupDemo() {

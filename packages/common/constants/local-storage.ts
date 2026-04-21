@@ -6,15 +6,25 @@ export const LOCAL_STORAGE_KEYS = {
     `supabase-ai-assistant-state-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
   EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
+  PROJECTS_VIEW: 'projects-view',
+  PROJECTS_FILTER: 'projects-filter',
+  PROJECTS_SORT: 'projects-sort',
+  FEEDBACK_WIDGET_CONTENT: 'feedback-widget-content',
+  FEEDBACK_WIDGET_SCREENSHOT: 'feedback-widget-screenshot',
+  INCIDENT_BANNER_DISMISSED_IDS: 'incident-banner-dismissed-ids',
+  MAINTENANCE_BANNER_DISMISSED: (id: string) => `maintenance-banner-dismissed-${id}`,
+  DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
 
-  UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_PREVIEW_UNIFIED_LOGS: 'supabase-ui-preview-unified-logs',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
-  UI_PREVIEW_REALTIME_SETTINGS: 'supabase-ui-realtime-settings',
-  UI_PREVIEW_BRANCHING_2_0: 'supabase-ui-branching-2-0',
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
+  UI_PREVIEW_QUEUE_OPERATIONS: 'supabase-ui-queue-operations',
+  UI_PREVIEW_PG_DELTA_DIFF: 'supabase-ui-pg-delta-diff',
+  UI_PREVIEW_FLOATING_MOBILE_TOOLBAR: 'supabase-ui-floating-mobile-toolbar',
+  UI_PREVIEW_PLATFORM_WEBHOOKS: 'supabase-ui-platform-webhooks',
+  UI_PREVIEW_JIT_DB_ACCESS: 'supabase-ui-jit-db-access',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
@@ -22,6 +32,12 @@ export const LOCAL_STORAGE_KEYS = {
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
   STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
+
+  AUTH_USERS_FILTER: (ref: string) => `auth-users-filter-${ref}`,
+  AUTH_USERS_SORT_BY_VALUE: (ref: string) => `auth-users-sort-by-value-${ref}`,
+  AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
+  AUTH_USERS_IMPROVED_SEARCH_DISMISSED: (ref: string) =>
+    `auth-users-improved-search-dismissed-${ref}`,
 
   SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
   SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
@@ -38,6 +54,7 @@ export const LOCAL_STORAGE_KEYS = {
   CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
   CLS_SELECT_STAR_WARNING: 'cls-select-star-warning-dismissed',
   QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',
+  LINTER_SHOW_FOOTER: 'supabase-linter-show-footer',
   // Key to track account deletion requests
   ACCOUNT_DELETION_REQUEST: 'supabase-account-deletion-request',
   // Used for storing a user id when sending reports to Sentry. The id is hashed for anonymity.
@@ -55,12 +72,16 @@ export const LOCAL_STORAGE_KEYS = {
   // Notice banner keys
   FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
-  MIDDLEWARE_OUTAGE_BANNER: 'middleware-outage-banner-2025-05-16',
-  AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
+  MAINTENANCE_WINDOW_BANNER: 'maintenance-window-banner-2026-01-16',
   REPORT_DATERANGE: 'supabase-report-daterange',
+  PROJECT_PAUSING_STARTED_AT: (ref: string) => `supabase-project-pausing-started-at-${ref}`,
+  PROJECT_RESTORING_STARTED_AT: (ref: string) => `supabase-project-restoring-started-at-${ref}`,
 
   // api keys view switcher for new and legacy api keys
   API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
+
+  // Shortcut preferences
+  SHORTCUT_STORAGE_KEY: 'supabase-shortcut-preferences',
 
   LAST_VISITED_ORGANIZATION: 'last-visited-organization',
 
@@ -68,12 +89,33 @@ export const LOCAL_STORAGE_KEYS = {
   USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>
     `user-impersonation-selector-previous-searches-${ref}`,
 
+  LAST_OPENED_SIDE_BAR: (ref: string) => `last-opened-sidebar-${ref}`,
+
+  // Index Advisor notice dismissed
+  INDEX_ADVISOR_NOTICE_DISMISSED: (ref: string) => `index-advisor-notice-dismissed-${ref}`,
+
+  // RLS event trigger banner dismissed
+  RLS_EVENT_TRIGGER_BANNER_DISMISSED: (ref: string) => `rls-event-trigger-banner-dismissed-${ref}`,
+
+  // Observability banner dismissed
+  OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
+
+  // Tax ID banner dismissed
+  TAX_ID_BANNER_DISMISSED: (slug: string) => `tax-id-banner-dismissed-${slug}`,
+
+  TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED: (ref: string) =>
+    `table-editor-queue-operations-banner-dismissed-${ref}`,
+  FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
+    `free-micro-upgrade-banner-dismissed-${ref}`,
+  STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
+    `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
+  PRIVACY_NOTICE_ACKNOWLEDGED: 'privacy-notice-acknowledged-2026-03',
+
   /**
    * COMMON
    */
   /** @deprecated – we're using usercentrics instead to handle telemetry consent */
   TELEMETRY_CONSENT: 'supabase-consent-ph',
-  TELEMETRY_DATA: 'supabase-telemetry-data',
 
   /**
    * DOCS
@@ -99,16 +141,18 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   'supabase.dashboard.auth.debug',
   'supabase.dashboard.auth.navigatorLock.disabled',
   LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT,
-  LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
-  LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS,
-  LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
+  LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
+  LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
 ]
 
 export function clearLocalStorage() {

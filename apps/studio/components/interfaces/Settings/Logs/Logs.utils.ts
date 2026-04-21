@@ -1,15 +1,15 @@
 import { useMonaco } from '@monaco-editor/react'
+import { IS_PLATFORM } from 'common'
 import dayjs, { Dayjs } from 'dayjs'
-import { get, isEqual } from 'lodash'
+import { get } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
+import logConstants from 'shared-data/log-constants'
 
-import { IS_PLATFORM } from 'common'
-import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
-import type { PlanId } from 'data/subscriptions/types'
-import logConstants from 'shared-data/logConstants'
 import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
-import type { Filters, LogData, LogsEndpointParams } from './Logs.types'
+import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
+import BackwardIterator from '@/components/ui/CodeEditor/Providers/BackwardIterator'
+import type { PlanId } from '@/data/subscriptions/types'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -77,6 +77,7 @@ const getDotKeys = (obj: { [k: string]: unknown }, parent?: string): string[] =>
 const genWhereStatement = (table: LogsTableName, filters: Filters) => {
   const keys = Object.keys(filters)
   const filterTemplates = SQL_FILTER_TEMPLATES[table]
+
   const _resolveTemplateToStatement = (dotKey: string): string | null => {
     const template = filterTemplates[dotKey]
     const value = get(filters, dotKey)
@@ -142,7 +143,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: n
 
   switch (table) {
     case 'edge_logs':
-      if (IS_PLATFORM === false) {
+      if (!IS_PLATFORM) {
         return `
 -- local dev edge_logs query
 select id, edge_logs.timestamp, event_message, request.method, request.path, request.search, response.status_code
@@ -162,7 +163,7 @@ limit ${limit};
   `
 
     case 'postgres_logs':
-      if (IS_PLATFORM === false) {
+      if (!IS_PLATFORM) {
         return `
 select postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint
 from postgres_logs
@@ -180,7 +181,7 @@ limit ${limit}
   `
 
     case 'function_logs':
-      return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.level from ${table}
+      return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.execution_id, metadata.level from ${table}
   ${joins}
   ${where}
   ${orderBy}
@@ -196,7 +197,15 @@ limit ${limit}
     `
 
     case 'function_edge_logs':
-      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
+      if (!IS_PLATFORM) {
+        return `
+select id, function_edge_logs.timestamp, event_message
+from function_edge_logs
+${orderBy}
+limit ${limit}
+`
+      }
+      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, request.pathname, m.function_id, m.execution_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   ${joins}
   ${where}
   ${orderBy}
@@ -216,14 +225,11 @@ limit ${limit}
   `
 
     case 'pg_cron_logs':
-      const baseWhere = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+      const pgCronWhere = where ? `${basePgCronWhere} AND ${where.substring(6)}` : basePgCronWhere
 
-      const pgCronWhere = where ? `${baseWhere} AND ${where.substring(6)}` : baseWhere
-
-      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.query
+      return `select id, postgres_logs.timestamp, event_message, parsed.error_severity, parsed.query
 from postgres_logs
-  cross join unnest(metadata) as m
-  cross join unnest(m.parsed) as parsed
+${joins}
 ${pgCronWhere}
 ${orderBy}
 limit ${limit}
@@ -242,6 +248,7 @@ const genCrossJoinUnnests = (table: LogsTableName) => {
   cross join unnest(m.request) as request
   cross join unnest(m.response) as response`
 
+    case 'pg_cron_logs':
     case 'postgres_logs':
       return `cross join unnest(metadata) as m
   cross join unnest(m.parsed) as parsed`
@@ -274,30 +281,36 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
 /**
  * Determine if we should show the user an upgrade prompt while browsing logs
  */
-export const maybeShowUpgradePrompt = (from: string | null | undefined, planId?: PlanId) => {
+export const maybeShowUpgradePromptIfNotEntitled = (
+  from: string | null | undefined,
+  entitledToDays: number | undefined
+) => {
+  if (!entitledToDays) return false
   const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
-
-  return (
-    (day > 1 && planId === 'free') ||
-    (day > 7 && planId === 'pro') ||
-    (day > 28 && planId === 'team') ||
-    (day > 90 && planId === 'enterprise')
-  )
+  return day > entitledToDays
 }
 
 export const genCountQuery = (table: LogsTableName, filters: Filters): string => {
-  const where = genWhereStatement(table, filters)
+  let where = genWhereStatement(table, filters)
+  // pg_cron logs are a subset of postgres logs
+  // to calculate the chart, we need to query postgres logs
+  if (table === LogsTableName.PG_CRON) {
+    table = LogsTableName.POSTGRES
+    where = basePgCronWhere
+  }
   const joins = genCrossJoinUnnests(table)
   return `SELECT count(*) as count FROM ${table} ${joins} ${where}`
 }
 
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
-const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] => {
+const calcChartStart = (
+  params: Partial<LogsEndpointParams>
+): [Dayjs, 'minute' | 'hour' | 'day'] => {
   const ite = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
   // todo @TzeYiing needs typing
   const its: any = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
 
-  let trunc = 'minute'
+  let trunc: 'minute' | 'hour' | 'day' = 'minute'
   let extendValue = 60 * 6
   const minuteDiff = ite.diff(its, 'minute')
   const hourDiff = ite.diff(its, 'hour')
@@ -308,11 +321,13 @@ const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] =>
     trunc = 'day'
     extendValue = 7
   }
-  //
-  // @ts-ignore
   return [its.add(-extendValue, trunc), trunc]
 }
 
+// TODO(qiao): workaround for self-hosted cron logs error until logflare is fixed
+const basePgCronWhere = IS_PLATFORM
+  ? `where ( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
+  : `where ( parsed.application_name = 'pg_cron' or event_message::text LIKE '%cron job%' )`
 /**
  *
  * generates log event chart query
@@ -331,7 +346,7 @@ export const genChartQuery = (
   // to calculate the chart, we need to query postgres logs
   if (table === LogsTableName.PG_CRON) {
     table = LogsTableName.POSTGRES
-    where = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+    where = basePgCronWhere
   }
 
   let joins = genCrossJoinUnnests(table)
@@ -640,7 +655,7 @@ function getErrorCondition(table: LogsTableName): string {
     case 'postgres_logs':
       return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
     case 'auth_logs':
-      return "metadata.level = 'error' OR metadata.status >= 400"
+      return "metadata.level = 'error' OR SAFE_CAST(metadata.status AS INT64) >= 400"
     case 'function_edge_logs':
       return 'response.status_code >= 500'
     case 'function_logs':
@@ -725,4 +740,102 @@ export function role(metadata: any) {
   }
 
   return payload.role
+}
+
+export function formatLogsAsJson(rows: LogData[]): string {
+  return JSON.stringify(rows, null, 2)
+}
+
+export function formatLogsAsMarkdown(rows: LogData[]): string {
+  return rows
+    .map((row, i) => {
+      const lines: string[] = [`## Log ${i + 1}`]
+      if (row.timestamp) {
+        const numTs = Number(row.timestamp)
+        let tsString: string
+        if (isFinite(numTs)) {
+          tsString = new Date(numTs / 1000).toISOString()
+        } else if (typeof row.timestamp === 'string') {
+          const d = new Date(row.timestamp)
+          tsString = isNaN(d.getTime()) ? row.timestamp : d.toISOString()
+        } else {
+          tsString = String(row.timestamp)
+        }
+        lines.push(`**Timestamp:** ${tsString}`)
+      }
+      if (row.event_message) {
+        lines.push(`**Message:** ${row.event_message}`)
+      }
+      const { id: _id, timestamp: _ts, event_message: _msg, ...rest } = row as any
+      if (Object.keys(rest).length > 0) {
+        lines.push('', '**Details:**', '```json', JSON.stringify(rest, null, 2), '```')
+      }
+      return lines.join('\n')
+    })
+    .join('\n\n---\n\n')
+}
+
+const QUERY_TYPE_LABELS: Record<QueryType, string> = {
+  api: 'API Gateway (Edge Network)',
+  database: 'Postgres Database',
+  functions: 'Edge Functions',
+  fn_edge: 'Edge Functions (edge runtime)',
+  auth: 'Auth',
+  realtime: 'Realtime',
+  storage: 'Storage',
+  supavisor: 'Supavisor (connection pooling)',
+  postgrest: 'PostgREST',
+  pg_upgrade: 'Postgres upgrade',
+  pg_cron: 'pg_cron',
+  pgbouncer: 'PgBouncer',
+  etl: 'ETL',
+}
+
+const LOG_TABLE_TO_SERVICE_LABEL: Record<LogsTableName, string> = {
+  edge_logs: 'API Gateway (Edge Network)',
+  postgres_logs: 'Postgres Database',
+  function_logs: 'Edge Functions',
+  function_edge_logs: 'Edge Functions (edge runtime)',
+  auth_logs: 'Auth',
+  auth_audit_logs: 'Auth (audit)',
+  realtime_logs: 'Realtime',
+  storage_logs: 'Storage',
+  postgrest_logs: 'PostgREST',
+  supavisor_logs: 'Supavisor (connection pooling)',
+  pgbouncer_logs: 'PgBouncer',
+  pg_upgrade_logs: 'Postgres upgrade',
+  pg_cron_logs: 'pg_cron',
+  etl_replication_logs: 'ETL',
+}
+
+const isLogsTableName = (value: string): value is LogsTableName =>
+  value in LOG_TABLE_TO_SERVICE_LABEL
+const isQueryType = (value: string): value is QueryType => value in QUERY_TYPE_LABELS
+
+export function extractEdgeFunctionName(pathname: unknown): string {
+  if (typeof pathname !== 'string' || !pathname) return ''
+  const parts = pathname.split('/').filter(Boolean)
+  return parts[parts.length - 1] ?? ''
+}
+
+function extractServiceLabelFromSql(sql: string): string | null {
+  const match = sql.match(/\bfrom\s+(\w+)/i)
+  const tableName = match?.[1]
+  return tableName && isLogsTableName(tableName) ? LOG_TABLE_TO_SERVICE_LABEL[tableName] : null
+}
+
+export function buildLogsPrompt(rows: LogData[], queryType?: string, sqlQuery?: string): string {
+  const serviceLabel =
+    (queryType && isQueryType(queryType) ? QUERY_TYPE_LABELS[queryType] : null) ??
+    (sqlQuery ? extractServiceLabelFromSql(sqlQuery) : null)
+  const serviceContext = serviceLabel ? ` from the **${serviceLabel}** service` : ''
+  const sqlContext = sqlQuery ? `\n\n**Query used:**\n\`\`\`sql\n${sqlQuery.trim()}\n\`\`\`` : ''
+  const header = `I have ${rows.length} Supabase log entr${rows.length === 1 ? 'y' : 'ies'}${serviceContext} I'd like help debugging:\n\n`
+  const body = formatLogsAsMarkdown(rows)
+  return (
+    header +
+    body +
+    sqlContext +
+    '\n\nWhat do these logs indicate? What steps can I take to resolve it? Keep your answer very concise and actionable. Max 2 or 3 bullet points.'
+  )
 }

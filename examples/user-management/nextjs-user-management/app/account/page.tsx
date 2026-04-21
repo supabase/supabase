@@ -1,12 +1,10 @@
 import AccountForm from './account-form'
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 
 export default async function Account() {
-    const supabase = await createClient()
+  const supabase = await createClient()
 
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
+  const { data: claimsData } = await supabase.auth.getClaims()
 
-    return <AccountForm user={user} />
+  return <AccountForm claims={claimsData?.claims ?? null} />
 }

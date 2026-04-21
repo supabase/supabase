@@ -1,28 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Form, FormControl, FormField } from '@ui/components/shadcn/ui/form'
+import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { Form, FormControl, FormField } from '@ui/components/shadcn/ui/form'
-import { useParams } from 'common'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { FormActions } from 'components/ui/Forms/FormActions'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
-import NoPermission from 'components/ui/NoPermission'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
-import {
-  useAsyncCheckProjectPermissions,
-  useCheckPermissions,
-} from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { FormMessage_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -32,6 +14,21 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
+import { z } from 'zod'
+
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from '@/components/layouts/Scaffold'
+import { FormActions } from '@/components/ui/Forms/FormActions'
+import { FormPanel } from '@/components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
+import NoPermission from '@/components/ui/NoPermission'
+import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import { useOrganizationUpdateMutation } from '@/data/organizations/organization-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const FORM_ID = 'org-billing-email'
 const formSchema = z.object({
@@ -45,11 +42,16 @@ const BillingEmail = () => {
 
   const { name, billing_email } = selectedOrganization ?? {}
 
-  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const { isSuccess: isPermissionsLoaded, can: canReadBillingEmail } =
-    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
+  const { can: canReadBillingEmail, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'organizations'
+  )
 
-  const { data: billingCustomer, isLoading: loadingBillingCustomer } =
+  const { data: billingCustomer, isPending: loadingBillingCustomer } =
     useOrganizationCustomerProfileQuery({ slug }, { enabled: canReadBillingEmail })
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -63,7 +65,7 @@ const BillingEmail = () => {
   const { errors } = form.formState
   const additionalEmailsError = errors.additionalBillingEmails ?? []
 
-  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
+  const { mutate: updateOrganization, isPending: isUpdating } = useOrganizationUpdateMutation()
 
   const onUpdateOrganizationEmail = async (values: z.infer<typeof formSchema>) => {
     if (!canUpdateOrganization) {
@@ -131,7 +133,7 @@ const BillingEmail = () => {
                   </div>
                 }
               >
-                <FormSection>
+                <FormSection className="!px-8">
                   <FormSectionContent fullWidth loading={loadingBillingCustomer}>
                     <FormField
                       control={form.control}

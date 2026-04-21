@@ -1,5 +1,10 @@
 'use client'
 
+import { Check, ChevronsUpDown, Logs, Terminal } from 'lucide-react'
+import { useMemo, useState } from 'react'
+
+import { genDefaultQuery, LogsTableName } from '../../lib/logs'
+import { cn } from '@/lib/utils'
 import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -26,17 +31,13 @@ import {
   TableRow,
 } from '@/registry/default/components/ui/table'
 import { useGetLogs } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-logs'
-import { LogsTableName, genDefaultQuery } from '../../lib/logs'
-import { cn } from '@/lib/utils'
-import { Check, ChevronsUpDown, Logs, Terminal } from 'lucide-react'
-import { useMemo, useState } from 'react'
 
 // Define log types with names and descriptions
 const logTypes = [
   {
     value: LogsTableName.FN_EDGE,
     label: 'Function Edge Logs',
-    description: 'Edge function execution logs with request/response data',
+    description: 'Edge function execution logs with request and response metadata',
   },
   {
     value: LogsTableName.AUTH,
@@ -66,7 +67,7 @@ const logTypes = [
   {
     value: LogsTableName.EDGE,
     label: 'Edge Logs',
-    description: 'HTTP requests and responses from Edge Functions',
+    description: 'HTTP requests and responses from the data API',
   },
 
   {
@@ -88,11 +89,6 @@ const logTypes = [
     value: LogsTableName.PGBOUNCER,
     label: 'PgBouncer Logs',
     description: 'Legacy connection pooling logs',
-  },
-  {
-    value: LogsTableName.WAREHOUSE,
-    label: 'Warehouse Logs',
-    description: 'Data warehouse operations and analytics',
   },
   {
     value: LogsTableName.PG_UPGRADE,

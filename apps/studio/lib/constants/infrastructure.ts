@@ -1,8 +1,8 @@
 import type { CloudProvider } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 
-import type { components } from 'data/api'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import type { components } from '@/data/api'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 
 export const AWS_REGIONS_DEFAULT =
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
@@ -118,11 +118,11 @@ export const PASSWORD_STRENGTH_COLOR = {
 }
 
 export const PASSWORD_STRENGTH_PERCENTAGE = {
-  0: '10%',
-  1: '30%',
-  2: '50%',
-  3: '80%',
-  4: '100%',
+  0: 10,
+  1: 30,
+  2: 50,
+  3: 80,
+  4: 100,
 }
 
 export const DEFAULT_PROJECT_API_SERVICE_ID = 1

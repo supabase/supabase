@@ -1,5 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
+import { Plus } from 'lucide-react'
+import { useParams } from 'next/navigation'
+import { parseAsString, useQueryState } from 'nuqs'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   Button,
@@ -12,16 +14,15 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
-import { useParams } from 'next/navigation'
+import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
 
 const FORM_ID = 'create-publishable-api-key'
 const SCHEMA = z.object({
@@ -33,15 +34,18 @@ export interface CreatePublishableAPIKeyDialogProps {
   projectRef: string
 }
 
-function CreatePublishableAPIKeyDialog() {
+export const CreatePublishableAPIKeyDialog = () => {
   const params = useParams()
   const projectRef = params?.ref as string
 
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useQueryState('new', parseAsString.withDefault(''))
 
-  const onClose = (value: boolean) => {
-    setVisible(value)
+  const onOpenChange = (value: boolean) => {
+    if (value) setVisible('publishable')
+    else setVisible('')
   }
+
+  const defaultValues = { name: '', description: '' }
 
   const form = useForm<z.infer<typeof SCHEMA>>({
     resolver: zodResolver(SCHEMA),
@@ -51,7 +55,7 @@ function CreatePublishableAPIKeyDialog() {
     },
   })
 
-  const { mutate: createAPIKey, isLoading: isCreatingAPIKey } = useAPIKeyCreateMutation()
+  const { mutate: createAPIKey, isPending: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
     createAPIKey(
@@ -63,17 +67,18 @@ function CreatePublishableAPIKeyDialog() {
       },
       {
         onSuccess: () => {
-          onClose(false)
+          form.reset(defaultValues)
+          onOpenChange(false)
         },
       }
     )
   }
 
   return (
-    <Dialog open={visible} onOpenChange={onClose}>
+    <Dialog open={visible === 'publishable'} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button type="default" className="pointer-events-auto">
-          Create new
+        <Button type="default" icon={<Plus />}>
+          New publishable key
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -135,5 +140,3 @@ function CreatePublishableAPIKeyDialog() {
     </Dialog>
   )
 }
-
-export default CreatePublishableAPIKeyDialog

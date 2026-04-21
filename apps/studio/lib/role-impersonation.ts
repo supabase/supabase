@@ -1,6 +1,8 @@
-import type { User } from 'data/auth/users-infinite-query'
-import { RoleImpersonationState as ValtioRoleImpersonationState } from 'state/role-impersonation-state'
+import { getImpersonationSQL } from '@supabase/pg-meta'
+
 import { uuidv4 } from './helpers'
+import type { User } from '@/data/auth/users-infinite-query'
+import { RoleImpersonationState as ValtioRoleImpersonationState } from '@/state/role-impersonation-state'
 
 type PostgrestImpersonationRole =
   | {
@@ -31,7 +33,7 @@ type PostgrestImpersonationRole =
 
 export type PostgrestRole = PostgrestImpersonationRole['role']
 
-export type CustomImpersonationRole = {
+type CustomImpersonationRole = {
   type: 'custom'
   role: string
 }
@@ -92,56 +94,17 @@ export function getPostgrestClaims(projectRef: string, role: PostgrestImpersonat
   }
 }
 
-function getPostgrestRoleImpersonationSql(
-  role: PostgrestImpersonationRole,
-  claims: ReturnType<typeof getPostgrestClaims>
-) {
-  const unexpiredClaims = { ...claims, exp: getExp1HourFromNow() }
-
-  return `
-select set_config('role', '${role.role}', true),
-set_config('request.jwt.claims', '${JSON.stringify(unexpiredClaims).replaceAll("'", "''")}', true),
-set_config('request.method', 'POST', true),
-set_config('request.path', '/impersonation-example-request-path', true),
-set_config('request.headers', '{"accept": "*/*"}', true);
-  `.trim()
-}
-
-// Includes getPostgrestRoleImpersonationSql() and wrapWithRoleImpersonation()
-export const ROLE_IMPERSONATION_SQL_LINE_COUNT = 11
-export const ROLE_IMPERSONATION_NO_RESULTS = 'ROLE_IMPERSONATION_NO_RESULTS'
-
-function getCustomRoleImpersonationSql(roleName: string) {
-  return /* SQL */ `
-    set local role '${roleName}';
-  `.trim()
-}
-
 export type RoleImpersonationState = Pick<ValtioRoleImpersonationState, 'role' | 'claims'>
 
 export function wrapWithRoleImpersonation(sql: string, state?: RoleImpersonationState) {
   const { role, claims } = state ?? { role: undefined, claims: undefined }
 
-  if (role === undefined) {
-    return sql
-  }
+  if (role === undefined) return sql
 
-  const impersonationSql =
-    role.type === 'postgrest'
-      ? claims !== undefined
-        ? getPostgrestRoleImpersonationSql(role, claims)
-        : ''
-      : getCustomRoleImpersonationSql(role.role)
-
-  return /* SQL */ `
-    ${impersonationSql}
-
-    -- If the users sql returns no rows, pg-meta will
-    -- fallback to returning the result of the impersonation sql.
-    select 1 as "${ROLE_IMPERSONATION_NO_RESULTS}";
-
-    ${sql}
-  `.trim()
+  const unexpiredClaims =
+    claims !== undefined ? { ...claims, exp: getExp1HourFromNow() } : undefined
+  const impersonationSql = getImpersonationSQL({ role: role, unexpiredClaims, sql })
+  return impersonationSql
 }
 
 function encodeText(data: string) {

@@ -1,37 +1,37 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { useBackupsQuery } from 'data/database/backups-query'
-import { usePitrRestoreMutation } from 'data/database/pitr-restore-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { PROJECT_STATUS } from 'lib/constants'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Modal,
   WarningIcon,
 } from 'ui'
+
 import { BackupsEmpty } from '../BackupsEmpty'
 import { BackupsStorageAlert } from '../BackupsStorageAlert'
 import type { Timezone } from './PITR.types'
 import { getClientTimezone } from './PITR.utils'
+import { PITRForm } from './PITRForm'
 import PITRStatus from './PITRStatus'
-import { PITRForm } from './pitr-form'
+import { FormHeader } from '@/components/ui/Forms/FormHeader'
+import { useBackupsQuery } from '@/data/database/backups-query'
+import { usePitrRestoreMutation } from '@/data/database/pitr-restore-mutation'
+import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { PROJECT_STATUS } from '@/lib/constants'
 
-const PITRSelection = () => {
+export const PITRSelection = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const queryClient = useQueryClient()
 
   const { data: backups } = useBackupsQuery({ projectRef: ref })
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
+  const { setProjectStatus } = useSetProjectStatus()
+
   const [showConfiguration, setShowConfiguration] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
@@ -45,13 +45,13 @@ const PITRSelection = () => {
 
   const {
     mutate: restoreFromPitr,
-    isLoading: isRestoring,
+    isPending: isRestoring,
     isSuccess: isSuccessPITR,
   } = usePitrRestoreMutation({
-    onSuccess: (res, variables) => {
+    onSuccess: (_, variables) => {
       setTimeout(() => {
         setShowConfirmation(false)
-        setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
+        setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.RESTORING })
         router.push(`/project/${variables.ref}`)
       }, 3000)
     },
@@ -187,5 +187,3 @@ const PITRSelection = () => {
     </>
   )
 }
-
-export default PITRSelection

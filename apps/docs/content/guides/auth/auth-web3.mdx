@@ -9,17 +9,43 @@ subtitle: 'Use your Web3 wallet to authenticate users with Supabase'
 Supported Web3 wallets:
 
 - All Solana wallets
-- Coming soon: All Ethereum wallets
+- All Ethereum wallets
 
 ## How does it work?
 
-Sign in with Web3 utilizes the [EIP 4361](https://eips.ethereum.org/EIPS/eip-4361) standard to authenticate wallet addresses off-chain. This standard is adopted by the Solana ecosystem with some minor differences from Ethereum.
+Sign in with Web3 utilizes the [EIP 4361](https://eips.ethereum.org/EIPS/eip-4361) standard to authenticate wallet addresses off-chain. This standard is widely supported by the Ethereum and Solana ecosystems, making it the best choice for verifying wallet ownership.
 
 Authentication works by asking the Web3 wallet application to sign a predefined message with the user's wallet. This message is parsed both by the Web3 wallet application and Supabase Auth to verify its validity and purpose, before creating a user account or session.
 
-The Web3 wallet application uses the information contained in the message to provide the user with a confirmation dialog, asking whether they want to allow sign in with your project.
+An example of such a message is:
 
-Not all Web3 wallet applications show a dedicated confirmation dialog for these sign in messages. In that case the Web3 wallet shows a traditional message signature confirmation dialog.
+```
+example.com wants you to sign in with your Ethereum account:
+0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2
+
+I accept the ExampleOrg Terms of Service: https://example.com/tos
+
+URI: https://example.com/login
+Version: 1
+Chain ID: 1
+Nonce: 32891756
+Issued At: 2021-09-30T16:25:24Z
+Resources:
+- https://example.com/my-web2-claim.json
+```
+
+It defines the wallet address, timestamp, browser location where the sign-in occurred and includes a customizable statement (`I accept...`) which you can use to ask consent from the user.
+
+Most Web3 wallets are able to recognize these messages and show a dedicated "Confirm Sign In" dialog validating and presenting the information in the message in a secure and responsible way to the user. Even if the wallet does not directly support these messages, it will use the message signature dialog instead.
+
+Finally the Supabase Auth server validates both the message's contents and signature before issuing a valid [User session](/docs/guides/auth/sessions) to your application. Validation rules include:
+
+- Message structure validation
+- Cryptographic signature verification
+- Timestamp validation, ensuring the signature was created within 10 minutes of the sign-in call
+- URI and Domain validation, ensuring these match your server's defined [Redirect URLs](/docs/guides/auth/redirect-urls)
+
+The wallet address is used as the identity identifier, and in the identity data you can also find the statement and additional metadata.
 
 ## Enable the Web3 provider
 
@@ -29,6 +55,9 @@ In the CLI add the following config to your `supabase/config.toml` file:
 
 ```toml
 [auth.web3.solana]
+enabled = true
+
+[auth.web3.ethereum]
 enabled = true
 ```
 
@@ -63,7 +92,65 @@ For example if the user is signing in to the page `https://example.com/sign-in` 
 
 ## Sign in with Ethereum
 
-Sign in with Ethereum wallets is coming soon.
+Ethereum defines the [`window.ethereum` global scope object](https://eips.ethereum.org/EIPS/eip-1193) that your app uses to interact with Ethereum Wallets. Additionally there is a [wallet discovery mechanism (EIP-6963)](https://eips.ethereum.org/EIPS/eip-6963) that your app can use to discover all of the available wallets on the user's browser.
+
+To sign in a user with their Ethereum wallet make sure that the user has installed a wallet application. There are two ways to do this:
+
+1. Detect the `window.ethereum` global scope object and ensure it's defined. This only works if your user has only one wallet installed on their browser.
+2. Use the wallet discovery mechanism (EIP-6963) to ask the user to choose a wallet before they continue to sign in. Read [the MetaMask guide on the best way to support this](https://docs.metamask.io/wallet/tutorials/react-dapp-local-state).
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="window"
+  queryGroup="ethWallet"
+>
+
+<TabPanel id="window" label="Ethereum Window API (EIP-1193)">
+
+Use the following code to sign in a user, implicitly relying on the `window.ethereum` global scope wallet API:
+
+```typescript
+const { data, error } = await supabase.auth.signInWithWeb3({
+  chain: 'ethereum',
+  statement: 'I accept the Terms of Service at https://example.com/tos',
+})
+```
+
+</TabPanel>
+
+<TabPanel id="wallet" label="Ethereum Wallet API (EIP-6963)">
+
+Once you've obtained a wallet using the wallet detection (EIP-6963) mechanism, you can pass the selected wallet to the Supabase JavaScript SDK to continue the sign-in process.
+
+```typescript
+const { data, error } = await supabase.auth.signInWithWeb3({
+  chain: 'ethereum',
+  statement: 'I accept the Terms of Service at https://example.com/tos',
+  wallet: selectedWallet, // obtain this using the EIP-6963 mechanism
+})
+```
+
+An excellent guide on using the [EIP-6963](https://eips.ethereum.org/EIPS/eip-6963) mechanism is available by [MetaMask](https://docs.metamask.io/wallet/tutorials/react-dapp-local-state).
+
+</TabPanel>
+
+<TabPanel id="custom" label="Ethereum Message and Signature">
+
+If your application relies on a custom Ethereum wallet API, you can pass a [Sign in with Ethereum (EIP-4361)](https://eips.ethereum.org/EIPS/eip-4361) message and signature to complete the sign in process.
+
+```typescript
+const { data, error } = await supabase.auth.signInWithWeb3({
+  chain: 'ethereum',
+  message: '<sign in with ethereum message>',
+  signature: '<hex of the ethereum signature over the message>',
+})
+```
+
+</TabPanel>
+
+</Tabs>
 
 ## Sign in with Solana
 

@@ -54,3 +54,5 @@ export const LW15_TWEET_TEXT =
 export const LW15_URL = `${SITE_ORIGIN}/launch-week`
 
 export const SITE_NAME = 'Supabase'
+
+export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''

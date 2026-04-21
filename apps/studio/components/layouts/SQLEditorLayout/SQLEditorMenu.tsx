@@ -5,13 +5,6 @@ import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProfile } from 'lib/profile'
-import { getAppStateSnapshot } from 'state/app-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
   DropdownMenu,
@@ -28,8 +21,15 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
 } from 'ui-patterns/InnerSideMenu'
+
 import { SearchList } from './SQLEditorNavV2/SearchList'
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProfile } from '@/lib/profile'
+import { getAppStateSnapshot } from '@/state/app-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export const SQLEditorMenu = () => {
   const router = useRouter()
@@ -48,10 +48,14 @@ export const SQLEditorMenu = () => {
   const appState = getAppStateSnapshot()
   const debouncedSearch = useDebounce(search, 500)
 
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
+    {
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
 
   const createNewFolder = () => {
     if (!ref) return console.error('Project ref is required')

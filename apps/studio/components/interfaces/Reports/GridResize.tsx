@@ -1,25 +1,26 @@
 import RGL, { WidthProvider } from 'react-grid-layout'
+
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
-import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
-import { AnalyticsInterval } from 'data/analytics/constants'
-import {
-  UpsertContentPayload,
-  useContentUpsertMutation,
-} from 'data/content/content-upsert-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProfile } from 'lib/profile'
-import uuidv4 from 'lib/uuid'
-import { Dashboards } from 'types'
+import { toast } from 'sonner'
+
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { ReportBlock } from './ReportBlock/ReportBlock'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
+import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from '@/data/content/content-upsert-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProfile } from '@/lib/profile'
+import type { Dashboards } from '@/types'
 
 const ReactGridLayout = WidthProvider(RGL)
 
@@ -93,15 +94,21 @@ export const GridResize = ({
 
     const toastId = toast.loading(`Creating new query: ${label}`)
 
-    const id = uuidv4()
+    const payload = createSqlSnippetSkeletonV2({
+      name: label,
+      sql,
+      owner_id: profile?.id,
+      project_id: project?.id,
+    }) as UpsertContentPayload
+
     const updatedLayout = layout.map((x) => {
       const existingBlock = editableReport.layout.find((y) => x.i === y.id)
       if (existingBlock) {
         return { ...existingBlock, x: x.x, y: x.y }
       } else {
         return {
-          id,
-          attribute: `new_snippet_${id}`,
+          id: payload.id,
+          attribute: `new_snippet_${payload.id}`,
           chartConfig: { ...DEFAULT_CHART_CONFIG, ...(config ?? {}) },
           label,
           chart_type: 'bar',
@@ -114,22 +121,14 @@ export const GridResize = ({
     })
     setEditableReport({ ...editableReport, layout: updatedLayout })
 
-    const payload = createSqlSnippetSkeletonV2({
-      id,
-      name: label,
-      sql,
-      owner_id: profile?.id,
-      project_id: project?.id,
-    }) as UpsertContentPayload
-
     upsertContent(
       { projectRef: ref, payload },
       {
         onSuccess: () => {
           toast.success(`Successfully created new query: ${label}`, { id: toastId })
           const finalLayout = updatedLayout.map((x) => {
-            if (x.id === id) {
-              return { ...x, attribute: `snippet_${id}` }
+            if (x.id === payload.id) {
+              return { ...x, attribute: `snippet_${payload.id}` }
             } else return x
           })
           setEditableReport({ ...editableReport, layout: finalLayout })

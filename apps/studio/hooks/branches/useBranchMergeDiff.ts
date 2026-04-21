@@ -1,10 +1,11 @@
 import { useMemo } from 'react'
-import { useBranchDiffQuery } from 'data/branches/branch-diff-query'
-import { useMigrationsQuery } from 'data/database/migrations-query'
+
 import { useEdgeFunctionsDiff, type EdgeFunctionsDiffResult } from './useEdgeFunctionsDiff'
+import { useIsPgDeltaDiffEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useBranchDiffQuery } from '@/data/branches/branch-diff-query'
+import { useMigrationsQuery } from '@/data/database/migrations-query'
 
 interface UseBranchMergeDiffProps {
-  branchId?: string
   currentBranchRef?: string
   parentProjectRef?: string
   currentBranchConnectionString?: string
@@ -46,27 +47,29 @@ export interface BranchMergeDiffResult {
 }
 
 export const useBranchMergeDiff = ({
-  branchId,
   currentBranchRef,
   parentProjectRef,
   currentBranchConnectionString,
   parentBranchConnectionString,
   currentBranchCreatedAt,
 }: UseBranchMergeDiffProps): BranchMergeDiffResult => {
+  const pgDeltaDiffEnabled = useIsPgDeltaDiffEnabled()
+
   // Get database diff
   const {
     data: diffContent,
-    isLoading: isDatabaseDiffLoading,
+    isPending: isDatabaseDiffLoading,
     isRefetching: isDatabaseDiffRefetching,
     error: databaseDiffError,
     refetch: refetchDatabaseDiff,
   } = useBranchDiffQuery(
     {
-      branchId: branchId || '',
+      branchRef: currentBranchRef || '',
       projectRef: parentProjectRef || '',
+      pgdelta: pgDeltaDiffEnabled,
     },
     {
-      enabled: !!branchId && !!parentProjectRef,
+      enabled: !!currentBranchRef && !!parentProjectRef,
       refetchOnMount: 'always',
       refetchOnWindowFocus: false,
       staleTime: 0,

@@ -1,20 +1,20 @@
 import { useParams } from 'common'
 import { Save } from 'lucide-react'
 import Link from 'next/link'
-
-import LogsSavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
-import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import Table from 'components/to-be-cleaned/Table'
-import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
-import { useContentQuery } from 'data/content/content-query'
-import type { NextPageWithLayout } from 'types'
 import { Loading } from 'ui'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+
+import LogsSavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
+import Table from '@/components/to-be-cleaned/Table'
+import LogsExplorerHeader from '@/components/ui/Logs/LogsExplorerHeader'
+import { useContentQuery } from '@/data/content/content-query'
+import type { NextPageWithLayout } from '@/types'
 
 // [Joshen] This page looks like its not longer in use from a UI POV - double checking and deprecate + add redirects
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { data, isLoading } = useContentQuery({
+  const { data, isPending: isLoading } = useContentQuery({
     projectRef: ref,
     type: 'log_sql',
   })
@@ -68,7 +68,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
 
 LogsSavedPage.getLayout = (page) => (
   <DefaultLayout>
-    <LogsLayout>{page}</LogsLayout>
+    <LogsLayout title="Saved">{page}</LogsLayout>
   </DefaultLayout>
 )
 

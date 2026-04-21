@@ -1,17 +1,18 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
-import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
-import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OrganizationCreateInvitationVariables = {
   slug: string
   email: string
   roleId: number
   projects?: string[]
+  requireSso?: boolean
 }
 
 export async function createOrganizationInvitation({
@@ -19,9 +20,11 @@ export async function createOrganizationInvitation({
   email,
   roleId,
   projects,
+  requireSso,
 }: OrganizationCreateInvitationVariables) {
   const payload: components['schemas']['CreateInvitationBody'] = { email, role_id: roleId }
   if (projects !== undefined) payload.role_scoped_projects = projects
+  if (requireSso !== undefined) payload.require_sso = requireSso
 
   const { data, error } = await post('/platform/organizations/{slug}/members/invitations', {
     params: { path: { slug } },
@@ -39,7 +42,7 @@ export const useOrganizationCreateInvitationMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationMemberUpdateData,
     ResponseError,
     OrganizationCreateInvitationVariables
@@ -52,13 +55,14 @@ export const useOrganizationCreateInvitationMutation = ({
     OrganizationMemberUpdateData,
     ResponseError,
     OrganizationCreateInvitationVariables
-  >((vars) => createOrganizationInvitation(vars), {
+  >({
+    mutationFn: (vars) => createOrganizationInvitation(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(organizationKeys.rolesV2(slug)),
-        queryClient.invalidateQueries(organizationKeysV1.members(slug)),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.rolesV2(slug) }),
+        queryClient.invalidateQueries({ queryKey: organizationKeysV1.members(slug) }),
       ])
 
       await onSuccess?.(data, variables, context)

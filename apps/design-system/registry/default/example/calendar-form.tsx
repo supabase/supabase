@@ -5,9 +5,6 @@ import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { cn } from '@/lib/utils'
 import {
   Button,
   Calendar,
@@ -22,6 +19,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
 } from 'ui'
+import { z } from 'zod'
+
+import { cn } from '@/lib/utils'
 
 const FormSchema = z.object({
   dob: z.date({

@@ -2,6 +2,7 @@
 
 import * as LabelPrimitive from '@radix-ui/react-label'
 import { Slot } from '@radix-ui/react-slot'
+import { AnimatePresence, motion } from 'framer-motion'
 import * as React from 'react'
 import {
   Controller,
@@ -14,8 +15,10 @@ import {
 } from 'react-hook-form'
 
 import { cn } from '../../../lib/utils/cn'
+import type { InputProps } from './input'
+import { InputGroupInput, InputGroupTextarea } from './input-group'
 import { Label } from './label'
-import { motion, AnimatePresence } from 'framer-motion'
+import type { TextareaProps } from './textarea'
 
 const Form = FormProvider
 
@@ -88,15 +91,17 @@ FormItem.displayName = 'FormItem'
 
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { enableSelection?: boolean }
+>(({ className, enableSelection = false, ...props }, ref) => {
   const { error, formItemId } = useFormField()
 
+  const Comp = enableSelection ? 'label' : Label
+
   return (
-    <Label
+    <Comp
       ref={ref}
       className={cn(
-        'text-foreground-light',
+        'text-foreground-light text-sm',
         'transition-colors',
         error && '!text-destructive',
         className,
@@ -177,6 +182,32 @@ const FormMessage = React.forwardRef<
 
 FormMessage.displayName = 'FormMessage'
 
+function FormInputGroupInput(props: InputProps) {
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+
+  return (
+    <InputGroupInput
+      id={formItemId}
+      aria-describedby={!error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`}
+      aria-invalid={!!error}
+      {...props}
+    />
+  )
+}
+
+function FormInputGroupTextArea(props: TextareaProps) {
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+
+  return (
+    <InputGroupTextarea
+      id={formItemId}
+      aria-describedby={!error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`}
+      aria-invalid={!!error}
+      {...props}
+    />
+  )
+}
+
 export {
   Form,
   FormControl,
@@ -186,5 +217,7 @@ export {
   FormLabel,
   FormMessage,
   useFormField,
+  FormInputGroupInput,
+  FormInputGroupTextArea,
   useWatch,
 }

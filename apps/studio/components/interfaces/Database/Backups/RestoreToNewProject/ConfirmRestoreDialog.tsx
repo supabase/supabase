@@ -1,5 +1,3 @@
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Dialog,
@@ -10,8 +8,11 @@ import {
   DialogSection,
   DialogTitle,
 } from 'ui'
+
 import { AdditionalMonthlySpend } from './AdditionalMonthlySpend'
 import { NewProjectPrice } from './RestoreToNewProject.utils'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface ConfirmRestoreDialogProps {
   open: boolean
@@ -61,7 +62,6 @@ export const ConfirmRestoreDialog = ({
               <li>Storage objects & settings</li>
               <li>Edge Functions</li>
               <li>Auth settings & API keys</li>
-              <li>Realtime settings</li>
               <li>Database extensions and settings</li>
               <li>Read replicas</li>
             </ul>

@@ -1,33 +1,20 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
-import { DefaultChatTransport } from 'ai'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Eraser, Info, Pencil, X } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-
+import { lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
-import { Markdown } from 'components/interfaces/Markdown'
-import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
-import { constructHeaders } from 'data/fetchers'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useHotKey } from 'hooks/ui/useHotKey'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import uuidv4 from 'lib/uuid'
-import type { AssistantMessageType } from 'state/ai-assistant-state'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Eraser, Pencil, X } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import AlertError from '../AlertError'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { ErrorBoundary } from '../ErrorBoundary'
-import { type SqlSnippet } from './AIAssistant.types'
+import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
+import { ASSISTANT_ERRORS } from './AiAssistant.constants'
+import type { SqlSnippet } from './AIAssistant.types'
 import { onErrorChat } from './AIAssistant.utils'
 import { AIAssistantHeader } from './AIAssistantHeader'
 import { AIOnboarding } from './AIOnboarding'
@@ -37,7 +24,31 @@ import {
   ConversationContent,
   ConversationScrollButton,
 } from './elements/Conversation'
-import { MemoizedMessage } from './Message'
+import { Message } from './Message'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
+import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useHotKey } from '@/hooks/ui/useHotKey'
+import {
+  DEFAULT_ASSISTANT_BASE_MODEL_ID,
+  defaultAssistantModelId,
+  isAssistantBaseModelId,
+  isKnownAssistantModelId,
+} from '@/lib/ai/model.utils'
+import { IS_PLATFORM } from '@/lib/constants'
+import { uuidv4 } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
+import type { AssistantModel } from '@/state/ai-assistant-state'
+import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 interface AIAssistantProps {
   initialMessages?: MessageType[] | undefined
@@ -46,16 +57,40 @@ interface AIAssistantProps {
 
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
-  const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { ref, id: entityId } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const searchParams = useSearchParamsShallow()
+
+  const { data: selectedOrganization, isPending: isLoadingOrganization } =
+    useSelectedOrganizationQuery()
 
   useHotKey(() => cancelEdit(), 'Escape')
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
+  const state = useAiAssistantState()
+  const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
+
+  const { hasAccess: hasAccessToAdvanceModel, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('assistant.advance_model')
+
+  const selectedModel = useMemo<AssistantModel>(() => {
+    // While entitlements are loading, use the stored model without enforcing access
+    if (isLoadingEntitlements) {
+      return snap.model ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
+    }
+
+    const defaultModel = defaultAssistantModelId(hasAccessToAdvanceModel)
+    const model = snap.model ?? defaultModel
+
+    if (!isKnownAssistantModelId(model)) return defaultModel
+    if (!hasAccessToAdvanceModel && !isAssistantBaseModelId(model)) {
+      return DEFAULT_ASSISTANT_BASE_MODEL_ID
+    }
+
+    return model
+  }, [isLoadingEntitlements, hasAccessToAdvanceModel, snap.model])
 
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
@@ -73,12 +108,21 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
 
+  // Keep latest selected organization to avoid stale values in useChat transport
+  const selectedOrganizationRef = useRef(selectedOrganization)
+  useEffect(() => {
+    selectedOrganizationRef.current = selectedOrganization
+  }, [selectedOrganization])
+
   const [value, setValue] = useState<string>(snap.initialInput || '')
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
   const [isResubmitting, setIsResubmitting] = useState(false)
+  const [messageRatings, setMessageRatings] = useState<Record<string, 'positive' | 'negative'>>({})
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
-  const isApiKeySet = IS_PLATFORM || !!check?.hasKey
+  const isApiKeySet = !!check?.hasKey
+
+  const { mutateAsync: rateMessage } = useRateMessageMutation()
 
   const isInSQLEditor = router.pathname.includes('/sql/[id]')
   const snippet = snippets[entityId ?? '']
@@ -95,26 +139,18 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const currentTable = tables?.find((t) => t.id.toString() === entityId)
   const currentSchema = searchParams?.get('schema') ?? 'public'
-  const currentChat = snap.activeChat?.name
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  // Update context in state
+  useEffect(() => {
+    state.setContext({
+      projectRef: project?.ref,
+      orgSlug: selectedOrganizationRef.current?.slug,
+      connectionString: project?.connectionString ?? '',
+    })
+  }, [project?.ref, project?.connectionString, selectedOrganizationRef.current?.slug, state])
 
-  // Handle completion of the assistant's response
-  const handleChatFinish = useCallback(
-    ({ message }: { message: MessageType }) => {
-      if (lastUserMessageRef.current) {
-        snap.saveMessage([lastUserMessageRef.current, message])
-        lastUserMessageRef.current = null
-      } else {
-        snap.saveMessage(message)
-      }
-    },
-    [snap]
-  )
+  const track = useTrack()
 
-  // TODO(refactor): This useChat hook should be moved down into each chat session.
-  // That way we won't have to disable switching chats while the chat is loading,
-  // and don't run the risk of messages getting mixed up between chats.
   const {
     messages: chatMessages,
     status: chatStatus,
@@ -126,85 +162,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     regenerate,
   } = useChat({
     id: snap.activeChatId,
-    // [Alaister] typecast is needed here because valtio returns readonly arrays
-    // and useChat expects a mutable array
-    messages: snap.activeChat?.messages as unknown as MessageType[] | undefined,
-    async onToolCall({ toolCall }) {
-      if (toolCall.toolName === 'rename_chat') {
-        const { newName } = toolCall.input as { newName: string }
-        if (snap.activeChatId && newName?.trim()) {
-          snap.renameChat(snap.activeChatId, newName.trim())
-          addToolResult({
-            tool: toolCall.toolName,
-            toolCallId: toolCall.toolCallId,
-            output: 'Chat renamed',
-          })
-        }
-        addToolResult({
-          tool: toolCall.toolName,
-          toolCallId: toolCall.toolCallId,
-          output: 'Failed to rename chat: Invalid chat or name',
-        })
-      }
-    },
-    transport: new DefaultChatTransport({
-      api: `${BASE_PATH}/api/ai/sql/generate-v4`,
-      async prepareSendMessagesRequest({ messages, ...options }) {
-        // [Joshen] Specifically limiting the chat history that get's sent to reduce the
-        // size of the context that goes into the model. This should always be an odd number
-        // as much as possible so that the first message is always the user's
-        const MAX_CHAT_HISTORY = 5
-
-        const slicedMessages = messages.slice(-MAX_CHAT_HISTORY)
-
-        // Filter out results from messages before sending to the model
-        const cleanedMessages = slicedMessages.map((message: any) => {
-          const cleanedMessage = { ...message } as AssistantMessageType
-          if (message.role === 'assistant' && (message as AssistantMessageType).results) {
-            delete cleanedMessage.results
-          }
-          return cleanedMessage
-        })
-
-        const headerData = await constructHeaders()
-        const authorizationHeader = headerData.get('Authorization')
-
-        return {
-          ...options,
-          body: {
-            messages: cleanedMessages,
-            aiOptInLevel,
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            schema: currentSchema,
-            table: currentTable?.name,
-            chatName: currentChat,
-            orgSlug: selectedOrganization?.slug,
-          },
-          headers: { Authorization: authorizationHeader ?? '' },
-        }
-      },
-    }),
+    ...(snap.activeChatId && snap.chatInstances[snap.activeChatId]
+      ? { chat: snap.chatInstances[snap.activeChatId] }
+      : {}),
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     onError: onErrorChat,
-    onFinish: handleChatFinish,
   })
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
-
-  const updateMessage = useCallback(
-    ({
-      messageId,
-      resultId,
-      results,
-    }: {
-      messageId: string
-      resultId?: string
-      results: any[]
-    }) => {
-      snap.updateMessage({ id: messageId, resultId, results })
-    },
-    [snap]
-  )
 
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
@@ -258,6 +223,47 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setValue('')
   }, [setValue])
 
+  const handleRateMessage = useCallback(
+    async (messageId: string, rating: 'positive' | 'negative', reason?: string) => {
+      if (!project?.ref || !selectedOrganization?.slug) return
+
+      // Optimistically update UI
+      setMessageRatings((prev) => ({ ...prev, [messageId]: rating }))
+
+      try {
+        const result = await rateMessage({
+          rating,
+          messages: chatMessages,
+          messageId,
+          projectRef: project.ref,
+          orgSlug: selectedOrganization.slug,
+          reason,
+          spanId: state.messageSpanIds[messageId],
+        })
+
+        track('assistant_message_rating_submitted', {
+          rating,
+          category: result.category,
+          ...(reason && { reason }),
+          chatId: state.activeChatId,
+        })
+      } catch (error) {
+        console.error('Failed to rate message:', error)
+        // Rollback on error
+        setMessageRatings((prev) => {
+          const { [messageId]: _, ...rest } = prev
+          return rest
+        })
+      }
+    },
+    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, track, state]
+  )
+
+  const isContextExceededError =
+    error &&
+    (error.message?.includes('context_length_exceeded') ||
+      error.message?.includes('exceeds the context window'))
+
   const renderedMessages = useMemo(
     () =>
       chatMessages.map((message, index) => {
@@ -265,34 +271,41 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         const isAfterEditedMessage = editingMessageId
           ? chatMessages.findIndex((m) => m.id === editingMessageId) < index
           : false
+        const isLastMessage = index === chatMessages.length - 1
 
         return (
-          <MemoizedMessage
+          <Message
+            id={message.id}
             key={message.id}
             message={message}
-            status={chatStatus}
-            onResults={updateMessage}
+            isLoading={chatStatus === 'submitted' || chatStatus === 'streaming'}
+            readOnly={message.role === 'user'}
+            addToolResult={addToolResult}
             onDelete={deleteMessageFromHere}
             onEdit={editMessage}
             isAfterEditedMessage={isAfterEditedMessage}
             isBeingEdited={isBeingEdited}
             onCancelEdit={cancelEdit}
+            isLastMessage={isLastMessage}
+            onRate={handleRateMessage}
+            rating={messageRatings[message.id] ?? null}
           />
         )
       }),
     [
       chatMessages,
-      updateMessage,
       deleteMessageFromHere,
       editMessage,
       cancelEdit,
       editingMessageId,
       chatStatus,
+      addToolResult,
+      handleRateMessage,
+      messageRatings,
     ]
   )
 
   const hasMessages = chatMessages.length > 0
-  const isShowingOnboarding = !hasMessages && isApiKeySet
 
   const sendMessageToAssistant = (finalContent: string) => {
     if (editingMessageId) {
@@ -312,29 +325,23 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
     snap.clearSqlSnippets()
     lastUserMessageRef.current = payload
-    sendMessage(payload)
+    sendMessage(payload, {
+      body: {
+        schema: currentSchema,
+        table: currentTable?.name,
+      },
+    })
     setValue('')
 
     if (finalContent.includes('Help me to debug')) {
-      sendEvent({
-        action: 'assistant_debug_submitted',
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: selectedOrganization?.slug ?? 'Unknown',
-        },
-      })
+      track('assistant_debug_submitted', { chatId: snap.activeChatId })
     } else {
-      sendEvent({
-        action: 'assistant_prompt_submitted',
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: selectedOrganization?.slug ?? 'Unknown',
-        },
-      })
+      track('assistant_prompt_submitted', { chatId: snap.activeChatId })
     }
   }
 
   const handleClearMessages = () => {
+    if (isChatLoading) stop()
     snap.clearMessages()
     setMessages([])
     lastUserMessageRef.current = null
@@ -358,11 +365,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   }, [snap.initialInput])
 
   useEffect(() => {
-    if (snap.open && isInSQLEditor && !!snippetContent) {
+    const isOpen = activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT
+    if (isOpen && isInSQLEditor && !!snippetContent) {
       snap.setSqlSnippets([{ label: 'Current Query', content: snippetContent }])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snap.open, isInSQLEditor, snippetContent])
+  }, [activeSidebar?.id, isInSQLEditor, snippetContent])
 
   return (
     <ErrorBoundary
@@ -383,66 +391,91 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         },
       ]}
     >
-      <div className={cn('flex flex-col h-full', className)}>
-        <Conversation className={cn('flex-1')}>
-          <AIAssistantHeader
-            isChatLoading={isChatLoading}
-            onClearMessages={handleClearMessages}
-            onCloseAssistant={snap.closeAssistant}
-            showMetadataWarning={showMetadataWarning}
-            updatedOptInSinceMCP={updatedOptInSinceMCP}
-            isHipaaProjectDisallowed={isHipaaProjectDisallowed as boolean}
-            aiOptInLevel={aiOptInLevel}
-          />
-
-          {hasMessages && (
+      <div className={cn('flex flex-col h-full w-full md:h-full max-h-[100dvh]', className)}>
+        <AIAssistantHeader
+          isChatLoading={isChatLoading}
+          onNewChat={snap.newChat}
+          onCloseAssistant={() => closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)}
+          showMetadataWarning={showMetadataWarning}
+          updatedOptInSinceMCP={updatedOptInSinceMCP}
+          isHipaaProjectDisallowed={isHipaaProjectDisallowed}
+          aiOptInLevel={aiOptInLevel}
+        />
+        {hasMessages ? (
+          <Conversation className={cn('flex-1')}>
             <ConversationContent className="w-full px-7 py-8 mb-10">
               {renderedMessages}
               {error && (
-                <div className="border rounded-md px-2 py-2 flex items-center justify-between gap-x-4">
-                  <div className="flex items-start gap-2 text-foreground-light text-sm">
-                    <div>
-                      <Info size={16} className="mt-0.5" />
-                    </div>
-                    <div>
-                      <p>
-                        Sorry, I'm having trouble responding right now. If the error persists while
-                        retrying, you may try clearing the conversation's messages and try again.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-x-2">
-                    <Button
-                      type="default"
-                      size="tiny"
-                      onClick={() => regenerate()}
-                      className="text-xs"
-                    >
-                      Retry
-                    </Button>
-                    <ButtonTooltip
-                      type="default"
-                      size="tiny"
-                      onClick={handleClearMessages}
-                      className="w-7 h-7"
-                      icon={<Eraser />}
-                      tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
-                    />
-                  </div>
-                </div>
+                <>
+                  <AlertError
+                    error={
+                      isContextExceededError
+                        ? ASSISTANT_ERRORS['context-exceeded']
+                        : IS_PLATFORM
+                          ? ASSISTANT_ERRORS['default']
+                          : error
+                    }
+                    showErrorPrefix={false}
+                    showInstructions={false}
+                    subject="Sorry, I'm having trouble responding right now."
+                    additionalActions={
+                      <div className="flex items-center gap-x-2 mr-auto">
+                        {isContextExceededError ? (
+                          <Button
+                            type="default"
+                            size="tiny"
+                            onClick={() => snap.newChat()}
+                            className="text-xs"
+                          >
+                            New chat
+                          </Button>
+                        ) : (
+                          <>
+                            <Button
+                              type="default"
+                              size="tiny"
+                              onClick={() => regenerate()}
+                              className="text-xs"
+                            >
+                              Retry
+                            </Button>
+                            <ButtonTooltip
+                              type="default"
+                              size="tiny"
+                              onClick={handleClearMessages}
+                              className="w-7 h-7"
+                              icon={<Eraser />}
+                              tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
+                            />
+                          </>
+                        )}
+                      </div>
+                    }
+                  />
+                </>
               )}
               {isChatLoading && (
                 <motion.span
                   animate={{ opacity: [1, 0] }}
                   transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                  className="inline-block w-1.5 h-4 bg-foreground-lighter"
+                  className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
                 />
               )}
             </ConversationContent>
-          )}
-
-          <ConversationScrollButton />
-        </Conversation>
+            <ConversationScrollButton />
+          </Conversation>
+        ) : (
+          <AIOnboarding
+            sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
+            suggestions={
+              snap.suggestions as
+                | { title?: string; prompts?: { label: string; description: string }[] }
+                | undefined
+            }
+            onValueChange={(val) => setValue(val)}
+            onFocusInput={() => inputRef.current?.focus()}
+          />
+        )}
 
         <AnimatePresence>
           {editingMessageId && (
@@ -512,19 +545,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             />
           )}
 
-          {isShowingOnboarding && (
-            <AIOnboarding
-              sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
-              suggestions={
-                snap.suggestions as
-                  | { title?: string; prompts?: { label: string; description: string }[] }
-                  | undefined
-              }
-              onValueChange={(val) => setValue(val)}
-              onFocusInput={() => inputRef.current?.focus()}
-            />
-          )}
-
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
@@ -532,7 +552,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}
-            disabled={!isApiKeySet || disablePrompts || (isChatLoading && !editingMessageId)}
+            disabled={!isApiKeySet || disablePrompts || isLoadingOrganization}
             placeholder={
               hasMessages
                 ? 'Ask a follow up question...'
@@ -550,7 +570,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               // to save partial responses from the AI
               const lastMessage = chatMessages[chatMessages.length - 1]
               if (lastMessage && lastMessage.role === 'assistant') {
-                handleChatFinish({ message: lastMessage })
+                state.updateMessage(lastMessage)
               }
             }}
             sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
@@ -560,6 +580,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               snap.setSqlSnippets(newSnippets)
             }}
             includeSnippetsInMessage={aiOptInLevel !== 'disabled'}
+            selectedModel={selectedModel}
+            onSelectModel={(model) => snap.setModel(model)}
           />
         </div>
       </div>

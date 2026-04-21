@@ -1,9 +1,7 @@
-import { IntegrationSettings } from 'components/interfaces/Organization'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
-import type { NextPageWithLayout } from 'types'
+import { IntegrationSettings } from '@/components/interfaces/Organization/IntegrationSettings/IntegrationSettings'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import OrganizationLayout from '@/components/layouts/OrganizationLayout'
+import type { NextPageWithLayout } from '@/types'
 
 const OrgIntegrationSettings: NextPageWithLayout = () => {
   return <IntegrationSettings />
@@ -11,9 +9,7 @@ const OrgIntegrationSettings: NextPageWithLayout = () => {
 
 OrgIntegrationSettings.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
-      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
-    </OrganizationLayout>
+    <OrganizationLayout title="Integrations">{page}</OrganizationLayout>
   </DefaultLayout>
 )
 

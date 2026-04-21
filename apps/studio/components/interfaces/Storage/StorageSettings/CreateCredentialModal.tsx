@@ -1,15 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-
 import { FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
-import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Plus } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import {
   Button,
   Dialog,
@@ -22,12 +17,19 @@ import {
   DialogTitle,
   DialogTrigger,
   Form_Shadcn_,
+  FormField_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useS3AccessKeyCreateMutation } from '@/data/storage/s3-access-key-create-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 
 interface CreateCredentialModalProps {
   visible: boolean
@@ -39,7 +41,10 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
   const isProjectActive = useIsProjectActive()
   const [showSuccess, setShowSuccess] = useState(false)
 
-  const canCreateCredentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const { can: canCreateCredentials } = useAsyncCheckPermissions(
+    PermissionAction.STORAGE_ADMIN_WRITE,
+    '*'
+  )
 
   const { data: config } = useProjectStorageConfigQuery({ projectRef })
   const isS3ConnectionEnabled = config?.features.s3Protocol.enabled
@@ -60,7 +65,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
   const {
     data: createS3KeyData,
     mutate: createS3AccessKey,
-    isLoading: isCreating,
+    isPending: isCreating,
   } = useS3AccessKeyCreateMutation({
     onSuccess: () => {
       setShowSuccess(true)
@@ -83,7 +88,12 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
       <Tooltip>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
-            <Button type="default" disabled={disableCreation} className="pointer-events-auto">
+            <Button
+              type="default"
+              icon={<Plus size={14} />}
+              disabled={disableCreation}
+              className="pointer-events-auto"
+            >
               New access key
             </Button>
           </DialogTrigger>
@@ -118,22 +128,10 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
             <DialogSectionSeparator />
             <DialogSection className="flex flex-col gap-4">
               <FormItemLayout label="Access key ID" isReactForm={false}>
-                <Input
-                  className="input-mono"
-                  readOnly
-                  copy
-                  disabled
-                  value={createS3KeyData?.access_key}
-                />
+                <Input className="input-mono" readOnly copy value={createS3KeyData?.access_key} />
               </FormItemLayout>
               <FormItemLayout label={'Secret access key'} isReactForm={false}>
-                <Input
-                  className="input-mono"
-                  readOnly
-                  copy
-                  disabled
-                  value={createS3KeyData?.secret_key}
-                />
+                <Input className="input-mono" readOnly copy value={createS3KeyData?.secret_key} />
               </FormItemLayout>
             </DialogSection>
             <DialogFooter>
@@ -160,15 +158,15 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
             <Form_Shadcn_ {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <DialogSection>
-                  <FormField
+                  <FormField_Shadcn_
                     name="description"
-                    render={() => (
+                    render={({ field }) => (
                       <FormItemLayout label="Description">
                         <Input
                           autoComplete="off"
                           placeholder="My test key"
                           type="text"
-                          {...form.register('description')}
+                          {...field}
                         />
                       </FormItemLayout>
                     )}

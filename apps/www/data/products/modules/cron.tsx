@@ -1,7 +1,8 @@
 // import Image from 'next/image'
 import { PRODUCT_MODULES } from 'shared-data/products'
-import BrowserFrame from '~/components/BrowserFrame'
-import { Image } from 'ui'
+import { Image } from 'ui-patterns/Image'
+
+import BrowserFrame from '@/components/BrowserFrame'
 
 export default () => ({
   metaTitle: 'Supabase Cron | Schedule Recurring Jobs in Postgres',

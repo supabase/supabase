@@ -1,6 +1,8 @@
+'use client'
+
 import { useEffect } from 'react'
 import { useTheme } from 'next-themes'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 
 export function useForceDeepDark() {

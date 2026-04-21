@@ -3,8 +3,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
 import {
   Button,
   Form_Shadcn_,
@@ -18,6 +16,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from 'ui'
+import { z } from 'zod'
 
 const FormSchema = z.object({
   pin: z.string().min(6, {

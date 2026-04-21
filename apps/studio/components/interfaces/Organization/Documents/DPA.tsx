@@ -1,18 +1,18 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from 'ui'
 
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useDpaRequestMutation } from 'data/documents/dpa-request-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useProfile } from 'lib/profile'
-import { Button } from 'ui'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+} from '@/components/layouts/Scaffold'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useDpaRequestMutation } from '@/data/documents/dpa-request-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useProfile } from '@/lib/profile'
 
 export const DPA = () => {
   const { profile } = useProfile()
@@ -22,7 +22,7 @@ export const DPA = () => {
   const [isOpen, setIsOpen] = useState(false)
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: requestDpa, isLoading: isRequesting } = useDpaRequestMutation({
+  const { mutate: requestDpa, isPending: isRequesting } = useDpaRequestMutation({
     onSuccess: () => {
       toast.success('DPA request sent successfully')
       setIsOpen(false)
@@ -37,10 +37,10 @@ export const DPA = () => {
 
   return (
     <>
-      <ScaffoldSection>
-        <ScaffoldSectionDetail className="sticky space-y-6 top-12">
-          <p className="text-base m-0">Data Processing Addendum (DPA)</p>
-          <div className="space-y-2 text-sm text-foreground-light m-0">
+      <ScaffoldSection className="py-12">
+        <ScaffoldSectionDetail>
+          <h4 className="mb-5">Data Processing Addendum (DPA)</h4>
+          <div className="space-y-2 text-sm text-foreground-light [&_p]:m-0">
             <p>
               All organizations can sign our Data Processing Addendum ("DPA") as part of their GDPR
               compliance.
@@ -48,7 +48,7 @@ export const DPA = () => {
             <p>
               You can review a static PDF version of our latest DPA document{' '}
               <InlineLink
-                href="https://supabase.com/downloads/docs/Supabase+DPA+250805.pdf"
+                href="https://supabase.com/downloads/docs/Supabase+DPA+260317.pdf"
                 onClick={() =>
                   sendEvent({
                     action: 'dpa_pdf_opened',
@@ -62,18 +62,20 @@ export const DPA = () => {
             </p>
           </div>
         </ScaffoldSectionDetail>
-        <ScaffoldSectionContent className="flex items-center justify-center h-full">
-          <Button
-            onClick={() => {
-              setIsOpen(true)
-              sendEvent({
-                action: 'dpa_request_button_clicked',
-              })
-            }}
-            type="default"
-          >
-            Request DPA
-          </Button>
+        <ScaffoldSectionContent>
+          <div className="@lg:flex items-center justify-center h-full">
+            <Button
+              onClick={() => {
+                setIsOpen(true)
+                sendEvent({
+                  action: 'dpa_request_button_clicked',
+                })
+              }}
+              type="default"
+            >
+              Request DPA
+            </Button>
+          </div>
         </ScaffoldSectionContent>
       </ScaffoldSection>
 

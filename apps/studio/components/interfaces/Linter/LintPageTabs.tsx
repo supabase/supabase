@@ -1,36 +1,27 @@
-import { MessageSquareMore } from 'lucide-react'
-
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
-
+import { MessageSquareMore } from 'lucide-react'
+import { useRouter } from 'next/router'
 import {
+  cn,
+  Tabs_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { LINTER_LEVELS, LINT_TABS } from 'components/interfaces/Linter/Linter.constants'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { Lint } from 'data/lint/lint-query'
-import { useRouter } from 'next/router'
+import { LINT_TABS, LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
+import { Lint } from '@/data/lint/lint-query'
 
 interface LintPageTabsProps {
   currentTab: string
   setCurrentTab: (value: LINTER_LEVELS) => void
-  setSelectedLint: (value: Lint | null) => void
   isLoading: boolean
   activeLints: Lint[]
 }
-const LintPageTabs = ({
-  currentTab,
-  setCurrentTab,
-  setSelectedLint,
-  isLoading,
-  activeLints,
-}: LintPageTabsProps) => {
+const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: LintPageTabsProps) => {
   const router = useRouter()
 
   const warnLintsCount = activeLints.filter((x) => x.level === 'WARN').length
@@ -73,7 +64,6 @@ const LintPageTabs = ({
       defaultValue={currentTab}
       onValueChange={(value) => {
         setCurrentTab(value as LINTER_LEVELS)
-        setSelectedLint(null)
         const { sort, search, ...rest } = router.query
         router.push({ ...router, query: { ...rest, preset: value, id: null } })
       }}
@@ -103,7 +93,7 @@ const LintPageTabs = ({
                   tab.id === LINTER_LEVELS.ERROR
                     ? 'text-destructive-600'
                     : tab.id === LINTER_LEVELS.WARN
-                      ? 'text-warning-600'
+                      ? 'text-warning'
                       : 'text-brand-500'
                 }
               >

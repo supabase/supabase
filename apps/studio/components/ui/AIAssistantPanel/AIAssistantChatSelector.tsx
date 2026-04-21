@@ -1,7 +1,5 @@
 import { Check, ChevronDown, Edit, Plus, Trash, X } from 'lucide-react'
 import { useState } from 'react'
-
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Button,
   cn,
@@ -18,6 +16,8 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
+
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 
 interface AIAssistantChatSelectorProps {
   disabled?: boolean
@@ -98,7 +98,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-[250px] p-0" align="start">
         <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Search chats..." />
+          <CommandInput_Shadcn_ className="text-xs" placeholder="Search chats..." />
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>No chats found.</CommandEmpty_Shadcn_>
             <CommandGroup_Shadcn_>

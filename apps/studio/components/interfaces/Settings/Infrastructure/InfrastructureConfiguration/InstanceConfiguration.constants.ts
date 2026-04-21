@@ -1,15 +1,46 @@
 import { ReadReplicaSetupError, ReadReplicaSetupProgress } from '@supabase/shared-types/out/events'
-
-import { components } from 'data/api'
-import { PROJECT_STATUS } from 'lib/constants'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
 import { AWS_REGIONS } from 'shared-data'
+
+import { components } from '@/data/api'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export interface Region {
   key: AWS_REGIONS_KEYS
   name: string
   region: string
   coordinates: [number, number]
+}
+
+export type NodeData = {
+  id: string
+  provider: string
+  region: Region
+  computeSize?: string
+  status: string
+  inserted_at: string
+}
+
+export type PrimaryNodeData = NodeData & {
+  numReplicas: number
+  numRegions: number
+  hasLoadBalancer: boolean
+}
+
+export type LoadBalancerData = NodeData & {
+  numDatabases: number
+}
+
+export type ReplicaNodeData = NodeData & {
+  onSelectRestartReplica: () => void
+  onSelectResizeReplica: () => void
+  onSelectDropReplica: () => void
+}
+
+export type EdgeData = {
+  status: string
+  identifier: string
+  connectionString: string | null | undefined
 }
 
 // ReactFlow is scaling everything by the factor of 2
@@ -33,6 +64,7 @@ export const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
   NORTHEAST_ASIA_2: [126.98, 37.56],
   CENTRAL_CANADA: [-73.6, 45.5],
   WEST_US: [-121.96, 37.35],
+  WEST_US_2: [-122.67, 45.51],
   EAST_US: [-78.45, 38.13],
   WEST_EU: [-8, 53],
   WEST_EU_2: [-0.1, 51],

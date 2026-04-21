@@ -1,20 +1,20 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
+import { logsKeys } from './keys'
+import {
+  getUnifiedLogsISOStartEnd,
+  UNIFIED_LOGS_QUERY_OPTIONS,
+} from './unified-logs-infinite-query'
 import {
   getAuthServiceFlowQuery,
   getEdgeFunctionServiceFlowQuery,
   getPostgresServiceFlowQuery,
   getPostgrestServiceFlowQuery,
   getStorageServiceFlowQuery,
-} from 'components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
-import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
-import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
-import { logsKeys } from './keys'
-import {
-  getUnifiedLogsISOStartEnd,
-  UNIFIED_LOGS_QUERY_OPTIONS,
-} from './unified-logs-infinite-query'
+} from '@/components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
+import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 // Service flow types - subset of LOG_TYPES that support service flows
 export const SERVICE_FLOW_TYPES = [
@@ -178,14 +178,12 @@ export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<UnifiedLogInspectionData, UnifiedLogInspectionError, TData> = {}
+  }: UseCustomQueryOptions<UnifiedLogInspectionData, UnifiedLogInspectionError, TData> = {}
 ) =>
-  useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>(
-    logsKeys.serviceFlow(projectRef, search, logId),
-    ({ signal }) => getUnifiedLogInspection({ projectRef, logId, type, search }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...UNIFIED_LOGS_QUERY_OPTIONS,
-      ...options,
-    }
-  )
+  useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>({
+    queryKey: logsKeys.serviceFlow(projectRef, search, logId),
+    queryFn: ({ signal }) => getUnifiedLogInspection({ projectRef, logId, type, search }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...UNIFIED_LOGS_QUERY_OPTIONS,
+    ...options,
+  })

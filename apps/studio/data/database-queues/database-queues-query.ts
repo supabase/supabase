@@ -1,7 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import { useQuery } from '@tanstack/react-query'
+
 import { databaseQueuesKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabaseQueuesVariables = {
   projectRef?: string
@@ -33,13 +34,14 @@ export type DatabaseQueueError = ResponseError
 
 export const useQueuesQuery = <TData = DatabaseQueueData>(
   { projectRef, connectionString }: DatabaseQueuesVariables,
-  { enabled = true, ...options }: UseQueryOptions<DatabaseQueueData, DatabaseQueueError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<DatabaseQueueData, DatabaseQueueError, TData> = {}
 ) =>
-  useQuery<DatabaseQueueData, DatabaseQueueError, TData>(
-    databaseQueuesKeys.list(projectRef),
-    () => getDatabaseQueues({ projectRef, connectionString }),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseQueueData, DatabaseQueueError, TData>({
+    queryKey: databaseQueuesKeys.list(projectRef),
+    queryFn: () => getDatabaseQueues({ projectRef, connectionString }),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

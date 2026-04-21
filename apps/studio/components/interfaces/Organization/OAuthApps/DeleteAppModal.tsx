@@ -1,11 +1,11 @@
+import { useParams } from 'common'
 import { Lock } from 'lucide-react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useOAuthAppDeleteMutation } from 'data/oauth/oauth-app-delete-mutation'
-import type { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { Modal } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { useOAuthAppDeleteMutation } from '@/data/oauth/oauth-app-delete-mutation'
+import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
 
 export interface DeleteAppModalProps {
   selectedApp?: OAuthApp
@@ -14,7 +14,7 @@ export interface DeleteAppModalProps {
 
 export const DeleteAppModal = ({ selectedApp, onClose }: DeleteAppModalProps) => {
   const { slug } = useParams()
-  const { mutate: deleteOAuthApp, isLoading: isDeleting } = useOAuthAppDeleteMutation({
+  const { mutate: deleteOAuthApp, isPending: isDeleting } = useOAuthAppDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted the app "${selectedApp?.name}"`)
       onClose()

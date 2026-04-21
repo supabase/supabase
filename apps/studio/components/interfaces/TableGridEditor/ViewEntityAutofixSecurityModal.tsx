@@ -1,14 +1,15 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-
-import { useViewDefinitionQuery } from 'data/database/view-definition-query'
-import { lintKeys } from 'data/lint/keys'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { Entity, isViewLike } from 'data/table-editor/table-editor-types'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { ScrollArea, SimpleCodeBlock } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { ScrollArea } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
+
+import { useViewDefinitionQuery } from '@/data/database/view-definition-query'
+import { lintKeys } from '@/data/lint/keys'
+import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { Entity, isViewLike } from '@/data/table-editor/table-editor-types'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface ViewEntityAutofixSecurityModalProps {
   table: Entity
@@ -23,7 +24,11 @@ export default function ViewEntityAutofixSecurityModal({
 }: ViewEntityAutofixSecurityModalProps) {
   const { data: project } = useSelectedProjectQuery()
   const queryClient = useQueryClient()
-  const { isSuccess, isLoading, data } = useViewDefinitionQuery(
+  const {
+    isSuccess,
+    isPending: isLoading,
+    data,
+  } = useViewDefinitionQuery(
     {
       id: table?.id,
       projectRef: project?.ref,
@@ -38,7 +43,7 @@ export default function ViewEntityAutofixSecurityModal({
     onSuccess: async () => {
       toast.success('View security changed successfully')
       setIsAutofixViewSecurityModalOpen(false)
-      await queryClient.invalidateQueries(lintKeys.lint(project?.ref))
+      await queryClient.invalidateQueries({ queryKey: lintKeys.lint(project?.ref) })
     },
     onError: (error) => {
       toast.error(`Failed to autofix view security: ${error.message}`)

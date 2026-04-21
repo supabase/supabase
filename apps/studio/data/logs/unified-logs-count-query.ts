@@ -1,15 +1,16 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { getLogsCountQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
-import { FacetMetadataSchema } from 'components/interfaces/UnifiedLogs/UnifiedLogs.schema'
-import { handleError, post } from 'data/fetchers'
-import { ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { logsKeys } from './keys'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
   UnifiedLogsVariables,
 } from './unified-logs-infinite-query'
+import { getLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { FacetMetadataSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
+import { handleError, post } from '@/data/fetchers'
+import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from '@/types'
 
 export async function getUnifiedLogsCount(
   { projectRef, search }: UnifiedLogsVariables,
@@ -81,14 +82,12 @@ export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<UnifiedLogsCountData, UnifiedLogsCountError, TData> = {}
+  }: UseCustomQueryOptions<UnifiedLogsCountData, UnifiedLogsCountError, TData> = {}
 ) =>
-  useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>(
-    logsKeys.unifiedLogsCount(projectRef, search),
-    ({ signal }) => getUnifiedLogsCount({ projectRef, search }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...UNIFIED_LOGS_QUERY_OPTIONS,
-      ...options,
-    }
-  )
+  useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
+    queryKey: logsKeys.unifiedLogsCount(projectRef, search),
+    queryFn: ({ signal }) => getUnifiedLogsCount({ projectRef, search }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...UNIFIED_LOGS_QUERY_OPTIONS,
+    ...options,
+  })

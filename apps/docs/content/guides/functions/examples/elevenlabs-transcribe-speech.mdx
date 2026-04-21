@@ -20,7 +20,7 @@ Find the [example project on GitHub](https://github.com/elevenlabs/elevenlabs-ex
 
 - An ElevenLabs account with an [API key](/app/settings/api-keys).
 - A [Supabase](https://supabase.com) account (you can sign up for a free account via [database.new](https://database.new)).
-- The [Supabase CLI](https://supabase.com/docs/guides/local-development) installed on your machine.
+- The [Supabase CLI](/docs/guides/local-development) installed on your machine.
 - The [Deno runtime](https://docs.deno.com/runtime/getting_started/installation/) installed on your machine and optionally [setup in your favourite IDE](https://docs.deno.com/runtime/getting_started/setup_your_environment).
 - A [Telegram](https://telegram.org) account.
 
@@ -34,7 +34,7 @@ Use the [BotFather](https://t.me/BotFather) to create a new Telegram bot. Run th
 
 ### Create a Supabase project locally
 
-After installing the [Supabase CLI](https://supabase.com/docs/guides/local-development), run the following command to create a new Supabase project locally:
+After installing the [Supabase CLI](/docs/guides/local-development), run the following command to create a new Supabase project locally:
 
 ```bash
 supabase init
@@ -97,7 +97,7 @@ FUNCTION_SECRET=random_secret
 The project uses a couple of dependencies:
 
 - The open-source [grammY Framework](https://grammy.dev/) to handle the Telegram webhook requests.
-- The [@supabase/supabase-js](https://supabase.com/docs/reference/javascript) library to interact with the Supabase database.
+- The [@supabase/supabase-js](/docs/reference/javascript) library to interact with the Supabase database.
 - The ElevenLabs [JavaScript SDK](/docs/quickstart) to interact with the speech-to-text API.
 
 Since Supabase Edge Function uses the [Deno runtime](https://deno.land/), you don't need to install the dependencies, rather you can [import](https://docs.deno.com/examples/npm/) them via the `npm:` prefix.
@@ -253,7 +253,7 @@ Run the following command to apply the database migrations from the `supabase/mi
 supabase db push
 ```
 
-Navigate to the [table editor](https://supabase.com/dashboard/project/_/editor) in your Supabase dashboard and you should see and empty `transcription_logs` table.
+Navigate to the [table editor](/dashboard/project/_/editor) in your Supabase dashboard and you should see and empty `transcription_logs` table.
 
 ![Empty table](/docs/img/guides/functions/elevenlabs/supa-empty-table.png)
 
@@ -263,7 +263,7 @@ Lastly, run the following command to deploy the Edge Function:
 supabase functions deploy --no-verify-jwt scribe-bot
 ```
 
-Navigate to the [Edge Functions view](https://supabase.com/dashboard/project/_/functions) in your Supabase dashboard and you should see the `scribe-bot` function deployed. Make a note of the function URL as you'll need it later, it should look something like `https://<project-ref>.functions.supabase.co/scribe-bot`.
+Navigate to the [Edge Functions view](/dashboard/project/_/functions) in your Supabase dashboard and you should see the `scribe-bot` function deployed. Make a note of the function URL as you'll need it later, it should look something like `https://<project-ref>.functions.supabase.co/scribe-bot`.
 
 ![Edge Function deployed](/docs/img/guides/functions/elevenlabs/supa-edge-function-deployed.png)
 

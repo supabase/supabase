@@ -4,8 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
 import {
   Button,
   Checkbox_Shadcn_,
@@ -16,6 +14,7 @@ import {
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
 } from 'ui'
+import { z } from 'zod'
 
 const FormSchema = z.object({
   mobile: z.boolean().default(false).optional(),

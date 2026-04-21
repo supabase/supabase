@@ -1,6 +1,7 @@
-import { SVGProps, forwardRef } from 'react'
-import { cn } from '../lib/utils'
 import { Check } from 'lucide-react'
+import { forwardRef, SVGProps } from 'react'
+
+import { cn } from '../lib/utils'
 
 export interface StatusIconProps {
   hideBackground?: boolean
@@ -91,7 +92,7 @@ const WarningIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
       className={cn(
         !hideBackground
           ? 'w-4 h-4 p-0.5 bg-warning-600 text-warning-200 rounded'
-          : 'w-3 h-3 text-warning-600',
+          : 'w-3 h-3 text-warning',
         props.className
       )}
     >
@@ -151,7 +152,7 @@ const EyeIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
       className={cn(
         !hideBackground
           ? 'w-4 h-4 p-0.5 bg-warning-600 text-warning-200 rounded'
-          : 'w-3 h-3 text-warning-600',
+          : 'w-3 h-3 text-warning',
         props.className
       )}
     >
@@ -180,7 +181,7 @@ const EyeOffIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
       className={cn(
         !hideBackground
           ? 'w-4 h-4 p-0.5 bg-foreground-light text-background rounded'
-          : 'w-3 h-3 text-warning-600',
+          : 'w-3 h-3 text-warning',
         props.className
       )}
     >

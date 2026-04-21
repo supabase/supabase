@@ -1,14 +1,15 @@
 import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
+import { getAccessToken } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { LogoLoader } from 'ui'
 
-import { SignInMfaForm } from 'components/interfaces/SignIn/SignInMfaForm'
-import ForgotPasswordLayout from 'components/layouts/SignInLayout/ForgotPasswordLayout'
-import { Loading } from 'components/ui/Loading'
-import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
-import type { NextPageWithLayout } from 'types'
+import { SignInMfaForm } from '@/components/interfaces/SignIn/SignInMfaForm'
+import ForgotPasswordLayout from '@/components/layouts/SignInLayout/ForgotPasswordLayout'
+import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import type { NextPageWithLayout } from '@/types'
 
 const ForgotPasswordMfa: NextPageWithLayout = () => {
   const router = useRouter()
@@ -68,7 +69,7 @@ const ForgotPasswordMfa: NextPageWithLayout = () => {
   if (loading) {
     return (
       <div className="flex flex-col flex-1 bg-alternative h-screen items-center justify-center">
-        <Loading />
+        <LogoLoader />
       </div>
     )
   }

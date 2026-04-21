@@ -6,6 +6,177 @@ subtitle: 'Learn how to develop and manage your Supabase branches'
 
 This guide covers how to work with Supabase branches effectively, including migration management, seeding behavior, and development workflows.
 
+## Subscribing to notifications
+
+You can subscribe to webhook notifications when an action run completes on a persistent branch. The payload format follows the [webhook standards](https://www.standardwebhooks.com).
+
+```json
+{
+  "type": "run.completed",
+  "timestamp": "2025-10-17T02:27:18.705861793Z",
+  "data": {
+    "project_ref": "xuqpsshjxdecrwdyuxvs",
+    "details_url": "https://supabase.com/dashboard/project/xuqpsshjxdecrwdyuxvs/branches",
+    "action_run": {
+      "id": "d5f8b4298d0a4d37b99e255c7837e7af",
+      "created_at": "2025-10-17T02:27:10.133329324Z"
+      "steps": [
+        {
+          "name": "clone",
+          "status": "exited",
+          "updated_at": "2025-10-17T02:27:10.788435466Z"
+        },
+        {
+          "name": "pull",
+          "status": "exited",
+          "updated_at": "2025-10-17T02:27:11.701742857Z"
+        },
+        {
+          "name": "health",
+          "status": "exited",
+          "updated_at": "2025-10-17T02:27:12.79205717Z"
+        },
+        {
+          "name": "configure",
+          "status": "exited",
+          "updated_at": "2025-10-17T02:27:13.726839657Z"
+        },
+        {
+          "name": "migrate",
+          "status": "exited",
+          "updated_at": "2025-10-17T02:27:14.97017507Z"
+        },
+        {
+          "name": "seed",
+          "status": "exited",
+          "updated_at": "2025-10-17T02:27:15.637684921Z"
+        },
+        {
+          "name": "deploy",
+          "status": "exited",
+          "updated_at": "2025-10-17T02:27:18.604193114Z"
+        }
+      ]
+    }
+  }
+}
+```
+
+We recommend registering a single webhooks processor that dispatches events to downstream services based on the payload type. The easiest way to do that is by deploying an Edge Function. For example, the following Edge Function listens for run completed events to notify a Slack channel.
+
+```typescript name=supabase/functions/notify-slack/index.ts
+// Setup type definitions for built-in Supabase Runtime APIs
+import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
+
+console.log('Branching notification booted!')
+const slack = Deno.env.get('SLACK_WEBHOOK_URL') ?? ''
+
+Deno.serve(async (request) => {
+  const body = await request.json()
+  const blocks = [
+    {
+      type: 'header',
+      text: {
+        type: 'plain_text',
+        text: `Action run ${body.data.action_run.failure ? 'failed' : 'completed'}`,
+        emoji: true,
+      },
+    },
+    {
+      type: 'section',
+      fields: [
+        {
+          type: 'mrkdwn',
+          text: `*Branch ref:*\n${body.data.project_ref}`,
+        },
+        {
+          type: 'mrkdwn',
+          text: `*Run ID:*\n${body.data.action_run.id}`,
+        },
+      ],
+    },
+    {
+      type: 'section',
+      fields: [
+        {
+          type: 'mrkdwn',
+          text: `*Started at:*\n${body.data.action_run.created_at}`,
+        },
+        {
+          type: 'mrkdwn',
+          text: `*Completed at:*\n${body.timestamp}`,
+        },
+      ],
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `<${body.data.details_url}|View logs>`,
+      },
+    },
+  ]
+  const resp = await fetch(slack, {
+    method: 'POST',
+    body: JSON.stringify({
+      blocks,
+    }),
+  })
+  const message = await resp.text()
+  return new Response(
+    JSON.stringify({
+      message,
+    }),
+    {
+      status: 200,
+    }
+  )
+})
+```
+
+<StepHikeCompact>
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Setup Slack webhook URL" fullWidth>
+
+      Create a [Slack webhook URL](https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks/) and set it as Function secrets.
+
+      ```markdown
+      supabase secrets set --project-ref <branch-ref> SLACK_WEBHOOK_URL=<your-webhook-url>
+      ```
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Deploy your webhooks processor" fullWidth>
+
+      Create and deploy an Edge Function to process webhooks.
+
+      ```markdown
+      supabase functions deploy --project-ref <branch-ref> --use-api notify-slack
+      ```
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+      <StepHikeCompact.Details title="Update branch notification URL" fullWidth>
+
+        Update the notification URL of your target branch to point to your Edge Function.
+
+        ```markdown
+        supabase branches update <branch-ref> --notify-url https://<branch-ref>.supabase.co/functions/v1/notify-slack
+        ```
+
+      </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+After completing the steps above, you should receive a Slack message whenever an action run completes on your target branch.
+
 ## Migration and seeding behavior
 
 Migrations are run in sequential order. Each migration builds upon the previous one.

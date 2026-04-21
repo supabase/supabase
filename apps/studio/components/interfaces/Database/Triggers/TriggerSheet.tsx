@@ -1,17 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { Terminal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { PostgresTrigger } from '@supabase/postgres-meta'
-import FormBoxEmpty from 'components/ui/FormBoxEmpty'
-import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
-import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -33,6 +25,8 @@ import {
   SheetTitle,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
 import ChooseFunctionForm from './ChooseFunctionForm'
 import {
   TRIGGER_ENABLED_MODES,
@@ -40,6 +34,14 @@ import {
   TRIGGER_ORIENTATIONS,
   TRIGGER_TYPES,
 } from './Triggers.constants'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import FormBoxEmpty from '@/components/ui/FormBoxEmpty'
+import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
+import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 
 const formId = 'create-trigger'
 
@@ -75,31 +77,37 @@ const defaultValues: z.infer<typeof FormSchema> = {
 
 interface TriggerSheetProps {
   selectedTrigger?: PostgresTrigger
+  isDuplicatingTrigger?: boolean
   open: boolean
-  setOpen: (val: boolean) => void
+  onClose: () => void
 }
 
-export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetProps) => {
+export const TriggerSheet = ({
+  selectedTrigger,
+  isDuplicatingTrigger,
+  open,
+  onClose,
+}: TriggerSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
 
   const [showFunctionSelector, setShowFunctionSelector] = useState(false)
 
-  const { mutate: createDatabaseTrigger, isLoading: isCreating } = useDatabaseTriggerCreateMutation(
+  const { mutate: createDatabaseTrigger, isPending: isCreating } = useDatabaseTriggerCreateMutation(
     {
-      onSuccess: (res) => {
-        toast.success(`Successfully created trigger ${res.name}`)
-        setOpen(false)
+      onSuccess: () => {
+        toast.success(`Successfully created trigger`)
+        onClose()
       },
       onError: (error) => {
         toast.error(`Failed to create trigger: ${error.message}`)
       },
     }
   )
-  const { mutate: updateDatabaseTrigger, isLoading: isUpdating } = useDatabaseTriggerUpdateMutation(
+  const { mutate: updateDatabaseTrigger, isPending: isUpdating } = useDatabaseTriggerUpdateMutation(
     {
-      onSuccess: (res) => {
-        toast.success(`Successfully updated trigger ${res.name}`)
-        setOpen(false)
+      onSuccess: () => {
+        toast.success(`Successfully updated trigger`)
+        onClose()
       },
       onError: (error) => {
         toast.error(`Failed to update trigger: ${error.message}`)
@@ -117,7 +125,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
   const tables = data
     .sort((a, b) => a.schema.localeCompare(b.schema))
     .filter((a) => !protectedSchemas.find((s) => s.name === a.schema))
-  const isEditing = !!selectedTrigger
+  const isEditing = !isDuplicatingTrigger && !!selectedTrigger
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
@@ -126,6 +134,11 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
     defaultValues,
   })
   const { function_name, function_schema } = form.watch()
+
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => form.formState.isDirty,
+    onClose,
+  })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
@@ -151,7 +164,16 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
     if (open && isSuccess) {
       form.clearErrors()
 
-      if (isEditing) {
+      if (isDuplicatingTrigger && selectedTrigger) {
+        const initalSelectedTable = tables.find((t) => t.name === selectedTrigger.table)
+
+        form.reset({
+          ...selectedTrigger,
+          tableId: initalSelectedTable?.id.toString(),
+          table: initalSelectedTable?.name,
+          schema: initalSelectedTable?.schema,
+        })
+      } else if (isEditing) {
         form.reset(selectedTrigger)
       } else if (tables.length > 0) {
         form.reset({
@@ -167,13 +189,15 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
 
   return (
     <>
-      <Sheet open={open} onOpenChange={setOpen}>
+      <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetContent size="lg" className="flex flex-col gap-0">
           <SheetHeader>
             <SheetTitle>
-              {isEditing
-                ? `Edit database trigger: ${selectedTrigger.name}`
-                : 'Create a new database trigger'}
+              {isDuplicatingTrigger
+                ? 'Duplicate trigger'
+                : isEditing
+                  ? `Edit database trigger: ${selectedTrigger.name}`
+                  : 'Create a new database trigger'}
             </SheetTitle>
           </SheetHeader>
 
@@ -250,10 +274,12 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
                           <Select_Shadcn_
                             defaultValue={field.value}
                             onValueChange={(val) => {
+                              // mark table ID as dirty to trigger validation
+                              field.onChange(val)
                               const table = tables.find((x) => x.id.toString() === val)
                               if (table) {
-                                form.setValue('table', table.name)
-                                form.setValue('schema', table.schema)
+                                form.setValue('table', table.name, { shouldDirty: true })
+                                form.setValue('schema', table.schema, { shouldDirty: true })
                               }
                             }}
                           >
@@ -387,7 +413,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
                       <FormItemLayout layout="vertical" className="px-5">
                         <FormControl_Shadcn_>
                           <div className="flex flex-col gap-y-2">
-                            <p className="text-smn">Function to trigger</p>
+                            <p className="text-sm">Function to trigger</p>
                             {function_name.length === 0 ? (
                               <button
                                 type="button"
@@ -446,7 +472,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
               type="default"
               htmlType="reset"
               disabled={isCreating || isUpdating}
-              onClick={() => setOpen(false)}
+              onClick={confirmOnClose}
             >
               Cancel
             </Button>
@@ -454,6 +480,8 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
               {isEditing ? 'Save' : 'Create'} trigger
             </Button>
           </SheetFooter>
+
+          <DiscardChangesConfirmationDialog {...modalProps} />
         </SheetContent>
       </Sheet>
 
@@ -461,8 +489,8 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
         visible={showFunctionSelector}
         setVisible={setShowFunctionSelector}
         onChange={(fn) => {
-          form.setValue('function_name', fn.name)
-          form.setValue('function_schema', fn.schema)
+          form.setValue('function_name', fn.name, { shouldDirty: true })
+          form.setValue('function_schema', fn.schema, { shouldDirty: true })
         }}
       />
     </>

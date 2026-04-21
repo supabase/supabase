@@ -1,8 +1,10 @@
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
-import { LanguageModel } from 'ai'
 import { createCredentialChain, fromNodeProviderChain } from '@aws-sdk/credential-providers'
 import { CredentialsProviderError } from '@smithy/property-provider'
 import { awsCredentialsProvider } from '@vercel/functions/oidc'
+import { LanguageModel } from 'ai'
+
+import { BedrockModel } from './model.utils'
 import { selectWeightedKey } from './util'
 
 const credentialProvider = createCredentialChain(
@@ -61,8 +63,6 @@ export const regionPrefixMap: Record<BedrockRegion, string> = {
   euc1: 'eu',
 }
 
-export type BedrockModel = 'anthropic.claude-3-7-sonnet-20250219-v1:0' | 'openai.gpt-oss-120b-1:0'
-
 export type RegionWeights = Record<BedrockRegion, number>
 
 /**
@@ -91,10 +91,8 @@ const modelRegionWeights: Record<BedrockModel, RegionWeights> = {
  * Used to load balance requests across multiple regions depending on
  * their capacities.
  */
-export function createRoutedBedrock(routingKey?: string, useOpenAI = false) {
-  return async (
-    modelId: BedrockModel
-  ): Promise<{ model: LanguageModel; supportsCachePoint: boolean }> => {
+export function createRoutedBedrock(routingKey?: string) {
+  return async (modelId: BedrockModel): Promise<LanguageModel> => {
     const regionWeights = modelRegionWeights[modelId]
 
     // Select the Bedrock region based on the routing key and the model
@@ -116,7 +114,6 @@ export function createRoutedBedrock(routingKey?: string, useOpenAI = false) {
     const modelName = activeRegions > 1 ? `${regionPrefixMap[bedrockRegion]}.${modelId}` : modelId
 
     const model = bedrock(modelName)
-    const supportsCachePoint = modelId === 'anthropic.claude-3-7-sonnet-20250219-v1:0'
-    return { model, supportsCachePoint }
+    return model
   }
 }

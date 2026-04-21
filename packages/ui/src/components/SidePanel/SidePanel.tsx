@@ -2,6 +2,7 @@
 
 import * as Dialog from '@radix-ui/react-dialog'
 import React from 'react'
+
 import { Button } from '../../components/Button/Button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../components/shadcn/ui/tooltip'
 import styleHandler from '../../lib/theme/styleHandler'
@@ -9,7 +10,8 @@ import styleHandler from '../../lib/theme/styleHandler'
 export type SidePanelProps = RadixProps & CustomProps
 
 interface RadixProps
-  extends Dialog.DialogProps,
+  extends
+    Dialog.DialogProps,
     Pick<
       Dialog.DialogContentProps,
       | 'onOpenAutoFocus'
@@ -72,7 +74,7 @@ const SidePanel = ({
           {cancelText}
         </Button>
       </div>
-      {onConfirm !== undefined && (
+      {!!onConfirm && (
         <Tooltip>
           <TooltipTrigger asChild>
             <span className="inline-block">
@@ -80,7 +82,7 @@ const SidePanel = ({
                 htmlType="submit"
                 disabled={disabled || loading}
                 loading={loading}
-                onClick={() => (onConfirm ? onConfirm() : null)}
+                onClick={onConfirm}
               >
                 {confirmText}
               </Button>
@@ -104,13 +106,17 @@ const SidePanel = ({
 
   open = open || visible
 
+  const {
+    onOpenAutoFocus,
+    onCloseAutoFocus,
+    onEscapeKeyDown,
+    onPointerDownOutside,
+    onInteractOutside,
+  } = props
+
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange} defaultOpen={defaultOpen}>
-      {triggerElement && (
-        <Dialog.Trigger asChild className={__styles.trigger}>
-          {triggerElement}
-        </Dialog.Trigger>
-      )}
+      {triggerElement && <Dialog.Trigger asChild>{triggerElement}</Dialog.Trigger>}
 
       <Dialog.Portal>
         <Dialog.Overlay className={__styles.overlay} />
@@ -121,15 +127,16 @@ const SidePanel = ({
             __styles.align[align],
             className && className,
           ].join(' ')}
-          onOpenAutoFocus={props.onOpenAutoFocus}
-          onCloseAutoFocus={props.onCloseAutoFocus}
-          onEscapeKeyDown={props.onEscapeKeyDown}
-          onPointerDownOutside={props.onPointerDownOutside}
+          onOpenAutoFocus={onOpenAutoFocus}
+          onCloseAutoFocus={onCloseAutoFocus}
+          onEscapeKeyDown={onEscapeKeyDown}
+          onPointerDownOutside={onPointerDownOutside}
           onInteractOutside={(event) => {
             const isToast = (event.target as Element)?.closest('#toast')
             if (isToast) event.preventDefault()
-            if (props.onInteractOutside) props.onInteractOutside(event)
+            if (onInteractOutside) onInteractOutside(event)
           }}
+          {...props}
         >
           {header && <header className={__styles.header}>{header}</header>}
           <div className={__styles.contents}>{children}</div>

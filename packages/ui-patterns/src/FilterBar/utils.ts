@@ -1,0 +1,360 @@
+import {
+  AsyncOptionsFunction,
+  CustomOptionObject,
+  FilterCondition,
+  FilterGroup,
+  FilterOperatorGroup,
+  FilterOperatorObject,
+  FilterOptionObject,
+  FilterProperty,
+  GROUP_ORDER,
+  GroupedMenuItem,
+  isGroup,
+  MenuItem,
+  MenuItemGroup,
+  ResolvedPropertyChange,
+  SyncOptionsFunction,
+} from './types'
+
+export function pathsEqual(a: number[], b: number[]): boolean {
+  return a.length === b.length && a.every((v, i) => v === b[i])
+}
+
+export function findGroupByPath(group: FilterGroup, path: number[]): FilterGroup | null {
+  if (path.length === 0) return group
+
+  const [current, ...rest] = path
+  const condition = group.conditions[current]
+  if (!condition) return null
+
+  if (rest.length === 0) {
+    return isGroup(condition) ? condition : null
+  }
+
+  if (isGroup(condition)) {
+    return findGroupByPath(condition, rest)
+  }
+
+  return null
+}
+
+export function findConditionByPath(group: FilterGroup, path: number[]): FilterCondition | null {
+  if (path.length === 0) return null
+
+  const [current, ...rest] = path
+  const condition = group.conditions[current]
+  if (!condition) return null
+
+  if (rest.length === 0) {
+    return isGroup(condition) ? null : condition
+  }
+
+  if (isGroup(condition)) {
+    return findConditionByPath(condition, rest)
+  }
+
+  return null
+}
+
+export function isCustomOptionObject(option: any): option is CustomOptionObject {
+  return typeof option === 'object' && option !== null && 'component' in option
+}
+
+export function isFilterOptionObject(option: any): option is FilterOptionObject {
+  return typeof option === 'object' && option !== null && 'value' in option && 'label' in option
+}
+
+export function isFilterOperatorObject(operator: any): operator is FilterOperatorObject {
+  return (
+    typeof operator === 'object' && operator !== null && 'value' in operator && 'label' in operator
+  )
+}
+
+export function isAsyncOptionsFunction(
+  options: FilterProperty['options']
+): options is AsyncOptionsFunction {
+  if (!options || Array.isArray(options) || isCustomOptionObject(options)) return false
+  if (typeof options !== 'function') return false
+  // More reliable async function detection
+  const fnString = options.toString()
+  return (
+    options.constructor.name === 'AsyncFunction' ||
+    fnString.startsWith('async ') ||
+    fnString.includes('async function')
+  )
+}
+
+export function isSyncOptionsFunction(
+  options: FilterProperty['options']
+): options is SyncOptionsFunction {
+  if (!options || Array.isArray(options) || isCustomOptionObject(options)) return false
+  return typeof options === 'function'
+}
+
+export function updateNestedFilter(
+  group: FilterGroup,
+  path: number[],
+  updateFn: (condition: FilterCondition) => FilterCondition
+): FilterGroup {
+  if (path.length === 1) {
+    return {
+      ...group,
+      conditions: group.conditions.map((condition, index) =>
+        index === path[0] ? updateFn(condition as FilterCondition) : condition
+      ),
+    }
+  }
+
+  const [current, ...rest] = path
+  return {
+    ...group,
+    conditions: group.conditions.map((condition, index) =>
+      index === current && isGroup(condition)
+        ? updateNestedFilter(condition, rest, updateFn)
+        : condition
+    ),
+  }
+}
+
+export function removeFromGroup(group: FilterGroup, path: number[]): FilterGroup {
+  if (path.length === 1) {
+    return {
+      ...group,
+      conditions: group.conditions.filter((_, i) => i !== path[0]),
+    }
+  }
+
+  const [current, ...rest] = path
+  return {
+    ...group,
+    conditions: group.conditions.map((condition, i) =>
+      i === current ? removeFromGroup(condition as FilterGroup, rest) : condition
+    ),
+  }
+}
+
+export function addFilterToGroup(
+  group: FilterGroup,
+  path: number[],
+  property: FilterProperty
+): FilterGroup {
+  if (path.length === 0) {
+    return {
+      ...group,
+      conditions: [...group.conditions, { propertyName: property.name, value: '', operator: '' }],
+    }
+  }
+
+  const [current, ...rest] = path
+  return {
+    ...group,
+    conditions: group.conditions.map((condition, i) =>
+      i === current ? addFilterToGroup(condition as FilterGroup, rest, property) : condition
+    ),
+  }
+}
+
+export function addGroupToGroup(group: FilterGroup, path: number[]): FilterGroup {
+  if (path.length === 0) {
+    return {
+      ...group,
+      conditions: [...group.conditions, { logicalOperator: 'AND', conditions: [] }],
+    }
+  }
+
+  const [current, ...rest] = path
+  return {
+    ...group,
+    conditions: group.conditions.map((condition, i) =>
+      i === current ? addGroupToGroup(condition as FilterGroup, rest) : condition
+    ),
+  }
+}
+
+export function updateNestedValue(
+  group: FilterGroup,
+  path: number[],
+  newValue: string
+): FilterGroup {
+  if (path.length === 1) {
+    return {
+      ...group,
+      conditions: group.conditions.map((condition, i) =>
+        i === path[0] ? { ...condition, value: newValue } : condition
+      ),
+    }
+  }
+
+  const [current, ...rest] = path
+  return {
+    ...group,
+    conditions: group.conditions.map((condition, i) =>
+      i === current
+        ? isGroup(condition)
+          ? updateNestedValue(condition, rest, newValue)
+          : condition
+        : condition
+    ),
+  }
+}
+
+export function updateNestedOperator(
+  group: FilterGroup,
+  path: number[],
+  newOperator: string
+): FilterGroup {
+  if (path.length === 1) {
+    return {
+      ...group,
+      conditions: group.conditions.map((condition, i) =>
+        i === path[0] ? { ...condition, operator: newOperator } : condition
+      ),
+    }
+  }
+
+  const [current, ...rest] = path
+  return {
+    ...group,
+    conditions: group.conditions.map((condition, i) =>
+      i === current
+        ? isGroup(condition)
+          ? updateNestedOperator(condition, rest, newOperator)
+          : condition
+        : condition
+    ),
+  }
+}
+
+export function updateNestedPropertyName(
+  group: FilterGroup,
+  path: number[],
+  newPropertyName: string,
+  newOperator?: string,
+  newValue?: string
+): FilterGroup {
+  return updateNestedFilter(group, path, (condition) => ({
+    ...condition,
+    propertyName: newPropertyName,
+    ...(newOperator !== undefined ? { operator: newOperator } : {}),
+    ...(newValue !== undefined ? { value: newValue } : {}),
+  }))
+}
+
+export function resolvePropertyChange(
+  currentOperator: string,
+  currentValue: string,
+  newProperty: FilterProperty
+): ResolvedPropertyChange {
+  if (!currentOperator || !newProperty.operators) {
+    return { operator: '', value: '', focusTarget: 'operator' }
+  }
+
+  const operatorValues = newProperty.operators.map((op) =>
+    isFilterOperatorObject(op) ? op.value : op
+  )
+
+  if (!operatorValues.includes(currentOperator)) {
+    return { operator: '', value: '', focusTarget: 'operator' }
+  }
+
+  if (!currentValue) {
+    return { operator: currentOperator, value: '', focusTarget: 'value' }
+  }
+
+  if (newProperty.options && Array.isArray(newProperty.options)) {
+    // New property has fixed options — only preserve value if it's in the list
+    const optionValues = newProperty.options.map((opt) =>
+      typeof opt === 'string' ? opt : 'value' in opt ? opt.value : ''
+    )
+    const preservedValue = optionValues.includes(currentValue) ? currentValue : ''
+    return { operator: currentOperator, value: preservedValue, focusTarget: 'value' }
+  }
+
+  return { operator: currentOperator, value: currentValue, focusTarget: 'value' }
+}
+
+export function updateNestedLogicalOperator(group: FilterGroup, path: number[]): FilterGroup {
+  if (path.length === 0) {
+    return {
+      ...group,
+      logicalOperator: group.logicalOperator === 'AND' ? 'OR' : 'AND',
+    }
+  }
+
+  const [current, ...rest] = path
+  return {
+    ...group,
+    conditions: group.conditions.map((condition, i) =>
+      i === current
+        ? isGroup(condition)
+          ? updateNestedLogicalOperator(condition, rest)
+          : condition
+        : condition
+    ),
+  }
+}
+
+export function updateGroupAtPath(
+  group: FilterGroup,
+  path: number[],
+  newGroup: FilterGroup
+): FilterGroup {
+  if (path.length === 0) {
+    return newGroup
+  }
+
+  const [current, ...rest] = path
+  return {
+    ...group,
+    conditions: group.conditions.map((condition, index) =>
+      index === current ? updateGroupAtPath(condition as FilterGroup, rest, newGroup) : condition
+    ),
+  }
+}
+
+export function groupMenuItemsByOperator(items: MenuItem[]): MenuItemGroup[] {
+  const grouped = items.reduce<Map<FilterOperatorGroup, GroupedMenuItem[]>>((acc, item, index) => {
+    const group: FilterOperatorGroup = item.group ?? 'uncategorized'
+    const existing = acc.get(group) ?? []
+    acc.set(group, [...existing, { item, index }])
+    return acc
+  }, new Map())
+
+  return GROUP_ORDER.filter((groupKey) => grouped.has(groupKey)).map((groupKey) => ({
+    group: groupKey,
+    items: grouped.get(groupKey) ?? [],
+  }))
+}
+
+export function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text
+  return text.slice(0, maxLength) + '...'
+}
+
+export function getActionItemLabel(item: MenuItem): string {
+  if (item.isAction && item.actionInputValue) {
+    return `Ask AI: "${truncateText(item.actionInputValue, 30)}"`
+  }
+  return item.label
+}
+
+export function buildFilterPlaceholder(
+  filterProperties: FilterProperty[],
+  options: { maxProperties?: number; hasActions?: boolean } = {}
+): string {
+  const { maxProperties = 3, hasActions = false } = options
+
+  if (filterProperties.length === 0) {
+    return hasActions ? 'Add filters or ask AI...' : 'Add filters...'
+  }
+
+  const propertyNames = filterProperties
+    .slice(0, maxProperties)
+    .map((prop) => prop.label)
+    .join(', ')
+
+  const suffix = filterProperties.length > maxProperties ? '...' : ''
+  const aiSuffix = hasActions ? ' or ask AI' : ''
+
+  return `Filter by ${propertyNames}${suffix}${aiSuffix}`
+}

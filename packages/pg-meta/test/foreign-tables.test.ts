@@ -1,6 +1,7 @@
-import { expect, test, beforeAll, afterAll } from 'vitest'
+import { afterAll, beforeAll, expect, test } from 'vitest'
+
 import pgMeta from '../src/index'
-import { createTestDatabase, cleanupRoot } from './db/utils'
+import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
   // Any global setup if needed
@@ -98,6 +99,9 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
         },
       ],
       "comment": null,
+      "foreign_data_wrapper_handler": "postgres_fdw_handler",
+      "foreign_data_wrapper_name": "postgres_fdw",
+      "foreign_server_name": "foreign_server",
       "id": Any<Number>,
       "name": "foreign_table",
       "schema": "public",
@@ -115,6 +119,9 @@ withTestDatabase('list foreign tables without columns', async ({ executeQuery })
     `
     {
       "comment": null,
+      "foreign_data_wrapper_handler": "postgres_fdw_handler",
+      "foreign_data_wrapper_name": "postgres_fdw",
+      "foreign_server_name": "foreign_server",
       "id": Any<Number>,
       "name": "foreign_table",
       "schema": "public",
@@ -199,6 +206,9 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
         },
       ],
       "comment": null,
+      "foreign_data_wrapper_handler": "postgres_fdw_handler",
+      "foreign_data_wrapper_name": "postgres_fdw",
+      "foreign_server_name": "foreign_server",
       "id": Any<Number>,
       "name": "foreign_table",
       "schema": "public",
@@ -282,6 +292,9 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
         },
       ],
       "comment": null,
+      "foreign_data_wrapper_handler": "postgres_fdw_handler",
+      "foreign_data_wrapper_name": "postgres_fdw",
+      "foreign_server_name": "foreign_server",
       "id": Any<Number>,
       "name": "foreign_table",
       "schema": "public",

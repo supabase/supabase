@@ -1,8 +1,10 @@
 import './utils/dotenv.js'
-
 import 'dotenv/config'
+
 import fs from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
+
+import { isFeatureEnabled } from '../../../packages/common/enabled-features/index.js'
 import {
   fetchCliLibReferenceSource,
   fetchCSharpLibReferenceSource,
@@ -22,17 +24,23 @@ interface Source {
    */
   relPath: string
   fetch: () => Promise<SearchSource[]>
+  enabled: boolean
 }
 
-function toLink(source: Source) {
-  return `[${source.title}](https://supabase.com/${source.relPath})`
-}
+const {
+  sdkCsharp: sdkCsharpEnabled,
+  sdkDart: sdkDartEnabled,
+  sdkKotlin: sdkKotlinEnabled,
+  sdkPython: sdkPythonEnabled,
+  sdkSwift: sdkSwiftEnabled,
+} = isFeatureEnabled(['sdk:csharp', 'sdk:dart', 'sdk:kotlin', 'sdk:python', 'sdk:swift'])
 
 const SOURCES: Source[] = [
   {
     title: 'Supabase Guides',
     relPath: 'llms/guides.txt',
     fetch: fetchGuideSources,
+    enabled: true,
   },
   {
     title: 'Supabase Reference (JavaScript)',
@@ -41,6 +49,7 @@ const SOURCES: Source[] = [
       (await fetchJsLibReferenceSource()).filter(
         (item): item is SearchSource => item !== undefined
       ),
+    enabled: true,
   },
   {
     title: 'Supabase Reference (Dart)',
@@ -49,6 +58,7 @@ const SOURCES: Source[] = [
       (await fetchDartLibReferenceSource()).filter(
         (item): item is SearchSource => item !== undefined
       ),
+    enabled: sdkDartEnabled,
   },
   {
     title: 'Supabase Reference (Swift)',
@@ -57,6 +67,7 @@ const SOURCES: Source[] = [
       (await fetchSwiftLibReferenceSource()).filter(
         (item): item is SearchSource => item !== undefined
       ),
+    enabled: sdkSwiftEnabled,
   },
   {
     title: 'Supabase Reference (Kotlin)',
@@ -65,6 +76,7 @@ const SOURCES: Source[] = [
       (await fetchKtLibReferenceSource()).filter(
         (item): item is SearchSource => item !== undefined
       ),
+    enabled: sdkKotlinEnabled,
   },
   {
     title: 'Supabase Reference (Python)',
@@ -73,6 +85,7 @@ const SOURCES: Source[] = [
       (await fetchPythonLibReferenceSource()).filter(
         (item): item is SearchSource => item !== undefined
       ),
+    enabled: sdkPythonEnabled,
   },
   {
     title: 'Supabase Reference (C#)',
@@ -81,6 +94,7 @@ const SOURCES: Source[] = [
       (await fetchCSharpLibReferenceSource()).filter(
         (item): item is SearchSource => item !== undefined
       ),
+    enabled: sdkCsharpEnabled,
   },
   {
     title: 'Supabase CLI Reference',
@@ -89,37 +103,42 @@ const SOURCES: Source[] = [
       (await fetchCliLibReferenceSource()).filter(
         (item): item is SearchSource => item !== undefined
       ),
+    enabled: true,
   },
 ]
-
-async function generateMainLlmsTxt() {
-  const sourceLinks = SOURCES.map((source) => `- ${toLink(source)}`).join('\n')
-  const fullText = `# Supabase Docs\n\n${sourceLinks}`
-  fs.writeFile('public/llms.txt', fullText)
-}
-
-async function generateSourceLlmsTxt(sourceDefn: Source) {
-  const source = await sourceDefn.fetch()
-  const sourceText = source
-    .map((section) => {
-      section.process()
-      return section.extractIndexedContent()
-    })
-    .join('\n\n')
-  const fullText = sourceDefn.title + '\n\n' + sourceText
-
-  fs.writeFile(`public/${sourceDefn.relPath}`, fullText)
-}
 
 async function generateLlmsTxt() {
   try {
     await fs.mkdir('public/llms', { recursive: true })
-    await Promise.all([generateMainLlmsTxt(), ...SOURCES.map(generateSourceLlmsTxt)])
+
+    const enabledSources = SOURCES.filter((source) => source.enabled !== false)
+
+    const fetchedSources = await Promise.all(
+      enabledSources.map(async (sourceDefn) => {
+        const source = await sourceDefn.fetch()
+        const sourceText = source
+          .map((section) => {
+            section.process()
+            return section.extractIndexedContent()
+          })
+          .join('\n\n')
+        return { defn: sourceDefn, text: sourceText }
+      })
+    )
+
+    await Promise.all(
+      fetchedSources.map(({ defn, text }) =>
+        fs.writeFile(`public/${defn.relPath}`, `${defn.title}\n\n${text}`)
+      )
+    )
   } catch (err) {
     console.error(err)
+    throw err
   }
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   generateLlmsTxt()
 }
+
+export { generateLlmsTxt, SOURCES }

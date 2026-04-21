@@ -1,17 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { AlertCircle, Info, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import InformationBox from 'components/ui/InformationBox'
-import NoSearchResults from 'components/ui/NoSearchResults'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Card,
@@ -28,7 +20,15 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { PublicationSkeleton } from './PublicationSkeleton'
+import AlertError from '@/components/ui/AlertError'
+import InformationBox from '@/components/ui/InformationBox'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface PublicationEvent {
   event: string
@@ -43,7 +43,7 @@ export const PublicationsList = () => {
   const {
     data = [],
     error,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
   } = useDatabasePublicationsQuery({
@@ -57,8 +57,10 @@ export const PublicationsList = () => {
     },
   })
 
-  const { can: canUpdatePublications, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckProjectPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'publications')
+  const { can: canUpdatePublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'publications'
+  )
 
   const publicationEvents: PublicationEvent[] = [
     { event: 'Insert', key: 'publish_insert' },
@@ -98,8 +100,8 @@ export const PublicationsList = () => {
           <div className="flex items-center">
             <Input
               size="tiny"
-              icon={<Search size={12} />}
-              className="w-48 pl-8"
+              icon={<Search />}
+              className="w-48"
               placeholder="Search for a publication"
               value={filterString}
               onChange={(e) => setFilterString(e.target.value)}
@@ -145,25 +147,27 @@ export const PublicationsList = () => {
               {isSuccess &&
                 publications.map((x) => (
                   <TableRow key={x.name}>
-                    <TableCell className="flex items-center gap-x-2 items-center">
-                      {x.name}
-                      {/* [Joshen] Making this tooltip very specific for these 2 publications */}
-                      {['supabase_realtime', 'supabase_realtime_messages_publication'].includes(
-                        x.name
-                      ) && (
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info size={14} className="text-foreground-light" />
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom">
-                            {x.name === 'supabase_realtime'
-                              ? 'This publication is managed by Supabase and handles Postgres changes'
-                              : x.name === 'supabase_realtime_messages_publication'
-                                ? 'This publication is managed by Supabase and handles broadcasts from the database'
-                                : undefined}
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
+                    <TableCell>
+                      <div className="flex items-center gap-x-2">
+                        {x.name}
+                        {/* [Joshen] Making this tooltip very specific for these 2 publications */}
+                        {['supabase_realtime', 'supabase_realtime_messages_publication'].includes(
+                          x.name
+                        ) && (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info size={14} className="text-foreground-light" />
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              {x.name === 'supabase_realtime'
+                                ? 'Managed by Supabase and handles Postgres changes'
+                                : x.name === 'supabase_realtime_messages_publication'
+                                  ? 'Managed by Supabase and handles broadcasts from the database'
+                                  : undefined}
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>{x.id}</TableCell>
                     {publicationEvents.map((event) => (

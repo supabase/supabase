@@ -1,9 +1,11 @@
-import { Style } from '@/registry/styles'
-import { Theme } from '@/registry/themes'
 import { useAtom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 import { ComponentProps } from 'react'
 import { SonnerToaster } from 'ui'
+
+import { Style } from '@/registry/styles'
+import { Theme } from '@/registry/themes'
+
 // import { BackendProvider } from '@/registry/backend-provider'
 
 type Config = {

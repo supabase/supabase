@@ -1,10 +1,5 @@
-import { sep } from 'node:path'
-
-import {
-  GitHubDiscussionLoader,
-  type GitHubDiscussionSource,
-  fetchDiscussions,
-} from './github-discussion.js'
+import { type GuideModel } from '../../../resources/guide/guideModel.js'
+import { GuideModelLoader } from '../../../resources/guide/guideModelLoader.js'
 import { LintWarningsGuideLoader, type LintWarningsGuideSource } from './lint-warnings-guide.js'
 import { MarkdownLoader, type MarkdownSource } from './markdown.js'
 import { IntegrationLoader, type IntegrationSource, fetchPartners } from './partner-integrations.js'
@@ -16,32 +11,21 @@ import {
   OpenApiReferenceLoader,
   type OpenApiReferenceSource,
 } from './reference-doc.js'
-import { walk } from './util.js'
-
-const ignoredFiles = ['pages/404.mdx']
+import { fetchTroubleshootingSources, type TroubleshootingSource } from './troubleshooting.js'
 
 export type SearchSource =
   | MarkdownSource
   | OpenApiReferenceSource
   | ClientLibReferenceSource
   | CliReferenceSource
-  | GitHubDiscussionSource
+  | TroubleshootingSource
   | IntegrationSource
   | LintWarningsGuideSource
 
 export async function fetchGuideSources() {
-  return (
-    await Promise.all(
-      (await walk('content/guides'))
-        .filter(
-          ({ path }) =>
-            /\.mdx?$/.test(path) &&
-            !ignoredFiles.includes(path) &&
-            !path.split(sep).some((part) => part.startsWith('_'))
-        )
-        .map((entry) => new MarkdownLoader('guide', entry.path, { yaml: true }).load())
-    )
-  ).flat()
+  const guides = (await GuideModelLoader.allFromFs()).unwrapLeft()
+
+  return guides.map((guide: GuideModel) => MarkdownLoader.fromGuideModel('guide', guide))
 }
 
 export async function fetchOpenApiReferenceSource() {
@@ -138,43 +122,39 @@ export async function fetchLintWarningsGuideSources() {
 /**
  * Fetches all the sources we want to index for search
  */
-export async function fetchAllSources() {
+export async function fetchAllSources(fullIndex: boolean) {
   const guideSources = fetchGuideSources()
   const lintWarningsGuideSources = fetchLintWarningsGuideSources()
   const openApiReferenceSource = fetchOpenApiReferenceSource()
   const jsLibReferenceSource = fetchJsLibReferenceSource()
-  const dartLibReferenceSource = fetchDartLibReferenceSource()
-  const pythonLibReferenceSource = fetchPythonLibReferenceSource()
-  const cSharpLibReferenceSource = fetchCSharpLibReferenceSource()
-  const swiftLibReferenceSource = fetchSwiftLibReferenceSource()
-  const ktLibReferenceSource = fetchKtLibReferenceSource()
-  const cliReferenceSource = fetchCliLibReferenceSource()
+  const dartLibReferenceSource = fullIndex ? fetchDartLibReferenceSource() : []
+  const pythonLibReferenceSource = fullIndex ? fetchPythonLibReferenceSource() : []
+  const cSharpLibReferenceSource = fullIndex ? fetchCSharpLibReferenceSource() : []
+  const swiftLibReferenceSource = fullIndex ? fetchSwiftLibReferenceSource() : []
+  const ktLibReferenceSource = fullIndex ? fetchKtLibReferenceSource() : []
+  const cliReferenceSource = fullIndex ? fetchCliLibReferenceSource() : []
 
-  const partnerIntegrationSources = fetchPartners()
-    .then((partners) =>
-      partners
-        ? Promise.all(
-            partners.map((partner) => new IntegrationLoader(partner.slug, partner).load())
-          )
-        : []
-    )
-    .then((data) => data.flat())
-
-  const githubDiscussionSources = fetchDiscussions(
-    'supabase',
-    'supabase',
-    'DIC_kwDODMpXOc4CUvEr' // 'Troubleshooting' category
-  )
-    .then((discussions) =>
-      Promise.all(
-        discussions.map((discussion) =>
-          new GitHubDiscussionLoader('supabase/supabase', discussion).load()
+  const partnerIntegrationSources = fullIndex
+    ? fetchPartners()
+        .then((partners) =>
+          partners
+            ? Promise.all(
+                partners.map((partner) => new IntegrationLoader(partner.slug, partner).load())
+              )
+            : []
         )
-      )
-    )
+        .then((data) => data.flat())
+    : []
+
+  // Load troubleshooting articles from local MDX files
+  const troubleshootingSources = fetchTroubleshootingSources()
+    .then((loaders) => Promise.all(loaders.map((loader) => loader.load())))
     .then((data) => data.flat())
 
-  const sources: SearchSource[] = (
+  // Type assertion required because ReferenceLoader.load() returns Promise<BaseSource[]>
+  // which widens the inferred union type. All concrete sources in this array are valid
+  // SearchSource types (MarkdownSource, OpenApiReferenceSource, etc.).
+  const sources = (
     await Promise.all([
       guideSources,
       lintWarningsGuideSources,
@@ -187,9 +167,9 @@ export async function fetchAllSources() {
       ktLibReferenceSource,
       cliReferenceSource,
       partnerIntegrationSources,
-      githubDiscussionSources,
+      troubleshootingSources,
     ])
-  ).flat()
+  ).flat() as SearchSource[]
 
   return sources
 }

@@ -1,9 +1,11 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { literal } from '@supabase/pg-meta/src/pg-format'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
+import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueuePurgeVariables = {
   projectRef: string
@@ -16,10 +18,16 @@ export async function purgeDatabaseQueue({
   connectionString,
   queueName,
 }: DatabaseQueuePurgeVariables) {
+  if (!isQueueNameValid(queueName)) {
+    throw new Error(
+      'Invalid queue name: must contain only alphanumeric characters, underscores, and hyphens'
+    )
+  }
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from pgmq.purge_queue('${queueName}');`,
+    sql: `select * from pgmq.purge_queue(${literal(queueName)});`,
     queryKey: databaseQueuesKeys.purge(queueName),
   })
 
@@ -33,29 +41,27 @@ export const useDatabaseQueuePurgeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseQueuePurgeData, ResponseError, DatabaseQueuePurgeVariables>,
+  UseCustomMutationOptions<DatabaseQueuePurgeData, ResponseError, DatabaseQueuePurgeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseQueuePurgeData, ResponseError, DatabaseQueuePurgeVariables>(
-    (vars) => purgeDatabaseQueue(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, queueName } = variables
-        await queryClient.invalidateQueries(
-          databaseQueuesKeys.getMessagesInfinite(projectRef, queueName)
-        )
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to purge database queue: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseQueuePurgeData, ResponseError, DatabaseQueuePurgeVariables>({
+    mutationFn: (vars) => purgeDatabaseQueue(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, queueName } = variables
+      await queryClient.invalidateQueries({
+        queryKey: databaseQueuesKeys.getMessagesInfinite(projectRef, queueName),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to purge database queue: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

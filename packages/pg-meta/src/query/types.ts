@@ -20,7 +20,7 @@ export type FilterOperator =
   | 'is'
 
 export interface Filter {
-  column: string
+  column: string | Array<string>
   operator: FilterOperator
   value: any
 }

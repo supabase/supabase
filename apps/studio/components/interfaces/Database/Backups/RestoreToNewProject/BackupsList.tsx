@@ -1,25 +1,22 @@
-import Panel from 'components/ui/Panel'
-import { useCloneBackupsQuery } from 'data/projects/clone-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, Button } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
 import { BackupsEmpty } from '../BackupsEmpty'
+import Panel from '@/components/ui/Panel'
+import { useCloneBackupsQuery } from '@/data/projects/clone-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface BackupsListProps {
   onSelectRestore: (id: number) => void
   disabled?: boolean
+  hasAccess?: boolean
 }
 
-export const BackupsList = ({ onSelectRestore, disabled }: BackupsListProps) => {
+export const BackupsList = ({ onSelectRestore, disabled, hasAccess }: BackupsListProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-
-  const isFreePlan = organization?.plan?.id === 'free'
-
   const { data: cloneBackups } = useCloneBackupsQuery(
     { projectRef: project?.ref },
-    { enabled: !isFreePlan }
+    { enabled: hasAccess }
   )
 
   return (
@@ -35,7 +32,12 @@ export const BackupsList = ({ onSelectRestore, disabled }: BackupsListProps) => 
               return (
                 <div className="grid grid-cols-4 gap-4 items-center p-4" key={backup.id}>
                   <div>
-                    <TimestampInfo utcTimestamp={backup.inserted_at} />
+                    <TimestampInfo
+                      displayAs="utc"
+                      utcTimestamp={backup.inserted_at}
+                      labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+                      className="text-left !text-sm font-mono tracking-tight"
+                    />
                   </div>
                   <div>
                     <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>

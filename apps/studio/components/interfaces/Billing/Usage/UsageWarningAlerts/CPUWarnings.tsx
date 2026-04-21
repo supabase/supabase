@@ -1,15 +1,21 @@
 import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
-import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, Button } from 'ui'
+
+import { DOCS_URL } from '@/lib/constants'
 
 interface CPUWarningsProps {
-  isFreePlan: boolean
+  hasAccessToComputeSizes: boolean
   upgradeUrl: string
   severity?: 'warning' | 'critical' | null
 }
 
-const CPUWarnings = ({ isFreePlan, upgradeUrl, severity }: CPUWarningsProps) => {
+export const CPUWarnings = ({
+  hasAccessToComputeSizes,
+  upgradeUrl,
+  severity,
+}: CPUWarningsProps) => {
   if (severity === 'warning') {
     return (
       <Alert_Shadcn_ variant="warning">
@@ -22,13 +28,11 @@ const CPUWarnings = ({ isFreePlan, upgradeUrl, severity }: CPUWarningsProps) => 
         </AlertDescription_Shadcn_>
         <div className="mt-3 flex items-center space-x-2">
           <Button asChild type="default">
-            <Link href="https://supabase.com/docs/guides/troubleshooting/high-cpu-usage">
-              Learn more
-            </Link>
+            <Link href={`${DOCS_URL}/guides/troubleshooting/high-cpu-usage`}>Learn more</Link>
           </Button>
           <Button asChild type="warning">
             <Link href={upgradeUrl}>
-              {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
+              {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
             </Link>
           </Button>
         </div>
@@ -48,13 +52,11 @@ const CPUWarnings = ({ isFreePlan, upgradeUrl, severity }: CPUWarningsProps) => 
         </AlertDescription_Shadcn_>
         <div className="mt-3 flex items-center space-x-2">
           <Button asChild type="default">
-            <Link href="https://supabase.com/docs/guides/troubleshooting/high-cpu-usage">
-              Learn more
-            </Link>
+            <Link href={`${DOCS_URL}/guides/troubleshooting/high-cpu-usage`}>Learn more</Link>
           </Button>
           <Button asChild type="danger">
             <Link href={upgradeUrl}>
-              {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
+              {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
             </Link>
           </Button>
         </div>
@@ -64,5 +66,3 @@ const CPUWarnings = ({ isFreePlan, upgradeUrl, severity }: CPUWarningsProps) => 
 
   return null
 }
-
-export default CPUWarnings

@@ -1,18 +1,18 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
-import { Badge, HoverCard, HoverCardContent, HoverCardTrigger, Input, cn } from 'ui'
+import { Badge, cn, HoverCard, HoverCardContent, HoverCardTrigger, Input } from 'ui'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
-import { Markdown } from 'components/interfaces/Markdown'
-import { SimpleCodeBlock } from 'ui'
-import CardButton from 'components/ui/CardButton'
-import CopyButton from 'components/ui/CopyButton'
-import NoSearchResults from 'components/ui/NoSearchResults'
 import {
   getGeneralPolicyTemplates,
   getQueuePolicyTemplates,
   getRealtimePolicyTemplates,
 } from '../PolicyEditorModal/PolicyEditorModal.constants'
+import { Markdown } from '@/components/interfaces/Markdown'
+import CardButton from '@/components/ui/CardButton'
+import CopyButton from '@/components/ui/CopyButton'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
 
 interface PolicyTemplatesProps {
   schema: string
@@ -59,7 +59,7 @@ export const PolicyTemplates = ({
       <Input
         size="small"
         id="template-search"
-        icon={<Search size={16} className="text-foreground-muted" />}
+        icon={<Search className="text-foreground-muted" />}
         placeholder="Search templates"
         value={search}
         onChange={(event) => setSearch(event.target.value)}
@@ -88,7 +88,7 @@ export const PolicyTemplates = ({
                   hideChevron
                   fixedHeight={false}
                   icon={
-                    <div className="min-w-16">
+                    <div className="min-w-16 flex items-start">
                       <Badge
                         className={cn(
                           '!rounded font-mono',
@@ -98,9 +98,9 @@ export const PolicyTemplates = ({
                         )}
                         variant={
                           template.command === 'ALL'
-                            ? 'outline'
+                            ? 'default'
                             : template.command === 'SELECT'
-                              ? 'brand'
+                              ? 'success'
                               : template.command === 'UPDATE'
                                 ? 'default'
                                 : template.command === 'DELETE'

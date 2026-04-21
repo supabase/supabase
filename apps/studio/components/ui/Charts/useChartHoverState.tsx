@@ -14,8 +14,8 @@ const CHART_TOOLTIP_SYNC_STORAGE_KEY = 'supabase-chart-tooltip-sync-enabled'
 let globalState: ChartHoverState = {
   hoveredIndex: null,
   hoveredChart: null,
-  syncHover: false,
-  syncTooltip: false,
+  syncHover: true,
+  syncTooltip: true,
 }
 
 // Subscribers for state changes
@@ -23,14 +23,16 @@ const subscribers = new Set<(state: ChartHoverState) => void>()
 
 // Load initial sync settings from localStorage
 try {
-  const hoverSyncStored = localStorage.getItem(CHART_HOVER_SYNC_STORAGE_KEY)
-  const tooltipSyncStored = localStorage.getItem(CHART_TOOLTIP_SYNC_STORAGE_KEY)
+  if (typeof window !== 'undefined') {
+    const hoverSyncStored = localStorage.getItem(CHART_HOVER_SYNC_STORAGE_KEY)
+    const tooltipSyncStored = localStorage.getItem(CHART_TOOLTIP_SYNC_STORAGE_KEY)
 
-  if (hoverSyncStored !== null) {
-    globalState.syncHover = JSON.parse(hoverSyncStored)
-  }
-  if (tooltipSyncStored !== null) {
-    globalState.syncTooltip = JSON.parse(tooltipSyncStored)
+    if (hoverSyncStored !== null) {
+      globalState.syncHover = JSON.parse(hoverSyncStored)
+    }
+    if (tooltipSyncStored !== null) {
+      globalState.syncTooltip = JSON.parse(tooltipSyncStored)
+    }
   }
 } catch (error) {
   console.warn('Failed to load chart sync settings from localStorage:', error)

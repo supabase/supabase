@@ -5,16 +5,15 @@ import {
   AccordionTrigger_Shadcn_ as AccordionTrigger,
 } from 'ui'
 
+import { DateRangeDisabled } from '../DataTable.types'
+import { useDataTable } from '../providers/DataTableProvider'
 import { DataTableFilterCheckbox } from './DataTableFilterCheckbox'
+import { DataTableFilterCheckboxAsync } from './DataTableFilterCheckboxAsync'
+import { DataTableFilterCheckboxLoader } from './DataTableFilterCheckboxLoader'
 import { DataTableFilterInput } from './DataTableFilterInput'
 import { DataTableFilterResetButton } from './DataTableFilterResetButton'
 import { DataTableFilterSlider } from './DataTableFilterSlider'
 import { DataTableFilterTimerange } from './DataTableFilterTimerange'
-
-import { DateRangeDisabled } from '../DataTable.types'
-import { useDataTable } from '../providers/DataTableProvider'
-import { DataTableFilterCheckboxAsync } from './DataTableFilterCheckboxAsync'
-import { DataTableFilterCheckboxLoader } from './DataTableFilterCheckboxLoader'
 
 // FIXME: use @container (especially for the slider element) to restructure elements
 
@@ -70,12 +69,7 @@ export function DataTableFilterControls({ dateRangeDisabled }: DataTableFilterCo
                       return <DataTableFilterInput {...field} />
                     }
                     case 'timerange': {
-                      return (
-                        <DataTableFilterTimerange
-                          dateRangeDisabled={dateRangeDisabled}
-                          {...field}
-                        />
-                      )
+                      return <DataTableFilterTimerange {...field} />
                     }
                   }
                 })()}

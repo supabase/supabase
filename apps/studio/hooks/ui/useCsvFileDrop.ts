@@ -1,7 +1,7 @@
-import { type DragEvent, useCallback, useState } from 'react'
-
 import { type ImportDataFileDroppedEvent } from 'common/telemetry-constants'
-import { flagInvalidFileImport } from 'components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
+import { useCallback, useState, type DragEvent } from 'react'
+
+import { flagInvalidFileImport } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
 
 interface UseCsvFileDropOptions {
   enabled: boolean
@@ -26,6 +26,11 @@ export function useCsvFileDrop({
     (event: DragEvent<HTMLDivElement>) => {
       if (!enabled) return
 
+      const [item] = event.dataTransfer.items
+
+      // ignore non files drop, like column headers
+      if (item && item.kind !== 'file') return
+
       if (event.type === 'dragover' && !isDraggedOver) {
         setIsDraggedOver(true)
       } else if (event.type === 'dragleave' || event.type === 'drop') {
@@ -44,6 +49,11 @@ export function useCsvFileDrop({
       onDragOver(event)
 
       const [file] = event.dataTransfer.files
+      const [item] = event.dataTransfer.items
+
+      // ignore non files drop, like column headers
+      if (item && item.kind !== 'file') return
+
       if (flagInvalidFileImport(file)) return
 
       onFileDropped(file)

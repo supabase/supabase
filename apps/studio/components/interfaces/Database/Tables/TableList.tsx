@@ -1,41 +1,12 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { noop } from 'lodash'
-import {
-  Check,
-  Columns,
-  Copy,
-  Edit,
-  Eye,
-  Filter,
-  MoreVertical,
-  Plus,
-  Search,
-  Table2,
-  Trash,
-  X,
-} from 'lucide-react'
+import { Check, Copy, Edit, Eye, Filter, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { useForeignTablesQuery } from 'data/foreign-tables/foreign-tables-query'
-import { useMaterializedViewsQuery } from 'data/materialized-views/materialized-views-query'
-import { usePrefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useViewsQuery } from 'data/views/views-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import {
   Button,
   Card,
@@ -45,24 +16,43 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
   Label_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  Table,
-  TableHeader,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  cn,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
+import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
+import SchemaSelector from '@/components/ui/SchemaSelector'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { useForeignTablesQuery } from '@/data/foreign-tables/foreign-tables-query'
+import { useMaterializedViewsQuery } from '@/data/materialized-views/materialized-views-query'
+import { usePrefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useViewsQuery } from '@/data/views/views-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
 interface TableListProps {
   onAddTable: () => void
@@ -85,10 +75,10 @@ export const TableList = ({
 
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
-  const [filterString, setFilterString] = useState<string>('')
+  const [filterString, setFilterString] = useQueryState('search', parseAsString.withDefault(''))
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
 
-  const { can: canUpdateTables } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateTables } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
   )
@@ -97,7 +87,7 @@ export const TableList = ({
     data: tables,
     error: tablesError,
     isError: isErrorTables,
-    isLoading: isLoadingTables,
+    isPending: isLoadingTables,
     isSuccess: isSuccessTables,
   } = useTablesQuery(
     {
@@ -120,7 +110,7 @@ export const TableList = ({
     data: views,
     error: viewsError,
     isError: isErrorViews,
-    isLoading: isLoadingViews,
+    isPending: isLoadingViews,
     isSuccess: isSuccessViews,
   } = useViewsQuery(
     {
@@ -141,7 +131,7 @@ export const TableList = ({
     data: materializedViews,
     error: materializedViewsError,
     isError: isErrorMaterializedViews,
-    isLoading: isLoadingMaterializedViews,
+    isPending: isLoadingMaterializedViews,
     isSuccess: isSuccessMaterializedViews,
   } = useMaterializedViewsQuery(
     {
@@ -164,7 +154,7 @@ export const TableList = ({
     data: foreignTables,
     error: foreignTablesError,
     isError: isErrorForeignTables,
-    isLoading: isLoadingForeignTables,
+    isPending: isLoadingForeignTables,
     isSuccess: isSuccessForeignTables,
   } = useForeignTablesQuery(
     {
@@ -205,11 +195,14 @@ export const TableList = ({
     isSuccessTables && isSuccessViews && isSuccessMaterializedViews && isSuccessForeignTables
 
   const formatTooltipText = (entityType: string) => {
-    return Object.entries(ENTITY_TYPE)
-      .find(([, value]) => value === entityType)?.[0]
-      ?.toLowerCase()
-      ?.split('_')
-      ?.join(' ')
+    const text =
+      Object.entries(ENTITY_TYPE)
+        .find(([, value]) => value === entityType)?.[0]
+        ?.toLowerCase()
+        ?.split('_')
+        ?.join(' ') || ''
+    // Return sentence case (capitalize first letter only)
+    return text.charAt(0).toUpperCase() + text.slice(1)
   }
 
   return (
@@ -232,7 +225,7 @@ export const TableList = ({
                 icon={<Filter />}
               />
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center" portal={true}>
+            <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
               <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
                 <p className="text-xs">Show entity types</p>
                 <div className="flex flex-col">
@@ -277,7 +270,7 @@ export const TableList = ({
             placeholder="Search for a table"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
-            icon={<Search size={12} />}
+            icon={<Search />}
           />
 
           {!isSchemaLocked && (
@@ -313,20 +306,14 @@ export const TableList = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead key="icon" className="!px-0" />
-                  <TableHead key="name">Name</TableHead>
-                  <TableHead key="description" className="hidden lg:table-cell">
-                    Description
+                  <TableHead key="icon" className="w-0 !px-0" />
+                  <TableHead key="name" className="max-w-[160px] sm:max-w-[280px]">
+                    Name
                   </TableHead>
-                  <TableHead key="rows" className="hidden text-right xl:table-cell">
-                    Rows (Estimated)
-                  </TableHead>
-                  <TableHead key="size" className="hidden text-right xl:table-cell">
-                    Size (Estimated)
-                  </TableHead>
-                  <TableHead key="realtime" className="hidden xl:table-cell text-center">
-                    Realtime Enabled
-                  </TableHead>
+                  <TableHead key="columns">Columns</TableHead>
+                  <TableHead key="rows">Rows (Estimated)</TableHead>
+                  <TableHead key="size">Size (Estimated)</TableHead>
+                  <TableHead key="realtime">Realtime</TableHead>
                   <TableHead key="buttons"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -380,102 +367,84 @@ export const TableList = ({
                   {entities.length > 0 &&
                     entities.map((x) => (
                       <TableRow key={x.id}>
-                        <TableCell className="!pl-5 !pr-1">
+                        <TableCell className="w-0 !pl-5 !pr-1">
                           <Tooltip>
-                            <TooltipTrigger asChild>
-                              {x.type === ENTITY_TYPE.TABLE ? (
-                                <Table2
-                                  size={15}
-                                  strokeWidth={1.5}
-                                  className="text-foreground-lighter"
-                                />
-                              ) : x.type === ENTITY_TYPE.VIEW ? (
-                                <Eye
-                                  size={15}
-                                  strokeWidth={1.5}
-                                  className="text-foreground-lighter"
-                                />
-                              ) : (
-                                <div
-                                  className={cn(
-                                    'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
-                                    x.type === ENTITY_TYPE.FOREIGN_TABLE &&
-                                      'text-yellow-900 bg-yellow-500',
-                                    x.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
-                                      'text-purple-1000 bg-purple-500'
-                                    // [Alaister]: tables endpoint doesn't distinguish between tables and partitioned tables
-                                    // once we update the endpoint to include partitioned tables, we can uncomment this
-                                    // x.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                                    //   'text-foreground-light bg-border-stronger'
-                                  )}
-                                >
-                                  {Object.entries(ENTITY_TYPE)
-                                    .find(([, value]) => value === x.type)?.[0]?.[0]
-                                    ?.toUpperCase()}
-                                </div>
-                              )}
+                            <TooltipTrigger asChild className="cursor-default">
+                              <div className="flex w-4 justify-center">
+                                <EntityTypeIcon type={x.type} />
+                              </div>
                             </TooltipTrigger>
-                            <TooltipContent side="bottom" className="capitalize">
+                            <TooltipContent side="bottom">
                               {formatTooltipText(x.type)}
                             </TooltipContent>
                           </Tooltip>
                         </TableCell>
-                        <TableCell>
-                          {/* only show tooltips if required, to reduce noise */}
-                          {x.name.length > 20 ? (
-                            <Tooltip disableHoverableContent={true}>
-                              <TooltipTrigger
-                                asChild
-                                className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
-                              >
-                                <p>{x.name}</p>
-                              </TooltipTrigger>
+                        <TableCell className="max-w-[160px] sm:max-w-[280px]">
+                          <div className="flex min-w-0 flex-col">
+                            {/* only show tooltips if required, to reduce noise */}
+                            {x.name.length > 20 ? (
+                              <Tooltip disableHoverableContent={true}>
+                                <TooltipTrigger
+                                  asChild
+                                  className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
+                                >
+                                  <p>{x.name}</p>
+                                </TooltipTrigger>
 
-                              <TooltipContent side="bottom">{x.name}</TooltipContent>
-                            </Tooltip>
+                                <TooltipContent side="bottom">{x.name}</TooltipContent>
+                              </Tooltip>
+                            ) : (
+                              <p>{x.name}</p>
+                            )}
+                            {x.comment !== null ? (
+                              <span
+                                className="max-w-md truncate text-foreground-lighter"
+                                title={x.comment}
+                              >
+                                {x.comment}
+                              </span>
+                            ) : null}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <p className="text-foreground-light">
+                            {x.columns.length.toLocaleString()}
+                          </p>
+                        </TableCell>
+                        <TableCell>
+                          {x.rows !== undefined ? (
+                            <p className="text-foreground-light">{x.rows.toLocaleString()}</p>
                           ) : (
-                            <p>{x.name}</p>
+                            <p className="text-foreground-muted">–</p>
                           )}
                         </TableCell>
-                        <TableCell className="hidden lg:table-cell ">
-                          {x.comment !== null ? (
-                            <span className="lg:max-w-48 truncate inline-block" title={x.comment}>
-                              {x.comment}
-                            </span>
+                        <TableCell>
+                          {x.size !== undefined ? (
+                            <p className="text-foreground-light">{x.size}</p>
                           ) : (
-                            <p className="text-border-stronger">No description</p>
+                            <p className="text-foreground-muted">–</p>
                           )}
                         </TableCell>
-                        <TableCell className="hidden text-right xl:table-cell">
-                          {x.rows !== undefined ? x.rows.toLocaleString() : '-'}
-                        </TableCell>
-                        <TableCell className="hidden text-right xl:table-cell">
-                          {x.size !== undefined ? <code className="text-xs">{x.size}</code> : '-'}
-                        </TableCell>
-                        <TableCell className="hidden xl:table-cell text-center">
+                        <TableCell>
                           {(realtimePublication?.tables ?? []).find(
                             (table) => table.id === x.id
                           ) ? (
-                            <div className="flex justify-center">
-                              <Check size={18} strokeWidth={2} className="text-brand" />
+                            <div className="flex items-center gap-x-2">
+                              <Check size={16} strokeWidth={2} className="text-brand-link" />
+                              <p className="text-foreground-light">Enabled</p>
                             </div>
                           ) : (
-                            <div className="flex justify-center">
-                              <X size={18} strokeWidth={2} className="text-foreground-lighter" />
+                            <div className="flex items-center gap-x-2">
+                              <X size={16} strokeWidth={2} className="text-foreground-muted" />
+                              <p className="text-foreground-lighter">Disabled</p>
                             </div>
                           )}
                         </TableCell>
                         <TableCell>
                           <div className="flex justify-end gap-2">
-                            <Button
-                              asChild
-                              type="default"
-                              iconRight={<Columns size={14} className="text-foreground-light" />}
-                              className="whitespace-nowrap hover:border-muted"
-                              style={{ paddingTop: 3, paddingBottom: 3 }}
-                            >
+                            <Button asChild type="default">
                               <Link href={`/project/${ref}/database/tables/${x.id}`}>
-                                {x.columns.length} columns
+                                View columns
                               </Link>
                             </Button>
 
@@ -488,7 +457,13 @@ export const TableList = ({
                                   <DropdownMenuItem
                                     className="flex items-center space-x-2"
                                     onClick={() =>
-                                      router.push(`/project/${project?.ref}/editor/${x.id}`)
+                                      router.push(
+                                        buildTableEditorUrl({
+                                          projectRef: project?.ref,
+                                          tableId: x.id,
+                                          schema: x.schema,
+                                        })
+                                      )
                                     }
                                     onMouseEnter={() =>
                                       prefetchEditorTablePage({
@@ -566,6 +541,13 @@ export const TableList = ({
                     ))}
                 </>
               </TableBody>
+              <TableFooter className="font-normal">
+                <TableRow className="border-b-0 [&>td]:hover:bg-inherit">
+                  <TableCell colSpan={7} className="text-foreground-muted">
+                    {entities.length} {entities.length === 1 ? 'table' : 'tables'}
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
             </Table>
           </Card>
         </div>

@@ -24,6 +24,7 @@ export interface IApiEndPoint {
   }
   tags?: Array<string>
   security?: Array<ISecurityOption>
+  'x-oauth-scope'?: string
 }
 
 export type ISchema =
@@ -117,7 +118,7 @@ interface IApiFormUrlEncodedDTO {
   }
 }
 
-type ISecurityOption = IBearerSecurity | IOAuth2Security
+type ISecurityOption = IBearerSecurity | IOAuth2Security | IFgaSecurity
 
 interface IBearerSecurity {
   bearer: []
@@ -125,6 +126,10 @@ interface IBearerSecurity {
 
 interface IOAuth2Security {
   oauth2: Array<'read' | 'write'>
+}
+
+interface IFgaSecurity {
+  fga_permissions: string[]
 }
 
 export function getTypeDisplayFromSchema(schema: ISchema) {
@@ -184,5 +189,10 @@ export function getTypeDisplayFromSchema(schema: ISchema) {
     return {
       displayName: 'object',
     }
+  }
+
+  // Default fallback for unhandled schema types
+  return {
+    displayName: 'unknown',
   }
 }

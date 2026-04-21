@@ -1,7 +1,8 @@
-import { Organization } from 'types'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
+
 import { PARTNER_TO_NAME } from './PartnerManagedResource'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import type { Organization } from '@/types'
 
 interface PartnerIconProps {
   organization: Pick<Organization, 'managed_by'>

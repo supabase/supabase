@@ -1,11 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Edit2, Trash } from 'lucide-react'
 import Link from 'next/link'
-
-import { ContentBase } from 'data/content/content-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useProfile } from 'lib/profile'
-import { Dashboards } from 'types'
 import {
   Button,
   cn,
@@ -15,6 +10,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+
+import { ContentBase } from '@/data/content/content-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useProfile } from '@/lib/profile'
+import type { Dashboards } from '@/types'
 
 interface ReportMenuItemProps {
   item: {
@@ -41,14 +41,18 @@ export const ReportMenuItem = ({
   onSelectDelete,
 }: ReportMenuItemProps) => {
   const { profile } = useProfile()
-  const canUpdateCustomReport = useCheckPermissions(PermissionAction.UPDATE, 'user_content', {
-    resource: {
-      type: 'report',
-      visibility: item.report.visibility,
-      owner_id: item.report.owner_id,
-    },
-    subject: { id: profile?.id },
-  })
+  const { can: canUpdateCustomReport } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'user_content',
+    {
+      resource: {
+        type: 'report',
+        visibility: item.report.visibility,
+        owner_id: item.report.owner_id,
+      },
+      subject: { id: profile?.id },
+    }
+  )
 
   return (
     <Link

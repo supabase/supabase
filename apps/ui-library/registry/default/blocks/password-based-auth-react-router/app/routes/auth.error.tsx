@@ -1,5 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/registry/default/components/ui/card'
 import { useSearchParams } from 'react-router'
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/registry/default/components/ui/card'
 
 export default function Page() {
   let [searchParams] = useSearchParams()

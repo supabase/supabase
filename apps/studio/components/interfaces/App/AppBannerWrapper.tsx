@@ -1,27 +1,26 @@
+import { useFlag } from 'common'
 import { PropsWithChildren } from 'react'
 
-import { useFlag } from 'common'
-import { ClockSkewBanner } from 'components/layouts/AppLayout/ClockSkewBanner'
-import IncidentBanner from 'components/layouts/AppLayout/IncidentBanner'
-import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
+import { ClockSkewBanner } from '@/components/layouts/AppLayout/ClockSkewBanner'
+import { NoticeBanner } from '@/components/layouts/AppLayout/NoticeBanner'
+import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
+import { TaxIdBanner } from '@/components/layouts/AppLayout/TaxIdBanner'
 
-const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
-  const ongoingIncident = useFlag('ongoingIncident')
+export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const showNoticeBanner = useFlag('showNoticeBanner')
   const clockSkewBanner = useFlag('clockSkewBanner')
 
   return (
     <div className="flex flex-col">
       <div className="flex-shrink-0">
-        {ongoingIncident && <IncidentBanner />}
+        <StatusPageBanner />
         {showNoticeBanner && <NoticeBanner />}
         <OrganizationResourceBanner />
+        <TaxIdBanner />
         {clockSkewBanner && <ClockSkewBanner />}
       </div>
       {children}
     </div>
   )
 }
-
-export default AppBannerWrapper

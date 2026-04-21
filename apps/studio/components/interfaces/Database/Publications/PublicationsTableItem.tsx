@@ -2,12 +2,12 @@ import type { PostgresPublication, PostgresTable } from '@supabase/postgres-meta
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { Badge, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 
 interface PublicationsTableItemProps {
   table: PostgresTable
@@ -28,12 +28,12 @@ export const PublicationsTableItem = ({
     selectedPublication.tables?.find((x: any) => x.id == table.id) != undefined
   )
 
-  const { can: canUpdatePublications } = useAsyncCheckProjectPermissions(
+  const { can: canUpdatePublications } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'publications'
   )
 
-  const { mutate: updatePublications, isLoading } = useDatabasePublicationUpdateMutation()
+  const { mutate: updatePublications, isPending } = useDatabasePublicationUpdateMutation()
 
   const toggleReplicationForTable = async (
     table: PostgresTable,
@@ -78,8 +78,8 @@ export const PublicationsTableItem = ({
   return (
     <TableRow key={table.id}>
       <TableCell className="py-3 whitespace-nowrap">{table.name}</TableCell>
-      <TableCell className="py-3 whitespace-nowrap">{table.schema}</TableCell>
-      <TableCell className="py-3 hidden max-w-sm truncate whitespace-nowrap lg:table-cell">
+      <TableCell className="py-3 whitespace-nowrap text-foreground-light">{table.schema}</TableCell>
+      <TableCell className="py-3 whitespace-nowrap hidden lg:table-cell max-w-sm truncate text-foreground-light">
         {table.comment}
       </TableCell>
       <TableCell className="py-3">
@@ -94,7 +94,7 @@ export const PublicationsTableItem = ({
               <TooltipTrigger>
                 <Switch
                   size="small"
-                  disabled={!canUpdatePublications || isLoading || isProtected}
+                  disabled={!canUpdatePublications || isPending || isProtected}
                   checked={checked}
                   onClick={() => toggleReplicationForTable(table, selectedPublication)}
                 />

@@ -1,13 +1,17 @@
 import * as Sentry from '@sentry/nextjs'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import { getAccessToken, IS_PLATFORM } from 'common'
 import createClient from 'openapi-fetch'
 
-import { IS_PLATFORM } from 'common'
-import { API_URL } from 'lib/constants'
-import { getAccessToken } from 'lib/gotrue'
-import { uuidv4 } from 'lib/helpers'
-import { ResponseError } from 'types'
-import type { paths } from './api' // generated from openapi-typescript
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import type { paths } from './api'
+import { ERROR_PATTERNS } from './error-patterns'
+import { API_URL } from '@/lib/constants'
+import { uuidv4 } from '@/lib/helpers'
+import { ResponseError } from '@/types'
+import { UnknownAPIResponseError } from '@/types/api-errors'
+import { ErrorMetadata } from '@/types/base'
+
+// generated from openapi-typescript
 
 const DEFAULT_HEADERS = { Accept: 'application/json' }
 
@@ -23,7 +27,7 @@ export const fetchHandler: typeof fetch = async (input, init) => {
   }
 }
 
-const client = createClient<paths>({
+export const client = createClient<paths>({
   fetch: fetchHandler,
   // [Joshen] Just FYI, the replace is temporary until we update env vars API_URL to remove /platform or /v1 - should just be the base URL
   baseUrl: API_URL?.replace('/platform', ''),
@@ -104,9 +108,14 @@ client.use(
 
         // add code field to body
         body.code = response.status
+
         body.requestId = request.headers.get('X-Request-Id')
+
         const retryAfterHeader = response.headers.get('Retry-After')
         body.retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
+
+        const requestUrl = new URL(request.url)
+        body.requestPathname = requestUrl.pathname
 
         return new Response(JSON.stringify(body), {
           headers: response.headers,
@@ -135,15 +144,13 @@ export const {
 
 type HandleErrorOptions = {
   alwaysCapture?: boolean
+  sentryContext?: Parameters<typeof Sentry.captureException>[1]
 }
 
-export const handleError = (
-  error: unknown,
-  options: HandleErrorOptions = { alwaysCapture: false }
-): never => {
+export const handleError = (error: unknown, options: HandleErrorOptions = {}): never => {
   if (error && typeof error === 'object') {
     if (options.alwaysCapture) {
-      Sentry.captureException(error)
+      Sentry.captureException(error, options.sentryContext)
     }
     const errorMessage =
       'msg' in error && typeof error.msg === 'string'
@@ -157,9 +164,40 @@ export const handleError = (
       'requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined
     const retryAfter =
       'retryAfter' in error && typeof error.retryAfter === 'number' ? error.retryAfter : undefined
+    const requestPathname =
+      'requestPathname' in error && typeof error.requestPathname === 'string'
+        ? error.requestPathname
+        : undefined
+    const metadata =
+      'metadata' in error && typeof error.metadata === 'object' && !!error.metadata
+        ? (error.metadata as ErrorMetadata)
+        : undefined
+    const formattedError =
+      'formattedError' in error && typeof error.formattedError === 'string'
+        ? error.formattedError
+        : undefined
 
     if (errorMessage) {
-      throw new ResponseError(errorMessage, errorCode, requestId, retryAfter)
+      const matched = ERROR_PATTERNS.find(({ pattern }) => pattern.test(errorMessage))
+      throw matched
+        ? new matched.ErrorClass(
+            errorMessage,
+            errorCode,
+            requestId,
+            retryAfter,
+            requestPathname,
+            metadata,
+            formattedError
+          )
+        : new UnknownAPIResponseError(
+            errorMessage,
+            errorCode,
+            requestId,
+            retryAfter,
+            requestPathname,
+            metadata,
+            formattedError
+          )
     }
   }
 
@@ -169,11 +207,11 @@ export const handleError = (
 
   // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
   // add handling for it.
-  Sentry.captureException(error)
+  Sentry.captureException(error, options.sentryContext)
 
   // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
   // up in the UI.
-  throw new ResponseError(undefined)
+  throw new UnknownAPIResponseError(undefined)
 }
 
 // [Joshen] The methods below are brought over from lib/common/fetch because we still need them

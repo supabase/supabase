@@ -1,15 +1,9 @@
-import { AlertTriangleIcon } from 'lucide-react'
-
 import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
+import { AlertTriangleIcon } from 'lucide-react'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Dialog,
   DialogClose,
@@ -21,6 +15,13 @@ import {
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
+
+import { Markdown } from '@/components/interfaces/Markdown'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
+import { DOCS_URL } from '@/lib/constants'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { useDatabaseSettingsStateSnapshot } from '@/state/database-settings'
 
 export const PoolingModesModal = () => {
   const { ref: projectRef } = useParams()
@@ -42,7 +43,9 @@ export const PoolingModesModal = () => {
           <DialogTitle>
             <div className="w-full flex items-center justify-between">
               <p className="max-w-2xl">Which pooling mode should I use?</p>
-              <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres#how-connection-pooling-works" />
+              <DocsButton
+                href={`${DOCS_URL}/guides/database/connecting-to-postgres#how-connection-pooling-works`}
+              />
             </div>
           </DialogTitle>
           <DialogDescription className="max-w-2xl">

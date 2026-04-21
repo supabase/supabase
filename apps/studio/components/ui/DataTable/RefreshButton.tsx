@@ -1,4 +1,5 @@
 import { LoaderCircle, RefreshCcw } from 'lucide-react'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 
 interface RefreshButtonProps {
@@ -10,7 +11,7 @@ export const RefreshButton = ({ isLoading, onRefresh }: RefreshButtonProps) => {
   return (
     <ButtonTooltip
       size="tiny"
-      type="outline"
+      type="default"
       disabled={isLoading}
       onClick={onRefresh}
       className="w-[26px]"

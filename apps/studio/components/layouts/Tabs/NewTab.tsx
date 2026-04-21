@@ -1,22 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { partition } from 'lodash'
 import { Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
-import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Button,
   cn,
@@ -26,9 +14,22 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
+
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { ActionCard } from './ActionCard'
 import { RecentItems } from './RecentItems'
+import { SQL_TEMPLATES } from '@/components/interfaces/SQLEditor/SQLEditor.queries'
+import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { useProfile } from '@/lib/profile'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export function NewTab() {
   const router = useRouter()
@@ -37,30 +38,37 @@ export function NewTab() {
   const { profile } = useProfile()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
+  const { selectedSchema } = useQuerySchemaState()
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const snap = useTableEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabs = useTabsStateSnapshot()
-
   const [templates] = partition(SQL_TEMPLATES, { type: 'template' })
   const [quickstarts] = partition(SQL_TEMPLATES, { type: 'quickstart' })
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
-
-  const tableEditorActions = [
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'user_content',
     {
-      icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
-      title: 'Create a table',
-      description: 'Design and create a new database table',
-      bgColor: 'bg-blue-500',
-      isBeta: false,
-      onClick: snap.onAddTable,
-    },
-  ]
+      resource: { type: 'sql', owner_id: profile?.id },
+      subject: { id: profile?.id },
+    }
+  )
+
+  const tableEditorActions = isSchemaLocked
+    ? []
+    : [
+        {
+          icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
+          title: 'Create a table',
+          description: 'Design and create a new database table',
+          bgColor: 'bg-blue-500',
+          isBeta: false,
+          onClick: () => snap.onAddTable(),
+        },
+      ]
 
   const sqlEditorActions = [
     {
@@ -86,7 +94,6 @@ export function NewTab() {
 
     try {
       const snippet = createSqlSnippetSkeletonV2({
-        id: uuidv4(),
         name,
         sql,
         owner_id: profile?.id,

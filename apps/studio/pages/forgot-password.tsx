@@ -1,7 +1,8 @@
-import { ForgotPasswordWizard } from 'components/interfaces/SignIn/ForgotPasswordWizard'
-import ForgotPasswordLayout from 'components/layouts/SignInLayout/ForgotPasswordLayout'
 import Link from 'next/link'
-import type { NextPageWithLayout } from 'types'
+
+import { ForgotPasswordWizard } from '@/components/interfaces/SignIn/ForgotPasswordWizard'
+import ForgotPasswordLayout from '@/components/layouts/SignInLayout/ForgotPasswordLayout'
+import type { NextPageWithLayout } from '@/types'
 
 const ForgotPasswordPage: NextPageWithLayout = () => {
   return (
@@ -23,7 +24,7 @@ const ForgotPasswordPage: NextPageWithLayout = () => {
 ForgotPasswordPage.getLayout = (page) => (
   <ForgotPasswordLayout
     heading="Forgot your password?"
-    subheading="Type in your email and we'll send you a code to reset the password"
+    subheading="Enter your email and we'll send you a code to reset the password"
   >
     {page}
   </ForgotPasswordLayout>

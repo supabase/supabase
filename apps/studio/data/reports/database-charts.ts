@@ -1,247 +1,36 @@
-import { numberFormatter } from 'components/ui/Charts/Charts.utils'
-import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
-import { formatBytes } from 'lib/helpers'
-import { Organization } from 'types'
-import { Project } from '../projects/project-detail-query'
-import { DiskAttributesData } from '../config/disk-attributes-query'
-import { MaxConnectionsData } from '../database/max-connections-query'
-import { PgbouncerConfigData } from '../database/pgbouncer-config-query'
-
-export const getReportAttributes = (
-  org: Organization,
-  project: Project,
-  diskConfig?: DiskAttributesData,
-  maxConnections?: MaxConnectionsData,
-  poolerConfig?: PgbouncerConfigData
-): ReportAttributes[] => {
-  const computeSize = project?.infra_compute_size || 'medium'
-
-  return [
-    {
-      id: 'ram-usage',
-      label: 'Memory usage',
-      availableIn: ['free', 'pro'],
-      hide: false,
-      showTooltip: false,
-      showLegend: false,
-      hideChartType: false,
-      defaultChartStyle: 'bar',
-      showMaxValue: false,
-      showGrid: false,
-      syncId: 'database-reports',
-      valuePrecision: 0,
-      format: '%',
-      attributes: [
-        {
-          attribute: 'ram_usage',
-          provider: 'infra-monitoring',
-          label: 'Memory usage',
-          format: '%',
-          tooltip: 'RAM usage by the database',
-        },
-      ],
-    },
-    {
-      id: 'avg_cpu_usage',
-      label: 'Average CPU usage',
-      syncId: 'database-reports',
-      format: '%',
-      valuePrecision: 2,
-      availableIn: ['free', 'pro'],
-      hide: false,
-      showTooltip: false,
-      showLegend: false,
-      showMaxValue: false,
-      showGrid: false,
-      hideChartType: false,
-      defaultChartStyle: 'bar',
-      attributes: [
-        {
-          attribute: 'avg_cpu_usage',
-          provider: 'infra-monitoring',
-          label: 'Average CPU usage',
-          format: '%',
-          tooltip: 'Average CPU usage',
-        },
-      ],
-    },
-    {
-      id: 'max_cpu_usage',
-      label: 'Max CPU usage',
-      syncId: 'database-reports',
-      format: '%',
-      valuePrecision: 2,
-      availableIn: ['free', 'pro'],
-      hide: false,
-      showTooltip: false,
-      showLegend: false,
-      showMaxValue: false,
-      showGrid: false,
-      hideChartType: false,
-      defaultChartStyle: 'bar',
-      attributes: [
-        {
-          attribute: 'max_cpu_usage',
-          provider: 'infra-monitoring',
-          label: 'Max CPU usage',
-          format: '%',
-          tooltip: 'Max CPU usage',
-        },
-      ],
-    },
-    {
-      id: 'disk-iops',
-      label: 'Disk Input/Output operations per second (IOPS)',
-      syncId: 'database-reports',
-      availableIn: ['free', 'pro'],
-      hide: false,
-      showTooltip: true,
-      valuePrecision: 2,
-      showLegend: true,
-      hideChartType: false,
-      showGrid: true,
-      showMaxValue: false,
-      YAxisProps: {
-        width: 35,
-        tickFormatter: (value: any) => numberFormatter(value, 2),
-      },
-      defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/platform/compute-and-disk#compute-size',
-      attributes: [
-        {
-          attribute: 'disk_iops_write',
-          provider: 'infra-monitoring',
-          label: 'write IOPS',
-          tooltip:
-            'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity',
-        },
-        {
-          attribute: 'disk_iops_read',
-          provider: 'infra-monitoring',
-          label: 'read IOPS',
-          tooltip:
-            'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching',
-        },
-        {
-          attribute: 'disk_iops_max',
-          provider: 'reference-line',
-          label: 'Max IOPS',
-          value: diskConfig?.attributes?.iops,
-          tooltip:
-            'Maximum IOPS (Input/Output Operations Per Second) for your current compute size',
-          isMaxValue: true,
-        },
-      ],
-    },
-    {
-      id: 'disk-io-usage',
-      label: 'Disk IO Usage',
-      syncId: 'database-reports',
-      availableIn: ['team', 'enterprise'],
-      hide: false,
-      format: '%',
-      attributes: [],
-    },
-    {
-      id: 'pooler-database-connections',
-      label: 'Pooler to Database connections',
-      syncId: 'database-reports',
-      valuePrecision: 0,
-      availableIn: ['free', 'pro'],
-      hide: false,
-      showTooltip: false,
-      showLegend: false,
-      showMaxValue: false,
-      hideChartType: false,
-      showGrid: false,
-      defaultChartStyle: 'bar',
-      attributes: [
-        {
-          attribute: 'pg_stat_database_num_backends',
-          provider: 'infra-monitoring',
-          label: 'Database connections',
-          tooltip: 'Number of pooler connections to the database',
-        },
-      ],
-    },
-    {
-      id: 'supavisor-connections',
-      label: 'Shared Pooler connections',
-      syncId: 'database-reports',
-      valuePrecision: 0,
-      availableIn: ['free', 'pro'],
-      hide: false,
-      showTooltip: false,
-      showLegend: false,
-      showMaxValue: false,
-      showGrid: false,
-      hideChartType: false,
-      defaultChartStyle: 'bar',
-      attributes: [
-        {
-          attribute: 'supavisor_connections_active',
-          provider: 'infra-monitoring',
-          label: 'Client to Shared Pooler connections',
-          tooltip: 'Active connections from clients to the shared pooler',
-        },
-      ],
-    },
-    {
-      id: 'pgbouncer-connections',
-      label: 'Dedicated Pooler connections',
-      syncId: 'database-reports',
-      valuePrecision: 0,
-      availableIn: ['pro', 'team'],
-      hide: false,
-      showTooltip: false,
-      showLegend: false,
-      showMaxValue: false,
-      showGrid: false,
-      hideChartType: false,
-      defaultChartStyle: 'bar',
-      attributes: [
-        {
-          attribute: 'client_connections_pgbouncer',
-          provider: 'infra-monitoring',
-          label: 'Client to Dedicated Pooler connections',
-          tooltip: 'PgBouncer connections',
-        },
-      ],
-    },
-    {
-      id: 'disk-size',
-      label: 'Disk Usage',
-      syncId: 'database-reports',
-      availableIn: ['team', 'enterprise'],
-      hide: false,
-      attributes: [],
-    },
-  ]
-}
+import { compactNumberFormatter } from '@/components/ui/Charts/Charts.utils'
+import { ReportAttributes } from '@/components/ui/Charts/ComposedChart.utils'
+import { DiskAttributesData } from '@/data/config/disk-attributes-query'
+import { MaxConnectionsData } from '@/data/database/max-connections-query'
+import { Project } from '@/data/projects/project-detail-query'
+import { DOCS_URL } from '@/lib/constants'
+import { formatBytes } from '@/lib/helpers'
 
 export const getReportAttributesV2: (
-  org: Organization,
+  entitledFeatures: string[],
   project: Project,
   diskConfig?: DiskAttributesData,
   maxConnections?: MaxConnectionsData,
-  poolerConfig?: PgbouncerConfigData
-) => ReportAttributes[] = (org, project, diskConfig, maxConnections, poolerConfig) => {
-  const isFreePlan = org?.plan?.id === 'free'
-  const computeSize = project?.infra_compute_size || 'medium'
-  const isSpendCapEnabled =
-    org?.plan.id !== 'free' && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
-
+  pgBouncerMaxConnections?: number,
+  isSpendCapEnabled?: boolean
+) => ReportAttributes[] = (
+  entitledFeatures,
+  project,
+  diskConfig,
+  maxConnections,
+  pgBouncerMaxConnections,
+  isSpendCapEnabled
+) => {
   return [
     {
       id: 'ram-usage',
       label: 'Memory usage',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#memory-usage',
-      availableIn: ['team', 'enterprise'],
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
       hide: false,
       showTooltip: true,
       showLegend: true,
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       showMaxValue: false,
       showGrid: true,
       syncId: 'database-reports',
@@ -261,7 +50,7 @@ export const getReportAttributesV2: (
         {
           attribute: 'ram_usage_cache_and_buffers',
           provider: 'infra-monitoring',
-          label: 'Cache + buffers',
+          label: 'Cache + Buffers',
           tooltip:
             'RAM used by the operating system page cache and PostgreSQL buffers to accelerate disk reads/writes',
         },
@@ -277,28 +66,32 @@ export const getReportAttributesV2: (
     {
       id: 'cpu-usage',
       label: 'CPU usage',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#cpu-usage',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#cpu-usage`,
       syncId: 'database-reports',
       format: '%',
       valuePrecision: 2,
-      availableIn: ['team', 'enterprise'],
       hide: false,
       showTooltip: true,
       showLegend: true,
       showMaxValue: false,
       showGrid: true,
+      normalizeVisibleStackToPercent: true,
       YAxisProps: {
-        width: 45,
-        tickFormatter: (value: any) => `${numberFormatter(value, 2)}%`,
+        width: 55,
+        domain: [0, 100] as [number, number],
+        allowDataOverflow: true,
+        tickFormatter: (v: number) => `${Math.round(v)}%`,
       },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'cpu_usage_busy_system',
           provider: 'infra-monitoring',
           label: 'System',
           format: '%',
+          color: { light: '#EDC35E', dark: '#EDD35E' },
+          fill: { light: '#F6D99F', dark: '#5C5230' },
           tooltip:
             'CPU time spent on kernel operations (e.g., process scheduling, memory management). High values may indicate system overhead',
         },
@@ -307,6 +100,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'User',
           format: '%',
+          color: { light: '#0063E8', dark: '#65BCD9' },
+          fill: { light: '#80B1F4', dark: '#2A3D45' },
           tooltip:
             'CPU time used by database queries and user-space processes. High values may suggest CPU-intensive queries',
         },
@@ -315,6 +110,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'IOwait',
           format: '%',
+          color: { light: '#DB3A34', dark: '#FF6B6B' },
+          fill: { light: '#F2A7A3', dark: '#5C2A2A' },
           tooltip:
             'CPU time waiting for disk or network I/O. High values may indicate disk bottlenecks',
         },
@@ -323,6 +120,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'IRQs',
           format: '%',
+          color: { light: '#DA760B', dark: '#DA760B' },
+          fill: { light: '#FFB885', dark: '#5C3D0A' },
           tooltip: 'CPU time handling hardware interrupt requests (IRQ)',
         },
         {
@@ -330,8 +129,20 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'Other',
           format: '%',
+          color: { light: '#B616A6', dark: '#DB8DF9' },
+          fill: { light: '#DB8BD3', dark: '#4A3D5C' },
           tooltip:
             'CPU time spent on other tasks (e.g., background processes, software interrupts)',
+        },
+        {
+          attribute: 'cpu_usage_busy_idle',
+          provider: 'infra-monitoring',
+          label: 'Idle',
+          format: '%',
+          omitFromTotal: true,
+          color: { light: '#6EA85F', dark: '#A3FFC2' },
+          fill: { light: '#A6D8AE', dark: '#2A5C3F' },
+          tooltip: 'CPU time spent idle and available for new work',
         },
         {
           attribute: 'cpu_usage_max',
@@ -346,34 +157,32 @@ export const getReportAttributesV2: (
     {
       id: 'disk-iops',
       label: 'Disk Input/Output operations per second (IOPS)',
-      docsUrl:
-        'https://supabase.com/docs/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops`,
       syncId: 'database-reports',
-      availableIn: ['team', 'enterprise'],
       hide: false,
       showTooltip: true,
-      valuePrecision: 2,
+      valuePrecision: 0,
       showLegend: true,
       hideChartType: false,
       showGrid: true,
       showMaxValue: true,
       YAxisProps: {
-        width: 35,
-        tickFormatter: (value: any) => numberFormatter(value, 2),
+        width: 55,
+        tickFormatter: (value: any) => compactNumberFormatter(value),
       },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'disk_iops_write',
           provider: 'infra-monitoring',
-          label: 'write IOPS',
+          label: 'Write IOPS',
           tooltip:
             'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity',
         },
         {
           attribute: 'disk_iops_read',
           provider: 'infra-monitoring',
-          label: 'read IOPS',
+          label: 'Read IOPS',
           tooltip:
             'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching',
         },
@@ -389,49 +198,99 @@ export const getReportAttributesV2: (
       ],
     },
     {
-      id: 'disk-io-usage',
-      label: 'Disk IO Usage',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#disk-io-usage',
+      id: 'disk-throughput',
+      label: 'Disk throughput',
+      docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput`,
       syncId: 'database-reports',
-      availableIn: ['team', 'enterprise'],
       hide: false,
       showTooltip: true,
-      format: '%',
-      valuePrecision: 6,
-      showLegend: false,
-      showMaxValue: false,
+      format: 'bytes-per-second',
+      valuePrecision: 1,
+      showLegend: true,
+      showMaxValue: true,
       hideChartType: false,
       showGrid: true,
       YAxisProps: {
         width: 70,
-        tickFormatter: (value: any) => `${numberFormatter(value, 6)}%`,
+        tickFormatter: (value: any) => `${formatBytes(value, 1)}/s`,
       },
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'stackedAreaLine',
       attributes: [
         {
-          attribute: 'disk_io_usage',
+          attribute: 'disk_bytes_read',
           provider: 'infra-monitoring',
-          label: 'IO Usage',
-          tooltip:
-            'The actual number of IO operations per second that the database is currently using',
+          label: 'Read throughput',
+          tooltip: 'Disk read throughput (bytes per second)',
+        },
+        {
+          attribute: 'disk_bytes_written',
+          provider: 'infra-monitoring',
+          label: 'Write throughput',
+          tooltip: 'Disk write throughput (bytes per second)',
+        },
+        {
+          attribute: 'disk_throughput_max',
+          provider: 'reference-line',
+          label: 'Max throughput',
+          value:
+            diskConfig?.attributes?.type === 'gp3' &&
+            typeof diskConfig.attributes.throughput_mbps === 'number'
+              ? diskConfig.attributes.throughput_mbps * 1024 * 1024
+              : undefined,
+          tooltip: 'Maximum disk throughput for your current compute size',
+          isMaxValue: true,
         },
       ],
     },
     {
+      // Client Connections metric for free tier
+      id: 'client-connections-basic',
+      label: 'Database Connections',
+      syncId: 'database-reports',
+      valuePrecision: 0,
+      hide: entitledFeatures.includes('database'),
+      showTooltip: false,
+      showLegend: false,
+      showMaxValue: true,
+      hideChartType: false,
+      showGrid: true,
+      YAxisProps: { width: 30 },
+      defaultChartStyle: 'bar',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
+      attributes: [
+        {
+          attribute: 'pg_stat_database_num_backends',
+          provider: 'infra-monitoring',
+          label: 'Total connections',
+          tooltip: 'Total number of active database connections',
+        },
+        {
+          attribute: 'max_db_connections',
+          provider: 'reference-line',
+          label: 'Max connections',
+          value: maxConnections?.maxConnections,
+          tooltip: 'Max available connections for your current compute size',
+          isMaxValue: true,
+        },
+      ],
+    },
+    {
+      // advanced client connections metric for paid and above
       id: 'client-connections',
       label: 'Database Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['team', 'enterprise'],
-      hide: false,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
       showTooltip: true,
       showLegend: true,
       showMaxValue: true,
       hideChartType: false,
       showGrid: true,
       YAxisProps: { width: 30 },
-      defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#database-connections',
+      defaultChartStyle: 'bar',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#database-connections`,
       attributes: [
         {
           attribute: 'client_connections_postgres',
@@ -486,16 +345,17 @@ export const getReportAttributesV2: (
       label: 'Dedicated Pooler Client Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team'],
-      hide: isFreePlan,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
       showTooltip: true,
       showLegend: true,
       showMaxValue: true,
       showGrid: true,
       YAxisProps: { width: 30 },
       hideChartType: false,
-      defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/platform/compute-and-disk#limits-and-constraints',
+      defaultChartStyle: 'bar',
+      docsUrl: `${DOCS_URL}/guides/platform/compute-and-disk#limits-and-constraints`,
       attributes: [
         {
           attribute: 'client_connections_pgbouncer',
@@ -507,7 +367,7 @@ export const getReportAttributesV2: (
           attribute: 'pg_pooler_max_connections',
           provider: 'reference-line',
           label: 'Max pooler connections',
-          value: poolerConfig?.max_client_conn,
+          value: pgBouncerMaxConnections,
           tooltip: 'Maximum allowed pooler connections for your current compute size',
           isMaxValue: true,
         },
@@ -518,15 +378,16 @@ export const getReportAttributesV2: (
       label: 'Shared Pooler (Supavisor) client connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team'],
-      hide: isFreePlan,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
       showTooltip: false,
       showLegend: false,
       showMaxValue: false,
       showGrid: true,
       YAxisProps: { width: 30 },
       hideChartType: false,
-      defaultChartStyle: 'line',
+      defaultChartStyle: 'bar',
       attributes: [
         {
           attribute: 'supavisor_connections_active',
@@ -541,7 +402,6 @@ export const getReportAttributesV2: (
       label: 'Disk Usage',
       syncId: 'database-reports',
       valuePrecision: 2,
-      availableIn: ['free', 'pro', 'team'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -552,8 +412,8 @@ export const getReportAttributesV2: (
         tickFormatter: (value: any) => formatBytes(value, 1),
       },
       hideChartType: false,
-      defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#disk-size',
+      defaultChartStyle: 'bar',
+      docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-size`,
       attributes: [
         {
           attribute: 'disk_fs_used_system',
@@ -585,7 +445,7 @@ export const getReportAttributesV2: (
           label: 'Disk Size',
           tooltip: 'Disk Size refers to the total space your project occupies on disk',
         },
-        !isFreePlan &&
+        entitledFeatures.includes('database') &&
           (isSpendCapEnabled
             ? {
                 attribute: 'pg_database_size_percent_paid_spendCap',

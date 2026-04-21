@@ -109,6 +109,14 @@ You can delete a trigger using the `drop trigger` command:
 drop trigger "trigger_name" on "table_name";
 ```
 
+If your trigger is inside a restricted schema, you won't be able to drop it due to permission restrictions. In those cases, you can drop the function it depends on instead using the CASCADE clause to automatically remove all triggers that call it:
+
+```sql
+drop function if exists restricted_schema.function_name() cascade;
+```
+
+Make sure you take a backup of the function before removing it in case you're planning to recreate it later.
+
 ## Resources
 
 - Official Postgres Docs: [Triggers](https://www.postgresql.org/docs/current/triggers.html)

@@ -1,12 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { useCreateThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-create-mutation'
 import {
   Button,
   Dialog,
@@ -15,13 +12,16 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { useCreateThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-create-mutation'
 
 interface CreateFirebaseAuthIntegrationProps {
   visible: boolean
@@ -50,7 +50,7 @@ export const CreateFirebaseAuthIntegrationDialog = ({
   const isCreating = true
 
   const { ref: projectRef } = useParams()
-  const { mutate: createAuthIntegration, isLoading } = useCreateThirdPartyAuthIntegrationMutation({
+  const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
       toast.success(`Successfully created a new Firebase Auth integration.`)
       onClose()
@@ -151,10 +151,10 @@ export const CreateFirebaseAuthIntegrationDialog = ({
             </div>
           )}
 
-          <Button disabled={isLoading} type="default" onClick={() => onClose()}>
+          <Button disabled={isPending} type="default" onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button form={FORM_ID} htmlType="submit" disabled={isLoading} loading={isLoading}>
+          <Button form={FORM_ID} htmlType="submit" disabled={isPending} loading={isPending}>
             {isCreating ? 'Create connection' : 'Update connection'}
           </Button>
         </DialogFooter>

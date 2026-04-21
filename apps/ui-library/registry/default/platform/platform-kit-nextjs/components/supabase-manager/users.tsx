@@ -1,7 +1,7 @@
 'use client'
 
-import { SqlEditor } from '@/registry/default/platform/platform-kit-nextjs/components/sql-editor'
 import { useState } from 'react'
+
 import {
   Select,
   SelectContent,
@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/registry/default/components/ui/select'
+import { SqlEditor } from '@/registry/default/platform/platform-kit-nextjs/components/sql-editor'
 import { UsersGrowthChart } from '@/registry/default/platform/platform-kit-nextjs/components/users-growth-chart'
 
 export function UsersManager({ projectRef }: { projectRef: string }) {

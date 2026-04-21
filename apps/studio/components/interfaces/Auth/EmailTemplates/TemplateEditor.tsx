@@ -1,18 +1,11 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Code, Monitor } from 'lucide-react'
-import { editor } from 'monaco-editor'
+import { useParams } from 'common'
+import type { editor } from 'monaco-editor'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import type { FormSchema } from 'types'
 import {
   Button,
   CardContent,
@@ -22,38 +15,39 @@ import {
   FormField_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { SpamValidation } from './SpamValidation'
+import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import type { FormSchema } from '@/types'
 
 interface TemplateEditorProps {
   template: FormSchema
 }
 
-const TemplateEditor = ({ template }: TemplateEditorProps) => {
+export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canUpdateConfig } = useAsyncCheckProjectPermissions(
+  const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
-
-  // Add a ref to the code editor
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
 
   // [Joshen] Error state is handled in the parent
   const { data: authConfig, isSuccess } = useAuthConfigQuery({ projectRef })
 
-  const { mutate: validateSpam } = useValidateSpamMutation({
-    onSuccess: (res) => setValidationResult(res),
-  })
+  const { mutate: validateSpam } = useValidateSpamMutation()
 
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
@@ -75,12 +69,10 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
+  const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
-  const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
 
-  // Create form values
   const INITIAL_VALUES = useMemo(() => {
     const result: { [x: string]: string } = {}
     Object.keys(properties).forEach((key) => {
@@ -89,27 +81,16 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
     return result
   }, [authConfig, properties])
 
-  // Setup React Hook Form
   const form = useForm({
     defaultValues: INITIAL_VALUES,
+    resolver: zodResolver(template.validationSchema),
   })
-
-  // Update form values when authConfig changes
-  useEffect(() => {
-    if (authConfig) {
-      const values: { [key: string]: string } = {}
-      Object.keys(properties).forEach((key) => {
-        values[key] = ((authConfig && authConfig[key as keyof typeof authConfig]) ?? '') as string
-      })
-      form.reset(values)
-      setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
-    }
-  }, [authConfig, properties, messageSlug, form])
 
   const onSubmit = (values: any) => {
     if (!projectRef) return console.error('Project ref is required')
 
     setIsSavingTemplate(true)
+
     const payload = { ...values }
 
     // Because the template content uses the code editor which is not a form component
@@ -129,6 +110,7 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
       },
       {
         onSuccess: (res) => {
+          setValidationResult(res)
           const spamRules = (res?.rules ?? []).filter((rule) => rule.score > 0)
           const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
 
@@ -143,8 +125,8 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
               {
                 onSuccess: () => {
                   setIsSavingTemplate(false)
-                  toast.success('Successfully updated settings')
                   setHasUnsavedChanges(false) // Reset the unsaved changes state
+                  toast.success('Successfully updated email template')
                 },
               }
             )
@@ -154,36 +136,6 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
       }
     )
   }
-
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault()
-        e.returnValue = '' // deprecated, but older browsers still require this
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [hasUnsavedChanges])
-
-  useEffect(() => {
-    if (projectRef && id && !!authConfig) {
-      const [subjectKey] = Object.keys(properties)
-
-      validateSpam({
-        projectRef,
-        template: {
-          subject: authConfig[subjectKey as keyof typeof authConfig] as string,
-          content: authConfig[messageSlug],
-        },
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id])
 
   // Single useMemo hook to parse and prepare message variables
   const messageVariables = useMemo(() => {
@@ -210,8 +162,10 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
   // Check if form values have changed
   const formValues = form.watch()
-  const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(INITIAL_VALUES)
-  const hasChanges = hasFormChanges || ((authConfig && authConfig[messageSlug]) ?? '') !== bodyValue
+  const baselineValues = INITIAL_VALUES
+  const baselineBodyValue = (authConfig && authConfig[messageSlug]) ?? ''
+  const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(baselineValues)
+  const hasChanges = hasFormChanges || baselineBodyValue !== bodyValue
 
   // Function to insert text at cursor position
   const insertTextAtCursor = (text: string) => {
@@ -241,6 +195,37 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
     }
   }
 
+  // Update form values when authConfig changes
+  useEffect(() => {
+    if (authConfig) {
+      const values: { [key: string]: string } = {}
+      Object.keys(properties).forEach((key) => {
+        values[key] = ((authConfig && authConfig[key as keyof typeof authConfig]) ?? '') as string
+      })
+      form.reset(values)
+      setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+    }
+  }, [authConfig, properties, messageSlug, form])
+
+  useEffect(() => {
+    if (projectRef && id && !!authConfig) {
+      const [subjectKey] = Object.keys(properties)
+
+      validateSpam({
+        projectRef,
+        template: {
+          subject: authConfig[subjectKey as keyof typeof authConfig] as string,
+          content: authConfig[messageSlug],
+        },
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
+
+  useEffect(() => {
+    if (!hasChanges) setValidationResult(undefined)
+  }, [hasChanges])
+
   return (
     <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -255,6 +240,8 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                   name={x}
                   render={({ field }) => (
                     <FormItemLayout
+                      className="gap-y-3"
+                      layout="vertical"
                       label={property.title}
                       description={
                         property.description ? (
@@ -285,76 +272,76 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
         {messageProperty && (
           <>
-            <CardContent className="p-0">
-              <Label_Shadcn_ className="p-6 pb-4 block">Message body</Label_Shadcn_>
-              <Tabs_Shadcn_ defaultValue="source">
-                <TabsList_Shadcn_ className="gap-3 px-6">
-                  <TabsTrigger_Shadcn_ value="source" className="gap-2">
-                    <Code size={14} />
-                    Source
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ value="preview" className="gap-2">
-                    <Monitor size={14} />
-                    Preview
-                  </TabsTrigger_Shadcn_>
-                </TabsList_Shadcn_>
-                <TabsContent_Shadcn_ value="source" className="p-0 mt-0">
-                  <CodeEditor
-                    id="code-id"
-                    language="html"
-                    isReadOnly={!canUpdateConfig}
-                    className="!mb-0 relative h-96 overflow-hidden p-0"
-                    onInputChange={(e: string | undefined) => {
-                      setBodyValue(e ?? '')
-                      if (bodyValue !== e) setHasUnsavedChanges(true)
-                    }}
-                    options={{ wordWrap: 'on', contextmenu: false, padding: { top: 16 } }}
-                    value={bodyValue}
-                    editorRef={editorRef}
-                  />
+            <CardContent className="flex flex-col gap-4">
+              <div className="flex items-center justify-between gap-2">
+                <Label_Shadcn_>Body</Label_Shadcn_>
+                <TwoOptionToggle
+                  width={60}
+                  options={['preview', 'source']}
+                  activeOption={activeView}
+                  onClickOption={(option: 'source' | 'preview') => setActiveView(option)}
+                  borderOverride="border-muted"
+                />
+              </div>
+              {activeView === 'source' ? (
+                <>
+                  <div className="overflow-hidden rounded-md border dark:border-control overflow-hidden [&_.monaco-editor]:outline-0 [&_.monaco-editor-background]:!bg-surface-200/30 [&_.monaco-editor_.margin]:!bg-surface-200/30 dark:[&_.monaco-editor-background]:!bg-surface-300 dark:[&_.monaco-editor_.margin]:!bg-surface-300">
+                    <CodeEditor
+                      id="code-id"
+                      language="html"
+                      isReadOnly={!canUpdateConfig}
+                      className="!mb-0 relative h-96 outline-none outline-offset-0 outline-width-0 outline-0"
+                      onInputChange={(e: string | undefined) => {
+                        setBodyValue(e ?? '')
+                        if (bodyValue !== e) setHasUnsavedChanges(true)
+                      }}
+                      options={{ wordWrap: 'on', contextmenu: false, padding: { top: 16 } }}
+                      value={bodyValue}
+                      editorRef={editorRef}
+                    />
+                  </div>
                   {messageVariables.length > 0 && (
-                    <div className="px-6 py-3 border-t bg-surface-200">
-                      <div className="flex flex-wrap gap-1">
-                        {messageVariables.map(({ variable, description }) => (
-                          <Tooltip key={variable}>
-                            <TooltipTrigger asChild>
-                              <Button
-                                type="outline"
-                                size="tiny"
-                                className="rounded-full"
-                                onClick={() => insertTextAtCursor(variable)}
-                              >
-                                {variable}
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="top">
-                              <p>{description || 'Variable description not available'}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        ))}
-                      </div>
+                    <div className="flex flex-wrap gap-1">
+                      {messageVariables.map(({ variable, description }) => (
+                        <Tooltip key={variable}>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="outline"
+                              size="tiny"
+                              className="rounded-full"
+                              onClick={() => insertTextAtCursor(variable)}
+                            >
+                              {variable}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top">
+                            <p>{description || 'Variable description not available'}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ))}
                     </div>
                   )}
-                </TabsContent_Shadcn_>
-                <TabsContent_Shadcn_ value="preview" className="pt-0 mt-0">
+                </>
+              ) : (
+                <>
                   <iframe
-                    className="!mb-0 mt-0 overflow-hidden h-96 w-full"
+                    className="!mb-0 mt-0 overflow-hidden h-96 w-full rounded-md border bg-white"
                     title={id}
                     srcDoc={bodyValue}
                     sandbox="allow-scripts allow-forms"
                   />
                   <Admonition
                     type="default"
-                    title="The preview may differ slightly from the actual rendering in the email client"
-                    className="rounded-none border-0 mb-0"
+                    title="Email rendering may differ"
+                    description="The preview shown here may differ slightly from how your email appears in the recipient’s email client."
                   />
-                </TabsContent_Shadcn_>
-              </Tabs_Shadcn_>
+                </>
+              )}
             </CardContent>
-            <CardContent>
-              <SpamValidation validationResult={validationResult} />
-            </CardContent>
-            <CardFooter className="justify-end space-x-2">
+
+            <SpamValidation spamRules={spamRules} />
+
+            <CardFooter className="flex flex-row justify-end gap-2">
               {hasChanges && (
                 <Button
                   type="default"
@@ -370,9 +357,7 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
               <Button
                 type="primary"
                 htmlType="submit"
-                disabled={
-                  !canUpdateConfig || isSavingTemplate || !hasChanges || preventSaveFromSpamCheck
-                }
+                disabled={!canUpdateConfig || isSavingTemplate || !hasChanges}
                 loading={isSavingTemplate}
               >
                 Save changes
@@ -381,8 +366,7 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
           </>
         )}
       </form>
+      <PreventNavigationOnUnsavedChanges hasChanges={hasChanges} />
     </Form_Shadcn_>
   )
 }
-
-export default TemplateEditor

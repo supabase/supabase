@@ -1,28 +1,34 @@
+import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
-import { debounce } from 'lodash'
-import { ChangeEvent, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
+import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
 import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
-import { isVercelUrl } from 'components/interfaces/Integrations/Vercel/VercelIntegration.utils'
-import { Markdown } from 'components/interfaces/Markdown'
-import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
-import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
-import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
-import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
-import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH, PROVIDERS } from 'lib/constants'
-import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
-import passwordStrength from 'lib/password-strength'
-import { generateStrongPassword } from 'lib/project'
-import { AWS_REGIONS } from 'shared-data'
-import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import type { NextPageWithLayout } from 'types'
+import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
+import { Markdown } from '@/components/interfaces/Markdown'
+import VercelIntegrationWindowLayout from '@/components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
+import { ScaffoldColumn, ScaffoldContainer } from '@/components/layouts/Scaffold'
+import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
+import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integrations/integrations-vercel-connections-create-mutation'
+import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProjectCreateMutation } from '@/data/projects/project-create-mutation'
+import {
+  useDataApiRevokeOnCreateDefaultEnabled,
+  useTrackDefaultPrivilegesExposure,
+} from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { usePHFlag } from '@/hooks/ui/useFlag'
+import { BASE_PATH, PROVIDERS } from '@/lib/constants'
+import { getInitialMigrationSQLFromGitHubRepo } from '@/lib/integration-utils'
+import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
+import { generateStrongPassword } from '@/lib/project'
+import { useTrack } from '@/lib/telemetry/track'
+import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
+import type { NextPageWithLayout } from '@/types'
 
 const VercelIntegration: NextPageWithLayout = () => {
   return (
@@ -61,11 +67,21 @@ const CreateProject = () => {
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
   const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region.displayName)
 
+  const track = useTrack()
   const snapshot = useIntegrationInstallationSnapshot()
+  const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
+  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
+  const [dataApiDefaultPrivileges, setDataApiDefaultPrivileges] = useState(
+    !isDataApiRevokeOnCreateDefault
+  )
 
-  const delayedCheckPasswordStrength = useRef(
-    debounce((value: string) => checkPasswordStrength(value), 300)
-  ).current
+  useTrackDefaultPrivilegesExposure({ surface: 'vercel' })
+
+  async function checkPasswordStrength(value: string) {
+    const { message, strength } = await passwordStrength(value)
+    setPasswordStrengthScore(strength)
+    setPasswordStrengthMessage(message)
+  }
 
   const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
@@ -105,19 +121,13 @@ const CreateProject = () => {
     if (value == '') {
       setPasswordStrengthScore(-1)
       setPasswordStrengthMessage('')
-    } else delayedCheckPasswordStrength(value)
-  }
-
-  async function checkPasswordStrength(value: string) {
-    const { message, strength } = await passwordStrength(value)
-    setPasswordStrengthScore(strength)
-    setPasswordStrengthMessage(message)
+    } else checkPasswordStrength(value)
   }
 
   function generatePassword() {
     const password = generateStrongPassword()
     setDbPass(password)
-    delayedCheckPasswordStrength(password)
+    checkPasswordStrength(password)
   }
 
   const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
@@ -125,6 +135,21 @@ const CreateProject = () => {
   const { mutate: createProject } = useProjectCreateMutation({
     onSuccess: (res) => {
       setNewProjectRef(res.ref)
+      track(
+        'project_creation_simple_version_submitted',
+        {
+          surface: 'vercel',
+          dataApiEnabled: true,
+          dataApiDefaultPrivilegesGranted: dataApiDefaultPrivileges,
+          ...(dataApiRevokeOnCreateDefaultFlag !== undefined && {
+            dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
+          }),
+        },
+        {
+          project: res.ref,
+          organization: res.organization_slug,
+        }
+      )
     },
     onError: (error) => {
       toast.error(error.message)
@@ -140,11 +165,15 @@ const CreateProject = () => {
 
     snapshot.setLoading(true)
 
-    let dbSql: string | undefined
+    let dbSqlParts: string[] = []
     if (shouldRunMigrations) {
       const id = toast(`Fetching initial migrations from GitHub repo`)
-      dbSql = (await getInitialMigrationSQLFromGitHubRepo(externalId)) ?? undefined
+      const migrationSql = await getInitialMigrationSQLFromGitHubRepo(externalId)
+      if (migrationSql) dbSqlParts.push(migrationSql)
       toast.success(`Done fetching initial migrations`, { id })
+    }
+    if (!dataApiDefaultPrivileges) {
+      dbSqlParts.push(buildDefaultPrivilegesSql('revoke'))
     }
 
     createProject({
@@ -152,59 +181,64 @@ const CreateProject = () => {
       name: projectName,
       dbPass,
       dbRegion,
-      dbSql,
+      dbSql: dbSqlParts.length > 0 ? dbSqlParts.join('\n') : undefined,
     })
   }
 
   // Wait for the new project to be created before creating the connection
-  useProjectSettingsV2Query(
+  const { data, isSuccess } = useProjectSettingsV2Query(
     { projectRef: newProjectRef },
     {
       enabled: newProjectRef !== undefined,
       // refetch until the project is created
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
+        const data = query.state.data
         return ((data?.service_api_keys ?? []).length ?? 0) > 0 ? false : 1000
-      },
-      async onSuccess(data) {
-        const isReady = (data?.service_api_keys ?? []).length > 0
-
-        if (!isReady || !organizationIntegration || !foreignProjectId || !newProjectRef) {
-          return
-        }
-
-        const projectDetails = vercelProjects?.find((x: any) => x.id === foreignProjectId)
-
-        try {
-          const { id: connectionId } = await createConnections({
-            organizationIntegrationId: organizationIntegration?.id,
-            connection: {
-              foreign_project_id: foreignProjectId,
-              supabase_project_ref: newProjectRef,
-              integration_id: '0',
-              metadata: {
-                ...projectDetails,
-                supabaseConfig: {
-                  projectEnvVars: {
-                    write: true,
-                  },
-                },
-              },
-            },
-            orgSlug: selectedOrganization?.slug,
-          })
-        } catch (error) {
-          console.error('An error occurred during createConnections:', error)
-          return
-        }
-
-        snapshot.setLoading(false)
-
-        if (next && isVercelUrl(next)) {
-          window.location.href = next
-        }
       },
     }
   )
+  useEffect(() => {
+    if (!isSuccess) return
+    const onSuccessFunc = async () => {
+      const isReady = (data.service_api_keys ?? []).length > 0
+
+      if (!isReady || !organizationIntegration || !foreignProjectId || !newProjectRef) {
+        return
+      }
+
+      const projectDetails = vercelProjects?.find((x: any) => x.id === foreignProjectId)
+
+      try {
+        await createConnections({
+          organizationIntegrationId: organizationIntegration?.id,
+          connection: {
+            foreign_project_id: foreignProjectId,
+            supabase_project_ref: newProjectRef,
+            integration_id: '0',
+            metadata: {
+              ...projectDetails,
+              supabaseConfig: {
+                projectEnvVars: {
+                  write: true,
+                },
+              },
+            },
+          },
+          orgSlug: selectedOrganization?.slug,
+        })
+      } catch (error) {
+        console.error('An error occurred during createConnections:', error)
+        return
+      }
+
+      snapshot.setLoading(false)
+
+      if (next && isVercelUrl(next)) {
+        window.location.href = next
+      }
+    }
+    onSuccessFunc()
+  }, [data, isSuccess])
 
   return (
     <div>
@@ -232,7 +266,7 @@ const CreateProject = () => {
           onChange={onDbPassChange}
           descriptionText={
             <PasswordStrengthBar
-              passwordStrengthScore={passwordStrengthScore}
+              passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
               password={dbPass}
               passwordStrengthMessage={passwordStrengthMessage}
               generateStrongPassword={generatePassword}
@@ -278,6 +312,15 @@ const CreateProject = () => {
           description="To get you started quickly, we can create new tables for you with seed (sample) data. You can delete these tables later."
           checked={shouldRunMigrations}
           onChange={(e) => setShouldRunMigrations(e.target.checked)}
+        />
+      </div>
+      <div className="py-2 pb-4">
+        <Checkbox
+          name="dataApiDefaultPrivileges"
+          label="Automatically expose new tables and functions"
+          description="Grants privileges to Data API roles by default, exposing new tables and functions. We recommend disabling this to control access manually."
+          checked={dataApiDefaultPrivileges}
+          onChange={(e) => setDataApiDefaultPrivileges(e.target.checked)}
         />
       </div>
       <div className="flex flex-row w-full justify-end">

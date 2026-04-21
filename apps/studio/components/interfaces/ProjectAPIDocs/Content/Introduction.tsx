@@ -1,18 +1,25 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Button, Input, copyToClipboard } from 'ui'
-
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { Copy } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { Button, copyToClipboard, Input } from 'ui'
+
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
-const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
+export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref })
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref }, { enabled: canReadAPIKeys })
   const { data } = useProjectSettingsV2Query({ projectRef: ref })
+  const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const [copied, setCopied] = useState<'anon' | 'service'>()
 
@@ -54,6 +61,17 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
                   onClick={() => {
                     setCopied('anon')
                     copyToClipboard(anonApiKey ?? 'SUPABASE_CLIENT_ANON_KEY')
+                    sendEvent({
+                      action: 'api_docs_code_copy_button_clicked',
+                      properties: {
+                        title: 'Client API key',
+                        selectedLanguage: language,
+                      },
+                      groups: {
+                        project: ref ?? 'Unknown',
+                        organization: org?.slug ?? 'Unknown',
+                      },
+                    })
                   }}
                 >
                   {copied === 'anon' ? 'Copied' : 'Copy'}
@@ -69,7 +87,7 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
               size="small"
               value={
                 showKeys
-                  ? serviceApiKey ?? 'SUPABASE_CLIENT_SERVICE_KEY'
+                  ? (serviceApiKey ?? 'SUPABASE_CLIENT_SERVICE_KEY')
                   : 'Reveal API keys via dropdown in the header'
               }
               className="w-full"
@@ -87,6 +105,17 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
                   onClick={() => {
                     setCopied('service')
                     copyToClipboard(serviceApiKey)
+                    sendEvent({
+                      action: 'api_docs_code_copy_button_clicked',
+                      properties: {
+                        title: 'Service key',
+                        selectedLanguage: language,
+                      },
+                      groups: {
+                        project: ref ?? 'Unknown',
+                        organization: org?.slug ?? 'Unknown',
+                      },
+                    })
                   }}
                 >
                   {copied === 'service' ? 'Copied' : 'Copy'}
@@ -113,5 +142,3 @@ const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) =>
     </>
   )
 }
-
-export default Introduction

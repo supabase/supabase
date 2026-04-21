@@ -1,9 +1,13 @@
-export { default as passwordStrength } from './password-strength'
-export { default as uuidv4 } from './uuid'
 import { UIEvent } from 'react'
+import { v4 as _uuidV4 } from 'uuid'
+
 import type { TablesData } from '../data/tables/tables-query'
 
-export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean => {
+export const uuidv4 = () => {
+  return _uuidV4()
+}
+
+export const isAtBottom = ({ currentTarget }: UIEvent<HTMLElement>): boolean => {
   return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
 }
 
@@ -178,6 +182,11 @@ export const detectOS = () => {
   }
 }
 
+export const getModKeyLabel = () => {
+  const os = detectOS()
+  return os === 'macos' ? '⌘' : 'Ctrl+'
+}
+
 /**
  * Convert a list of tables to SQL
  * @param t - The list of tables
@@ -251,6 +260,62 @@ export const isValidHttpUrl = (value: string) => {
     return false
   }
   return url.protocol === 'http:' || url.protocol === 'https:'
+}
+
+/**
+ * Remove markdown code blocks (fenced and inline) from text
+ */
+export const stripMarkdownCodeBlocks = (text: string): string => {
+  // Remove fenced code blocks (```...```)
+  const withoutFenced = text.replace(/```[\s\S]*?```/g, '')
+  // Remove inline code (`...`)
+  return withoutFenced.replace(/`[^`]+`/g, '')
+}
+
+interface ExtractUrlsOptions {
+  excludeCodeBlocks?: boolean
+  excludeTemplates?: boolean
+}
+
+/**
+ * Extract URLs from text using regex for URL detection
+ * Matches URLs with protocols (http/https) and common domain patterns
+ * @param text - The text to extract URLs from
+ * @param options - Optional filtering options
+ * @returns Array of extracted URLs with trailing punctuation removed
+ */
+export const extractUrls = (text: string, options?: ExtractUrlsOptions): string[] => {
+  const { excludeCodeBlocks = false, excludeTemplates = false } = options ?? {}
+
+  let processedText = text
+  if (excludeCodeBlocks) {
+    processedText = stripMarkdownCodeBlocks(processedText)
+  }
+
+  // Regex matches URLs with protocols (http/https)
+  // Handles: domains, ports, paths, query params, and fragments
+  // Pattern: https?://domain(:port)?(/path)?(?query)?(#fragment)?
+  const urlRegex = /https?:\/\/(?:[-\w.])+(?::\d+)?(?:\/(?:[\w\/_.~!*'();:@&=+$,?#[\]%-])*)?/gi
+
+  const urls: string[] = []
+  let match
+
+  while ((match = urlRegex.exec(processedText)) !== null) {
+    // Remove trailing punctuation that might have been captured (common in text)
+    const url = match[0].replace(/[.,;:!?)*]+$/, '')
+
+    if (excludeTemplates) {
+      // Skip URLs that were truncated at an angle bracket (template URL)
+      const endPos = match.index + match[0].length
+      if (processedText[endPos] === '<') {
+        continue
+      }
+    }
+
+    urls.push(url)
+  }
+
+  return urls
 }
 
 /**
@@ -330,4 +395,49 @@ export const formatCurrency = (amount: number | undefined | null): string | null
   } else {
     return currencyFormatterDefault.format(amount)
   }
+}
+
+/**
+ * [Joshen] This is to address an incredibly weird bug that's happening between Data Grid + Shadcn ContextMenu + Shadcn Overlay
+ * This trifecta is causing a pointer events none style getting left behind on the body element which makes the dashboard become
+ * unresponsive, hence the attempt to clean things up here
+ *
+ * Timeout is made configurable as I've observed it requires a higher timeout sometimes (e.g when closing the cron job sheet)
+ */
+export const cleanPointerEventsNoneOnBody = (timeoutMs: number = 300) => {
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      if (document.body.style.pointerEvents === 'none') {
+        document.body.style.pointerEvents = ''
+      }
+    }, timeoutMs)
+  }
+}
+
+export const createWrappedSymbol = (name: string, display: string): Symbol => {
+  const sym = Symbol(name)
+  const wrapper = Object(sym)
+
+  wrapper.toString = () => display
+
+  Object.freeze(wrapper)
+  return wrapper
+}
+
+// Intentional for generic use; does not affect type safety since this branch is
+// unreachable.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function neverGuard(_: never): any {}
+
+export function isObject(
+  maybeObject: unknown
+): maybeObject is Record<string | symbol | number, unknown> {
+  return maybeObject !== null && typeof maybeObject === 'object' && !Array.isArray(maybeObject)
+}
+
+export function isObjectContainingKeys<T extends string | symbol | number>(
+  maybeObject: unknown,
+  keys: Array<T>
+): maybeObject is { [K in T]: unknown } {
+  return isObject(maybeObject) && keys.every((key) => key in maybeObject)
 }

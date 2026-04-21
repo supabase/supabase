@@ -3,11 +3,8 @@ import { Modal } from 'ui'
 import PolicyAllowedOperation from './PolicyAllowedOperation'
 import PolicyDefinition from './PolicyDefinition'
 import PolicyEditorFooter from './PolicyEditorFooter'
-import PolicyName from './PolicyName'
-import PolicyRoles from './PolicyRoles'
-
-// Exposed for StoragePoliciesEditor.js
-export { PolicyName, PolicyRoles }
+import { PolicyName } from './PolicyName'
+import { PolicyRoles } from './PolicyRoles'
 
 interface PolicyEditorProps {
   isNewPolicy: boolean
@@ -17,7 +14,7 @@ interface PolicyEditorProps {
   onReviewPolicy: () => void
 }
 
-const PolicyEditor = ({
+export const PolicyEditor = ({
   isNewPolicy = true,
   policyFormFields = {},
   onUpdatePolicyFormFields = () => {},
@@ -78,5 +75,3 @@ const PolicyEditor = ({
     </div>
   )
 }
-
-export default PolicyEditor

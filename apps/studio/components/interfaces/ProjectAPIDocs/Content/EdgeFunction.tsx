@@ -1,12 +1,12 @@
 import { useParams } from 'common'
 
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useAppStateSnapshot } from '@/state/app-state'
 
-const Bucket = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
+export const EdgeFunction = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const { data } = useEdgeFunctionsQuery({ projectRef: ref })
@@ -37,5 +37,3 @@ const Bucket = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
     </div>
   )
 }
-
-export default Bucket

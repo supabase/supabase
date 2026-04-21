@@ -1,13 +1,15 @@
 'use client'
 
-import { Fragment } from 'react'
+import type { User } from '@supabase/supabase-js'
+import type { LucideIcon } from 'icons/src/createSupabaseIcon'
+import { UserIcon } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useTheme } from 'next-themes'
-import { UserIcon } from 'lucide-react'
+import { Fragment } from 'react'
 import {
-  cn,
   buttonVariants,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -19,9 +21,6 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { themes } from 'ui/src/components/ThemeProvider/themes'
-
-import type { User } from '@supabase/supabase-js'
-import type { LucideIcon } from 'icons/src/createSupabaseIcon'
 import type { Theme } from 'ui/src/components/ThemeProvider/themes'
 
 interface Props {

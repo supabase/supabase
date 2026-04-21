@@ -1,4 +1,3 @@
-/* eslint-disable */
 import * as types from './graphql'
 
 /**

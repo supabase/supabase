@@ -1,4 +1,6 @@
-import type { SqlSnippets, UserContent } from 'types'
+import { IS_PLATFORM } from 'common'
+
+import type { SqlSnippets, UserContent } from '@/types'
 
 const SQL_SNIPPET_SCHEMA_VERSION = '1.0'
 
@@ -7,11 +9,11 @@ export const NEW_SQL_SNIPPET_SKELETON: UserContent<SqlSnippets.Content> = {
   description: '',
   type: 'sql',
   visibility: 'user', // default to user scope
+  favorite: false,
   content: {
     schema_version: SQL_SNIPPET_SCHEMA_VERSION,
     content_id: '',
     sql: 'this is a test',
-    favorite: false,
   },
 }
 
@@ -20,10 +22,34 @@ export const sqlAiDisclaimerComment = `
 -- Always verify the output before executing
 `.trim()
 
+// Should only be used for comparisons. If you need a new title, use generateSnippetTitle()
 export const untitledSnippetTitle = 'Untitled query'
+
+/**
+ * Generates a snippet title. If the platform is self-hosted, it will return a random number to avoid conflicts.
+ */
+export const generateSnippetTitle = () => {
+  if (IS_PLATFORM) {
+    return untitledSnippetTitle
+  } else {
+    return `${untitledSnippetTitle} ${Math.floor(Math.random() * 900) + 100}`
+  }
+}
 
 export const destructiveSqlRegex = [
   /^(.*;)?\s*(drop|delete|truncate|alter\s+table\s+.*\s+drop\s+column)\s/is,
+]
+
+// Matches `UPDATE <table> SET ...` where <table> is any combination of bareword
+// or double-quoted identifiers, optionally schema-qualified. Quoted identifiers
+// can contain any character (including spaces) and use `""` to escape an inner
+// quote, mirroring Postgres syntax.
+export const updateWithoutWhereRegex =
+  /(?:^|;)\s*update\s+(?:"(?:[^"]|"")+"|[\w]+)(?:\.(?:"(?:[^"]|"")+"|[\w]+))?\s+set\s+[\w\W]+?(?!\s*where\s)/is
+
+export const alterDatabasePreventConnectionStatements = [
+  'alter database postgres connection limit 0',
+  'alter database postgres allow_connections false',
 ]
 
 export const ASSISTANT_TEMPLATES = [

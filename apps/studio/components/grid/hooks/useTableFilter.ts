@@ -1,9 +1,8 @@
 import { useCallback } from 'react'
 
-import { filtersToUrlParams, formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
-import type { Filter } from 'components/grid/types'
-import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
-import { useSaveTableEditorState } from './useSaveTableEditorState'
+import { filtersToUrlParams, formatFilterURLParams } from '@/components/grid/SupabaseGrid.utils'
+import type { Filter } from '@/components/grid/types'
+import { useTableEditorFiltersSort } from '@/hooks/misc/useTableEditorFiltersSort'
 
 /**
  * Hook for managing table filter URL parameters and saving.
@@ -11,7 +10,6 @@ import { useSaveTableEditorState } from './useSaveTableEditorState'
  */
 export function useTableFilter() {
   const { filters: urlFilters, setParams } = useTableEditorFiltersSort()
-  const { saveFiltersAndTriggerSideEffects } = useSaveTableEditorState()
 
   const filters = formatFilterURLParams(urlFilters)
 
@@ -19,14 +17,18 @@ export function useTableFilter() {
     (appliedFilters: Filter[]) => {
       const newUrlFilters = filtersToUrlParams(appliedFilters)
       setParams((prevParams) => ({ ...prevParams, filter: newUrlFilters }))
-      saveFiltersAndTriggerSideEffects(newUrlFilters)
     },
-    [setParams, saveFiltersAndTriggerSideEffects]
+    [setParams]
   )
+
+  const clearFilters = useCallback(() => {
+    setParams((prevParams) => ({ ...prevParams, filter: [] }))
+  }, [setParams])
 
   return {
     filters, // Formatted Filter[] object array
     urlFilters, // Raw string[] from URL
     onApplyFilters, // Callback to apply changes
+    clearFilters, // Callback to clear filters
   }
 }

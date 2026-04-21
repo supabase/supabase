@@ -60,6 +60,7 @@ const nextConfig = {
   ],
   outputFileTracingIncludes: {
     '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
+    '/api/guides-md/**/*': ['./public/docs/guides/**/*'],
     '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*', './examples/**/*'],
     '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
   },
@@ -156,9 +157,10 @@ const nextConfig = {
     ]
   },
   typescript: {
-    // WARNING: production builds can successfully complete even there are type errors
-    // Typechecking is checked separately via .github/workflows/typecheck.yml
-    ignoreBuildErrors: true,
+    // On previews, typechecking is run via GitHub Action only for efficiency
+    // On production, we turn it on to prevent errors from conflicting PRs getting into
+    // prod
+    ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
   },
   eslint: {
     // We are already running linting via GH action, this will skip linting during production build on Vercel

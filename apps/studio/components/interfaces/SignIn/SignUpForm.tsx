@@ -7,24 +7,24 @@ import { parseAsString, useQueryStates } from 'nuqs'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { useSignUpMutation } from 'data/misc/signup-mutation'
-import { BASE_PATH } from 'lib/constants'
-import { buildPathWithParams } from 'lib/gotrue'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  cn,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import PasswordConditionsHelper from './PasswordConditionsHelper'
+import { useSignUpMutation } from '@/data/misc/signup-mutation'
+import { BASE_PATH } from '@/lib/constants'
+import { buildPathWithParams } from '@/lib/gotrue'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -67,7 +67,7 @@ export const SignUpForm = () => {
     token: parseAsString.withDefault(''),
   })
 
-  const { mutate: signup, isLoading: isSigningUp } = useSignUpMutation({
+  const { mutate: signup, isPending: isSigningUp } = useSignUpMutation({
     onSuccess: () => {
       toast.success(`Signed up successfully!`)
       setIsSubmitted(true)
@@ -183,8 +183,8 @@ export const SignUpForm = () => {
                       />
                       <Button
                         type="default"
-                        title={passwordHidden ? `Hide password` : `Show password`}
-                        aria-label={passwordHidden ? `Hide password` : `Show password`}
+                        title={passwordHidden ? `Show password` : `Hide password`}
+                        aria-label={passwordHidden ? `Show password` : `Hide password`}
                         className="absolute right-1 top-1 px-1.5"
                         icon={passwordHidden ? <Eye /> : <EyeOff />}
                         disabled={isSubmitting}
@@ -222,7 +222,7 @@ export const SignUpForm = () => {
               disabled={password.length === 0 || isSubmitting}
               loading={isSubmitting}
             >
-              Sign Up
+              Sign up
             </Button>
           </form>
         </Form_Shadcn_>

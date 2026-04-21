@@ -1,7 +1,13 @@
-import { expect, test as setup } from '@playwright/test'
+import { test as setup } from '@playwright/test'
 import dotenv from 'dotenv'
-import path from 'path'
-import { env, STORAGE_STATE_PATH } from '../env.config'
+import path from 'node:path'
+import os from 'node:os'
+import fs from 'node:fs/promises'
+
+import { env } from '../env.config.js'
+import { setupProjectForTests } from '../scripts/setup-platform-tests.js'
+import { loginWithEmail } from '../scripts/login/email.js'
+import { loginWithGithubWithRetry } from '../scripts/login/github.js'
 
 /**
  * Run any setup tasks for the tests.
@@ -9,19 +15,18 @@ import { env, STORAGE_STATE_PATH } from '../env.config'
  */
 
 dotenv.config({
-  path: path.resolve(__dirname, '..', '.env.local'),
+  path: path.resolve(import.meta.dirname, '..', '.env.local'),
   override: true,
 })
 
 const IS_PLATFORM = process.env.IS_PLATFORM
-
-const envHasAuth = env.AUTHENTICATION
+const doAuthentication = env.AUTHENTICATION
 
 setup('Global Setup', async ({ page }) => {
   console.log(`\n 🧪 Setting up test environment.
     - Studio URL: ${env.STUDIO_URL}
     - API URL: ${env.API_URL}
-    - Auth: ${envHasAuth ? 'enabled' : 'disabled'}
+    - Auth: ${doAuthentication ? 'enabled' : 'disabled'}
     - Is Platform: ${IS_PLATFORM}
     `)
 
@@ -34,7 +39,7 @@ setup('Global Setup', async ({ page }) => {
 
   await page.goto(studioUrl).catch((err) => {
     console.error(
-      `\n 🚨 Setup Error 
+      `\n 🚨 Setup Error
 Studio is not available at: ${studioUrl}
 
 Please ensure:
@@ -67,89 +72,62 @@ To start API locally, run:
   console.log(`\n ✅ API is running at ${apiUrl}`)
 
   /**
+   * Setup Project for tests
+   */
+  const projectRef = await setupProjectForTests()
+  process.env.PROJECT_REF = projectRef
+  env.PROJECT_REF = projectRef
+
+  /**
    * Only run authentication if the environment requires it
    */
-  if (!env.AUTHENTICATION) {
+  if (!doAuthentication) {
     console.log(`\n 🔑 Skipping authentication for ${env.STUDIO_URL}`)
     return
-  } else {
-    if (!env.EMAIL || !env.PASSWORD || !env.PROJECT_REF) {
-      console.error(`Missing environment variables. Check README.md for more information.`)
-      throw new Error('Missing environment variables')
-    }
   }
 
-  const signInUrl = `${studioUrl}/sign-in`
-  console.log(`\n 🔑 Navigating to sign in page: ${signInUrl}`)
+  const { EMAIL, PASSWORD } = env
+  if (EMAIL && PASSWORD) {
+    console.log(`\n 🔑 Authenticating user with email and password`)
 
-  await page.goto(signInUrl, { waitUntil: 'networkidle' })
-  await page.waitForLoadState('domcontentloaded')
-  await page.waitForLoadState('networkidle')
-
-  // Check if we're still on the sign-in page
-  const currentUrl = page.url()
-  console.log(`\n 📍 Current URL: ${currentUrl}`)
-
-  if (!currentUrl.includes('/sign-in')) {
-    console.log('\n ⚠️ Redirected away from sign-in page. Checking if already authenticated...')
-
-    // Check if we're already on the projects page
-    if (currentUrl.includes('/projects')) {
-      console.log('\n ✅ Already authenticated, proceeding with tests')
-      await page.context().storageState({ path: STORAGE_STATE_PATH })
+    try {
+      await loginWithEmail(page, studioUrl, {
+        email: EMAIL,
+        password: PASSWORD,
+      })
+      console.log(`\n ✅ Successfully authenticated with email`)
       return
-    }
-
-    // If we're redirected somewhere else, try to navigate back to sign-in
-    console.log('\n 🔄 Attempting to navigate back to sign-in page')
-    await page.goto(signInUrl, { waitUntil: 'networkidle' })
-    await page.waitForLoadState('domcontentloaded')
-    await page.waitForLoadState('networkidle')
-
-    // Check URL again after second attempt
-    const secondAttemptUrl = page.url()
-    if (!secondAttemptUrl.includes('/sign-in')) {
-      throw new Error(`Failed to reach sign-in page. Current URL: ${secondAttemptUrl}`)
+    } catch (err) {
+      console.error(`\n 🚨 Authentication failed with email/password`)
+      throw err
     }
   }
 
-  const auth = {
-    email: env.EMAIL,
-    password: env.PASSWORD,
-    projectRef: env.PROJECT_REF,
+  const { GITHUB_USER, GITHUB_PASS, GITHUB_TOTP } = env
+  if (GITHUB_USER && GITHUB_PASS && GITHUB_TOTP) {
+    console.log(`\n 🔑 Authenticating user with GitHub`)
+    try {
+      await loginWithGithubWithRetry({
+        page,
+        githubTotp: GITHUB_TOTP,
+        githubUser: GITHUB_USER,
+        githubPass: GITHUB_PASS,
+        supaDashboard: studioUrl,
+      })
+      console.log(`\n ✅ Successfully authenticated with GitHub`)
+      return
+    } catch (err) {
+      console.error(`\n 🚨 Authentication failed with GitHub`)
+      throw err
+    }
   }
 
-  expect(auth).toBeDefined()
-  expect(auth.email).toBeDefined()
-  expect(auth.password).toBeDefined()
-  expect(auth.projectRef).toBeDefined()
-
-  // Wait for form elements with increased timeout
-  const emailInput = page.getByLabel('Email')
-  const passwordInput = page.getByLabel('Password')
-  const signInButton = page.getByRole('button', { name: 'Sign In' })
-
-  // if found click opt out on telemetry
-  const optOutButton = page.getByRole('button', { name: 'Opt out' })
-  if ((await optOutButton.count()) > 0) {
-    await optOutButton.click()
+  // Cleanup locks as they may persist between runs especially locally
+  const locksDirPath = path.join(os.tmpdir(), 'playwright-locks')
+  try {
+    await fs.access(locksDirPath);
+    await fs.rm(locksDirPath, { recursive: true, force: true })
+  } catch {
+    // Silently catch, no directory
   }
-
-  // Debug element states
-  console.log('\n 🔍 Checking form elements:')
-  console.log(`Email input exists: ${(await emailInput.count()) > 0}`)
-  console.log(`Password input exists: ${(await passwordInput.count()) > 0}`)
-  console.log(`Sign in button exists: ${(await signInButton.count()) > 0}`)
-
-  await emailInput.waitFor({ state: 'visible', timeout: 15000 })
-  await passwordInput.waitFor({ state: 'visible', timeout: 15000 })
-  await signInButton.waitFor({ state: 'visible', timeout: 15000 })
-
-  await emailInput.fill(auth.email ?? '')
-  await passwordInput.fill(auth.password ?? '')
-  await signInButton.click()
-
-  await page.waitForURL('**/organizations')
-
-  await page.context().storageState({ path: STORAGE_STATE_PATH })
 })

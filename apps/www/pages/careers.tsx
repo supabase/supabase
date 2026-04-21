@@ -1,5 +1,10 @@
 import { GlobeAltIcon } from '@heroicons/react/outline'
-import { Check } from 'lucide-react'
+import Globe from '~/components/Globe'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import career from '~/data/career.json'
+import { filterGenericJob, groupJobsByTeam, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
+import Styles from '~/styles/career.module.css'
 import { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
@@ -8,14 +13,6 @@ import { useRouter } from 'next/router'
 import ReactMarkdown from 'react-markdown'
 import { Badge, Button, buttonVariants, cn, Separator } from 'ui'
 import { z } from 'zod'
-import Styles from '~/styles/career.module.css'
-
-import Globe from '~/components/Globe'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-
-import career from '~/data/career.json'
-import { filterGenericJob, groupJobsByTeam, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
 
 const ContributorSchema = z.object({
   login: z.string(),
@@ -138,9 +135,10 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                 >
                   <div className="hidden md:block border-t-[1px] lg:border-t-2 border-brand w-[60px] lg:w-[100px]"></div>
                   <h2 className="text-3xl lg:text-4xl pt-3 tracking-[-1px]">{company.number}</h2>
-                  <ReactMarkdown className="text-foreground-light text-sm lg:text-base">
-                    {company.text}
-                  </ReactMarkdown>
+
+                  <div className="text-foreground-light text-sm lg:text-base">
+                    <ReactMarkdown>{company.text}</ReactMarkdown>
+                  </div>
                 </div>
               )
             })}
@@ -184,7 +182,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
               <div className="md:flex md:gap-6">
                 <div className="md:w-1/2">
                   <div>
-                    <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">
+                    <h2 className="text-2xl pb-2 sm:text-3xl xl:text-4xl tracking-[-1px]">
                       What is Supabase
                     </h2>
                     <p className="text-foreground-light text-sm lg:text-lg pt-2 sm:max-w-md xl:max-w-lg">
@@ -199,7 +197,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   <div className="md:w-full rounded-md mt-10 md:mt-36 lg:mt-40">
                     <div className="relative w-full aspect-[148/125]">
                       <Image
-                        src="/images/career/team.jpg"
+                        src="/images/career/team.jpeg"
                         alt="supabase team"
                         fill
                         sizes="(min-width: 767px) 45vw, 100vw"
@@ -214,7 +212,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                     <div className="w-full md:w-5/6 rounded-md mt-6">
                       <div className="relative w-full aspect-[29/22]">
                         <Image
-                          src="/images/career/founders.jpg"
+                          src="/images/career/founders.jpeg"
                           alt="supabase founders"
                           fill
                           sizes="(min-width: 767px) 45vw, 100vw"
@@ -313,7 +311,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
             <SectionContainer className="!pb-0">
               <div className="text-center">
                 <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-1px]">
-                  1,000+ Contributors building Supabase
+                  1,500+ Contributors building Supabase
                 </h2>
                 <p className="text-foreground-light text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
                   We're building a community of communities, bringing together developers from many
@@ -388,7 +386,9 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   <div className="h-full flex items-start space-x-6 w-full" key={i}>
                     <div className="h-fit text-sm lg:text-base">
                       <h3 className="text-base">{benefits.title}</h3>
-                      <ReactMarkdown className="prose pt-1 text-sm">{benefits.text}</ReactMarkdown>
+                      <div className="prose pt-1 text-sm">
+                        <ReactMarkdown>{benefits.text}</ReactMarkdown>
+                      </div>
                     </div>
                   </div>
                 )
@@ -471,7 +471,7 @@ const JobItem = ({ job }: { job: JobItemProps }) => {
         <div className="flex items-center gap-4">
           <Badge>
             <GlobeAltIcon className="w-3 h-3" />
-            <span className="ml-1">{job.location}</span>
+            <span>{job.location}</span>
           </Badge>
           <span className="hidden md:block">{job.employment}</span>
         </div>

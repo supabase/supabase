@@ -1,21 +1,24 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { useAuthError } from 'common'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import z from 'zod'
-
-import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import { useSignOut } from 'lib/auth'
-import { getReturnToPath } from 'lib/gotrue'
 import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import z from 'zod'
+
+import { SupportLink } from '../Support/SupportLink'
+import AlertError from '@/components/ui/AlertError'
+import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
+import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
+import { useSignOut } from '@/lib/auth'
+import { getReturnToPath } from '@/lib/gotrue'
 
 const schema = z.object({
   code: z.string().min(1, 'MFA Code is required'),
@@ -31,22 +34,25 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   const router = useRouter()
   const signOut = useSignOut()
   const queryClient = useQueryClient()
+
   const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { code: '' },
   })
 
+  const { code } = form.watch()
+
   const {
     data: factors,
     error: factorsError,
     isError: isErrorFactors,
     isSuccess: isSuccessFactors,
-    isLoading: isLoadingFactors,
+    isPending: isLoadingFactors,
   } = useMfaListFactorsQuery()
   const {
     mutate: mfaChallengeAndVerify,
-    isLoading: isVerifying,
+    isPending: isVerifying,
     isSuccess,
   } = useMfaChallengeAndVerifyMutation({
     onSuccess: async () => {
@@ -86,6 +92,26 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
     }
   }, [factors?.totp, isSuccessFactors, router, queryClient])
 
+  useEffect(() => {
+    if (code.length === 6) form.handleSubmit(onSubmit)()
+  }, [code])
+
+  const error = useAuthError()
+
+  if (error) {
+    return (
+      <AlertError
+        error={error}
+        subject="Error while signing in"
+        additionalActions={
+          <Button asChild type="default">
+            <Link href="/sign-in">Back to sign in</Link>
+          </Button>
+        }
+      />
+    )
+  }
+
   return (
     <>
       {isLoadingFactors && <GenericSkeletonLoader />}
@@ -115,7 +141,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                       </div>
                       <Input_Shadcn_
                         id="code"
-                        className="pl-10"
+                        className="pl-10 font-mono"
                         {...field}
                         autoFocus
                         autoComplete="off"
@@ -131,7 +157,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
               )}
             />
 
-            <div className="flex items-center justify-between space-x-2">
+            <div className="flex items-center justify-between gap-x-2">
               <Button
                 block
                 type="outline"
@@ -175,17 +201,23 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
             </li>
           )}
           <li>
-            <Link href="/logout">Force sign out and clear cookies</Link>
-          </li>
-          <li>
             <Link
-              target="_blank"
-              rel="noreferrer"
-              href="/support/new?subject=Unable+to+sign+in+via+MFA&category=Login_issues"
+              href="/logout"
               className="text-sm transition text-foreground-light hover:text-foreground"
             >
-              Reach out to us via support
+              Force sign out and clear cookies
             </Link>
+          </li>
+          <li>
+            <SupportLink
+              className="text-sm transition text-foreground-light hover:text-foreground"
+              queryParams={{
+                subject: 'Unable to sign in via MFA',
+                category: SupportCategories.LOGIN_ISSUES,
+              }}
+            >
+              Reach out to us via support
+            </SupportLink>
           </li>
         </ul>
       </div>

@@ -2,12 +2,6 @@ import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Edit, MoreVertical, Trash } from 'lucide-react'
-
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Button,
   DropdownMenu,
@@ -21,7 +15,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import { generatePolicyUpdateSQL } from './PolicyTableRow.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -37,7 +39,8 @@ export const PolicyRow = ({
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
   const aiSnap = useAiAssistantStateSnapshot()
-  const { can: canUpdatePolicies } = useAsyncCheckProjectPermissions(
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const { can: canUpdatePolicies } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'policies'
   )
@@ -104,11 +107,16 @@ export const PolicyRow = ({
           )}
         </div>
       </TableCell>
-      <TableCell className="w-0 text-right whitespace-nowrap">
+      <TableCell className="text-right whitespace-nowrap">
         {!isLocked && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+              <Button
+                type="default"
+                className="px-1.5"
+                icon={<MoreVertical />}
+                data-testid={`policy-${policy.name}-actions-button`}
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-52">
               <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>
@@ -119,9 +127,9 @@ export const PolicyRow = ({
                 className="space-x-2"
                 onClick={() => {
                   const sql = generatePolicyUpdateSQL(policy)
+                  openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
                   aiSnap.newChat({
                     name: `Update policy ${policy.name}`,
-                    open: true,
                     sqlSnippets: [sql],
                     initialInput: `Update the policy with name \"${policy.name}\" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
                     suggestions: {

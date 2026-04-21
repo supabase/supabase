@@ -4,54 +4,57 @@ import { Plus, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
-import { DatabaseFunction } from 'data/database-functions/database-functions-query'
-import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import type { FormSchema } from 'types'
 import {
   Button,
+  cn,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   Radio,
   ScrollArea,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Separator,
   Sheet,
   SheetContent,
   SheetFooter,
   SheetSection,
   Toggle,
-  cn,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { convertArgumentTypes, convertConfigParams } from '../Functions.utils'
+import { CreateFunctionConfigParamsSection } from './CreateFunctionConfigParamsSection'
 import { CreateFunctionHeader } from './CreateFunctionHeader'
 import { FunctionEditor } from './FunctionEditor'
+import { POSTGRES_DATA_TYPES } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import SchemaSelector from '@/components/ui/SchemaSelector'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useDatabaseFunctionCreateMutation } from '@/data/database-functions/database-functions-create-mutation'
+import { DatabaseFunction } from '@/data/database-functions/database-functions-query'
+import { useDatabaseFunctionUpdateMutation } from '@/data/database-functions/database-functions-update-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import type { FormSchema } from '@/types'
 
 const FORM_ID = 'create-function-sidepanel'
 
 interface CreateFunctionProps {
   func?: DatabaseFunction
+  isDuplicating?: boolean
   visible: boolean
-  setVisible: (value: boolean) => void
+  onClose: () => void
 }
 
 const FormSchema = z.object({
@@ -68,29 +71,32 @@ const FormSchema = z.object({
     .optional(),
 })
 
-const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
+export const CreateFunction = ({
+  func,
+  visible,
+  isDuplicating = false,
+  onClose,
+}: CreateFunctionProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
-  // For now, there's no AI assistant for functions
-  const [assistantVisible, setAssistantVisible] = useState(false)
   const [focusedEditor, setFocusedEditor] = useState(false)
 
-  const isEditing = !!func?.id
+  const isEditing = !isDuplicating && !!func?.id
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
   const language = form.watch('language')
 
-  const { mutate: createDatabaseFunction, isLoading: isCreating } =
-    useDatabaseFunctionCreateMutation()
-  const { mutate: updateDatabaseFunction, isLoading: isUpdating } =
-    useDatabaseFunctionUpdateMutation()
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => form.formState.isDirty,
+    onClose,
+  })
 
-  function isClosingSidePanel() {
-    form.formState.isDirty ? setIsClosingPanel(true) : setVisible(!visible)
-  }
+  const { mutate: createDatabaseFunction, isPending: isCreating } =
+    useDatabaseFunctionCreateMutation()
+  const { mutate: updateDatabaseFunction, isPending: isUpdating } =
+    useDatabaseFunctionUpdateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!project) return console.error('Project is required')
@@ -111,7 +117,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         {
           onSuccess: () => {
             toast.success(`Successfully updated function ${data.name}`)
-            setVisible(!visible)
+            onClose()
           },
         }
       )
@@ -125,7 +131,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         {
           onSuccess: () => {
             toast.success(`Successfully created function ${data.name}`)
-            setVisible(!visible)
+            onClose()
           },
         }
       )
@@ -147,27 +153,20 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         config_params: convertConfigParams(func?.config_params).value,
       })
     }
-  }, [visible, func])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, func?.id])
 
   const { data: protectedSchemas } = useProtectedSchemas()
 
   return (
-    <Sheet open={visible} onOpenChange={() => isClosingSidePanel()}>
+    <Sheet open={visible} onOpenChange={handleOpenChange}>
       <SheetContent
         showClose={false}
-        size={assistantVisible ? 'lg' : 'default'}
-        className={cn(
-          // 'bg-surface-200',
-          'p-0 flex flex-row gap-0',
-          assistantVisible ? '!min-w-screen lg:!min-w-[1200px]' : '!min-w-screen lg:!min-w-[600px]'
-        )}
+        size={'default'}
+        className={'p-0 flex flex-row gap-0 !min-w-screen lg:!min-w-[600px]'}
       >
-        <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
-          <CreateFunctionHeader
-            selectedFunction={func?.name}
-            assistantVisible={assistantVisible}
-            setAssistantVisible={setAssistantVisible}
-          />
+        <div className="flex flex-col grow w-full">
+          <CreateFunctionHeader selectedFunction={func?.name} isDuplicating={isDuplicating} />
           <Separator />
           <Form_Shadcn_ {...form}>
             <form
@@ -205,7 +204,6 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                     >
                       <FormControl_Shadcn_>
                         <SchemaSelector
-                          portal={false}
                           selectedSchemaName={field.value}
                           excludedSchemas={protectedSchemas?.map((s) => s.name)}
                           size="small"
@@ -334,7 +332,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       </SheetSection>
                       <Separator className={focusedEditor ? 'hidden' : ''} />
                       <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                        <FormFieldConfigParams readonly={isEditing} />
+                        <CreateFunctionConfigParamsSection />
                       </SheetSection>
                       <Separator className={focusedEditor ? 'hidden' : ''} />
                       <SheetSection className={focusedEditor ? 'hidden' : ''}>
@@ -392,7 +390,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
             </form>
           </Form_Shadcn_>
           <SheetFooter>
-            <Button disabled={isCreating || isUpdating} type="default" onClick={isClosingSidePanel}>
+            <Button disabled={isCreating || isUpdating} type="default" onClick={confirmOnClose}>
               Cancel
             </Button>
             <Button
@@ -405,32 +403,11 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
             </Button>
           </SheetFooter>
         </div>
-        {assistantVisible ? (
-          <div className="border-l shadow-[rgba(0,0,0,0.13)_-4px_0px_6px_0px] z-10 w-[50%] bg-studio">
-            {/* This is where the AI assistant would be added */}
-          </div>
-        ) : null}
-        <ConfirmationModal
-          visible={isClosingPanel}
-          title="Discard changes"
-          confirmLabel="Discard"
-          onCancel={() => setIsClosingPanel(false)}
-          onConfirm={() => {
-            setIsClosingPanel(false)
-            setVisible(!visible)
-          }}
-        >
-          <p className="text-sm text-foreground-light">
-            There are unsaved changes. Are you sure you want to close the panel? Your changes will
-            be lost.
-          </p>
-        </ConfirmationModal>
+        <DiscardChangesConfirmationDialog {...modalProps} />
       </SheetContent>
     </Sheet>
   )
 }
-
-export default CreateFunction
 
 interface FormFieldConfigParamsProps {
   readonly?: boolean
@@ -522,75 +499,6 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
             disabled={readonly}
           >
             Add a new argument
-          </Button>
-        )}
-      </div>
-    </>
-  )
-}
-
-interface FormFieldConfigParamsProps {
-  readonly?: boolean
-}
-
-const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
-  const { fields, append, remove } = useFieldArray<z.infer<typeof FormSchema>>({
-    name: 'config_params',
-  })
-
-  return (
-    <>
-      <h5 className="text-base text-foreground">Configuration Parameters</h5>
-      <div className="space-y-2 pt-4">
-        {readonly && isEmpty(fields) && (
-          <span className="text-foreground-lighter">No argument for this function</span>
-        )}
-        {fields.map((field, index) => {
-          return (
-            <div className="flex flex-row space-x-1" key={field.id}>
-              <FormField_Shadcn_
-                name={`config_params.${index}.name`}
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex-1">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="parameter_name" />
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
-                )}
-              />
-              <FormField_Shadcn_
-                name={`config_params.${index}.value`}
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex-1">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="parameter_value" />
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
-                )}
-              />
-
-              {!readonly && (
-                <Button
-                  type="danger"
-                  icon={<Trash size={12} />}
-                  onClick={() => remove(index)}
-                  className="h-[38px] w-[38px]"
-                />
-              )}
-            </div>
-          )
-        })}
-
-        {!readonly && (
-          <Button
-            type="default"
-            icon={<Plus size={12} />}
-            onClick={() => append({ name: '', type: '' })}
-            disabled={readonly}
-          >
-            Add a new config
           </Button>
         )}
       </div>

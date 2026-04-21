@@ -1,20 +1,22 @@
 'use client'
 
-import * as React from 'react'
 import { addDays, format } from 'date-fns'
 import { Calendar as CalendarIcon } from 'lucide-react'
-
-import { cn } from '@/lib/utils'
-import { Button } from 'ui'
-import { Calendar } from 'ui'
-import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import * as React from 'react'
 import {
+  Button,
+  Calendar,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
+
+import { cn } from '@/lib/utils'
 
 export default function DatePickerWithPresets() {
   const [date, setDate] = React.useState<Date>()
@@ -28,8 +30,8 @@ export default function DatePickerWithPresets() {
             'w-[280px] justify-start text-left font-normal',
             !date && 'text-muted-foreground'
           )}
+          icon={<CalendarIcon className="h-4 w-4" />}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
           {date ? format(date, 'PPP') : <span>Pick a date</span>}
         </Button>
       </PopoverTrigger_Shadcn_>

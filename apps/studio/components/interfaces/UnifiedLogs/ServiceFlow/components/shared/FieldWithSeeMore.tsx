@@ -1,8 +1,6 @@
 import { Table } from '@tanstack/react-table'
 import { X } from 'lucide-react'
 import { useState } from 'react'
-
-import { DataTableFilterField } from 'components/ui/DataTable/DataTable.types'
 import {
   Badge,
   Collapsible_Shadcn_ as Collapsible,
@@ -10,11 +8,13 @@ import {
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
   Skeleton,
 } from 'ui'
+
 import { BlockFieldConfig } from '../../types'
 import { BlockField } from './BlockField'
+import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 
 // Single source of truth for field row styling
-const FieldRow = ({
+export const FieldRow = ({
   label,
   value,
   expandButton,
@@ -44,7 +44,7 @@ interface FieldWithSeeMoreProps {
 }
 
 // Primary field with expandable additional details
-const FieldWithSeeMore = ({
+export const FieldWithSeeMore = ({
   primaryField,
   additionalFields,
   data,
@@ -78,11 +78,7 @@ const FieldWithSeeMore = ({
     }
 
     if (showValueAsBadge && primaryValue && primaryValue !== 'N/A') {
-      return (
-        <Badge variant="secondary" size="small">
-          {primaryValue}
-        </Badge>
-      )
+      return <Badge variant="secondary">{primaryValue}</Badge>
     }
 
     return (
@@ -131,5 +127,3 @@ const FieldWithSeeMore = ({
     </div>
   )
 }
-
-export { FieldRow, FieldWithSeeMore }

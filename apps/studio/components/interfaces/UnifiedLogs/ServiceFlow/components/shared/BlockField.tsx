@@ -1,11 +1,12 @@
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import { DataTableSheetRowAction } from 'components/ui/DataTable/DataTableSheetRowAction'
 import { Skeleton } from 'ui'
+
 import { getStatusLevel } from '../../../UnifiedLogs.utils'
 import { BlockFieldProps } from '../../types'
 import { TruncatedTextWithPopover } from './TruncatedTextWithPopover'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { DataTableSheetRowAction } from '@/components/ui/DataTable/DataTableSheetRowAction'
 
-const BlockField = ({
+export const BlockField = ({
   config,
   data,
   enrichedData,
@@ -84,5 +85,3 @@ const BlockField = ({
 
   return <div className="flex justify-between items-center py-1 px-2">{fieldContent}</div>
 }
-
-export { BlockField }

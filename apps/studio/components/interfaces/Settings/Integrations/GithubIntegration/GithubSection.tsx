@@ -1,22 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IS_PLATFORM, useParams } from 'common'
 import { useMemo } from 'react'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { useParams } from 'common'
+import { GitHubIntegrationConnectionForm } from './GitHubIntegrationConnectionForm'
 import {
   ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import NoPermission from 'components/ui/NoPermission'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { cn } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
-import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'
+} from '@/components/layouts/Scaffold'
+import NoPermission from '@/components/ui/NoPermission'
+import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH } from '@/lib/constants'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -28,15 +26,12 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   )
 }
 
-const GitHubSection = () => {
+export const GitHubSection = () => {
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
 
   const { can: canReadGitHubConnection, isLoading: isLoadingPermissions } =
-    useAsyncCheckProjectPermissions(PermissionAction.READ, 'integrations.github_connections')
-
-  const isProPlanAndUp = organization?.plan?.id !== 'free'
-  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
+    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.github_connections')
 
   const { data: connections } = useGitHubConnectionsQuery(
     { organizationId: organization?.id },
@@ -52,7 +47,7 @@ const GitHubSection = () => {
 
   return (
     <ScaffoldContainer>
-      <ScaffoldSection>
+      <ScaffoldSection className="py-12">
         <ScaffoldSectionDetail title={GitHubTitle}>
           <p>Connect any of your GitHub repositories to a project.</p>
           <IntegrationImageHandler title="github" />
@@ -64,26 +59,13 @@ const GitHubSection = () => {
             <NoPermission resourceText="view this organization's GitHub connections" />
           ) : (
             <div className="space-y-6">
-              <div>
-                <h5 className="text-foreground mb-2">How does the GitHub integration work?</h5>
-                <p className="text-foreground-light text-sm mb-6">
-                  Connecting to GitHub allows you to sync preview branches with a chosen GitHub
-                  branch, keep your production branch in sync, and automatically create preview
-                  branches for every pull request.
-                </p>
-                {promptProPlanUpgrade && (
-                  <div className="mb-6">
-                    <UpgradeToPro
-                      primaryText="Upgrade to unlock GitHub integration"
-                      secondaryText="Connect your GitHub repository to automatically sync preview branches and deploy changes."
-                      source="github-integration"
-                    />
-                  </div>
-                )}
-                <div className={cn(promptProPlanUpgrade && 'opacity-25 pointer-events-none')}>
-                  <GitHubIntegrationConnectionForm connection={existingConnection} />
-                </div>
-              </div>
+              <h5 className="text-foreground mb-2">How does the GitHub integration work?</h5>
+              <p className="text-foreground-light text-sm mb-6">
+                Connecting to GitHub allows you to sync preview branches with a chosen GitHub
+                branch, keep your production branch in sync, and automatically create preview
+                branches for every pull request.
+              </p>
+              <GitHubIntegrationConnectionForm connection={existingConnection} />
             </div>
           )}
         </ScaffoldSectionContent>
@@ -91,5 +73,3 @@ const GitHubSection = () => {
     </ScaffoldContainer>
   )
 }
-
-export default GitHubSection

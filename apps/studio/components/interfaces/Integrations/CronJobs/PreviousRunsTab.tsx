@@ -1,19 +1,21 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { CircleCheck, CircleX, Loader } from 'lucide-react'
-import { UIEvent, useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import DataGrid, { Column, Row } from 'react-data-grid'
+import { cn, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { useParams } from 'common'
+import { calculateDuration, formatDate } from './CronJobs.utils'
+import CronJobsEmptyState from './CronJobsEmptyState'
 import {
   CronJobRun,
   useCronJobRunsInfiniteQuery,
-} from 'data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { cn, CodeBlock, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { calculateDuration, formatDate } from './CronJobs.utils'
-import CronJobsEmptyState from './CronJobsEmptyState'
+} from '@/data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
+import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const cronJobColumns = [
   {
@@ -33,30 +35,34 @@ const cronJobColumns = [
     minWidth: 200,
     value: (row: CronJobRun) => (
       <div className="flex items-center gap-1.5">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="text-xs cursor-pointer truncate max-w-[300px]">
-              {row.return_message}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent
-            side="bottom"
-            align="start"
-            className="min-w-[200px] max-w-[300px] text-wrap p-0"
-          >
-            <p className="text-xs font-mono px-2 py-1 border-b bg-surface-100">Message</p>
-            <CodeBlock
-              hideLineNumbers
-              language="sql"
-              value={row.return_message.trim()}
-              className={cn(
-                'py-0 px-3.5 max-w-full prose dark:prose-dark border-0 rounded-t-none',
-                '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap min-h-11',
-                '[&>code]:text-xs'
-              )}
-            />
-          </TooltipContent>
-        </Tooltip>
+        {row.return_message ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="text-xs cursor-pointer truncate max-w-[300px]">
+                {row.return_message}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent
+              side="bottom"
+              align="start"
+              className="min-w-[200px] max-w-[300px] text-wrap p-0"
+            >
+              <p className="text-xs font-mono px-2 py-1 border-b bg-surface-100">Message</p>
+              <CodeBlock
+                hideLineNumbers
+                language="sql"
+                value={row.return_message.trim()}
+                className={cn(
+                  'py-0 px-3.5 max-w-full prose dark:prose-dark border-0 rounded-t-none',
+                  '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap min-h-11',
+                  '[&>code]:text-xs'
+                )}
+              />
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          <span>-</span>
+        )}
       </div>
     ),
   },
@@ -78,7 +84,9 @@ const cronJobColumns = [
     name: 'End Time',
     minWidth: 120,
     value: (row: CronJobRun) => (
-      <div className="text-xs">{row.status === 'succeeded' ? formatDate(row.end_time) : '-'}</div>
+      <div className="flex items-center text-xs">
+        {row.end_time ? formatDate(row.end_time) : '-'}
+      </div>
     ),
   },
 
@@ -89,7 +97,7 @@ const cronJobColumns = [
     value: (row: CronJobRun) => (
       <div className="flex items-center">
         <span className="text-xs">
-          {row.status === 'succeeded' ? calculateDuration(row.start_time, row.end_time) : ''}
+          {row.start_time && row.end_time ? calculateDuration(row.start_time, row.end_time) : ''}
         </span>
       </div>
     ),
@@ -119,16 +127,19 @@ const columns = cronJobColumns.map((col) => {
       const value = col.value(props.row)
 
       if (['start_time', 'end_time'].includes(col.id)) {
-        const formattedValue = dayjs((props.row as any)[(col as any).id]).valueOf()
-        return (
-          <div className="flex items-center">
-            <TimestampInfo
-              utcTimestamp={formattedValue}
-              labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-              className="text-xs"
-            />
-          </div>
-        )
+        const rawValue = (props.row as any)[(col as any).id]
+        if (rawValue) {
+          const formattedValue = dayjs(rawValue).valueOf()
+          return (
+            <div className="flex items-center">
+              <TimestampInfo
+                utcTimestamp={formattedValue}
+                labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+                className="text-xs"
+              />
+            </div>
+          )
+        }
       }
 
       return value
@@ -136,10 +147,6 @@ const columns = cronJobColumns.map((col) => {
   }
   return result
 })
-
-function isAtBottom({ currentTarget }: UIEvent<HTMLDivElement>): boolean {
-  return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
-}
 
 export const PreviousRunsTab = () => {
   const { childId } = useParams()
@@ -149,8 +156,10 @@ export const PreviousRunsTab = () => {
 
   const {
     data,
-    isLoading: isLoadingCronJobRuns,
+    isPending: isLoadingCronJobRuns,
     isFetching,
+    isFetchingNextPage,
+    hasNextPage,
     fetchNextPage,
   } = useCronJobRunsInfiniteQuery(
     {
@@ -163,15 +172,12 @@ export const PreviousRunsTab = () => {
 
   const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
 
-  const handleScroll = useCallback(
-    (event: UIEvent<HTMLDivElement>) => {
-      if (isLoadingCronJobRuns || !isAtBottom(event)) return
-      // the cancelRefetch is to prevent the query from being refetched when the user scrolls back up and down again,
-      // resulting in multiple fetchNextPage calls
-      fetchNextPage({ cancelRefetch: false })
-    },
-    [fetchNextPage, isLoadingCronJobRuns]
-  )
+  const handleScroll = useInfiniteScroll({
+    isLoading: isLoadingCronJobRuns,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  })
 
   return (
     <div className="h-full flex flex-col">

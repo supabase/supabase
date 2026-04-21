@@ -1,86 +1,129 @@
-import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { IS_PLATFORM } from 'lib/constants'
+import { useFlag, useParams } from 'common'
 
-export const generateAuthMenu = (
-  ref: string,
-  flags?: {
-    authenticationSignInProviders: boolean
-    authenticationRateLimits: boolean
-    authenticationEmails: boolean
-    authenticationMultiFactor: boolean
-    authenticationAttackProtection: boolean
-    authenticationAdvanced: boolean
+import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
+
+export interface GenerateAuthMenuOptions {
+  ref?: string
+  isPlatform: boolean
+  showOverview: boolean
+  features: {
+    signInProviders: boolean
+    rateLimits: boolean
+    emails: boolean
+    multiFactor: boolean
+    attackProtection: boolean
+    performance: boolean
+    passkeys?: boolean
   }
-): ProductMenuGroup[] => {
-  const {
-    authenticationSignInProviders,
-    authenticationRateLimits,
-    authenticationEmails,
-    authenticationMultiFactor,
-    authenticationAttackProtection,
-    authenticationAdvanced,
-  } = flags ?? {}
+}
+
+export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuGroup[] {
+  const { ref, isPlatform, showOverview, features } = options
+  const passkeysInMenu = Boolean(features.passkeys)
+  const baseUrl = `/project/${ref}/auth`
 
   return [
     {
       title: 'Manage',
-      items: [{ name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] }],
+      items: [
+        ...(showOverview
+          ? [{ name: 'Overview', key: 'overview', url: `${baseUrl}/overview`, items: [] }]
+          : []),
+        { name: 'Users', key: 'users', url: `${baseUrl}/users`, items: [] },
+        ...(isPlatform
+          ? [
+              {
+                name: 'OAuth Apps',
+                key: 'oauth-apps',
+                url: `${baseUrl}/oauth-apps`,
+                items: [],
+              },
+            ]
+          : []),
+      ],
     },
+    ...(features.emails && isPlatform
+      ? [
+          {
+            title: 'Notifications',
+            items: [
+              ...(features.emails
+                ? [
+                    {
+                      name: 'Email',
+                      key: 'email',
+                      pages: ['templates', 'smtp'],
+                      url: `${baseUrl}/templates`,
+                      items: [],
+                    },
+                  ]
+                : []),
+            ],
+          },
+        ]
+      : []),
     {
       title: 'Configuration',
       items: [
         {
           name: 'Policies',
           key: 'policies',
-          url: `/project/${ref}/auth/policies`,
+          url: `${baseUrl}/policies`,
           items: [],
         },
-        ...(IS_PLATFORM
+        ...(isPlatform
           ? [
-              ...(authenticationSignInProviders
+              ...(features.signInProviders
                 ? [
                     {
                       name: 'Sign In / Providers',
                       key: 'sign-in-up',
                       pages: ['providers', 'third-party'],
-                      url: `/project/${ref}/auth/providers`,
+                      url: `${baseUrl}/providers`,
                       items: [],
+                    },
+                  ]
+                : []),
+              ...(passkeysInMenu
+                ? [
+                    {
+                      name: 'Passkeys',
+                      key: 'passkeys',
+                      url: `${baseUrl}/passkeys`,
+                      label: 'Beta',
                     },
                   ]
                 : []),
               {
+                name: 'OAuth Server',
+                key: 'oauth-server',
+                url: `${baseUrl}/oauth-server`,
+                label: 'Beta',
+              },
+              {
                 name: 'Sessions',
                 key: 'sessions',
-                url: `/project/${ref}/auth/sessions`,
+                url: `${baseUrl}/sessions`,
                 items: [],
               },
-              ...(authenticationRateLimits
+              ...(features.rateLimits
                 ? [
                     {
                       name: 'Rate Limits',
                       key: 'rate-limits',
-                      url: `/project/${ref}/auth/rate-limits`,
+                      url: `${baseUrl}/rate-limits`,
                       items: [],
                     },
                   ]
                 : []),
-              ...(authenticationEmails
-                ? [
-                    {
-                      name: 'Emails',
-                      key: 'emails',
-                      pages: ['templates', 'smtp'],
-                      url: `/project/${ref}/auth/templates`,
-                      items: [],
-                    },
-                  ]
-                : []),
-              ...(authenticationMultiFactor
+              ...(features.multiFactor
                 ? [
                     {
                       name: 'Multi-Factor',
                       key: 'mfa',
-                      url: `/project/${ref}/auth/mfa`,
+                      url: `${baseUrl}/mfa`,
                       items: [],
                     },
                   ]
@@ -88,15 +131,15 @@ export const generateAuthMenu = (
               {
                 name: 'URL Configuration',
                 key: 'url-configuration',
-                url: `/project/${ref}/auth/url-configuration`,
+                url: `${baseUrl}/url-configuration`,
                 items: [],
               },
-              ...(authenticationAttackProtection
+              ...(features.attackProtection
                 ? [
                     {
                       name: 'Attack Protection',
                       key: 'protection',
-                      url: `/project/${ref}/auth/protection`,
+                      url: `${baseUrl}/protection`,
                       items: [],
                     },
                   ]
@@ -104,16 +147,22 @@ export const generateAuthMenu = (
               {
                 name: 'Auth Hooks',
                 key: 'hooks',
-                url: `/project/${ref}/auth/hooks`,
+                url: `${baseUrl}/hooks`,
                 items: [],
-                label: 'BETA',
+                label: 'Beta',
               },
-              ...(authenticationAdvanced
+              {
+                name: 'Audit Logs',
+                key: 'audit-logs',
+                url: `${baseUrl}/audit-logs`,
+                items: [],
+              },
+              ...(features.performance
                 ? [
                     {
-                      name: 'Advanced',
-                      key: 'advanced',
-                      url: `/project/${ref}/auth/advanced`,
+                      name: 'Performance',
+                      key: 'performance',
+                      url: `${baseUrl}/performance`,
                       items: [],
                     },
                   ]
@@ -123,4 +172,41 @@ export const generateAuthMenu = (
       ],
     },
   ]
+}
+
+export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
+  const { ref } = useParams()
+  const showOverview = useFlag('authOverviewPage')
+  const enablePasskeyAuth = useFlag('enablePasskeyAuth')
+
+  const {
+    authenticationSignInProviders,
+    authenticationRateLimits,
+    authenticationEmails,
+    authenticationMultiFactor,
+    authenticationAttackProtection,
+    authenticationPerformance,
+  } = useIsFeatureEnabled([
+    'authentication:sign_in_providers',
+    'authentication:rate_limits',
+    'authentication:emails',
+    'authentication:multi_factor',
+    'authentication:attack_protection',
+    'authentication:performance',
+  ])
+
+  return generateAuthMenu({
+    ref,
+    isPlatform: IS_PLATFORM,
+    showOverview,
+    features: {
+      signInProviders: authenticationSignInProviders,
+      rateLimits: authenticationRateLimits,
+      emails: authenticationEmails,
+      multiFactor: authenticationMultiFactor,
+      attackProtection: authenticationAttackProtection,
+      performance: authenticationPerformance,
+      passkeys: enablePasskeyAuth,
+    },
+  })
 }

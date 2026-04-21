@@ -1,21 +1,26 @@
-import '@code-hike/mdx/styles'
-import 'config/code-hike.scss'
-import '../styles/main.scss'
-import '../styles/new-docs.scss'
-import '../styles/prism-okaidia.scss'
-
-import { type Metadata, type Viewport } from 'next'
-
-import { genFaviconData } from 'common/MetaFavicons/app-router'
+import '@code-hike/mdx/styles.css'
+import 'config/code-hike.css'
+import 'ui-patterns/ShimmeringLoader/index.css'
+import '../styles/main.css'
+import '../styles/new-docs.css'
+import '../styles/prism-okaidia.css'
 
 import { GlobalProviders } from '~/features/app.providers'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'
 import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { TelemetryTagManager } from 'common'
+import { genFaviconData } from 'common/MetaFavicons/app-router'
+import type { Metadata, Viewport } from 'next'
+
+const { metadataApplicationName, metadataTitle } = getCustomContent([
+  'metadata:application_name',
+  'metadata:title',
+])
 
 const metadata: Metadata = {
-  applicationName: 'Supabase Docs',
-  title: 'Supabase Docs',
+  applicationName: metadataApplicationName,
+  title: metadataTitle,
   description:
     'Supabase is the Postgres development platform providing all the backend features you need to build a product.',
   metadataBase: new URL('https://supabase.com'),
@@ -46,7 +51,7 @@ const viewport: Viewport = {
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
         <TelemetryTagManager />
         <GlobalProviders>

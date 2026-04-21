@@ -1,14 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { ContentDiff, DiffType } from './SQLEditor.types'
 import {
   compareAsAddition,
@@ -16,6 +11,10 @@ import {
   compareAsNewSnippet,
   createSqlSnippetSkeletonV2,
 } from './SQLEditor.utils'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProfile } from '@/lib/profile'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export const useNewQuery = () => {
   const router = useRouter()
@@ -24,7 +23,7 @@ export const useNewQuery = () => {
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const { can: canCreateSQLSnippet } = useAsyncCheckProjectPermissions(
+  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
     'user_content',
     {
@@ -45,7 +44,6 @@ export const useNewQuery = () => {
 
     try {
       const snippet = createSqlSnippetSkeletonV2({
-        id: uuidv4(),
         name,
         sql,
         owner_id: profile?.id,

@@ -1,26 +1,26 @@
+import { ChevronDown } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
-
-import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
-import PartnerIcon from 'components/ui/PartnerIcon'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
-import type { IntegrationName } from 'data/integrations/integrations.types'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import type { Organization } from 'types'
 import {
   Badge,
   Button,
+  cn,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  cn,
 } from 'ui'
-import { ChevronDown } from 'lucide-react'
+
+import { getHasInstalledObject } from '@/components/layouts/IntegrationsLayout/Integrations.utils'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
+import type { IntegrationName } from '@/data/integrations/integrations.types'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import type { Organization } from '@/types'
 
 export interface OrganizationPickerProps {
   integrationName: IntegrationName
@@ -41,7 +41,7 @@ const OrganizationPicker = ({
   const ref = useRef<HTMLButtonElement>(null)
 
   const { data: integrationData } = useIntegrationsQuery()
-  const { data: organizationsData, isLoading: isLoadingOrganization } = useOrganizationsQuery()
+  const { data: organizationsData, isPending: isLoadingOrganization } = useOrganizationsQuery()
 
   const installed = useMemo(
     () =>
@@ -88,7 +88,7 @@ const OrganizationPicker = ({
           className="p-0 w-full"
           side="bottom"
           align="center"
-          style={{ width: ref.current?.offsetWidth }}
+          sameWidthAsTrigger
         >
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Search organizations..." />
