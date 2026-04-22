@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { ProjectCard } from './ProjectCard'
 import { ProjectTableRow } from './ProjectTableRow'
+import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { render } from '@/tests/helpers'
 
@@ -57,7 +58,7 @@ vi.mock('@/lib/navigation', () => ({
   createNavigationHandler: () => vi.fn(),
 }))
 
-function createOrgProject(overrides: Partial<any> = {}) {
+function createOrgProject(overrides: Partial<OrgProject> = {}): OrgProject {
   return {
     ref: 'proj_1',
     name: 'Hammer',
@@ -65,10 +66,11 @@ function createOrgProject(overrides: Partial<any> = {}) {
     cloud_provider: 'AWS',
     region: 'us-east-1',
     inserted_at: '2026-04-09T06:36:14.718416',
+    is_branch: false,
     integration_source: null,
     databases: [],
     ...overrides,
-  }
+  } as OrgProject
 }
 
 describe('project integration badges', () => {

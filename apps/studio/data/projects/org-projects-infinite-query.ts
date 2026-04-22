@@ -22,7 +22,7 @@ interface GetOrgProjectsInfiniteVariables {
 }
 
 type OrganizationProjectsResponseBase = components['schemas']['OrganizationProjectsResponse']
-type OrgProjectIntegrationSource = 'stripe_projects' | null
+type OrgProjectIntegrationSource = string | null
 
 export type OrgProject = OrganizationProjectsResponseBase['projects'][number] & {
   integration_source?: OrgProjectIntegrationSource

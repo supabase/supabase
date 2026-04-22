@@ -7,7 +7,7 @@ import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrganizationVariables = { slug?: string }
-type OrganizationIntegrationSource = 'stripe_projects' | null
+type OrganizationIntegrationSource = string | null
 export type OrganizationDetail = components['schemas']['OrganizationSlugResponse'] & {
   integration_source?: OrganizationIntegrationSource
 }

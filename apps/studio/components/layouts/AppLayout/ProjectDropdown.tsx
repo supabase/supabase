@@ -14,6 +14,7 @@ import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
+import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -167,12 +168,7 @@ export const ProjectDropdown = ({
       close()
       router.push(href)
     },
-    renderRow: (project: {
-      ref: string
-      name: string
-      status?: string
-      integration_source?: 'stripe_projects' | null
-    }) => (
+    renderRow: (project: Pick<OrgProject, 'ref' | 'name' | 'status' | 'integration_source'>) => (
       <ProjectRowLink
         project={project}
         selectedRef={ref}

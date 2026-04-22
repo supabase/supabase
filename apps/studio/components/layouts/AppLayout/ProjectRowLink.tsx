@@ -12,7 +12,7 @@ export interface ProjectRowLinkProps {
     ref: string
     name: string
     status?: string
-    integration_source?: 'stripe_projects' | null
+    integration_source?: string | null
   }
   selectedRef: string | undefined
   route: string

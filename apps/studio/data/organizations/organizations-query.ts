@@ -7,7 +7,7 @@ import { get, handleError } from '@/data/fetchers'
 import { useProfile } from '@/lib/profile'
 import type { Organization, ResponseError, UseCustomQueryOptions } from '@/types'
 
-type OrganizationIntegrationSource = 'stripe_projects' | null
+type OrganizationIntegrationSource = string | null
 export type OrganizationBase = components['schemas']['OrganizationResponse'] & {
   integration_source?: OrganizationIntegrationSource
 }

@@ -8,7 +8,7 @@ import { get, handleError, isValidConnString } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ProjectDetailVariables = { ref?: string }
-type ProjectDetailIntegrationSource = 'stripe_projects' | null
+type ProjectDetailIntegrationSource = string | null
 export type ProjectDetail = components['schemas']['ProjectDetailResponse'] & {
   integration_source?: ProjectDetailIntegrationSource
 }
