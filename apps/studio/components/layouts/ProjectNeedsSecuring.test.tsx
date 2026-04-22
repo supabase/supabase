@@ -126,7 +126,7 @@ describe('ProjectNeedsSecuring', () => {
   beforeEach(() => {
     mockAnimationsApi()
     mockUseFlag.mockReturnValue(true)
-    mockUseRouter.mockReturnValue({ pathname: '/project/[ref]/database/tables' })
+    mockUseRouter.mockReturnValue({ pathname: '/project/[ref]' })
     mockUseSelectedProjectQuery.mockReturnValue({
       data: { connectionString: 'postgresql://example' },
     })
@@ -167,6 +167,10 @@ describe('ProjectNeedsSecuring', () => {
 
     expect(screen.getByText('Your project needs securing')).toBeInTheDocument()
     expect(screen.getByText('Review and fix')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open Data API settings' })).toHaveAttribute(
+      'href',
+      '/project/project-ref/integrations/data_api/settings'
+    )
     expect(screen.getByRole('link', { name: 'View policies' })).toHaveAttribute(
       'href',
       '/project/project-ref/auth/policies?schema=public&search=invoices'
@@ -198,6 +202,19 @@ describe('ProjectNeedsSecuring', () => {
       isPending: false,
       isError: false,
     })
+
+    render(
+      <ProjectNeedsSecuring>
+        <div data-testid="project-children">Project content</div>
+      </ProjectNeedsSecuring>
+    )
+
+    expect(screen.queryByText('Your project needs securing')).not.toBeInTheDocument()
+    expect(screen.getByTestId('project-children')).toBeInTheDocument()
+  })
+
+  it('renders the project content on non-home project routes', () => {
+    mockUseRouter.mockReturnValue({ pathname: '/project/[ref]/database/tables' })
 
     render(
       <ProjectNeedsSecuring>

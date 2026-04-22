@@ -1,10 +1,20 @@
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowRight, Check, Lightbulb, Lock, X } from 'lucide-react'
+import { ArrowRight, Check, ExternalLink, Lightbulb, Lock, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useMemo } from 'react'
-import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import {
+  Button,
+  Button_Shadcn_,
+  Card,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -24,8 +34,9 @@ import {
 } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import AlertError from '@/components/ui/AlertError'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import AlertError from '@/components/ui/AlertError'
 import {
   parseDbSchemaString,
   useProjectPostgrestConfigQuery,
@@ -38,18 +49,13 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { isApiAccessRole, isApiPrivilegeType } from '@/lib/data-api-types'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
-import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
-const ALLOWED_PATHNAMES = new Set(['/project/[ref]/auth/policies'])
 const PROJECT_SECURITY_FEATURE_FLAG = 'projectNeedsSecuring'
+const PROJECT_HOME_PATHNAME = '/project/[ref]'
 const DEFAULT_EXPOSED_SCHEMA = 'public'
 
-type ProjectSecurityActionType =
-  | 'ask_assistant'
-  | 'copy_prompt'
-  | 'skip_to_home'
-  | 'view_policies'
+type ProjectSecurityActionType = 'ask_assistant' | 'copy_prompt' | 'skip_to_home' | 'view_policies'
 
 type ProjectSecurityActionDetails = {
   schema?: string
@@ -109,7 +115,7 @@ const buildSecurityPromptMarkdown = (issueCount: number, tables: ProjectSecurity
 const StatusCell = ({ enabled, label }: { enabled: boolean; label: string }) => (
   <div className="flex items-center gap-2 text-sm">
     {enabled ? (
-      <Check size={14} className="text-success-600" aria-hidden="true" />
+      <Check size={14} className="text-brand" aria-hidden="true" />
     ) : (
       <X size={14} className="text-destructive" aria-hidden="true" />
     )}
@@ -167,7 +173,7 @@ const ProjectNeedsSecuringView = ({
 
   return (
     <>
-      <div className="flex flex-1 flex-col overflow-y-auto bg-gradient-to-b from-destructive-200 to-background">
+      <div className="flex flex-1 flex-col overflow-y-auto">
         <PageHeader size="default">
           <PageHeaderMeta>
             <PageHeaderIcon>
@@ -189,11 +195,7 @@ const ProjectNeedsSecuringView = ({
                 copyLabel="Copy Markdown"
                 disabled={isLoading}
               />
-              <Button
-                asChild
-                type="default"
-                iconRight={<ArrowRight />}
-              >
+              <Button asChild type="default" iconRight={<ArrowRight />}>
                 <Link
                   href={`/project/${projectRef}`}
                   onClick={() => {
@@ -231,7 +233,21 @@ const ProjectNeedsSecuringView = ({
                       <TableRow>
                         <TableHead>Name</TableHead>
                         <TableHead>Schema</TableHead>
-                        <TableHead>Accessible via Data API</TableHead>
+                        <TableHead>
+                          <div className="flex items-center gap-1.5">
+                            <span>Accessible via Data API</span>
+                            <Button_Shadcn_ asChild variant="ghost" size="icon" className="h-6 w-6">
+                              <Link
+                                href={`/project/${projectRef}/integrations/data_api/settings`}
+                                target="_blank"
+                                rel="noreferrer"
+                                aria-label="Open Data API settings"
+                              >
+                                <ExternalLink size={14} aria-hidden="true" />
+                              </Link>
+                            </Button_Shadcn_>
+                          </div>
+                        </TableHead>
                         <TableHead>RLS</TableHead>
                         <TableHead className="text-right">Action</TableHead>
                       </TableRow>
@@ -297,11 +313,11 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
       null
     )
 
-  const isAllowedRoute = ALLOWED_PATHNAMES.has(router.pathname)
+  const isProjectHomeRoute = router.pathname === PROJECT_HOME_PATHNAME
 
   const { data: lints = [], isPending: isLoadingLints } = useProjectLintsQuery(
     { projectRef },
-    { enabled: !isAllowedRoute && !!projectRef }
+    { enabled: isProjectHomeRoute && !!projectRef }
   )
 
   const rlsIssueKeys = useMemo(() => {
@@ -320,13 +336,17 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
 
   const hasRlsIssues = rlsIssueKeys.size > 0
   const shouldRenderGate =
-    !isAllowedRoute &&
+    isProjectHomeRoute &&
     !!projectRef &&
     !isLoadingDismissedAt &&
     hasRlsIssues &&
     securityDismissedAt === null
 
-  const { data: tables, error: tablesError, isPending: isLoadingTables } = useTablesQuery(
+  const {
+    data: tables,
+    error: tablesError,
+    isPending: isLoadingTables,
+  } = useTablesQuery(
     {
       projectRef,
       connectionString: project?.connectionString,
@@ -376,8 +396,7 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
       const key = getTableKey(entry)
       const hasDataApiAccess = entry.privileges.some(
         (privilege) =>
-          isApiAccessRole(privilege.grantee) &&
-          isApiPrivilegeType(privilege.privilege_type)
+          isApiAccessRole(privilege.grantee) && isApiPrivilegeType(privilege.privilege_type)
       )
 
       if (hasDataApiAccess) {
@@ -403,7 +422,7 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
     )
   }, [dbSchema, rlsIssueKeys, tablePrivileges, tables])
 
-  if (isAllowedRoute || !projectRef || isLoadingLints || !hasRlsIssues) {
+  if (!isProjectHomeRoute || !projectRef || isLoadingLints || !hasRlsIssues) {
     return <>{children}</>
   }
 
@@ -445,7 +464,7 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
 }
 
 export const ProjectNeedsSecuring = ({ children }: PropsWithChildren) => {
-  const isEnabled = useFlag(PROJECT_SECURITY_FEATURE_FLAG)
+  const isEnabled = true //useFlag(PROJECT_SECURITY_FEATURE_FLAG)
 
   if (!isEnabled) {
     return <>{children}</>
