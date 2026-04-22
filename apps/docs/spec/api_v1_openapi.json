@@ -1912,10 +1912,10 @@
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to retrieve project's JIT access config" }
+          "500": { "description": "Failed to retrieve project's temporary access configuration." }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_read"] }],
-        "summary": "[Beta] Get project's just-in-time access configuration.",
+        "summary": "[Beta] Get project's temporary access configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
         "x-endpoint-owners": ["security", "management-api"],
@@ -1956,10 +1956,10 @@
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to update project's just-in-time access configuration." }
+          "500": { "description": "Failed to update project's temporary access configuration." }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
-        "summary": "[Beta] Update project's just-in-time access configuration.",
+        "summary": "[Beta] Update project's temporary access configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["security", "management-api"],
@@ -8416,9 +8416,7 @@
       },
       "JitAccessRequestRequest": {
         "type": "object",
-        "properties": {
-          "state": { "type": "string", "enum": ["enabled", "disabled", "unavailable"] }
-        },
+        "properties": { "state": { "type": "string", "enum": ["enabled", "disabled"] } },
         "required": ["state"],
         "example": { "state": "enabled" }
       },
@@ -12136,6 +12134,7 @@
                         "security.audit_logs_days",
                         "security.questionnaire",
                         "security.soc2_report",
+                        "security.iso27001_certificate",
                         "security.private_link",
                         "security.enforce_mfa",
                         "log.retention_days",

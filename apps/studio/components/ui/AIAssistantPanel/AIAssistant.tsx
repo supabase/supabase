@@ -35,7 +35,6 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useHotKey } from '@/hooks/ui/useHotKey'
 import {
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
   defaultAssistantModelId,
@@ -47,6 +46,8 @@ import { uuidv4 } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 import type { AssistantModel } from '@/state/ai-assistant-state'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
@@ -64,7 +65,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { data: selectedOrganization, isPending: isLoadingOrganization } =
     useSelectedOrganizationQuery()
 
-  useHotKey(() => cancelEdit(), 'Escape')
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT, () => cancelEdit())
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()

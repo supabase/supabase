@@ -142,7 +142,12 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   const restPage = query.restPage ? Number(query.restPage) : 1
 
   const octokitRest = new OctokitRest({
-    auth: process.env.GITHUB_CHANGELOG_APP_REST_KEY,
+    authStrategy: createAppAuth,
+    auth: {
+      appId: process.env.GITHUB_CHANGELOG_APP_ID,
+      installationId: process.env.GITHUB_CHANGELOG_APP_INSTALLATION_ID,
+      privateKey: process.env.GITHUB_CHANGELOG_APP_PRIVATE_KEY,
+    },
   })
 
   // uses the rest api
