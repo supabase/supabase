@@ -118,10 +118,8 @@ export const JWTSettings = () => {
     useJwtSecretUpdateMutation()
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: legacyKey } = useLegacyJWTSigningKeyQuery(
-    {
-      projectRef,
-    },
+  const { data: legacyKey, isSuccess: isSuccessLegacyKey } = useLegacyJWTSigningKeyQuery(
+    { projectRef },
     { enabled: canReadAPIKeys }
   )
   const { data: legacyAPIKeysStatus } = useLegacyAPIKeysStatusQuery(
@@ -356,7 +354,7 @@ export const JWTSettings = () => {
             </form>
           </Form_Shadcn_>
 
-          {!legacyKey && (
+          {isSuccessLegacyKey && !legacyKey && (
             <>
               {isUpdatingJwtSecret && (
                 <div className="flex items-center space-x-2">
