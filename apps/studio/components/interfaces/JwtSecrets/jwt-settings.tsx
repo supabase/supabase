@@ -372,7 +372,7 @@ export const JWTSettings = () => {
                 </Admonition>
               )}
 
-              <Collapsible_Shadcn_ className="bg border rounded-md">
+              <Collapsible_Shadcn_ className="bg border rounded-md mt-4">
                 <CollapsibleTrigger_Shadcn_ className="p-4 w-full flex items-center justify-between [&[data-state=open]>svg]:!-rotate-180">
                   <p className="text-sm">
                     {disableLegacyJwtSecretRotation
