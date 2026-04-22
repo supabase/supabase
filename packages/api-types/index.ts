@@ -22,4 +22,4 @@ export interface components {
   pathItems: apiComponents['pathItems'] & platformComponents['pathItems']
 }
 
-export { platformComponents, apiComponents }
+export type { platformComponents, apiComponents }
