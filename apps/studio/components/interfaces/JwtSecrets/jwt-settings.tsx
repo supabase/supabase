@@ -385,8 +385,7 @@ const JWTSettings = () => {
                     {disableLegacyJwtSecretRotation ? (
                       <>
                         Migrate to the new publishable and secret API keys to enable rotation with
-                        zero downtime. Combined with JWT Signing Keys, you can rotate each piece
-                        independently without signing users out, and the change stays reversible
+                        zero downtime and without signing users out. The change is reversible
                         until you revoke the legacy secret.
                       </>
                     ) : (
