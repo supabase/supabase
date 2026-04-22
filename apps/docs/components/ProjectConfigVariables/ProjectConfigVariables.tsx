@@ -306,7 +306,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   const hasBranches = selectedProject?.is_branch_enabled ?? false
   const ref = hasBranches ? selectedBranch?.project_ref : selectedProject?.ref
 
-  const needsApiQuery = variable === 'publishable' || variable === 'anon' || variable === 'url'
+  const needsApiQuery = variable === 'publishable' || variable === 'url'
   const needsSupavisorQuery = variable === 'sessionPooler'
 
   const {
@@ -370,10 +370,6 @@ function VariableView({ variable, className }: { variable: Variable; className?:
     switch (variable) {
       case 'url':
         variableValue = `https://${apiSettingsData?.app_config?.endpoint}`
-        break
-      case 'anon':
-        variableValue =
-          apiKeysData?.find((key) => key.type === 'legacy' && key.id === 'anon')?.api_key || ''
         break
       case 'publishable':
         variableValue = apiKeysData?.find((key) => key.type === 'publishable')?.api_key || ''

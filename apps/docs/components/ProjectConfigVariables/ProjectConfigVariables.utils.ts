@@ -5,7 +5,7 @@ import { ProjectInfoInfinite } from '~/lib/fetch/projects-infinite'
 export type Org = OrganizationsData[number]
 export type Branch = BranchesData[number]
 
-export type Variable = 'url' | 'publishable' | 'anon' | 'sessionPooler'
+export type Variable = 'url' | 'publishable' | 'sessionPooler'
 
 function removeDoubleQuotes(str: string) {
   return str.replaceAll('"', '')
@@ -29,7 +29,6 @@ function unescapeDoubleQuotes(str: string) {
 
 export const prettyFormatVariable: Record<Variable, string> = {
   url: 'Project URL',
-  anon: 'Anon key',
   publishable: 'Publishable key',
   sessionPooler: 'Connection string (pooler session mode)',
 }
