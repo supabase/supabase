@@ -1,34 +1,34 @@
-import React, { useState } from "react";
-import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { supabase } from "../lib/supabase";
-import { appStyles } from "../styles/styles";
+import React, { useState } from 'react'
+import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { supabase } from '../lib/supabase'
+import { appStyles } from '../styles/styles'
 
 export default function Auth() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const styles = appStyles;
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const styles = appStyles
 
   async function signInWithEmail() {
-    setLoading(true);
+    setLoading(true)
     const { error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
-    });
+    })
 
-    if (error) Alert.alert(error.message);
-    setLoading(false);
+    if (error) Alert.alert(error.message)
+    setLoading(false)
   }
 
   async function signUpWithEmail() {
-    setLoading(true);
+    setLoading(true)
     const { error } = await supabase.auth.signUp({
       email: email,
       password: password,
-    });
+    })
 
-    if (error) Alert.alert(error.message);
-    setLoading(false);
+    if (error) Alert.alert(error.message)
+    setLoading(false)
   }
 
   return (
@@ -73,5 +73,5 @@ export default function Auth() {
         </TouchableOpacity>
       </View>
     </View>
-  );
+  )
 }
