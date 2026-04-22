@@ -1,0 +1,320 @@
+---
+title: 'Choosing the Right SSO Login Flow'
+description: 'Quick reference guide to help you choose between IdP-initiated, SP-initiated, or both login flows based on your use case.'
+---
+
+Not sure which single sign-on (SSO) login flow to enable? This guide maps common enterprise scenarios to the recommended configuration.
+
+<Admonition type="tip">
+
+Start with identity provider (IdP)-initiated, the default behavior. It requires no domain configuration, and works for most enterprise use cases. You can enable SP-initiated later if needed.
+
+</Admonition>
+
+## Decision flowchart
+
+```
+Do users need to start login at supabase.com?
+│
+├─ No → Use IdP-initiated only (default) ✅
+│        - No domain configuration needed
+│        - Simplest setup
+│        - Users access via IdP dashboard
+│
+└─ Yes → Do you need multiple SAML apps per domain?
+         │
+         ├─ Yes → Use IdP-initiated only ✅
+         │         - Supports Dev/Staging/Prod under same domain
+         │         - Each environment is a separate IdP tile
+         │
+         └─ No → Enable both flows ✅
+                  - SP-initiated for users who bookmark supabase.com
+                  - IdP-initiated still works from IdP dashboard
+                  - Configure email domains
+```
+
+## Common scenarios
+
+### Scenario 1: Multiple environments (dev, staging, prod)
+
+**Your situation:**
+
+- You need separate Supabase organizations for Dev, Staging, and Production
+- All employees use `company.com` email addresses
+- You can't assign different email domains to different environments
+
+**Recommended configuration:** IdP-initiated only ✅
+
+**Why:**
+
+- Create separate SAML apps in your IdP for each environment
+- All apps use the same domain (`company.com`)
+- Users click "Supabase Dev", "Supabase Staging", or "Supabase Prod" tiles
+- No domain conflicts
+
+**How to configure:**
+
+1. In your IdP, create three SAML apps:
+   - "Supabase Dev" → Points to dev org ACS URL
+   - "Supabase Staging" → Points to staging org ACS URL
+   - "Supabase Production" → Points to prod org ACS URL
+2. In each Supabase organization:
+   - Enable SSO
+   - Leave "Enable SP-initiated login" **OFF**
+   - Configure metadata from corresponding IdP app
+3. Users access each environment via IdP tiles
+
+**Result:** Clean separation of environments with single domain.
+
+---
+
+### Scenario 2: Single production organization
+
+**Your situation:**
+
+- One Supabase organization for your entire company
+- All employees use company email domain
+- Users are comfortable with IdP dashboard
+
+**Recommended configuration:** IdP-initiated only ✅
+
+**Why:**
+
+- Simplest possible setup
+- No domain configuration required
+- Users access Supabase with one click from IdP
+- Fewer potential failure points
+
+**How to configure:**
+
+1. Enable SSO in your Supabase organization
+2. Leave "Enable SP-initiated login" **OFF**
+3. Configure identity provider metadata
+4. Create Supabase app tile in your IdP
+
+**Result:** One-click SSO login for all users.
+
+---
+
+### Scenario 3: Users bookmark supabase.com
+
+**Your situation:**
+
+- Users frequently bookmark supabase.com directly
+- You want to support starting login from Supabase
+- Single domain, single organization
+
+**Recommended configuration:** Enable both flows ✅
+
+**Why:**
+
+- Supports users who start at supabase.com (SP-initiated)
+- Also supports users who prefer IdP tiles (IdP-initiated)
+- Flexible for different user preferences
+
+**How to configure:**
+
+1. Enable SSO in your Supabase organization
+2. Toggle "Enable SP-initiated login" **ON**
+3. Add your email domain(s) (e.g., `company.com`)
+4. Configure identity provider metadata
+5. Create Supabase app tile in your IdP (optional but recommended)
+
+**Result:** Users can start login from either Supabase or IdP.
+
+---
+
+### Scenario 4: Migrating from password authentication
+
+**Your situation:**
+
+- Currently using password-based login
+- Transitioning to SSO
+- Users are used to starting at supabase.com
+
+**Recommended configuration:** Enable both flows ✅
+
+**Why:**
+
+- Familiar login starting point for existing users
+- Gradual transition to IdP-based access
+- Can promote IdP tiles after users adapt
+
+**How to configure:**
+
+1. Ensure at least one non-SSO owner account exists
+2. Enable SSO and toggle "Enable SP-initiated login" **ON**
+3. Add email domain(s)
+4. Start with auto-join **disabled**
+5. Test with small group
+6. Enable auto-join once confirmed
+7. Communicate new IdP tiles to users
+8. Gradually encourage IdP-initiated usage
+
+**Migration path:**
+
+- **Week 1:** Enable both flows, announce SSO availability
+- **Week 2-4:** Monitor usage, troubleshoot issues
+- **Month 2+:** Promote IdP tiles, consider disabling SP-initiated if usage drops
+
+---
+
+### Scenario 5: Multiple subsidiaries with different domains
+
+**Your situation:**
+
+- Parent company (`parent.com`) and subsidiaries (`sub1.com`, `sub2.com`)
+- All use the same Supabase organization
+- Each domain maps to same identity provider
+
+**Recommended configuration:** SP-initiated with multiple domains ✅
+
+**Why:**
+
+- Multiple domains supported in SP-initiated configuration
+- Automatic routing based on email domain
+- Centralized organization management
+
+**How to configure:**
+
+1. Enable SSO in your Supabase organization
+2. Toggle "Enable SP-initiated login" **ON**
+3. Add all domains: `parent.com`, `sub1.com`, `sub2.com`
+4. Configure identity provider to accept all domains
+5. Create Supabase app tiles in IdP (IdP-initiated also works)
+
+**Result:** Users with any configured domain can access organization.
+
+---
+
+### Scenario 6: SaaS platform with customer-specific SSO
+
+**Your situation:**
+
+- You're building a SaaS product
+- Each customer has their own organization
+- Each customer uses their own identity provider
+
+**Recommended configuration:** Per-customer decision (typically IdP-initiated)
+
+**Why:**
+
+- Each customer may have different preferences
+- Default to IdP-initiated for simplicity
+- Enable SP-initiated only if customer requests it
+
+**How to configure:**
+
+1. For each customer organization:
+   - Enable SSO with their IdP metadata
+   - Default: Leave SP-initiated **OFF**
+   - If customer requests SP-initiated: Toggle **ON** and add their domain
+2. Document both options in customer onboarding
+3. Let customers choose based on their workflow
+
+**Result:** Flexible, customer-specific SSO configurations.
+
+---
+
+### Scenario 7: Mixed authentication (SSO + non-SSO users)
+
+**Your situation:**
+
+- Some users authenticate via SSO (employees)
+- Some users use password/social auth (contractors, external partners)
+- Single organization with mixed membership
+
+**Recommended configuration:** Both flows with careful planning ⚠️
+
+**Why:**
+
+- SSO users can use either flow
+- Non-SSO users use password/social login
+- Separate invitation types for each group
+
+**How to configure:**
+
+1. Enable SSO with both flows (toggle SP-initiated **ON**)
+2. Configure employee email domain(s)
+3. Use **SSO-required invitations** for employees
+4. Use **non-SSO invitations** for contractors
+5. Consider disabling auto-join to control membership
+
+<Admonition type="caution" label="Account linking caution">
+
+SSO and non-SSO accounts with the same email are treated as separate accounts. An employee with `alice@company.com` will have two accounts if they:
+
+1. Join via SSO (SSO account)
+2. Previously joined via password (non-SSO account)
+
+Communicate clearly which authentication method each user should use.
+
+</Admonition>
+
+**Result:** Mixed authentication with clear separation.
+
+## Configuration quick reference
+
+| Use Case                                 | IdP-initiated | SP-initiated | Domains Required  |
+| ---------------------------------------- | ------------- | ------------ | ----------------- |
+| Multiple environments (Dev/Staging/Prod) | ✅ Only       | ❌ Off       | No                |
+| Single production org                    | ✅ Only       | ❌ Off       | No                |
+| Users bookmark supabase.com              | ✅ Yes        | ✅ Yes       | Yes               |
+| Migrating from passwords                 | ✅ Yes        | ✅ Yes       | Yes               |
+| Multiple email domains                   | ✅ Yes        | ✅ Yes       | Yes (all domains) |
+| Customer-specific SSO (SaaS)             | ✅ Default    | Optional     | Per customer      |
+| Mixed authentication                     | ✅ Yes        | ✅ Yes       | Yes               |
+
+## Testing your configuration
+
+After choosing your login flow, thoroughly test:
+
+1. **IdP-initiated:** Click app tile in IdP → Verify redirect to Supabase
+2. **SP-initiated:** Go to supabase.com/sign-in-sso → Enter email → Verify IdP redirect
+3. **Auto-join:** Test with new user accounts
+4. **Domain restrictions:** Try non-matching domain (should fail for SP-initiated)
+
+See our comprehensive [SSO Testing and Best Practices guide](/docs/guides/platform/sso/testing-best-practices) for detailed testing procedures.
+
+## When to change configuration
+
+You can safely change login flow configuration at any time:
+
+### Adding SP-initiated to IdP-only
+
+- Toggle "Enable SP-initiated login" ON
+- Add required domains
+- Test with existing users
+- No disruption to IdP-initiated flow
+
+### Removing SP-initiated
+
+- Toggle "Enable SP-initiated login" OFF
+- Domains are preserved (can re-enable later)
+- IdP-initiated continues working
+- Users who bookmarked supabase.com need to use IdP tiles instead
+
+**No migration required** - Changes take effect immediately.
+
+## Still not sure?
+
+If you're uncertain which configuration to use:
+
+1. Start with IdP-initiated only (simplest, works for most cases)
+2. Test with a small group of users
+3. Gather feedback on user experience
+4. Enable SP-initiated if users request it
+5. Monitor usage to see which flow is preferred
+
+<Admonition type="tip" label="Support available">
+
+If you need help choosing the right configuration for your organization, contact Supabase support with details about your use case. We're happy to provide personalized recommendations.
+
+</Admonition>
+
+## Next steps
+
+- **Understand the technical details:** Read [Understanding SSO Login Flows](/docs/guides/platform/sso/login-flows)
+- **Configure your provider:** Follow our [provider-specific guides](/docs/guides/platform/sso#supported-providers)
+- **Test your setup:** Review [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices)
+- **Enable auto-join:** Configure [auto-join settings](/docs/guides/platform/sso#key-configuration-options)

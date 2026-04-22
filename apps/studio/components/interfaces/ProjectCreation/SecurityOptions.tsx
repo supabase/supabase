@@ -2,11 +2,15 @@ import Link from 'next/link'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Checkbox_Shadcn_,
+  cn,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   useWatch_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -14,6 +18,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
 import Panel from '@/components/ui/Panel'
+import { useTrackDefaultPrivilegesExposure } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 
 interface SecurityOptionsProps {
   form: UseFormReturn<CreateProjectForm>
@@ -22,6 +27,8 @@ interface SecurityOptionsProps {
 
 export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptionsProps) => {
   const dataApi = useWatch_Shadcn_({ control: form.control, name: 'dataApi' })
+
+  useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiEnabled: dataApi ?? true })
 
   return (
     <Panel.Content className="pb-8">
@@ -54,6 +61,55 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
                       supabase-js
                     </Link>
                     .
+                  </FormDescription_Shadcn_>
+                </div>
+              </FormItem_Shadcn_>
+            )}
+          />
+
+          <FormField_Shadcn_
+            name="dataApiDefaultPrivileges"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem_Shadcn_
+                className={cn(
+                  'flex items-start gap-3',
+                  !dataApi && 'opacity-50 cursor-not-allowed'
+                )}
+              >
+                <FormControl_Shadcn_>
+                  {dataApi ? (
+                    <Checkbox_Shadcn_
+                      checked={field.value}
+                      disabled={field.disabled}
+                      onCheckedChange={(value) => field.onChange(value === true)}
+                    />
+                  ) : (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="cursor-not-allowed">
+                          <Checkbox_Shadcn_ checked={field.value} disabled />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">
+                        Enable the Data API to configure default privileges.
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </FormControl_Shadcn_>
+                <div className="space-y-1">
+                  <FormLabel_Shadcn_
+                    className={cn('text-sm text-foreground', !dataApi && 'text-foreground-muted')}
+                  >
+                    Automatically expose new tables and functions
+                  </FormLabel_Shadcn_>
+                  <FormDescription_Shadcn_ className="text-foreground-lighter">
+                    Grants privileges to Data API roles by default, exposing new tables and
+                    functions.
+                    <br />
+                    <strong className="font-medium text-foreground-light">
+                      We recommend disabling this to control access manually.
+                    </strong>
                   </FormDescription_Shadcn_>
                 </div>
               </FormItem_Shadcn_>

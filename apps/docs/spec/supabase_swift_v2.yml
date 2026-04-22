@@ -4052,7 +4052,7 @@ functions:
             .execute()
           ```
         description: |
-          Ensure that the RPC call affects at most 10 rows. Useful for limiting the impact of stored procedures.
+          Ensure that the RPC call affects at most 10 rows. Useful for limiting the impact of functions.
 
   - id: single
     title: single()

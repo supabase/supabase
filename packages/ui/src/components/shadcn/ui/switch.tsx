@@ -50,6 +50,7 @@ const Switch = React.forwardRef<React.ElementRef<typeof SwitchPrimitives.Root>, 
   ({ className, size, ...props }, ref) => (
     <SwitchPrimitives.Root
       className={cn(switchRootVariants({ size }), className)}
+      tabIndex={0}
       {...props}
       ref={ref}
     >
