@@ -30,6 +30,7 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import type { FormSchema } from '@/types'
 
 interface TemplateEditorProps {
@@ -42,6 +43,8 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
+  const { data: organization } = useSelectedOrganizationQuery()
+  const isFreePlan = organization?.plan?.id === 'free'
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
 
   // [Joshen] Error state is handled in the parent
@@ -64,6 +67,8 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     isSuccess &&
     authConfig &&
     (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
+
+  const isRestricted = !!builtInSMTP && isFreePlan
 
   const [validationResult, setValidationResult] = useState<ValidateSpamResponse>()
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
@@ -137,28 +142,52 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     )
   }
 
+  const brandingVariables: { variable: string; description: string }[] = [
+    { variable: '{{ .SenderName }}', description: 'The configured sender name for this project' },
+    { variable: '{{ .BrandLogoURL }}', description: 'URL of the brand logo for this project' },
+    {
+      variable: '{{ .ContentHeader }}',
+      description: 'Global HTML header injected at the top of every email',
+    },
+    {
+      variable: '{{ .ContentFooter }}',
+      description: 'Global HTML footer injected at the bottom of every email',
+    },
+  ]
+
   // Single useMemo hook to parse and prepare message variables
   const messageVariables = useMemo(() => {
-    if (!messageProperty?.description) return []
-
-    // Parse bullet point format: - `{{ .Variable }}` : Description
-    const lines = messageProperty.description.split('\n')
     const variables: { variable: string; description: string }[] = []
 
-    for (const line of lines) {
-      // Match lines that start with a bullet point followed by a variable in the format {{ .Variable }}
-      // Handle variations in formatting (with or without backticks, different spacing)
-      const match = line.match(/-\s*`?({{\s*\.\w+\s*}})`?\s*(?::|-)?\s*(.+)/)
-      if (match && match[1] && match[2]) {
-        variables.push({
-          variable: match[1].replace(/`/g, '').trim(),
-          description: match[2].trim(),
-        })
+    if (messageProperty?.description) {
+      // Parse bullet point format: - `{{ .Variable }}` : Description
+      const lines = messageProperty.description.split('\n')
+
+      for (const line of lines) {
+        // Match lines that start with a bullet point followed by a variable in the format {{ .Variable }}
+        // Handle variations in formatting (with or without backticks, different spacing)
+        const match = line.match(/-\s*`?({{\s*\.\w+\s*}})`?\s*(?::|-)?\s*(.+)/)
+        if (match?.[1] && match[2]) {
+          variables.push({
+            variable: match[1].replace(/`/g, '').trim(),
+            description: match[2].trim(),
+          })
+        }
       }
     }
 
-    return variables
+    return [...variables, ...brandingVariables]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageProperty?.description])
+
+  const previewValue = useMemo(() => {
+    const c = authConfig as Record<string, unknown>
+    return bodyValue
+      .replace(/\{\{\s*\.SenderName\s*\}\}/g, (c?.MAILER_SENDER_NAME as string) ?? '')
+      .replace(/\{\{\s*\.BrandLogoURL\s*\}\}/g, (c?.MAILER_BRAND_LOGO_URL as string) ?? '')
+      .replace(/\{\{\s*\.ContentHeader\s*\}\}/g, (c?.MAILER_CONTENT_HEADER as string) ?? '')
+      .replace(/\{\{\s*\.ContentFooter\s*\}\}/g, (c?.MAILER_CONTENT_FOOTER as string) ?? '')
+  }, [bodyValue, authConfig])
 
   // Check if form values have changed
   const formValues = form.watch()
@@ -272,6 +301,16 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
         {messageProperty && (
           <>
+            {isRestricted && (
+              <CardContent>
+                <Admonition
+                  type="warning"
+                  title="Template editing is not available on the free plan"
+                  description="Upgrade to a paid plan or configure custom SMTP to edit email templates."
+                />
+              </CardContent>
+            )}
+
             <CardContent className="flex flex-col gap-4">
               <div className="flex items-center justify-between gap-2">
                 <Label_Shadcn_>Body</Label_Shadcn_>
@@ -289,7 +328,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                     <CodeEditor
                       id="code-id"
                       language="html"
-                      isReadOnly={!canUpdateConfig}
+                      isReadOnly={!canUpdateConfig || isRestricted}
                       className="!mb-0 relative h-96 outline-none outline-offset-0 outline-width-0 outline-0"
                       onInputChange={(e: string | undefined) => {
                         setBodyValue(e ?? '')
@@ -300,7 +339,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                       editorRef={editorRef}
                     />
                   </div>
-                  {messageVariables.length > 0 && (
+                  {messageVariables.length > 0 && !isRestricted && (
                     <div className="flex flex-wrap gap-1">
                       {messageVariables.map(({ variable, description }) => (
                         <Tooltip key={variable}>
@@ -327,22 +366,24 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                   <iframe
                     className="!mb-0 mt-0 overflow-hidden h-96 w-full rounded-md border bg-white"
                     title={id}
-                    srcDoc={bodyValue}
+                    srcDoc={previewValue}
                     sandbox="allow-scripts allow-forms"
                   />
-                  <Admonition
-                    type="default"
-                    title="Email rendering may differ"
-                    description="The preview shown here may differ slightly from how your email appears in the recipient’s email client."
-                  />
+                  {!isRestricted && (
+                    <Admonition
+                      type="default"
+                      title="Email rendering may differ"
+                      description="The preview shown here may differ slightly from how your email appears in the recipient's email client."
+                    />
+                  )}
                 </>
               )}
             </CardContent>
 
-            <SpamValidation spamRules={spamRules} />
+            {!isRestricted && <SpamValidation spamRules={spamRules} />}
 
             <CardFooter className="flex flex-row justify-end gap-2">
-              {hasChanges && (
+              {hasChanges && !isRestricted && (
                 <Button
                   type="default"
                   onClick={() => {
@@ -357,7 +398,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
               <Button
                 type="primary"
                 htmlType="submit"
-                disabled={!canUpdateConfig || isSavingTemplate || !hasChanges}
+                disabled={!canUpdateConfig || isSavingTemplate || !hasChanges || isRestricted}
                 loading={isSavingTemplate}
               >
                 Save changes

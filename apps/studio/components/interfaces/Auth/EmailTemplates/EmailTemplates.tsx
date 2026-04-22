@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
@@ -14,12 +14,15 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Input_Shadcn_,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
   PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -34,6 +37,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 
 const notificationEnabledKeys = TEMPLATES_SCHEMAS.filter(
@@ -52,12 +56,19 @@ const NotificationsFormSchema = z.object({
   ),
 })
 
+const BrandingFormSchema = z.object({
+  MAILER_SENDER_NAME: z.string(),
+  MAILER_BRAND_LOGO_URL: z.string(),
+})
+
 export const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
+  const { data: organization } = useSelectedOrganizationQuery()
+  const isFreePlan = organization?.plan?.id === 'free'
 
   const {
     data: authConfig,
@@ -81,6 +92,8 @@ export const EmailTemplates = () => {
     authConfig &&
     (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
 
+  const isRestricted = !!builtInSMTP && isFreePlan
+
   const defaultValues = notificationEnabledKeys.reduce(
     (acc, key) => {
       acc[key] = authConfig ? Boolean(authConfig[key as keyof typeof authConfig]) : false
@@ -94,7 +107,17 @@ export const EmailTemplates = () => {
     defaultValues,
   })
 
-  const onSubmit = (values: any) => {
+  const brandingForm = useForm<z.infer<typeof BrandingFormSchema>>({
+    resolver: zodResolver(BrandingFormSchema),
+    defaultValues: { MAILER_SENDER_NAME: '', MAILER_BRAND_LOGO_URL: '' },
+  })
+
+  const onSubmit = (values: z.infer<typeof NotificationsFormSchema>) => {
+    if (!projectRef) return console.error('Project ref is required')
+    updateAuthConfig({ projectRef: projectRef, config: { ...values } })
+  }
+
+  const onSubmitBranding = (values: z.infer<typeof BrandingFormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     updateAuthConfig({ projectRef: projectRef, config: { ...values } })
   }
@@ -102,6 +125,17 @@ export const EmailTemplates = () => {
   useEffect(() => {
     if (authConfig) {
       notificationsForm.reset(defaultValues)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authConfig])
+
+  useEffect(() => {
+    if (authConfig) {
+      const c = authConfig as Record<string, unknown>
+      brandingForm.reset({
+        MAILER_SENDER_NAME: (c.MAILER_SENDER_NAME as string) ?? '',
+        MAILER_BRAND_LOGO_URL: (c.MAILER_BRAND_LOGO_URL as string) ?? '',
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authConfig])
@@ -125,19 +159,152 @@ export const EmailTemplates = () => {
       {isSuccess && (
         <>
           <PageSection>
-            {builtInSMTP && (
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Email Branding</PageSectionTitle>
+                <PageSectionDescription>
+                  {isRestricted ? (
+                    <>
+                      Customize the sender name and logo that appear in your emails. To edit full
+                      email templates,{' '}
+                      <InlineLink href={`/project/${projectRef}/auth/smtp`}>
+                        configure custom SMTP
+                      </InlineLink>{' '}
+                      or{' '}
+                      <InlineLink
+                        href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}
+                      >
+                        upgrade your plan
+                      </InlineLink>
+                      .
+                    </>
+                  ) : (
+                    'Customize the sender name and logo that appear in your emails.'
+                  )}
+                </PageSectionDescription>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            <PageSectionContent>
+              <Form_Shadcn_ {...brandingForm}>
+                <form onSubmit={brandingForm.handleSubmit(onSubmitBranding)} className="space-y-4">
+                  <Card>
+                    <CardContent className="flex flex-col gap-6 pt-6">
+                      <FormField_Shadcn_
+                        control={brandingForm.control}
+                        name="MAILER_SENDER_NAME"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            layout="vertical"
+                            label="Sender name"
+                            description="Display name shown in the From field of emails sent to your users."
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                {...field}
+                                placeholder="My App"
+                                disabled={!canUpdateConfig}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                      <FormField_Shadcn_
+                        control={brandingForm.control}
+                        name="MAILER_BRAND_LOGO_URL"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            layout="vertical"
+                            label="Logo URL"
+                            description="URL of the logo shown at the top of emails sent to your users."
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                {...field}
+                                placeholder="https://example.com/logo.png"
+                                disabled={!canUpdateConfig}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                    </CardContent>
+                    <CardFooter className="justify-end space-x-2">
+                      {brandingForm.formState.isDirty && (
+                        <Button type="default" onClick={() => brandingForm.reset()}>
+                          Cancel
+                        </Button>
+                      )}
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        disabled={
+                          !canUpdateConfig || isUpdatingConfig || !brandingForm.formState.isDirty
+                        }
+                        loading={isUpdatingConfig}
+                      >
+                        Save changes
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form_Shadcn_>
+            </PageSectionContent>
+          </PageSection>
+
+          <PageSection>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Email Layout</PageSectionTitle>
+                <PageSectionDescription>
+                  Global HTML injected into every email. Managed by Supabase.
+                </PageSectionDescription>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            <PageSectionContent>
+              <Card>
+                {[
+                  {
+                    slug: 'header',
+                    label: 'Email Header',
+                    description: 'HTML injected at the top of every email body.',
+                  },
+                  {
+                    slug: 'footer',
+                    label: 'Email Footer',
+                    description: 'HTML injected at the bottom of every email body.',
+                  },
+                ].map(({ slug, label, description }) => (
+                  <CardContent key={slug} className="p-0">
+                    <Link
+                      href={`/project/${projectRef}/auth/templates/${slug}`}
+                      className="flex items-center justify-between hover:bg-surface-200 transition-colors py-4 px-6 w-full h-full"
+                    >
+                      <div className="flex flex-col">
+                        <h3 className="text-sm text-foreground">{label}</h3>
+                        <p className="text-sm text-foreground-lighter">{description}</p>
+                      </div>
+                      <ChevronRight size={16} className="text-foreground-muted" />
+                    </Link>
+                  </CardContent>
+                ))}
+              </Card>
+            </PageSectionContent>
+          </PageSection>
+
+          <PageSection>
+            {builtInSMTP && !isRestricted && (
               <Admonition
                 type="warning"
                 title="Set up custom SMTP"
                 description={
                   <p>
-                    You’re using the built-in email service. This service has rate limits and is not
+                    You're using the built-in email service. This service has rate limits and is not
                     meant to be used for production apps.{' '}
                     <InlineLink
                       href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}
                     >
                       Learn more
-                    </InlineLink>{' '}
+                    </InlineLink>
                   </p>
                 }
                 layout="horizontal"
@@ -173,10 +340,7 @@ export const EmailTemplates = () => {
                             <p className="text-sm text-foreground-lighter">{template.purpose}</p>
                           )}
                         </div>
-
-                        <div className="flex items-center gap-4">
-                          <ChevronRight size={16} className="text-foreground-muted" />
-                        </div>
+                        <ChevronRight size={16} className="text-foreground-muted" />
                       </Link>
                     </CardContent>
                   )
@@ -206,17 +370,14 @@ export const EmailTemplates = () => {
                             key={`${template.id}`}
                             className="p-0 flex items-center justify-between hover:bg-surface-200 transition-colors w-full h-full"
                           >
-                            <Link
-                              href={`/project/${projectRef}/auth/templates/${templateSlug}`}
-                              className="flex flex-col flex-1 py-4 px-6"
-                            >
+                            <div className="flex flex-col flex-1 py-4 px-6">
                               <h3 className="text-sm text-foreground">{template.title}</h3>
                               {template.purpose && (
                                 <p className="text-sm text-foreground-lighter">
                                   {template.purpose}
                                 </p>
                               )}
-                            </Link>
+                            </div>
 
                             <div className="flex items-center gap-4 h-full pl-2 relative">
                               <FormField_Shadcn_
@@ -233,12 +394,18 @@ export const EmailTemplates = () => {
                                 )}
                               />
 
-                              <Link
-                                href={`/project/${projectRef}/auth/templates/${templateSlug}`}
-                                className="py-6 pr-6"
-                              >
-                                <ChevronRight size={16} className="text-foreground-muted" />
-                              </Link>
+                              {isRestricted ? (
+                                <div className="py-6 pr-6">
+                                  <Lock size={14} className="text-foreground-muted" />
+                                </div>
+                              ) : (
+                                <Link
+                                  href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                                  className="py-6 pr-6"
+                                >
+                                  <ChevronRight size={16} className="text-foreground-muted" />
+                                </Link>
+                              )}
                             </div>
                           </CardContent>
                         )
