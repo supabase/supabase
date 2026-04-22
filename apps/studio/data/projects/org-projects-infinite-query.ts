@@ -1,5 +1,5 @@
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
-import { components } from 'api-types'
+import { platformComponents as components } from 'api-types'
 import { useCallback } from 'react'
 
 import { INFINITE_PROJECTS_KEY_PREFIX, projectKeys } from './keys'
@@ -21,15 +21,8 @@ interface GetOrgProjectsInfiniteVariables {
   statuses?: string[]
 }
 
-type OrganizationProjectsResponseBase = components['schemas']['OrganizationProjectsResponse']
-type OrgProjectIntegrationSource = string | null
-
-export type OrgProject = OrganizationProjectsResponseBase['projects'][number] & {
-  integration_source?: OrgProjectIntegrationSource
-}
-export type OrgProjectsResponse = Omit<OrganizationProjectsResponseBase, 'projects'> & {
-  projects: OrgProject[]
-}
+export type OrgProjectsResponse = components['schemas']['OrganizationProjectsResponse']
+export type OrgProject = OrgProjectsResponse['projects'][number]
 
 export async function getOrganizationProjects(
   {
@@ -56,7 +49,7 @@ export async function getOrganizationProjects(
   })
 
   if (error) handleError(error)
-  return data as OrgProjectsResponse
+  return data
 }
 
 export type OrgProjectsInfiniteData = Awaited<ReturnType<typeof getOrganizationProjects>>

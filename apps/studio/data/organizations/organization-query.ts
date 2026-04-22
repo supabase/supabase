@@ -1,5 +1,5 @@
 import { QueryClient, useQuery } from '@tanstack/react-query'
-import { components } from 'api-types'
+import { platformComponents as components } from 'api-types'
 
 import { organizationKeys } from './keys'
 import { getManagedByFromOrganizationPartner } from './managed-by-utils'
@@ -7,10 +7,7 @@ import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrganizationVariables = { slug?: string }
-type OrganizationIntegrationSource = string | null
-export type OrganizationDetail = components['schemas']['OrganizationSlugResponse'] & {
-  integration_source?: OrganizationIntegrationSource
-}
+export type OrganizationDetail = components['schemas']['OrganizationSlugResponse']
 export type OrganizationPlanID = OrganizationDetail['plan']['id']
 
 export function castOrganizationSlugResponseToOrganization(org: OrganizationDetail) {

@@ -1,5 +1,5 @@
 import { QueryClient, useQuery } from '@tanstack/react-query'
-import { components } from 'api-types'
+import { platformComponents as components } from 'api-types'
 
 import { organizationKeys } from './keys'
 import { getManagedByFromOrganizationPartner } from './managed-by-utils'
@@ -7,10 +7,7 @@ import { get, handleError } from '@/data/fetchers'
 import { useProfile } from '@/lib/profile'
 import type { Organization, ResponseError, UseCustomQueryOptions } from '@/types'
 
-type OrganizationIntegrationSource = string | null
-export type OrganizationBase = components['schemas']['OrganizationResponse'] & {
-  integration_source?: OrganizationIntegrationSource
-}
+export type OrganizationBase = components['schemas']['OrganizationResponse']
 
 export function castOrganizationResponseToOrganization(org: OrganizationBase): Organization {
   return {
