@@ -8,9 +8,9 @@ import {
   CollapsibleTrigger_Shadcn_,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 interface RLSTableCardProps {
   table: { schema: string; name: string; isRLSEnabled: boolean }
@@ -53,9 +53,10 @@ export const RLSTableCard = ({
       <>
         {!!trueOnlyPolicy ? (
           <p>
-            A policy exists for the <code className="text-code-inline">{role}</code> role on this
-            table that evaluates to <code className="text-code-inline">true</code>, so all data is
-            accessible to the role.
+            The policy "{trueOnlyPolicy.name}" for the{' '}
+            <code className="text-code-inline">{role}</code> role on this table that evaluates to{' '}
+            <code className="text-code-inline">true</code>, so all data from this query is
+            accessible to this user.
           </p>
         ) : (
           <p>
@@ -65,31 +66,33 @@ export const RLSTableCard = ({
           </p>
         )}
 
-        <p className="text-xs font-mono text-foreground-light uppercase mt-4 mb-2">
-          Evaluated policies
-        </p>
-        <ul className="border rounded">
-          {policies.map((policy) => (
-            <li key={policy.id} className="px-3 py-2 flex justify-between items-center">
-              <div>
-                <p>{policy.name}</p>
-                <p className="text-foreground-lighter">
-                  Show rows where:{' '}
-                  <code className="text-code-inline text-foreground">{policy.definition}</code>
-                </p>
-              </div>
-              <ButtonTooltip
-                type="text"
-                icon={<Edit />}
-                className="w-7"
-                tooltip={{ content: { side: 'bottom', text: 'Edit policy' } }}
-                onClick={() => {
-                  handleSelectEditPolicy(policy)
-                }}
-              />
-            </li>
-          ))}
-        </ul>
+        <div className="border rounded mt-4">
+          <p className="text-xs font-mono text-foreground-light uppercase border-b px-3 py-2">
+            {policies.length} {policies.length > 1 ? 'policies' : 'policy'} applied
+          </p>
+          <ul className="">
+            {policies.map((policy) => (
+              <li key={policy.id} className="px-3 py-2 flex justify-between items-center">
+                <div>
+                  <p>{policy.name}</p>
+                  <p className="text-foreground-lighter">
+                    Show rows where:{' '}
+                    <code className="text-code-inline text-foreground">{policy.definition}</code>
+                  </p>
+                </div>
+                <ButtonTooltip
+                  type="text"
+                  icon={<Edit />}
+                  className="w-7"
+                  tooltip={{ content: { side: 'bottom', text: 'Edit policy' } }}
+                  onClick={() => {
+                    handleSelectEditPolicy(policy)
+                  }}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
       </>
     )
   }, [isRLSEnabled, noPolicies, trueOnlyPolicy, role, policies, handleSelectEditPolicy])
@@ -97,7 +100,7 @@ export const RLSTableCard = ({
   return (
     <Collapsible_Shadcn_
       className={cn('border rounded', !isRLSEnabled && 'bg-warning-300 border-warning-500')}
-      defaultOpen={!isRLSEnabled || noPolicies}
+      // defaultOpen={!isRLSEnabled || noPolicies}
     >
       <CollapsibleTrigger_Shadcn_ className="flex items-center justify-between px-3 py-2 w-full [&[data-state=open]>div>svg]:!-rotate-180">
         <div className="w-full flex items-center justify-between">

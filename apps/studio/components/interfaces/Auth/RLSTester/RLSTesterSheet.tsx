@@ -35,6 +35,7 @@ import { Results } from '../../SQLEditor/UtilityPanel/Results'
 import { RLSTableCard } from './RLSTableCard'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useParseClientCodeMutation } from '@/data/ai/parse-client-code-mutation'
+import type { User } from '@/data/auth/users-infinite-query'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useCheckTableRLSStatusMutation } from '@/data/database/table-check-rls-mutation'
 import {
@@ -61,6 +62,8 @@ type ParseQueryResults = {
   }[]
   operation: ParseSQLQueryResponse['operation']
   role?: string
+  user?: User
+  externalAuth?: string
 }
 
 interface RLSTesterSheetProps {
@@ -105,7 +108,7 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
   const { mutateAsync: getTableRLSStatus } = useCheckTableRLSStatusMutation()
 
   const isServiceRole = parseQueryResults?.role === undefined
-  const hasRLSEnabledButNoPolicies = parseQueryResults?.tables.some(
+  const tableWithRLSEnabledButNoPolicies = parseQueryResults?.tables.find(
     (x) => x.isRLSEnabled && x.tablePolicies.length === 0
   )
 
@@ -174,7 +177,26 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
           queryKey: ['rls-tester'],
         })
 
-        setParseQueryResults({ tables, operation: data.operation, role: role?.role })
+        const user =
+          impersonatedRoleState.role?.type === 'postgrest' &&
+          impersonatedRoleState.role.role === 'authenticated' &&
+          impersonatedRoleState.role.userType === 'native'
+            ? impersonatedRoleState.role.user
+            : undefined
+        const externalAuth =
+          impersonatedRoleState.role?.type === 'postgrest' &&
+          impersonatedRoleState.role.role === 'authenticated' &&
+          impersonatedRoleState.role.userType === 'external' &&
+          impersonatedRoleState.role.externalAuth
+            ? impersonatedRoleState.role.externalAuth.sub
+            : undefined
+        setParseQueryResults({
+          tables,
+          operation: data.operation,
+          role: role?.role,
+          user,
+          externalAuth,
+        })
       } else {
         toast('Only SELECT statements are supported for now')
       }
@@ -316,32 +338,67 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
             <>
               <div className="p-5 pt-4">
                 <p className="mb-2 text-sm font-mono uppercase tracking-tight text-foreground-light">
-                  Table access summary
+                  Summary
                 </p>
-                {!isServiceRole && hasRLSEnabledButNoPolicies && (
-                  <Admonition showIcon={false} className="mb-4" type="default">
+
+                {!!parseQueryResults && (
+                  <div className="border rounded flex items-center justify-between px-3 py-2 mb-4">
+                    <div className="flex items-center gap-x-2">
+                      <p className="text-xs text-foreground-light">Ran as</p>
+                      {!parseQueryResults.role ? (
+                        <code className="text-code-inline">postgres</code>
+                      ) : parseQueryResults.user ? (
+                        <p className="text-sm truncate max-w-52">{parseQueryResults.user.email}</p>
+                      ) : parseQueryResults.externalAuth ? (
+                        <p className="text-sm truncate max-w-52">
+                          {parseQueryResults.externalAuth}
+                        </p>
+                      ) : (
+                        <code className="text-code-inline">{parseQueryResults.role}</code>
+                      )}
+                    </div>
+
+                    {parseQueryResults.role === 'anon' && (
+                      <p className="text-foreground-light text-xs">Not logged in user</p>
+                    )}
+                    {!!parseQueryResults.user && (
+                      <code className="text-code-inline">ID: {parseQueryResults.user.id}</code>
+                    )}
+                  </div>
+                )}
+
+                {!isServiceRole && !!tableWithRLSEnabledButNoPolicies && (
+                  <Admonition showIcon={false} type="default" className="mb-4">
                     <p className="!mb-0.5">
                       Query returns no rows for the{' '}
                       <code className="text-code-inline">{parseQueryResults.role}</code> role
                     </p>
                     <p className="text-foreground-light">
-                      One of the tables has RLS enabled, but no policies set up for this role
+                      The table{' '}
+                      <code className="text-code-inline">
+                        {tableWithRLSEnabledButNoPolicies.schema}.
+                        {tableWithRLSEnabledButNoPolicies.table}
+                      </code>{' '}
+                      has RLS enabled but no policies set up for this role.
                     </p>
                   </Admonition>
                 )}
 
                 {isServiceRole ? (
-                  <Admonition
-                    showIcon={false}
-                    type="default"
-                    title="Query returns all rows for the Postgres role"
-                    description="Role has admin privileges and bypasses all RLS policies, all rows will be returned"
-                  />
+                  <Admonition showIcon={false} type="default" className="mb-4">
+                    <p className="!mb-0.5">
+                      Query returns all rows for the{' '}
+                      <code className="text-code-inline">postgres</code> role
+                    </p>
+                    <p className="text-foreground-light">
+                      The role has admin privileges and bypasses all RLS policies.
+                    </p>
+                  </Admonition>
                 ) : (
                   <>
-                    {/* <p className="text-xs font-mono uppercase tracking-tight text-foreground-light mb-2">
-                      Table access
-                    </p> */}
+                    <p className="text-sm font-mono uppercase tracking-tight text-foreground-light mb-2">
+                      Policies applied
+                    </p>
                     <div className="flex flex-col gap-y-2">
                       {parseQueryResults?.tables.map((x) => {
                         const { schema, table, tablePolicies, isRLSEnabled } = x
