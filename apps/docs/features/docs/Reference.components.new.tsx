@@ -88,7 +88,11 @@ function adaptType(pt: ProcessedType | null | undefined): TypeDetails {
       return { type: 'intrinsic', name: typeNameStr(pt) }
     }
     case 'object':
-      return { type: 'object', ...(pt.name ? { name: pt.name } : {}), properties: (pt.properties ?? []).map(adaptProperty) }
+      return {
+        type: 'object',
+        ...(pt.name ? { name: pt.name } : {}),
+        properties: (pt.properties ?? []).map(adaptProperty),
+      }
     case 'array':
       return { type: 'array', elemType: adaptType(pt.elementType) }
     case 'union':

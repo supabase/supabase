@@ -38,7 +38,7 @@ export function ReferencePageLayout({
         />
       }
     >
-      <GuideTemplate meta={{...meta, hideToc: true}} content={content} />
+      <GuideTemplate meta={{ ...meta, hideToc: true }} content={content} />
     </Layout>
   )
 }

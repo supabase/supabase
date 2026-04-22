@@ -36,8 +36,11 @@ import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
-
-import { RefDefinitionReturnType, RefDefinitionParams } from '~/features/docs/Reference.components.new'
+import {
+  RefDefinitionReturnType,
+  RefDefinitionParams,
+} from '~/features/docs/Reference.components.new'
+import { CollapsibleDetails } from './Reference.ui'
 
 // Wrap Admonition for Docs-specific styling (within MDX prose, requires a margin-bottom)
 const AdmonitionWithMargin = (props: AdmonitionProps) => {
@@ -45,8 +48,6 @@ const AdmonitionWithMargin = (props: AdmonitionProps) => {
 }
 
 const components = {
-  RefDefinitionParams,
-  RefDefinitionReturnType,
   Accordion,
   AccordionItem,
   Admonition: AdmonitionWithMargin,
@@ -111,6 +112,13 @@ const components = {
    */
   code: (props: any) => <code {...props}>{props.children}</code>,
   Price,
+  /**
+   * Components for new rerence page rendering pipeline.
+   */
+  RefDefinitionParams,
+  RefDefinitionReturnType,
+  CodeBlock,
+  CollapsibleDetails,
 }
 
 export { components }

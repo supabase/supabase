@@ -8,7 +8,7 @@ import { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 /**
  * Within this file we mimic what would potentially be the folder structure
  * outside the app directory.
- * 
+ *
  * For the moment, we only have a distinctive ReferenceNavigation.new file and
  * a ReferencePageLayout element outside of this. With a full migration of all resources, the parts within here would be moved each to its own file.
  */
@@ -39,7 +39,7 @@ async function getReferenceContent(library: string, version: string | undefined)
   const filePath = join(REFERENCE_DIRECTORY, `${libKey}.mdx`)
   const fileContent = await fs.readFile(filePath, 'utf-8')
   const { data: meta, content } = matter(fileContent)
-  return { meta, content } as { content: string, meta: GuideFrontmatter}
+  return { meta, content } as { content: string; meta: GuideFrontmatter }
 }
 
 async function getReferenceSections(library: string, version: string | undefined) {
@@ -53,27 +53,26 @@ function getLibKey(library: string, version: string | undefined) {
   return `${library}${version ? `-${version}` : ''}` as LibKey
 }
 
-
 /**
  * app/reference/[library]/[version]/page.tsx
- * 
+ *
  * Actual content from file, though it contains logic from a possible
  * separate layout.tsx file.
- * 
+ *
  */
 
 /**
  * Ideally both navigation components and these parameters are going to be
  * moved to a layout.tsx file at route level and consume `library` and
  * `version` from the slug to then get content and sections ahead of time.
- * 
+ *
  * Version being undefined or null means it's latest.
  *
  * See: https://nextjs.org/docs/app/api-reference/file-conventions/layout#params-optional
  */
 const params = {
   library: 'javascript',
-  version: undefined
+  version: undefined,
 }
 
 async function ReferencePage() {
