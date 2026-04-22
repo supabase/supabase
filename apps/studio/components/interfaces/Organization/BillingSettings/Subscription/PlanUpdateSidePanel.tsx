@@ -16,7 +16,10 @@ import { ExitSurveyModal } from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
-import { STRIPE_DASHBOARD_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
+import {
+  STRIPE_DASHBOARD_URL,
+  STRIPE_PROJECTS_DOCS_URL,
+} from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
 import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
@@ -43,7 +46,7 @@ const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
     return {
       installationId: selectedOrganization?.partner_id,
       path: '/settings',
-      message: 'Change Plan on Vercel Marketplace',
+      message: 'Change plan on Vercel Marketplace',
     }
   }
   if (selectedOrganization.managed_by === MANAGED_BY.AWS_MARKETPLACE) {
@@ -216,10 +219,10 @@ export const PlanUpdateSidePanel = () => {
             <PartnerManagedResource
               managedBy={MANAGED_BY.STRIPE_PROJECTS}
               resource="Organization plans"
-              title="Organization plans are managed by Stripe."
+              title="Organization plans are managed through Stripe."
               cta={{
-                overrideUrl: STRIPE_DASHBOARD_URL,
-                message: 'Change Plan in Stripe Dashboard',
+                overrideUrl: `${STRIPE_PROJECTS_DOCS_URL}#upgrade-a-service-tier`,
+                message: 'Change plan via Stripe CLI',
               }}
             />
           ) : isPartnerBilledOrganization ? (
