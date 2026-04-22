@@ -3219,9 +3219,6 @@ export interface ResourceExhaustionBannerAiAssistantClickedEvent {
 export interface UnifiedLogsRowClickedEvent {
   action: 'unified_logs_row_clicked'
   properties: {
-    /**
-     * The log type of the clicked row. e.g. 'postgres', 'postgrest', 'auth', 'storage', 'edge function', 'edge'
-     */
     log_type: string
   }
   groups: TelemetryGroups
