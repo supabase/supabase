@@ -7,6 +7,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -99,6 +100,9 @@ export const CreateClerkAuthIntegrationDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="truncate">Add new Clerk connection</DialogTitle>
+          <DialogDescription className="sr-only">
+            Add a Clerk connection by registering the Clerk domain for this Supabase project.
+          </DialogDescription>
         </DialogHeader>
 
         <Separator />

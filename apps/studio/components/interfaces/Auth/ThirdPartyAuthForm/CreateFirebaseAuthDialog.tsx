@@ -8,6 +8,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -94,6 +95,10 @@ export const CreateFirebaseAuthIntegrationDialog = ({
               ? `Add new Firebase Auth connection`
               : `Update existing Firebase Auth connection`}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Add a Firebase Auth connection so JWTs from a Firebase project can access this
+            Supabase project.
+          </DialogDescription>
         </DialogHeader>
 
         <Separator />
