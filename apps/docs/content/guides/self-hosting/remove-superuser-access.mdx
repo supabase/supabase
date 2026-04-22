@@ -53,6 +53,12 @@ This script only updates ownership for database objects in the `public` schema. 
       PG_META_DB_USER: postgres
   ```
 
+<Admonition type="tip">
+
+Studio uses its own credentials to access Postgres via `postgres-meta`, so this change is only needed for backward compatibility and consistency.
+
+</Admonition>
+
 ### Step 3: Restart Supabase
 
 ```sh
