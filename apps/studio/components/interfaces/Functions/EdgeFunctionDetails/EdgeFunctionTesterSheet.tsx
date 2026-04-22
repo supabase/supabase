@@ -450,7 +450,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                 <RoleImpersonationStateContextProvider
                   key={`role-impersonation-state-${projectRef}`}
                 >
-                  <RoleImpersonationPopover disallowAuthenticatedOption />
+                  <RoleImpersonationPopover />
                 </RoleImpersonationStateContextProvider>
                 <Button
                   type="primary"

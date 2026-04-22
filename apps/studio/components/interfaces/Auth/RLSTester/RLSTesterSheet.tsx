@@ -1,8 +1,18 @@
 import { type PostgresPolicy } from '@supabase/postgres-meta'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@ui/components/shadcn/ui/select'
 import { Code, ListTodo } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
+  Badge,
   Button,
   DialogSectionSeparator,
   Sheet,
@@ -13,6 +23,9 @@ import {
   SheetSection,
   SheetTitle,
   SheetTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
@@ -21,6 +34,7 @@ import { checkIfAppendLimitRequired, suffixWithLimit } from '../../SQLEditor/SQL
 import { Results } from '../../SQLEditor/UtilityPanel/Results'
 import { RLSTableCard } from './RLSTableCard'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { useParseClientCodeMutation } from '@/data/ai/parse-client-code-mutation'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useCheckTableRLSStatusMutation } from '@/data/database/table-check-rls-mutation'
 import {
@@ -38,6 +52,17 @@ import {
 
 const limit = 100
 
+type ParseQueryResults = {
+  tables: {
+    schema: string
+    table: string
+    tablePolicies: PostgresPolicy[]
+    isRLSEnabled: boolean
+  }[]
+  operation: ParseSQLQueryResponse['operation']
+  role?: string
+}
+
 interface RLSTesterSheetProps {
   handleSelectEditPolicy: (policy: PostgresPolicy) => void
 }
@@ -50,33 +75,33 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
 
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+
+  const [format, setFormat] = useState<'sql' | 'lib'>('sql')
+  const [inferredSQL, setInferredSQL] = useState<string>()
+
   const [value, setValue] = useState<string>('')
-  const [results, setResults] = useState<Object[]>([])
+  const [results, setResults] = useState<Object[] | null>(null)
   const [autoLimit, setAutoLimit] = useState(false)
-  const [parseQueryResults, setParseQueryResults] = useState<{
-    tables: {
-      schema: string
-      table: string
-      tablePolicies: PostgresPolicy[]
-      isRLSEnabled: boolean
-    }[]
-    operation: ParseSQLQueryResponse['operation']
-    role?: string
-  }>()
+  const [parseQueryResults, setParseQueryResults] = useState<ParseQueryResults>()
 
   const { data: policies = [] } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const { mutate: executeSql, isSuccess } = useExecuteSqlMutation({
+  const { mutateAsync: executeSql, error: executeSqlError } = useExecuteSqlMutation({
     onSuccess: (data, vars) => {
       setResults(data.result)
       setAutoLimit(!!vars.autoLimit)
     },
+    onError: () => {},
   })
-
-  const { mutateAsync: parseQuery } = useParseSQLQueryMutation()
+  const { mutateAsync: parseQuery, error: parseQueryError } = useParseSQLQueryMutation({
+    onError: () => {},
+  })
+  const { mutateAsync: parseClientCode, error: parseClientCodeError } = useParseClientCodeMutation({
+    onError: () => {},
+  })
   const { mutateAsync: getTableRLSStatus } = useCheckTableRLSStatusMutation()
 
   const isServiceRole = parseQueryResults?.role === undefined
@@ -87,12 +112,23 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
   const onRunQuery = async () => {
     if (!project) return console.error('Project is required')
 
-    const { appendAutoLimit } = checkIfAppendLimitRequired(value, limit)
-    const formattedSql = suffixWithLimit(value, limit)
-
     try {
       setIsLoading(true)
 
+      let formattedValue = value
+
+      if (format === 'lib') {
+        const { sql, valid } = await parseClientCode({ code: value })
+        if (valid && !!sql) {
+          formattedValue = sql
+          setInferredSQL(sql)
+        } else {
+          return toast.error('Client library code provided is not valid')
+        }
+      }
+
+      const { appendAutoLimit } = checkIfAppendLimitRequired(formattedValue, limit)
+      const formattedSql = suffixWithLimit(formattedValue, limit)
       const data = await parseQuery({ sql: formattedSql })
 
       if (data.operation === 'SELECT') {
@@ -125,9 +161,7 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
 
           .sort((a, b) => (a.isRLSEnabled && a.tablePolicies.length === 0 ? -1 : 1))
 
-        setParseQueryResults({ tables, operation: data.operation, role: role?.role })
-
-        executeSql({
+        await executeSql({
           projectRef: project.ref,
           connectionString: project.connectionString,
           sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
@@ -139,10 +173,14 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
           },
           queryKey: ['rls-tester'],
         })
+
+        setParseQueryResults({ tables, operation: data.operation, role: role?.role })
       } else {
         toast('Only SELECT statements are supported for now')
       }
     } catch (error) {
+      setResults(null)
+      setParseQueryResults(undefined)
     } finally {
       setIsLoading(false)
     }
@@ -164,18 +202,39 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
           </SheetDescription>
         </SheetHeader>
 
-        <div className="grow overflow-y-auto">
+        <div className="flex-grow overflow-y-auto flex flex-col">
           <SheetSection className="px-0 py-0">
             <div className="flex items-center justify-between px-5 py-2">
-              <p className="text-sm">Query</p>
-              <RoleImpersonationPopover title="Run SQL query as" />
+              <p className="text-sm font-mono uppercase tracking-tight text-foreground-light">
+                Query
+              </p>
+              <div className="flex items-center gap-x-2">
+                <Select value={format} onValueChange={(x) => setFormat(x as 'sql' | 'lib')}>
+                  <SelectTrigger size="tiny">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Query format</SelectLabel>
+                      <SelectItem value="sql">SQL</SelectItem>
+                      <SelectItem value="lib">Client library</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <RoleImpersonationPopover title="Run SQL query as" serviceRoleLabel="postgres" />
+              </div>
             </div>
-            <div className="h-56 relative">
+
+            <div className="h-44 relative">
               <CodeEditor
                 id="rls-tester"
                 language="pgsql"
                 value={value}
-                placeholder="select * from table;"
+                placeholder={
+                  format === 'sql'
+                    ? 'select * from table;'
+                    : 'SQL will be inferred from client library code'
+                }
                 onInputChange={(val) => setValue(val ?? '')}
                 actions={{
                   runQuery: {
@@ -189,9 +248,61 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
             </div>
           </SheetSection>
 
+          {format === 'lib' && !!inferredSQL && (
+            <div>
+              <div className="flex items-center justify-between px-4 py-2 border-y">
+                <p className="text-sm font-mono uppercase tracking-tight text-foreground-light">
+                  Inferred SQL:
+                </p>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Badge variant="warning">Generated</Badge>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="end" className="w-64 text-center">
+                    This query is inferred from client library code with the help of the Assistant
+                    and may not guarantee correctness.
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <div className="h-44 relative">
+                <CodeEditor isReadOnly id="inferred-sql" language="pgsql" value={inferredSQL} />
+              </div>
+            </div>
+          )}
+
           <DialogSectionSeparator />
 
-          {results.length === 0 && !isSuccess ? (
+          {parseQueryError && (
+            <div className="p-4">
+              <Admonition
+                type="warning"
+                title="Error parsing query"
+                description={parseQueryError.message}
+              />
+            </div>
+          )}
+
+          {parseClientCodeError && (
+            <div className="p-4">
+              <Admonition
+                type="warning"
+                title="Error parsing client code"
+                description={parseClientCodeError.message}
+              />
+            </div>
+          )}
+
+          {executeSqlError && (
+            <div className="p-4">
+              <Admonition
+                type="warning"
+                title="Error running SQL query"
+                description={executeSqlError.message}
+              />
+            </div>
+          )}
+
+          {results === null ? (
             <div className="flex flex-col items-center justify-center h-64">
               <ListTodo className="mb-2 text-foreground-light" />
               <p className="text-foreground-light text-sm">
@@ -204,7 +315,9 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
           ) : (
             <>
               <div className="p-5 pt-4">
-                <p className="text-sm mb-2">Summary</p>
+                <p className="mb-2 text-sm font-mono uppercase tracking-tight text-foreground-light">
+                  Table access summary
+                </p>
                 {!isServiceRole && hasRLSEnabledButNoPolicies && (
                   <Admonition showIcon={false} className="mb-4" type="default">
                     <p className="!mb-0.5">
@@ -226,9 +339,9 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
                   />
                 ) : (
                   <>
-                    <p className="text-xs font-mono uppercase tracking-tight text-foreground-light mb-2">
+                    {/* <p className="text-xs font-mono uppercase tracking-tight text-foreground-light mb-2">
                       Table access
-                    </p>
+                    </p> */}
                     <div className="flex flex-col gap-y-2">
                       {parseQueryResults?.tables.map((x) => {
                         const { schema, table, tablePolicies, isRLSEnabled } = x
@@ -247,10 +360,10 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
                 )}
               </div>
 
-              <DialogSectionSeparator />
-
-              <div className="px-5 py-3 text-sm flex items-center justify-between">
-                <span>Results</span>
+              <div className="px-5 py-3 flex items-center justify-between border-t">
+                <span className="text-sm font-mono uppercase tracking-tight text-foreground-light">
+                  Results
+                </span>
                 {results.length > 0 && (
                   <span className="font-mono text-xs text-foreground-light">
                     {results.length} row{results.length > 1 ? 's' : ''}
@@ -258,7 +371,8 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
                   </span>
                 )}
               </div>
-              <div className="flex flex-col h-56 border-t">
+
+              <div className="flex-grow flex flex-col h-56 border-t">
                 <Results rows={results} />
               </div>
             </>

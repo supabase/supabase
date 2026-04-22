@@ -2,11 +2,13 @@ import { type PostgresPolicy } from '@supabase/postgres-meta'
 import { Check, ChevronDown, Edit, X } from 'lucide-react'
 import { useMemo } from 'react'
 import {
+  cn,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
@@ -93,7 +95,10 @@ export const RLSTableCard = ({
   }, [isRLSEnabled, noPolicies, trueOnlyPolicy, role, policies, handleSelectEditPolicy])
 
   return (
-    <Collapsible_Shadcn_ className="border rounded">
+    <Collapsible_Shadcn_
+      className={cn('border rounded', !isRLSEnabled && 'bg-warning-300 border-warning-500')}
+      defaultOpen={!isRLSEnabled || noPolicies}
+    >
       <CollapsibleTrigger_Shadcn_ className="flex items-center justify-between px-3 py-2 w-full [&[data-state=open]>div>svg]:!-rotate-180">
         <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-x-2">
@@ -104,13 +109,18 @@ export const RLSTableCard = ({
             ) : (
               <Check size={16} className="text-brand" />
             )}
-            <p className="text-xs font-mono">
+            <p className={cn('text-xs font-mono', !isRLSEnabled && 'font-medium text-foreground')}>
               {schema}.{name}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-x-2">
-          <p className="text-xs text-foreground-light w-max">
+          <p
+            className={cn(
+              'text-xs text-foreground-light w-max',
+              !isRLSEnabled && 'text-foreground'
+            )}
+          >
             {noPolicies
               ? 'Returns no rows'
               : !isRLSEnabled || !!trueOnlyPolicy
@@ -120,7 +130,12 @@ export const RLSTableCard = ({
           <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
         </div>
       </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ className="border-t p-3 text-sm">
+      <CollapsibleContent_Shadcn_
+        className={cn(
+          'border-t p-3 text-sm text-foreground-light',
+          !isRLSEnabled && 'border-warning-500'
+        )}
+      >
         {tableAccessDescription}
       </CollapsibleContent_Shadcn_>
     </Collapsible_Shadcn_>
