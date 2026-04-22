@@ -141,7 +141,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   return (
     <>
-      <Card className="w-[40rem] mx-auto">
+      <Card className="w-full max-w-[40rem] mx-auto">
         <CardContent>
           <PauseCircle
             size={48}
@@ -235,7 +235,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
         )}
 
         {isPauseStatusSuccess && !isRestoreDisabled && (
-          <CardFooter className="flex justify-end items-center gap-x-2">
+          <CardFooter className="flex flex-wrap justify-end items-center gap-2">
             <ButtonTooltip
               size="tiny"
               type="default"

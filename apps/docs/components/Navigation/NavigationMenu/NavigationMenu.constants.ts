@@ -1494,7 +1494,7 @@ export const api: NavMenuConstant = {
       items: [
         { name: 'How API Keys work', url: '/guides/api/api-keys' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
-        { name: 'Hardening the Data API', url: '/guides/api/hardening-data-api' },
+        { name: 'Data API', url: '/guides/database/data-api' },
         {
           name: 'Custom Claims & RBAC',
           url: '/guides/api/custom-claims-and-role-based-access-control-rbac',
@@ -2485,7 +2485,7 @@ export const security: NavMenuConstant = {
           url: '/guides/deployment/shared-responsibility-model' as `/${string}`,
         },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
-        { name: 'Hardening the Data API', url: '/guides/api/hardening-data-api' },
+        { name: 'Data API', url: '/guides/database/data-api' },
       ],
     },
   ],
@@ -2897,6 +2897,7 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
+        { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
       ],
     },
     {

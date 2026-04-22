@@ -7,7 +7,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/hardening-data-api',
-    destination: '/docs/guides/api/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
   },
   {
     permanent: true,
