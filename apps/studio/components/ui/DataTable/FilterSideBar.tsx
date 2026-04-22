@@ -1,4 +1,4 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
@@ -27,8 +27,7 @@ export function FilterSideBar({
   const { ref } = useParams()
   const { table } = useDataTable()
 
-  const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const { disable: disableUnifiedLogs } = useUnifiedLogsPreview()
+  const { disable: disableUnifiedLogs, isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
 
   const handleGoBackToOldLogs = () => {
     disableUnifiedLogs()
@@ -69,7 +68,7 @@ export function FilterSideBar({
       </div>
 
       <div className="flex-1 p-2 sm:overflow-y-scroll">
-        {isUnifiedLogsPreviewAvailable && (
+        {isUnifiedLogsEligible && (
           <FeaturePreviewSidebarPanel
             className="mx-2 mt-2 mb-3"
             title="Go back to old logs"

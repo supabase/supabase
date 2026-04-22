@@ -52,6 +52,7 @@ import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const CHART_CONFIG = {
   success: {
@@ -72,6 +73,7 @@ export const UnifiedLogs = () => {
   useResetFocus()
 
   const { ref: projectRef } = useParams()
+  const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
 
   const { sort, start, size, id, cursor, direction, live, ...filter } = search
@@ -305,6 +307,7 @@ export const UnifiedLogs = () => {
       setSearch({
         id: selectedRowId,
       })
+      track('unified_logs_row_clicked', { logType: selectedRow.original.log_type })
       // Don't clear rowSelection here - let it persist to maintain the selection
     } else if (!selectedRowId && search.id) {
       // Clear the URL parameter when no row is selected

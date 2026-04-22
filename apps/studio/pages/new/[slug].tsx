@@ -104,7 +104,6 @@ const Wizard: NextPageWithLayout = () => {
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
   // PostHog) so we only record true/false when the flag is resolved.
-  const tableEditorApiAccessToggleFlag = usePHFlag<boolean>('tableEditorApiAccessToggle')
   const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
   const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
 
@@ -274,9 +273,6 @@ const Wizard: NextPageWithLayout = () => {
           dataApiEnabled: form.getValues('dataApi'),
           dataApiDefaultPrivilegesGranted: form.getValues('dataApiDefaultPrivileges'),
           useOrioleDb: form.getValues('useOrioleDb'),
-          ...(tableEditorApiAccessToggleFlag !== undefined && {
-            tableEditorApiAccessToggleEnabled: tableEditorApiAccessToggleFlag,
-          }),
           ...(dataApiRevokeOnCreateDefaultFlag !== undefined && {
             dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
           }),
