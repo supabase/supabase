@@ -3,51 +3,54 @@ import { routes, type VercelConfig } from '@vercel/config/v1'
 // Vite's `base` bakes the prefix into asset URLs but leaves the filesystem
 // layout at `dist/client/...`. On Vercel we strip the prefix for file lookups
 // and fall through to the SPA shell. When NEXT_PUBLIC_BASE_PATH is empty
-// these rules collapse to identity rewrites plus the shell fallback.
+// the prefixed rule set is skipped and only the root-level rules fire.
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
+// Build the rewrites + headers for a given prefix ('' for root, or a base
+// path like '/dashboard'). We run this once for each prefix and concatenate
+// the results so we don't hand-duplicate every rule.
+//
+// Rewrite ordering: API + server-function passthrough first so extensioned
+// API paths (/api/foo.json) don't get caught by the asset rule. Asset rule
+// next — it's an identity rewrite that also guards missing files from
+// falling through to the shell (a missing .js should 404, not serve HTML).
+// Shell rule last, catching everything else.
+function routesFor(prefix: string) {
+  return {
+    rewrites: [
+      routes.rewrite(`${prefix}/api/(.*)`, '/api/server'),
+      routes.rewrite(`${prefix}/_serverFn/(.*)`, '/api/server'),
+      routes.rewrite(`${prefix}/(.*\\.\\w+)`, '/$1'),
+      routes.rewrite(`${prefix}/(.*)`, '/_shell'),
+    ],
+    headers: [
+      // Dynamic function responses must not be cached by any shared cache —
+      // handlers can still opt in with their own Cache-Control on the
+      // Response when a response IS safe to cache.
+      routes.cacheControl(`${prefix}/api/(.*)`, { private: true, noStore: true }),
+      routes.cacheControl(`${prefix}/_serverFn/(.*)`, { private: true, noStore: true }),
+      // Hashed bundles under /assets/* are content-addressed — safe to
+      // cache forever.
+      routes.cacheControl(`${prefix}/assets/(.*)`, {
+        public: true,
+        maxAge: '1year',
+        immutable: true,
+      }),
+    ],
+  }
+}
+
+// When a base path is configured, emit both the prefixed and root rule
+// sets (prefixed first so it wins for explicit /dashboard/* hits, root as
+// a fallback for bare-domain traffic).
+const ruleSets = (basePath ? [basePath, ''] : ['']).map(routesFor)
 
 export const config: VercelConfig = {
   framework: null,
   outputDirectory: 'dist/client',
   cleanUrls: true,
-  rewrites: [
-    // Prefixed rules — only emitted when a base path is configured. Vite
-    // bakes `${basePath}/assets/*` URLs into the HTML, so anything hitting
-    // a prefixed path needs to be stripped back to its filesystem location
-    // (or routed to the /api/server function).
-    ...(basePath
-      ? [
-          routes.rewrite(`${basePath}/api/(.*)`, '/api/server'),
-          routes.rewrite(`${basePath}/_serverFn/(.*)`, '/api/server'),
-          routes.rewrite(`${basePath}/(.*\\.\\w+)`, '/$1'),
-          routes.rewrite(`${basePath}/(.*)`, '/_shell'),
-        ]
-      : []),
-    // Root-level rules — always emitted. These serve the app at `/` and
-    // also cover any paths that don't carry the base-path prefix (handy for
-    // health checks, bare-domain hits, or links that forget the prefix).
-    //
-    // Order matters: API + server-function passthrough first so extensioned
-    // API paths (`/api/foo.json`) don't get caught by the asset rule. Asset
-    // rule next — it's an identity rewrite that also guards missing files
-    // from falling through to the shell (a missing `.js` should 404, not
-    // serve HTML). Shell rule last, catching everything else.
-    routes.rewrite('/api/(.*)', '/api/server'),
-    routes.rewrite('/_serverFn/(.*)', '/api/server'),
-    routes.rewrite('/(.*\\.\\w+)', '/$1'),
-    routes.rewrite('/(.*)', '/_shell'),
-  ],
-  // TEMPORARY (testing): force `private, no-store` on every response so
-  // nothing (CDN or browser) caches stale content while we iterate. Once
-  // the deploy is stable, narrow this back to just the /api/* and
-  // /_serverFn/* paths and let the SPA shell + hashed assets take
-  // appropriate public cache headers.
-  headers: [
-    ...(basePath
-      ? [routes.cacheControl(`${basePath}/(.*)`, { private: true, noStore: true })]
-      : []),
-    routes.cacheControl('/(.*)', { private: true, noStore: true }),
-  ],
+  rewrites: ruleSets.flatMap((r) => r.rewrites),
+  headers: ruleSets.flatMap((r) => r.headers),
 }
 
 // Belt-and-braces: local @vercel/config CLI reads module.default, but the
