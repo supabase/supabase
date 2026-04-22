@@ -1,0 +1,22 @@
+# To migrate existing files from ./volumes/storage into the named volume:
+#   1. Stop Supabase:     docker compose down
+#   2. Create the volume: docker volume create supabase_storage-data
+#   3. Copy the data:
+#        docker run --rm \
+#          -v "$(pwd)/volumes/storage:/from:ro" \
+#          -v supabase_storage-data:/to \
+#          alpine sh -c 'cp -av /from/. /to/'
+#   4. Start Supabase with this override file.
+
+services:
+
+  storage:
+    volumes:
+      - storage-data:/var/lib/storage
+
+  imgproxy:
+    volumes:
+      - storage-data:/var/lib/storage
+
+volumes:
+  storage-data:
