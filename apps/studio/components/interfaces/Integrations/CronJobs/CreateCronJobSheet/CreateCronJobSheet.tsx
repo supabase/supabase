@@ -176,10 +176,14 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
         const nameExists = !!checkExistingJob
 
         if (nameExists) {
-          return form.setError('name', {
-            type: 'manual',
-            message: 'A cron job with this name already exists',
-          })
+          return form.setError(
+            'name',
+            {
+              type: 'manual',
+              message: 'A cron job with this name already exists',
+            },
+            { shouldFocus: true }
+          )
         }
       } catch (error: any) {
         toast.error(`Failed to validate cron job name: ${error.message}`)
