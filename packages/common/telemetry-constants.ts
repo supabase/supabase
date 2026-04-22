@@ -3211,6 +3211,23 @@ export interface ResourceExhaustionBannerAiAssistantClickedEvent {
 }
 
 /**
+ * User clicked a row in the Unified Logs interface.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface UnifiedLogsRowClickedEvent {
+  action: 'unified_logs_row_clicked'
+  properties: {
+    /**
+     * The log type of the clicked row. e.g. 'postgres', 'postgrest', 'auth', 'storage', 'edge function', 'edge'
+     */
+    log_type: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -3389,3 +3406,4 @@ export type TelemetryEvent =
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
   | ResourceExhaustionBannerAiAssistantClickedEvent
+  | UnifiedLogsRowClickedEvent
