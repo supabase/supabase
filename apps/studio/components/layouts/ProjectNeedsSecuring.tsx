@@ -1,11 +1,9 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowRight, Check, Lightbulb, Shield, X } from 'lucide-react'
+import { ArrowRight, Check, Lightbulb, Lock, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useMemo, useState } from 'react'
-import { toast } from 'sonner'
+import { PropsWithChildren, useMemo } from 'react'
 import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -24,26 +22,39 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import AlertError from '@/components/ui/AlertError'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import {
   parseDbSchemaString,
   useProjectPostgrestConfigQuery,
 } from '@/data/config/project-postgrest-config-query'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { useTablePrivilegesQuery } from '@/data/privileges/table-privileges-query'
-import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { isApiAccessRole, isApiPrivilegeType } from '@/lib/data-api-types'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 const ALLOWED_PATHNAMES = new Set(['/project/[ref]/auth/policies'])
+const PROJECT_SECURITY_FEATURE_FLAG = 'projectNeedsSecuring'
 const DEFAULT_EXPOSED_SCHEMA = 'public'
+
+type ProjectSecurityActionType =
+  | 'ask_assistant'
+  | 'copy_prompt'
+  | 'skip_to_home'
+  | 'view_policies'
+
+type ProjectSecurityActionDetails = {
+  schema?: string
+  tableName?: string
+}
 
 type ProjectSecurityTable = {
   id: number
@@ -53,11 +64,6 @@ type ProjectSecurityTable = {
   dataApiAccessible: boolean
   hasRlsIssue: boolean
 }
-
-type ProjectSecurityTableToToggleRLS = Pick<
-  ProjectSecurityTable,
-  'id' | 'schema' | 'name' | 'rlsEnabled'
->
 
 const getTableKey = ({ schema, name }: { schema: string; name: string }) => `${schema}.${name}`
 
@@ -70,6 +76,34 @@ const formatRlsDescription = (count: number) => {
   const noun = count === 1 ? 'table' : 'tables'
 
   return `${count} ${noun} has RLS disabled which means anyone can access its data via the Data API.`
+}
+
+const buildSecurityPromptMarkdown = (issueCount: number, tables: ProjectSecurityTable[]) => {
+  const noun = issueCount === 1 ? 'table' : 'tables'
+  const header = [
+    '## Project security review',
+    '',
+    `${issueCount} ${noun} has RLS disabled which means anyone can access its data via the Data API.`,
+    '',
+    '### Tables',
+    '',
+    '| Table | Schema | Accessible via Data API | RLS |',
+    '| --- | --- | --- | --- |',
+  ]
+
+  const rows = tables.map(
+    (table) =>
+      `| ${table.name} | ${table.schema} | ${table.dataApiAccessible ? 'Yes' : 'No'} | ${table.rlsEnabled ? 'Enabled' : 'Disabled'} |`
+  )
+
+  const footer = [
+    '',
+    '### Next step',
+    '',
+    'Help me enable RLS on these tables and suggest the minimum policies I should create.',
+  ]
+
+  return [...header, ...rows, ...footer].join('\n')
 }
 
 const StatusCell = ({ enabled, label }: { enabled: boolean; label: string }) => (
@@ -99,51 +133,35 @@ const sortTables = (tables: ProjectSecurityTable[]) => {
 
 const ProjectNeedsSecuringView = ({
   projectRef,
-  connectionString,
   issueCount,
   tables,
   isLoading,
   error,
   onDismiss,
+  onTrackAction,
 }: {
   projectRef: string
-  connectionString?: string | null
   issueCount: number
   tables: ProjectSecurityTable[]
   isLoading: boolean
   error?: { message: string } | null
   onDismiss: () => void
+  onTrackAction: (type: ProjectSecurityActionType, details?: ProjectSecurityActionDetails) => void
 }) => {
-  const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] =
-    useState<ProjectSecurityTableToToggleRLS>()
+  const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
 
-  const { can: canToggleRLS } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const promptMarkdown = useMemo(
+    () => buildSecurityPromptMarkdown(issueCount, tables),
+    [issueCount, tables]
   )
 
-  const { mutate: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
-    onError: (error) => {
-      toast.error(`Failed to toggle RLS: ${error.message}`)
-    },
-    onSettled: () => {
-      setSelectedTableToToggleRLS(undefined)
-    },
-  })
-
-  const onToggleRLS = () => {
-    if (!selectedTableToToggleRLS) return console.error('Table is required')
-
-    updateTable({
-      projectRef,
-      connectionString,
-      id: selectedTableToToggleRLS.id,
-      name: selectedTableToToggleRLS.name,
-      schema: selectedTableToToggleRLS.schema,
-      payload: {
-        id: selectedTableToToggleRLS.id,
-        rls_enabled: !selectedTableToToggleRLS.rlsEnabled,
-      },
+  const handleOpenAssistant = () => {
+    onTrackAction('ask_assistant')
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    aiSnap.newChat({
+      name: 'Review project security',
+      initialInput: promptMarkdown,
     })
   }
 
@@ -160,14 +178,33 @@ const ProjectNeedsSecuringView = ({
             <PageHeaderSummary>
               <PageHeaderTitle>Your project needs securing</PageHeaderTitle>
               <PageHeaderDescription>{formatRlsDescription(issueCount)}</PageHeaderDescription>
-          </PageHeaderSummary>
-          <PageHeaderAside>
-            <Button asChild type="default" iconRight={<ArrowRight />}>
-              <Link href={`/project/${projectRef}`} onClick={onDismiss}>
-                Skip to home
-              </Link>
-            </Button>
-          </PageHeaderAside>
+            </PageHeaderSummary>
+            <PageHeaderAside>
+              <AiAssistantDropdown
+                label="Ask Assistant"
+                size="tiny"
+                buildPrompt={() => promptMarkdown}
+                onOpenAssistant={handleOpenAssistant}
+                onCopyPrompt={() => onTrackAction('copy_prompt')}
+                copyLabel="Copy Markdown"
+                disabled={isLoading}
+              />
+              <Button
+                asChild
+                type="default"
+                iconRight={<ArrowRight />}
+              >
+                <Link
+                  href={`/project/${projectRef}`}
+                  onClick={() => {
+                    onTrackAction('skip_to_home')
+                    onDismiss()
+                  }}
+                >
+                  Skip to home
+                </Link>
+              </Button>
+            </PageHeaderAside>
           </PageHeaderMeta>
         </PageHeader>
 
@@ -218,24 +255,19 @@ const ProjectNeedsSecuringView = ({
                           </TableCell>
                           <TableCell className="text-right">
                             {!table.rlsEnabled && (
-                              <ButtonTooltip
-                                type="default"
-                                size="tiny"
-                                icon={<Shield size={14} />}
-                                disabled={!canToggleRLS}
-                                onClick={() => setSelectedTableToToggleRLS(table)}
-                                data-testid={`${table.name}-toggle-rls`}
-                                tooltip={{
-                                  content: {
-                                    side: 'bottom',
-                                    text: !canToggleRLS
-                                      ? 'You need additional permissions to toggle RLS'
-                                      : undefined,
-                                  },
-                                }}
-                              >
-                                Enable RLS
-                              </ButtonTooltip>
+                              <Button asChild type="default" size="tiny" icon={<Lock size={14} />}>
+                                <Link
+                                  href={`/project/${projectRef}/auth/policies?schema=${table.schema}&search=${table.name}`}
+                                  onClick={() =>
+                                    onTrackAction('view_policies', {
+                                      schema: table.schema,
+                                      tableName: table.name,
+                                    })
+                                  }
+                                >
+                                  View policies
+                                </Link>
+                              </Button>
                             )}
                           </TableCell>
                         </TableRow>
@@ -248,25 +280,14 @@ const ProjectNeedsSecuringView = ({
           </PageSection>
         </PageContainer>
       </div>
-
-      <ConfirmationModal
-        visible={selectedTableToToggleRLS !== undefined}
-        variant="default"
-        title="Enable Row Level Security"
-        description={`Are you sure you want to enable Row Level Security (RLS) for the table “${selectedTableToToggleRLS?.name}”?`}
-        confirmLabel="Enable RLS"
-        confirmLabelLoading="Enabling RLS"
-        loading={isUpdatingTable}
-        onCancel={() => setSelectedTableToToggleRLS(undefined)}
-        onConfirm={onToggleRLS}
-      />
     </>
   )
 }
 
-export const ProjectNeedsSecuring = ({ children }: PropsWithChildren) => {
+const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
   const { ref: projectRef } = useParams()
   const router = useRouter()
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const [securityDismissedAt, setSecurityDismissedAt, { isLoading: isLoadingDismissedAt }] =
     useLocalStorageQuery<string | null>(
@@ -313,6 +334,16 @@ export const ProjectNeedsSecuring = ({ children }: PropsWithChildren) => {
     },
     { enabled: shouldRenderGate }
   )
+
+  const handleTrackAction = (
+    type: ProjectSecurityActionType,
+    details?: ProjectSecurityActionDetails
+  ) => {
+    track('project_security_cta_clicked', {
+      type,
+      ...details,
+    })
+  }
 
   const {
     data: dbSchema,
@@ -389,12 +420,12 @@ export const ProjectNeedsSecuring = ({ children }: PropsWithChildren) => {
         >
           <ProjectNeedsSecuringView
             projectRef={projectRef}
-            connectionString={project?.connectionString}
             issueCount={rlsIssueKeys.size}
             tables={tableRows}
             isLoading={isLoadingTables || isLoadingPostgrestConfig || isLoadingTablePrivileges}
             error={tablesError ?? postgrestConfigError ?? tablePrivilegesError}
             onDismiss={() => setSecurityDismissedAt(new Date().toISOString())}
+            onTrackAction={handleTrackAction}
           />
         </motion.div>
       ) : (
@@ -411,6 +442,16 @@ export const ProjectNeedsSecuring = ({ children }: PropsWithChildren) => {
       )}
     </AnimatePresence>
   )
+}
+
+export const ProjectNeedsSecuring = ({ children }: PropsWithChildren) => {
+  const isEnabled = true //useFlag(PROJECT_SECURITY_FEATURE_FLAG)
+
+  if (!isEnabled) {
+    return <>{children}</>
+  }
+
+  return <ProjectNeedsSecuringGate>{children}</ProjectNeedsSecuringGate>
 }
 
 export default ProjectNeedsSecuring

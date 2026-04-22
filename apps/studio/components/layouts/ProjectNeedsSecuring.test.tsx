@@ -7,24 +7,22 @@ import { ProjectNeedsSecuring } from './ProjectNeedsSecuring'
 import { render } from '@/tests/helpers'
 
 const {
+  mockUseFlag,
   mockUseProjectLintsQuery,
   mockUseSelectedProjectQuery,
   mockUseTablesQuery,
   mockUseProjectPostgrestConfigQuery,
   mockUseTablePrivilegesQuery,
   mockUseLocalStorageQuery,
-  mockUseAsyncCheckPermissions,
-  mockUseTableUpdateMutation,
   mockUseRouter,
 } = vi.hoisted(() => ({
+  mockUseFlag: vi.fn(),
   mockUseProjectLintsQuery: vi.fn(),
   mockUseSelectedProjectQuery: vi.fn(),
   mockUseTablesQuery: vi.fn(),
   mockUseProjectPostgrestConfigQuery: vi.fn(),
   mockUseTablePrivilegesQuery: vi.fn(),
   mockUseLocalStorageQuery: vi.fn(),
-  mockUseAsyncCheckPermissions: vi.fn(),
-  mockUseTableUpdateMutation: vi.fn(),
   mockUseRouter: vi.fn(),
 }))
 
@@ -33,6 +31,7 @@ vi.mock('common', async () => {
 
   return {
     ...actual,
+    useFlag: mockUseFlag,
     useParams: () => ({ ref: 'project-ref' }),
   }
 })
@@ -82,14 +81,6 @@ vi.mock('@/hooks/misc/useLocalStorage', () => ({
   useLocalStorageQuery: mockUseLocalStorageQuery,
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
-}))
-
-vi.mock('@/data/tables/table-update-mutation', () => ({
-  useTableUpdateMutation: mockUseTableUpdateMutation,
-}))
-
 vi.mock('sonner', () => ({
   toast: {
     error: vi.fn(),
@@ -134,6 +125,7 @@ const tablePrivileges = [
 describe('ProjectNeedsSecuring', () => {
   beforeEach(() => {
     mockAnimationsApi()
+    mockUseFlag.mockReturnValue(true)
     mockUseRouter.mockReturnValue({ pathname: '/project/[ref]/database/tables' })
     mockUseSelectedProjectQuery.mockReturnValue({
       data: { connectionString: 'postgresql://example' },
@@ -159,11 +151,6 @@ describe('ProjectNeedsSecuring', () => {
       isError: false,
     })
     mockUseLocalStorageQuery.mockReturnValue([null, vi.fn(), { isLoading: false }])
-    mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
-    mockUseTableUpdateMutation.mockReturnValue({
-      mutate: vi.fn(),
-      isPending: false,
-    })
   })
 
   afterEach(() => {
@@ -180,7 +167,10 @@ describe('ProjectNeedsSecuring', () => {
 
     expect(screen.getByText('Your project needs securing')).toBeInTheDocument()
     expect(screen.getByText('Review and fix')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Enable RLS' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'View policies' })).toHaveAttribute(
+      'href',
+      '/project/project-ref/auth/policies?schema=public&search=invoices'
+    )
     expect(screen.getByText('Skip to home')).toBeInTheDocument()
     expect(screen.queryByTestId('project-children')).not.toBeInTheDocument()
   })
@@ -208,6 +198,19 @@ describe('ProjectNeedsSecuring', () => {
       isPending: false,
       isError: false,
     })
+
+    render(
+      <ProjectNeedsSecuring>
+        <div data-testid="project-children">Project content</div>
+      </ProjectNeedsSecuring>
+    )
+
+    expect(screen.queryByText('Your project needs securing')).not.toBeInTheDocument()
+    expect(screen.getByTestId('project-children')).toBeInTheDocument()
+  })
+
+  it('renders the project content when the feature flag is disabled', () => {
+    mockUseFlag.mockReturnValue(false)
 
     render(
       <ProjectNeedsSecuring>
