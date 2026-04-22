@@ -11612,8 +11612,8 @@ packages:
     resolution: {integrity: sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w==}
     engines: {node: '>= 4'}
 
-  dompurify@3.3.3:
-    resolution: {integrity: sha512-Oj6pzI2+RqBfFG+qOaOLbFXLQ90ARpcGG6UePL82bJLtdsa6CYJD7nmiU8MW9nQNOtCHV3lZ/Bzq1X0QYbBZCA==}
+  dompurify@3.4.0:
+    resolution: {integrity: sha512-nolgK9JcaUXMSmW+j1yaSvaEaoXYHwWyGJlkoCTghc97KgGDDSnpoU/PlEnw63Ah+TGKFOyY+X5LnxaWbCSfXg==}
 
   domutils@3.1.0:
     resolution: {integrity: sha512-H78uMmQtI2AhgDJjWeQmHwJJ2bLPD3GMmO7Zja/ZZh84wkm+4ut+IUnUdRa8uCGX88DiVx1j6FRe1XfxEgjEZA==}
@@ -29660,7 +29660,7 @@ snapshots:
     dependencies:
       domelementtype: 2.3.0
 
-  dompurify@3.3.3:
+  dompurify@3.4.0:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 
@@ -33003,7 +33003,7 @@ snapshots:
       d3-sankey: 0.12.3
       dagre-d3-es: 7.0.13
       dayjs: 1.11.18
-      dompurify: 3.3.3
+      dompurify: 3.4.0
       katex: 0.16.22
       khroma: 2.1.0
       lodash-es: 4.18.1
@@ -33739,7 +33739,7 @@ snapshots:
 
   monaco-editor@0.55.1:
     dependencies:
-      dompurify: 3.3.3
+      dompurify: 3.4.0
       marked: 14.0.0
 
   moo@0.5.2: {}
@@ -35296,7 +35296,7 @@ snapshots:
       '@posthog/core': 1.23.1
       '@posthog/types': 1.357.0
       core-js: 3.44.0
-      dompurify: 3.3.3
+      dompurify: 3.4.0
       fflate: 0.4.8
       preact: 10.28.4
       query-selector-shadow-dom: 1.0.1
@@ -35880,7 +35880,7 @@ snapshots:
       classnames: 2.5.1
       core-js: 3.44.0
       decko: 1.2.0
-      dompurify: 3.3.3
+      dompurify: 3.4.0
       eventemitter3: 5.0.4
       json-pointer: 0.6.2
       lunr: 2.3.9
