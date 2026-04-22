@@ -2,6 +2,9 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Copy } from 'lucide-react'
+// Required to avoid issue:
+// The inferred type of ConfirmationModal cannot be named without a reference to DialogProps
+import { Dialog as _RadixDialog } from 'radix-ui'
 import { forwardRef, ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {

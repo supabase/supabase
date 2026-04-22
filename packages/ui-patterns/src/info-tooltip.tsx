@@ -1,3 +1,6 @@
+// Required to avoid issue:
+// The inferred type of InfoTooltip cannot be named without a reference to TooltipContentProps
+import { Tooltip as _RadixToolpip } from 'radix-ui'
 import { ElementRef, forwardRef } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
