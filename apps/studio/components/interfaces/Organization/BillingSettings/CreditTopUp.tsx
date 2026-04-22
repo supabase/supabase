@@ -15,7 +15,6 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  cn,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -34,6 +33,7 @@ import { z } from 'zod'
 
 import type { PaymentMethodElementRef } from '../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import PaymentMethodSelection from './Subscription/PaymentMethodSelection'
+import { ChargeBreakdown } from '@/components/interfaces/Billing/ChargeBreakdown'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from '@/components/interfaces/Billing/Payment/PaymentConfirmation'
 import { NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
@@ -45,7 +45,6 @@ import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { subscriptionKeys } from '@/data/subscriptions/keys'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
-import { formatCurrency } from '@/lib/helpers'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -383,46 +382,21 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
               )}
 
               {creditPreviewInitialized && !!validAmount && (
-                <div
-                  className={cn(
-                    'text-foreground-light text-sm transition-opacity mt-4',
-                    creditPreviewIsFetching && 'opacity-50'
-                  )}
-                >
-                  {creditPreview.total !== creditPreview.amount && (
-                    <div className="flex items-center justify-between gap-2 border-b border-muted text-sm">
-                      <div className="py-2">Credit amount</div>
-                      <div className="py-2 text-right tabular-nums" translate="no">
-                        {formatCurrency(creditPreview.amount)}
-                      </div>
-                    </div>
-                  )}
-
-                  {creditPreview.tax_status === 'calculated' &&
-                    creditPreview.tax &&
-                    creditPreview.tax.tax_amount > 0 && (
-                      <div className="flex items-center justify-between gap-2 border-b border-muted text-sm">
-                        <div className="py-2">Tax ({creditPreview.tax.tax_rate_percentage}%)</div>
-                        <div className="py-2 text-right tabular-nums" translate="no">
-                          {formatCurrency(creditPreview.tax.tax_amount)}
-                        </div>
-                      </div>
-                    )}
-
-                  {creditPreview.tax_status === 'failed' && (
-                    <div className="flex items-center justify-between gap-2 border-b border-muted text-sm">
-                      <div className="py-2 text-foreground-lighter">
-                        Tax could not be estimated and may be applied separately
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between gap-2 text-foreground text-base">
-                    <div className="py-2">Total due today</div>
-                    <div className="py-2 text-right tabular-nums" translate="no">
-                      {formatCurrency(creditPreview.total)}
-                    </div>
-                  </div>
+                <div className="mt-4">
+                  <ChargeBreakdown
+                    subtotal={creditPreview.amount}
+                    total={creditPreview.total}
+                    tax={
+                      creditPreview.tax
+                        ? {
+                            amount: creditPreview.tax.tax_amount,
+                            percentage: creditPreview.tax.tax_rate_percentage,
+                          }
+                        : undefined
+                    }
+                    taxStatus={creditPreview.tax_status}
+                    isFetching={creditPreviewIsFetching}
+                  />
                 </div>
               )}
             </DialogSection>
