@@ -6,6 +6,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/guides/api/api-keys/',
+    destination: '/docs/guides/getting-started/api-keys',
+  }
+  {
+    permanent: true,
     source: '/docs/guides/database/hardening-data-api',
     destination: '/docs/guides/api/hardening-data-api',
   },

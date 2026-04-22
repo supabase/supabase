@@ -6,6 +6,12 @@ description: "First-layer protection for your project's data"
 
 Supabase gives you fine-grained control over which application components are allowed to access your project through API keys.
 
+<Admonition type="tip" title="Looking for your API Keys?">
+
+In most cases, you can get the correct key from [the Project's **Connect** dialog](/dashboard/project/_?showConnect=true), but if you want a specific key, you can find all keys in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard:
+
+</Admonition>
+
 API keys provide the first layer of authentication for data access. Auth then builds upon that. This chart covers the differences:
 
 | Responsibility                     | Question                           | Answer                                             |
@@ -17,31 +23,24 @@ API keys provide the first layer of authentication for data access. Auth then bu
 
 An API key authenticates an application component to give it access to Supabase services. An application component might be a web page, a mobile app, or a server. The API key _does not_ distinguish between users, only between applications.
 
-There are 4 types of API keys that can be used with Supabase:
+There are 4 types of API keys that you can use with Supabase:
 
 | Type                                                       | Format                                                           | Privileges | Availability                                              | Use                                                                                                                                                                                                                                                                                               |
 | ---------------------------------------------------------- | ---------------------------------------------------------------- | ---------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Publishable&nbsp;key                                       | <span className="!whitespace-nowrap">`sb_publishable_...`</span> | Low        | Platform                                                  | Safe to expose online: web page, mobile or desktop app, GitHub actions, CLIs, source code.                                                                                                                                                                                                        |
 | Secret&nbsp;keys                                           | <span className="!whitespace-nowrap">`sb_secret_...`</span>      | Elevated   | Platform                                                  | **Only use in backend components of your app:** servers, already secured APIs (admin panels), [Edge Functions](/docs/guides/functions), microservices, etc. They provide _full access_ to your project's data, bypassing [Row Level Security](/docs/guides/database/postgres/row-level-security). |
-| <span className="!whitespace-nowrap">`anon`</span>         | JWT (long lived)                                                 | Low        | <span className="!whitespace-nowrap">Platform, CLI</span> | Exactly like the publishable key.                                                                                                                                                                                                                                                                 |
-| <span className="!whitespace-nowrap">`service_role`</span> | JWT (long lived)                                                 | Elevated   | <span className="!whitespace-nowrap">Platform, CLI</span> | Exactly like secret keys.                                                                                                                                                                                                                                                                         |
+| <span className="!whitespace-nowrap">`anon`</span>         | JWT (long lived)                                                 | Low        | <span className="!whitespace-nowrap">Platform, CLI</span> | Legacy version of publishable keys.                                                                                                                                                                                                                                                               |
+| <span className="!whitespace-nowrap">`service_role`</span> | JWT (long lived)                                                 | Elevated   | <span className="!whitespace-nowrap">Platform, CLI</span> | Legacy version of secret keys.                                                                                                                                                                                                                                                                    |
 
-<Admonition type="note" title="Changes to API keys">
+<Admonition type="warning" title="Changes to API keys">
 
-Supabase is changing the way keys work to improve project security and developer experience. You can [read the full announcement](https://github.com/orgs/supabase/discussions/29260).
+Supabase has changed the way keys work to improve project security and developer experience. You can read [the full announcement](https://github.com/orgs/supabase/discussions/29260).
 
-`anon` and `service_role` keys are based on the project's JWT secret. They are generated when your project is created and can only be changed when you rotate the JWT secret. This can cause significant issues in production applications. You should now use the `sb_publishable_xxx` and `secret` keys instead.
+`anon` and `service_role` keys are based on the project's JWT secret. They are generated when your project is created and you can only change them when you rotate the JWT secret. This can cause significant issues in production applications. **You should now use the `sb_publishable_xxx` and `sb_secret_xxx` keys instead**.
+
+You can still find legacy keys in the **Legacy anon, service_role API keys** tab of the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard:
 
 </Admonition>
-
-## Where to find keys
-
-You can find API keys in a couple of different places.
-
-In most cases, you can get the correct key from [the Project's **Connect** dialog](/dashboard/project/_?showConnect=true), but if you want a specific key, you can find all keys in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard:
-
-- **For new keys**, open the **Publishable and secret API keys** tab, if you don't have a publishable key already, click **Create new API Keys**, and copy the value from the **Publishable key** section.
-- **For legacy keys**, open the **Legacy anon, service_role API keys** tab, and copy the `anon` key for client-side operations and the `service_role` key for server-side operations.
 
 ## What publishable keys secure
 
@@ -151,49 +150,3 @@ As the publishable and secret keys are no longer JWT-based, there are some known
 - You cannot send a publishable or secret key in the `Authorization: Bearer ...` header, except if the value exactly equals the `apikey` header. In this case, your request will be forwarded down to your project's database, but will be rejected as the value is not a JWT.
 - Edge Functions **only support JWT verification** via the `anon` and `service_role` JWT-based API keys. You will need to use the `--no-verify-jwt` option when using publishable and secret keys. The Supabase platform does not verify the `apikey` header when using Edge Functions in this way. Implement your own `apikey`-header authorization logic inside the Edge Function code itself.
 - Public Realtime connections are limited to 24 hours in duration, unless the connection is upgraded and further maintained with user-level authentication via Supabase Auth or a supported Third-Party Auth provider.
-
-## Frequently asked questions
-
-{/* supa-mdx-lint-disable Rule004ExcludeWords */}
-
-### I am using JWT-based `anon` key in a mobile, desktop, or CLI application and need to rotate my `service_role` JWT secret?
-
-If the JWT secret is secure, substitute the `service_role` JWT-based key with a new secret key which you can create in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard. This prevents downtime for your application.
-
-### Can I still use my old `anon` and `service-role` API keys after enabling the publishable and secret keys?
-
-Yes. This allows you to transition between the API keys with zero downtime by gradually swapping your clients while both sets of keys are active. See the next question for how to deactivate your keys once all your clients are switched over.
-
-### How do I deactivate the `anon` and `service_role` JWT-based API keys after moving to publishable and secret keys?
-
-You can do this in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard. To prevent downtime in your application's components, use the last used indicators on the page to confirm that these are no longer used before deactivating.
-
-You can re-activate them should you need to.
-
-### Why are `anon` and `service_role` JWT-based keys no longer recommended?
-
-Since the start of Supabase, the JWT-based `anon` and `service_role` keys were the right trade-off against simplicity and relative security for your project. Unfortunately they pose some real challenges in live applications, especially around rotation and security best practices.
-
-The main reasons for preferring the publishable and secret keys (`sb_publishable_...` and `sb_secret_...`) are:
-
-- Tight coupling between the JWT secret (which itself can be compromised, if you mint your own JWTs), the `anon` (low privilege) and `service_role` (high privilege) and `authenticated` (issued by Supabase Auth) Postgres roles.
-- Inability to independently rotate each aspect of the keys, without downtime.
-- Inability to roll-back an unnecessary or problematic JWT secret rotation.
-- Publishing new versions of mobile applications can take days and often weeks in the app review phase with Apple's App Store and Google's Play Store. A forced rotation can cause weeks of downtime for mobile app users.
-- Users may continue using desktop, CLI and mobile apps with very old versions, making rotation impossible without a forced version upgrade.
-- JWTs had 10-year expiry duration, giving malicious actors more to work with.
-- JWTs were self-referential and full of redundant information not necessary for achieving their primary purpose.
-- JWTs are large, hard to parse, verify, and manipulate -- leading to insecure logging or bad security practices.
-- They were signed with a symmetric JWT secret.
-
-### How are publishable and secret keys implemented on the hosted platform?
-
-When your applications use the Supabase APIs they go through a component called the API Gateway on the Supabase hosted platform. This provides us (and therefore you) with the following features:
-
-- Observability and logging.
-- Performance and request routing (such as to read-replicas).
-- Security, for blocking malicious patterns or behavior on a global scale.
-
-This API Gateway component is able to verify the API key (sent in the `apikey` request header, or for WebSocket in a query param) against your project's publishable and secret key list. If the match is found, it mints a temporary, short-lived JWT that is then forwarded down to your project's servers.
-
-It may be possible to replicate similar behavior if you self-host by using programmable proxies such as [Kong](https://konghq.com/), [Envoy](https://www.envoyproxy.io/), [NGINX](https://nginx.org/) or similar.

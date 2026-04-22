@@ -328,6 +328,7 @@ export const gettingstarted: NavMenuConstant = {
   url: '/guides/getting-started',
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
+    { name: 'API Keys', url: '/guides/getting-started/api-keys' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
     {
       name: 'Framework Quickstarts',
@@ -1492,7 +1493,6 @@ export const api: NavMenuConstant = {
       name: 'Security',
       url: '/guides/api',
       items: [
-        { name: 'How API Keys work', url: '/guides/api/api-keys' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
         { name: 'Hardening the Data API', url: '/guides/api/hardening-data-api' },
         {
