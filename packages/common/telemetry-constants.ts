@@ -3219,7 +3219,7 @@ export interface ResourceExhaustionBannerAiAssistantClickedEvent {
 export interface UnifiedLogsRowClickedEvent {
   action: 'unified_logs_row_clicked'
   properties: {
-    log_type: string
+    logType: string
   }
   groups: TelemetryGroups
 }

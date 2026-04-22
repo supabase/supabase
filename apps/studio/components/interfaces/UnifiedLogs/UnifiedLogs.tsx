@@ -311,7 +311,7 @@ export const UnifiedLogs = () => {
       })
       sendEvent({
         action: 'unified_logs_row_clicked',
-        properties: { log_type: selectedRow.original.log_type },
+        properties: { logType: selectedRow.original.log_type },
         groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
       // Don't clear rowSelection here - let it persist to maintain the selection
