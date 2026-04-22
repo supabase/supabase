@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { MoreVertical, Plus, Search, X } from 'lucide-react'
+import { Plus, Search, X } from 'lucide-react'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -8,10 +8,6 @@ import {
   Card,
   CardContent,
   cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
   Table,
   TableBody,
   TableCell,
@@ -223,38 +219,26 @@ export const Destinations = () => {
             {canDisableExternalReplication &&
               externalReplicationSource !== undefined &&
               projectRef && (
-                <>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        aria-label="Manage replication"
-                        type="default"
-                        className="px-1"
-                        icon={<MoreVertical />}
-                      />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="bottom" align="end" className="w-56">
-                      <DropdownMenuItem
-                        className="text-destructive focus:text-destructive"
-                        onClick={() => setShowDisableExternalReplicationDialog(true)}
-                      >
-                        Disable external replication
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-
-                  <DisableExternalReplicationDialog
-                    projectRef={projectRef}
-                    tenantId={externalReplicationSource.tenant_id}
-                    visible={showDisableExternalReplicationDialog}
-                    onOpenChange={setShowDisableExternalReplicationDialog}
-                  />
-                </>
+                <Button
+                  type="text"
+                  className="text-destructive hover:text-destructive"
+                  onClick={() => setShowDisableExternalReplicationDialog(true)}
+                >
+                  Disable external replication
+                </Button>
               )}
             <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
           </div>
         </div>
       </div>
+
+      {canDisableExternalReplication && externalReplicationSource !== undefined && projectRef && (
+        <DisableExternalReplicationDialog
+          projectRef={projectRef}
+          visible={showDisableExternalReplicationDialog}
+          onOpenChange={setShowDisableExternalReplicationDialog}
+        />
+      )}
 
       <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
         {hasErrorsFetchingData && (

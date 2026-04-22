@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -16,34 +15,25 @@ import { useDeleteReplicationTenantMutation } from '@/data/replication/delete-te
 
 interface DisableExternalReplicationDialogProps {
   projectRef: string
-  tenantId: string
   visible: boolean
   onOpenChange: (open: boolean) => void
 }
 
 export const DisableExternalReplicationDialog = ({
   projectRef,
-  tenantId,
   visible,
   onOpenChange,
 }: DisableExternalReplicationDialogProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const { mutateAsync: deleteReplicationTenant } = useDeleteReplicationTenantMutation({
-    onSuccess: () => {
-      toast.success('External replication has been disabled')
-      onOpenChange(false)
-    },
-  })
+  const { mutateAsync: deleteReplicationTenant, isPending: isSubmitting } =
+    useDeleteReplicationTenantMutation({
+      onSuccess: () => {
+        toast.success('External replication has been disabled')
+        onOpenChange(false)
+      },
+    })
 
   const onConfirm = async () => {
-    setIsSubmitting(true)
-
-    try {
-      await deleteReplicationTenant({ projectRef, tenantId })
-    } finally {
-      setIsSubmitting(false)
-    }
+    await deleteReplicationTenant({ projectRef })
   }
 
   return (
