@@ -464,7 +464,7 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
 }
 
 export const ProjectNeedsSecuring = ({ children }: PropsWithChildren) => {
-  const isEnabled = true //useFlag(PROJECT_SECURITY_FEATURE_FLAG)
+  const isEnabled = useFlag(PROJECT_SECURITY_FEATURE_FLAG)
 
   if (!isEnabled) {
     return <>{children}</>
