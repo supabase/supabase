@@ -7,6 +7,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -198,6 +199,9 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{`Edit bucket “${bucket?.name}”`}</DialogTitle>
+          <DialogDescription className="sr-only">
+            Update this bucket&apos;s visibility, upload limits, and allowed MIME types.
+          </DialogDescription>
         </DialogHeader>
 
         <DialogSectionSeparator />

@@ -7,6 +7,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -169,6 +170,10 @@ export const CreateVectorBucketDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create vector bucket</DialogTitle>
+          <DialogDescription className="sr-only">
+            Create a vector bucket and set up the required integration for querying it from
+            Postgres.
+          </DialogDescription>
         </DialogHeader>
 
         <DialogSectionSeparator />

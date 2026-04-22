@@ -7,6 +7,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -189,9 +190,13 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         }
       }}
     >
-      <DialogContent aria-describedby={undefined}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Create file bucket</DialogTitle>
+          <DialogDescription className="sr-only">
+            Create a file bucket and configure its visibility, upload limits, and allowed MIME
+            types.
+          </DialogDescription>
         </DialogHeader>
 
         <DialogSectionSeparator />
