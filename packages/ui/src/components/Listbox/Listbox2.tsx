@@ -1,8 +1,8 @@
 'use client'
 
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { flatten } from 'lodash'
 import { Check } from 'lucide-react'
+import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
