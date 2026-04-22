@@ -87,7 +87,7 @@ const PricingComputeSection = () => {
                   <p className="text-foreground-light font-medium">
                     Everything in the Pro Plan, plus:
                   </p>
-                  <p className="text-foreground-light">SOC2</p>
+                  <p className="text-foreground-light">SOC2 & ISO 27001</p>
                   <p className="text-foreground-light">Project-scoped and read-only access</p>
                   <p className="text-foreground-light">HIPAA available as paid add-on</p>
                   <p className="text-foreground-light">SSO for Supabase Dashboard</p>

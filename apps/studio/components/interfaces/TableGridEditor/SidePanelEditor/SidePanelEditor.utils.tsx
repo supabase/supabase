@@ -1072,6 +1072,40 @@ export async function insertRowsViaSpreadsheet({
         console.log(
           `Total time taken for importing spreadsheet: ${(t2.getTime() - t1.getTime()) / 1000} seconds`
         )
+        if (insertError === undefined) {
+          const sequenceColumns = (table.columns ?? []).filter(
+            (column) =>
+              column.is_identity ||
+              (typeof column.default_value === 'string' &&
+                column.default_value.includes('nextval('))
+          )
+
+          if (sequenceColumns.length === 0) {
+            resolve({ error: insertError })
+            return
+          }
+
+          const updateSequenceSQL = sequenceColumns
+            .map((column) =>
+              getUpdateIdentitySequenceSQL({
+                schema: table.schema,
+                table: table.name,
+                column: column.name,
+              })
+            )
+            .join(';\n')
+
+          executeSql({
+            projectRef,
+            connectionString,
+            sql: updateSequenceSQL,
+            queryKey: ['sequences', 'update-batch'],
+          })
+            .then(() => resolve({ error: insertError }))
+            .catch((error) => resolve({ error }))
+          return
+        }
+
         resolve({ error: insertError })
       },
     })

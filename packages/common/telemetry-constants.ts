@@ -283,15 +283,52 @@ export interface ProjectCreationRlsOptionExperimentExposedEvent {
 }
 
 /**
- * Existing project creation form was submitted and the project was created.
+ * Top-of-funnel event for the dataApiRevokeOnCreateDefault rollout. Fires once per
+ * mount after the flag resolves so cohort attribution is clean — pair with
+ * project_creation_simple_version_submitted to measure the flag's impact on
+ * project creation completion rate.
  *
  * @group Events
  * @source studio
- * @page new/{slug}
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface ProjectCreationDefaultPrivilegesExposedEvent {
+  action: 'project_creation_default_privileges_exposed'
+  properties: {
+    /** Where the checkbox was shown. */
+    surface: 'main' | 'vercel'
+    /**
+     * State of the "Enable Data API" toggle at exposure time. Main flow only —
+     * the Vercel surface has no such toggle, so this is omitted there.
+     */
+    dataApiEnabled?: boolean
+    /**
+     * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at exposure time.
+     * true = revoke cohort (checkbox defaulted to unchecked)
+     * false = control cohort (checkbox defaulted to checked)
+     */
+    dataApiRevokeOnCreateDefaultEnabled: boolean
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Project creation form was submitted and the project was created. Fires from both
+ * the main project creation wizard and the Vercel deploy-button flow — disambiguate
+ * by the `surface` property.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
  */
 export interface ProjectCreationSimpleVersionSubmittedEvent {
   action: 'project_creation_simple_version_submitted'
   properties: {
+    /**
+     * Which surface produced the submission. Omitted on events emitted before this
+     * property was introduced; treat absent as 'main' for backfill.
+     */
+    surface?: 'main' | 'vercel'
     /**
      * The instance size selected in the project creation form.
      */
@@ -323,13 +360,28 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     useOrioleDb?: boolean
     /**
-     * Whether the tableEditorApiAccessToggle PostHog flag was enabled for this user,
-     * meaning the project was created with default public schema grants revoked.
-     * true = user is in the staged rollout cohort (revoke SQL ran at creation)
-     * false = user is outside the rollout (default grants left intact)
+     * Whether the tableEditorApiAccessToggle PostHog flag was enabled for this user.
+     * Gates the integrations → Data API settings surface only; no longer controls
+     * project-creation revoke behaviour (see dataApiRevokeOnCreateDefaultEnabled).
+     * true/false = flag state when project was created
      * omitted = PostHog flags had not loaded at the time of project creation
      */
     tableEditorApiAccessToggleEnabled?: boolean
+    /**
+     * Raw checkbox state for "Automatically expose new tables and functions" at submission.
+     * true = default privileges are granted on new entities (current behaviour)
+     * false = revoke SQL ran; user must manually grant access per entity
+     */
+    dataApiDefaultPrivilegesGranted?: boolean
+    /**
+     * Whether the dataApiRevokeOnCreateDefault PostHog flag was enabled for this user.
+     * Controls only the default checkbox state of "Automatically expose new tables and functions"
+     * at project creation. Tracking it lets us correlate flag cohort with user choice.
+     * true = user is in the staged rollout cohort (checkbox defaulted to unchecked)
+     * false = user is outside the rollout (checkbox defaulted to checked)
+     * omitted = PostHog flags had not loaded at the time of project creation
+     */
+    dataApiRevokeOnCreateDefaultEnabled?: boolean
   }
   groups: TelemetryGroups
 }
@@ -2016,7 +2068,7 @@ export interface DocumentViewButtonClickedEvent {
     /**
      * The name of the document being viewed, e.g. TIA, SOC2, Standard Security Questionnaire
      */
-    documentName: 'TIA' | 'SOC2' | 'Standard Security Questionnaire'
+    documentName: 'TIA' | 'SOC2' | 'ISO27001' | 'Standard Security Questionnaire'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -3178,6 +3230,7 @@ export type TelemetryEvent =
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
   | ProjectCreationRlsOptionExperimentExposedEvent
+  | ProjectCreationDefaultPrivilegesExposedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | TableApiAccessToggleClickedEvent
