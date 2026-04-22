@@ -1,18 +1,16 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
-import {
-  StyleSheet,
-  View,
-  Alert,
-  TextInput,
-  Text,
-  TouchableOpacity,
-} from "react-native";
-import { Session } from "@supabase/supabase-js";
+import { View, Alert, TextInput, Text, TouchableOpacity } from "react-native";
+import Avatar from "./Avatar";
 import { appStyles } from "../styles/styles";
 
-export default function Account({ session }: { session: Session }) {
+export default function Account({
+  userId,
+  email,
+}: {
+  userId: string;
+  email?: string;
+}) {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
   const [website, setWebsite] = useState("");
@@ -20,18 +18,17 @@ export default function Account({ session }: { session: Session }) {
   const styles = appStyles;
 
   useEffect(() => {
-    if (session) getProfile();
-  }, [session]);
+    if (userId) getProfile();
+  }, [userId]);
 
   async function getProfile() {
     try {
       setLoading(true);
-      if (!session?.user) throw new Error("No user on the session!");
 
-      const { data, error, status } = await supabase
+      let { data, error, status } = await supabase
         .from("profiles")
         .select(`username, website, avatar_url`)
-        .eq("id", session?.user.id)
+        .eq("id", userId)
         .single();
       if (error && status !== 406) {
         throw error;
@@ -62,25 +59,22 @@ export default function Account({ session }: { session: Session }) {
   }) {
     try {
       setLoading(true);
-      if (!session?.user) throw new Error("No user on the session!");
 
       const updates = {
-        id: session?.user.id,
+        id: userId,
         username,
         website,
         avatar_url,
         updated_at: new Date(),
       };
 
-      const { error } = await supabase.from("profiles").upsert(updates);
+      let { error } = await supabase.from("profiles").upsert(updates);
 
       if (error) {
         throw error;
-      } else {
-        Alert.alert('Profile updated successfully');
       }
     } catch (error: any) {
-      Alert.alert(error.message ?? String(error));
+      Alert.alert(error.message);
     } finally {
       setLoading(false);
     }
@@ -88,10 +82,20 @@ export default function Account({ session }: { session: Session }) {
 
   return (
     <View style={styles.container}>
+      <View>
+        <Avatar
+          size={200}
+          url={avatarUrl}
+          onUpload={(url: string) => {
+            setAvatarUrl(url);
+            updateProfile({ username, website, avatar_url: url });
+          }}
+        />
+      </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Text style={styles.label}>Email</Text>
         <TextInput
-          value={session?.user?.email}
+          value={email}
           readOnly
           style={[styles.input, styles.inputDisabled]}
         />

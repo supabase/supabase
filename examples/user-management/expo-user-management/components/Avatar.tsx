@@ -37,6 +37,7 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
       };
     } catch (error: any) {
         console.log("Error downloading image: ", error.message);
+      
     }
   }
 
@@ -81,8 +82,8 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
       }
 
       onUpload(data.path);
-    } catch (error) {
-      if (error instanceof Error) {
+    } catch (error: any) {
+      if (error) {
         Alert.alert(error.message);
       } else {
         throw error;
