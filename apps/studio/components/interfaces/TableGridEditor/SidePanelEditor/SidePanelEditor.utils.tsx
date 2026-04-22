@@ -1163,8 +1163,11 @@ export async function insertTableRows({
   const batchedPromises = chunk(tasks, 10)
   for (const batchedPromise of batchedPromises) {
     const res = await Promise.allSettled(batchedPromise.map((batch) => batch()))
-    const hasFailedBatch = find(res, { status: 'rejected' })
-    if (hasFailedBatch) break
+    const failedBatch = res.find((result) => result.status === 'rejected')
+    if (failedBatch?.status === 'rejected') {
+      if (insertError === undefined) insertError = failedBatch.reason
+      break
+    }
     onProgressUpdate(insertProgress * 100)
   }
 
