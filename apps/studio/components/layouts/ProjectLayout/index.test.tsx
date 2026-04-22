@@ -35,6 +35,7 @@ const {
       status: 'ACTIVE_HEALTHY',
       postgrestStatus: 'ONLINE',
       infra_compute_size: undefined as string | undefined,
+      integration_source: null as string | null,
     },
   },
   mockResourceWarningsState: { current: undefined as any[] | undefined },
@@ -236,6 +237,7 @@ describe('ProjectLayout title', () => {
       status: 'ACTIVE_HEALTHY',
       postgrestStatus: 'ONLINE',
       infra_compute_size: undefined,
+      integration_source: null,
     }
     mockBannerDismissedState.current = false
     mockUseLocalStorageQuery.mockImplementation(() => [mockBannerDismissedState.current, vi.fn()])
@@ -324,6 +326,7 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       status: 'ACTIVE_HEALTHY',
       postgrestStatus: 'ONLINE',
       infra_compute_size: 'nano',
+      integration_source: null,
     }
     mockResourceWarningsState.current = [
       {
@@ -346,6 +349,7 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       status: 'ACTIVE_HEALTHY',
       postgrestStatus: 'ONLINE',
       infra_compute_size: undefined,
+      integration_source: null,
     }
     mockResourceWarningsState.current = undefined
     mockBannerDismissedState.current = false
