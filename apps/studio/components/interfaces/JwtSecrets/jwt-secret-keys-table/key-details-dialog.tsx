@@ -2,6 +2,7 @@ import { FileKey } from 'lucide-react'
 import { useMemo } from 'react'
 import {
   Button,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -30,6 +31,9 @@ export function KeyDetailsDialog({
     <>
       <DialogHeader>
         <DialogTitle>Key Details</DialogTitle>
+        <DialogDescription className="sr-only">
+          Review this JWT signing key&apos;s identifier, discovery URL, and public key details.
+        </DialogDescription>
       </DialogHeader>
       <DialogSectionSeparator />
       <DialogSection className="flex flex-col gap-6">
