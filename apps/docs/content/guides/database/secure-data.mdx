@@ -7,18 +7,34 @@ Supabase helps you control access to your data. With access policies, you can pr
 
 ## Connecting your app securely
 
-Supabase allows you to access your database using the auto-generated [Data APIs](/docs/guides/database/connecting-to-postgres#data-apis). This speeds up the process of building web apps, since you don't need to write your own backend services to pass database queries and results back and forth.
+Supabase gives you several ways to access your data. Each option has a different security model:
 
-You can keep your data secure while accessing the Data APIs from the frontend, so long as you:
+### Data API
 
-- Turn on [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) for your tables
-- Use your Supabase **anon key** when you create a Supabase client
+Use Supabase client libraries, REST, or GraphQL with a publishable key. Protect exposed tables with [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) and grant only the privileges each role needs.
 
-Your anon key is safe to expose with RLS enabled, because row access permission is checked against your access policies and the user's [JSON Web Token (JWT)](/docs/learn/auth-deep-dive/auth-deep-dive-jwts). The JWT is automatically sent by the Supabase client libraries if the user is logged in using Supabase Auth.
+### Edge Functions
+
+Put custom server-side logic between your client and database with [Edge Functions](/docs/guides/functions). You can use secrets, service role keys, or database connection strings inside the function, and you can [disable the Data API](/docs/guides/database/data-api#disable-the-data-api-completely) if your app only accesses data this way.
+
+### Direct database connections
+
+Connect to Postgres with a connection string from trusted servers, workers, or tools. Keep database credentials secret and use the right [connection method](/docs/guides/database/connecting-to-postgres) for your environment. You can [disable the Data API](/docs/guides/database/data-api#disable-the-data-api-completely) if your app only uses direct connections.
+
+## Frontend access
+
+For frontend apps, the Data API is the usual choice. You can keep your data secure while accessing it from the frontend, so long as you:
+
+- Turn on [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) for your tables and properly configure your access policies to grant the least privileges necessary for your app to function
+- Use your Supabase **publishable key** when you create a Supabase client
+
+Your publishable key is safe to expose with RLS enabled, because row access permission is checked against your access policies and the user's [JSON Web Token (JWT)](/docs/learn/auth-deep-dive/auth-deep-dive-jwts). The JWT is automatically sent by the Supabase client libraries if the user is logged in using Supabase Auth.
+
+Older projects may also show an `anon` key. Treat it like a publishable key: it can identify your project, but it is not a secret and must be paired with RLS and least-privilege grants.
 
 <Admonition type="danger" label="Never expose your service role key on the frontend">
 
-Unlike your anon key, your **service role key** is **never** safe to expose because it bypasses RLS. Only use your service role key on the backend. Treat it as a secret (for example, import it as a sensitive environment variable instead of hardcoding it).
+Unlike your publishable key, your **service role key** is **never** safe to expose because it bypasses RLS. Only use your service role key on the backend. Treat it as a secret (for example, import it as a sensitive environment variable instead of hardcoding it).
 
 </Admonition>
 

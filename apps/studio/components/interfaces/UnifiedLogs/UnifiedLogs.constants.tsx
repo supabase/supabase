@@ -19,6 +19,7 @@ import {
 export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
 export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const
 export const LOG_TYPES = ['postgres', 'postgrest', 'auth', 'storage', 'edge function'] as const
+export const DEFAULT_LOG_TYPES = ['postgres', 'postgrest'] as const
 
 const parseAsSort = createParser({
   parse(queryValue: string) {
