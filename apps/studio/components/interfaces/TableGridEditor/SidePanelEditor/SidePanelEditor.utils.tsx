@@ -1167,7 +1167,42 @@ export async function insertTableRows({
     if (hasFailedBatch) break
     onProgressUpdate(insertProgress * 100)
   }
-  return { error: insertError }
+
+  if (insertError !== undefined) {
+    return { error: insertError }
+  }
+
+  const sequenceColumns = (table.columns ?? []).filter(
+    (column) =>
+      column.is_identity ||
+      (typeof column.default_value === 'string' && column.default_value.includes('nextval('))
+  )
+
+  if (sequenceColumns.length === 0) {
+    return { error: insertError }
+  }
+
+  const updateSequenceSQL = sequenceColumns
+    .map((column) =>
+      getUpdateIdentitySequenceSQL({
+        schema: table.schema,
+        table: table.name,
+        column: column.name,
+      })
+    )
+    .join(';\n')
+
+  try {
+    await executeSql({
+      projectRef,
+      connectionString,
+      sql: updateSequenceSQL,
+      queryKey: ['sequences', 'update-batch'],
+    })
+    return { error: insertError }
+  } catch (error) {
+    return { error }
+  }
 }
 
 const updateForeignKeys = async ({
