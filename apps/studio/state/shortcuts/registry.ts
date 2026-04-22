@@ -29,6 +29,19 @@ export const SHORTCUT_IDS = {
   OPERATION_QUEUE_TOGGLE: 'operation-queue.toggle',
   OPERATION_QUEUE_UNDO: 'operation-queue.undo',
   UNIFIED_LOGS_RESET_FOCUS: 'unified-logs.reset-focus',
+  NAV_HOME: 'nav.home',
+  NAV_TABLE_EDITOR: 'nav.table-editor',
+  NAV_SQL_EDITOR: 'nav.sql-editor',
+  NAV_DATABASE: 'nav.database',
+  NAV_AUTH: 'nav.auth',
+  NAV_STORAGE: 'nav.storage',
+  NAV_FUNCTIONS: 'nav.functions',
+  NAV_REALTIME: 'nav.realtime',
+  NAV_ADVISORS: 'nav.advisors',
+  NAV_OBSERVABILITY: 'nav.observability',
+  NAV_LOGS: 'nav.logs',
+  NAV_INTEGRATIONS: 'nav.integrations',
+  NAV_SETTINGS: 'nav.settings',
 } as const
 
 /**
@@ -180,5 +193,70 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     label: 'Reset focus in logs',
     sequence: ['Mod+.'],
     showInSettings: false,
+  },
+  [SHORTCUT_IDS.NAV_HOME]: {
+    id: SHORTCUT_IDS.NAV_HOME,
+    label: 'Go to Project Overview',
+    sequence: ['G', 'H'],
+  },
+  [SHORTCUT_IDS.NAV_TABLE_EDITOR]: {
+    id: SHORTCUT_IDS.NAV_TABLE_EDITOR,
+    label: 'Go to Table Editor',
+    sequence: ['G', 'T'],
+  },
+  [SHORTCUT_IDS.NAV_SQL_EDITOR]: {
+    id: SHORTCUT_IDS.NAV_SQL_EDITOR,
+    label: 'Go to SQL Editor',
+    sequence: ['G', 'S'],
+  },
+  [SHORTCUT_IDS.NAV_DATABASE]: {
+    id: SHORTCUT_IDS.NAV_DATABASE,
+    label: 'Go to Database',
+    sequence: ['G', 'D'],
+  },
+  [SHORTCUT_IDS.NAV_AUTH]: {
+    id: SHORTCUT_IDS.NAV_AUTH,
+    label: 'Go to Authentication',
+    sequence: ['G', 'A'],
+  },
+  [SHORTCUT_IDS.NAV_STORAGE]: {
+    id: SHORTCUT_IDS.NAV_STORAGE,
+    label: 'Go to Storage',
+    sequence: ['G', 'B'],
+  },
+  [SHORTCUT_IDS.NAV_FUNCTIONS]: {
+    id: SHORTCUT_IDS.NAV_FUNCTIONS,
+    label: 'Go to Edge Functions',
+    sequence: ['G', 'F'],
+  },
+  [SHORTCUT_IDS.NAV_REALTIME]: {
+    id: SHORTCUT_IDS.NAV_REALTIME,
+    label: 'Go to Realtime',
+    sequence: ['G', 'R'],
+  },
+  [SHORTCUT_IDS.NAV_ADVISORS]: {
+    id: SHORTCUT_IDS.NAV_ADVISORS,
+    label: 'Go to Advisors',
+    sequence: ['G', 'V'],
+  },
+  [SHORTCUT_IDS.NAV_OBSERVABILITY]: {
+    id: SHORTCUT_IDS.NAV_OBSERVABILITY,
+    label: 'Go to Observability',
+    sequence: ['G', 'O'],
+  },
+  [SHORTCUT_IDS.NAV_LOGS]: {
+    id: SHORTCUT_IDS.NAV_LOGS,
+    label: 'Go to Logs',
+    sequence: ['G', 'L'],
+  },
+  [SHORTCUT_IDS.NAV_INTEGRATIONS]: {
+    id: SHORTCUT_IDS.NAV_INTEGRATIONS,
+    label: 'Go to Integrations',
+    sequence: ['G', 'I'],
+  },
+  [SHORTCUT_IDS.NAV_SETTINGS]: {
+    id: SHORTCUT_IDS.NAV_SETTINGS,
+    label: 'Go to Project Settings',
+    sequence: ['G', ','],
   },
 }
