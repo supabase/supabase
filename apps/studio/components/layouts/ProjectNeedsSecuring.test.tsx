@@ -45,12 +45,14 @@ vi.mock('next/link', () => ({
     href,
     children,
     onClick,
+    ...props
   }: {
     href: string
     children: ReactNode
     onClick?: MouseEventHandler<HTMLAnchorElement>
+    [key: string]: unknown
   }) => (
-    <a href={href} onClick={onClick}>
+    <a href={href} onClick={onClick} {...props}>
       {children}
     </a>
   ),

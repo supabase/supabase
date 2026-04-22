@@ -12,7 +12,6 @@ import { StudioMobileSheetNav } from './Navigation/NavigationBar/StudioMobileShe
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
 import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
-import { ProjectNeedsSecuring } from './ProjectNeedsSecuring'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
 import { Sidebar } from '@/components/interfaces/Sidebar'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
@@ -96,34 +95,32 @@ export const DefaultLayout = ({
                   )}
                   <LayoutHeader headerTitle={headerTitle} backToDashboardURL={backToDashboardURL} />
                 </div>
-                <ProjectNeedsSecuring>
-                  {/* Main Content Area */}
-                  <div className="flex flex-1 w-full overflow-y-hidden">
-                    {/* Sidebar - Only show for project pages, not account pages */}
-                    {!router.pathname.startsWith('/account') && <Sidebar />}
-                    {/* Main Content with Layout Sidebar */}
-                    <ResizablePanelGroup
-                      orientation="horizontal"
-                      className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
-                      autoSaveId="default-layout-content"
+                {/* Main Content Area */}
+                <div className="flex flex-1 w-full overflow-y-hidden">
+                  {/* Sidebar - Only show for project pages, not account pages */}
+                  {!router.pathname.startsWith('/account') && <Sidebar />}
+                  {/* Main Content with Layout Sidebar */}
+                  <ResizablePanelGroup
+                    orientation="horizontal"
+                    className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
+                    autoSaveId="default-layout-content"
+                  >
+                    <ResizablePanel
+                      id="panel-content"
+                      className="w-full"
+                      minSize={`${contentMinSizePercentage}`}
+                      maxSize={`${contentMaxSizePercentage}`}
+                      defaultSize={`${contentMaxSizePercentage}`}
                     >
-                      <ResizablePanel
-                        id="panel-content"
-                        className="w-full"
-                        minSize={`${contentMinSizePercentage}`}
-                        maxSize={`${contentMaxSizePercentage}`}
-                        defaultSize={`${contentMaxSizePercentage}`}
-                      >
-                        <div className="h-full overflow-y-auto">{children}</div>
-                      </ResizablePanel>
-                      <LayoutSidebar
-                        minSize={`${100 - contentMaxSizePercentage}`}
-                        maxSize={`${100 - contentMinSizePercentage}`}
-                        defaultSize={`${100 - contentMaxSizePercentage}`}
-                      />
-                    </ResizablePanelGroup>
-                  </div>
-                </ProjectNeedsSecuring>
+                      <div className="h-full overflow-y-auto">{children}</div>
+                    </ResizablePanel>
+                    <LayoutSidebar
+                      minSize={`${100 - contentMaxSizePercentage}`}
+                      maxSize={`${100 - contentMinSizePercentage}`}
+                      defaultSize={`${100 - contentMaxSizePercentage}`}
+                    />
+                  </ResizablePanelGroup>
+                </div>
               </div>
 
               <BannerStack />
