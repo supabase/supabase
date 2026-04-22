@@ -114,6 +114,11 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
       ? parsedAmount
       : undefined
 
+  const isPreviewStale =
+    watchedAmount !== debouncedAmount ||
+    billingAddress !== debouncedAddress ||
+    billingTaxId !== debouncedTaxId
+
   const handleAddressChange = useCallback((address: CustomerAddress) => {
     setLatestAddress(address)
   }, [])
@@ -428,6 +433,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                   htmlType="submit"
                   type="primary"
                   loading={executingTopUp || paymentConfirmationLoading}
+                  disabled={isPreviewStale || creditPreviewIsFetching}
                 >
                   Top Up
                 </Button>
