@@ -13,6 +13,7 @@ import {
   Table2,
 } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { toast } from 'sonner'
 import {
   Button,
   cn,
@@ -20,6 +21,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Tooltip,
   TooltipContent,
@@ -28,9 +30,12 @@ import {
 
 import { useSchemaGraphContext } from './SchemaGraphContext'
 import { TableNodeData } from './Schemas.constants'
+import { getTableDefinitionAsMarkdown } from './Schemas.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import { getTableDefinition } from '@/data/database/table-definition-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { formatSql } from '@/lib/formatSql'
 
 // ReactFlow is scaling everything by the factor of 2
 export const TABLE_NODE_WIDTH = 320
@@ -128,16 +133,6 @@ export const TableNode = ({
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="flex items-center space-x-2 whitespace-nowrap"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            copyToClipboard(data.name)
-                          }}
-                        >
-                          <Copy size={12} />
-                          <span>Copy name</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="flex items-center space-x-2 whitespace-nowrap"
                           onClick={() =>
                             router.push(
                               buildTableEditorUrl({
@@ -150,6 +145,73 @@ export const TableNode = ({
                         >
                           <TableEditor size={12} />
                           <p>View in Table Editor</p>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="flex items-center space-x-2 whitespace-nowrap"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            copyToClipboard(data.name)
+                          }}
+                        >
+                          <Copy size={12} />
+                          <span>Copy name</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          key="copy-schema-sql"
+                          className="space-x-2"
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            const toastId = toast.loading('Getting table schema...')
+
+                            const formattedSchema = getTableDefinition({
+                              id: data.id,
+                              projectRef: project?.ref,
+                              connectionString: project?.connectionString,
+                            }).then((tableDefinition) => {
+                              if (!tableDefinition) {
+                                throw new Error('Failed to get table schema')
+                              }
+                              return formatSql(tableDefinition)
+                            })
+
+                            try {
+                              await copyToClipboard(formattedSchema, () => {
+                                toast.success('Table schema copied to clipboard', { id: toastId })
+                              })
+                            } catch (err) {
+                              toast.error(
+                                'Failed to copy schema: ' + ((err as Error).message || err),
+                                {
+                                  id: toastId,
+                                }
+                              )
+                            }
+                          }}
+                        >
+                          <Copy size={12} />
+                          <span>Copy as SQL</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          key="copy-schema-markdown"
+                          className="space-x-2"
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            const markdown = getTableDefinitionAsMarkdown(data)
+
+                            try {
+                              await copyToClipboard(markdown, () => {
+                                toast.success('Table schema copied to clipboard')
+                              })
+                            } catch (err) {
+                              toast.error(
+                                'Failed to copy schema: ' + ((err as Error).message || err)
+                              )
+                            }
+                          }}
+                        >
+                          <Copy size={12} />
+                          <span>Copy as Markdown</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

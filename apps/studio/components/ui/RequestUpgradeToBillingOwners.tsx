@@ -48,6 +48,7 @@ interface RequestUpgradeToBillingOwnersProps {
   /** Used in the default message template, e.g: "Upgrade to ..." */
   featureProposition?: string
   className?: string
+  type?: 'primary' | 'default'
 }
 
 export const RequestUpgradeToBillingOwners = ({
@@ -57,6 +58,7 @@ export const RequestUpgradeToBillingOwners = ({
   featureProposition,
   children,
   className,
+  type = 'primary',
 }: PropsWithChildren<RequestUpgradeToBillingOwnersProps>) => {
   const [open, setOpen] = useState(false)
   const track = useTrack()
@@ -121,10 +123,8 @@ export const RequestUpgradeToBillingOwners = ({
 
   const defaultValues = {
     note: !!addon
-      ? addon === 'spendCap'
-        ? `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
-        : `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
-      : `We'd like to upgrade to the ${plan} plan ${!!featureProposition ? ` to ${featureProposition} ` : ''}${target}`,
+      ? `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
+      : `We'd like to upgrade to the ${plan} plan ${!!featureProposition ? `to ${featureProposition} ` : ''}${target}`,
   }
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -162,7 +162,7 @@ export const RequestUpgradeToBillingOwners = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button block={block} type="primary" className={className}>
+        <Button block={block} type={type} className={className}>
           {buttonText}
         </Button>
       </DialogTrigger>

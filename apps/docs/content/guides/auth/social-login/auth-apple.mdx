@@ -534,7 +534,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     import Supabase
 
     struct SignInView: View {
-        let client = SupabaseClient(supabaseURL: URL(string: "your url")!, supabaseKey: "your anon key")
+        let client = SupabaseClient(supabaseURL: URL(string: "https://your-project-id.supabase.co")!, supabaseKey: "sb_publishable_...")
 
         var body: some View {
           SignInWithAppleButton { request in
