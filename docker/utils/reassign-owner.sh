@@ -5,6 +5,9 @@
 # Context and documentation:
 #   https://supabase.com/docs/guides/self-hosting/remove-superuser-access
 #
+# Credits:
+#   Original version by Inder Singh.
+#
 # Usage:
 #   sh utils/reassign-owner.sh
 #
