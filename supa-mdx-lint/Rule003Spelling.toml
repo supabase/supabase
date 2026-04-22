@@ -313,6 +313,7 @@ allow_list = [
     "postgres-meta",
     # We prefer Postgres, but check for vocabulary preference in a separate rule
     "PostgreSQL",
+    "PowerBI",
     "ProGuard",
     "PubSub",
     "Prisma",
