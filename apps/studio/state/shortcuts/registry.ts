@@ -10,11 +10,21 @@ import { ShortcutDefinition } from './types'
 export const SHORTCUT_IDS = {
   COMMAND_MENU_OPEN: 'command-menu.open',
   AI_ASSISTANT_TOGGLE: 'ai-assistant.toggle',
+  AI_ASSISTANT_CANCEL_EDIT: 'ai-assistant.cancel-edit',
   INLINE_EDITOR_TOGGLE: 'inline-editor.toggle',
   RESULTS_COPY_MARKDOWN: 'results.copy-markdown',
   RESULTS_COPY_JSON: 'results.copy-json',
   RESULTS_COPY_CSV: 'results.copy-csv',
   RESULTS_DOWNLOAD_CSV: 'results.download-csv',
+  DATA_TABLE_TOGGLE_FILTERS: 'data-table.toggle-filters',
+  DATA_TABLE_RESET_FILTERS: 'data-table.reset-filters',
+  DATA_TABLE_RESET_COLUMNS: 'data-table.reset-columns',
+  DATA_TABLE_TOGGLE_LIVE: 'data-table.toggle-live',
+  ACTION_BAR_SAVE: 'action-bar.save',
+  OPERATION_QUEUE_SAVE: 'operation-queue.save',
+  OPERATION_QUEUE_TOGGLE: 'operation-queue.toggle',
+  OPERATION_QUEUE_UNDO: 'operation-queue.undo',
+  UNIFIED_LOGS_RESET_FOCUS: 'unified-logs.reset-focus',
 } as const
 
 /**
@@ -78,5 +88,65 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     id: SHORTCUT_IDS.RESULTS_DOWNLOAD_CSV,
     label: 'Download results as CSV',
     sequence: ['Mod+Shift+D'],
+  },
+  [SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT]: {
+    id: SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT,
+    label: 'Cancel AI Assistant edit',
+    sequence: ['Mod+Escape'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS]: {
+    id: SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS,
+    label: 'Toggle data table filter controls',
+    sequence: ['Mod+B'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.DATA_TABLE_RESET_FILTERS]: {
+    id: SHORTCUT_IDS.DATA_TABLE_RESET_FILTERS,
+    label: 'Reset data table filters',
+    sequence: ['Mod+Escape'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS]: {
+    id: SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS,
+    label: 'Reset data table columns',
+    sequence: ['Mod+U'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE]: {
+    id: SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE,
+    label: 'Toggle live mode',
+    sequence: ['Mod+J'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.ACTION_BAR_SAVE]: {
+    id: SHORTCUT_IDS.ACTION_BAR_SAVE,
+    label: 'Save form',
+    sequence: ['Mod+Enter'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.OPERATION_QUEUE_SAVE]: {
+    id: SHORTCUT_IDS.OPERATION_QUEUE_SAVE,
+    label: 'Save pending table edits',
+    sequence: ['Mod+S'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.OPERATION_QUEUE_TOGGLE]: {
+    id: SHORTCUT_IDS.OPERATION_QUEUE_TOGGLE,
+    label: 'Toggle operation queue panel',
+    sequence: ['Mod+.'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.OPERATION_QUEUE_UNDO]: {
+    id: SHORTCUT_IDS.OPERATION_QUEUE_UNDO,
+    label: 'Undo latest table edit',
+    sequence: ['Mod+Z'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.UNIFIED_LOGS_RESET_FOCUS]: {
+    id: SHORTCUT_IDS.UNIFIED_LOGS_RESET_FOCUS,
+    label: 'Reset focus in logs',
+    sequence: ['Mod+.'],
+    showInSettings: false,
   },
 }
