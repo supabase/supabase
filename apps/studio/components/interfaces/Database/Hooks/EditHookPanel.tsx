@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { keyword } from '@supabase/pg-meta'
 import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
 import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
@@ -275,7 +276,11 @@ export const EditHookPanel = () => {
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           originalTrigger: selectedHook,
-          updatedTrigger: { ...payload, enabled_mode: 'ORIGIN' },
+          updatedTrigger: {
+            ...payload,
+            enabled_mode: 'ORIGIN',
+            events: payload.events.map(keyword),
+          },
         })
       }
     } catch (error) {

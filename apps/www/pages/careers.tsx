@@ -1,4 +1,10 @@
 import { GlobeAltIcon } from '@heroicons/react/outline'
+import Globe from '~/components/Globe'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import career from '~/data/career.json'
+import { filterGenericJob, groupJobsByTeam, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
+import Styles from '~/styles/career.module.css'
 import { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
@@ -7,14 +13,6 @@ import { useRouter } from 'next/router'
 import ReactMarkdown from 'react-markdown'
 import { Badge, Button, buttonVariants, cn, Separator } from 'ui'
 import { z } from 'zod'
-import Styles from '~/styles/career.module.css'
-
-import Globe from '~/components/Globe'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-
-import career from '~/data/career.json'
-import { filterGenericJob, groupJobsByTeam, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
 
 const ContributorSchema = z.object({
   login: z.string(),
@@ -137,9 +135,10 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                 >
                   <div className="hidden md:block border-t-[1px] lg:border-t-2 border-brand w-[60px] lg:w-[100px]"></div>
                   <h2 className="text-3xl lg:text-4xl pt-3 tracking-[-1px]">{company.number}</h2>
-                  <ReactMarkdown className="text-foreground-light text-sm lg:text-base">
-                    {company.text}
-                  </ReactMarkdown>
+
+                  <div className="text-foreground-light text-sm lg:text-base">
+                    <ReactMarkdown>{company.text}</ReactMarkdown>
+                  </div>
                 </div>
               )
             })}
@@ -387,7 +386,9 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   <div className="h-full flex items-start space-x-6 w-full" key={i}>
                     <div className="h-fit text-sm lg:text-base">
                       <h3 className="text-base">{benefits.title}</h3>
-                      <ReactMarkdown className="prose pt-1 text-sm">{benefits.text}</ReactMarkdown>
+                      <div className="prose pt-1 text-sm">
+                        <ReactMarkdown>{benefits.text}</ReactMarkdown>
+                      </div>
                     </div>
                   </div>
                 )

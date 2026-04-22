@@ -1,11 +1,20 @@
+import {
+  ident,
+  joinSqlFragments,
+  keyword,
+  literal,
+  safeSql,
+  type SafeSqlFragment,
+} from '../../../pg-format'
+
 type SimplifiedWrapperMeta = {
   handlerName: string
   validatorName: string
   server: { options: { name: string; encrypted: boolean }[] }
 }
 
-export const getFDWsSql = () => {
-  const sql = /* SQL */ `
+export const getFDWsSql = (): SafeSqlFragment => {
+  const sql = safeSql`
     select
       s.oid as "id",
       w.fdwname as "name",
@@ -58,20 +67,27 @@ export function getCreateFDWSql({
   }
   // If mode is skip, the wrapper will skip the last step, binding the schema/tables to foreign data. This could be done later.
   mode: 'tables' | 'schema' | 'skip'
-  tables: any[]
+  tables: {
+    is_new_schema: boolean
+    schema_name: string
+    table_name: string
+    columns: { name: string; type: string }[]
+  }[]
   sourceSchema: string
   targetSchema: string
-  schemaOptions?: string[]
-}) {
-  const newSchemasSql = tables
-    .filter((table) => table.is_new_schema)
-    .map((table) => /* SQL */ `create schema if not exists ${table.schema_name};`)
-    .join('\n')
+  schemaOptions?: SafeSqlFragment[]
+}): SafeSqlFragment {
+  const newSchemasSql = joinSqlFragments(
+    tables
+      .filter((table) => table.is_new_schema)
+      .map((table) => safeSql`create schema if not exists ${ident(table.schema_name)};`),
+    '\n'
+  )
 
-  const createWrapperSql = /* SQL */ `
-    create foreign data wrapper "${formState.wrapper_name}"
-    handler "${wrapperMeta.handlerName}"
-    validator "${wrapperMeta.validatorName}";
+  const createWrapperSql = safeSql`
+    create foreign data wrapper ${ident(formState.wrapper_name)}
+    handler ${ident(wrapperMeta.handlerName)}
+    validator ${ident(wrapperMeta.validatorName)};
   `
 
   const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
@@ -79,10 +95,9 @@ export function getCreateFDWSql({
 
   const createEncryptedKeysSqlArray = encryptedOptions.map((option) => {
     const key = `${formState.wrapper_name}_${option.name}`
-    // Escape single quotes in postgresql by doubling them up
-    const value = (formState[option.name] || '').replace(/'/g, "''")
+    const quotedValue = literal(formState[option.name] || '')
 
-    return /* SQL */ `
+    return safeSql`
       do $$
       begin
         -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
@@ -118,43 +133,53 @@ export function getCreateFDWSql({
           create extension if not exists pgsodium;
 
           perform pgsodium.create_key(
-            name := '${key}'
+            name := ${literal(key)}
           );
 
           perform vault.create_secret(
-            new_secret := '${value}',
-            new_name   := '${key}',
-            new_key_id := (select id from pgsodium.valid_key where name = '${key}')
+            new_secret := ${quotedValue},
+            new_name   := ${literal(key)},
+            new_key_id := (select id from pgsodium.valid_key where name = ${literal(key)})
           );
         else
           perform vault.create_secret(
-            new_secret := '${value}',
-            new_name := '${key}'
+            new_secret := ${quotedValue},
+            new_name := ${literal(key)}
           );
         end if;
       end $$;
     `
   })
 
-  const createEncryptedKeysSql = createEncryptedKeysSqlArray.join('\n')
+  const createEncryptedKeysSql = joinSqlFragments(createEncryptedKeysSqlArray, '\n')
 
   const encryptedOptionsSqlArray = encryptedOptions
     .filter((option) => formState[option.name])
-    .map((option) => `${option.name} ''%s''`)
+    .map((option) => safeSql`${ident(option.name)} ''%s''`)
   const unencryptedOptionsSqlArray = unencryptedOptions
     .filter((option) => formState[option.name])
-    // wrap all option names in double quotes to handle dots
-    // wrap all options values in single quotes, replace single quotes with 4 single quotes to escape them in SQL past the execute format
-    .map((option) => `"${option.name}" ''${formState[option.name].replace(/'/g, `''''`)}''`)
-  const optionsSqlArray = [...encryptedOptionsSqlArray, ...unencryptedOptionsSqlArray].join(',')
+    .map((option) => {
+      // literal() returns 'value' with single quotes. Escape those quotes for
+      // the surrounding E'...' string context ('' represents one ')
+      const escapedValue = literal(formState[option.name]).replace(/'/g, "''") as SafeSqlFragment
 
-  const createServerSql = /* SQL */ `
+      return safeSql`${ident(option.name)} ${escapedValue}`
+    })
+  const optionsSqlArray = joinSqlFragments(
+    [...encryptedOptionsSqlArray, ...unencryptedOptionsSqlArray],
+    ','
+  )
+
+  const createServerSql = safeSql`
     do $$
     declare
       -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
       -- we use Vault directly.
       is_using_old_wrappers bool;
-      ${encryptedOptions.map((option) => `v_${option.name} text;`).join('\n')}
+      ${joinSqlFragments(
+        encryptedOptions.map((option) => safeSql`${ident(`v_${option.name}`)} text;`),
+        '\n'
+      )}
     begin
       is_using_old_wrappers := (select extversion from pg_extension where extname = 'wrappers') in (
         '0.1.0',
@@ -184,65 +209,73 @@ export function getCreateFDWSql({
         '0.4.4',
         '0.4.5'
       );
-      ${encryptedOptions
-        .map(
-          (option) => /* SQL */ `
+      ${joinSqlFragments(
+        encryptedOptions.map(
+          (option) => safeSql`
               if is_using_old_wrappers then
-                select id into v_${option.name} from pgsodium.valid_key where name = '${formState.wrapper_name}_${option.name}' limit 1;
+                select id into ${ident(`v_${option.name}`)} from pgsodium.valid_key where name = ${literal(`${formState.wrapper_name}_${option.name}`)} limit 1;
               else
-                select id into v_${option.name} from vault.secrets where name = '${formState.wrapper_name}_${option.name}' limit 1;
+                select id into ${ident(`v_${option.name}`)} from vault.secrets where name = ${literal(`${formState.wrapper_name}_${option.name}`)} limit 1;
               end if;
             `
-        )
-        .join('\n')}
+        ),
+        '\n'
+      )}
     
       execute format(
-        E'create server "${formState.server_name}" foreign data wrapper "${formState.wrapper_name}" options (${optionsSqlArray});',
-        ${encryptedOptions
-          .filter((option) => formState[option.name])
-          .map((option) => `v_${option.name}`)
-          .join(',\n')}
+        E'create server ${ident(formState.server_name)} foreign data wrapper ${ident(formState.wrapper_name)} options (${optionsSqlArray});',
+        ${joinSqlFragments(
+          encryptedOptions
+            .filter((option) => formState[option.name])
+            .map((option) => ident(`v_${option.name}`)),
+          ','
+        )}
       );
     end $$;
   `
 
-  const createTablesSql = tables
-    .map((newTable) => {
-      const columns = newTable.columns as {
-        name: string
-        type: string
-      }[]
+  const createTablesSql = joinSqlFragments(
+    tables.map((newTable) => {
+      const columns = newTable.columns
 
-      return /* SQL */ `
-        create foreign table "${newTable.schema_name}"."${newTable.table_name}" (
-          ${columns.map((column) => `"${column.name}" ${column.type}`).join(',\n          ')}
+      return safeSql`
+        create foreign table ${ident(newTable.schema_name)}.${ident(newTable.table_name)} (
+          ${joinSqlFragments(
+            columns.map((column) => safeSql`${ident(column.name)} ${keyword(column.type)}`),
+            ','
+          )}
         )
-        server ${formState.server_name}
+        server ${ident(formState.server_name)}
         options (
-          ${Object.entries(newTable)
-            .filter(
-              ([key, value]) =>
-                key !== 'table_name' &&
-                key !== 'schema_name' &&
-                key !== 'columns' &&
-                key !== 'index' &&
-                key !== 'is_new_schema' &&
-                Boolean(value)
-            )
-            .map(([key, value]) => `${key} '${value}'`)
-            .join(',\n          ')}
+          ${joinSqlFragments(
+            Object.entries(newTable)
+              .filter(
+                ([key, value]) =>
+                  key !== 'table_name' &&
+                  key !== 'schema_name' &&
+                  key !== 'columns' &&
+                  key !== 'index' &&
+                  key !== 'is_new_schema' &&
+                  Boolean(value)
+              )
+              .map(([key, value]) => safeSql`${ident(key)} ${literal(value)}`),
+            ','
+          )}
         );
       `
-    })
-    .join('\n\n')
+    }),
+    '\n\n'
+  )
 
-  const options = [...schemaOptions, "strict 'true'"].join(', ')
+  const options = joinSqlFragments([...schemaOptions, safeSql`strict 'true'`], ', ')
 
-  const importForeignSchemaSql = /* SQL */ `
-  import foreign schema "${sourceSchema}" from server ${formState.server_name} into ${targetSchema} options (${options});
+  function createImportForeignSchemaSql(): SafeSqlFragment {
+    return safeSql`
+  import foreign schema ${ident(sourceSchema)} from server ${ident(formState.server_name)} into ${ident(targetSchema)} options (${options});
 `
+  }
 
-  const sql = /* SQL */ `
+  const sql = safeSql`
     ${newSchemasSql}
 
     ${createWrapperSql}
@@ -251,9 +284,9 @@ export function getCreateFDWSql({
 
     ${createServerSql}
 
-    ${mode === 'tables' ? createTablesSql : ''}
+    ${mode === 'tables' ? createTablesSql : safeSql``}
 
-    ${mode === 'schema' ? importForeignSchemaSql : ''}
+    ${mode === 'schema' ? createImportForeignSchemaSql() : safeSql``}
   `
 
   return sql
@@ -265,13 +298,13 @@ export const getDeleteFDWSql = ({
 }: {
   wrapper: { name: string }
   wrapperMeta: SimplifiedWrapperMeta
-}) => {
+}): SafeSqlFragment => {
   const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
 
   const deleteEncryptedSecretsSqlArray = encryptedOptions.map((option) => {
     const key = `${wrapper.name}_${option.name}`
 
-    return /* SQL */ `
+    return safeSql`
       do $$
       begin
         -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
@@ -304,20 +337,20 @@ export const getDeleteFDWSql = ({
           '0.4.4',
           '0.4.5'
         ) then
-          delete from vault.secrets where key_id = (select id from pgsodium.valid_key where name = '${key}');
+          delete from vault.secrets where key_id = (select id from pgsodium.valid_key where name = ${literal(key)});
 
-          delete from pgsodium.key where name = '${key}';
+          delete from pgsodium.key where name = ${literal(key)};
         else
-          delete from vault.secrets where name = '${key}';
+          delete from vault.secrets where name = ${literal(key)};
         end if;
       end $$;
     `
   })
 
-  const deleteEncryptedSecretsSql = deleteEncryptedSecretsSqlArray.join('\n')
+  const deleteEncryptedSecretsSql = joinSqlFragments(deleteEncryptedSecretsSqlArray, '\n')
 
-  const sql = /* SQL */ `
-    drop foreign data wrapper if exists "${wrapper.name}" cascade;
+  const sql = safeSql`
+    drop foreign data wrapper if exists ${ident(wrapper.name)} cascade;
 
     ${deleteEncryptedSecretsSql}
   `
@@ -335,7 +368,7 @@ export const getUpdateFDWSql = ({
   wrapperMeta: SimplifiedWrapperMeta
   formState: { [k: string]: string }
   tables: any[]
-}) => {
+}): SafeSqlFragment => {
   const deleteWrapperSql = getDeleteFDWSql({ wrapper, wrapperMeta })
   const createWrapperSql = getCreateFDWSql({
     wrapperMeta,
@@ -346,7 +379,7 @@ export const getUpdateFDWSql = ({
     targetSchema: '',
   })
 
-  const sql = /* SQL */ `
+  const sql = safeSql`
     ${deleteWrapperSql}
 
     ${createWrapperSql}
@@ -364,20 +397,26 @@ export function getImportForeignSchemaSql({
   serverName: string
   sourceSchema: string
   targetSchema: string
-  schemaOptions?: string[]
-}) {
-  const options = [...schemaOptions, "strict 'true'"].join(', ')
+  schemaOptions?: SafeSqlFragment[]
+}): SafeSqlFragment {
+  const options = joinSqlFragments([...schemaOptions, safeSql`strict 'true'`], ', ')
 
-  const sql = /* SQL */ `
-  import foreign schema "${sourceSchema}" from server ${serverName} into ${targetSchema} options (${options});
+  const sql = safeSql`
+  import foreign schema ${ident(sourceSchema)} from server ${ident(serverName)} into ${ident(targetSchema)} options (${options});
 `
 
   return sql
 }
 
-export function getDropForeignTableSql({ schema, table }: { schema: string; table: string }) {
-  const sql = /* SQL */ `
-drop foreign table if exists "${schema}"."${table}";
+export function getDropForeignTableSql({
+  schema,
+  table,
+}: {
+  schema: string
+  table: string
+}): SafeSqlFragment {
+  const sql = safeSql`
+drop foreign table if exists ${ident(schema)}.${ident(table)};
 `
 
   return sql

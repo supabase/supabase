@@ -4,7 +4,7 @@ import { useParams } from 'common'
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
-import JWTSettings from '@/components/interfaces/JwtSecrets/jwt-settings'
+import { JWTSettings } from '@/components/interfaces/JwtSecrets/jwt-settings'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from '@/components/interfaces/JwtSecrets/jwt.constants'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import JWTKeysLayout from '@/components/layouts/JWTKeys/JWTKeysLayout'

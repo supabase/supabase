@@ -1,3 +1,5 @@
+import { joinSqlFragments, literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
+
 export const getEntityTypesSQL = ({
   schemas,
   search,
@@ -6,17 +8,23 @@ export const getEntityTypesSQL = ({
   limit,
   page,
 }: {
-  schemas: string[]
+  schemas: Array<string>
   search?: string
   sort: 'alphabetical' | 'grouped-alphabetical'
-  filterTypes: string[]
+  filterTypes: Array<string>
   limit: number
   page: number
-}) => {
-  const innerOrderBy = sort === 'alphabetical' ? `c.relname asc` : `"type_sort" asc, c.relname asc`
-  const outerOrderBy = sort === 'alphabetical' ? `r.name asc` : `r.type_sort asc, r.name asc`
+}): SafeSqlFragment => {
+  const innerOrderBy =
+    sort === 'alphabetical' ? safeSql`c.relname asc` : safeSql`"type_sort" asc, c.relname asc`
+  const outerOrderBy =
+    sort === 'alphabetical' ? safeSql`r.name asc` : safeSql`r.type_sort asc, r.name asc`
 
-  const sql = /* SQL */ `
+  const typeList = joinSqlFragments(filterTypes.map(literal), ', ')
+  const schemaList = joinSqlFragments(schemas.map(literal), ', ')
+  const searchClause = search ? safeSql`and c.relname ilike ${literal(`%${search}%`)}` : safeSql``
+
+  return safeSql`
     with records as (
       select
         c.oid::int8 as "id",
@@ -37,7 +45,7 @@ export const getEntityTypesSQL = ({
         pg_namespace nc
         join pg_class c on nc.oid = c.relnamespace
       where
-        c.relkind in (${filterTypes.map((x) => `'${x}'`).join(', ')})
+        c.relkind in (${typeList})
         and not pg_is_other_temp_schema(nc.oid)
         and (
           pg_has_role(c.relowner, 'USAGE')
@@ -47,11 +55,11 @@ export const getEntityTypesSQL = ({
           )
           or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
         )
-        and nc.nspname in (${schemas.map((x) => `'${x}'`)})
-        ${search ? `and c.relname ilike '%${search}%'` : ''}
+        and nc.nspname in (${schemaList})
+        ${searchClause}
       order by ${innerOrderBy}
-      limit ${limit}
-      offset ${page * limit}
+      limit ${literal(limit)}
+      offset ${literal(page * limit)}
     )
     select
       jsonb_build_object(
@@ -69,7 +77,5 @@ export const getEntityTypesSQL = ({
         'count', coalesce(min(r.count), 0)
       ) "data"
     from records r;
-  `.trim()
-
-  return sql
+  `
 }

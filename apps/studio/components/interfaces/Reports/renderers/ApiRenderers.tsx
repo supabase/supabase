@@ -3,7 +3,7 @@ import { geoCentroid } from 'd3-geo'
 import sumBy from 'lodash/sumBy'
 import { ChevronRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { Fragment, useRef, useState } from 'react'
+import { Fragment, useRef, useState, type ReactNode } from 'react'
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
 import {
   Alert_Shadcn_,
@@ -576,7 +576,7 @@ export const RequestsByCountryMapRenderer = (
                     if (code) present.add(code)
                   }
 
-                  const markers: JSX.Element[] = []
+                  const markers: ReactNode[] = []
                   for (const iso2 in countsByIso2) {
                     const count = countsByIso2[iso2]
                     if (count <= 0) continue
