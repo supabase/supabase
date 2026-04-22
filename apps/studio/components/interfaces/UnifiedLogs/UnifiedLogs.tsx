@@ -51,9 +51,8 @@ import { TimelineChart } from '@/components/ui/DataTable/TimelineChart'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const CHART_CONFIG = {
   success: {
@@ -74,8 +73,7 @@ export const UnifiedLogs = () => {
   useResetFocus()
 
   const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
 
   const { sort, start, size, id, cursor, direction, live, ...filter } = search
@@ -309,11 +307,7 @@ export const UnifiedLogs = () => {
       setSearch({
         id: selectedRowId,
       })
-      sendEvent({
-        action: 'unified_logs_row_clicked',
-        properties: { logType: selectedRow.original.log_type },
-        groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
+      track('unified_logs_row_clicked', { logType: selectedRow.original.log_type })
       // Don't clear rowSelection here - let it persist to maintain the selection
     } else if (!selectedRowId && search.id) {
       // Clear the URL parameter when no row is selected
