@@ -95,8 +95,9 @@ export default function Account({
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Text style={styles.label}>Email</Text>
         <TextInput
-          value={email}
-          readOnly
+          value={email ?? ""}
+          editable={false}
+          selectTextOnFocus={false}
           style={[styles.input, styles.inputDisabled]}
         />
       </View>
