@@ -12,7 +12,7 @@ import {
   useReactFlow,
 } from '@xyflow/react'
 import { toPng, toSvg } from 'html-to-image'
-import { Check, Copy, Download, Loader2, Plus } from 'lucide-react'
+import { Check, ChevronDown, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -45,7 +45,11 @@ import { DefaultEdge } from './DefaultEdge'
 import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGraphContext'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { EdgeData, TableNodeData } from './Schemas.constants'
-import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
+import {
+  getGraphDataFromTables,
+  getLayoutedElementsViaDagre,
+  getSchemaAsMarkdown,
+} from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
 import { useExportSchemaToImage } from './useExportSchemaToImage'
 import AlertError from '@/components/ui/AlertError'
@@ -269,52 +273,85 @@ export const SchemaGraph = () => {
             />
             {!hasNoTables && (
               <div className="flex items-center gap-x-2">
-                <ButtonTooltip
-                  type="outline"
-                  icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
-                  onClick={() => {
-                    if (tables) {
-                      copyToClipboard(tablesToSQL(tables))
-                      setCopied(true)
-                    }
-                  }}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: (
-                        <div className="max-w-[180px] space-y-2 text-foreground-light">
-                          <p className="text-foreground">Note</p>
-                          <p>
-                            This schema is for context or debugging only. Table order and
-                            constraints may be invalid. Not meant to be run as-is.
-                          </p>
-                        </div>
-                      ),
-                    },
-                  }}
-                >
-                  Copy as SQL
-                </ButtonTooltip>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <ButtonTooltip
-                      aria-label="Download Schema"
-                      type="default"
-                      loading={isDownloading}
-                      className="px-1.5"
-                      icon={<Download />}
-                      tooltip={{ content: { side: 'bottom', text: 'Download current view' } }}
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-32">
-                    <DropdownMenuItem onClick={() => downloadImage('png')}>
-                      Download as PNG
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => downloadImage('svg')}>
-                      Download as SVG
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center gap-0">
+                  <ButtonTooltip
+                    type="default"
+                    className="rounded-r-none border-r-0"
+                    icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
+                    onClick={() => {
+                      if (tables) {
+                        copyToClipboard(tablesToSQL(tables))
+                        setCopied(true)
+                      }
+                    }}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: (
+                          <div className="max-w-[180px] space-y-2 text-foreground-light">
+                            <p className="text-foreground">Note</p>
+                            <p>
+                              This schema is for context or debugging only. Table order and
+                              constraints may be invalid. Not meant to be run as-is.
+                            </p>
+                          </div>
+                        ),
+                      },
+                    }}
+                  >
+                    Copy as SQL
+                  </ButtonTooltip>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="default"
+                        size="tiny"
+                        className="rounded-l-none pl-1 pr-0"
+                        icon={<ChevronDown size={12} />}
+                      >
+                        <span className="sr-only">Export options</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      <DropdownMenuItem
+                        className="flex items-center space-x-2 whitespace-nowrap"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          const tables = reactFlowInstance
+                            .getNodes()
+                            .filter((node) => node.type === 'table')
+                            .map((node) => node.data as TableNodeData)
+
+                          copyToClipboard(getSchemaAsMarkdown(selectedSchema, tables))
+                          setCopied(true)
+                        }}
+                      >
+                        <Copy size={12} />
+                        <span>Copy as Markdown</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="flex items-center space-x-2 whitespace-nowrap"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          downloadImage('png')
+                        }}
+                      >
+                        <Download size={12} />
+                        <span>Download as PNG</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="flex items-center space-x-2 whitespace-nowrap"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          downloadImage('svg')
+                        }}
+                      >
+                        <Download size={12} />
+                        <span>Download as SVG</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <ButtonTooltip

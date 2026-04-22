@@ -46,6 +46,23 @@ const FormSchema = z.object({
   DB_MAX_POOL_SIZE_UNIT: z.enum(['percent', 'connections']),
 })
 
+export const DatabaseFormSchema = z
+  .object({
+    DB_MAX_POOL_SIZE: z.coerce.number().min(1),
+    DB_MAX_POOL_SIZE_UNIT: z.enum(['percent', 'connections']),
+  })
+  .superRefine((data, ctx) => {
+    if (data.DB_MAX_POOL_SIZE_UNIT === 'percent') {
+      if (data.DB_MAX_POOL_SIZE < 1 || data.DB_MAX_POOL_SIZE > 100) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['DB_MAX_POOL_SIZE'],
+          message: 'Percentage must be between 1 and 100',
+        })
+      }
+    }
+  })
+
 export const PerformanceSettingsForm = () => {
   const { data: project } = useSelectedProjectQuery()
   const { hasAccess: hasAccessToPerformance, isLoading: isLoadingEntitlement } =
@@ -87,12 +104,7 @@ export const PerformanceSettingsForm = () => {
   })
 
   const databaseForm = useForm({
-    resolver: zodResolver(
-      z.object({
-        DB_MAX_POOL_SIZE: FormSchema.shape.DB_MAX_POOL_SIZE,
-        DB_MAX_POOL_SIZE_UNIT: FormSchema.shape.DB_MAX_POOL_SIZE_UNIT,
-      })
-    ),
+    resolver: zodResolver(DatabaseFormSchema),
     defaultValues: {
       DB_MAX_POOL_SIZE: 10,
       DB_MAX_POOL_SIZE_UNIT: 'connections',
@@ -375,12 +387,6 @@ export const PerformanceSettingsForm = () => {
                               <FormInputGroupInput
                                 type="number"
                                 {...field}
-                                min={3}
-                                max={
-                                  chosenUnit === 'percent'
-                                    ? 80
-                                    : Math.floor(maxConnectionLimit * 0.8)
-                                }
                                 disabled={!canUpdateConfig || promptUpgrade}
                               />
                               <InputGroupAddon align="inline-end">

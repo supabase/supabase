@@ -174,15 +174,14 @@ We'll create a database table called `todos` for storing tasks. This creates a c
 
     Find your API URL and Keys in your Dashboard [API Settings](/dashboard/project/_/settings/api). You can now query your "todos" table by appending `/rest/v1/todos` to the API URL.
 
-    Copy this block of code, substitute `<PROJECT_REF>` and `<ANON_KEY>`, then run it from a terminal.
+    Copy this block of code, substitute `<PROJECT_REF>` and `<PUBLISHABLE_KEY>`, then run it from a terminal.
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
       ```bash Terminal
       curl 'https://<PROJECT_REF>.supabase.co/rest/v1/todos' \
-      -H "apikey: <ANON_KEY>" \
-      -H "Authorization: Bearer <ANON_KEY>"
+      -H "apikey: <PUBLISHABLE_KEY>"
       ```
 
     </StepHikeCompact.Code>
@@ -197,9 +196,9 @@ There are several options for accessing your data:
 
 ### Browser
 
-You can query the route in your browser, by appending the `anon` key as a query parameter:
+You can query the route in your browser, by appending the `publishable` key as a query parameter:
 
-`https://<PROJECT_REF>.supabase.co/rest/v1/todos?apikey=<ANON_KEY>`
+`https://<PROJECT_REF>.supabase.co/rest/v1/todos?apikey=<PUBLISHABLE_KEY>`
 
 ### Client libraries
 
