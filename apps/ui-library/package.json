@@ -28,7 +28,7 @@
     "api-types": "workspace:*",
     "axios": "^1.12.0",
     "class-variance-authority": "*",
-    "cmdk": "^1.0.0",
+    "cmdk": "^1.1.1",
     "common": "workspace:*",
     "common-tags": "^1.8.2",
     "contentlayer2": "0.4.6",
