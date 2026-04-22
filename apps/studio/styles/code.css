@@ -7,7 +7,7 @@
     white-space: normal;
     word-break: break-word;
 
-    // overflow: auto !important;
+    /* overflow: auto !important; */
   }
 
   .token-line {
@@ -16,13 +16,13 @@
 
   .token.imports,
   .token.property-access {
-    @apply text-foreground-lighter #{!important};
+    @apply text-foreground-lighter !important;
   }
 
   .token.keyword.module,
   .token.function {
     font-style: normal !important;
-    @apply text-foreground-lighter #{!important};
+    @apply text-foreground-lighter !important;
   }
 
   .token.plain,
@@ -35,32 +35,32 @@
   .token.doc-comment.parameter.punctuation,
   .token.doc-comment.optional-parameter.punctuation {
     font-style: normal !important;
-    @apply text-foreground-light #{!important};
+    @apply text-foreground-light !important;
   }
 
   .token.keyword,
   .token.doc-comment.keyword {
     font-style: normal !important;
-    @apply text-blue-900 #{!important};
+    @apply text-blue-900 !important;
   }
 
   .token.string {
     font-style: normal !important;
-    @apply text-brand #{!important};
+    @apply text-brand !important;
   }
 
   .token.constant {
     font-style: normal !important;
-    @apply text-blue-900 #{!important};
+    @apply text-blue-900 !important;
   }
 
   .token.comment {
     font-style: normal !important;
-    @apply text-foreground-lighter #{!important};
+    @apply text-foreground-lighter !important;
   }
 
   .token.number {
-    @apply text-brand #{!important};
+    @apply text-brand !important;
   }
 
   .token.boolean,
@@ -134,7 +134,7 @@
   }
 
   .code-header {
-    // @apply bg-gray-600;
+    /* @apply bg-gray-600; */
     color: #ccc;
     padding: 5px 15px;
     border-radius: 4px 4px 0 0;

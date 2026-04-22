@@ -75,7 +75,7 @@ For a production deployment, consider using a 4096-bit key by adding `-pkeyopt r
 
 Add the following to your `.env` file:
 
-```sh
+```sh name=.env
 ############
 # SAML SSO
 ############
@@ -101,7 +101,7 @@ SAML_PRIVATE_KEY=<your-base64-encoded-private-key>
 
 In `docker-compose.yml`, add the SAML environment variables to the `auth` service. Auth expects the `GOTRUE_` prefix for all of its configuration variables:
 
-```yaml
+```yaml name=docker-compose.yml
 auth:
   environment:
     # ... existing variables ...

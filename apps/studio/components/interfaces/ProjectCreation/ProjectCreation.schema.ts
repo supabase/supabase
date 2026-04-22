@@ -34,6 +34,7 @@ export const FormSchema = z
     dbPassStrengthWarning: z.string().default(''),
     instanceSize: z.string().optional(),
     dataApi: z.boolean(),
+    dataApiDefaultPrivileges: z.boolean(),
     enableRlsEventTrigger: z.boolean(),
     postgresVersionSelection: z.string(),
     useOrioleDb: z.boolean(),

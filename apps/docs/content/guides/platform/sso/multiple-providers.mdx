@@ -1,0 +1,546 @@
+---
+title: 'Multiple SSO Providers'
+description: 'Configure multiple SSO providers for different environments, teams, or use cases'
+---
+
+Many enterprises need multiple single sign-on (SSO) providers configured within Supabase to support different environments, teams, or organizational structures. This guide explains when and how to set up multiple providers effectively.
+
+## Why multiple SSO providers?
+
+Common scenarios requiring multiple SSO providers include:
+
+- **Multiple environments**: Separate Dev, Staging, and Production organizations
+- **Team separation**: Different business units or departments
+- **Migration**: Transitioning from one identity provider to another
+- **Acquisitions**: Integrating subsidiaries with different identity systems
+- **Testing**: Isolated test environments alongside production
+
+## Key concept: IDP-initiated enables unlimited providers per domain
+
+The traditional challenge with multiple SAML apps is domain conflicts. With SP-initiated flow only, each SAML app requires a unique email domain. Since all your employees use the same domain (e.g., `company.com`), this creates a problem.
+
+**Solution:** Use identity provider (IdP)-initiated flow, which doesn't require domain configuration. You can create unlimited SAML apps under the same domain.
+
+<Admonition type="tip" label="Recommended pattern">
+
+Configure each environment as IdP-initiated only (no domains). Users access each environment through different app tiles in your identity provider.
+
+For technical details, see [the Understanding SSO Login Flows guide](/docs/guides/platform/sso/login-flows#multiple-saml-apps-per-domain).
+
+</Admonition>
+
+## Use case 1: Multiple environments (dev/staging/prod)
+
+This is the most common enterprise pattern and the primary use case for IDP-initiated flow.
+
+### The challenge
+
+You have three Supabase organizations:
+
+- Development (`dev-org`)
+- Staging (`staging-org`)
+- Production (`prod-org`)
+
+All employees use `company.com` email addresses. You need separate SSO configurations for each environment.
+
+### The solution
+
+Create three separate SAML apps in your identity provider, each pointing to a different Supabase organization.
+
+#### In your identity provider (Okta, Azure AD, Google Workspace)
+
+1. **Create "Supabase Dev" SAML app**
+   - Configure with Dev organization's ACS URL
+   - Assign developers and testers
+   - Deploy app tile labeled "Supabase Dev"
+
+2. **Create "Supabase Staging" SAML app**
+   - Configure with Staging organization's ACS URL
+   - Assign QA team and release managers
+   - Deploy app tile labeled "Supabase Staging"
+
+3. **Create "Supabase Production" SAML app**
+   - Configure with Production organization's ACS URL
+   - Assign production users only
+   - Deploy app tile labeled "Supabase Production"
+
+#### In each Supabase organization
+
+1. Navigate to [the **SSO** settings](/dashboard/org/_/sso) section of the dashboard
+2. Enable **Single Sign-On**
+3. Leave **Enable SP-initiated login** "OFF", this is critical
+4. Configure metadata from the corresponding IDP app
+5. Set up attribute mappings
+6. Configure auto-join if desired
+
+### Result
+
+- Users click the appropriate app tile for the environment they need
+- No domain conflicts (all apps use `company.com`)
+- Clean isolation between environments
+- Each environment can have different user assignments and roles
+
+### Configuration example
+
+Here's how the three configurations differ:
+
+| Environment | Organization | IDP App Name       | ACS URL                              |
+| ----------- | ------------ | ------------------ | ------------------------------------ |
+| Dev         | `dev`        | "Supabase Dev"     | `https://...dev-org.../saml/acs`     |
+| Staging     | `staging`    | "Supabase Staging" | `https://...staging-org.../saml/acs` |
+| Production  | `prod`       | "Supabase Prod"    | `https://...prod-org.../saml/acs`    |
+
+#### Each organization
+
+- SP-initiated: **OFF** (no domains configured)
+- IDP-initiated: **ON** (automatic, no configuration needed)
+- Auto-join: Your preference (typically enabled for dev, disabled for prod)
+
+## Use case 2: Different teams or business units
+
+Some organizations need to isolate teams within separate Supabase organizations.
+
+### Example scenario
+
+- Engineering team uses `engineering-org`
+- Data team uses `data-org`
+- Both teams have `company.com` emails
+
+### Configuration approach
+
+#### Option A: IDP-initiated with different app tiles
+
+Create separate SAML apps in your IDP:
+
+- "Supabase Engineering" → Points to `engineering-org`
+- "Supabase Data" → Points to `data-org`
+
+Assign appropriate users to each app. Users only see the tiles they're assigned to.
+
+#### Option B: Both IDP and SP-initiated with role-based routing
+
+Configure both organizations with SP-initiated enabled using the same domain:
+
+- Both organizations add `company.com` as a domain
+- Users can log in via SP-initiated at supabase.com
+- System routes based on org membership (first match wins)
+- Also provide IDP tiles for explicit routing
+
+<Admonition type="caution" label="SP-initiated routing with multiple providers">
+
+When multiple organizations use SP-initiated with the same domain, the first provider where the user is a member will be used. This can cause confusion. **IDP-initiated is recommended** for clarity.
+
+</Admonition>
+
+## Use case 3: Migration from one IDP to another
+
+When migrating from one identity provider to another, multiple providers help ensure a smooth transition.
+
+### Migration workflow
+
+#### Phase 1: Dual configuration
+
+1. Configure new IDP as additional SSO provider
+2. Keep existing IDP active
+3. Test new IDP with small group
+4. Both providers operational simultaneously
+
+#### Phase 2: Gradual rollout
+
+1. Migrate users in batches to new IDP
+2. Update app tile assignments
+3. Monitor for issues
+4. Keep old IDP as fallback
+
+#### Phase 3: Cutover
+
+1. Move all users to new IDP
+2. Verify no users depend on old IDP
+3. Disable (don't delete) old IDP provider
+4. Monitor for any issues
+
+#### Phase 4: Cleanup
+
+1. After verification period (1-2 weeks)
+2. Delete old IDP provider
+3. Update documentation
+
+<Admonition type="caution">
+
+Always maintain at least one non-SSO owner account during migrations to ensure you never lose access to the organization.
+
+</Admonition>
+
+## Use case 4: Acquisitions and subsidiaries
+
+Organizations with multiple email domains need provider configurations for each domain.
+
+### Example scenario
+
+- Parent company: `parent.com`
+- Subsidiary 1: `subsidiary1.com`
+- Subsidiary 2: `subsidiary2.com`
+
+All authenticate through the same central IDP but use different email domains.
+
+### Configuration approach
+
+#### Option A: Single provider with multiple domains (SP-initiated)
+
+1. Enable SSO with SP-initiated flow
+2. Add all domains: `parent.com`, `subsidiary1.com`, `subsidiary2.com`
+3. Configure single IDP metadata
+4. Users with any matching domain can log in via supabase.com
+
+#### Option B: Separate providers per subsidiary (IDP-initiated)
+
+1. Create separate SAML apps for each entity
+2. Configure as IDP-initiated only
+3. Assign users based on their subsidiary
+4. More isolation, clearer organization boundaries
+
+## Step-by-step setup guide
+
+### For IDP-initiated multi-environment pattern
+
+This is the recommended pattern for most enterprises.
+
+#### Step 1: Plan your environments
+
+Document:
+
+- Organization names and slugs
+- Environment purposes (dev, staging, prod)
+- Which users need access to which environments
+- Default roles for each environment
+
+#### Step 2: Create SAML apps in your IDP
+
+For each environment, follow your provider-specific guide to create a SAML app:
+
+- [Okta setup guide](/docs/guides/platform/sso/okta)
+- [Azure AD setup guide](/docs/guides/platform/sso/azure)
+- [Google Workspace setup guide](/docs/guides/platform/sso/gsuite)
+
+#### Naming convention example
+
+- "Supabase - Production"
+- "Supabase - Staging"
+- "Supabase - Development"
+
+Use consistent naming to help users identify the right environment.
+
+#### Step 3: Configure each Supabase organization
+
+For **each** organization:
+
+1. Navigate to [the **SSO** settings](/dashboard/org/_/sso) section of the dashboard
+2. Enable **Single Sign-On**
+3. Verify **Enable SP-initiated login** is "OFF"
+4. Upload or paste metadata from the corresponding IDP app
+5. Configure attribute mappings:
+   - Email (required): Map to `email`
+   - Name (optional): Map to `name` or `displayName`
+6. Configure auto-join settings:
+   - Dev: Usually enabled with "Developer" role
+   - Staging: Usually enabled with "Developer" role
+   - Prod: Usually disabled (explicit invitations only)
+7. Save configuration
+
+#### Step 4: Test each environment separately
+
+For each environment:
+
+1. Open your IDP dashboard (Okta, Azure, Google)
+2. Click the corresponding app tile
+3. Verify redirect to correct Supabase organization
+4. Check that user information is populated correctly
+5. Verify auto-join behavior (if enabled)
+
+See [the SSO Testing and Best Practices guide](/docs/guides/platform/sso/testing-best-practices) for comprehensive testing procedures.
+
+#### Step 5: Assign users in your IDP
+
+Configure app assignments in your IDP:
+
+- **Production**: Only production users (restrictive)
+- **Staging**: QA team, release managers, senior engineers
+- **Development**: All engineers and testers (permissive)
+
+Users only see app tiles they're assigned to.
+
+#### Step 6: Document and communicate
+
+Create documentation for your team:
+
+- Which app tile corresponds to which environment
+- Access request process for each environment
+- Naming conventions and organization structure
+- Emergency access procedures (non-SSO owner account)
+
+## User access management
+
+### IDP app assignment strategies
+
+#### Per-environment access control
+
+Control who can access each environment by managing app assignments in your IDP:
+
+```
+Engineering Team:
+├─ Supabase Dev (assigned) ✅
+├─ Supabase Staging (assigned) ✅
+└─ Supabase Prod (assigned) ✅
+
+QA Team:
+├─ Supabase Dev (assigned) ✅
+├─ Supabase Staging (assigned) ✅
+└─ Supabase Prod (NOT assigned) ❌
+
+Contractors:
+├─ Supabase Dev (assigned) ✅
+├─ Supabase Staging (NOT assigned) ❌
+└─ Supabase Prod (NOT assigned) ❌
+```
+
+### Role assignment patterns
+
+#### Option 1: Different default roles per environment
+
+- Dev: Auto-join with "Administrator" role (developers need full control)
+- Staging: Auto-join with "Developer" role
+- Prod: No auto-join, explicit invitations with "Read-only" or "Developer"
+
+#### Option 2: Consistent roles, manual promotion
+
+- All environments: Auto-join with "Developer" role
+- Promote to "Administrator" or "Owner" manually as needed
+- Provides consistent baseline, explicit elevation
+
+#### Option 3: No auto-join, explicit control
+
+- All environments: Auto-join disabled
+- Send explicit invitations with appropriate roles
+- Maximum control, more management overhead
+
+Choose based on your organization's security posture and operational preferences.
+
+## Best practices
+
+### Naming conventions
+
+#### IDP app names
+
+Use consistent, descriptive names that clearly indicate the environment:
+
+- ✅ "Supabase - Production"
+- ✅ "Supabase Prod"
+- ❌ "Supabase" (ambiguous)
+- ❌ "SUPA_PROD" (unclear abbreviation)
+
+#### Supabase organization names
+
+Match your IDP app names when possible:
+
+- IDP app: "Supabase - Production" → Org: `acme-production`
+- IDP app: "Supabase - Staging" → Org: `acme-staging`
+- IDP app: "Supabase - Dev" → Org: `acme-development`
+
+### Configuration synchronization
+
+Keep critical settings synchronized across environments:
+
+- **Attribute mappings**: Should be identical across all providers
+- **Certificate settings**: Coordinate renewals across all environments
+- **Safety accounts**: Each org needs a non-SSO owner account
+
+#### Configuration drift checklist
+
+- [ ] Attribute mappings match across environments
+- [ ] Certificate expiration dates documented for all providers
+- [ ] Non-SSO owner accounts exist in all organizations
+- [ ] Auto-join settings are intentional (not accidental)
+- [ ] Default roles appropriate for each environment
+
+### Testing in lower environments first
+
+Always test SSO changes in non-production environments:
+
+1. **Make change in Dev environment**
+2. **Test thoroughly** (see [testing guide](/docs/guides/platform/sso/testing-best-practices))
+3. **Deploy to Staging** and verify
+4. **Monitor for issues** (1-2 days)
+5. **Deploy to Production** during low-usage period
+6. **Monitor closely** after production deployment
+
+### Security considerations
+
+#### Environment isolation
+
+- Never reuse metadata between environments (security risk)
+- Each environment should have unique ACS URLs
+- Verify IDP app assignments are correct (don't give prod access accidentally)
+
+#### Access reviews
+
+- Quarterly review of who has access to production
+- Verify IDP app assignments are up to date
+- Remove access for users who have changed roles
+- Audit auto-join configurations (still appropriate?)
+
+#### Break-glass access
+
+Each organization must have at least one non-SSO owner account:
+
+- Create dedicated "break-glass" accounts
+- Store credentials in secure password manager
+- Test these accounts regularly (quarterly)
+- Document emergency access procedures
+
+## Troubleshooting
+
+### Users accessing the wrong environment
+
+#### Symptom
+
+User clicks "Supabase Prod" tile but sees the dev environment.
+
+#### Causes
+
+- Metadata configured incorrectly (swapped between environments)
+- ACS URL points to wrong organization
+- User has bookmarked the wrong organization
+
+#### Solution
+
+1. Verify ACS URL in IDP app configuration
+2. Compare metadata in Supabase SSO settings
+3. Check that organization slug matches expected environment
+4. Have user clear browser cookies and try again
+5. Verify user is clicking correct app tile
+
+### Configuration drift between environments
+
+#### Symptom
+
+SSO works in dev but fails in staging or production.
+
+#### Causes
+
+- Attribute mappings differ between providers
+- Certificate expired in one environment but not others
+- Domain configuration inconsistent (if using SP-initiated)
+
+#### Solution
+
+1. Compare SSO configurations side-by-side
+2. Check attribute mappings are identical
+3. Verify certificate expiration dates
+4. Test with same user account across all environments
+5. Review IDP audit logs for authentication failures
+
+### Users don't see expected app tiles
+
+#### Symptom
+
+User cannot find "Supabase Staging" tile in IDP dashboard.
+
+#### Causes
+
+- User not assigned to the app in IDP
+- App not deployed/published in IDP
+- User looking in wrong place (different IDP portal)
+
+#### Solution
+
+1. Verify app assignment in IDP admin console
+2. Check app is published/active
+3. Confirm user has logged out and back into IDP
+4. Verify user is checking correct IDP portal (some organizations have multiple)
+
+### Auto-join adding users to wrong organization
+
+#### Symptom
+
+User joins dev environment when they should join production.
+
+#### Cause
+
+User clicked wrong app tile, auto-join is enabled.
+
+#### Prevention
+
+- Disable auto-join in production (explicit invitations only)
+- Use clear app tile naming
+- Document which tile corresponds to which environment
+- Consider using different IDP groups for different environments
+
+#### Remediation
+
+1. Remove user from incorrect organization
+2. Send explicit invitation to correct organization
+3. Educate user on correct app tile to use
+4. Consider disabling auto-join to prevent recurrence
+
+### Multiple organizations with same domain (SP-initiated confusion)
+
+#### Symptom
+
+With SP-initiated enabled and same domain in multiple organizations, users get routed to unexpected organization.
+
+#### Cause
+
+SP-initiated routing uses first matching provider.
+
+#### Solution
+
+- **Recommended:** Switch to IDP-initiated only (disable SP-initiated)
+- Remove domain configuration from all but one organization
+- Provide clear IDP app tiles for explicit routing
+- Document which organization users should access via SP-initiated
+
+## Migration from single to multiple providers
+
+If you currently have a single SSO provider and need to add more:
+
+### Phase 1: Planning
+
+1. Decide which pattern to use (environments, teams, etc.)
+2. Document new organization structure
+3. Identify users for each environment
+4. Plan user communication strategy
+
+### Phase 2: Create new organizations
+
+1. Create additional Supabase organizations
+2. Configure projects within each organization
+3. Migrate data if needed (see [project transfer](/docs/guides/platform/project-transfer))
+
+### Phase 3: Configure SSO providers
+
+1. Create additional SAML apps in your IDP
+2. Configure SSO in each new organization
+3. Start with auto-join disabled
+4. Test with small group
+
+### Phase 4: Migrate users
+
+1. Communicate changes to users
+2. Assign users to appropriate IDP apps
+3. Test that users can access correct environments
+4. Enable auto-join if desired
+
+### Phase 5: Decommission old configuration (if applicable)
+
+1. Migrate all users to new structure
+2. Verify no one depends on old configuration
+3. Disable old SSO provider
+4. Monitor for issues
+5. Delete after verification period
+
+## Next steps
+
+- **Configure your IDP:** Follow your [provider-specific guide](/docs/guides/platform/sso#supported-providers)
+- **Test thoroughly:** Review [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices)
+- **Understand login flows:** Read [Understanding SSO Login Flows](/docs/guides/platform/sso/login-flows)
+- **Choose the right flow:** See [Choosing the Right Login Flow](/docs/guides/platform/sso/choosing-login-flow)
