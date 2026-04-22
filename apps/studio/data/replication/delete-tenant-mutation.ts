@@ -9,7 +9,7 @@ export type DeleteReplicationTenantParams = {
   projectRef: string
 }
 
-async function deleteReplicationTenant(
+export async function deleteReplicationTenant(
   { projectRef }: DeleteReplicationTenantParams,
   signal?: AbortSignal
 ) {
@@ -19,9 +19,7 @@ async function deleteReplicationTenant(
     params: { path: { ref: projectRef } },
     signal,
   })
-  if (error) {
-    handleError(error)
-  }
+  if (error) handleError(error)
 
   return data
 }
