@@ -7,10 +7,6 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import ChangePaymentMethodModal from './ChangePaymentMethodModal'
-import CreditCard from './CreditCard'
-import DeletePaymentMethodModal from './DeletePaymentMethodModal'
-import { StripePaymentConnection } from './StripePaymentConnection'
 import AddNewPaymentMethodModal from '@/components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import {
@@ -30,6 +26,9 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { getURL } from '@/lib/helpers'
+import ChangePaymentMethodModal from './ChangePaymentMethodModal'
+import CreditCard from './CreditCard'
+import DeletePaymentMethodModal from './DeletePaymentMethodModal'
 
 const PaymentMethods = () => {
   const { slug } = useParams()
@@ -69,17 +68,13 @@ const PaymentMethods = () => {
             <p className="text-foreground text-base m-0">Payment Methods</p>
             <p className="text-sm text-foreground-light mb-2 pr-4 m-0">
               {isStripeManagedOrganization
-                ? 'Billing for this organisation is handled through a connected Stripe payment token.'
+                ? 'Billing for this organisation is handled through Stripe Projects.'
                 : 'Payments for your subscription are made using the default card.'}
             </p>
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {isStripeManagedOrganization ? (
-            <StripePaymentConnection
-              status="connected" // TODO: derive from token status once API-917 lands
-            />
-          ) : selectedOrganization && isPartnerBilledOrganization ? (
+          {selectedOrganization && isPartnerBilledOrganization ? (
             <PartnerManagedResource
               managedBy={selectedOrganization?.managed_by}
               resource="Payment Methods"
@@ -128,23 +123,25 @@ const PaymentMethods = () => {
                   )}
                   <FormPanel
                     footer={
-                      <div className="flex items-center justify-between py-4 px-8">
-                        {!canUpdatePaymentMethods ? (
-                          <p className="text-sm text-foreground-light">
-                            You need additional permissions to manage payment methods
-                          </p>
-                        ) : (
-                          <div />
-                        )}
-                        <Button
-                          type="default"
-                          icon={<Plus />}
-                          disabled={!canUpdatePaymentMethods}
-                          onClick={() => setShowAddPaymentMethodModal(true)}
-                        >
-                          Add new card
-                        </Button>
-                      </div>
+                      !isStripeManagedOrganization ? (
+                        <div className="flex items-center justify-between py-4 px-8">
+                          {!canUpdatePaymentMethods ? (
+                            <p className="text-sm text-foreground-light">
+                              You need additional permissions to manage payment methods
+                            </p>
+                          ) : (
+                            <div />
+                          )}
+                          <Button
+                            type="default"
+                            icon={<Plus />}
+                            disabled={!canUpdatePaymentMethods}
+                            onClick={() => setShowAddPaymentMethodModal(true)}
+                          >
+                            Add new card
+                          </Button>
+                        </div>
+                      ) : undefined
                     }
                   >
                     <FormSection>
