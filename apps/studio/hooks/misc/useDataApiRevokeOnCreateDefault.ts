@@ -5,13 +5,10 @@ import { IS_TEST_ENV } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 /**
- * Controls the default state of the "Default privileges for new entities"
+ * Controls the default state of the "Automatically expose new tables and functions"
  * checkbox at project creation. When the flag is on, the checkbox defaults
  * to unchecked (i.e. revoke SQL runs). When off/absent, the checkbox defaults
  * to checked (current behaviour — default grants remain).
- *
- * Scoped to project-creation only. The existing `tableEditorApiAccessToggle`
- * flag continues to gate the integrations → Data API settings surface.
  */
 export const useDataApiRevokeOnCreateDefaultEnabled = (): boolean => {
   const flag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
