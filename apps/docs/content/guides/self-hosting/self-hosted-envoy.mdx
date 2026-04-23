@@ -14,6 +14,7 @@ This guide explains the architecture, configuration layout, and security posture
 - To enable opaque `sb_` key translation, complete [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys)
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ## Enabling the Envoy gateway
 
 The Envoy gateway is provided as a Docker Compose override. Start your stack with both the base compose file and the Envoy override:
@@ -80,8 +81,8 @@ All Envoy configuration lives in `./volumes/api/envoy/` (relative to the directo
 | File                   | Purpose                                                                                                                                                                                     |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `envoy.yaml`           | Bootstrap configuration. Points Envoy at the CDS and LDS files, configures the admin interface, and sets an overload manager limit on downstream connections.                               |
-| `cds.yaml`             | Cluster Discovery Service - upstream service definitions (DNS, ports, health checks, connect timeouts, circuit breakers).                                                       |
-| `lds.template.yaml`    | Listener Discovery Service template. Defines the listener, filter chain, routes, RBAC policy, and CORS policy. Contains placeholders for keys and credentials.                  |
+| `cds.yaml`             | Cluster Discovery Service - upstream service definitions (DNS, ports, health checks, connect timeouts, circuit breakers).                                                                   |
+| `lds.template.yaml`    | Listener Discovery Service template. Defines the listener, filter chain, routes, RBAC policy, and CORS policy. Contains placeholders for keys and credentials.                              |
 | `docker-entrypoint.sh` | Renders the LDS template into `lds.yaml` at container startup by substituting environment variables, computes a SHA1+base64 hash of `DASHBOARD_PASSWORD` for basic auth, then starts Envoy. |
 
 ### How the configuration is rendered at startup
@@ -221,7 +222,7 @@ The gateway is configured with these production-oriented settings:
 | `normalize_path: true`, `merge_slashes: true`         | Prevents path-confusion bypass of RBAC prefix rules                                                                                                                                                |
 | `path_with_escaped_slashes_action: REJECT_REQUEST`    | Rejects requests that contain URL-encoded slashes in the path                                                                                                                                      |
 | `use_remote_address: true`                            | Treats Envoy as an edge proxy: uses the peer connection IP as the trusted client address (rather than trusting client-supplied `X-Forwarded-For`) and strips untrusted `x-envoy-*` request headers |
-| `headers_with_underscores_action: REJECT_REQUEST`     | Blocks header smuggling attacks that exploit underscore-vs-hyphen normalization                                                                                                        |
+| `headers_with_underscores_action: REJECT_REQUEST`     | Blocks header smuggling attacks that exploit underscore-vs-hyphen normalization                                                                                                                    |
 | `per_connection_buffer_limit_bytes: 32768`            | Caps per-connection buffer memory to 32 KiB                                                                                                                                                        |
 | `max_active_downstream_connections: 30000`            | Overload manager limit on total downstream connections                                                                                                                                             |
 | Admin interface bound to `127.0.0.1:9901`             | The admin API is reachable only from inside the container, not from other containers or the host                                                                                                   |
