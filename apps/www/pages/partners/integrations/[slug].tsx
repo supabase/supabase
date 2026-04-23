@@ -346,9 +346,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const overview = await serialize({
     source: partner.overview,
     options: {
-      scope: {
-        chCodeConfig: codeHikeOptions,
-      },
       mdxOptions: {
         remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
       },

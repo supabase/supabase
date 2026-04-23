@@ -90,9 +90,7 @@ export async function mdxSerialize(source: string, options?: { tocDepth?: number
   const mdxSource = await serialize({
     source: preprocessedSource,
     options: {
-      blockJS: false,
       scope: {
-        chCodeConfig: codeHikeOptions,
         toc: { content: '', json: collectedToc },
       },
       mdxOptions: {
