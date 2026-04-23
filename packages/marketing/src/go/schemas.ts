@@ -137,17 +137,15 @@ export const formFieldSchema = z.discriminatedUnion('type', [
 // ----- Form CRM config schemas -----
 
 /**
- * Matches a 32-hex ID, optionally formatted as a dashed UUID. Used to validate
- * ID-shaped values (HubSpot formGuid, Notion database_id) that are interpolated
- * into outbound API URLs — the `crm` config travels over the server-action wire
- * and must be treated as untrusted input.
+ * Matches a UUID or a bare 32-char hex ID (Notion's database IDs often come
+ * without dashes). Used for values interpolated into outbound API URLs — the
+ * `crm` config travels over the server-action wire and must be treated as
+ * untrusted input.
  */
-const uuidLikeIdSchema = z
-  .string()
-  .regex(
-    /^(?:[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i,
-    'Must be a 32-character hex ID, optionally dashed (UUID format)'
-  )
+const uuidLikeIdSchema = z.union([
+  z.string().uuid(),
+  z.string().regex(/^[0-9a-f]{32}$/i, 'Must be a 32-character hex ID'),
+])
 
 export const hubspotFormConfigSchema = z.object({
   /**
