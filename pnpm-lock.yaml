@@ -2633,6 +2633,9 @@ importers:
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
+      tsx:
+        specifier: 'catalog:'
+        version: 4.20.3
       typescript:
         specifier: 'catalog:'
         version: 6.0.2

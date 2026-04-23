@@ -8,7 +8,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "typecheck": "tsc --noEmit",
-    "generate-demo-tailwind-classes": "node internals/tokens/generate-demo-tailwind-classes.js",
+    "generate-tailwind-classes": "tsx ./scripts/generate-tailwind-classes.ts",
     "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
     "test": "vitest",
     "test:ci": "vitest --run --coverage",
@@ -79,6 +79,7 @@
     "@vitest/coverage-v8": "catalog:",
     "config": "workspace:*",
     "tsconfig": "workspace:*",
+    "tsx": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
