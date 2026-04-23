@@ -349,7 +349,7 @@ const response = await fetch(`https://<project>.supabase.co/rest/v1/rpc/broadcas
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    -H "apikey: <PUBLISHABLE_KEY>"
+    -H "apikey: <SECRET_KEY>"
   },
   body: JSON.stringify({
     topic: 'room:lobby:messages',
