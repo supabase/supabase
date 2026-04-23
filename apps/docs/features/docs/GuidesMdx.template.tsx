@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Github } from 'lucide-react'
 import { type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 
@@ -62,7 +62,7 @@ type GuideTemplateProps =
 
 const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideTemplateProps) => {
   const hideToc = meta?.hideToc || meta?.hide_table_of_contents
-
+  console.log('GuideMDX.template.tsx', meta)
   return (
     <TocAnchorsProvider>
       <div className={'grid grid-cols-12 relative gap-4'}>
@@ -83,10 +83,24 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             <h1 className="mb-0 [&>p]:m-0">
               <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
             </h1>
+            {meta?.referenceLink && (
+              <div className="text-base font-mono text-foreground-light flex items-center gap-2">
+                {meta.referenceLinkLabel}
+                <a
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="hover:text-brand-link focus-visible:text-brand-link transition-colors"
+                  href={meta.referenceLink}
+                >
+                  <span className="sr-only">View on GitHub</span>
+                  <Github size={18} />
+                </a>
+              </div>
+            )}
             {meta?.subtitle && (
-              <h2 className="mt-3 text-xl text-foreground-light">
+              <div className="mt-3 text-base text-foreground-light">
                 <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
-              </h2>
+              </div>
             )}
             <hr className="not-prose border-t-0 border-b my-8" />
 

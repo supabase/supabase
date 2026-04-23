@@ -1,9 +1,17 @@
-import { mkdirSync, writeFileSync } from 'fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { join, dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { processSpec } from './process-tsdoc.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
+
+const CONFIG_PATH = join(__dirname, '../spec/enrichments/tsdoc_v2/config.json')
+const config: {
+  title?: string
+  subtitle?: string
+  referenceLink?: string
+  referenceLinkLabel?: string
+} = JSON.parse(readFileSync(CONFIG_PATH, 'utf-8'))
 
 function escapeMdxProse(text: string): string {
   // Escape { and } outside code blocks/spans so MDX doesn't treat them as JSX.
@@ -79,7 +87,18 @@ function generateExamplesBlock(examples: any[]): string[] {
 }
 
 function generateMdx(categories: ReturnType<typeof processSpec>): string {
-  const lines: string[] = ['---', 'title: JavaScript Client library', '---', '', '']
+  const fmVal = (v: string) => `"${v.replace(/"/g, '\\"')}"`
+  const frontmatter = [
+    '---',
+    `title: ${fmVal(config.title ?? 'Reference')}`,
+    ...(config.subtitle ? [`subtitle: ${fmVal(config.subtitle)}`] : []),
+    ...(config.referenceLink ? [`referenceLink: ${fmVal(config.referenceLink)}`] : []),
+    ...(config.referenceLinkLabel ? [`referenceLinkLabel: ${fmVal(config.referenceLinkLabel)}`] : []),
+    '---',
+    '',
+    '',
+  ]
+  const lines: string[] = frontmatter
 
   for (let i = 0; i < categories.length; i++) {
     const { category, definitions } = categories[i]

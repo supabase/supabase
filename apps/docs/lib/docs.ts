@@ -29,6 +29,8 @@ export type GuideFrontmatter = {
   /** @deprecated */
   hide_table_of_contents?: boolean
   tocVideo?: string
+  referenceLink?: string
+  referenceLinkLabel?: string
 }
 
 /**

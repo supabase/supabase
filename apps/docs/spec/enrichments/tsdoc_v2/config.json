@@ -1,0 +1,16 @@
+{
+    "title":"JavaScript Client library",
+"subtitle": "Use the `supabase-js` package to interact with your Postgres database, listen to database changes, invoke Deno Edge Functions, build login and user management functionality, and manage large files.",
+"referenceLink": "https://github.com/supabase/supabase-js",
+"referenceLinkLabel": "@supabase/supabase-js",
+    "versions": [
+        "v1",
+        "v2"
+    ],
+    "isLatestVersion": true,
+    "version": "v2",
+    "ignoreDefinitions": [
+        "constructor"
+    ],
+    "categoryOrder": [ "Initializing", "Database", "Auth", "Functions", "Realtime", "Storage" ]
+}

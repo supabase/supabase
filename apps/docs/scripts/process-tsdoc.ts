@@ -216,6 +216,17 @@ const SOURCE_FILES = [
 
 export function processSpec() {
   const specDir = join(__dirname, '../spec/enrichments/tsdoc_v2')
+
+  const config: { ignoreDefinitions?: string[]; categoryOrder?: string[] } = (() => {
+    try {
+      return JSON.parse(readFileSync(join(specDir, 'config.json'), 'utf-8'))
+    } catch {
+      return {}
+    }
+  })()
+  const ignoredNames = new Set(config.ignoreDefinitions ?? [])
+  const categoryOrder = config.categoryOrder ?? []
+
   const roots = SOURCE_FILES.map((f) => JSON.parse(readFileSync(join(specDir, f), 'utf-8')))
 
   // Build a per-file targetMap so IDs from different packages don't collide
@@ -239,6 +250,8 @@ export function processSpec() {
     const remarkTags = blockTags.filter((t) => t.tag === '@remarks')
     const examples = parseExamples(blockTags)
 
+    if (ignoredNames.has(decl.name)) continue
+
     const definition: any = {
       name: decl.name,
       description: contentToMd(decl.comment?.summary ?? []),
@@ -253,10 +266,20 @@ export function processSpec() {
     categoryMap.get(category)!.push(definition)
   }
 
-  const result = Array.from(categoryMap.entries()).map(([category, definitions]) => ({
-    category,
-    definitions,
-  }))
+  const result = Array.from(categoryMap.entries())
+    .map(([category, definitions]) => ({ category, definitions }))
+    .sort((a, b) => {
+      const ai = categoryOrder.indexOf(a.category)
+      const bi = categoryOrder.indexOf(b.category)
+      // Both in order list: sort by position
+      if (ai !== -1 && bi !== -1) return ai - bi
+      // Only a is in list: a goes first
+      if (ai !== -1) return -1
+      // Only b is in list: b goes first
+      if (bi !== -1) return 1
+      // Neither in list: preserve insertion order
+      return 0
+    })
 
   console.log(result)
 
