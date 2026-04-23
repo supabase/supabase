@@ -354,7 +354,7 @@ export const JWTSettings = () => {
             </form>
           </Form_Shadcn_>
 
-          {!isPending && !legacyKey && (
+          {!isPending && (disableLegacyJwtSecretRotation || !legacyKey) && (
             <>
               {isUpdatingJwtSecret && (
                 <div className="flex items-center space-x-2">
