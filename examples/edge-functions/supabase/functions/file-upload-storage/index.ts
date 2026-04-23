@@ -26,7 +26,7 @@ app.use(async (ctx) => {
   const supabaseClient = createClient(
     // Supabase API URL - env var exported by default.
     Deno.env.get('SUPABASE_URL')!,
-    // Supabase API ANON KEY - env var exported by default.
+    // Supabase publishable key - env var exported by default.
     Deno.env.get('SUPABASE_PUBLISHABLE_KEY')!
   )
 
