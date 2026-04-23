@@ -171,13 +171,35 @@ export const customerioFormConfigSchema = z.object({
   staticProperties: z.record(z.string(), z.unknown()).optional(),
 })
 
+export const notionFormConfigSchema = z.object({
+  /**
+   * Notion database ID to create a page in. The integration token is read
+   * from the NOTION_API_KEY env var and must have write access to the database.
+   */
+  database_id: z.string().min(1),
+  /**
+   * Map each form field `name` to a Notion database column name.
+   * Only fields listed here are sent. Property types (title, rich_text,
+   * email, etc.) are auto-detected from the database schema.
+   * Example: { email_address: 'email', first_name: 'first_name' }
+   */
+  columnMap: z.record(z.string(), z.string()).optional(),
+  /**
+   * Static properties merged into the Notion page. Keys must match column
+   * names in the target database.
+   * Example: { source: 'Website Go Page' }
+   */
+  staticProperties: z.record(z.string(), z.unknown()).optional(),
+})
+
 export const formCrmConfigSchema = z
   .object({
     hubspot: hubspotFormConfigSchema.optional(),
     customerio: customerioFormConfigSchema.optional(),
+    notion: notionFormConfigSchema.optional(),
   })
-  .refine((v) => v.hubspot || v.customerio, {
-    message: 'At least one CRM provider (hubspot or customerio) must be configured',
+  .refine((v) => v.hubspot || v.customerio || v.notion, {
+    message: 'At least one CRM provider (hubspot, customerio, or notion) must be configured',
   })
 
 export const formSectionSchema = z.object({
@@ -371,6 +393,7 @@ export type GoFormField = z.infer<typeof formFieldSchema>
 export type GoFormSection = z.infer<typeof formSectionSchema>
 export type GoHubSpotFormConfig = z.infer<typeof hubspotFormConfigSchema>
 export type GoCustomerIOFormConfig = z.infer<typeof customerioFormConfigSchema>
+export type GoNotionFormConfig = z.infer<typeof notionFormConfigSchema>
 export type GoFormCrmConfig = z.infer<typeof formCrmConfigSchema>
 export type GoFeatureGridItem = z.infer<typeof featureGridItemSchema>
 export type GoFeatureGridSection = z.infer<typeof featureGridSectionSchema>
