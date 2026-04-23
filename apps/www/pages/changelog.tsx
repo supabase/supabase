@@ -332,7 +332,9 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
                       </div>
                       <div className="col-span-8 ml-8 lg:ml-0 max-w-[calc(100vw-80px)]">
                         <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
-                          {'error' in entry.source ? null : ( // TODO: handle error
+                          {'error' in entry.source ? (
+                            <p>Error rendering changelog: {entry.source.error.message}</p>
+                          ) : (
                             <MDXClient {...entry.source} components={mdxComponents('blog')} />
                           )}
                         </article>

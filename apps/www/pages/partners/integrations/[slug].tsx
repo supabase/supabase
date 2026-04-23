@@ -190,7 +190,9 @@ function Partner({
                 </h2>
 
                 <div className="prose">
-                  {'error' in overview ? null : ( // TODO: handle error
+                  {'error' in overview ? (
+                    <p>Error rendering integration page: {overview.error.message}</p>
+                  ) : (
                     <MDXClient {...overview} components={mdxComponents(setFocusedImage)} />
                   )}
                 </div>

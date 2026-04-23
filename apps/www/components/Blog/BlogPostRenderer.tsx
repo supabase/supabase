@@ -244,7 +244,9 @@ const BlogPostRenderer = ({
                       {/* Use ReactMarkdown for LivePreview mode, MDXRemote for normal mode */}
                       {isLivePreview ? (
                         <ReactMarkdown>{livePreviewContent}</ReactMarkdown>
-                      ) : 'error' in blog.content ? null : ( // TODO: handle error
+                      ) : 'error' in blog.content ? (
+                        <p>Error rendering blog post: {blog.content.error.message}</p>
+                      ) : (
                         <MDXClient {...blog.content} components={mdxComponents('blog')} />
                       )}
                     </div>
