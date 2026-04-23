@@ -50,7 +50,7 @@ const EnableReplicationModal = () => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Enable External Replication</DialogTitle>
+          <DialogTitle>Enable external replication</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-y-2 !p-0">
