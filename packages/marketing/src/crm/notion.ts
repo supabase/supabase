@@ -48,7 +48,13 @@ export class NotionClient {
   private getSchema(databaseId: string): Promise<NotionDatabaseSchema> {
     let pending = this.schemaCache.get(databaseId)
     if (!pending) {
-      pending = this.request<NotionDatabaseSchema>(`/databases/${databaseId}`, 'GET')
+      // databaseId is validated at the schema layer, but encodeURIComponent
+      // keeps this safe as defense-in-depth if the client ever grows a caller
+      // that bypasses the zod boundary.
+      pending = this.request<NotionDatabaseSchema>(
+        `/databases/${encodeURIComponent(databaseId)}`,
+        'GET'
+      )
       this.schemaCache.set(databaseId, pending)
     }
     return pending
