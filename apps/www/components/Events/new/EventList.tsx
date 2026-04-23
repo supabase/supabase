@@ -83,7 +83,7 @@ export function EventList() {
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
-                      <h3 className="leading-3">{event.title}</h3>
+                      <h3 className="leading-snug">{event.title}</h3>
                       {event.isSpeaking && (
                         <Badge variant="success" className="flex items-center gap-1">
                           Speaking
