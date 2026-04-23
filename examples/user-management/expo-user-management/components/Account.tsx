@@ -88,7 +88,12 @@ export default function Account({ userId, email }: { userId: string; email?: str
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Text style={styles.label}>Email</Text>
-        <TextInput value={email} readOnly style={[styles.input, styles.inputDisabled]} />
+        <TextInput
+          value={email ?? ""}
+          editable={false}
+          selectTextOnFocus={false}
+          style={[styles.input, styles.inputDisabled]}
+        />
       </View>
       <View style={styles.verticallySpaced}>
         <Text style={styles.label}>Username</Text>
