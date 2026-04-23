@@ -43,11 +43,7 @@ export const TerminalInstructions = forwardRef<
   const { anonKey, publishableKey } = getKeys(apiKeys)
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
-  const invokeUrl = buildEdgeFunctionUrl(
-    'hello-world',
-    projectRef,
-    endpoint ? `https://${endpoint}` : undefined
-  )
+  const invokeUrl = buildEdgeFunctionUrl('hello-world', projectRef, endpoint)
 
   const commands: Commands[] = [
     {

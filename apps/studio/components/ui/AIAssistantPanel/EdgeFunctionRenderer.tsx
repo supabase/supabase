@@ -61,9 +61,10 @@ export const EdgeFunctionRenderer = ({
 
   const functionUrl = useMemo(() => {
     const endpoint = settings?.app_config?.endpoint
+    const protocol = settings?.app_config?.protocol ?? 'https'
     if (!endpoint || !ref || !functionName) return undefined
-    return buildEdgeFunctionUrl(functionName, ref, `https://${endpoint}`)
-  }, [settings?.app_config?.endpoint, ref, functionName])
+    return buildEdgeFunctionUrl(functionName, ref, `${protocol}://${endpoint}`)
+  }, [settings?.app_config?.endpoint, settings?.app_config?.protocol, ref, functionName])
 
   const deploymentDetailsUrl = useMemo(() => {
     if (!ref || !functionName) return undefined
