@@ -345,8 +345,6 @@ export interface paths {
     /**
      * List all projects
      * @description Returns a list of all projects you've previously created.
-     *
-     *     Use `/v1/organizations/{slug}/projects` instead when possible to get more precise results and pagination support.
      */
     get: operations['v1-list-all-projects']
     put?: never
@@ -1564,9 +1562,9 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Get project's just-in-time access configuration. */
+    /** [Beta] Get project's temporary access configuration. */
     get: operations['v1-get-jit-access-config']
-    /** [Beta] Update project's just-in-time access configuration. */
+    /** [Beta] Update project's temporary access configuration. */
     put: operations['v1-update-jit-access-config']
     post?: never
     delete?: never
@@ -3094,7 +3092,7 @@ export interface components {
      *     } */
     JitAccessRequestRequest: {
       /** @enum {string} */
-      state: 'enabled' | 'disabled' | 'unavailable'
+      state: 'enabled' | 'disabled'
     }
     JitAccessResponse: {
       /** Format: uuid */
@@ -4951,54 +4949,6 @@ export interface components {
       name?: string
       version: string
     }[]
-    V1ListProjectsPaginatedResponse: {
-      pagination: {
-        /** @description Total number of projects. Use this to calculate the total number of pages. */
-        count: number
-        /** @description Maximum number of projects per page (actual number may be less) */
-        limit: number
-        /** @description Number of projects skipped in this response */
-        offset: number
-      }
-      projects: {
-        cloud_provider: string
-        disk_volume_size_gb?: number
-        id: number
-        /** @enum {string} */
-        infra_compute_size?:
-          | 'pico'
-          | 'nano'
-          | 'micro'
-          | 'small'
-          | 'medium'
-          | 'large'
-          | 'xlarge'
-          | '2xlarge'
-          | '4xlarge'
-          | '8xlarge'
-          | '12xlarge'
-          | '16xlarge'
-          | '24xlarge'
-          | '24xlarge_optimized_memory'
-          | '24xlarge_optimized_cpu'
-          | '24xlarge_high_memory'
-          | '48xlarge'
-          | '48xlarge_optimized_memory'
-          | '48xlarge_optimized_cpu'
-          | '48xlarge_high_memory'
-        inserted_at: string | null
-        is_branch_enabled: boolean
-        is_physical_backups_enabled: boolean | null
-        name: string
-        organization_id: number
-        organization_slug: string
-        preview_branch_refs: string[]
-        ref: string
-        region: string
-        status: string
-        subscription_id: string | null
-      }[]
-    }
     V1OrganizationMemberResponse: {
       email?: string
       mfa_enabled: boolean
@@ -11208,7 +11158,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to retrieve project's JIT access config */
+      /** @description Failed to retrieve project's temporary access configuration. */
       500: {
         headers: {
           [name: string]: unknown
@@ -11262,7 +11212,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to update project's just-in-time access configuration. */
+      /** @description Failed to update project's temporary access configuration. */
       500: {
         headers: {
           [name: string]: unknown

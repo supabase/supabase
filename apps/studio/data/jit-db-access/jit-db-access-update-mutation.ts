@@ -7,7 +7,7 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type JitDbAccessUpdateVariables = {
   projectRef: string
-  requestedConfig: { state: 'enabled' | 'disabled' | 'unavailable' }
+  requestedConfig: { state: 'enabled' | 'disabled' }
 }
 
 async function updateJitDbAccess({ projectRef, requestedConfig }: JitDbAccessUpdateVariables) {

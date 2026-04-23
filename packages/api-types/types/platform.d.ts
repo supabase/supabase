@@ -5174,6 +5174,7 @@ export interface components {
           /** @enum {string|null} */
           billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
           id: number
+          integration_source: string | null
           is_owner: boolean
           name: string
           opt_in_tags: string[]
@@ -7690,6 +7691,7 @@ export interface components {
           type: 'PRIMARY' | 'READ_REPLICA'
         }[]
         inserted_at: string
+        integration_source: string | null
         is_branch: boolean
         name: string
         ref: string
@@ -7718,6 +7720,7 @@ export interface components {
       /** @enum {string|null} */
       billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
       id: number
+      integration_source: string | null
       is_owner: boolean
       name: string
       opt_in_tags: string[]
@@ -7789,6 +7792,7 @@ export interface components {
       billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
       has_oriole_project: boolean
       id: number
+      integration_source: string | null
       name: string
       opt_in_tags: string[]
       plan: {
@@ -8644,6 +8648,7 @@ export interface components {
         | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
       inserted_at: string
+      integration_source?: string | null
       is_branch_enabled: boolean
       is_physical_backups_enabled: boolean
       lastDatabaseResizeAt?: string
@@ -18132,6 +18137,7 @@ export interface operations {
           | 'security.audit_logs_days'
           | 'security.questionnaire'
           | 'security.soc2_report'
+          | 'security.iso27001_certificate'
           | 'security.private_link'
           | 'security.enforce_mfa'
           | 'log.retention_days'
