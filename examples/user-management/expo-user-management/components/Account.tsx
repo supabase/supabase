@@ -123,10 +123,7 @@ export default function Account({ userId, email }: { userId: string; email?: str
       </View>
 
       <View style={styles.verticallySpaced}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => supabase.auth.signOut()}
-        >
+        <TouchableOpacity style={styles.button} onPress={() => supabase.auth.signOut()}>
           <Text style={styles.buttonText}>Sign Out</Text>
         </TouchableOpacity>
       </View>
