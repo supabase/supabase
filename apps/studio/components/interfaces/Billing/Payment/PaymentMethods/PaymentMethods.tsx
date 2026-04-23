@@ -7,6 +7,9 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import ChangePaymentMethodModal from './ChangePaymentMethodModal'
+import CreditCard from './CreditCard'
+import DeletePaymentMethodModal from './DeletePaymentMethodModal'
 import AddNewPaymentMethodModal from '@/components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import {
@@ -26,9 +29,6 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { getURL } from '@/lib/helpers'
-import ChangePaymentMethodModal from './ChangePaymentMethodModal'
-import CreditCard from './CreditCard'
-import DeletePaymentMethodModal from './DeletePaymentMethodModal'
 
 const PaymentMethods = () => {
   const { slug } = useParams()
