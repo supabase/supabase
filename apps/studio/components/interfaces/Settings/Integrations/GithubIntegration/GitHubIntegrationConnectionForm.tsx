@@ -582,12 +582,24 @@ export const GitHubIntegrationConnectionForm = ({
                         <FormItemLayout
                           layout="flex-row-reverse"
                           label="Working directory"
-                          description="Path to working directory with your supabase folder"
+                          description={
+                            <>
+                              <span>
+                                Relative path to the directory that contains your <code>supabase</code>{' '}
+                                folder (not the <code>supabase</code> folder itself).
+                              </span>
+                              <span className="mt-1 block">
+                                For example, enter <code>.</code> if <code>supabase/</code> is at the
+                                repository root, or a path like <code>apps/web</code> if your layout
+                                is <code>apps/web/supabase/</code>.
+                              </span>
+                            </>
+                          }
                         >
                           <FormControl_Shadcn_>
                             <Input_Shadcn_
                               {...field}
-                              placeholder="supabase"
+                              placeholder="."
                               autoComplete="off"
                               disabled={!canUpdateGitHubConnection}
                             />
