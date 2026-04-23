@@ -45,7 +45,7 @@ const AiIconAnimationComponent = ({
 
   const outerVariants = {
     rest: { rotate: 0 },
-    loading: { rotate: 360 },
+    loading: { rotate: [0, 360] },
     hover: { rotate: 10 },
   }
 
@@ -92,6 +92,7 @@ const AiIconAnimationComponent = ({
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
+          initial="rest"
           animate={loading ? 'loading' : isHovering ? 'hover' : 'rest'}
           variants={outerVariants}
           transition={{
@@ -107,6 +108,7 @@ const AiIconAnimationComponent = ({
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
+          initial="rest"
           variants={innerVariants}
           animate={isHovering ? 'hover' : loading ? 'loading' : 'rest'}
           style={{ x: springX, y: springY }}
