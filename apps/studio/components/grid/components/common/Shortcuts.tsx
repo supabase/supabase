@@ -1,7 +1,11 @@
 import { RefObject } from 'react'
 import type { DataGridHandle } from 'react-data-grid'
 
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import { useTableFilterNew } from '@/components/grid/hooks/useTableFilterNew'
+import { useTableSort } from '@/components/grid/hooks/useTableSort'
 import { SupaRow } from '@/components/grid/types'
+import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
@@ -14,6 +18,9 @@ type ShortcutsProps = {
 export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
   const snap = useTableEditorTableStateSnapshot()
   const canStartNavigation = !snap.selectedCellPosition && rows.length > 0
+
+  const { filters, clearFilters } = useTableFilterNew()
+  const { sorts, onApplySorts } = useTableSort()
 
   const startGridNavigation = () => {
     const frozenColumns = snap.gridColumns.filter((x) => x.frozen)
@@ -98,6 +105,35 @@ export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
       enabled: !!snap.selectedCellPosition,
     }
   )
+
+  useShortcut(
+    SHORTCUT_IDS.TABLE_EDITOR_FOCUS_FILTERS,
+    () => {
+      const input = document.querySelector<HTMLInputElement>(
+        '[data-testid="filter-bar-freeform-input"]'
+      )
+      input?.focus()
+    },
+    {
+      registerInCommandMenu: true,
+    }
+  )
+
+  useShortcut(
+    SHORTCUT_IDS.TABLE_EDITOR_CLEAR_FILTERS,
+    () => {
+      clearFilters()
+    },
+    {
+      registerInCommandMenu: true,
+      enabled: filters.length > 0,
+    }
+  )
+
+  useShortcut(SHORTCUT_IDS.TABLE_EDITOR_CLEAR_SORT, () => onApplySorts([]), {
+    registerInCommandMenu: true,
+    enabled: sorts.length > 0,
+  })
 
   return null
 }
