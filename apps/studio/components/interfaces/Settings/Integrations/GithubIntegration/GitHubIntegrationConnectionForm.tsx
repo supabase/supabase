@@ -137,6 +137,13 @@ export const GitHubIntegrationConnectionForm = ({
       onSuccess: () => {
         toast.success('GitHub integration successfully updated')
       },
+      onError: (error) => {
+        // Don't show error toast when connection already exists - the branch
+        // settings update will still proceed and show its own success toast
+        if (!error.message?.includes('already exists')) {
+          toast.error(`Failed to create GitHub connection: ${error.message}`)
+        }
+      },
     })
 
   const { mutateAsync: deleteConnection, isPending: isDeletingConnection } =

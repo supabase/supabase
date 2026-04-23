@@ -92,7 +92,6 @@ export const RestoreToNewProject = () => {
       enabled: PHYSICAL_BACKUPS_ENABLED || PITR_ENABLED,
     }
   )
-  const IS_CLONED_PROJECT = cloneStatus?.cloned_from?.source_project?.ref ? true : false
   const isLoading = !isPermissionsLoaded || cloneBackupsLoading || cloneStatusLoading
 
   useEffect(() => {
@@ -184,22 +183,6 @@ export const RestoreToNewProject = () => {
 
   if (isLoading) {
     return <GenericSkeletonLoader />
-  }
-
-  if (IS_CLONED_PROJECT) {
-    return (
-      <Admonition type="default" title="This project cannot be restored to a new project">
-        <Markdown
-          className="max-w-full [&>p]:!leading-normal"
-          content={`This is a temporary limitation whereby projects that were originally restored from another project cannot be restored to yet another project.`}
-        />
-        <Button asChild type="default">
-          <Link href={`/project/${cloneStatus?.cloned_from?.source_project?.ref || ''}`}>
-            Go to original project
-          </Link>
-        </Button>
-      </Admonition>
-    )
   }
 
   if (isError) {

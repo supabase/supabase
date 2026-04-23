@@ -429,7 +429,7 @@
     },
     "/v1/projects": {
       "get": {
-        "description": "Returns a list of all projects you've previously created.\n\nUse `/v1/organizations/{slug}/projects` instead when possible to get more precise results and pagination support.",
+        "description": "Returns a list of all projects you've previously created.",
         "operationId": "v1-list-all-projects",
         "parameters": [],
         "responses": {
@@ -443,7 +443,10 @@
                 }
               }
             }
-          }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["projects_read"] }],
         "summary": "List all projects",
@@ -467,7 +470,10 @@
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/V1ProjectResponse" } }
             }
-          }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["organization_projects_create"] }],
         "summary": "Create a project",
@@ -563,6 +569,9 @@
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Unexpected error listing organizations" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["organizations_read"] }],
@@ -592,6 +601,9 @@
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Unexpected error creating an organization" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["organizations_create"] }],
@@ -802,7 +814,12 @@
             "schema": { "example": "S256", "type": "string", "enum": ["plain", "sha256", "S256"] }
           }
         ],
-        "responses": { "204": { "description": "" } },
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
         "security": [
           { "bearer": [] },
           { "fga_permissions": ["organization_admin_write", "project_admin_write"] }
@@ -856,6 +873,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/SnippetList" } }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list user's SQL snippets" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["snippets_read"] }],
@@ -888,6 +908,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/SnippetResponse" } }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve SQL snippet" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["snippets_read"] }],
@@ -1540,9 +1563,6 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve database branches" }
         },
         "security": [
@@ -1587,9 +1607,6 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create database branch" }
         },
         "security": [
@@ -1668,9 +1685,6 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to fetch database branch" }
         },
         "security": [
@@ -7141,6 +7155,9 @@
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve projects" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["organization_projects_read"] }],
@@ -7350,92 +7367,6 @@
         "type": "object",
         "properties": { "message": { "type": "string", "enum": ["Branch restoration initiated"] } },
         "required": ["message"]
-      },
-      "V1ListProjectsPaginatedResponse": {
-        "type": "object",
-        "properties": {
-          "projects": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": { "type": "number" },
-                "cloud_provider": { "type": "string" },
-                "inserted_at": { "type": "string", "nullable": true },
-                "name": { "type": "string" },
-                "organization_id": { "type": "number" },
-                "organization_slug": { "type": "string" },
-                "ref": { "type": "string" },
-                "region": { "type": "string" },
-                "status": { "type": "string" },
-                "subscription_id": { "type": "string", "nullable": true },
-                "is_branch_enabled": { "type": "boolean" },
-                "is_physical_backups_enabled": { "type": "boolean", "nullable": true },
-                "preview_branch_refs": { "type": "array", "items": { "type": "string" } },
-                "disk_volume_size_gb": { "type": "number" },
-                "infra_compute_size": {
-                  "type": "string",
-                  "enum": [
-                    "pico",
-                    "nano",
-                    "micro",
-                    "small",
-                    "medium",
-                    "large",
-                    "xlarge",
-                    "2xlarge",
-                    "4xlarge",
-                    "8xlarge",
-                    "12xlarge",
-                    "16xlarge",
-                    "24xlarge",
-                    "24xlarge_optimized_memory",
-                    "24xlarge_optimized_cpu",
-                    "24xlarge_high_memory",
-                    "48xlarge",
-                    "48xlarge_optimized_memory",
-                    "48xlarge_optimized_cpu",
-                    "48xlarge_high_memory"
-                  ]
-                }
-              },
-              "required": [
-                "id",
-                "cloud_provider",
-                "inserted_at",
-                "name",
-                "organization_id",
-                "organization_slug",
-                "ref",
-                "region",
-                "status",
-                "subscription_id",
-                "is_branch_enabled",
-                "is_physical_backups_enabled",
-                "preview_branch_refs"
-              ]
-            }
-          },
-          "pagination": {
-            "type": "object",
-            "properties": {
-              "count": {
-                "type": "number",
-                "description": "Total number of projects. Use this to calculate the total number of pages."
-              },
-              "limit": {
-                "type": "number",
-                "description": "Maximum number of projects per page (actual number may be less)"
-              },
-              "offset": {
-                "type": "number",
-                "description": "Number of projects skipped in this response"
-              }
-            },
-            "required": ["count", "limit", "offset"]
-          }
-        },
-        "required": ["projects", "pagination"]
       },
       "V1ProjectWithDatabaseResponse": {
         "type": "object",

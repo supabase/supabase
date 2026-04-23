@@ -65,12 +65,12 @@ jobs:
       - uses: supabase/embeddings-generator@v0.0.x # Update this to the latest version.
         with:
           supabase-url: 'https://your-project-ref.supabase.co' # Update this to your project URL.
-          supabase-service-role-key: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          supabase-secret-key: ${{ secrets.SUPABASE_SECRET_KEY }}
           openai-key: ${{ secrets.OPENAI_API_KEY }}
           docs-root-path: 'docs' # the path to the root of your md(x) files
 ```
 
-Make sure to choose the latest version, and set your `SUPABASE_SERVICE_ROLE_KEY` and `OPENAI_API_KEY` as repository secrets in your repo settings (settings > secrets > actions).
+Make sure to choose the latest version, and set your `SUPABASE_SECRET_KEY` and `OPENAI_API_KEY` as repository secrets in your repo settings (settings > secrets > actions).
 
 ### Add a search interface
 
