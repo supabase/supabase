@@ -26,6 +26,7 @@ import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { getTotalCreditBalanceCents } from './helpers'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
@@ -33,7 +34,6 @@ import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organi
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLatest } from '@/hooks/misc/useLatest'
-import { getTotalCreditBalanceCents } from './helpers'
 
 const FORM_ID = 'credit-code-redemption'
 
