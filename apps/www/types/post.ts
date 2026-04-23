@@ -1,4 +1,4 @@
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
+import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client/serialize'
 
 import type { getSortedPosts } from '@/lib/posts'
 

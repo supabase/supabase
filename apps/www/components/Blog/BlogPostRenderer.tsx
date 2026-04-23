@@ -2,8 +2,7 @@
 
 import dayjs from 'dayjs'
 import { ChevronLeft } from 'lucide-react'
-import { MDXRemote } from 'next-mdx-remote'
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { MDXClient } from 'next-mdx-remote-client/csr'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -245,11 +244,8 @@ const BlogPostRenderer = ({
                       {/* Use ReactMarkdown for LivePreview mode, MDXRemote for normal mode */}
                       {isLivePreview ? (
                         <ReactMarkdown>{livePreviewContent}</ReactMarkdown>
-                      ) : (
-                        <MDXRemote
-                          {...(blog.content as MDXRemoteSerializeResult)}
-                          components={mdxComponents('blog')}
-                        />
+                      ) : 'error' in blog.content ? null : ( // TODO: handle error
+                        <MDXClient {...blog.content} components={mdxComponents('blog')} />
                       )}
                     </div>
                   </article>

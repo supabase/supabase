@@ -1,28 +1,30 @@
-import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
+import { remarkCodeHike, type CodeHikeConfig } from '@code-hike/mdx'
 import { CH } from '@code-hike/mdx/components'
 import { ChevronLeft, ExternalLink } from 'lucide-react'
 import { type GetStaticPaths, type GetStaticProps } from 'next'
-import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
+import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client'
+import { MDXClient } from 'next-mdx-remote-client/csr'
+import { serialize } from 'next-mdx-remote-client/serialize'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { type Dispatch, type SetStateAction, useState } from 'react'
+import { useState, type Dispatch, type SetStateAction } from 'react'
 import remarkGfm from 'remark-gfm'
-import 'swiper/css'
-import { Swiper, SwiperSlide } from 'swiper/react'
 
-import { useBreakpoint } from 'common'
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
-import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
-import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+import 'swiper/css'
 
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
 import type { Partner } from '~/types/partners'
+import { useBreakpoint } from 'common'
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+
 import Error404 from '../../404'
 
 /**
@@ -188,7 +190,9 @@ function Partner({
                 </h2>
 
                 <div className="prose">
-                  <MDXRemote {...overview} components={mdxComponents(setFocusedImage)} />
+                  {'error' in overview ? null : ( // TODO: handle error
+                    <MDXClient {...overview} components={mdxComponents(setFocusedImage)} />
+                  )}
                 </div>
               </div>
 
@@ -339,13 +343,15 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // Parse markdown
-  const overview = await serialize(partner.overview, {
-    blockJS: false,
-    scope: {
-      chCodeConfig: codeHikeOptions,
-    },
-    mdxOptions: {
-      remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+  const overview = await serialize({
+    source: partner.overview,
+    options: {
+      scope: {
+        chCodeConfig: codeHikeOptions,
+      },
+      mdxOptions: {
+        remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+      },
     },
   })
 

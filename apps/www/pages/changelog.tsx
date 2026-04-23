@@ -3,17 +3,18 @@ import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { Octokit as OctokitRest } from '@octokit/rest'
-import dayjs from 'dayjs'
-import { GitCommit } from 'lucide-react'
-import { GetServerSideProps } from 'next'
-import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { NextSeo } from 'next-seo'
-import Link from 'next/link'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import { deletedDiscussions } from '~/lib/changelog.utils'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
+import dayjs from 'dayjs'
+import { GitCommit } from 'lucide-react'
+import { GetServerSideProps } from 'next'
+import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client/'
+import { MDXClient } from 'next-mdx-remote-client/csr'
+import { NextSeo } from 'next-seo'
+import Link from 'next/link'
 
 export type Discussion = {
   id: string
@@ -331,7 +332,9 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
                       </div>
                       <div className="col-span-8 ml-8 lg:ml-0 max-w-[calc(100vw-80px)]">
                         <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
-                          <MDXRemote {...entry.source} components={mdxComponents('blog')} />
+                          {'error' in entry.source ? null : ( // TODO: handle error
+                            <MDXClient {...entry.source} components={mdxComponents('blog')} />
+                          )}
                         </article>
                       </div>
                     </div>
