@@ -220,8 +220,7 @@ export const EmailTemplates = () => {
                           >
                             <BrandLogoUpload
                               value={field.value}
-                              onChange={(url) => field.onChange(url)}
-                              onRemove={() => field.onChange('')}
+                              onChange={field.onChange}
                               disabled={!canUpdateConfig}
                             />
                           </FormItemLayout>

@@ -1,8 +1,10 @@
 import { useParams } from 'common'
-import { ImageIcon, Loader2, Upload, X } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { Database, ExternalLink, Globe, ImageIcon, ImageOff, Loader2, Upload } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
+import { Button, Input_Shadcn_ } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
@@ -16,15 +18,16 @@ const LOGO_PATH = 'brand-logo'
 interface BrandLogoUploadProps {
   value: string
   onChange: (url: string) => void
-  onRemove: () => void
   disabled?: boolean
 }
 
-export const BrandLogoUpload = ({ value, onChange, onRemove, disabled }: BrandLogoUploadProps) => {
+export const BrandLogoUpload = ({ value, onChange, disabled }: BrandLogoUploadProps) => {
   const { ref: projectRef } = useParams()
   const inputRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [showBucketConfirm, setShowBucketConfirm] = useState(false)
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
+  const [imgLoadError, setImgLoadError] = useState(false)
 
   const { storageEndpoint, hostEndpoint } = useProjectApiUrl({ projectRef })
   const clientEndpoint = storageEndpoint ?? hostEndpoint ?? ''
@@ -35,26 +38,34 @@ export const BrandLogoUpload = ({ value, onChange, onRemove, disabled }: BrandLo
   )
   const bucketExists = !!existingBucket
 
+  const isStorageUrl = useMemo(() => {
+    if (!value) return false
+    const endpoints = [storageEndpoint, hostEndpoint].filter((ep): ep is string => !!ep)
+    return endpoints.some((ep) => value.startsWith(ep))
+  }, [value, storageEndpoint, hostEndpoint])
+
+  useEffect(() => {
+    setImgLoadError(false)
+  }, [value])
+
   const handleUploadClick = () => {
-    if (!bucketExists) {
-      setShowBucketConfirm(true)
-    } else {
-      inputRef.current?.click()
-    }
+    inputRef.current?.click()
   }
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file || !projectRef) return
+  const performUpload = async (file: File) => {
+    if (!projectRef) return
 
     setIsUploading(true)
     try {
-      if (!bucketExists) {
-        const { error: bucketError } = await post('/platform/storage/{ref}/buckets', {
-          params: { path: { ref: projectRef } },
-          body: { id: BUCKET_NAME, public: true },
-        })
-        if (bucketError) handleError(bucketError)
+      // Always attempt bucket creation — a no-op if it already exists,
+      // and avoids stale-closure issues with the bucketExists flag.
+      const { error: bucketError } = await post('/platform/storage/{ref}/buckets', {
+        params: { path: { ref: projectRef } },
+        body: { id: BUCKET_NAME, public: true },
+      })
+      // Only surface errors that aren't "bucket already exists"
+      if (bucketError && !JSON.stringify(bucketError).toLowerCase().includes('already exists')) {
+        handleError(bucketError)
       }
 
       const client = await createProjectSupabaseClient(projectRef, clientEndpoint)
@@ -74,57 +85,103 @@ export const BrandLogoUpload = ({ value, onChange, onRemove, disabled }: BrandLo
       toast.error(`Failed to upload logo: ${message}`)
     } finally {
       setIsUploading(false)
+      setPendingFile(null)
       if (inputRef.current) inputRef.current.value = ''
     }
   }
 
-  return (
-    <div className="flex items-center gap-4">
-      <button
-        type="button"
-        disabled={disabled || isUploading}
-        onClick={handleUploadClick}
-        className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-strong bg-surface-200 transition-colors hover:border-foreground-muted disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {isUploading ? (
-          <Loader2 size={20} className="animate-spin text-foreground-muted" />
-        ) : value ? (
-          <img src={value} alt="Brand logo" className="h-full w-full object-contain" />
-        ) : (
-          <ImageIcon size={20} className="text-foreground-muted" />
-        )}
-      </button>
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
 
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-center gap-2">
-          <Button
-            type="default"
-            size="tiny"
-            icon={<Upload size={12} />}
-            loading={isUploading}
-            disabled={disabled || isUploading}
-            onClick={handleUploadClick}
-          >
-            {value ? 'Replace' : 'Upload logo'}
-          </Button>
-          {value && !isUploading && (
-            <Button
-              type="text"
-              size="tiny"
-              icon={<X size={12} />}
-              disabled={disabled}
-              onClick={onRemove}
-            >
-              Remove
-            </Button>
-          )}
-        </div>
-        {value && (
-          <p className="max-w-xs truncate text-xs text-foreground-lighter" title={value}>
-            {value}
-          </p>
+    if (!bucketExists) {
+      setPendingFile(file)
+      setShowBucketConfirm(true)
+    } else {
+      performUpload(file)
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-strong bg-surface-200">
+        {isUploading ? (
+          <Loader2 size={24} className="animate-spin text-foreground-muted" />
+        ) : value && !imgLoadError ? (
+          <img
+            src={value}
+            alt="Brand logo"
+            className="h-full w-full object-contain"
+            onError={() => setImgLoadError(true)}
+          />
+        ) : value && imgLoadError ? (
+          <ImageOff size={24} className="text-foreground-muted" />
+        ) : (
+          <ImageIcon size={24} className="text-foreground-muted" />
         )}
       </div>
+
+      <div className="flex items-center gap-2">
+        <Input_Shadcn_
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="https://example.com/logo.png"
+          disabled={disabled || isUploading}
+          className="flex-1"
+        />
+        <Button
+          type="default"
+          icon={<Upload size={14} />}
+          loading={isUploading}
+          disabled={disabled || isUploading}
+          onClick={handleUploadClick}
+        >
+          Upload
+        </Button>
+      </div>
+
+      {value && (
+        <div>
+          {isStorageUrl ? (
+            <Link
+              href={`/project/${projectRef}/storage/buckets/${BUCKET_NAME}`}
+              className="flex w-fit items-center gap-1.5 text-xs text-foreground-lighter transition-colors hover:text-foreground"
+            >
+              <Database size={11} />
+              Stored in Supabase Storage
+              <ExternalLink size={11} />
+            </Link>
+          ) : (
+            <span className="flex items-center gap-1.5 text-xs text-foreground-muted">
+              <Globe size={11} />
+              External URL
+            </span>
+          )}
+        </div>
+      )}
+
+      {value && imgLoadError && isStorageUrl && (
+        <Admonition
+          type="warning"
+          title="Logo image could not be loaded"
+          description={
+            <span>
+              The image at this URL is not publicly accessible. Ensure your{' '}
+              <Link
+                href={`/project/${projectRef}/storage/buckets/${BUCKET_NAME}`}
+                className="underline"
+              >
+                bucket
+              </Link>{' '}
+              is set to public, or review your{' '}
+              <Link href={`/project/${projectRef}/storage/policies`} className="underline">
+                RLS policies
+              </Link>{' '}
+              to allow anonymous reads.
+            </span>
+          }
+        />
+      )}
 
       <input
         ref={inputRef}
@@ -136,6 +193,7 @@ export const BrandLogoUpload = ({ value, onChange, onRemove, disabled }: BrandLo
 
       <ConfirmationModal
         visible={showBucketConfirm}
+        size="medium"
         title="Create storage bucket"
         description={
           <span>
@@ -144,11 +202,15 @@ export const BrandLogoUpload = ({ value, onChange, onRemove, disabled }: BrandLo
             accessible via URL.
           </span>
         }
-        confirmLabel="Create bucket and upload"
-        onCancel={() => setShowBucketConfirm(false)}
+        confirmLabel="Create bucket"
+        onCancel={() => {
+          setShowBucketConfirm(false)
+          setPendingFile(null)
+          if (inputRef.current) inputRef.current.value = ''
+        }}
         onConfirm={() => {
           setShowBucketConfirm(false)
-          inputRef.current?.click()
+          if (pendingFile) performUpload(pendingFile)
         }}
       />
     </div>
