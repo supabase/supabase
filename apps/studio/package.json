@@ -110,7 +110,7 @@
     "papaparse": "^5.3.1",
     "path-to-regexp": "^8.0.0",
     "pg-minify": "^1.6.3",
-    "radix-ui": "^1.4.3",
+    "radix-ui": "catalog:",
     "randombytes": "^2.1.0",
     "react": "catalog:",
     "react-data-grid": "7.0.0-beta.47",

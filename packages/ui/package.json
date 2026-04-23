@@ -31,7 +31,7 @@
     "lodash": "catalog:",
     "lucide-react": "^0.436.0",
     "prop-types": "^15.7.2",
-    "radix-ui": "^1.4.3",
+    "radix-ui": "catalog:",
     "react": "catalog:",
     "react-accessible-treeview": "^2.11.2",
     "react-copy-to-clipboard": "^5.1.0",
