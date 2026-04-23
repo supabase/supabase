@@ -94,6 +94,7 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
     {
       enabled: enabledInCommandMenu,
       deps: depsInCommandMenu,
+      sectionMeta: { priority: 1 },
     }
   )
 }
