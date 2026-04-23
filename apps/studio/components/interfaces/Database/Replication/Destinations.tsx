@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Plus, Search, X } from 'lucide-react'
+import { MoreVertical, Plus, Search, X } from 'lucide-react'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -8,6 +8,10 @@ import {
   Card,
   CardContent,
   cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   Table,
   TableBody,
   TableCell,
@@ -40,8 +44,6 @@ import { DOCS_URL } from '@/lib/constants'
 export const Destinations = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
-  const [showDisableExternalReplicationDialog, setShowDisableExternalReplicationDialog] =
-    useState(false)
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
@@ -58,6 +60,8 @@ export const Destinations = () => {
   const prefetchedRef = useRef(false)
   const [filterString, setFilterString] = useState<string>('')
   const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
+  const [showDisableExternalReplicationDialog, setShowDisableExternalReplicationDialog] =
+    useState(false)
 
   const [_, setDestinationType] = useQueryState(
     'destinationType',
@@ -103,20 +107,12 @@ export const Destinations = () => {
           destination.name.toLowerCase().includes(filterString.toLowerCase())
         )
 
-  const {
-    data: pipelinesData,
-    isError: isPipelinesError,
-    isSuccess: isPipelinesSuccess,
-  } = useReplicationPipelinesQuery({
+  const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery({
     projectRef,
   })
   const pipelines = pipelinesData?.pipelines ?? []
 
-  const {
-    data: sourcesData,
-    isError: isSourcesError,
-    isSuccess: isSourcesSuccess,
-  } = useReplicationSourcesQuery({
+  const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
     projectRef,
   })
   const externalReplicationSource = useMemo(
@@ -125,11 +121,8 @@ export const Destinations = () => {
   )
   const canDisableExternalReplication =
     isSourcesSuccess &&
-    !isSourcesError &&
     isDestinationsSuccess &&
-    !isDestinationsError &&
     isPipelinesSuccess &&
-    !isPipelinesError &&
     !!externalReplicationSource &&
     destinations.length === 0 &&
     pipelines.length === 0
@@ -216,29 +209,22 @@ export const Destinations = () => {
             >
               Add destination
             </Button>
-            {canDisableExternalReplication &&
-              externalReplicationSource !== undefined &&
-              projectRef && (
-                <Button
-                  type="text"
-                  className="text-destructive hover:text-destructive"
-                  onClick={() => setShowDisableExternalReplicationDialog(true)}
-                >
-                  Disable external replication
-                </Button>
-              )}
             <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
+            {canDisableExternalReplication && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" icon={<MoreVertical />} className="w-7" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuItem onClick={() => setShowDisableExternalReplicationDialog(true)}>
+                    Disable external replication
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </div>
-
-      {canDisableExternalReplication && externalReplicationSource !== undefined && projectRef && (
-        <DisableExternalReplicationDialog
-          projectRef={projectRef}
-          visible={showDisableExternalReplicationDialog}
-          onOpenChange={setShowDisableExternalReplicationDialog}
-        />
-      )}
 
       <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
         {hasErrorsFetchingData && (
@@ -331,6 +317,11 @@ export const Destinations = () => {
       </div>
 
       <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
+
+      <DisableExternalReplicationDialog
+        open={showDisableExternalReplicationDialog}
+        setOpen={setShowDisableExternalReplicationDialog}
+      />
     </>
   )
 }

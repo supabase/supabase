@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -14,45 +15,41 @@ import {
 import { useDeleteReplicationTenantMutation } from '@/data/replication/delete-tenant-mutation'
 
 interface DisableExternalReplicationDialogProps {
-  projectRef: string
-  visible: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean
+  setOpen: (value: boolean) => void
 }
 
 export const DisableExternalReplicationDialog = ({
-  projectRef,
-  visible,
-  onOpenChange,
+  open,
+  setOpen,
 }: DisableExternalReplicationDialogProps) => {
+  const { ref: projectRef } = useParams()
+
   const { mutateAsync: deleteReplicationTenant, isPending: isSubmitting } =
     useDeleteReplicationTenantMutation({
       onSuccess: () => {
         toast.success('External replication has been disabled')
-        onOpenChange(false)
+        setOpen(false)
       },
     })
 
   const onConfirm = async () => {
+    if (!projectRef) return console.error('Project ref is required')
     await deleteReplicationTenant({ projectRef })
   }
 
   return (
-    <AlertDialog open={visible} onOpenChange={(open) => !isSubmitting && onOpenChange(open)}>
+    <AlertDialog open={open} onOpenChange={(open) => !isSubmitting && setOpen(open)}>
       <AlertDialogContent size="medium">
         <AlertDialogHeader>
-          <AlertDialogTitle>Disable external replication?</AlertDialogTitle>
-          <AlertDialogDescription asChild>
-            <div className="space-y-2 text-sm">
-              <p>
-                Disable external replication if you no longer plan to send database changes to
-                external destinations.
-              </p>
-              <p>
-                This removes the <code>etl</code> schema and connected resources that are required
-                for external replication to work.
-              </p>
-              <p>Read replicas are not affected.</p>
-            </div>
+          <AlertDialogTitle>Confirm to disable external replication</AlertDialogTitle>
+          <AlertDialogDescription className="space-y-2 text-sm">
+            <p>
+              This will remove the <code className="text-code-inline">etl</code> schema and all
+              connected resources from your database. Any active pipelines sending changes to
+              external destinations will stop.
+            </p>
+            <p>Read replicas are not affected.</p>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
