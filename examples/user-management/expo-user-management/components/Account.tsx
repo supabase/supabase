@@ -89,7 +89,7 @@ export default function Account({ userId, email }: { userId: string; email?: str
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Text style={styles.label}>Email</Text>
         <TextInput
-          value={email ?? ""}
+          value={email ?? ''}
           editable={false}
           selectTextOnFocus={false}
           style={[styles.input, styles.inputDisabled]}
@@ -124,7 +124,7 @@ export default function Account({ userId, email }: { userId: string; email?: str
 
       <View style={styles.verticallySpaced}>
         <TouchableOpacity
-          style={[styles.button, styles.buttonDisabled]}
+          style={styles.button}
           onPress={() => supabase.auth.signOut()}
         >
           <Text style={styles.buttonText}>Sign Out</Text>
