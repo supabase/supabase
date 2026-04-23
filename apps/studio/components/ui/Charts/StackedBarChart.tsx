@@ -196,13 +196,13 @@ const StackedBarChart: React.FC<Props> = ({
               return String(value) + suffix
             }}
             cursor={false}
-            labelClassName="text-white"
+            labelClassName="text-foreground"
             contentStyle={{
-              backgroundColor: '#444444',
-              borderColor: '#444444',
+              backgroundColor: 'hsl(var(--background-surface-300))',
+              borderColor: 'hsl(var(--border-default))',
               fontSize: '12px',
             }}
-            wrapperClassName="bg-gray-600 rounded min-w-md"
+            wrapperClassName="rounded min-w-md"
             active={!!syncId && syncTooltip && hoveredIndex !== null}
           />
         </BarChart>
