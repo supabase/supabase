@@ -8,6 +8,7 @@ import { Badge, Button, cn } from 'ui'
 
 const CATEGORIES_FILTERS = [
   { name: 'All', value: 'all' },
+  { name: 'Community Event', value: 'community' },
   { name: 'Meetup', value: 'meetup' },
   { name: 'Conference', value: 'conference' },
   { name: 'Workshop', value: 'workshop' },

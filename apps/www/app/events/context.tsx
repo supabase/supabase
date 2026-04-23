@@ -43,9 +43,13 @@ export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProv
 
         if (data.success) {
           const transformedEvents: SupabaseEvent[] = data.events.map((event: any) => {
-            let categories: string[] = []
-            const isMeetup = event.name.toLowerCase().includes('meetup')
-            if (isMeetup) categories.push('meetup')
+            // Categorize by the originating Luma calendar: events from the
+            // Supabase Hackathons calendar → `hackathon`; everything from the
+            // Supabase Community Events calendar → `community`.
+            const categories: string[] = [
+              event?.calendar === 'hackathon' ? 'hackathon' : 'community',
+            ]
+            const isCommunity = categories[0] === 'community'
 
             const rawUrl = event?.url || ''
             let safeUrl: string | undefined
@@ -74,7 +78,8 @@ export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProv
               location: new Intl.ListFormat('en', { style: 'narrow', type: 'unit' }).format(
                 [event?.city, event?.country].filter(Boolean)
               ),
-              hosts: isMeetup || event?.hosts?.length === 0 ? [SUPABASE_HOST] : event?.hosts || [],
+              hosts:
+                isCommunity || event?.hosts?.length === 0 ? [SUPABASE_HOST] : event?.hosts || [],
               source: 'luma' as const,
               disable_page_build: true,
               link: safeUrl ? { href: safeUrl, target: '_blank' as const } : undefined,
