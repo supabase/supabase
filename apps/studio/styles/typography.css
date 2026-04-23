@@ -56,12 +56,12 @@
 @layer utilities {
   /* Heading */
   .heading-title {
-    @apply scroll-m-20 text-2xl tracking-tight font-semibold;
+    @apply scroll-m-20 text-2xl tracking-tight font-medium;
     font-family: var(--font-heading);
   }
 
   .heading-section {
-    @apply scroll-m-20 text-xl font-semibold;
+    @apply scroll-m-20 text-xl font-medium;
     font-family: var(--font-heading);
   }
 
@@ -70,12 +70,12 @@
   }
 
   .heading-default {
-    @apply scroll-m-20 text-sm font-semibold;
+    @apply scroll-m-20 text-sm font-medium;
     font-family: var(--font-heading);
   }
 
   .heading-compact {
-    @apply scroll-m-20 text-xs font-semibold;
+    @apply scroll-m-20 text-xs font-medium;
     font-family: var(--font-heading);
   }
 
