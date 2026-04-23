@@ -1,6 +1,6 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { CreditCardIcon, Plus } from 'lucide-react'
+import { CreditCardIcon, ExternalLink, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -59,7 +59,6 @@ const PaymentMethods = () => {
   )
   const isStripeManagedOrganization =
     selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
-
   return (
     <>
       <ScaffoldSection>
@@ -105,19 +104,39 @@ const PaymentMethods = () => {
                       type="note"
                       layout="horizontal"
                       title="Payment is currently by invoice"
-                      description="You get a monthly invoice and payment link via email. To change your payment
-                      method, please contact us via our support form."
+                      description={
+                        isStripeManagedOrganization
+                          ? 'You get a monthly invoice and payment link via email. Manage payment methods through Stripe Projects.'
+                          : 'You get a monthly invoice and payment link via email. To change your payment method, please contact us via our support form.'
+                      }
                       actions={
-                        <Button asChild key="payment-method-support" type="default">
-                          <SupportLink
-                            queryParams={{
-                              category: SupportCategories.BILLING,
-                              subject: 'Request to change payment method',
-                            }}
+                        isStripeManagedOrganization ? (
+                          <Button
+                            asChild
+                            key="stripe-projects-billing-docs"
+                            type="default"
+                            iconRight={<ExternalLink size={14} />}
                           >
-                            Contact support
-                          </SupportLink>
-                        </Button>
+                            <a
+                              href="https://docs.stripe.com/projects#manage-billing"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              View Stripe Projects docs
+                            </a>
+                          </Button>
+                        ) : (
+                          <Button asChild key="payment-method-support" type="default">
+                            <SupportLink
+                              queryParams={{
+                                category: SupportCategories.BILLING,
+                                subject: 'Request to change payment method',
+                              }}
+                            >
+                              Contact support
+                            </SupportLink>
+                          </Button>
+                        )
                       }
                     />
                   )}
