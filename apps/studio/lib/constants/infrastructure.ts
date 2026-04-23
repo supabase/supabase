@@ -15,6 +15,7 @@ export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
 export const MANAGED_BY = {
   VERCEL_MARKETPLACE: 'vercel-marketplace',
   AWS_MARKETPLACE: 'aws-marketplace',
+  STRIPE_PROJECTS: 'stripe-projects',
   SUPABASE: 'supabase',
 }
 
