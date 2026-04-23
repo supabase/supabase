@@ -55,7 +55,7 @@ Update your environment file `environment.ts`
 export const environment = {
   // ...
   supabaseUrl: "YOUR_SUPBASE_URL",
-  supbaseKey: "YOUR_SUPABASE_KEY"
+  supbaseKey: "YOUR_SUPABASE_PUBLISHABLE_KEY"
 };
 ```
 

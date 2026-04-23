@@ -25,7 +25,7 @@ This demonstrates how to use:
 
 The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?project-name=supabase-ionic-react&repo-name=supabase-ionic-react&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20your%20project%20settings%20at%20supabase.com%2Fdashboard&repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fionic-react-user-management&env=VITE_SUPABASE_URL%2CVITE_SUPABASE_KEY)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?project-name=supabase-ionic-react&repo-name=supabase-ionic-react&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20your%20project%20settings%20at%20supabase.com%2Fdashboard&repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fionic-react-user-management&env=VITE_SUPABASE_URL%2CVITE_SUPABASE_PUBLISHABLE_KEY)
 
 ## Build from scratch
 
@@ -53,7 +53,7 @@ Create a `.env.local` file in the project root (or update your existing `.env.lo
 
 ```bash
 VITE_SUPABASE_URL=YOUR_SUPABASE_URL
-VITE_SUPABASE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
+VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 ```
 
 Populate these variables with your project's URL and publishable key from the Supabase dashboard.
