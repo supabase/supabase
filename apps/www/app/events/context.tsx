@@ -20,9 +20,10 @@ const EventsContext = createContext<EventsContextValue | undefined>(undefined)
 interface EventsProviderProps {
   children: ReactNode
   notionEvents: SupabaseEvent[]
+  mdxEvents: SupabaseEvent[]
 }
 
-export function EventsProvider({ children, notionEvents }: EventsProviderProps) {
+export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProviderProps) {
   const [lumaEvents, setLumaEvents] = useState<SupabaseEvent[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -91,14 +92,17 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
     fetchLumaEvents()
   }, [])
 
-  // Merge Notion (server) + Luma (client) events, excluding past events
+  // Merge Notion (server) + mdx (server) + Luma (client) events, showing only today and future.
   const allEvents = useMemo(() => {
     const now = new Date()
-    return [...notionEvents, ...lumaEvents].filter((event) => {
+    const startOfToday = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    )
+    return [...notionEvents, ...mdxEvents, ...lumaEvents].filter((event) => {
       const eventDate = new Date(event.end_date || event.date)
-      return eventDate >= now
+      return eventDate >= startOfToday
     })
-  }, [notionEvents, lumaEvents])
+  }, [notionEvents, mdxEvents, lumaEvents])
 
   const categories = useMemo(() => {
     const counts: { [key: string]: number } = { all: 0 }
