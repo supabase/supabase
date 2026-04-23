@@ -43,10 +43,16 @@ const AiIconAnimationComponent = ({
     y.set(mouseY / 5)
   }
 
-  const outerAnimate = loading ? { rotate: [0, 360] } : { rotate: isHovering ? 10 : 0 }
+  const outerAnimate = loading ? { rotate: 360 } : { rotate: isHovering ? 10 : 0 }
 
   const outerTransition = loading
-    ? { duration: 2, repeat: Infinity, ease: 'linear' as const, repeatType: 'loop' as const }
+    ? {
+        type: 'spring' as const,
+        stiffness: 60,
+        damping: 10,
+        repeat: Infinity,
+        repeatType: 'loop' as const,
+      }
     : { type: 'spring' as const, stiffness: 300, damping: 30 }
 
   const innerAnimate = loading ? { scale: [1, 1.1, 1] } : { scale: isHovering ? 1.1 : 1 }
