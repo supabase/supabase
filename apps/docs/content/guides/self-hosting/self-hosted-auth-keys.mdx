@@ -8,8 +8,10 @@ You can configure self-hosted Supabase to use the [new API keys](/docs/guides/ap
 
 ## Before you begin
 
-- Complete the [Docker setup guide](/docs/guides/self-hosting/docker), including running `generate-keys.sh` so that `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY` are set in your `.env` file.
-- Ensure `openssl` and `node` version 16 or newer are available on the machine where you will generate new keys.
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+
+- Ensure OpenSSL and Node.js 16+ are available on the machine where you will generate new keys
+- Complete the [Docker setup guide](/docs/guides/self-hosting/docker), including running `generate-keys.sh` so that `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY` are set in your `.env` file
 - If you are upgrading an existing self-hosted Supabase environment, make sure to check the [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md) and add/update the following files:
   - `.env.example` (merge new sections into your `.env` file)
   - `docker-compose.yml`
@@ -36,7 +38,7 @@ The script reads `JWT_SECRET` from `.env` and includes it as a symmetric key ins
 
 After updating `.env`, enable new authentication by uncommenting these lines in `docker-compose.yml`:
 
-```yaml
+```yaml name=docker-compose.yml
 auth:
   environment:
     # JSON array of signing JWKs (EC private + legacy symmetric)
@@ -55,7 +57,13 @@ storage:
 
 PostgREST does not need uncommenting - it already uses `PGRST_JWT_SECRET: ${JWT_JWKS:-${JWT_SECRET}}` which automatically picks up `JWT_JWKS` when set.
 
-Then restart all services:
+<Admonition type="caution">
+
+Podman does not support nested variable interpolation (`${A:-${B}}`). If you are using Podman, replace each nested expression with the required variable directly - see the inline comments in `docker-compose.yml` for the exact substitutions.
+
+</Admonition>
+
+Restart all services:
 
 ```sh
 docker compose down && docker compose up -d
@@ -74,14 +82,14 @@ sb_secret_<22-char-random>_<8-char-checksum>
 
 Test with the new publishable key:
 
-```
+```sh
 curl http://<your-domain>/rest/v1/ \
 -H "apikey: your-supabase-publishable-key"
 ```
 
 You should receive a valid response from PostgREST. Then verify that the legacy key still works:
 
-```
+```sh
 curl http://<your-domain>/rest/v1/ \
 -H "apikey: your-anon-key"
 ```
@@ -90,7 +98,7 @@ Both should work and return the same result.
 
 You can also verify the public JWKS endpoint:
 
-```
+```sh
 curl http://<your-domain>/auth/v1/.well-known/jwks.json
 ```
 
@@ -119,10 +127,8 @@ New variables default to empty values in `.env.example`. When empty, the API gat
 
 The new authentication configuration is fully backward compatible:
 
-- **All new variables are optional.** If left with empty values, the API gateway (Kong) and all services behave exactly as before.
 - **Kong accepts both key types simultaneously.** You can migrate clients incrementally - some using legacy API keys, others using the new ones.
 - **JWKS includes the symmetric key.** `JWT_JWKS` contains both the EC public key (for verifying new ES256 tokens) and the legacy `JWT_SECRET` as a symmetric JWK (for verifying old HS256 tokens). Services that receive `JWT_JWKS` can verify both token types.
-- **Services fall back gracefully.** PostgREST uses `${JWT_JWKS:-${JWT_SECRET}}` - if `JWT_JWKS` is empty, it uses `JWT_SECRET` directly.
 - **No database changes required.** The asymmetric key system operates entirely at the API gateway and service configuration layer.
 
 <Admonition type="caution">
@@ -190,7 +196,7 @@ For **Realtime WebSocket** connections, the API key is sent as a `?apikey=` quer
 
 Kong is configured with two consumers that each accept both the legacy and new API keys:
 
-```yaml
+```yaml name=volumes/api/kong.yml
 consumers:
   - username: anon
     keyauth_credentials:

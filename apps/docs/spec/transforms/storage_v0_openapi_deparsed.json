@@ -1620,7 +1620,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["origin", "avif"]
+              "enum": ["origin", "avif", "webp"]
             },
             "in": "query",
             "name": "format",
@@ -2103,7 +2103,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["origin", "avif"]
+              "enum": ["origin", "avif", "webp"]
             },
             "in": "query",
             "name": "format",
@@ -2366,7 +2366,7 @@
                       },
                       "format": {
                         "type": "string",
-                        "enum": ["origin", "avif"]
+                        "enum": ["origin", "avif", "webp"]
                       },
                       "quality": {
                         "type": "integer",
@@ -3149,7 +3149,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["origin", "avif"]
+              "enum": ["origin", "avif", "webp"]
             },
             "in": "query",
             "name": "format",
@@ -3255,7 +3255,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["origin", "avif"]
+              "enum": ["origin", "avif", "webp"]
             },
             "in": "query",
             "name": "format",
@@ -3364,7 +3364,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["origin", "avif"]
+              "enum": ["origin", "avif", "webp"]
             },
             "in": "query",
             "name": "format",
@@ -3462,7 +3462,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["origin", "avif"]
+              "enum": ["origin", "avif", "webp"]
             },
             "in": "query",
             "name": "format",
@@ -3862,7 +3862,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["origin", "avif"]
+              "enum": ["origin", "avif", "webp"]
             },
             "in": "query",
             "name": "format",
@@ -3962,7 +3962,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["origin", "avif"]
+              "enum": ["origin", "avif", "webp"]
             },
             "in": "query",
             "name": "format",
@@ -4061,7 +4061,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["origin", "avif"]
+              "enum": ["origin", "avif", "webp"]
             },
             "in": "query",
             "name": "format",
@@ -4167,7 +4167,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["origin", "avif"]
+              "enum": ["origin", "avif", "webp"]
             },
             "in": "query",
             "name": "format",
@@ -4411,7 +4411,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["origin", "avif"]
+              "enum": ["origin", "avif", "webp"]
             },
             "in": "query",
             "name": "format",
@@ -4517,7 +4517,7 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["origin", "avif"]
+              "enum": ["origin", "avif", "webp"]
             },
             "in": "query",
             "name": "format",

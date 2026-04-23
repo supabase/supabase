@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 
+import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 
 // Pagination and control parameters
@@ -206,8 +207,6 @@ const calculateChartBucketing = (search: SearchParamsType | Record<string, any>)
   const hourDiff = endTime.diff(startTime, 'hour')
   const dayDiff = endTime.diff(startTime, 'day')
 
-  console.log(`Time difference: ${minuteDiff} minutes, ${hourDiff} hours, ${dayDiff} days`)
-
   // Adjust bucketing based on time range
   if (dayDiff >= 2) {
     truncationLevel = 'DAY'
@@ -227,8 +226,9 @@ const calculateChartBucketing = (search: SearchParamsType | Record<string, any>)
  */
 const getEdgeLogsQuery = () => {
   return `
-    select 
+    select
       id,
+      null as source_id,
       el.timestamp as timestamp,
       'edge' as log_type,
       CAST(edge_logs_response.status_code AS STRING) as status,
@@ -260,8 +260,9 @@ const getEdgeLogsQuery = () => {
 // WHERE pathname includes `/rest/`
 const getPostgrestLogsQuery = () => {
   return `
-    select 
+    select
       id,
+      null as source_id,
       el.timestamp as timestamp,
       'postgrest' as log_type,
       CAST(edge_logs_response.status_code AS STRING) as status,
@@ -291,8 +292,9 @@ const getPostgrestLogsQuery = () => {
  */
 const getPostgresLogsQuery = () => {
   return `
-    select 
+    select
       id,
+      null as source_id,
       pgl.timestamp as timestamp,
       'postgres' as log_type,
       CAST(pgl_parsed.sql_state_code AS STRING) as status,
@@ -319,8 +321,9 @@ const getPostgresLogsQuery = () => {
  */
 const getEdgeFunctionLogsQuery = () => {
   return `
-    select 
-      id, 
+    select
+      id,
+      null as source_id,
       fel.timestamp as timestamp,
       'edge function' as log_type,
       CAST(fel_response.status_code AS STRING) as status,
@@ -334,22 +337,21 @@ const getEdgeFunctionLogsQuery = () => {
       COALESCE(function_logs_agg.last_event_message, '') as event_message,
       fel_request.method as method,
       function_logs_agg.function_log_count as log_count,
-      function_logs_agg.logs as logs
+      null as logs
     from function_edge_logs as fel
     cross join unnest(metadata) as fel_metadata
     cross join unnest(fel_metadata.response) as fel_response
     cross join unnest(fel_metadata.request) as fel_request
     left join (
     SELECT
-        fl_metadata.execution_id,
+        fl_metadata.request_id,
         COUNT(fl.id) as function_log_count,
-        ANY_VALUE(fl.event_message) as last_event_message,
-        ARRAY_AGG(STRUCT(fl.id, fl.timestamp, fl.event_message, fl_metadata.level, fl_metadata.event_type)) as logs
+        ANY_VALUE(fl.event_message) as last_event_message
     FROM function_logs as fl
     CROSS JOIN UNNEST(fl.metadata) as fl_metadata
-    WHERE fl_metadata.execution_id IS NOT NULL
-    GROUP BY fl_metadata.execution_id
-    ) as function_logs_agg on fel_metadata.execution_id = function_logs_agg.execution_id
+    WHERE fl_metadata.request_id IS NOT NULL
+    GROUP BY fl_metadata.request_id
+    ) as function_logs_agg on fel_metadata.request_id = function_logs_agg.request_id
   `
 }
 
@@ -359,8 +361,9 @@ const getEdgeFunctionLogsQuery = () => {
 const getAuthLogsQuery = () => {
   return `
     select
-      al.id as id, 
-      el_in_al.timestamp as timestamp, 
+      el_in_al.id as id,
+      al.id as source_id,
+      el_in_al.timestamp as timestamp,
       'auth' as log_type,
       CAST(el_in_al_response.status_code AS STRING) as status,
       CASE
@@ -393,8 +396,9 @@ const getAuthLogsQuery = () => {
  */
 const getSupabaseStorageLogsQuery = () => {
   return `
-    select 
+    select
       id,
+      null as source_id,
       el.timestamp as timestamp,
       'storage' as log_type,
       CAST(edge_logs_response.status_code AS STRING) as status,
@@ -418,21 +422,30 @@ const getSupabaseStorageLogsQuery = () => {
   `
 }
 
+const LOG_TYPE_QUERIES: Record<string, () => string> = {
+  edge: getEdgeLogsQuery,
+  postgrest: getPostgrestLogsQuery,
+  postgres: getPostgresLogsQuery,
+  'edge function': getEdgeFunctionLogsQuery,
+  auth: getAuthLogsQuery,
+  storage: getSupabaseStorageLogsQuery,
+}
+
 /**
- * Combine all log sources to create the unified logs CTE
+ * Combine the requested log sources to create the unified logs CTE.
+ * Defaults to postgres + postgrest on first load to reduce query cost.
  */
-export const getUnifiedLogsCTE = () => {
+export const getUnifiedLogsCTE = (logTypes: string[] = [...DEFAULT_LOG_TYPES]) => {
+  const queries = logTypes
+    .filter((type) => type in LOG_TYPE_QUERIES)
+    .map((type) => LOG_TYPE_QUERIES[type]())
+
+  const effectiveQueries =
+    queries.length > 0 ? queries : DEFAULT_LOG_TYPES.map((type) => LOG_TYPE_QUERIES[type]())
+
   return `
 WITH unified_logs AS (
-    ${getPostgrestLogsQuery()}
-    union all
-    ${getPostgresLogsQuery()}
-    union all 
-    ${getEdgeFunctionLogsQuery()}
-    union all
-    ${getAuthLogsQuery()}
-    union all
-    ${getSupabaseStorageLogsQuery()}
+    ${effectiveQueries.join('\n    union all\n    ')}
 )
   `
 }
@@ -441,14 +454,14 @@ WITH unified_logs AS (
  * Unified logs SQL query
  */
 export const getUnifiedLogsQuery = (search: QuerySearchParamsType): string => {
-  // Use the buildQueryConditions helper
   const { finalWhere } = buildQueryConditions(search)
+  const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
 
-  // The unified SQL query with UNION ALL statements
   const sql = `
-${getUnifiedLogsCTE()}
+${getUnifiedLogsCTE(effectiveLogTypes)}
 SELECT
     id,
+    source_id,
     timestamp,
     log_type,
     status,
@@ -524,16 +537,20 @@ ${facet}_count AS (
 export const getUnifiedLogsCountCTE = () => {
   return `
 WITH unified_logs AS (
-    -- Edge logs (non-rest, non-storage)
-    select 
+    -- Single scan of edge_logs covering edge gateway, postgrest, and storage
+    select
       id,
-      'edge' as log_type,
+      CASE
+        WHEN edge_logs_request.path LIKE '%/rest/%' THEN 'postgrest'
+        WHEN edge_logs_request.path LIKE '%/storage/%' THEN 'storage'
+        ELSE 'edge'
+      END as log_type,
       CAST(edge_logs_response.status_code AS STRING) as status,
       CASE
-          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN edge_logs_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
+        WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
+        WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+        WHEN edge_logs_response.status_code >= 500 THEN 'error'
+        ELSE 'success'
       END as level,
       edge_logs_request.path as pathname,
       edge_logs_request.method as method
@@ -541,62 +558,39 @@ WITH unified_logs AS (
     cross join unnest(metadata) as edge_logs_metadata
     cross join unnest(edge_logs_metadata.request) as edge_logs_request
     cross join unnest(edge_logs_metadata.response) as edge_logs_response
-    WHERE edge_logs_request.path NOT LIKE '%/rest/%'
-    AND edge_logs_request.path NOT LIKE '%/storage/%'
-    
+
     union all
-    
-    -- Postgrest logs
-    select 
-      id,
-      'postgrest' as log_type,
-      CAST(edge_logs_response.status_code AS STRING) as status,
-      CASE
-          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN edge_logs_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
-      END as level,
-      edge_logs_request.path as pathname,
-      edge_logs_request.method as method
-    from edge_logs as el
-    cross join unnest(metadata) as edge_logs_metadata
-    cross join unnest(edge_logs_metadata.request) as edge_logs_request
-    cross join unnest(edge_logs_metadata.response) as edge_logs_response
-    WHERE edge_logs_request.path LIKE '%/rest/%'
-    
-    union all
-    
+
     -- Postgres logs
-    select 
+    select
       id,
       'postgres' as log_type,
       CAST(pgl_parsed.sql_state_code AS STRING) as status,
       CASE
-          WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
-          WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
-          WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
-          WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
-          ELSE null
+        WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
+        WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
+        WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
+        WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
+        ELSE null
       END as level,
       null as pathname,
       null as method
     from postgres_logs as pgl
     cross join unnest(pgl.metadata) as pgl_metadata
     cross join unnest(pgl_metadata.parsed) as pgl_parsed
-    
+
     union all
-    
+
     -- Edge function logs
-    select 
-      id,
+    select
+      fel.id,
       'edge function' as log_type,
       CAST(fel_response.status_code AS STRING) as status,
       CASE
-          WHEN fel_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN fel_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN fel_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
+        WHEN fel_response.status_code BETWEEN 200 AND 299 THEN 'success'
+        WHEN fel_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+        WHEN fel_response.status_code >= 500 THEN 'error'
+        ELSE 'success'
       END as level,
       fel_request.pathname as pathname,
       fel_request.method as method
@@ -604,100 +598,87 @@ WITH unified_logs AS (
     cross join unnest(metadata) as fel_metadata
     cross join unnest(fel_metadata.response) as fel_response
     cross join unnest(fel_metadata.request) as fel_request
-    
+
     union all
-    
+
     -- Auth logs
     select
-      al.id as id,
+      el_in_al.id as id,
       'auth' as log_type,
       CAST(el_in_al_response.status_code AS STRING) as status,
       CASE
-          WHEN el_in_al_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN el_in_al_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN el_in_al_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
+        WHEN el_in_al_response.status_code BETWEEN 200 AND 299 THEN 'success'
+        WHEN el_in_al_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+        WHEN el_in_al_response.status_code >= 500 THEN 'error'
+        ELSE 'success'
       END as level,
       el_in_al_request.path as pathname,
       el_in_al_request.method as method
     from auth_logs as al
-    cross join unnest(metadata) as al_metadata 
+    cross join unnest(metadata) as al_metadata
     left join (
     edge_logs as el_in_al
-        cross join unnest (metadata) as el_in_al_metadata 
-        cross join unnest (el_in_al_metadata.response) as el_in_al_response 
-        cross join unnest (el_in_al_response.headers) as el_in_al_response_headers 
-        cross join unnest (el_in_al_metadata.request) as el_in_al_request
+      cross join unnest(metadata) as el_in_al_metadata
+      cross join unnest(el_in_al_metadata.response) as el_in_al_response
+      cross join unnest(el_in_al_response.headers) as el_in_al_response_headers
+      cross join unnest(el_in_al_metadata.request) as el_in_al_request
     )
     on al_metadata.request_id = el_in_al_response_headers.cf_ray
     WHERE al_metadata.request_id is not null
-    
-    union all
-    
-    -- Storage logs
-    select 
-      id,
-      'storage' as log_type,
-      CAST(edge_logs_response.status_code AS STRING) as status,
-      CASE
-          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
-          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-          WHEN edge_logs_response.status_code >= 500 THEN 'error'
-          ELSE 'success'
-      END as level,
-      edge_logs_request.path as pathname,
-      edge_logs_request.method as method
-    from edge_logs as el
-    cross join unnest(metadata) as edge_logs_metadata
-    cross join unnest(edge_logs_metadata.request) as edge_logs_request
-    cross join unnest(edge_logs_metadata.response) as edge_logs_response
-    WHERE edge_logs_request.path LIKE '%/storage/%'
 )
   `
 }
 
 export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
-  const { finalWhere } = buildQueryConditions(search)
+  const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
+  const logTypeWhere = buildFacetWhere(search, 'log_type') || 'WHERE log_type IS NOT NULL'
+  const levelWhere = buildFacetWhere(search, 'level') || 'WHERE level IS NOT NULL'
 
-  // Create a count query using the same unified logs CTE
   const sql = `
-${getUnifiedLogsCountCTE()},
-${getFacetCountCTE({ search, facet: 'log_type' })},
+${getUnifiedLogsCTE(effectiveLogTypes)},
+
+-- Single COUNTIF pass for all log_type buckets + total (no GROUP BY / sort needed)
+log_type_counts AS (
+  SELECT
+    COUNT(*) AS total,
+    COUNTIF(log_type = 'edge') AS edge_count,
+    COUNTIF(log_type = 'postgrest') AS postgrest_count,
+    COUNTIF(log_type = 'storage') AS storage_count,
+    COUNTIF(log_type = 'postgres') AS postgres_count,
+    COUNTIF(log_type = 'edge function') AS edge_function_count,
+    COUNTIF(log_type = 'auth') AS auth_count
+  FROM unified_logs
+  ${logTypeWhere}
+),
+
+-- Single COUNTIF pass for all level buckets
+level_counts AS (
+  SELECT
+    COUNTIF(level = 'success') AS success_count,
+    COUNTIF(level = 'warning') AS warning_count,
+    COUNTIF(level = 'error') AS error_count
+  FROM unified_logs
+  ${levelWhere}
+),
+
+-- Variable facets: open-ended values still need GROUP BY
 ${getFacetCountCTE({ search, facet: 'method' })},
-${getFacetCountCTE({ search, facet: 'level' })},
 ${getFacetCountCTE({ search, facet: 'status' })},
 ${getFacetCountCTE({ search, facet: 'pathname' })}
 
--- Get total count
-SELECT 'total' as dimension, 'all' as value, COUNT(*) as count
-FROM unified_logs
-${finalWhere}
-
-UNION ALL
-
--- Get counts by log_type (exclude log_type filter to avoid self-filtering)
-SELECT dimension, value, count from log_type_count
-
-UNION ALL
-
--- Get counts by method (exclude method filter to avoid self-filtering)  
-SELECT dimension, value, count from method_count
-
-UNION ALL
-
--- Get counts by level (exclude level filter to avoid self-filtering)
-SELECT dimension, value, count from level_count
-
-UNION ALL
-
--- Get counts by status (exclude status filter to avoid self-filtering)
-SELECT dimension, value, count from status_count
-
-UNION ALL
-
--- Get counts by pathname (exclude pathname filter to avoid self-filtering)
-SELECT dimension, value, count from pathname_count
-
+SELECT 'total' AS dimension, 'all' AS value, total AS count FROM log_type_counts
+UNION ALL SELECT 'log_type', 'edge', edge_count FROM log_type_counts
+UNION ALL SELECT 'log_type', 'postgrest', postgrest_count FROM log_type_counts
+UNION ALL SELECT 'log_type', 'storage', storage_count FROM log_type_counts
+UNION ALL SELECT 'log_type', 'postgres', postgres_count FROM log_type_counts
+UNION ALL SELECT 'log_type', 'edge function', edge_function_count FROM log_type_counts
+UNION ALL SELECT 'log_type', 'auth', auth_count FROM log_type_counts
+UNION ALL SELECT 'level', 'success', success_count FROM level_counts
+UNION ALL SELECT 'level', 'warning', warning_count FROM level_counts
+UNION ALL SELECT 'level', 'error', error_count FROM level_counts
+UNION ALL SELECT dimension, value, count FROM method_count
+UNION ALL SELECT dimension, value, count FROM status_count
+UNION ALL SELECT dimension, value, count FROM pathname_count
 `
 
   return sql
@@ -708,14 +689,12 @@ SELECT dimension, value, count from pathname_count
  * Incorporates dynamic bucketing from the older implementation
  */
 export const getLogsChartQuery = (search: QuerySearchParamsType): string => {
-  // Use the buildQueryConditions helper
   const { finalWhere } = buildQueryConditions(search)
-
-  // Determine appropriate bucketing level based on time range
   const truncationLevel = calculateChartBucketing(search)
+  const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
 
   return `
-${getUnifiedLogsCTE()}
+${getUnifiedLogsCTE(effectiveLogTypes)}
 SELECT
   TIMESTAMP_TRUNC(timestamp, ${truncationLevel}) as time_bucket,
   COUNTIF(level = 'success') as success,
