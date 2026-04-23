@@ -118,9 +118,10 @@ describe('useShortcut', () => {
   })
 
   describe('ignoreInputs resolution', () => {
-    it('defaults to undefined when no registry default and no caller override', () => {
+    it('omits the key when no registry default and no caller override (library applies its per-hotkey default)', () => {
       renderHook(() => useShortcut(SHORTCUT_IDS.COMMAND_MENU_OPEN, vi.fn()))
-      expect(getLastHotkeyOptions().ignoreInputs).toBeUndefined()
+      const options = getLastHotkeyOptions()
+      expect('ignoreInputs' in options).toBe(false)
     })
 
     it('uses the registry default when no caller override', () => {
