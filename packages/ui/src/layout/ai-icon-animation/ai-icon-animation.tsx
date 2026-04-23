@@ -97,10 +97,7 @@ const AiIconAnimationComponent = ({
           transition={{
             duration: 2,
             repeat: loading ? Infinity : 0,
-            ease: 'circInOut',
-            type: 'spring',
-            stiffness: 60,
-            damping: 10,
+            ease: 'linear',
           }}
         />
         <motion.path
