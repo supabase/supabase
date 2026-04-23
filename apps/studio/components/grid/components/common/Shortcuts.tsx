@@ -51,5 +51,19 @@ export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
     })
   })
 
+  useShortcut(SHORTCUT_IDS.TABLE_EDITOR_TOGGLE_ROW_SELECTION, () => {
+    const rowIdx = snap.selectedCellPosition?.rowIdx
+    if (rowIdx === undefined) return
+
+    const row = rows[rowIdx]
+    if (!row) return
+
+    const next = new Set(snap.selectedRows)
+    if (next.has(row.idx)) next.delete(row.idx)
+    else next.add(row.idx)
+
+    snap.setSelectedRows(next)
+  })
+
   return null
 }

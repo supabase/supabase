@@ -13,7 +13,8 @@ import { formatClipboardValue } from './utils/common'
 import type { Filter, SavedState, SupaRow } from '@/components/grid/types'
 import { Entity, isTableLike } from '@/data/table-editor/table-editor-types'
 import { BASE_PATH } from '@/lib/constants'
-import { QueuedOperation, QueuedOperationType } from '@/state/table-editor-operation-queue.types'
+import { eventMatchesAnyShortcut } from '@/state/shortcuts/matchEvent'
+import { tableEditorRegistry } from '@/state/shortcuts/registry/table-editor'
 
 export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
   if (Array.isArray(sort)) {
@@ -273,14 +274,20 @@ export const handleCellKeyDown = (
   }: { mode: 'SELECT' | 'EDIT'; column: CalculatedColumn<any, unknown>; row: any },
   event: CellKeyboardEvent
 ) => {
-  if (mode === 'SELECT' && event.code === 'KeyC' && (event.metaKey || event.ctrlKey)) {
+  if (mode !== 'SELECT') return
+
+  if (event.code === 'KeyC' && (event.metaKey || event.ctrlKey)) {
     const colKey = column.key
     const cellValue = row[colKey] ?? ''
     const value = formatClipboardValue(cellValue)
     copyToClipboard(value)
   }
-  if (mode === 'SELECT' && event.key === 'Escape') {
+  if (event.key === 'Escape') {
     const activeElement = document.activeElement as HTMLElement | null
     activeElement?.blur()
+  }
+  // Let registered shortcuts win over rdg's "type a key to enter edit mode" default.
+  if (eventMatchesAnyShortcut(event.nativeEvent, tableEditorRegistry)) {
+    event.preventGridDefault()
   }
 }
