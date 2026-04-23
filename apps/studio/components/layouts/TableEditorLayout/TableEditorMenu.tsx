@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { Filter, Plus } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
@@ -48,7 +47,6 @@ export const TableEditorMenu = () => {
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const isMobile = useBreakpoint()
 
   const [searchText, setSearchText] = useState<string>('')
   const [tableToExport, setTableToExport] = useState<SupaTable>()
@@ -201,7 +199,6 @@ export const TableEditorMenu = () => {
         <div className="grow min-h-0 flex flex-col gap-2 pb-4">
           <InnerSideBarFilters className="mx-2">
             <InnerSideBarFilterSearchInput
-              autoFocus={!isMobile}
               name="search-tables"
               value={searchText}
               placeholder="Search tables..."
