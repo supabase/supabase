@@ -45,7 +45,6 @@ import {
 import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/AuthTemplatesValidation'
-import { EmailLayoutEditor } from '@/components/interfaces/Auth/EmailTemplates/EmailLayoutEditor'
 import { slugifyTitle } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
 import { TemplateEditor } from '@/components/interfaces/Auth/EmailTemplates/TemplateEditor'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
@@ -148,69 +147,6 @@ const RedirectToTemplates = () => {
 
   if (!templateId) {
     return null
-  }
-
-  const LAYOUT_FIELDS = {
-    header: {
-      label: 'Email Header',
-      description: 'HTML injected at the top of every email body.',
-      configKey: 'MAILER_CONTENT_HEADER' as const,
-    },
-    footer: {
-      label: 'Email Footer',
-      description: 'HTML injected at the bottom of every email body.',
-      configKey: 'MAILER_CONTENT_FOOTER' as const,
-    },
-  }
-
-  const layoutField =
-    typeof templateId === 'string'
-      ? LAYOUT_FIELDS[templateId as keyof typeof LAYOUT_FIELDS]
-      : undefined
-
-  if (layoutField) {
-    return (
-      <>
-        <PageHeader size="default">
-          <PageHeaderBreadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href={`/project/${ref}/auth/templates`}>Emails</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{layoutField.label}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </PageHeaderBreadcrumb>
-          <PageHeaderMeta>
-            <PageHeaderSummary>
-              <PageHeaderTitle>{layoutField.label}</PageHeaderTitle>
-              <PageHeaderDescription>{layoutField.description}</PageHeaderDescription>
-            </PageHeaderSummary>
-          </PageHeaderMeta>
-        </PageHeader>
-        <PageContainer size="default" className="pb-16">
-          {!isPermissionsLoaded || isLoadingConfig ? (
-            <PageSection>
-              <PageSectionContent>
-                <GenericSkeletonLoader />
-              </PageSectionContent>
-            </PageSection>
-          ) : (
-            <PageSection>
-              <PageSectionContent>
-                <Card>
-                  <EmailLayoutEditor configKey={layoutField.configKey} />
-                </Card>
-              </PageSectionContent>
-            </PageSection>
-          )}
-        </PageContainer>
-      </>
-    )
   }
 
   // Show error if templateId is invalid or template is not found

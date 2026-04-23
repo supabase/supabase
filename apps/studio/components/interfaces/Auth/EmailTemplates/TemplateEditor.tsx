@@ -145,14 +145,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const brandingVariables: { variable: string; description: string }[] = [
     { variable: '{{ .SenderName }}', description: 'The configured sender name for this project' },
     { variable: '{{ .BrandLogoURL }}', description: 'URL of the brand logo for this project' },
-    {
-      variable: '{{ .ContentHeader }}',
-      description: 'Global HTML header injected at the top of every email',
-    },
-    {
-      variable: '{{ .ContentFooter }}',
-      description: 'Global HTML footer injected at the bottom of every email',
-    },
   ]
 
   // Single useMemo hook to parse and prepare message variables
@@ -185,8 +177,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     return bodyValue
       .replace(/\{\{\s*\.SenderName\s*\}\}/g, (c?.MAILER_SENDER_NAME as string) ?? '')
       .replace(/\{\{\s*\.BrandLogoURL\s*\}\}/g, (c?.MAILER_BRAND_LOGO_URL as string) ?? '')
-      .replace(/\{\{\s*\.ContentHeader\s*\}\}/g, (c?.MAILER_CONTENT_HEADER as string) ?? '')
-      .replace(/\{\{\s*\.ContentFooter\s*\}\}/g, (c?.MAILER_CONTENT_FOOTER as string) ?? '')
   }, [bodyValue, authConfig])
 
   // Check if form values have changed

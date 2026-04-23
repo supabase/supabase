@@ -31,6 +31,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
+import { BrandLogoUpload } from './BrandLogoUpload'
 import { slugifyTitle } from './EmailTemplates.utils'
 import AlertError from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -214,16 +215,15 @@ export const EmailTemplates = () => {
                         render={({ field }) => (
                           <FormItemLayout
                             layout="vertical"
-                            label="Logo URL"
-                            description="URL of the logo shown at the top of emails sent to your users."
+                            label="Brand logo"
+                            description="Logo shown at the top of emails sent to your users. Uploaded to your project's storage."
                           >
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_
-                                {...field}
-                                placeholder="https://example.com/logo.png"
-                                disabled={!canUpdateConfig}
-                              />
-                            </FormControl_Shadcn_>
+                            <BrandLogoUpload
+                              value={field.value}
+                              onChange={(url) => field.onChange(url)}
+                              onRemove={() => field.onChange('')}
+                              disabled={!canUpdateConfig}
+                            />
                           </FormItemLayout>
                         )}
                       />
@@ -248,46 +248,6 @@ export const EmailTemplates = () => {
                   </Card>
                 </form>
               </Form_Shadcn_>
-            </PageSectionContent>
-          </PageSection>
-
-          <PageSection>
-            <PageSectionMeta>
-              <PageSectionSummary>
-                <PageSectionTitle>Email Layout</PageSectionTitle>
-                <PageSectionDescription>
-                  Global HTML injected into every email. Managed by Supabase.
-                </PageSectionDescription>
-              </PageSectionSummary>
-            </PageSectionMeta>
-            <PageSectionContent>
-              <Card>
-                {[
-                  {
-                    slug: 'header',
-                    label: 'Email Header',
-                    description: 'HTML injected at the top of every email body.',
-                  },
-                  {
-                    slug: 'footer',
-                    label: 'Email Footer',
-                    description: 'HTML injected at the bottom of every email body.',
-                  },
-                ].map(({ slug, label, description }) => (
-                  <CardContent key={slug} className="p-0">
-                    <Link
-                      href={`/project/${projectRef}/auth/templates/${slug}`}
-                      className="flex items-center justify-between hover:bg-surface-200 transition-colors py-4 px-6 w-full h-full"
-                    >
-                      <div className="flex flex-col">
-                        <h3 className="text-sm text-foreground">{label}</h3>
-                        <p className="text-sm text-foreground-lighter">{description}</p>
-                      </div>
-                      <ChevronRight size={16} className="text-foreground-muted" />
-                    </Link>
-                  </CardContent>
-                ))}
-              </Card>
             </PageSectionContent>
           </PageSection>
 
