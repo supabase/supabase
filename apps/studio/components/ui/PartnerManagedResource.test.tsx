@@ -47,7 +47,7 @@ describe('PartnerManagedResource', () => {
       />
     )
 
-    expect(screen.getByText('Payment Methods are connected to Stripe.')).toBeInTheDocument()
+    expect(screen.getByText('Payment Methods are connected to Stripe')).toBeInTheDocument()
     expect(screen.queryByRole('link')).toBeNull()
     expect(mockUseVercelRedirectQuery).toHaveBeenCalledWith(
       { installationId: 'vercel-installation-id' },
@@ -74,7 +74,7 @@ describe('PartnerManagedResource', () => {
       />
     )
 
-    expect(screen.getByText('Invoices are managed by AWS Marketplace.')).toBeInTheDocument()
+    expect(screen.getByText('Invoices are managed by AWS Marketplace')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'View Invoices on AWS Marketplace' })).toHaveAttribute(
       'href',
       'https://console.aws.amazon.com/billing/home#/bills'
@@ -96,9 +96,7 @@ describe('PartnerManagedResource', () => {
       />
     )
 
-    expect(
-      screen.getByText('Organization plans are managed by Vercel Marketplace.')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Organization plans are managed by Vercel Marketplace')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /view organization plans/i })).toBeNull()
   })
 })
