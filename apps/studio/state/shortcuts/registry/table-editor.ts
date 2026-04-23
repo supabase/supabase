@@ -6,6 +6,9 @@ export const TABLE_EDITOR_SHORTCUT_IDS = {
   TABLE_EDITOR_JUMP_FIRST_COL: 'table-editor.jump-first-col',
   TABLE_EDITOR_JUMP_LAST_COL: 'table-editor.jump-last-col',
   TABLE_EDITOR_TOGGLE_ROW_SELECTION: 'table-editor.toggle-row-selection',
+  TABLE_EDITOR_TOGGLE_ALL_ROW_SELECTION: 'table-editor.toggle-all-row-selection',
+  TABLE_EDITOR_SELECT_ALL_IN_TABLE: 'table-editor.select-all-in-table',
+  TABLE_EDITOR_DELETE_SELECTED_ROWS: 'table-editor.delete-selected-rows',
 }
 
 export type TableEditorShortcutId =
@@ -43,7 +46,28 @@ export const tableEditorRegistry: RegistryDefinations<TableEditorShortcutId> = {
   [TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_TOGGLE_ROW_SELECTION]: {
     id: TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_TOGGLE_ROW_SELECTION,
     label: 'Toggle selection on current row',
-    sequence: ['Shift+X'],
+    sequence: ['Shift+Space'],
+    showInSettings: false,
+    options: { ignoreInputs: true },
+  },
+  [TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_TOGGLE_ALL_ROW_SELECTION]: {
+    id: TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_TOGGLE_ALL_ROW_SELECTION,
+    label: 'Toggle selection on all displayed rows',
+    sequence: ['Mod+A'],
+    showInSettings: false,
+    options: { ignoreInputs: true },
+  },
+  [TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_SELECT_ALL_IN_TABLE]: {
+    id: TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_SELECT_ALL_IN_TABLE,
+    label: 'Toggle selection on all rows in table',
+    sequence: ['Mod+Shift+A'],
+    showInSettings: false,
+    options: { ignoreInputs: true },
+  },
+  [TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_DELETE_SELECTED_ROWS]: {
+    id: TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_DELETE_SELECTED_ROWS,
+    label: 'Delete selected rows',
+    sequence: ['Mod+Backspace'],
     showInSettings: false,
     options: { ignoreInputs: true },
   },

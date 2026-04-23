@@ -30,6 +30,7 @@ import {
   useExportAllRowsAsSql,
 } from '@/components/layouts/TableEditorLayout/ExportAllRows'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
@@ -41,6 +42,7 @@ import {
   useRoleImpersonationStateSnapshot,
   useSubscribeToImpersonatedRole,
 } from '@/state/role-impersonation-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
@@ -266,6 +268,14 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
     snap.setSelectedRows(new Set(allRows.map((row) => row.idx)), true)
   }
 
+  const onToggleSelectAllInTable = () => {
+    if (snap.allRowsSelected) {
+      snap.setSelectedRows(new Set(), false)
+    } else {
+      onSelectAllRows()
+    }
+  }
+
   const onRowsDelete = () => {
     const rowIdxs = Array.from(snap.selectedRows) as number[]
     const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
@@ -390,28 +400,37 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
     <>
       <div className="flex items-center gap-x-2">
         {snap.editable && (
-          <ButtonTooltip
-            type="default"
-            size="tiny"
-            icon={<Trash />}
-            onClick={onRowsDelete}
-            disabled={snap.allRowsSelected && isImpersonatingRole}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text:
-                  snap.allRowsSelected && isImpersonatingRole
-                    ? 'Table truncation is not supported when impersonating a role'
-                    : undefined,
-              },
+          <Shortcut
+            id={SHORTCUT_IDS.TABLE_EDITOR_DELETE_SELECTED_ROWS}
+            onTrigger={onRowsDelete}
+            options={{
+              registerInCommandMenu: true,
+              enabled: !(snap.allRowsSelected && isImpersonatingRole),
             }}
           >
-            {snap.allRowsSelected
-              ? `Delete all rows in table`
-              : snap.selectedRows.size > 1
-                ? `Delete ${snap.selectedRows.size} rows`
-                : `Delete ${snap.selectedRows.size} row`}
-          </ButtonTooltip>
+            <ButtonTooltip
+              type="default"
+              size="tiny"
+              icon={<Trash />}
+              onClick={onRowsDelete}
+              disabled={snap.allRowsSelected && isImpersonatingRole}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text:
+                    snap.allRowsSelected && isImpersonatingRole
+                      ? 'Table truncation is not supported when impersonating a role'
+                      : undefined,
+                },
+              }}
+            >
+              {snap.allRowsSelected
+                ? `Delete all rows in table`
+                : snap.selectedRows.size > 1
+                  ? `Delete ${snap.selectedRows.size} rows`
+                  : `Delete ${snap.selectedRows.size} row`}
+            </ButtonTooltip>
+          </Shortcut>
         )}
 
         {!snap.allRowsSelected ? (
@@ -477,14 +496,20 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {!snap.allRowsSelected && totalRows > allRows.length && (
+        {snap.selectedRows.size > 0 && totalRows > allRows.length && (
           <>
             <div className="h-6 ml-0.5">
               <Separator orientation="vertical" />
             </div>
-            <Button type="text" onClick={() => onSelectAllRows()}>
-              Select all rows in table
-            </Button>
+            <Shortcut
+              id={SHORTCUT_IDS.TABLE_EDITOR_SELECT_ALL_IN_TABLE}
+              onTrigger={onToggleSelectAllInTable}
+              options={{ registerInCommandMenu: true }}
+            >
+              <Button type="text" onClick={onToggleSelectAllInTable}>
+                {snap.allRowsSelected ? 'Deselect all rows in table' : 'Select all rows in table'}
+              </Button>
+            </Shortcut>
           </>
         )}
       </div>

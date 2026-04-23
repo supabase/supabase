@@ -12,6 +12,8 @@ import {
 import { SELECT_COLUMN_KEY } from '../../constants'
 import type { SupaRow } from '../../types'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
@@ -187,18 +189,26 @@ function SelectCellHeader({
 
   return (
     <div className="sb-grid-select-cell__header">
-      <input
-        ref={inputRef}
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledBy}
-        tabIndex={tabIndex}
-        type="checkbox"
-        className="sb-grid-select-cell__header__input"
-        disabled={disabled}
-        checked={value}
-        onChange={handleChange}
-        onClick={onClick}
-      />
+      <Shortcut
+        id={SHORTCUT_IDS.TABLE_EDITOR_TOGGLE_ALL_ROW_SELECTION}
+        onTrigger={() => onChange(!value, false)}
+        options={{
+          registerInCommandMenu: true,
+        }}
+      >
+        <input
+          ref={inputRef}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
+          tabIndex={tabIndex}
+          type="checkbox"
+          className="sb-grid-select-cell__header__input"
+          disabled={disabled}
+          checked={value}
+          onChange={handleChange}
+          onClick={onClick}
+        />
+      </Shortcut>
     </div>
   )
 }
