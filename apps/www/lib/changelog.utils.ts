@@ -150,8 +150,9 @@ export function githubLabelHex(color: string) {
 }
 
 const CHANGELOG_LABEL_DISPLAY_NAME: Record<string, string> = {
-  javascript: 'supabase-js',
+  documentation: 'docs',
   frontend: 'dashboard',
+  javascript: 'supabase-js',
   swift: 'supabase-swift',
   flutter: 'supabase-flutter',
   python: 'supabase-py',

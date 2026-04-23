@@ -113,7 +113,7 @@ function ChangelogV3DetailPage({
         description={title}
         openGraph={{
           title,
-          url: `https://supabase.com/changelog-minimal/${number}`,
+          url: `https://supabase.com/changelog/${number}`,
           type: 'article',
         }}
       />
@@ -124,7 +124,7 @@ function ChangelogV3DetailPage({
               aria-label="Breadcrumb"
               className="text-foreground-lighter flex flex-wrap items-center gap-x-2 gap-y-1 text-sm"
             >
-              <Link href="/changelog-minimal" className="text-foreground-lighter hover:underline">
+              <Link href="/changelog" className="text-foreground-lighter hover:underline">
                 Changelog
               </Link>
             </nav>
@@ -156,7 +156,7 @@ function ChangelogV3DetailPage({
           <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-6">
             {nextNumber != null ? (
               <Link
-                href={`/changelog-minimal/${nextNumber}`}
+                href={`/changelog/${nextNumber}`}
                 className="text-foreground-lighter flex items-center gap-2 text-sm hover:text-foreground"
               >
                 <ArrowLeftIcon className="h-4 w-4" /> Newer
@@ -166,7 +166,7 @@ function ChangelogV3DetailPage({
             )}
             {prevNumber != null ? (
               <Link
-                href={`/changelog-minimal/${prevNumber}`}
+                href={`/changelog/${prevNumber}`}
                 className="text-foreground-lighter flex items-center gap-2 text-sm hover:text-foreground"
               >
                 Older

@@ -12,7 +12,11 @@ import {
   type ChangelogLabel,
   type ChangelogTimelineIndexItem,
 } from '~/lib/changelog-github'
-import { discussionDisplayDate, githubChangelogLabelFilterUrl } from '~/lib/changelog.utils'
+import {
+  changelogLabelDisplayName,
+  discussionDisplayDate,
+  githubChangelogLabelFilterUrl,
+} from '~/lib/changelog.utils'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { useBreakpoint } from 'common'
@@ -51,20 +55,25 @@ const FEATURED_COUNT = 1
 
 /** GitHub changelog label slugs used for product filters. */
 const CHANGELOG_PRODUCT_TAGS = [
-  { slug: 'storage', label: 'Storage' },
   { slug: 'database', label: 'Database' },
-  { slug: 'realtime', label: 'Realtime' },
-  { slug: 'edge-functions', label: 'Edge Functions' },
   { slug: 'auth', label: 'Auth' },
-  { slug: 'sdk', label: 'SDK' },
-  { slug: 'self-hosted', label: 'Self-hosted' },
-  { slug: 'vector', label: 'Vector' },
+  { slug: 'storage', label: 'Storage' },
+  { slug: 'realtime', label: 'Realtime' },
+  { slug: 'edge functions', label: 'Edge Functions' },
+  { slug: 'postgres', label: 'postgres' },
+  { slug: 'postgrest', label: 'PostgREST' },
+  { slug: 'ai', label: 'AI & Vector' },
   { slug: 'billing', label: 'Billing' },
   { slug: 'breaking-change', label: 'Breaking Change' },
   { slug: 'cli', label: 'CLI' },
+  { slug: 'frontend', label: 'Dashboard' },
+  { slug: 'documentation', label: 'Docs' },
   { slug: 'infra', label: 'Infra' },
-  { slug: 'dashboard', label: 'Dashboard' },
-  { slug: 'docs', label: 'Docs' },
+  { slug: 'self-hosted', label: 'Self-hosted' },
+  { slug: 'javascript', label: 'supabase-js' },
+  { slug: 'swift', label: 'supabase-swift' },
+  { slug: 'flutter', label: 'supabase-flutter' },
+  { slug: 'python', label: 'supabase-py' },
 ] as const
 
 type ChangelogProductSlug = (typeof CHANGELOG_PRODUCT_TAGS)[number]['slug']
@@ -535,7 +544,7 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
                                   className="group inline-flex no-underline focus-visible:ring-brand-default rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                                 >
                                   <Badge className="group-hover:text-foreground-light text-foreground-lighter group-hover:border-foreground-muted px-1.5 py-px text-[11px] lowercase">
-                                    {label.name}
+                                    {changelogLabelDisplayName(label.name)}
                                   </Badge>
                                 </a>
                               ))}
@@ -558,7 +567,7 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
                   <ChangelogV3TimelineList
                     items={restIndex}
                     mode="link"
-                    hrefFor={(item) => `/changelog-minimal/${item.number}`}
+                    hrefFor={(item) => `/changelog/${item.number}`}
                     omitOuterTimelineBorder
                   />
                 </section>
