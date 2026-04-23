@@ -13,6 +13,7 @@ This guide explains the architecture, configuration layout, and security posture
 - A working self-hosted Supabase installation - see [Self-Hosting with Docker](/docs/guides/self-hosting/docker)
 - To enable opaque `sb_` key translation, complete [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys)
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 ## Enabling the Envoy gateway
 
 The Envoy gateway is provided as a Docker Compose override. Start your stack with both the base compose file and the Envoy override:
@@ -21,7 +22,7 @@ The Envoy gateway is provided as a Docker Compose override. Start your stack wit
 docker compose -f docker-compose.yml -f docker-compose.envoy.yml up -d
 ```
 
-The override disables the default Kong gateway and starts Envoy on the same port (default `8000`). It also rewires the Functions service to wait for Envoy via a healthcheck dependency.
+The override disables the default Kong gateway and starts Envoy on the same port (default `8000`). It also reconfigures the Functions service to wait for Envoy via a dependency.
 
 Envoy is registered as the `api-gw` service and also exposes `kong` as a network alias; the base Kong service likewise exposes `api-gw`. Either hostname resolves to whichever gateway is currently active, so internal configs that hardcode `kong:8000` (for example, in Edge Functions or Studio) keep working without changes.
 
@@ -79,15 +80,15 @@ All Envoy configuration lives in `./volumes/api/envoy/` (relative to the directo
 | File                   | Purpose                                                                                                                                                                                     |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `envoy.yaml`           | Bootstrap configuration. Points Envoy at the CDS and LDS files, configures the admin interface, and sets an overload manager limit on downstream connections.                               |
-| `cds.yaml`             | **C**luster **D**iscovery **S**ervice - upstream service definitions (DNS, ports, health checks, connect timeouts, circuit breakers).                                                       |
-| `lds.template.yaml`    | **L**istener **D**iscovery **S**ervice template. Defines the listener, filter chain, routes, RBAC policy, and CORS policy. Contains placeholders for keys and credentials.                  |
+| `cds.yaml`             | Cluster Discovery Service - upstream service definitions (DNS, ports, health checks, connect timeouts, circuit breakers).                                                       |
+| `lds.template.yaml`    | Listener Discovery Service template. Defines the listener, filter chain, routes, RBAC policy, and CORS policy. Contains placeholders for keys and credentials.                  |
 | `docker-entrypoint.sh` | Renders the LDS template into `lds.yaml` at container startup by substituting environment variables, computes a SHA1+base64 hash of `DASHBOARD_PASSWORD` for basic auth, then starts Envoy. |
 
 ### How the configuration is rendered at startup
 
 Envoy cannot natively read environment variables inside its config. The entrypoint script renders environment-specific values into the listener config with `sed` before launching Envoy:
 
-1. A SHA1+base64 hash of `DASHBOARD_PASSWORD` is computed and joined with `DASHBOARD_USERNAME` into a single `DASHBOARD_BASIC_AUTH` string in the htpasswd-style format `username:{SHA}<base64-encoded-sha1>` that Envoy's `basic_auth` filter expects. Other hash formats are not supported.
+1. A SHA1+base64 hash of `DASHBOARD_PASSWORD` is computed and joined with `DASHBOARD_USERNAME` into a single `DASHBOARD_BASIC_AUTH` string in the `username:{SHA}<base64-encoded-sha1>` format that Envoy's `basic_auth` filter expects. Other hash formats are not supported.
 2. The following variables are then substituted into `lds.template.yaml` and the result is written to `lds.yaml`:
 
 | Variable                      | Used for                                                                  |
@@ -220,7 +221,7 @@ The gateway is configured with these production-oriented settings:
 | `normalize_path: true`, `merge_slashes: true`         | Prevents path-confusion bypass of RBAC prefix rules                                                                                                                                                |
 | `path_with_escaped_slashes_action: REJECT_REQUEST`    | Rejects requests that contain URL-encoded slashes in the path                                                                                                                                      |
 | `use_remote_address: true`                            | Treats Envoy as an edge proxy: uses the peer connection IP as the trusted client address (rather than trusting client-supplied `X-Forwarded-For`) and strips untrusted `x-envoy-*` request headers |
-| `headers_with_underscores_action: REJECT_REQUEST`     | Blocks header smuggling attacks that exploit underscore-vs-hyphen normalization in backends                                                                                                        |
+| `headers_with_underscores_action: REJECT_REQUEST`     | Blocks header smuggling attacks that exploit underscore-vs-hyphen normalization                                                                                                        |
 | `per_connection_buffer_limit_bytes: 32768`            | Caps per-connection buffer memory to 32 KiB                                                                                                                                                        |
 | `max_active_downstream_connections: 30000`            | Overload manager limit on total downstream connections                                                                                                                                             |
 | Admin interface bound to `127.0.0.1:9901`             | The admin API is reachable only from inside the container, not from other containers or the host                                                                                                   |
@@ -245,7 +246,7 @@ All routing, filter, and cluster changes are made in the YAML files under `./vol
 - **Adding or modifying routes.** Edit `lds.template.yaml`. Routes are ordered - place new routes before the catch-all `/` route to ensure they match. Keep per-route `basic_auth: disabled` for API routes and set an appropriate RBAC override if the route should bypass the global policy.
 - **Adding a new upstream service.** Add a cluster definition to `cds.yaml` with the service's DNS name and port, then reference it from a route's `cluster:` field.
 - **Adding a new environment variable.** Placeholders in the template use the `${VAR_NAME}` form. If you add a placeholder, update both `docker-compose.envoy.yml` (to pass the variable into the container) and `docker-entrypoint.sh` (to substitute it with `sed`).
-- **Applying changes.** Envoy reads the rendered `lds.yaml` via filesystem-based xDS. Configuration changes require restarting the container so the entrypoint re-renders the template:
+- **Applying changes.** Envoy reads the rendered `lds.yaml` from the filesystem. Configuration changes require restarting the container so the entrypoint re-renders the template:
 
 ```sh
 docker compose -f docker-compose.yml -f docker-compose.envoy.yml restart api-gw
@@ -287,7 +288,7 @@ Bind to `127.0.0.1` (not `0.0.0.0`) so it's reachable only from your host, then 
 
 <Admonition type="caution">
 
-`/config_dump` includes all secrets in plaintext (API keys, JWTs, basic auth hash). Never expose port `9901` to a public network or untrusted host, and never share its output without redacting.
+`/config_dump` includes all secrets in plaintext (API keys, JWTs, basic auth hash). Never expose port `9901` to a public network or untrusted host, and never share its output without omitting sensitive configuration.
 
 </Admonition>
 
