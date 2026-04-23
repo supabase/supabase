@@ -585,13 +585,14 @@ export const GitHubIntegrationConnectionForm = ({
                           description={
                             <>
                               <span>
-                                Relative path to the directory that contains your <code>supabase</code>{' '}
-                                folder (not the <code>supabase</code> folder itself).
+                                Relative path to the directory that contains your{' '}
+                                <code>supabase</code> folder (not the <code>supabase</code> folder
+                                itself).
                               </span>
                               <span className="mt-1 block">
-                                For example, enter <code>.</code> if <code>supabase/</code> is at the
-                                repository root, or a path like <code>apps/web</code> if your layout
-                                is <code>apps/web/supabase/</code>.
+                                For example, enter <code>.</code> if <code>supabase/</code> is at
+                                the repository root, or a path like <code>apps/web</code> if your
+                                layout is <code>apps/web/supabase/</code>.
                               </span>
                             </>
                           }
