@@ -261,7 +261,7 @@ This guide does not cover Envoy's route, filter, and cluster reference. See the 
 
 ## Admin interface
 
-Envoy exposes an admin interface on `127.0.0.1:9901` inside the container, with endpoints like `/ready`, `/clusters`, `/stats`, and `/config_dump`. The interface is bound to the container's loopback only and port `9901` is not mapped to the host. The standard `envoyproxy/envoy` image is minimal (no `curl` or `wget`), so the admin endpoints are not reachable via `docker exec` without adding tooling.
+Envoy exposes an admin interface on `127.0.0.1:9901` inside the container, with endpoints like `/ready`, `/clusters`, `/stats`, and `/config_dump`. The standard `envoyproxy/envoy` image is minimal (no `curl` or `wget`), so the admin endpoints are not reachable via `docker exec` without adding tooling.
 
 The simplest way to query the admin interface during debugging is to run a short-lived `curl` container that joins the same network namespace as `supabase-envoy`:
 
