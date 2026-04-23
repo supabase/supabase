@@ -377,7 +377,7 @@ final response = await http.post(
   Uri.parse('https://<project>.supabase.co/rest/v1/rpc/broadcast'),
   headers: {
     'Content-Type': 'application/json',
-    -H "apikey: <PUBLISHABLE_KEY>"
+    -H "apikey: <SECRET_KEY>"
   },
   body: jsonEncode({
     'topic': 'room:lobby:messages',
@@ -405,7 +405,7 @@ let url = URL(string: "https://<project>.supabase.co/rest/v1/rpc/broadcast")!
 var request = URLRequest(url: url)
 request.httpMethod = "POST"
 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-request.setValue("<PUBLISHABLE_KEY>", forHTTPHeaderField: "apikey")
+request.setValue("<SECRET_KEY>", forHTTPHeaderField: "apikey")
 
 let payload = [
   "topic": "room:lobby:messages",
@@ -437,7 +437,7 @@ response = requests.post(
     'https://<project>.supabase.co/rest/v1/rpc/broadcast',
     headers={
         'Content-Type': 'application/json',
-        'apikey': '<PUBLISHABLE_KEY>'
+        'apikey': '<SECRET_KEY>'
     },
     json={
         'topic': 'room:lobby:messages',
