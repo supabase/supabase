@@ -6,7 +6,7 @@ tocVideo: 'AE7dKIKMJy4'
 
 <$Partial path="quickstart_intro.mdx" />
 
-![Supabase User Management example](/docs/img/supabase-flutter-demo.png)
+![Supabase User Management example](/docs/img/supabase-expo-react-native-demo.png)
 
 <Admonition type="note">
 
@@ -37,7 +37,7 @@ cd expo-user-management
 Then install the additional dependencies:
 
 ```bash
-npx expo install @supabase/supabase-js @rneui/themed expo-sqlite
+npx expo install @supabase/supabase-js @react-native-async-storage/async-storage
 ```
 
 Now create a helper file to initialize the Supabase client using the API URL and the key that you copied [earlier](#get-api-details).
@@ -75,7 +75,7 @@ These variables are safe to expose in your Expo app since Supabase has
 
     ```bash
     npm install @supabase/supabase-js
-    npm install @rneui/themed @react-native-async-storage/async-storage
+    npm install @react-native-async-storage/async-storage
     npm install aes-js react-native-get-random-values
     npm install --save-dev @types/aes-js
     npx expo install expo-secure-store
@@ -156,6 +156,16 @@ These variables are safe to expose in your Expo app since Supabase has
   </TabPanel>
 </Tabs>
 
+### App styling
+
+You can use the following `StyleSheet` component in `styles/styles.ts` to add style to the app:
+
+<$CodeSample
+path="/user-management/expo-user-management/styles/styles.ts"
+lines={[[1, -1]]}
+meta="name=styles/styles.ts"
+/>
+
 ### Set up a login component
 
 Set up a React Native component to manage logins and sign ups.
@@ -177,7 +187,7 @@ While testing, you can disable email confirmation in your [project's email auth 
 
 ### Account page
 
-After a user signs in, you can let them to edit their profile details and manage their account.
+After a user signs in, let them edit their profile details and manage their account.
 
 Create a new component for that called `Account.tsx`.
 

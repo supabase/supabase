@@ -405,7 +405,10 @@ describe('SQL Event Parser', () => {
       })
     })
 
-    it('handles dollar-quoted strings in SQL', () => {
+    it('does not scan inside dollar-quoted string literals', () => {
+      // $$...$$ is a string literal in Postgres — its contents must not be
+      // parsed as DDL, otherwise a user inserting SQL-shaped text into a log
+      // table would trigger false-positive table-created events.
       const sql = `
         CREATE TABLE users (id INT);
         INSERT INTO logs VALUES ($$CREATE TABLE fake$$);
@@ -413,11 +416,81 @@ describe('SQL Event Parser', () => {
       `
       const results = sqlEventParser.getTableEvents(sql)
       expect(results).toHaveLength(3)
-      expect(results[0].type).toBe(TABLE_EVENT_ACTIONS.TableCreated)
-      expect(results[0]).toMatchObject({ tableName: 'users' })
-      expect(results[1].type).toBe(TABLE_EVENT_ACTIONS.TableCreated)
-      expect(results[1]).toMatchObject({ tableName: 'fake' })
-      expect(results[2].type).toBe(TABLE_EVENT_ACTIONS.TableDataAdded)
+      expect(results[0]).toMatchObject({
+        type: TABLE_EVENT_ACTIONS.TableCreated,
+        tableName: 'users',
+      })
+      expect(results[1]).toMatchObject({
+        type: TABLE_EVENT_ACTIONS.TableDataAdded,
+        tableName: 'logs',
+      })
+      expect(results[2]).toMatchObject({
+        type: TABLE_EVENT_ACTIONS.TableDataAdded,
+        tableName: 'users',
+      })
+    })
+
+    it('does not treat SELECT..INTO inside a plpgsql body as table creation', () => {
+      // Regression for the RLS warning modal false-positive: variable
+      // assignment inside a function body must not be reported as a new table.
+      const sql = `
+        create or replace function schema_checks()
+        returns jsonb
+        language plpgsql
+        as $$
+        declare
+          ret jsonb;
+        begin
+          select jsonb_build_object('value', 'ok') into ret;
+          return ret;
+        end;
+        $$;
+      `
+      const results = sqlEventParser.getTableEvents(sql)
+      expect(results).toEqual([])
+    })
+
+    it('does not leak nested dollar-quoted dynamic SQL through statement splitting', () => {
+      // Regression: an inner $sql$...$sql$ tag used inside an outer $fn$...$fn$
+      // body was pairing with the outer opening tag (the splitStatements regex
+      // doesn't enforce matching tags), which caused the inner semicolon to
+      // split the statement and exposed `create table fake` to the detectors.
+      // The fix is that stripDollarQuoteBodies runs before splitStatements and
+      // uses a backreference to require matching tags.
+      const sql = `
+        create function f()
+        returns void
+        language plpgsql
+        as $fn$
+        begin
+          execute $sql$create table fake(id int);$sql$;
+        end;
+        $fn$;
+      `
+      const results = sqlEventParser.getTableEvents(sql)
+      expect(results).toEqual([])
+    })
+
+    it('still detects a real top-level CREATE TABLE next to a function with nested dollar tags', () => {
+      const sql = `
+        create table public.real_table(id int);
+        create function f()
+        returns void
+        language plpgsql
+        as $fn$
+        begin
+          execute $sql$create table fake(id int);$sql$;
+        end;
+        $fn$;
+      `
+      const results = sqlEventParser.getTableEvents(sql)
+      expect(results).toEqual([
+        {
+          type: TABLE_EVENT_ACTIONS.TableCreated,
+          schema: 'public',
+          tableName: 'real_table',
+        },
+      ])
     })
 
     it('handles SQL injection attempts safely', () => {

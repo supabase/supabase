@@ -224,8 +224,8 @@ export const FunctionsList = () => {
             disabledMessage="You need additional permissions to create functions"
           >
             <p className="text-sm text-foreground-light">
-              PostgreSQL functions, also known as stored procedures, is a set of SQL and procedural
-              commands such as declarations, assignments, loops, flow-of-control, etc.
+              PostgreSQL functions are a set of SQL and procedural commands such as declarations,
+              assignments, loops, flow-of-control, etc.
             </p>
             <p className="text-sm text-foreground-light">
               It's stored on the database server and can be invoked using the SQL interface.

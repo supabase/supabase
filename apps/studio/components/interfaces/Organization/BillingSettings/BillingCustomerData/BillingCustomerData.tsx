@@ -24,6 +24,7 @@ import AlertError from '@/components/ui/AlertError'
 import NoPermission from '@/components/ui/NoPermission'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { organizationKeys } from '@/data/organizations/keys'
+import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
@@ -159,6 +160,9 @@ export const BillingCustomerData = () => {
       }) as any,
     [resolvedTheme]
   )
+  const isPartnerBilledOrganization = isPartnerBillingOrganization(
+    selectedOrganization?.billing_partner
+  )
 
   return (
     <ScaffoldSection>
@@ -174,8 +178,7 @@ export const BillingCustomerData = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {selectedOrganization?.managed_by !== undefined &&
-        selectedOrganization?.managed_by !== 'supabase' ? (
+        {selectedOrganization && isPartnerBilledOrganization ? (
           <PartnerManagedResource
             managedBy={selectedOrganization?.managed_by}
             resource="Billing Addresses"

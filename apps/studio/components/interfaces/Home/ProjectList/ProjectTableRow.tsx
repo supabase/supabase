@@ -18,10 +18,13 @@ import { TimestampInfo } from 'ui-patterns'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
+import PartnerIcon from '@/components/ui/PartnerIcon'
 import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
+import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
 import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
 import { BASE_PATH } from '@/lib/constants'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { createNavigationHandler } from '@/lib/navigation'
 import type { Organization } from '@/types'
 
@@ -51,6 +54,11 @@ export const ProjectTableRow = ({
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
+  const projectManagedBy = getManagedByFromOrganizationPartner(
+    undefined,
+    project.integration_source
+  )
+  const hasPartnerIcon = projectManagedBy !== MANAGED_BY.SUPABASE
   const handleNavigation = createNavigationHandler(url, router)
 
   const handleCopyProjectRef = (e: React.SyntheticEvent) => {
@@ -97,7 +105,7 @@ export const ProjectTableRow = ({
                 )}
               </button>
             </div>
-            {(isGithubIntegrated || isVercelIntegrated) && (
+            {(isGithubIntegrated || isVercelIntegrated || hasPartnerIcon) && (
               <div className="flex items-center gap-x-1.5">
                 {isVercelIntegrated && (
                   <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center text-black dark:text-white">
@@ -108,6 +116,7 @@ export const ProjectTableRow = ({
                     />
                   </div>
                 )}
+                <PartnerIcon organization={{ managed_by: projectManagedBy }} />
                 {isGithubIntegrated && (
                   <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md">
                     <div className="w-5 h-5 p-1 flex items-center">
