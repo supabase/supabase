@@ -42,6 +42,12 @@ export const SHORTCUT_IDS = {
   NAV_LOGS: 'nav.logs',
   NAV_INTEGRATIONS: 'nav.integrations',
   NAV_SETTINGS: 'nav.settings',
+  NAV_ORG_PROJECTS: 'nav.org-projects',
+  NAV_ORG_TEAM: 'nav.org-team',
+  NAV_ORG_INTEGRATIONS: 'nav.org-integrations',
+  NAV_ORG_USAGE: 'nav.org-usage',
+  NAV_ORG_BILLING: 'nav.org-billing',
+  NAV_ORG_SETTINGS: 'nav.org-settings',
 } as const
 
 /**
@@ -251,7 +257,7 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   [SHORTCUT_IDS.NAV_OBSERVABILITY]: {
     id: SHORTCUT_IDS.NAV_OBSERVABILITY,
     label: 'Go to Observability',
-    sequence: ['G', 'O'],
+    sequence: ['G', 'U'],
     showInSettings: false,
   },
   [SHORTCUT_IDS.NAV_LOGS]: {
@@ -270,6 +276,42 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     id: SHORTCUT_IDS.NAV_SETTINGS,
     label: 'Go to Project Settings',
     sequence: ['G', ','],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.NAV_ORG_PROJECTS]: {
+    id: SHORTCUT_IDS.NAV_ORG_PROJECTS,
+    label: 'Go to Projects',
+    sequence: ['G', 'P'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.NAV_ORG_TEAM]: {
+    id: SHORTCUT_IDS.NAV_ORG_TEAM,
+    label: 'Go to Team',
+    sequence: ['G', 'M'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.NAV_ORG_INTEGRATIONS]: {
+    id: SHORTCUT_IDS.NAV_ORG_INTEGRATIONS,
+    label: 'Go to Organization Integrations',
+    sequence: ['G', 'I'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.NAV_ORG_USAGE]: {
+    id: SHORTCUT_IDS.NAV_ORG_USAGE,
+    label: 'Go to Usage',
+    sequence: ['G', 'U'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.NAV_ORG_BILLING]: {
+    id: SHORTCUT_IDS.NAV_ORG_BILLING,
+    label: 'Go to Billing',
+    sequence: ['G', 'B'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.NAV_ORG_SETTINGS]: {
+    id: SHORTCUT_IDS.NAV_ORG_SETTINGS,
+    label: 'Go to Organization Settings',
+    sequence: ['G', 'O'],
     showInSettings: false,
   },
 }

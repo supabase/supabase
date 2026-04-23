@@ -375,24 +375,28 @@ const OrganizationLinks = () => {
       href: `/org/${organizationSlug}`,
       key: 'projects',
       icon: <Boxes size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_PROJECTS,
     },
     {
       label: 'Team',
       href: `/org/${organizationSlug}/team`,
       key: 'team',
       icon: <Users size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_TEAM,
     },
     {
       label: 'Integrations',
       href: `/org/${organizationSlug}/integrations`,
       key: 'integrations',
       icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_INTEGRATIONS,
     },
     {
       label: 'Usage',
       href: `/org/${organizationSlug}/usage`,
       key: 'usage',
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_USAGE,
     },
     ...(showBilling
       ? [
@@ -401,6 +405,7 @@ const OrganizationLinks = () => {
             href: `/org/${organizationSlug}/billing`,
             key: 'billing',
             icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_BILLING,
           },
         ]
       : []),
@@ -409,6 +414,7 @@ const OrganizationLinks = () => {
       href: `/org/${organizationSlug}/general`,
       key: 'settings',
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS,
     },
   ]
 
@@ -433,6 +439,7 @@ const OrganizationLinks = () => {
               key: item.label,
               icon: item.icon,
               disabled: disableAccessMfa,
+              shortcutId: item.shortcutId,
             }}
           />
         ))}
