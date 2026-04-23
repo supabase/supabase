@@ -73,9 +73,8 @@ export const GitHubIntegrationConnectionForm = ({
     gitHubAuthorization,
     githubRepos,
     hasPartialResponseDueToSSO,
-    isLoadingGitHubAuthorization,
-    isLoadingGitHubRepos,
-    refetchGitHubAuthorizationAndRepositories,
+    isLoading: isLoadingRepositoryOptions,
+    refetch: refetchRepositoryOptions,
   } = useGitHubRepositoryOptions()
 
   const { mutate: updateBranch } = useBranchUpdateMutation({
@@ -370,8 +369,7 @@ export const GitHubIntegrationConnectionForm = ({
     isCreatingConnection ||
     isUpdatingConnection ||
     isDeletingConnection ||
-    isLoadingGitHubAuthorization ||
-    isLoadingGitHubRepos
+    isLoadingRepositoryOptions
 
   return (
     <>
@@ -400,11 +398,8 @@ export const GitHubIntegrationConnectionForm = ({
                 repositories={githubRepos}
                 gitHubAuthorization={gitHubAuthorization}
                 hasPartialResponseDueToSSO={hasPartialResponseDueToSSO}
-                isLoadingGitHubAuthorization={isLoadingGitHubAuthorization}
-                isLoadingGitHubRepos={isLoadingGitHubRepos}
-                refetchGitHubAuthorizationAndRepositories={
-                  refetchGitHubAuthorizationAndRepositories
-                }
+                isLoading={isLoadingRepositoryOptions}
+                refetch={refetchRepositoryOptions}
                 onRepositorySelect={(repo) => {
                   githubSettingsForm.setValue('branchName', repo.default_branch || 'main')
                 }}

@@ -79,9 +79,8 @@ export const useGitHubRepositoryOptions = () => {
     gitHubAuthorization,
     githubRepos,
     hasPartialResponseDueToSSO: githubReposData?.partial_response_due_to_sso ?? false,
-    isLoadingGitHubAuthorization,
-    isLoadingGitHubRepos,
-    refetchGitHubAuthorizationAndRepositories,
+    isLoading: isLoadingGitHubAuthorization || isLoadingGitHubRepos,
+    refetch: refetchGitHubAuthorizationAndRepositories,
   }
 }
 
@@ -98,10 +97,9 @@ interface GitHubRepositoryFieldProps<TFormValues extends FieldValues> {
   repositories: GitHubRepository[]
   gitHubAuthorization: unknown | null
   hasPartialResponseDueToSSO?: boolean
-  isLoadingGitHubAuthorization?: boolean
-  isLoadingGitHubRepos?: boolean
+  isLoading?: boolean
   placeholder?: string
-  refetchGitHubAuthorizationAndRepositories: () => void
+  refetch: () => void
   onConnectClick?: () => void
   onRepositorySelect?: (repo: GitHubRepository) => void
 }
@@ -119,10 +117,9 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
   repositories,
   gitHubAuthorization,
   hasPartialResponseDueToSSO = false,
-  isLoadingGitHubAuthorization = false,
-  isLoadingGitHubRepos = false,
+  isLoading = false,
   placeholder = 'Choose GitHub repository',
-  refetchGitHubAuthorizationAndRepositories,
+  refetch,
   onConnectClick,
   onRepositorySelect,
 }: GitHubRepositoryFieldProps<TFormValues>) => {
@@ -146,10 +143,7 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                 disabled={disabled}
                 onClick={() => {
                   onConnectClick?.()
-                  openInstallGitHubIntegrationWindow(
-                    'authorize',
-                    refetchGitHubAuthorizationAndRepositories
-                  )
+                  openInstallGitHubIntegrationWindow('authorize', refetch)
                 }}
                 icon={GITHUB_ICON}
               >
@@ -164,8 +158,8 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                     type="default"
                     htmlType="button"
                     className="justify-start h-[34px] w-full"
-                    disabled={disabled || isLoadingGitHubAuthorization || isLoadingGitHubRepos}
-                    loading={isLoadingGitHubAuthorization || isLoadingGitHubRepos}
+                    disabled={disabled || isLoading}
+                    loading={isLoading}
                     icon={GITHUB_ICON}
                     iconRight={
                       <span className="grow flex justify-end">
@@ -175,9 +169,7 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                   >
                     {selectedRepository?.name ||
                       selectedRepositoryName ||
-                      (isLoadingGitHubAuthorization
-                        ? 'Loading GitHub repositories...'
-                        : placeholder)}
+                      (isLoading ? 'Loading GitHub repositories...' : placeholder)}
                   </Button>
                 </FormControl_Shadcn_>
               </PopoverTrigger_Shadcn_>
@@ -230,10 +222,7 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                         className="flex gap-2 items-center cursor-pointer"
                         onSelect={() => {
                           setIsRepoSelectorOpen(false)
-                          openInstallGitHubIntegrationWindow(
-                            'install',
-                            refetchGitHubAuthorizationAndRepositories
-                          )
+                          openInstallGitHubIntegrationWindow('install', refetch)
                         }}
                       >
                         <PlusIcon size={16} />
@@ -248,10 +237,7 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                             className="flex gap-2 items-start cursor-pointer"
                             onSelect={() => {
                               setIsRepoSelectorOpen(false)
-                              openInstallGitHubIntegrationWindow(
-                                'authorize',
-                                refetchGitHubAuthorizationAndRepositories
-                              )
+                              openInstallGitHubIntegrationWindow('authorize', refetch)
                             }}
                           >
                             <RefreshCw size={16} className="mt-0.5 shrink-0" />

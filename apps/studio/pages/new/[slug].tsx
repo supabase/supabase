@@ -279,9 +279,8 @@ const Wizard: NextPageWithLayout = () => {
     gitHubAuthorization,
     githubRepos,
     hasPartialResponseDueToSSO,
-    isLoadingGitHubAuthorization,
-    isLoadingGitHubRepos,
-    refetchGitHubAuthorizationAndRepositories,
+    isLoading: isLoadingRepositoryOptions,
+    refetch: refetchRepositoryOptions,
   } = useGitHubRepositoryOptions()
 
   const {
@@ -542,11 +541,8 @@ const Wizard: NextPageWithLayout = () => {
                             repositories={githubRepos}
                             gitHubAuthorization={gitHubAuthorization}
                             hasPartialResponseDueToSSO={hasPartialResponseDueToSSO}
-                            isLoadingGitHubAuthorization={isLoadingGitHubAuthorization}
-                            isLoadingGitHubRepos={isLoadingGitHubRepos}
-                            refetchGitHubAuthorizationAndRepositories={
-                              refetchGitHubAuthorizationAndRepositories
-                            }
+                            isLoading={isLoadingRepositoryOptions}
+                            refetch={refetchRepositoryOptions}
                             onConnectClick={() => track('project_creation_github_connect_clicked')}
                           />
                         </Panel.Content>
