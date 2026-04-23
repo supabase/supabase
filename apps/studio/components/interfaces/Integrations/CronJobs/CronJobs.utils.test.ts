@@ -227,9 +227,7 @@ describe('parseCronJobCommand', () => {
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
       method: 'POST',
-      httpHeaders: [
-        { name: 'X-Name', value: "O'Reilly" },
-      ],
+      httpHeaders: [{ name: 'X-Name', value: "O'Reilly" }],
       httpBody: `{"message":"hello  there","name":"O'Reilly"}`,
       timeoutMs: 5000,
       type: 'http_request',

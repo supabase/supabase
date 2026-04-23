@@ -29,7 +29,9 @@ select
       headers:=jsonb_build_object(${headers
         .filter((v) => v.name && v.value)
         .map((v) => `'${escapeSqlLiteral(v.name)}', '${escapeSqlLiteral(v.value)}'`)
-        .join(', ')}), ${method === 'POST' && body ? `\n      body:='${escapeSqlLiteral(body)}',` : ''}
+        .join(
+          ', '
+        )}), ${method === 'POST' && body ? `\n      body:='${escapeSqlLiteral(body)}',` : ''}
       timeout_milliseconds:=${timeout}
   );`
 }
@@ -44,10 +46,7 @@ const DEFAULT_CRONJOB_COMMAND = {
 } as const
 
 export const parseCronJobCommand = (originalCommand: string, projectRef: string): CronJobType => {
-  const command = originalCommand
-    .replaceAll('$$', ' ')
-    .replaceAll(/\n/g, ' ')
-    .trim()
+  const command = originalCommand.replaceAll('$$', ' ').replaceAll(/\n/g, ' ').trim()
 
   if (command.toLocaleLowerCase().match(/^select\s+net\./)) {
     const methodMatch = command.match(/select\s+net\.([^']+)\(\s*url:=/i)
