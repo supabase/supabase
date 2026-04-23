@@ -30,7 +30,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       name: 'New Logs interface',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
       enabled: isUnifiedLogsPreviewAvailable && isEnterpriseOrSupabaseOrg,
-      isNew: false,
+      isNew: true,
       isPlatformOnly: true,
       isDefaultOptIn: false,
     },
