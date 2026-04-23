@@ -19,7 +19,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { PolicyRow } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
+import { PolicyRow } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyRow'
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
 import { Bucket } from '@/data/storage/buckets-query'
 

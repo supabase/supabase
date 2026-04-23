@@ -25,7 +25,7 @@ import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './Si
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 import type { SupaRow } from '@/components/grid/types'
-import { GeneratedPolicy } from '@/components/interfaces/Auth/Policies/Policies.utils'
+import { GeneratedPolicy } from '@/components/interfaces/Database/Policies/Policies.utils'
 import SparkBar from '@/components/ui/SparkBar'
 import { createDatabaseColumn } from '@/data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from '@/data/database-columns/database-column-delete-mutation'

@@ -20,7 +20,7 @@ import { formatPoliciesForStorage, UNGROUPED_POLICY_SYMBOL } from '../Storage.ut
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import { BucketsPolicies, type SelectBucketPolicyForAction } from './StoragePoliciesBucketsSection'
 import { StoragePoliciesEditPolicyModal } from './StoragePoliciesEditPolicyModal'
-import { PolicyEditorModal } from '@/components/interfaces/Auth/Policies/PolicyEditorModal'
+import { PolicyEditorModal } from '@/components/interfaces/Database/Policies/PolicyEditorModal'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useDatabasePolicyCreateMutation } from '@/data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'

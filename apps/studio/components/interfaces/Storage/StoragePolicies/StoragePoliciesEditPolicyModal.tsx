@@ -12,9 +12,9 @@ import {
 import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
 import StoragePoliciesEditor from './StoragePoliciesEditor'
 import StoragePoliciesReview from './StoragePoliciesReview'
-import { POLICY_MODAL_VIEWS } from '@/components/interfaces/Auth/Policies/Policies.constants'
-import PolicySelection from '@/components/interfaces/Auth/Policies/PolicySelection'
-import PolicyTemplates from '@/components/interfaces/Auth/Policies/PolicyTemplates'
+import { POLICY_MODAL_VIEWS } from '@/components/interfaces/Database/Policies/Policies.constants'
+import PolicySelection from '@/components/interfaces/Database/Policies/PolicySelection'
+import PolicyTemplates from '@/components/interfaces/Database/Policies/PolicyTemplates'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { DOCS_URL } from '@/lib/constants'
 

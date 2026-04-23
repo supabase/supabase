@@ -53,22 +53,26 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
       ],
     },
     {
-      title: 'Configuration',
+      title: 'Access Control',
       items: [
+        {
+          name: 'Policies',
+          key: 'policies',
+          url: getDatabaseURL('policies'),
+        },
         showRoles && { name: 'Roles', key: 'roles', url: getDatabaseURL('roles') },
         columnLevelPrivileges && {
           name: 'Column Privileges',
           key: 'column-privileges',
           url: getDatabaseURL('column-privileges'),
         },
-        {
-          name: 'Policies',
-          key: 'policies',
-          url: `/project/${ref}/auth/policies`,
-          rightIcon: ExternalLinkIcon,
-        },
-        { name: 'Settings', key: 'settings', url: getDatabaseURL('settings') },
       ].filter(Boolean) as ProductMenuGroupItem[],
+    },
+    {
+      title: 'Configuration',
+      items: [{ name: 'Settings', key: 'settings', url: getDatabaseURL('settings') }].filter(
+        Boolean
+      ) as ProductMenuGroupItem[],
     },
     {
       title: 'Platform',

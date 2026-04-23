@@ -1,8 +1,12 @@
 import { useFlag, useParams } from 'common'
+import { ArrowUpRight } from 'lucide-react'
+import { createElement } from 'react'
 
 import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
+
+const ExternalLinkIcon = createElement(ArrowUpRight, { strokeWidth: 1, className: 'h-4 w-4' })
 
 export interface GenerateAuthMenuOptions {
   ref?: string
@@ -71,6 +75,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
           name: 'Policies',
           key: 'policies',
           url: `${baseUrl}/policies`,
+          rightIcon: ExternalLinkIcon,
           items: [],
         },
         ...(isPlatform
