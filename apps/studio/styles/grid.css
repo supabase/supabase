@@ -36,6 +36,11 @@
   box-shadow: inset 0 0 0 1px #24b47e;
 }
 
+.rdg:not(:focus-within) .rdg-cell[aria-selected='true'] {
+  box-shadow: none;
+  outline: none;
+}
+
 /* Cell with unsaved changes - warning (amber) background/text color */
 .rdg-cell.rdg-cell--dirty {
   background-color: hsl(var(--warning-300) / 0.75);

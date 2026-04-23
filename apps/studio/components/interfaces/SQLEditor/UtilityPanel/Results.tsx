@@ -12,7 +12,7 @@ import {
 
 import { CellDetailPanel } from './CellDetailPanel'
 import { formatCellValue, formatClipboardValue } from './Results.utils'
-import { handleCopyCell } from '@/components/grid/SupabaseGrid.utils'
+import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 
 const Results = ({ rows }: { rows: readonly any[] }) => {
   const [expandCell, setExpandCell] = useState(false)
@@ -137,7 +137,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
             className="flex-grow min-h-0 border-t-0"
             rowClass={() => '[&>.rdg-cell]:items-center'}
             onSelectedCellChange={setCellPosition}
-            onCellKeyDown={handleCopyCell}
+            onCellKeyDown={handleCellKeyDown}
           />
           <CellDetailPanel
             column={cellPosition?.column.name ?? ''}

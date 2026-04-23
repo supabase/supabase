@@ -265,7 +265,7 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
   }, [urlParams, table, projectRef])
 }
 
-export const handleCopyCell = (
+export const handleCellKeyDown = (
   {
     mode,
     column,
@@ -278,5 +278,9 @@ export const handleCopyCell = (
     const cellValue = row[colKey] ?? ''
     const value = formatClipboardValue(cellValue)
     copyToClipboard(value)
+  }
+  if (mode === 'SELECT' && event.key === 'Escape') {
+    const activeElement = document.activeElement as HTMLElement | null
+    activeElement?.blur()
   }
 }

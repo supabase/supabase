@@ -15,7 +15,7 @@ import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import { RowContextMenuProvider, RowRenderer } from './RowRenderer'
 import { useTableFilterNew } from '@/components/grid/hooks/useTableFilterNew'
-import { handleCopyCell } from '@/components/grid/SupabaseGrid.utils'
+import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { formatForeignKeys } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
@@ -379,7 +379,12 @@ export const Grid = memo(
                       onRowDoubleClick(props.row, { name: props.column.name })
                     }
                   }}
-                  onCellKeyDown={handleCopyCell}
+                  onCellKeyDown={(args, event) => {
+                    handleCellKeyDown(args, event)
+                    if (args.mode === 'SELECT' && event.key === 'Escape') {
+                      ;(document.activeElement as HTMLElement | null)?.blur()
+                    }
+                  }}
                 />
               </RowContextMenuProvider>
               {/* The DragOverlay is necessary to avoid styling issues while dragging a column */}
