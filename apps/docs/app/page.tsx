@@ -138,7 +138,7 @@ const selfHostingOptions = [
 
 const clientLibraries = [
   {
-    title: 'Javascript',
+    title: 'JavaScript',
     icon: 'reference-javascript',
     href: '/reference/javascript/introduction',
     enabled: true,
