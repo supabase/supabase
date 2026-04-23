@@ -379,12 +379,7 @@ export const Grid = memo(
                       onRowDoubleClick(props.row, { name: props.column.name })
                     }
                   }}
-                  onCellKeyDown={(args, event) => {
-                    handleCellKeyDown(args, event)
-                    if (args.mode === 'SELECT' && event.key === 'Escape') {
-                      ;(document.activeElement as HTMLElement | null)?.blur()
-                    }
-                  }}
+                  onCellKeyDown={handleCellKeyDown}
                 />
               </RowContextMenuProvider>
               {/* The DragOverlay is necessary to avoid styling issues while dragging a column */}
