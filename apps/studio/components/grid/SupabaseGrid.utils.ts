@@ -282,10 +282,6 @@ export const handleCellKeyDown = (
     const value = formatClipboardValue(cellValue)
     copyToClipboard(value)
   }
-  if (event.key === 'Escape') {
-    const activeElement = document.activeElement as HTMLElement | null
-    activeElement?.blur()
-  }
   // Let registered shortcuts win over rdg's "type a key to enter edit mode" default.
   if (eventMatchesAnyShortcut(event.nativeEvent, tableEditorRegistry)) {
     event.preventGridDefault()

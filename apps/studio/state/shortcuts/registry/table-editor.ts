@@ -9,6 +9,9 @@ export const TABLE_EDITOR_SHORTCUT_IDS = {
   TABLE_EDITOR_TOGGLE_ALL_ROW_SELECTION: 'table-editor.toggle-all-row-selection',
   TABLE_EDITOR_SELECT_ALL_IN_TABLE: 'table-editor.select-all-in-table',
   TABLE_EDITOR_DELETE_SELECTED_ROWS: 'table-editor.delete-selected-rows',
+  TABLE_EDITOR_START_NAVIGATION_DOWN: 'table-editor.start-navigation-down',
+  TABLE_EDITOR_START_NAVIGATION_UP: 'table-editor.start-navigation-up',
+  TABLE_EDITOR_EXIT_SELECTION: 'table-editor.exit-selection',
 }
 
 export type TableEditorShortcutId =
@@ -68,6 +71,27 @@ export const tableEditorRegistry: RegistryDefinations<TableEditorShortcutId> = {
     id: TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_DELETE_SELECTED_ROWS,
     label: 'Delete selected rows',
     sequence: ['Mod+Backspace'],
+    showInSettings: false,
+    options: { ignoreInputs: true },
+  },
+  [TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_START_NAVIGATION_DOWN]: {
+    id: TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_START_NAVIGATION_DOWN,
+    label: 'Start grid navigation (down)',
+    sequence: ['ArrowDown'],
+    showInSettings: false,
+    options: { ignoreInputs: true },
+  },
+  [TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_START_NAVIGATION_UP]: {
+    id: TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_START_NAVIGATION_UP,
+    label: 'Start grid navigation (up)',
+    sequence: ['ArrowUp'],
+    showInSettings: false,
+    options: { ignoreInputs: true },
+  },
+  [TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_EXIT_SELECTION]: {
+    id: TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_EXIT_SELECTION,
+    label: 'Exit grid selection',
+    sequence: ['Escape'],
     showInSettings: false,
     options: { ignoreInputs: true },
   },

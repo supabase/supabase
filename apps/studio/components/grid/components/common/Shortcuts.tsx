@@ -13,6 +13,15 @@ type ShortcutsProps = {
 
 export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
   const snap = useTableEditorTableStateSnapshot()
+  const canStartNavigation = !snap.selectedCellPosition && rows.length > 0
+
+  const startGridNavigation = () => {
+    const frozenColumns = snap.gridColumns.filter((x) => x.frozen)
+    gridRef.current?.selectCell({
+      idx: frozenColumns.length,
+      rowIdx: 0,
+    })
+  }
 
   useShortcut(SHORTCUT_IDS.TABLE_EDITOR_JUMP_FIRST_ROW, () => {
     if (snap.selectedCellPosition) {
@@ -68,6 +77,25 @@ export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
     },
     {
       registerInCommandMenu: true,
+      enabled: !!snap.selectedCellPosition,
+    }
+  )
+
+  useShortcut(SHORTCUT_IDS.TABLE_EDITOR_START_NAVIGATION_DOWN, startGridNavigation, {
+    enabled: canStartNavigation,
+  })
+
+  useShortcut(SHORTCUT_IDS.TABLE_EDITOR_START_NAVIGATION_UP, startGridNavigation, {
+    enabled: canStartNavigation,
+  })
+
+  useShortcut(
+    SHORTCUT_IDS.TABLE_EDITOR_EXIT_SELECTION,
+    () => {
+      snap.setSelectedCellPosition(null)
+      ;(document.activeElement as HTMLElement | null)?.blur()
+    },
+    {
       enabled: !!snap.selectedCellPosition,
     }
   )
