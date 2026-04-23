@@ -1,26 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import { LogDrainDestinationSheetForm } from 'components/interfaces/LogDrains/LogDrainDestinationSheetForm'
-import { LogDrains } from 'components/interfaces/LogDrains/LogDrains'
-import { LOG_DRAIN_TYPES, LogDrainType } from 'components/interfaces/LogDrains/LogDrains.constants'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { DocsButton } from 'components/ui/DocsButton'
-import {
-  LogDrainCreateVariables,
-  useCreateLogDrainMutation,
-} from 'data/log-drains/create-log-drain-mutation'
-import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-mutation'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
 import { ChevronDown } from 'lucide-react'
 import { cloneElement, useState } from 'react'
 import { toast } from 'sonner'
-import type { NextPageWithLayout } from 'types'
 import {
   Alert_Shadcn_,
   Button,
@@ -31,6 +13,28 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { LogDrainDestinationSheetForm } from '@/components/interfaces/LogDrains/LogDrainDestinationSheetForm'
+import { LogDrains } from '@/components/interfaces/LogDrains/LogDrains'
+import {
+  LOG_DRAIN_TYPES,
+  LogDrainType,
+} from '@/components/interfaces/LogDrains/LogDrains.constants'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { DocsButton } from '@/components/ui/DocsButton'
+import {
+  LogDrainCreateVariables,
+  useCreateLogDrainMutation,
+} from '@/data/log-drains/create-log-drain-mutation'
+import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
+import { useUpdateLogDrainMutation } from '@/data/log-drains/update-log-drain-mutation'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -52,6 +56,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const sentryEnabled = useFlag('SentryLogDrain')
   const s3Enabled = useFlag('S3logdrain')
   const axiomEnabled = useFlag('axiomLogDrain')
+  const otlpEnabled = useFlag('otlpLogDrain')
   const last9Enabled = useFlag('Last9LogDrain')
 
   const { data: logDrains } = useLogDrainsQuery(
@@ -219,6 +224,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                       if (t.value === 'sentry') return sentryEnabled
                       if (t.value === 's3') return s3Enabled
                       if (t.value === 'axiom') return axiomEnabled
+                      if (t.value === 'otlp') return otlpEnabled
                       if (t.value === 'last9') return last9Enabled
                       return true
                     }).map((drainType) => (

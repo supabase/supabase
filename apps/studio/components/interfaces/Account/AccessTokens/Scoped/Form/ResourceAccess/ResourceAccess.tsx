@@ -1,11 +1,11 @@
-import { useOrgAndProjectData } from 'components/interfaces/Account/AccessTokens/hooks/useOrgAndProjectData'
-import { useProfile } from 'lib/profile'
 import { FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ResourceAccessProps } from './ResourceAccess.types'
 import { ResourceMultiSelector } from './ResourceMultiSelector'
 import { ResourceOption } from './ResourceOption'
+import { useOrgAndProjectData } from '@/components/interfaces/Account/AccessTokens/hooks/useOrgAndProjectData'
+import { useProfile } from '@/lib/profile'
 
 const RESOURCE_OPTIONS = [
   {

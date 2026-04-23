@@ -14,8 +14,7 @@ import { Badge, cn } from 'ui'
 // 2. AnchorHTMLAttributes - for standard HTML anchor props (className, etc)
 // We omit href from both since we compute it internally from item.href
 interface NavigationItemProps
-  extends Omit<LinkProps, 'href'>,
-    Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
+  extends Omit<LinkProps, 'href'>, Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
   item: SidebarNavItem
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
   level?: number

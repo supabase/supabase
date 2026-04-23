@@ -1,13 +1,14 @@
-import { useCallback } from 'react'
-
 import { useParams } from 'common'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import type {
-  CommandMenuOpenedEvent,
+  CommandMenuClosedEvent,
   CommandMenuCommandClickedEvent,
+  CommandMenuOpenedEvent,
   CommandMenuSearchSubmittedEvent,
 } from 'common/telemetry-constants'
+import { useCallback } from 'react'
+
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export function useStudioCommandMenuTelemetry() {
   const { ref: projectRef } = useParams()
@@ -18,6 +19,7 @@ export function useStudioCommandMenuTelemetry() {
     (
       event:
         | CommandMenuOpenedEvent
+        | CommandMenuClosedEvent
         | CommandMenuCommandClickedEvent
         | CommandMenuSearchSubmittedEvent
     ) => {

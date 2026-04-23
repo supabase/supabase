@@ -1,8 +1,28 @@
 module.exports = [
   {
     permanent: true,
+    source: '/ui/docs/ai-editors-rules/prompts',
+    destination: '/ui/docs/ai-editors-rules/skills',
+  },
+  {
+    permanent: true,
     source: '/auth/Auth',
     destination: '/auth',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
+    destination: '/docs/guides/api/custom-claims-and-role-based-access-control-rbac',
   },
   {
     permanent: true,
@@ -2648,6 +2668,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/storage/analytics/replication',
+    destination: '/docs/guides/database/replication/replication-setup',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/server-side-rendering',
     destination: '/docs/guides/auth/server-side/advanced-guide',
   },
@@ -2823,7 +2848,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/oauth-apps/oauth-scopes',
-    destination: '/docs/guides/integrations/build-a-supabase-integration/oauth-scopes',
+    destination: '/docs/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes',
   },
   {
     permanent: true,
@@ -3091,5 +3116,15 @@ module.exports = [
     ],
     destination: '/dashboard/redeem?code=:code',
     permanent: false,
+  },
+  {
+    permanent: true,
+    source: '/docs/llms.txt',
+    destination: '/llms.txt',
+  },
+  {
+    permanent: true,
+    source: '/docs/llms-full.txt',
+    destination: '/llms-full.txt',
   },
 ]

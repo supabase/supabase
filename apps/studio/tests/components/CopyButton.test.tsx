@@ -1,9 +1,9 @@
-import { expect, test, vi } from 'vitest'
-
 import { screen } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
-import CopyButton from 'components/ui/CopyButton'
-import { render } from 'tests/helpers'
+import { expect, test, vi } from 'vitest'
+
+import CopyButton from '@/components/ui/CopyButton'
+import { render } from '@/tests/helpers'
 
 test('shows copied text', async () => {
   const callback = vi.fn()

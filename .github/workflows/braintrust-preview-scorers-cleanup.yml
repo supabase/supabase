@@ -1,0 +1,65 @@
+name: Cleanup Braintrust preview scorers
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  cleanup-scorers:
+    name: Delete preview scorers
+    if: contains(github.event.pull_request.labels.*.name, 'preview-scorers') && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Delete preview scorers from staging
+        env:
+          BRAINTRUST_API_KEY: ${{ secrets.BRAINTRUST_API_KEY }}
+          BRAINTRUST_STAGING_PROJECT_ID: ${{ secrets.BRAINTRUST_STAGING_PROJECT_ID }}
+        run: |
+          BRANCH_SLUG=$(echo "${GITHUB_HEAD_REF}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
+          readarray -t SLUGS < <(jq -r '.[].slug' apps/studio/evals/scorer-online-manifest.json)
+
+          for slug in "${SLUGS[@]}"; do
+            prefixed="${BRANCH_SLUG}-${slug}"
+            id=$(curl -s "https://api.braintrust.dev/v1/function?project_id=${BRAINTRUST_STAGING_PROJECT_ID}&slug=${prefixed}" \
+              -H "Authorization: Bearer ${BRAINTRUST_API_KEY}" | jq -r '.objects[0].id // empty')
+            if [ -n "$id" ]; then
+              curl -s -X DELETE "https://api.braintrust.dev/v1/function/${id}" \
+                -H "Authorization: Bearer ${BRAINTRUST_API_KEY}"
+              echo "Deleted ${prefixed}"
+            else
+              echo "Not found: ${prefixed} (already deleted or never deployed)"
+            fi
+          done
+
+      - name: Post cleanup comment
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number
+            const marker = '<!-- preview-scorers-bot -->'
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            })
+
+            const existing = comments.find(c => c.body?.includes(marker))
+            if (!existing) return
+
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: existing.id,
+              body: `${marker}\n### Braintrust Preview Scorers\n\nPreview scorers have been cleaned up.`,
+            })

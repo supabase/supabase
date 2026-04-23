@@ -10,14 +10,9 @@ import {
   type ReactElement,
 } from 'react'
 import type { StreamdownProps } from 'streamdown'
-
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import {
   Button,
   cn,
-  CodeBlock,
-  CodeBlockLang,
-  markdownComponents,
   Dialog,
   DialogClose,
   DialogContent,
@@ -27,11 +22,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
+import { markdownComponents } from 'ui-patterns/Markdown'
+
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
-import { defaultUrlTransform } from './Message.utils'
+import { defaultUrlTransform, wrapPlaceholderUrls } from './Message.utils'
+import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 
 const Streamdown = dynamic<StreamdownProps>(
   () => import('streamdown').then((mod) => mod.Streamdown),
@@ -41,7 +40,7 @@ const Streamdown = dynamic<StreamdownProps>(
 // Streamdown splits ordered lists with complex content (e.g. code blocks) into
 // separate <ol> elements. The `start` attribute preserves semantics for screen
 // readers, while `counterReset` is what actually fixes the visible numbering —
-// the prose config (tailwind.config.js) uses a custom CSS counter named "item"
+// the prose config (tailwind.config.ts) uses a custom CSS counter named "item"
 // with `listStyleType: 'none'`, so the `start` attribute alone has no visual effect.
 export const OrderedList = memo(({ children, start }: { children?: ReactNode; start?: number }) => (
   <ol
@@ -155,13 +154,13 @@ export function MessageMarkdown({
 }) {
   const markdownSource = useMemo(() => {
     if (typeof children === 'string') {
-      return children
+      return wrapPlaceholderUrls(children)
     }
-
     if (Array.isArray(children)) {
-      return children.filter((child): child is string => typeof child === 'string').join('')
+      return wrapPlaceholderUrls(
+        children.filter((child): child is string => typeof child === 'string').join('')
+      )
     }
-
     return ''
   }, [children])
 

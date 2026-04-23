@@ -31,7 +31,7 @@ Grafana maintains a [Supabase integration guide](https://grafana.com/docs/grafan
 2. Provide:
    - Your Supabase project ref (e.g. `abcd1234`).
    - The Metrics API endpoint: `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`.
-   - HTTP Basic Auth credentials (`service_role` / `sb_secret_...`).
+   - HTTP Basic Auth credentials (`sb_secret_...`).
 3. Choose the scrape interval (1 minute recommended) and test the connection. Grafana Cloud will deploy an agent in the background that scrapes the Metrics API and forwards the data to Prometheus.
 
 If you prefer to reuse an existing Grafana Agent deployment, configure an [integration pipeline](https://grafana.com/docs/grafana-cloud/send-data/agent/integrations/integration-reference/integration-supabase/) with the same URL and credentials.

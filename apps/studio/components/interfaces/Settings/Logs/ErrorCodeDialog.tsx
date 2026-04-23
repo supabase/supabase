@@ -1,5 +1,3 @@
-import { useErrorCodesQuery } from 'data/content-api/docs-error-codes-query'
-import { type ErrorCodeQueryQuery, Service } from 'data/graphql/graphql'
 import { AlertTriangle } from 'lucide-react'
 import {
   Alert_Shadcn_,
@@ -14,6 +12,9 @@ import {
   DialogTitle,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { useErrorCodesQuery } from '@/data/content-api/docs-error-codes-query'
+import { Service, type ErrorCodeQueryQuery } from '@/data/graphql/graphql'
 
 interface ErrorCodeDialogProps {
   open: boolean

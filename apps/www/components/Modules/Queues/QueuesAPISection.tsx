@@ -1,8 +1,9 @@
-import React, { FC } from 'react'
+import React, { type FC, type ReactNode } from 'react'
+import { cn } from 'ui'
+import { TextLink } from 'ui-patterns/TextLink'
 
-import { cn, TextLink } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import CodeWindow from '~/components/CodeWindow'
+import CodeWindow from '@/components/CodeWindow'
+import SectionContainer from '@/components/Layouts/SectionContainer'
 
 const codeSnippet = `const queues = createClient(supabaseUrl, supabaseKey, {
     db: { schema: "pgmq_public" },
@@ -21,9 +22,9 @@ const message = await queues.rpc("pop", {
 
 interface Props {
   id: string
-  label: string | JSX.Element
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
+  label: ReactNode
+  heading: ReactNode
+  subheading: ReactNode
   className?: string
   cta?: {
     label: string

@@ -1,58 +1,43 @@
-import type { ProjectSettings } from '@/data/config/project-settings-v2-query'
-import type { CustomDomainsData } from '@/data/custom-domains/custom-domains-query'
 import type { ProjectJsonSchemaPaths } from '@/data/docs/project-json-schema-query'
 import type { LoadBalancer } from '@/data/read-replicas/load-balancers-query'
 import type { Database } from '@/data/read-replicas/replicas-query'
 import { snakeToCamel } from '@/lib/helpers'
 
 /**
- * Resolves the primary project API endpoint, respecting custom domains.
- */
-export function getProjectApiEndpoint({
-  settings,
-  customDomainData,
-}: {
-  settings: ProjectSettings | undefined
-  customDomainData: CustomDomainsData | undefined
-}): string {
-  if (customDomainData?.customDomain?.status === 'active') {
-    return `https://${customDomainData.customDomain.hostname}`
-  }
-
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint
-  return `${protocol}://${endpoint ?? '-'}`
-}
-
-/**
  * Resolves the API endpoint URL based on the selected database, custom domain
- * status, and load balancer configuration.
+ * status, and load balancer configuration. The returned URL is normalized to
+ * end with `/rest/v1/` to match the Data API base path documented elsewhere.
  */
 export function getApiEndpoint({
   selectedDatabaseId,
   projectRef,
-  customDomainData,
+  resolvedEndpoint,
   loadBalancers,
   selectedDatabase,
 }: {
   selectedDatabaseId: string | undefined
   projectRef: string | undefined
-  customDomainData: CustomDomainsData | undefined
+  resolvedEndpoint: string | undefined
   loadBalancers: Array<LoadBalancer> | undefined
   selectedDatabase: Database | undefined
 }): string {
-  const isCustomDomainActive = customDomainData?.customDomain?.status === 'active'
   const loadBalancerSelected = selectedDatabaseId === 'load-balancer'
 
-  if (isCustomDomainActive && selectedDatabaseId === projectRef) {
-    return `https://${customDomainData.customDomain.hostname}`
+  if (selectedDatabaseId === projectRef && !!resolvedEndpoint) {
+    return withDataApiPath(resolvedEndpoint)
   }
 
   if (loadBalancerSelected) {
-    return loadBalancers?.[0]?.endpoint ?? ''
+    return withDataApiPath(loadBalancers?.[0]?.endpoint)
   }
 
-  return selectedDatabase?.restUrl ?? ''
+  return withDataApiPath(selectedDatabase?.restUrl)
+}
+
+function withDataApiPath(url: string | undefined): string {
+  if (!url) return ''
+  const trimmed = url.replace(/\/+$/, '')
+  return /\/rest\/v1$/.test(trimmed) ? `${trimmed}/` : `${trimmed}/rest/v1/`
 }
 
 export type EnrichedEntity = { id: string; displayName: string; camelCase: string }

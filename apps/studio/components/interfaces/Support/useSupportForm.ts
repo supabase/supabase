@@ -1,18 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { type Dispatch, useEffect, useRef, useState } from 'react'
-import { type DefaultValues, type UseFormReturn, useForm, useWatch } from 'react-hook-form'
-// End of third-party imports
+import { useEffect, useRef, useState, type Dispatch } from 'react'
+import { useForm, useWatch, type DefaultValues, type UseFormReturn } from 'react-hook-form'
 
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { SupportFormSchema, type SupportFormValues } from './SupportForm.schema'
 import type { SupportFormActions } from './SupportForm.state'
 import {
+  loadSupportFormInitialParams,
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
-  type SupportFormUrlKeys,
-  loadSupportFormInitialParams,
   selectInitialOrgAndProject,
+  type SupportFormUrlKeys,
 } from './SupportForm.utils'
+// End of third-party imports
+
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 
 const supportFormDefaultValues: DefaultValues<SupportFormValues> = {
   organizationSlug: NO_ORG_MARKER,

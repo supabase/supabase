@@ -12,6 +12,7 @@ import type { ComponentType } from 'react'
 import type { PostReturnType, ProcessedBlogData, StaticAuthor, Tag } from 'types/post'
 import { Badge } from 'ui'
 
+import { BLOG_POST_HERO_IMAGE_SIZES, getBlogThumbnailImage } from '@/lib/blog-images'
 import mdxComponents from '@/lib/mdx/mdxComponents'
 
 const ShareArticleActions = dynamic(() => import('@/components/Blog/ShareArticleActions'))
@@ -131,11 +132,9 @@ const BlogPostRenderer = ({
     </div>
   )
 
-  const imageUrl = blogMetaData.imgThumb
-    ? blogMetaData.imgThumb.startsWith('/') || blogMetaData.imgThumb.startsWith('http')
-      ? blogMetaData.imgThumb
-      : `/images/blog/${blogMetaData.imgThumb}`
-    : ''
+  const imageUrl = getBlogThumbnailImage(blogMetaData, {
+    fallbackToPlaceholder: false,
+  })
 
   return (
     <>
@@ -168,7 +167,7 @@ const BlogPostRenderer = ({
                   <h1 className="text-2xl sm:text-4xl">{blogMetaData.title}</h1>
                   <div className="text-light flex space-x-3 text-sm">
                     <p>{dayjs(blogMetaData.date).format('DD MMM YYYY')}</p>
-                    <p>•</p>
+                    <p>·</p>
                     <p>{(blogMetaData as any).readingTime}</p>
                   </div>
                   {authors.length > 0 && (
@@ -231,14 +230,13 @@ const BlogPostRenderer = ({
                           allowFullScreen={true}
                         />
                       ) : (
-                        blogMetaData.imgThumb && (
+                        imageUrl && (
                           <div className="hidden md:block relative mb-8 w-full aspect-[1.91/1] overflow-auto rounded-lg border">
                             <Image
                               src={imageUrl}
                               alt={blogMetaData.title}
                               fill
-                              quality={100}
-                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                              sizes={BLOG_POST_HERO_IMAGE_SIZES}
                               className="object-cover m-0"
                             />
                           </div>

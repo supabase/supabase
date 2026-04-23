@@ -1,8 +1,8 @@
 import type { CloudProvider } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 
-import type { components } from 'data/api'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import type { components } from '@/data/api'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 
 export const AWS_REGIONS_DEFAULT =
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
@@ -15,6 +15,7 @@ export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
 export const MANAGED_BY = {
   VERCEL_MARKETPLACE: 'vercel-marketplace',
   AWS_MARKETPLACE: 'aws-marketplace',
+  STRIPE_PROJECTS: 'stripe-projects',
   SUPABASE: 'supabase',
 }
 

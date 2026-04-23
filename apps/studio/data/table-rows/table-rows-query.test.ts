@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+
 import { executeWithRetry } from './table-rows-query'
 
 describe('executeWithRetry', () => {

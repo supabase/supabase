@@ -156,8 +156,9 @@ export const UsersSearch = ({
 
       <Input
         size="tiny"
+        containerClassName="w-[245px] rounded-l-none -ml-[1px]"
         className={cn(
-          'w-[245px] bg-transparent rounded-l-none -ml-[1px]',
+          'bg-transparent',
           searchInvalid ? 'text-red-900 dark:border-red-900' : '',
           search.length > 1 && 'pr-6'
         )}

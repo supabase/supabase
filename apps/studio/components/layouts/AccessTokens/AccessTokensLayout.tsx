@@ -1,8 +1,7 @@
+import { useFlag } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
-
-import { useFlag } from 'common'
 import { NavMenu, NavMenuItem } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -14,7 +13,7 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
-const AccessTokensLayout = ({ children }: PropsWithChildren) => {
+export const AccessTokensLayout = ({ children }: PropsWithChildren) => {
   const router = useRouter()
   const scopedTokensEnabled = useFlag('scopedPAT')
 
@@ -68,5 +67,3 @@ const AccessTokensLayout = ({ children }: PropsWithChildren) => {
     </>
   )
 }
-
-export default AccessTokensLayout

@@ -56,7 +56,7 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
                     bucketName: bucketName,
                     objectName: fileName,
                     contentType: 'image/png',
-                    cacheControl: 3600,
+                    cacheControl: '3600',
                     metadata: JSON.stringify({ // custom metadata passed to the user_metadata column
                        yourCustomMetadata: true,
                     }),
@@ -136,8 +136,8 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
     export const useUppyWithSupabase = ({ bucketName }: { bucketName: string }) => {
         // Initialize Uppy instance only once
         const [uppy] = useState(() => new Uppy());
-        // Initialize Supabase client with project URL and anon key
-        const supabase = createClient(`https://${projectId}.supabase.co`, anonKey);
+        // Initialize Supabase client with project URL and publishable key
+        const supabase = createClient(`https://${projectId}.supabase.co`, publishableKey);
 
         useEffect(() => {
             const initializeUppy = async () => {

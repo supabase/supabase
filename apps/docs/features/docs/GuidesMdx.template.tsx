@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import { cn } from 'ui'
 
 import Breadcrumbs from '~/components/Breadcrumbs'
-import GuidesTableOfContents from '~/components/GuidesTableOfContents'
+import GuidesSidebar from '~/components/GuidesSidebar'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
@@ -71,7 +71,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             'relative',
             'transition-all ease-out',
             'duration-100',
-            hideToc ? 'col-span-12' : 'col-span-12 md:col-span-9'
+            'col-span-12 md:col-span-9'
           )}
         >
           <Breadcrumbs className="mb-2" />
@@ -114,24 +114,23 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             </footer>
           </article>
         </div>
-        {!hideToc && (
-          <GuidesTableOfContents
-            video={meta?.tocVideo}
-            className={cn(
-              'hidden md:flex',
-              'col-span-3 self-start',
-              'sticky',
-              /**
-               * --header-height: height of nav
-               * 1px: height of nav border
-               * 2rem: content padding
-               */
-              'top-[calc(var(--header-height)+1px+2rem)]',
-              // 3rem accounts for 2rem of top padding + 1rem of extra breathing room
-              'max-h-[calc(100vh-var(--header-height)-3rem)]'
-            )}
-          />
-        )}
+        <GuidesSidebar
+          video={meta?.tocVideo}
+          hideToc={hideToc}
+          className={cn(
+            'hidden md:flex',
+            'col-span-3 self-start',
+            'sticky',
+            /**
+             * --header-height: height of nav
+             * 1px: height of nav border
+             * 2rem: content padding
+             */
+            'top-[calc(var(--header-height)+1px+2rem)]',
+            // 3rem accounts for 2rem of top padding + 1rem of extra breathing room
+            'max-h-[calc(100vh-var(--header-height)-3rem)]'
+          )}
+        />
       </div>
     </TocAnchorsProvider>
   )

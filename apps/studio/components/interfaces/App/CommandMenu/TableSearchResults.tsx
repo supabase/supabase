@@ -1,16 +1,17 @@
 'use client'
 
-import { useMemo } from 'react'
-import { Database, Loader2 } from 'lucide-react'
 import { useParams } from 'common'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Database, Loader2 } from 'lucide-react'
+import { useMemo } from 'react'
+
 import {
-  SkeletonResults,
   EmptyState,
   ResultsList,
+  SkeletonResults,
   type SearchResult,
 } from './ContextSearchResults.shared'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface TableSearchResultsProps {
   query: string

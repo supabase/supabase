@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import { resolveSteps } from './connect.resolver'
-import { connectSchema, INSTALL_COMMANDS } from './connect.schema'
+import { connectSchema, EXTRA_PACKAGES, INSTALL_COMMANDS } from './connect.schema'
 import type { ConnectState } from './Connect.types'
 
 // ============================================================================
@@ -114,7 +114,7 @@ describe('connect.schema:fields', () => {
     const field = connectSchema.fields.mcpClient
     expect(field.type).toBe('select')
     expect(field.options).toEqual({ source: 'mcpClients' })
-    expect(field.defaultValue).toBe('cursor')
+    expect(field.defaultValue).toBe('claude-code')
   })
 
   test('mcpFeatures field should have multi-select type', () => {
@@ -150,6 +150,20 @@ describe('connect.schema:INSTALL_COMMANDS', () => {
   })
 })
 
+describe('connect.schema:EXTRA_PACKAGES', () => {
+  test('should have @supabase/ssr as extra package for nextjs app router with supabasejs', () => {
+    expect(EXTRA_PACKAGES.supabasejs?.['nextjs/app']).toContain('@supabase/ssr')
+  })
+
+  test('should not have extra packages for nextjs pages router', () => {
+    expect(EXTRA_PACKAGES.supabasejs?.['nextjs/pages']).toBeUndefined()
+  })
+
+  test('should have @supabase/ssr as extra package for remix with supabasejs', () => {
+    expect(EXTRA_PACKAGES.supabasejs?.remix).toContain('@supabase/ssr')
+  })
+})
+
 // ============================================================================
 // Steps Resolution Integration Tests
 // ============================================================================
@@ -165,11 +179,54 @@ describe('connect.schema:steps resolution', () => {
       expect(steps.find((s) => s.id === 'install-skills')).toBeDefined()
     })
 
+    test('should use "Install packages" title for nextjs app router', () => {
+      const state: ConnectState = {
+        mode: 'framework',
+        framework: 'nextjs',
+        frameworkVariant: 'app',
+        frameworkUi: false,
+      }
+      const steps = resolveSteps(connectSchema, state)
+      const installStep = steps.find((s) => s.id === 'install')
+
+      expect(installStep?.title).toBe('Install packages')
+    })
+
+    test('should use "Install package" title for nextjs pages router', () => {
+      const state: ConnectState = {
+        mode: 'framework',
+        framework: 'nextjs',
+        frameworkVariant: 'pages',
+        frameworkUi: false,
+      }
+      const steps = resolveSteps(connectSchema, state)
+      const installStep = steps.find((s) => s.id === 'install')
+
+      expect(installStep?.title).toBe('Install package')
+    })
+
+    test('should use "Install packages" title for remix install step', () => {
+      const state: ConnectState = { mode: 'framework', framework: 'remix' }
+      const steps = resolveSteps(connectSchema, state)
+      const installStep = steps.find((s) => s.id === 'install')
+
+      expect(installStep?.title).toBe('Install packages')
+    })
+
+    test('should use "Install package" title for frameworks without extra packages', () => {
+      const state: ConnectState = { mode: 'framework', framework: 'vuejs' }
+      const steps = resolveSteps(connectSchema, state)
+      const installStep = steps.find((s) => s.id === 'install')
+
+      expect(installStep?.title).toBe('Install package')
+    })
+
     test('should resolve shadcn steps for nextjs with frameworkUi true', () => {
       const state: ConnectState = { mode: 'framework', framework: 'nextjs', frameworkUi: true }
       const steps = resolveSteps(connectSchema, state)
 
       expect(steps.find((s) => s.id === 'shadcn-add')).toBeDefined()
+      expect(steps.find((s) => s.id === 'shadcn-env')).toBeDefined()
       expect(steps.find((s) => s.id === 'shadcn-explore')).toBeDefined()
     })
 
@@ -186,6 +243,7 @@ describe('connect.schema:steps resolution', () => {
       const steps = resolveSteps(connectSchema, state)
 
       expect(steps.find((s) => s.id === 'shadcn-add')).toBeDefined()
+      expect(steps.find((s) => s.id === 'shadcn-env')).toBeDefined()
     })
 
     test('should resolve default steps for other frameworks', () => {
@@ -335,6 +393,14 @@ describe('connect.schema:step content paths', () => {
     const exploreStep = steps.find((s) => s.id === 'shadcn-explore')
 
     expect(exploreStep?.content).toBe('steps/shadcn/explore')
+  })
+
+  test('shadcn env step should have valid content path', () => {
+    const state: ConnectState = { mode: 'framework', framework: 'nextjs', frameworkUi: true }
+    const steps = resolveSteps(connectSchema, state)
+    const envStep = steps.find((s) => s.id === 'shadcn-env')
+
+    expect(envStep?.content).toBe('steps/shadcn/env')
   })
 
   test('direct connection step should have valid content path', () => {

@@ -1,30 +1,32 @@
-import { Github, MoreVertical, Trash, Copy, Check } from 'lucide-react'
+import { Check, Copy, Github, MoreVertical, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
-import InlineSVG from 'react-inlinesvg'
 import { useState } from 'react'
-
-import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
-import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
-import type { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { BASE_PATH } from 'lib/constants'
-import { createNavigationHandler } from 'lib/navigation'
-import type { Organization } from 'types'
+import InlineSVG from 'react-inlinesvg'
+import { toast } from 'sonner'
 import {
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-  DropdownMenuContent,
+  Button,
+  copyToClipboard,
   DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   TableCell,
   TableRow,
-  Button,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
-import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
-import { toast } from 'sonner'
-import { copyToClipboard } from 'ui'
+import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
+import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
+import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
+import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
+import { BASE_PATH } from '@/lib/constants'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { createNavigationHandler } from '@/lib/navigation'
+import type { Organization } from '@/types'
 
 export interface ProjectTableRowProps {
   project: OrgProject
@@ -46,13 +48,17 @@ export const ProjectTableRow = ({
   const router = useRouter()
   const { name, ref: projectRef } = project
   const projectStatus = inferProjectStatus(project.status)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
 
   const url = rewriteHref ?? `/project/${project.ref}`
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
+  const projectManagedBy = getManagedByFromOrganizationPartner(
+    undefined,
+    project.integration_source
+  )
+  const hasPartnerIcon = projectManagedBy !== MANAGED_BY.SUPABASE
   const handleNavigation = createNavigationHandler(url, router)
 
   const handleCopyProjectRef = (e: React.SyntheticEvent) => {
@@ -99,7 +105,7 @@ export const ProjectTableRow = ({
                 )}
               </button>
             </div>
-            {(isGithubIntegrated || isVercelIntegrated) && (
+            {(isGithubIntegrated || isVercelIntegrated || hasPartnerIcon) && (
               <div className="flex items-center gap-x-1.5">
                 {isVercelIntegrated && (
                   <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center text-black dark:text-white">
@@ -110,6 +116,7 @@ export const ProjectTableRow = ({
                     />
                   </div>
                 )}
+                <PartnerIcon organization={{ managed_by: projectManagedBy }} />
                 {isGithubIntegrated && (
                   <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md">
                     <div className="w-5 h-5 p-1 flex items-center">
@@ -139,6 +146,7 @@ export const ProjectTableRow = ({
                 projectRef={project.ref}
                 cloudProvider={project.cloud_provider}
                 computeSize={getComputeSize(project)}
+                resourceWarnings={resourceWarnings}
               />
             ) : (
               <span className="text-xs text-foreground-muted">–</span>
@@ -177,23 +185,17 @@ export const ProjectTableRow = ({
                   className="gap-x-2"
                   onClick={(e) => {
                     e.stopPropagation()
-                    setIsDeleteModalOpen(true)
+                    router.push(`/project/${projectRef}/settings/general`)
                   }}
                 >
-                  <Trash size={14} />
-                  <span>Delete project</span>
+                  <Settings size={14} />
+                  <span>Settings</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </TableCell>
       </TableRow>
-      <DeleteProjectModal
-        visible={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        project={project}
-        organization={organization}
-      />
     </>
   )
 }

@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-
-import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
 import { DialogSection } from 'ui'
+
+import CountdownTimerRadial from '@/components/ui/CountdownTimer/CountdownTimerRadial'
 
 export const DiskMangementCoolDownSection = ({ visible }: { visible: boolean }) => {
   const [progress, setProgress] = useState(100)
@@ -72,7 +72,7 @@ export const DiskMangementCoolDownSection = ({ visible }: { visible: boolean }) 
             </div>
             <div className="flex flex-col gap-0 flex-grow">
               <p className="text-sm text-foreground">
-                For 6 hours you will not be able to change any disk attributes.
+                For 4 hours you will not be able to change any disk attributes.
               </p>
               <p className="text-sm text-foreground-light">
                 There is a cooldown period enforced for any disk attribute modifications
