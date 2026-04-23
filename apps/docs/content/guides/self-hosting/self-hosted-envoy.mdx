@@ -147,7 +147,7 @@ MCP routes are denied at the gateway by default. Allowing local access requires 
 
 ## Authentication
 
-The gateway handles authentication in three stages: dashboard basic auth on the catch-all route, API key enforcement on protected API routes, and an opaque-to-internal key translation step that runs before enforcement.
+The gateway handles three authentication-related steps: dashboard basic auth on the catch-all route, API key enforcement on protected routes, and an opaque-to-internal key translation step that runs before enforcement.
 
 ### Dashboard basic auth
 
@@ -259,6 +259,30 @@ This guide does not cover Envoy's route, filter, and cluster reference. See the 
 
 </Admonition>
 
+## Admin interface
+
+Envoy exposes an admin interface on `127.0.0.1:9901` inside the container, with endpoints like `/ready`, `/clusters`, `/stats`, and `/config_dump`. The interface is bound to the container's loopback only and port `9901` is not mapped to the host. The standard `envoyproxy/envoy` image is minimal (no `curl` or `wget`), so the admin endpoints are not reachable via `docker exec` without adding tooling.
+
+The simplest way to query the admin interface during debugging is to run a short-lived `curl` container that joins the same network namespace as `supabase-envoy`:
+
+```sh
+docker run --rm --network container:supabase-envoy curlimages/curl http://127.0.0.1:9901/clusters
+```
+
+```sh
+docker run --rm --network container:supabase-envoy curlimages/curl http://127.0.0.1:9901/stats
+```
+
+```sh
+docker run --rm --network container:supabase-envoy curlimages/curl http://127.0.0.1:9901/config_dump
+```
+
+<Admonition type="caution">
+
+`/config_dump` includes secrets in plaintext. Never expose port `9901` to a public network or untrusted host, and never share its output without first removing secrets.
+
+</Admonition>
+
 ## Troubleshooting
 
 ### Logs
@@ -270,28 +294,6 @@ docker compose -f docker-compose.yml -f docker-compose.envoy.yml logs api-gw
 ```
 
 The access log format is a standard combined log with the request method, original path, response code, and bytes sent.
-
-### Admin interface
-
-Envoy exposes an admin interface on `127.0.0.1:9901` inside the container, with endpoints like `/ready`, `/clusters`, `/stats`, and `/config_dump`. The interface is bound to localhost only and port `9901` is not mapped to the host. The standard `envoyproxy/envoy` image is minimal (no `curl` or `wget`), so the admin endpoints are not reachable via `docker exec` without adding tooling.
-
-To inspect the admin interface during debugging, temporarily expose port `9901` by editing `docker-compose.envoy.yml`:
-
-```yaml name=docker-compose.yml
-api-gw:
-  ports:
-    - '127.0.0.1:9901:9901/tcp'
-```
-
-Bind to `127.0.0.1` (not `0.0.0.0`) so it's reachable only from your host, then run `curl http://127.0.0.1:9901/clusters` (or `/stats`, `/config_dump`, etc.). **Remove the mapping when you're done.**
-
-`/clusters` shows upstream health and connection state. `/stats` exposes per-filter and per-cluster counters. `/config_dump` shows the fully rendered configuration - useful for debugging missed substitutions.
-
-<Admonition type="caution">
-
-`/config_dump` includes all secrets in plaintext (API keys, JWTs, basic auth hash). Never expose port `9901` to a public network or untrusted host, and never share its output without first removing API keys, JWTs, and the basic auth hash.
-
-</Admonition>
 
 ### Common issues
 
