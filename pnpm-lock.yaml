@@ -463,9 +463,9 @@ importers:
       next:
         specifier: ^15.5.15
         version: 15.5.15(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
-      next-mdx-remote:
-        specifier: ^6.0.0
-        version: 6.0.0(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
+      next-mdx-remote-client:
+        specifier: ^1.1.7
+        version: 1.1.7(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1)(unified@11.0.5)
       next-plugin-yaml:
         specifier: ^1.0.1
         version: 1.0.1
@@ -14954,12 +14954,6 @@ packages:
     peerDependencies:
       react: '>= 18.3.0 < 19.0.0'
       react-dom: '>= 18.3.0 < 19.0.0'
-
-  next-mdx-remote@6.0.0:
-    resolution: {integrity: sha512-cJEpEZlgD6xGjB4jL8BnI8FaYdN9BzZM4NwadPe1YQr7pqoWjg9EBCMv3nXBkuHqMRfv2y33SzUsuyNh9LFAQQ==}
-    engines: {node: '>=14', npm: '>=7'}
-    peerDependencies:
-      react: '>=16'
 
   next-plugin-yaml@1.0.1:
     resolution: {integrity: sha512-k13wbpN33wTgrgWUBiXPtObXO94JOEiwvYKJ3X0JrBz2yaW24EfNaVqHwA0dwhsn9PyPIKhPhgsu3bhJsNs+cQ==}
@@ -33972,20 +33966,6 @@ snapshots:
       - '@types/react'
       - supports-color
       - unified
-
-  next-mdx-remote@6.0.0(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1):
-    dependencies:
-      '@babel/code-frame': 7.29.0
-      '@mdx-js/mdx': 3.1.1(supports-color@8.1.1)
-      '@mdx-js/react': 3.1.1(@types/react@18.3.3)(react@18.3.1)
-      react: 18.3.1
-      unist-util-remove: 4.0.0
-      unist-util-visit: 5.1.0
-      vfile: 6.0.3
-      vfile-matter: 5.0.1
-    transitivePeerDependencies:
-      - '@types/react'
-      - supports-color
 
   next-plugin-yaml@1.0.1:
     dependencies:
