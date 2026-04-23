@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/Forms/FormSection'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { buildEdgeFunctionUrl } from '@/lib/edge-functions'
 
 interface HTTPRequestConfigProps {
   form: UseFormReturn<WebhookFormValues>
@@ -115,9 +116,11 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
                   </FormControl_Shadcn_>
                   <SelectContent_Shadcn_>
                     {edgeFunctions.map((fn) => {
-                      const restUrl = selectedProject?.restUrl
-                      const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
-                      const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fn.slug}`
+                      const functionUrl = buildEdgeFunctionUrl(
+                        fn.slug,
+                        ref,
+                        selectedProject?.restUrl
+                      )
 
                       return (
                         <SelectItem_Shadcn_ key={fn.id} value={functionUrl}>

@@ -9,6 +9,7 @@ import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { buildEdgeFunctionUrl } from '@/lib/edge-functions'
 
 interface EdgeFunctionRendererProps {
   label: string
@@ -61,16 +62,7 @@ export const EdgeFunctionRenderer = ({
   const functionUrl = useMemo(() => {
     const endpoint = settings?.app_config?.endpoint
     if (!endpoint || !ref || !functionName) return undefined
-
-    try {
-      const url = new URL(`https://${endpoint}`)
-      const restUrlTld = url.hostname.split('.').pop()
-      return restUrlTld
-        ? `https://${ref}.supabase.${restUrlTld}/functions/v1/${functionName}`
-        : undefined
-    } catch (error) {
-      return undefined
-    }
+    return buildEdgeFunctionUrl(functionName, ref, `https://${endpoint}`)
   }, [settings?.app_config?.endpoint, ref, functionName])
 
   const deploymentDetailsUrl = useMemo(() => {

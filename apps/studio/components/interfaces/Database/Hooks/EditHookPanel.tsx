@@ -19,21 +19,10 @@ import { useDatabaseHooksQuery } from '@/data/database-triggers/database-trigger
 import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { isEdgeFunctionUrl } from '@/lib/edge-functions'
 import { uuidv4 } from '@/lib/helpers'
 
 export type HTTPArgument = { id: string; name: string; value: string }
-
-export const isEdgeFunction = ({
-  ref,
-  restUrlTld,
-  url,
-}: {
-  ref?: string
-  restUrlTld?: string
-  url: string
-}) =>
-  url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`) ||
-  url.includes(`https://${ref}.supabase.${restUrlTld}/functions/`)
 
 const FORM_ID = 'edit-hook-panel-form'
 
@@ -140,7 +129,6 @@ export const EditHookPanel = () => {
   const isSubmitting = isCreating || isUpdating || isLoadingTable
 
   const restUrl = project?.restUrl
-  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const form = useForm<WebhookFormValues>({
     resolver: zodResolver(FormSchema),
@@ -149,11 +137,7 @@ export const EditHookPanel = () => {
       table_id: selectedHook?.table_id?.toString() ?? '',
       http_url: selectedHook?.function_args?.[0] ?? '',
       http_method: (selectedHook?.function_args?.[1] as 'GET' | 'POST') ?? 'POST',
-      function_type: isEdgeFunction({
-        ref,
-        restUrlTld,
-        url: selectedHook?.function_args?.[0] ?? '',
-      })
+      function_type: isEdgeFunctionUrl(selectedHook?.function_args?.[0] ?? '', ref, restUrl)
         ? 'supabase_function'
         : 'http_request',
       timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
@@ -185,11 +169,7 @@ export const EditHookPanel = () => {
         table_id: selectedHook?.table_id?.toString() ?? '',
         http_url: selectedHook?.function_args?.[0] ?? '',
         http_method: (selectedHook?.function_args?.[1] as 'GET' | 'POST') ?? 'POST',
-        function_type: isEdgeFunction({
-          ref,
-          restUrlTld,
-          url: selectedHook?.function_args?.[0] ?? '',
-        })
+        function_type: isEdgeFunctionUrl(selectedHook?.function_args?.[0] ?? '', ref, restUrl)
           ? 'supabase_function'
           : 'http_request',
         timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
@@ -198,7 +178,7 @@ export const EditHookPanel = () => {
         httpParameters: parseParameters(selectedHook),
       })
     }
-  }, [visible, selectedHook, ref, restUrlTld, form])
+  }, [visible, selectedHook, ref, restUrl, form])
 
   const queryClient = useQueryClient()
   const onSubmit: SubmitHandler<WebhookFormValues> = async (values) => {
