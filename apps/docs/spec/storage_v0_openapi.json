@@ -740,6 +740,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "minProperties": 1,
                 "properties": {
                   "public": { "type": "boolean", "example": false },
                   "file_size_limit": {
@@ -753,7 +754,12 @@
                     "nullable": true,
                     "items": { "type": "string", "example": ["image/png", "image/jpg"] }
                   }
-                }
+                },
+                "anyOf": [
+                  { "required": ["public"] },
+                  { "required": ["file_size_limit"] },
+                  { "required": ["allowed_mime_types"] }
+                ]
               }
             }
           }
