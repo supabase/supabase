@@ -76,7 +76,6 @@ export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
       snap.setSelectedRows(next)
     },
     {
-      registerInCommandMenu: true,
       enabled: !!snap.selectedCellPosition,
     }
   )
