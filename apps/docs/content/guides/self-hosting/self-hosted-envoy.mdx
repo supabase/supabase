@@ -147,7 +147,7 @@ MCP routes are denied at the gateway by default. Allowing local access requires 
 
 ## Authentication
 
-The gateway uses three layers of authentication.
+The gateway handles authentication in three stages: dashboard basic auth on the catch-all route, API key enforcement on protected API routes, and an opaque-to-internal key translation step that runs before enforcement.
 
 ### Dashboard basic auth
 
@@ -289,7 +289,7 @@ Bind to `127.0.0.1` (not `0.0.0.0`) so it's reachable only from your host, then 
 
 <Admonition type="caution">
 
-`/config_dump` includes all secrets in plaintext (API keys, JWTs, basic auth hash). Never expose port `9901` to a public network or untrusted host, and never share its output without omitting sensitive configuration.
+`/config_dump` includes all secrets in plaintext (API keys, JWTs, basic auth hash). Never expose port `9901` to a public network or untrusted host, and never share its output without first removing API keys, JWTs, and the basic auth hash.
 
 </Admonition>
 
