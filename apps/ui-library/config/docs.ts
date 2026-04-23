@@ -112,7 +112,7 @@ export const componentPages: SidebarNavGroup = {
     },
     {
       title: 'Realtime Chat',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'expo','tanstack', 'react'],
       href: '/docs/nextjs/realtime-chat',
       items: [],
       commandItemLabel: 'Realtime Chat',
@@ -149,6 +149,7 @@ export const frameworkTitles: Record<string, string> = {
   'react-router': 'React Router',
   tanstack: 'TanStack Start',
   react: 'React SPA',
+  expo: 'Expo',
   vue: 'Vue',
   nuxtjs: 'Nuxt.js',
 }
