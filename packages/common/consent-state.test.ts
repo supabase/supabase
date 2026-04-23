@@ -280,9 +280,7 @@ describe('detectPriorConsent', () => {
       storage.set(
         'uc_settings',
         JSON.stringify({
-          services: [
-            { id: 'svc1', status: true, processorId: 'p', history: [], version: '1' },
-          ],
+          services: [{ id: 'svc1', status: true, processorId: 'p', history: [], version: '1' }],
         })
       )
       expect(detectPriorConsent()).toEqual({
@@ -292,17 +290,12 @@ describe('detectPriorConsent', () => {
     })
 
     it('falls back to uc_settings when ucData is corrupt (scenario 1 fails closed, scenario 2 recovers)', () => {
-      storage.set(
-        'ucData',
-        JSON.stringify({ consent: { services: { svc1: 'corrupt' } } })
-      )
+      storage.set('ucData', JSON.stringify({ consent: { services: { svc1: 'corrupt' } } }))
       storage.set('uc_user_interaction', 'true')
       storage.set(
         'uc_settings',
         JSON.stringify({
-          services: [
-            { id: 'svc1', status: false, processorId: 'p', history: [], version: '1' },
-          ],
+          services: [{ id: 'svc1', status: false, processorId: 'p', history: [], version: '1' }],
         })
       )
       expect(detectPriorConsent()).toEqual({

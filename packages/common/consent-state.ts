@@ -102,7 +102,11 @@ export function detectPriorConsent(): PriorConsentDecision {
       if (ucSettings) {
         const parsed = JSON.parse(ucSettings)
         const services = parsed?.services
-        if (Array.isArray(services) && services.length > 0 && services.every(isValidUcSettingsService)) {
+        if (
+          Array.isArray(services) &&
+          services.length > 0 &&
+          services.every(isValidUcSettingsService)
+        ) {
           const decisions: UserDecision[] = services.map((s) => ({
             serviceId: s.id,
             status: s.status,
