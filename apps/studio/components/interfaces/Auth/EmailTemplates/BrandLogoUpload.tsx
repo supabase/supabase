@@ -1,7 +1,7 @@
 import { useParams } from 'common'
-import { Database, ExternalLink, Globe, ImageIcon, ImageOff, Loader2, Upload } from 'lucide-react'
+import { Database, ExternalLink, ImageIcon, ImageOff, Loader2, Upload } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Input_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -13,7 +13,7 @@ import { useBucketQuery } from '@/data/storage/buckets-query'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
 
 const BUCKET_NAME = 'email-assets'
-const LOGO_PATH = 'brand-logo'
+const LOGO_PATH_PREFIX = 'brand-logo'
 
 interface BrandLogoUploadProps {
   value: string
@@ -27,7 +27,6 @@ export const BrandLogoUpload = ({ value, onChange, disabled }: BrandLogoUploadPr
   const [isUploading, setIsUploading] = useState(false)
   const [showBucketConfirm, setShowBucketConfirm] = useState(false)
   const [pendingFile, setPendingFile] = useState<File | null>(null)
-  const [imgLoadError, setImgLoadError] = useState(false)
 
   const { storageEndpoint, hostEndpoint } = useProjectApiUrl({ projectRef })
   const clientEndpoint = storageEndpoint ?? hostEndpoint ?? ''
@@ -37,16 +36,13 @@ export const BrandLogoUpload = ({ value, onChange, disabled }: BrandLogoUploadPr
     { retry: false }
   )
   const bucketExists = !!existingBucket
+  const bucketIsPrivate = bucketExists && !existingBucket?.public
 
   const isStorageUrl = useMemo(() => {
     if (!value) return false
     const endpoints = [storageEndpoint, hostEndpoint].filter((ep): ep is string => !!ep)
     return endpoints.some((ep) => value.startsWith(ep))
   }, [value, storageEndpoint, hostEndpoint])
-
-  useEffect(() => {
-    setImgLoadError(false)
-  }, [value])
 
   const handleUploadClick = () => {
     inputRef.current?.click()
@@ -69,15 +65,29 @@ export const BrandLogoUpload = ({ value, onChange, disabled }: BrandLogoUploadPr
       }
 
       const client = await createProjectSupabaseClient(projectRef, clientEndpoint)
+
+      // Best-effort delete of the previous logo so old URLs are invalidated
+      if (isStorageUrl) {
+        const marker = `/object/public/${BUCKET_NAME}/`
+        const idx = value.indexOf(marker)
+        if (idx !== -1) {
+          const oldPath = value.slice(idx + marker.length)
+          await client.storage.from(BUCKET_NAME).remove([oldPath])
+        }
+      }
+
+      const ext = file.name.split('.').pop()
+      const newPath = `${LOGO_PATH_PREFIX}-${crypto.randomUUID()}${ext ? `.${ext}` : ''}`
+
       const { error: uploadError } = await client.storage
         .from(BUCKET_NAME)
-        .upload(LOGO_PATH, file, { upsert: true, cacheControl: '3600' })
+        .upload(newPath, file, { cacheControl: '3600' })
 
       if (uploadError) throw uploadError
 
       const {
         data: { publicUrl },
-      } = client.storage.from(BUCKET_NAME).getPublicUrl(LOGO_PATH)
+      } = client.storage.from(BUCKET_NAME).getPublicUrl(newPath)
 
       onChange(publicUrl)
     } catch (err) {
@@ -107,19 +117,32 @@ export const BrandLogoUpload = ({ value, onChange, disabled }: BrandLogoUploadPr
       <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-strong bg-surface-200">
         {isUploading ? (
           <Loader2 size={24} className="animate-spin text-foreground-muted" />
-        ) : value && !imgLoadError ? (
-          <img
-            src={value}
-            alt="Brand logo"
-            className="h-full w-full object-contain"
-            onError={() => setImgLoadError(true)}
-          />
-        ) : value && imgLoadError ? (
-          <ImageOff size={24} className="text-foreground-muted" />
+        ) : value && isStorageUrl ? (
+          <img src={value} alt="Brand logo preview" className="h-full w-full object-contain" />
         ) : (
           <ImageIcon size={24} className="text-foreground-muted" />
         )}
       </div>
+
+      {value && (
+        <div>
+          {isStorageUrl ? (
+            <Link
+              href={`/project/${projectRef}/storage/buckets/${BUCKET_NAME}`}
+              className="flex w-fit items-center gap-1.5 text-xs text-foreground-lighter transition-colors hover:text-foreground"
+            >
+              <Database size={11} />
+              Stored in Supabase Storage
+              <ExternalLink size={11} />
+            </Link>
+          ) : (
+            <span className="flex items-center gap-1.5 text-xs text-foreground-muted">
+              <ImageOff size={11} />
+              External URL · Preview unavailable
+            </span>
+          )}
+        </div>
+      )}
 
       <div className="flex items-center gap-2">
         <Input_Shadcn_
@@ -140,40 +163,21 @@ export const BrandLogoUpload = ({ value, onChange, disabled }: BrandLogoUploadPr
         </Button>
       </div>
 
-      {value && (
-        <div>
-          {isStorageUrl ? (
-            <Link
-              href={`/project/${projectRef}/storage/buckets/${BUCKET_NAME}`}
-              className="flex w-fit items-center gap-1.5 text-xs text-foreground-lighter transition-colors hover:text-foreground"
-            >
-              <Database size={11} />
-              Stored in Supabase Storage
-              <ExternalLink size={11} />
-            </Link>
-          ) : (
-            <span className="flex items-center gap-1.5 text-xs text-foreground-muted">
-              <Globe size={11} />
-              External URL
-            </span>
-          )}
-        </div>
-      )}
-
-      {value && imgLoadError && isStorageUrl && (
+      {value && isStorageUrl && bucketIsPrivate && (
         <Admonition
           type="warning"
-          title="Logo image could not be loaded"
+          title="Bucket is not public"
           description={
             <span>
-              The image at this URL is not publicly accessible. Ensure your{' '}
+              Your{' '}
               <Link
                 href={`/project/${projectRef}/storage/buckets/${BUCKET_NAME}`}
                 className="underline"
               >
-                bucket
+                {BUCKET_NAME}
               </Link>{' '}
-              is set to public, or review your{' '}
+              bucket is private. The logo will not be visible in emails. Set it to public or review
+              your{' '}
               <Link href={`/project/${projectRef}/storage/policies`} className="underline">
                 RLS policies
               </Link>{' '}

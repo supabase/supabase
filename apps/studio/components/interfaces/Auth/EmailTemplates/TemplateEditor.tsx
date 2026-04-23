@@ -143,7 +143,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   }
 
   const brandingVariables: { variable: string; description: string }[] = [
-    { variable: '{{ .SenderName }}', description: 'The configured sender name for this project' },
+    { variable: '{{ .BrandName }}', description: 'The configured brand name for this project' },
     { variable: '{{ .BrandLogoURL }}', description: 'URL of the brand logo for this project' },
   ]
 
@@ -175,7 +175,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const previewValue = useMemo(() => {
     const c = authConfig as Record<string, unknown>
     return bodyValue
-      .replace(/\{\{\s*\.SenderName\s*\}\}/g, (c?.MAILER_SENDER_NAME as string) ?? '')
+      .replace(/\{\{\s*\.BrandName\s*\}\}/g, (c?.MAILER_BRAND_NAME as string) ?? '')
       .replace(/\{\{\s*\.BrandLogoURL\s*\}\}/g, (c?.MAILER_BRAND_LOGO_URL as string) ?? '')
   }, [bodyValue, authConfig])
 

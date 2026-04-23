@@ -58,7 +58,7 @@ const NotificationsFormSchema = z.object({
 })
 
 const BrandingFormSchema = z.object({
-  MAILER_SENDER_NAME: z.string(),
+  MAILER_BRAND_NAME: z.string(),
   MAILER_BRAND_LOGO_URL: z.string(),
 })
 
@@ -110,7 +110,7 @@ export const EmailTemplates = () => {
 
   const brandingForm = useForm<z.infer<typeof BrandingFormSchema>>({
     resolver: zodResolver(BrandingFormSchema),
-    defaultValues: { MAILER_SENDER_NAME: '', MAILER_BRAND_LOGO_URL: '' },
+    defaultValues: { MAILER_BRAND_NAME: '', MAILER_BRAND_LOGO_URL: '' },
   })
 
   const onSubmit = (values: z.infer<typeof NotificationsFormSchema>) => {
@@ -134,7 +134,7 @@ export const EmailTemplates = () => {
     if (authConfig) {
       const c = authConfig as Record<string, unknown>
       brandingForm.reset({
-        MAILER_SENDER_NAME: (c.MAILER_SENDER_NAME as string) ?? '',
+        MAILER_BRAND_NAME: (c.MAILER_BRAND_NAME as string) ?? '',
         MAILER_BRAND_LOGO_URL: (c.MAILER_BRAND_LOGO_URL as string) ?? '',
       })
     }
@@ -166,7 +166,7 @@ export const EmailTemplates = () => {
                 <PageSectionDescription>
                   {isRestricted ? (
                     <>
-                      Customize the sender name and logo that appear in your emails. To edit full
+                      Customize the brand name and logo that appear in your emails. To edit full
                       email templates,{' '}
                       <InlineLink href={`/project/${projectRef}/auth/smtp`}>
                         configure custom SMTP
@@ -180,7 +180,7 @@ export const EmailTemplates = () => {
                       .
                     </>
                   ) : (
-                    'Customize the sender name and logo that appear in your emails.'
+                    'Customize the brand name and logo that appear in your emails.'
                   )}
                 </PageSectionDescription>
               </PageSectionSummary>
@@ -192,12 +192,17 @@ export const EmailTemplates = () => {
                     <CardContent className="flex flex-col gap-6 pt-6">
                       <FormField_Shadcn_
                         control={brandingForm.control}
-                        name="MAILER_SENDER_NAME"
+                        name="MAILER_BRAND_NAME"
                         render={({ field }) => (
                           <FormItemLayout
                             layout="vertical"
-                            label="Sender name"
-                            description="Display name shown in the From field of emails sent to your users."
+                            label="Brand name"
+                            description={
+                              <>
+                                Brand name shown in emails sent to your users. Injectable as{' '}
+                                <code className="text-xs">{'{{ .BrandName }}'}</code>.
+                              </>
+                            }
                           >
                             <FormControl_Shadcn_>
                               <Input_Shadcn_
@@ -216,7 +221,12 @@ export const EmailTemplates = () => {
                           <FormItemLayout
                             layout="vertical"
                             label="Brand logo"
-                            description="Logo shown at the top of emails sent to your users. Uploaded to your project's storage."
+                            description={
+                              <>
+                                Logo shown in emails sent to your users. Injectable as{' '}
+                                <code className="text-xs">{'{{ .BrandLogoURL }}'}</code>.
+                              </>
+                            }
                           >
                             <BrandLogoUpload
                               value={field.value}
