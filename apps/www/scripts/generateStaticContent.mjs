@@ -16,18 +16,10 @@ function loadLocalEnvFiles(rootDir) {
   const parseValue = (raw) => {
     const val = raw.trim()
     if (val.startsWith('"') && val.endsWith('"')) {
-      return val
-        .slice(1, -1)
-        .replace(/\\n/g, '\n')
-        .replace(/\\"/g, '"')
-        .replace(/\\\\/g, '\\')
+      return val.slice(1, -1).replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\')
     }
     if (val.startsWith("'") && val.endsWith("'")) {
-      return val
-        .slice(1, -1)
-        .replace(/\\n/g, '\n')
-        .replace(/\\'/g, "'")
-        .replace(/\\\\/g, '\\')
+      return val.slice(1, -1).replace(/\\n/g, '\n').replace(/\\'/g, "'").replace(/\\\\/g, '\\')
     }
     return val
   }
@@ -37,7 +29,10 @@ function loadLocalEnvFiles(rootDir) {
     if (!trimmed || trimmed.startsWith('#')) return
     const eq = trimmed.indexOf('=')
     if (eq === -1) return
-    const key = trimmed.slice(0, eq).trim().replace(/^export\s+/i, '')
+    const key = trimmed
+      .slice(0, eq)
+      .trim()
+      .replace(/^export\s+/i, '')
     if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) return
     const value = parseValue(trimmed.slice(eq + 1))
     if (override || process.env[key] === undefined) {
@@ -378,7 +373,7 @@ try {
   // Write RSS feed to public directory
   const rssPath = path.join(__dirname, '../public/rss.xml')
   await fs.writeFile(rssPath, rss.trim(), 'utf8')
-  console.log(`✅ Generated RSS feed with ${allBlogPosts.length} blog posts`)
+  console.log(`✅ Generated RSS feed with ${allBlogPosts.length} entries`)
 } catch (error) {
   console.warn('Error generating RSS feed:', error)
 }

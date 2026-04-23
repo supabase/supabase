@@ -149,6 +149,19 @@ export function githubLabelHex(color: string) {
   return '6b7280'
 }
 
+const CHANGELOG_LABEL_DISPLAY_NAME: Record<string, string> = {
+  javascript: 'supabase-js',
+  frontend: 'dashboard',
+  swift: 'supabase-swift',
+  flutter: 'supabase-flutter',
+  python: 'supabase-py',
+}
+
+/** Returns the display name for a GitHub label, falling back to the original name. */
+export function changelogLabelDisplayName(name: string): string {
+  return CHANGELOG_LABEL_DISPLAY_NAME[name.toLowerCase()] ?? name
+}
+
 const GITHUB_CHANGELOG_DISCUSSIONS_BASE =
   'https://github.com/orgs/supabase/discussions/categories/changelog'
 

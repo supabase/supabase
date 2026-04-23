@@ -1,9 +1,10 @@
 import type { ChangelogLabel, ChangelogTimelineIndexItem } from '~/lib/changelog-github'
-import { githubChangelogLabelFilterUrl } from '~/lib/changelog.utils'
+import { changelogLabelDisplayName, githubChangelogLabelFilterUrl } from '~/lib/changelog.utils'
 import dayjs from 'dayjs'
 import { GitCommit } from 'lucide-react'
 import Link from 'next/link'
 import type { MouseEvent } from 'react'
+import { Badge, cn } from 'ui'
 
 function groupChangelogIndexByYear(
   items: ChangelogTimelineIndexItem[]
@@ -17,18 +18,20 @@ function groupChangelogIndexByYear(
   return [...map.entries()].sort((a, b) => b[0] - a[0])
 }
 
-function LabelBadges({
+export function LabelBadges({
   labels,
   onBadgeClick,
   tiny,
+  className,
 }: {
   labels: ChangelogLabel[]
   onBadgeClick?: (e: MouseEvent) => void
   tiny?: boolean
+  className?: string
 }) {
   if (labels.length === 0) return null
   return (
-    <div className={tiny ? 'flex flex-wrap items-center gap-0.5' : 'contents'}>
+    <div className={cn('flex flex-wrap items-center gap-0.5', className)}>
       {labels.map((label) => (
         <a
           key={label.name}
@@ -42,15 +45,17 @@ function LabelBadges({
           }
           onClick={onBadgeClick}
         >
-          <span
-            className={
+          <Badge
+            variant="default"
+            className={cn(
+              'tracking-normal lowercase border-default bg-surface-200',
               tiny
-                ? 'border-default bg-surface-200 text-foreground-lighter rounded-full border px-0.5 py-px text-[8px] font-medium leading-none tracking-normal'
-                : 'border-default bg-surface-200 text-foreground-light rounded-full border px-1.5 py-px text-[11px] font-medium leading-tight'
-            }
+                ? 'text-foreground-lighter hover:text-foreground-light rounded-full border px-0.5 py-px text-[8px] font-medium leading-none'
+                : 'text-foreground-light hover:text-foreground rounded-full border px-1.5 py-px text-[11px] font-medium leading-tight'
+            )}
           >
-            {label.name}
-          </span>
+            {changelogLabelDisplayName(label.name)}
+          </Badge>
         </a>
       ))}
     </div>
@@ -79,18 +84,15 @@ function TimelineRow({
   const titleBlock =
     mode === 'link' && href ? (
       <Link href={href} prefetch={false} className="min-w-0 text-left">
-        <h3 className="text-foreground text-lg leading-snug group-hover:underline">{item.title}</h3>
+        <h3 className="text-foreground text-lg leading-snug hover:underline">{item.title}</h3>
       </Link>
     ) : (
-      <h3 className="text-foreground text-lg leading-snug group-hover:underline">{item.title}</h3>
+      <h3 className="text-foreground text-lg leading-snug hover:underline">{item.title}</h3>
     )
 
   const meta = (
     <div className="flex min-w-0 gap-2 pt-0.5">
-      <time
-        dateTime={item.sortDate}
-        className="text-foreground-lighter group-hover:text-foreground-light text-xs tracking-normal"
-      >
+      <time dateTime={item.sortDate} className="text-foreground-lighter text-xs tracking-normal">
         {dateLabel}
       </time>
       <LabelBadges labels={labels} onBadgeClick={(e) => e.stopPropagation()} />
@@ -173,15 +175,17 @@ export function ChangelogV3TimelineList(props: Props) {
         <section
           key={year}
           id={year.toString()}
-          aria-labelledby={`changelog-year-${year}`}
+          aria-labelledby={`${year}`}
           className="relative scroll-mt-20"
         >
-          <h2
-            id={`changelog-year-${year}`}
-            className="border-default bg-default text-foreground-light sticky top-[65px] z-20 border-b py-2 pl-0 font-mono text-sm tracking-wide lg:hidden"
+          <Link
+            href={`#${year}`}
+            prefetch={false}
+            id={`${year}`}
+            className="lg:hidden block border-default bg-default text-foreground-light sticky top-[65px] scroll-mt-10 z-20 border-b py-2 pl-0 font-mono text-sm tracking-wide"
           >
             {year}
-          </h2>
+          </Link>
 
           <div
             className={
@@ -196,7 +200,13 @@ export function ChangelogV3TimelineList(props: Props) {
                   <div className="bg-border border-muted flex h-5 w-5 shrink-0 items-center justify-center rounded border drop-shadow-sm">
                     <GitCommit size={14} strokeWidth={1.5} />
                   </div>
-                  <p className="font-mono text-base leading-none">{year}</p>
+                  <Link
+                    href={`#${year}`}
+                    prefetch={false}
+                    className="font-mono text-base leading-none"
+                  >
+                    {year}
+                  </Link>
                 </div>
               </div>
             </div>

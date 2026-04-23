@@ -47,7 +47,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import 'ui-patterns/ShimmeringLoader/index.css'
 
-const FEATURED_COUNT = 5
+const FEATURED_COUNT = 1
 
 /** GitHub changelog label slugs used for product filters. */
 const CHANGELOG_PRODUCT_TAGS = [
@@ -557,8 +557,8 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
                 <section aria-label="Earlier changelog entries" className="lg:pb-28">
                   <ChangelogV3TimelineList
                     items={restIndex}
-                    mode="action"
-                    onSelect={handleSelectFromList}
+                    mode="link"
+                    hrefFor={(item) => `/changelog-minimal/${item.number}`}
                     omitOuterTimelineBorder
                   />
                 </section>

@@ -117,6 +117,7 @@ export type FetchedChangelogDiscussion = {
   url: string
   createdAt: string
   category: { id: string; name: string } | null
+  labels: { nodes: ChangelogLabel[] }
 }
 
 export async function fetchChangelogDiscussionByNumber(
@@ -137,6 +138,12 @@ export async function fetchChangelogDiscussionByNumber(
           category {
             id
             name
+          }
+          labels(first: 25) {
+            nodes {
+              name
+              color
+            }
           }
         }
       }

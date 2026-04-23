@@ -1,5 +1,6 @@
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
 import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
+import { LabelBadges } from '~/components/Changelog/ChangelogV3TimelineList'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import {
@@ -7,12 +8,13 @@ import {
   createChangelogOctokit,
   fetchAllChangelogDiscussionMetadata,
   fetchChangelogDiscussionByNumber,
+  type ChangelogLabel,
 } from '~/lib/changelog-github'
 import { discussionDisplayDate } from '~/lib/changelog.utils'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import dayjs from 'dayjs'
-import { ArrowUpRightIcon, Github } from 'lucide-react'
+import { ArrowUpRightIcon } from 'lucide-react'
 import { GetServerSideProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
@@ -24,6 +26,7 @@ type PageProps = {
   created_at: string
   number: number
   source: MDXRemoteSerializeResult
+  labels: ChangelogLabel[]
   prevNumber: number | null
   nextNumber: number | null
 }
@@ -82,6 +85,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ params
         created_at,
         number,
         source,
+        labels: discussion.labels?.nodes ?? [],
         prevNumber,
         nextNumber,
       },
@@ -98,6 +102,7 @@ function ChangelogV3DetailPage({
   created_at,
   number,
   source,
+  labels,
   prevNumber,
   nextNumber,
 }: PageProps) {
@@ -108,7 +113,7 @@ function ChangelogV3DetailPage({
         description={title}
         openGraph={{
           title,
-          url: `https://supabase.com/changelog-v3/${number}`,
+          url: `https://supabase.com/changelog-minimal/${number}`,
           type: 'article',
         }}
       />
@@ -119,13 +124,12 @@ function ChangelogV3DetailPage({
               aria-label="Breadcrumb"
               className="text-foreground-lighter flex flex-wrap items-center gap-x-2 gap-y-1 text-sm"
             >
-              <Link href="/changelog-v3" className="text-foreground-lighter hover:underline">
+              <Link href="/changelog-minimal" className="text-foreground-lighter hover:underline">
                 Changelog
               </Link>
             </nav>
             <ChangelogRssButton />
           </div>
-
           <header className="border-default flex flex-col gap-2 border-b pb-6">
             <h1 className="h1 text-2xl sm:text-3xl">{title}</h1>
             <div className="flex items-center justify-between gap-2">
@@ -144,14 +148,15 @@ function ChangelogV3DetailPage({
             </div>
           </header>
 
+          <LabelBadges labels={labels} onBadgeClick={(e) => e.stopPropagation()} className="" />
+
           <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
             <MDXRemote {...source} components={mdxComponents('blog')} />
           </article>
-
           <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-6">
             {nextNumber != null ? (
               <Link
-                href={`/changelog-v3/${nextNumber}`}
+                href={`/changelog-minimal/${nextNumber}`}
                 className="text-foreground-lighter flex items-center gap-2 text-sm hover:text-foreground"
               >
                 <ArrowLeftIcon className="h-4 w-4" /> Newer
@@ -161,7 +166,7 @@ function ChangelogV3DetailPage({
             )}
             {prevNumber != null ? (
               <Link
-                href={`/changelog-v3/${prevNumber}`}
+                href={`/changelog-minimal/${prevNumber}`}
                 className="text-foreground-lighter flex items-center gap-2 text-sm hover:text-foreground"
               >
                 Older
