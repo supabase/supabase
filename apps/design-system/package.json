@@ -20,6 +20,7 @@
     "@hookform/resolvers": "^3.1.1",
     "@tanstack/react-table": "^8.21.3",
     "contentlayer2": "0.4.6",
+    "common": "workspace:*",
     "date-fns": "^2.30.0",
     "dayjs": "1.11.13",
     "eslint-config-supabase": "workspace:*",

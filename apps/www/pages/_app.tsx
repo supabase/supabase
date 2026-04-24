@@ -21,7 +21,7 @@ import { DefaultSeo } from 'next-seo'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { themes, TooltipProvider } from 'ui'
+import { TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsentToast } from 'ui-patterns/consent'
 
@@ -105,12 +105,7 @@ export default function App({ Component, pageProps }: AppProps) {
         {/* [TODO] I think we need to deconflict with the providers in layout.tsx? */}
         <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>
           <DevToolbarProvider apiUrl={API_URL}>
-            <ThemeProvider
-              themes={themes.map((theme) => theme.value)}
-              enableSystem
-              disableTransitionOnChange
-              forcedTheme={forceDarkMode ? 'dark' : undefined}
-            >
+            <ThemeProvider forcedTheme={forceDarkMode ? 'dark' : undefined}>
               <TooltipProvider delayDuration={0}>
                 <CommandProvider app="www" onTelemetry={onTelemetry}>
                   <Toaster />
