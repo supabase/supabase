@@ -95,10 +95,7 @@ Deno.serve((req) => {
     return Response.json({ error: 'forbidden' }, { status: 401 })
   }
 
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    SUPABASE_SECRET_KEYS['default'],
-  )
+  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, SUPABASE_SECRET_KEYS['default'])
 
   // your business logic. queries run with the service role
   return Response.json({ ok: true })
