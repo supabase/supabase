@@ -253,7 +253,7 @@ export const SupportFormV3 = ({
             )}
 
             {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
-              <SupportAccessToggle form={form} />
+              <SupportAccessToggle form={form} align="right" />
             )}
 
             {(showPlanExpectationInfo || showDirectEmailInfo) && (

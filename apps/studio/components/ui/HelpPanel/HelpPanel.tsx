@@ -32,6 +32,11 @@ export const HelpPanel = ({
   const router = useRouter()
   const [view, setView] = useState<'home' | 'support'>('home')
   const isSupportView = view === 'support'
+  const openAssistant = () => {
+    onClose()
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    snap.newChat(ASSISTANT_SUGGESTIONS)
+  }
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -66,6 +71,7 @@ export const HelpPanel = ({
             onFinish={() => {
               setView('home')
             }}
+            onAssistantClick={openAssistant}
           />
         ) : (
           <div className="flex h-full flex-col overflow-y-auto pb-5">
@@ -74,11 +80,7 @@ export const HelpPanel = ({
               isPlatform={IS_PLATFORM}
               projectRef={projectRef}
               supportLinkQueryParams={supportLinkQueryParams}
-              onAssistantClick={() => {
-                onClose()
-                openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-                snap.newChat(ASSISTANT_SUGGESTIONS)
-              }}
+              onAssistantClick={openAssistant}
               onSupportClick={() => {
                 setView('support')
                 return false

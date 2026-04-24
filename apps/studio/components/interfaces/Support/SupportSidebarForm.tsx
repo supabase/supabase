@@ -48,9 +48,10 @@ function useSupportFormTelemetry() {
 interface SupportFormProps {
   initialParams?: Partial<SupportFormUrlKeys>
   onFinish?: () => void
+  onAssistantClick?: () => void
 }
 
-export function SupportForm({ initialParams, onFinish }: SupportFormProps) {
+export function SupportForm({ initialParams, onFinish, onAssistantClick }: SupportFormProps) {
   const [state, dispatch] = useReducer(supportFormReducer, undefined, createInitialSupportFormState)
   const { form, initialError, projectRef, orgSlug } = useSupportForm(dispatch, initialParams)
 
@@ -91,7 +92,11 @@ export function SupportForm({ initialParams, onFinish }: SupportFormProps) {
         <div className="flex flex-col gap-y-8">
           {!isSuccess && !hasActiveIncidents && (
             <div className="flex flex-col gap-y-4">
-              <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
+              <AIAssistantOption
+                projectRef={projectRef}
+                organizationSlug={orgSlug}
+                onClick={onAssistantClick}
+              />
               <DiscordCTACard organizationSlug={orgSlug} />
             </div>
           )}
