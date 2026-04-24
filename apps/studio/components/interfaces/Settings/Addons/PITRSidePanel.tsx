@@ -10,7 +10,8 @@ import {
   Button,
   cn,
   CriticalIcon,
-  Radio,
+  RadioGroupCard,
+  RadioGroupCardItem,
   SidePanel,
 } from 'ui'
 
@@ -279,43 +280,41 @@ const PITRSidePanel = () => {
                 />
               ) : null}
 
-              <Radio.Group
-                type="large-cards"
-                size="tiny"
+              <RadioGroupCard
                 id="pitr"
-                label={<p className="text-sm">Choose the duration of recovery</p>}
-                onChange={(event: any) => setSelectedOption(event.target.value)}
+                className="flex flex-wrap gap-3"
+                value={selectedOption}
+                onValueChange={(value) => setSelectedOption(value)}
+                disabled={!hasAccessToPitrVariants || subscriptionCompute === undefined}
               >
                 {availableOptions.map((option) => (
-                  <Radio
-                    name="pitr"
-                    disabled={!hasAccessToPitrVariants || subscriptionCompute === undefined}
-                    className="col-span-4 !p-0"
+                  <RadioGroupCardItem
                     key={option.identifier}
-                    checked={selectedOption === option.identifier}
-                    label={<span className="text-sm">{option.name}</span>}
                     value={option.identifier}
-                  >
-                    <div className="w-full group">
-                      <div className="border-b border-default px-4 py-2">
-                        <p className="text-sm">{option.name}</p>
-                      </div>
-                      <div className="px-4 py-2">
-                        <p className="text-foreground-light">
-                          Allow database restorations to any time up to{' '}
-                          {option.identifier.split('_')[1]} days ago
-                        </p>
-                        <div className="flex items-center space-x-1 mt-2">
-                          <p className="text-foreground text-sm" translate="no">
-                            {formatCurrency(option.price)}
+                    id={option.identifier}
+                    label={
+                      <div className="w-full group">
+                        <div className="border-b border-default px-4 py-2">
+                          <p className="text-sm">{option.name}</p>
+                        </div>
+                        <div className="px-4 py-2">
+                          <p className="text-foreground-light">
+                            Allow database restorations to any time up to{' '}
+                            {option.identifier.split('_')[1]} days ago
                           </p>
-                          <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                          <div className="flex items-center space-x-1 mt-2">
+                            <p className="text-foreground text-sm" translate="no">
+                              {formatCurrency(option.price)}
+                            </p>
+                            <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Radio>
+                    }
+                    showIndicator={false}
+                  />
                 ))}
-              </Radio.Group>
+              </RadioGroupCard>
             </div>
           )}
 
