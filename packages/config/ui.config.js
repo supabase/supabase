@@ -407,7 +407,6 @@ const uiConfig = {
         { values: flattenColorPalette(theme('backgroundColor')), type: 'color' }
       )
     },
-    require('tailwindcss-radix')(),
     forms,
   ],
 }
