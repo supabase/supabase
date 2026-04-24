@@ -1,0 +1,70 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · Breaking Change</title>
+      <link>https://supabase.com/changelog</link>
+      <description>Breaking Change updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Tue, 17 Feb 2026 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/breaking-change.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/42949</guid>
+  <title>Breaking Change: Removing access to OpenAPI spec via the anon key</title>
+  <link>https://supabase.com/changelog/42949</link>
+  <pubDate>Tue, 17 Feb 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/42180</guid>
+  <title>Breaking Change: pg_graphql no longer enabled automatically (within approx 3 weeks from today)</title>
+  <link>https://supabase.com/changelog/42180</link>
+  <pubDate>Mon, 26 Jan 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/33670</guid>
+  <title>Upcoming breaking change to Dashboard Navigation</title>
+  <link>https://supabase.com/changelog/33670</link>
+  <pubDate>Tue, 18 Feb 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/29494</guid>
+  <title>Supabase Platform Access Control: Project Permissions Breaking Changes on October 15, 2024</title>
+  <link>https://supabase.com/changelog/29494</link>
+  <pubDate>Tue, 24 Sep 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/29260</guid>
+  <title>Upcoming changes to Supabase API Keys</title>
+  <link>https://supabase.com/changelog/29260</link>
+  <pubDate>Thu, 12 Sep 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/28493</guid>
+  <title>Let&apos;s Encrypt cross-signed chain will no longer be used for Custom Domains after September 9, 2024</title>
+  <link>https://supabase.com/changelog/28493</link>
+  <pubDate>Fri, 09 Aug 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/28118</guid>
+  <title>DigiCert no longer being used as the CA for Supabase HTTP APIs</title>
+  <link>https://supabase.com/changelog/28118</link>
+  <pubDate>Mon, 22 Jul 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/27993</guid>
+  <title>Supabase Platform Access Control: Organization Permissions Breaking Changes on July 26, 2024</title>
+  <link>https://supabase.com/changelog/27993</link>
+  <pubDate>Mon, 15 Jul 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19298</guid>
+  <title>Directly updating rows in the `cron.job` table is no longer allowed</title>
+  <link>https://supabase.com/changelog/19298</link>
+  <pubDate>Wed, 29 Nov 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19204</guid>
+  <title>LinkedIn OAuth Provider deprecated in favour of LinkedIn (OIDC) Provider</title>
+  <link>https://supabase.com/changelog/19204</link>
+  <pubDate>Fri, 24 Nov 2023 00:00:00 -0700</pubDate>
+</item>
+    </channel>
+  </rss>

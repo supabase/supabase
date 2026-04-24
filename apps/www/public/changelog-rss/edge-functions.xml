@@ -1,0 +1,196 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · Edge Functions</title>
+      <link>https://supabase.com/changelog</link>
+      <description>Edge Functions updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Wed, 11 Mar 2026 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/edge-functions.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/43644</guid>
+  <title>Edge Functions rate limits on recursive/nested Edge Functions calls</title>
+  <link>https://supabase.com/changelog/43644</link>
+  <pubDate>Wed, 11 Mar 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/43465</guid>
+  <title>Developer Update - March 2026</title>
+  <link>https://supabase.com/changelog/43465</link>
+  <pubDate>Thu, 05 Mar 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/42531</guid>
+  <title>Developer Update - February 2026</title>
+  <link>https://supabase.com/changelog/42531</link>
+  <pubDate>Thu, 05 Feb 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/41231</guid>
+  <title>Developer Update - December 2025</title>
+  <link>https://supabase.com/changelog/41231</link>
+  <pubDate>Wed, 10 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/37941</guid>
+  <title>All regions now run Deno 2.1 compatible release</title>
+  <link>https://supabase.com/changelog/37941</link>
+  <pubDate>Fri, 15 Aug 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/36850</guid>
+  <title>Update to Edge Functions Regional Invocations</title>
+  <link>https://supabase.com/changelog/36850</link>
+  <pubDate>Thu, 03 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/36814</guid>
+  <title>Deno 2.1 Preview - Hosted Environment</title>
+  <link>https://supabase.com/changelog/36814</link>
+  <pubDate>Wed, 02 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/34067</guid>
+  <title>Developer Update - February 2025</title>
+  <link>https://supabase.com/changelog/34067</link>
+  <pubDate>Fri, 07 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/34054</guid>
+  <title>Deno 2.1 Preview **local only**</title>
+  <link>https://supabase.com/changelog/34054</link>
+  <pubDate>Fri, 07 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/33720</guid>
+  <title>Deploy and update Edge Functions using the Management API</title>
+  <link>https://supabase.com/changelog/33720</link>
+  <pubDate>Thu, 20 Feb 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/33613</guid>
+  <title>Deploy Edge Functions from CLI without needing Docker + import files outside of supabase directory</title>
+  <link>https://supabase.com/changelog/33613</link>
+  <pubDate>Fri, 14 Feb 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/32815</guid>
+  <title>Add static files to Edge Functions</title>
+  <link>https://supabase.com/changelog/32815</link>
+  <pubDate>Thu, 16 Jan 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/32635</guid>
+  <title>Use a custom NPM registry for Edge Function dependencies</title>
+  <link>https://supabase.com/changelog/32635</link>
+  <pubDate>Tue, 07 Jan 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/30307</guid>
+  <title>Write Edge Functions in pure JavaScript instead of using TypeScript</title>
+  <link>https://supabase.com/changelog/30307</link>
+  <pubDate>Tue, 05 Nov 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/30291</guid>
+  <title>Use `deno.json` configuration file in Edge Functions</title>
+  <link>https://supabase.com/changelog/30291</link>
+  <pubDate>Tue, 05 Nov 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/30179</guid>
+  <title>Import NPM packages from private registries in Edge Functions</title>
+  <link>https://supabase.com/changelog/30179</link>
+  <pubDate>Wed, 30 Oct 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/29828</guid>
+  <title>Developer Update - September 2024</title>
+  <link>https://supabase.com/changelog/29828</link>
+  <pubDate>Thu, 10 Oct 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/29189</guid>
+  <title>Edge Functions are now Deno 1.45 compatible</title>
+  <link>https://supabase.com/changelog/29189</link>
+  <pubDate>Tue, 10 Sep 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/28154</guid>
+  <title>Developer Updates - June 2024</title>
+  <link>https://supabase.com/changelog/28154</link>
+  <pubDate>Wed, 24 Jul 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/27349</guid>
+  <title>Edge Functions are now Deno 1.43 compatible</title>
+  <link>https://supabase.com/changelog/27349</link>
+  <pubDate>Tue, 18 Jun 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/27338</guid>
+  <title>Developer Updates - May 2024</title>
+  <link>https://supabase.com/changelog/27338</link>
+  <pubDate>Tue, 18 Jun 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/25842</guid>
+  <title>JSR modules are supported in Edge Functions &amp; Edge Runtime</title>
+  <link>https://supabase.com/changelog/25842</link>
+  <pubDate>Tue, 07 May 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/21042</guid>
+  <title>Platform Updates: January 2024</title>
+  <link>https://supabase.com/changelog/21042</link>
+  <pubDate>Tue, 06 Feb 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/18972</guid>
+  <title>Edge Functions secrets should now get updated upon resetting DB password or JWT secret</title>
+  <link>https://supabase.com/changelog/18972</link>
+  <pubDate>Wed, 15 Nov 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/18845</guid>
+  <title>Connections to Postgres directly from an edge function are secured with SSL</title>
+  <link>https://supabase.com/changelog/18845</link>
+  <pubDate>Thu, 09 Nov 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19706</guid>
+  <title>Platform update September 2023</title>
+  <link>https://supabase.com/changelog/19706</link>
+  <pubDate>Fri, 06 Oct 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19702</guid>
+  <title>Platform updates: May 2023</title>
+  <link>https://supabase.com/changelog/19702</link>
+  <pubDate>Fri, 09 Jun 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19701</guid>
+  <title>Platform updates: April 2023</title>
+  <link>https://supabase.com/changelog/19701</link>
+  <pubDate>Wed, 10 May 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19700</guid>
+  <title>Platform Update February 2023</title>
+  <link>https://supabase.com/changelog/19700</link>
+  <pubDate>Thu, 09 Mar 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19697</guid>
+  <title>Platform updates: October 2022</title>
+  <link>https://supabase.com/changelog/19697</link>
+  <pubDate>Wed, 02 Nov 2022 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19696</guid>
+  <title>Platform Update September 2022</title>
+  <link>https://supabase.com/changelog/19696</link>
+  <pubDate>Fri, 07 Oct 2022 00:00:00 -0700</pubDate>
+</item>
+    </channel>
+  </rss>

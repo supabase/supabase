@@ -391,7 +391,7 @@ try {
     const { Octokit } = await import('@octokit/core')
     const { paginateGraphql } = await import('@octokit/plugin-paginate-graphql')
 
-    const { generateChangelogRssXml } = await import('../lib/changelog-rss.mjs')
+    const { generateChangelogRssXml, generateChangelogTagRssXml, labelToFileSlug } = await import('../lib/changelog-rss.mjs')
     const rewritesPath = path.join(__dirname, 'data/changelog-deleted-discussions.json')
     const rewrites = JSON.parse(await fs.readFile(rewritesPath, 'utf8'))
     const discussionDisplayDate = (item) => {
@@ -402,6 +402,30 @@ try {
     }
 
     const CHANGELOG_CATEGORY_ID = 'DIC_kwDODMpXOc4CAFUr'
+
+    /** Must stay in sync with CHANGELOG_PRODUCT_TAGS in apps/www/pages/changelog.tsx */
+    const CHANGELOG_PRODUCT_TAGS = [
+      { slug: 'database', label: 'Database' },
+      { slug: 'auth', label: 'Auth' },
+      { slug: 'storage', label: 'Storage' },
+      { slug: 'realtime', label: 'Realtime' },
+      { slug: 'edge functions', label: 'Edge Functions' },
+      { slug: 'postgres', label: 'postgres' },
+      { slug: 'postgrest', label: 'PostgREST' },
+      { slug: 'ai', label: 'AI & Vector' },
+      { slug: 'billing', label: 'Billing' },
+      { slug: 'breaking-change', label: 'Breaking Change' },
+      { slug: 'cli', label: 'CLI' },
+      { slug: 'frontend', label: 'Dashboard' },
+      { slug: 'documentation', label: 'Docs' },
+      { slug: 'infra', label: 'Infra' },
+      { slug: 'self-hosted', label: 'Self-hosted' },
+      { slug: 'javascript', label: 'supabase-js' },
+      { slug: 'swift', label: 'supabase-swift' },
+      { slug: 'flutter', label: 'supabase-flutter' },
+      { slug: 'python', label: 'supabase-py' },
+    ]
+
     const changelogQuery = `
     query changelogDiscussionMetadata($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
       repository(owner: $owner, name: $repo) {
@@ -416,6 +440,11 @@ try {
             title
             createdAt
             url
+            labels(first: 25) {
+              nodes {
+                name
+              }
+            }
           }
           pageInfo {
             hasNextPage
@@ -456,9 +485,11 @@ try {
     }
 
     const entries = collected.map((item) => ({
+      number: item.number,
       title: item.title,
       url: item.url,
       sortDate: discussionDisplayDate({ title: item.title, createdAt: item.createdAt }),
+      labels: (item.labels?.nodes ?? []).map((l) => l.name.toLowerCase()),
     }))
 
     const changelogXml = generateChangelogRssXml(entries)
@@ -466,6 +497,26 @@ try {
     await fs.writeFile(changelogRssPath, changelogXml.trim(), 'utf8')
     const visibleCount = entries.filter((e) => !e.title.includes('[d]')).length
     console.log(`✅ Generated changelog RSS with ${visibleCount} entries`)
+
+    // Per-tag RSS feeds → public/changelog-rss/<label-slug>.xml
+    const tagFeedsDir = path.join(__dirname, '../public/changelog-rss')
+    await fs.mkdir(tagFeedsDir, { recursive: true })
+    const tagResults = await Promise.allSettled(
+      CHANGELOG_PRODUCT_TAGS.map(async ({ slug, label }) => {
+        const fileSlug = labelToFileSlug(label)
+        const tagXml = generateChangelogTagRssXml(entries, {
+          githubLabelSlug: slug,
+          displayLabel: label,
+        })
+        await fs.writeFile(path.join(tagFeedsDir, `${fileSlug}.xml`), tagXml.trim(), 'utf8')
+        const count = entries.filter(
+          (e) => !e.title.includes('[d]') && e.labels.includes(slug.toLowerCase())
+        ).length
+        return { label, fileSlug, count }
+      })
+    )
+    const succeeded = tagResults.filter((r) => r.status === 'fulfilled').length
+    console.log(`✅ Generated ${succeeded}/${CHANGELOG_PRODUCT_TAGS.length} per-tag changelog RSS feeds`)
   }
 } catch (error) {
   console.warn('Error generating changelog RSS:', error)

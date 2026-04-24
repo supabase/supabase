@@ -1,0 +1,190 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · Auth</title>
+      <link>https://supabase.com/changelog</link>
+      <description>Auth updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Wed, 10 Dec 2025 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/auth.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/41231</guid>
+  <title>Developer Update - December 2025</title>
+  <link>https://supabase.com/changelog/41231</link>
+  <pubDate>Wed, 10 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/40349</guid>
+  <title>Notify users about security-sensitive actions on their accounts</title>
+  <link>https://supabase.com/changelog/40349</link>
+  <pubDate>Tue, 11 Nov 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/38022</guid>
+  <title>OAuth 2.1 Server Capabilities for Supabase Auth</title>
+  <link>https://supabase.com/changelog/38022</link>
+  <pubDate>Tue, 19 Aug 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/34270</guid>
+  <title>Restricting Access on Auth, Storage, and Realtime Schemas on April 21, 2025</title>
+  <link>https://supabase.com/changelog/34270</link>
+  <pubDate>Tue, 18 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/33416</guid>
+  <title>Developer Update - January 2025</title>
+  <link>https://supabase.com/changelog/33416</link>
+  <pubDate>Fri, 07 Feb 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/30772</guid>
+  <title>Slack V1 OAuth Provider Deprecated in favour of Slack (OIDC)</title>
+  <link>https://supabase.com/changelog/30772</link>
+  <pubDate>Mon, 02 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/30264</guid>
+  <title>Dashboard Updates [21/10/24 - 04/11/24]</title>
+  <link>https://supabase.com/changelog/30264</link>
+  <pubDate>Mon, 04 Nov 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/29370</guid>
+  <title>Supabase Auth: Changes to default email provider</title>
+  <link>https://supabase.com/changelog/29370</link>
+  <pubDate>Wed, 18 Sep 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/29331</guid>
+  <title>Developer Update - August 2024</title>
+  <link>https://supabase.com/changelog/29331</link>
+  <pubDate>Mon, 16 Sep 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/29289</guid>
+  <title>Supabase Auth: Asymmetric Keys support in 2025</title>
+  <link>https://supabase.com/changelog/29289</link>
+  <pubDate>Fri, 13 Sep 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/27338</guid>
+  <title>Developer Updates - May 2024</title>
+  <link>https://supabase.com/changelog/27338</link>
+  <pubDate>Tue, 18 Jun 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/27037</guid>
+  <title>@supabase/ssr updates and roadmap towards v1.0.0</title>
+  <link>https://supabase.com/changelog/27037</link>
+  <pubDate>Wed, 05 Jun 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/25860</guid>
+  <title>Developer Updates - April 2024</title>
+  <link>https://supabase.com/changelog/25860</link>
+  <pubDate>Wed, 08 May 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/23139</guid>
+  <title>Dashboard Weekly Updates [15/04/24 - 22/04/24]</title>
+  <link>https://supabase.com/changelog/23139</link>
+  <pubDate>Mon, 22 Apr 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19204</guid>
+  <title>LinkedIn OAuth Provider deprecated in favour of LinkedIn (OIDC) Provider</title>
+  <link>https://supabase.com/changelog/19204</link>
+  <pubDate>Fri, 24 Nov 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19705</guid>
+  <title>Platform updates: October 2023</title>
+  <link>https://supabase.com/changelog/19705</link>
+  <pubDate>Mon, 06 Nov 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19706</guid>
+  <title>Platform update September 2023</title>
+  <link>https://supabase.com/changelog/19706</link>
+  <pubDate>Fri, 06 Oct 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19703</guid>
+  <title>Platform updates June 2023</title>
+  <link>https://supabase.com/changelog/19703</link>
+  <pubDate>Fri, 07 Jul 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19702</guid>
+  <title>Platform updates: May 2023</title>
+  <link>https://supabase.com/changelog/19702</link>
+  <pubDate>Fri, 09 Jun 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19701</guid>
+  <title>Platform updates: April 2023</title>
+  <link>https://supabase.com/changelog/19701</link>
+  <pubDate>Wed, 10 May 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19699</guid>
+  <title>Platform update January 2023</title>
+  <link>https://supabase.com/changelog/19699</link>
+  <pubDate>Wed, 08 Feb 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19698</guid>
+  <title>Platform Updates November 2022</title>
+  <link>https://supabase.com/changelog/19698</link>
+  <pubDate>Thu, 08 Dec 2022 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19697</guid>
+  <title>Platform updates: October 2022</title>
+  <link>https://supabase.com/changelog/19697</link>
+  <pubDate>Wed, 02 Nov 2022 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19696</guid>
+  <title>Platform Update September 2022</title>
+  <link>https://supabase.com/changelog/19696</link>
+  <pubDate>Fri, 07 Oct 2022 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19695</guid>
+  <title>Platform updates: 30 Nov 2021</title>
+  <link>https://supabase.com/changelog/19695</link>
+  <pubDate>Tue, 30 Nov 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19694</guid>
+  <title>October Beta 2021</title>
+  <link>https://supabase.com/changelog/19694</link>
+  <pubDate>Mon, 08 Nov 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19693</guid>
+  <title>September Beta 2021</title>
+  <link>https://supabase.com/changelog/19693</link>
+  <pubDate>Mon, 04 Oct 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19692</guid>
+  <title>August Beta 2021</title>
+  <link>https://supabase.com/changelog/19692</link>
+  <pubDate>Mon, 13 Sep 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19691</guid>
+  <title>July Beta 2021</title>
+  <link>https://supabase.com/changelog/19691</link>
+  <pubDate>Thu, 12 Aug 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19690</guid>
+  <title>June Beta 2021</title>
+  <link>https://supabase.com/changelog/19690</link>
+  <pubDate>Sun, 04 Jul 2021 00:00:00 -0700</pubDate>
+</item>
+    </channel>
+  </rss>

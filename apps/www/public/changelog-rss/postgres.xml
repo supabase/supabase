@@ -1,0 +1,112 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · postgres</title>
+      <link>https://supabase.com/changelog</link>
+      <description>postgres updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Wed, 08 Oct 2025 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/postgres.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/39378</guid>
+  <title>Potential breaking change in pgmq from 1.4.4 to 1.5.1 and temporary halt on upgrade for existing projects</title>
+  <link>https://supabase.com/changelog/39378</link>
+  <pubDate>Wed, 08 Oct 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/34839</guid>
+  <title>Developer Update - March 2025</title>
+  <link>https://supabase.com/changelog/34839</link>
+  <pubDate>Tue, 08 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/34067</guid>
+  <title>Developer Update - February 2025</title>
+  <link>https://supabase.com/changelog/34067</link>
+  <pubDate>Fri, 07 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/28519</guid>
+  <title>Developer Updates - July 2024</title>
+  <link>https://supabase.com/changelog/28519</link>
+  <pubDate>Fri, 09 Aug 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/27946</guid>
+  <title>Postgres 13 Deprecation Notice</title>
+  <link>https://supabase.com/changelog/27946</link>
+  <pubDate>Fri, 12 Jul 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/18198</guid>
+  <title>Postgres 12 Deprecation Notice</title>
+  <link>https://supabase.com/changelog/18198</link>
+  <pubDate>Sat, 14 Oct 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19703</guid>
+  <title>Platform updates June 2023</title>
+  <link>https://supabase.com/changelog/19703</link>
+  <pubDate>Fri, 07 Jul 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19702</guid>
+  <title>Platform updates: May 2023</title>
+  <link>https://supabase.com/changelog/19702</link>
+  <pubDate>Fri, 09 Jun 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19701</guid>
+  <title>Platform updates: April 2023</title>
+  <link>https://supabase.com/changelog/19701</link>
+  <pubDate>Wed, 10 May 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19700</guid>
+  <title>Platform Update February 2023</title>
+  <link>https://supabase.com/changelog/19700</link>
+  <pubDate>Thu, 09 Mar 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19699</guid>
+  <title>Platform update January 2023</title>
+  <link>https://supabase.com/changelog/19699</link>
+  <pubDate>Wed, 08 Feb 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19697</guid>
+  <title>Platform updates: October 2022</title>
+  <link>https://supabase.com/changelog/19697</link>
+  <pubDate>Wed, 02 Nov 2022 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19696</guid>
+  <title>Platform Update September 2022</title>
+  <link>https://supabase.com/changelog/19696</link>
+  <pubDate>Fri, 07 Oct 2022 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19695</guid>
+  <title>Platform updates: 30 Nov 2021</title>
+  <link>https://supabase.com/changelog/19695</link>
+  <pubDate>Tue, 30 Nov 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19693</guid>
+  <title>September Beta 2021</title>
+  <link>https://supabase.com/changelog/19693</link>
+  <pubDate>Mon, 04 Oct 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19691</guid>
+  <title>July Beta 2021</title>
+  <link>https://supabase.com/changelog/19691</link>
+  <pubDate>Thu, 12 Aug 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19690</guid>
+  <title>June Beta 2021</title>
+  <link>https://supabase.com/changelog/19690</link>
+  <pubDate>Sun, 04 Jul 2021 00:00:00 -0700</pubDate>
+</item>
+    </channel>
+  </rss>

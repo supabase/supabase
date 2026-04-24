@@ -15,25 +15,38 @@ type Props = {
   className?: string
 }
 
-/** GitHub changelog label slugs — dedicated per-product RSS URLs are placeholders until feeds ship. */
+/** Must stay in sync with CHANGELOG_PRODUCT_TAGS in apps/www/pages/changelog.tsx */
 const PRODUCT_RSS_FEEDS = [
-  { slug: 'database', label: 'Database' },
-  { slug: 'auth', label: 'Auth' },
-  { slug: 'storage', label: 'Storage' },
-  { slug: 'realtime', label: 'Realtime' },
-  { slug: 'vector', label: 'Vector' },
-  { slug: 'edge-functions', label: 'Edge Functions' },
-  { slug: 'billing', label: 'Billing' },
-  { slug: 'cli', label: 'CLI' },
-  { slug: 'dashboard', label: 'Dashboard' },
-  { slug: 'docs', label: 'Docs' },
-  { slug: 'infra', label: 'Infra' },
-  { slug: 'sdk', label: 'SDK' },
-  { slug: 'self-hosted', label: 'Self-hosted' },
+  { label: 'Database' },
+  { label: 'Auth' },
+  { label: 'Storage' },
+  { label: 'Realtime' },
+  { label: 'Edge Functions' },
+  { label: 'postgres' },
+  { label: 'PostgREST' },
+  { label: 'AI & Vector' },
+  { label: 'Billing' },
+  { label: 'Breaking Change' },
+  { label: 'CLI' },
+  { label: 'Dashboard' },
+  { label: 'Docs' },
+  { label: 'Infra' },
+  { label: 'Self-hosted' },
+  { label: 'supabase-js' },
+  { label: 'supabase-swift' },
+  { label: 'supabase-flutter' },
+  { label: 'supabase-py' },
 ] as const
 
-function productFeedHref(slug: (typeof PRODUCT_RSS_FEEDS)[number]['slug']) {
-  return `/changelog-rss/${slug}.xml`
+function labelToFileSlug(label: string): string {
+  return label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+function productFeedHref(label: string): string {
+  return `/changelog-rss/${labelToFileSlug(label)}.xml`
 }
 
 export function ChangelogRssButton({ className }: Props) {
@@ -58,9 +71,9 @@ export function ChangelogRssButton({ className }: Props) {
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="max-h-100 w-52 overflow-y-auto">
-          {PRODUCT_RSS_FEEDS.map(({ slug, label }) => (
-            <DropdownMenuItem key={slug} asChild className="gap-2">
-              <Link href={productFeedHref(slug)}>
+          {PRODUCT_RSS_FEEDS.map(({ label }) => (
+            <DropdownMenuItem key={label} asChild className="gap-2">
+              <Link href={productFeedHref(label)}>
                 <Rss className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden />
                 {label} RSS
               </Link>

@@ -1,0 +1,76 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · Realtime</title>
+      <link>https://supabase.com/changelog</link>
+      <description>Realtime updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Tue, 12 Aug 2025 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/realtime.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/37869</guid>
+  <title>Change in `realtime-js` affecting Node.js &lt; 22</title>
+  <link>https://supabase.com/changelog/37869</link>
+  <pubDate>Tue, 12 Aug 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/37041</guid>
+  <title>Realtime Settings</title>
+  <link>https://supabase.com/changelog/37041</link>
+  <pubDate>Fri, 11 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/34270</guid>
+  <title>Restricting Access on Auth, Storage, and Realtime Schemas on April 21, 2025</title>
+  <link>https://supabase.com/changelog/34270</link>
+  <pubDate>Tue, 18 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/29331</guid>
+  <title>Developer Update - August 2024</title>
+  <link>https://supabase.com/changelog/29331</link>
+  <pubDate>Mon, 16 Sep 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/27338</guid>
+  <title>Developer Updates - May 2024</title>
+  <link>https://supabase.com/changelog/27338</link>
+  <pubDate>Tue, 18 Jun 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/22484</guid>
+  <title>Realtime Broadcast and Presence Authorization</title>
+  <link>https://supabase.com/changelog/22484</link>
+  <pubDate>Thu, 04 Apr 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/18861</guid>
+  <title>Improved Realtime reliability when migrations fail for a project</title>
+  <link>https://supabase.com/changelog/18861</link>
+  <pubDate>Fri, 10 Nov 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19706</guid>
+  <title>Platform update September 2023</title>
+  <link>https://supabase.com/changelog/19706</link>
+  <pubDate>Fri, 06 Oct 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19703</guid>
+  <title>Platform updates June 2023</title>
+  <link>https://supabase.com/changelog/19703</link>
+  <pubDate>Fri, 07 Jul 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19695</guid>
+  <title>Platform updates: 30 Nov 2021</title>
+  <link>https://supabase.com/changelog/19695</link>
+  <pubDate>Tue, 30 Nov 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19692</guid>
+  <title>August Beta 2021</title>
+  <link>https://supabase.com/changelog/19692</link>
+  <pubDate>Mon, 13 Sep 2021 00:00:00 -0700</pubDate>
+</item>
+    </channel>
+  </rss>

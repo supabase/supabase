@@ -1,0 +1,34 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · supabase-flutter</title>
+      <link>https://supabase.com/changelog</link>
+      <description>supabase-flutter updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Mon, 20 Apr 2026 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/supabase-flutter.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/45071</guid>
+  <title>Automatic PostgREST retries for transient errors</title>
+  <link>https://supabase.com/changelog/45071</link>
+  <pubDate>Mon, 20 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19697</guid>
+  <title>Platform updates: October 2022</title>
+  <link>https://supabase.com/changelog/19697</link>
+  <pubDate>Wed, 02 Nov 2022 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19692</guid>
+  <title>August Beta 2021</title>
+  <link>https://supabase.com/changelog/19692</link>
+  <pubDate>Mon, 13 Sep 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19691</guid>
+  <title>July Beta 2021</title>
+  <link>https://supabase.com/changelog/19691</link>
+  <pubDate>Thu, 12 Aug 2021 00:00:00 -0700</pubDate>
+</item>
+    </channel>
+  </rss>
