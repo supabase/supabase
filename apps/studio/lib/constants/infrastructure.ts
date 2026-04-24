@@ -1,4 +1,3 @@
-import type { CloudProvider } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 
 import type { components } from '@/data/api'
@@ -36,11 +35,7 @@ export const PRICING_TIER_PRODUCT_IDS = {
 }
 
 export function useDefaultProvider() {
-  const defaultProvider: CloudProvider =
-    process.env.NEXT_PUBLIC_ENVIRONMENT &&
-    ['staging', 'preview'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT)
-      ? 'AWS_K8S'
-      : 'AWS'
+  const defaultProvider = 'AWS'
 
   const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
 
@@ -48,7 +43,7 @@ export function useDefaultProvider() {
     return defaultProvider
   }
 
-  return (validCloudProviders?.[0] ?? 'AWS') as CloudProvider
+  return validCloudProviders?.[0] ?? 'AWS'
 }
 
 export const PROVIDERS = {

@@ -174,10 +174,11 @@ function StateOfStartupsPage() {
       <NextSeo
         title={meta_title}
         description={meta_description}
+        canonical="https://supabase.com/state-of-startups-2025"
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/state-of-startups`,
+          url: `https://supabase.com/state-of-startups-2025`,
           images: [
             {
               url: `https://supabase.com/images/state-of-startups/state-of-startups-og.png`,
