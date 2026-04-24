@@ -352,7 +352,7 @@ Make a POST request to a Supabase Edge Function with auth header and JSON body p
 select
     net.http_post(
         url:='https://project-ref.supabase.co/functions/v1/function-name',
-        headers:='{"Content-Type": "application/json", "Authorization": "Bearer <YOUR_ANON_KEY>"}'::jsonb,
+        headers:='{"Content-Type": "application/json", "apikey": "<SUPABASE_PUBLISHABLE_KEY>"}'::jsonb,
         body:='{"name": "pg_net"}'::jsonb
     ) as request_id;
 ```
@@ -370,7 +370,7 @@ select cron.schedule(
 	    select "net"."http_post"(
             -- URL of Edge function
             url:='https://project-ref.supabase.co/functions/v1/function-name',
-            headers:='{"Authorization": "Bearer <YOUR_ANON_KEY>"}'::jsonb,
+            headers:='{"apikey": "<SUPABASE_PUBLISHABLE_KEY>"}'::jsonb,
             body:='{"name": "pg_net"}'::jsonb
 	    ) as "request_id";
 	$$

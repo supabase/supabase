@@ -16,7 +16,7 @@ RadioGroupCard.displayName = RadioGroupPrimitive.Root.displayName
 
 interface RadioGroupCardItemProps {
   image?: React.ReactNode
-  label: string | React.ReactNode
+  label: React.ReactNode
   showIndicator?: boolean
 }
 
@@ -52,13 +52,13 @@ const RadioGroupCardItem = React.forwardRef<
         {showIndicator && (
           <div
             className="
-                aspect-square h-4 w-4 
+                aspect-square h-4 w-4
                 rounded-full border group-data-[state=checked]:border-foreground-muted
                 group-focus:border-foreground-muted
                 group-hover:border-foreground-muted
-                ring-offset-background 
-                group-focus:outline-none 
-                group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 
+                ring-offset-background
+                group-focus:outline-none
+                group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2
                 group-disabled:cursor-not-allowed group-disabled:opacity-50
                 flex items-center justify-center
                 transition
