@@ -236,7 +236,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
         {DASHBOARD_LOG_CATEGORIES.includes(category) && (
           <>
-            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} />
+            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} className="px-6" />
             <DialogSectionSeparator />
           </>
         )}

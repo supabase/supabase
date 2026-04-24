@@ -249,7 +249,7 @@ export const SupportFormV3 = ({
             <Separator />
 
             {DASHBOARD_LOG_CATEGORIES.includes(category) && (
-              <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} />
+              <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} align="right" />
             )}
 
             {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
