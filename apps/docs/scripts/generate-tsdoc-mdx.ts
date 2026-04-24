@@ -1,17 +1,37 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'fs'
-import { join, dirname, resolve } from 'path'
+import { mkdirSync, readdirSync, writeFileSync } from 'fs'
+import { join, dirname, relative } from 'path'
 import { fileURLToPath } from 'url'
-import { processSpec } from './process-tsdoc.js'
+import { processSpec, type SpecCategory, type SpecConfig } from './process-tsdoc.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const CONFIG_PATH = join(__dirname, '../spec/enrichments/tsdoc_v2/config.json')
-const config: {
-  title?: string
-  subtitle?: string
-  referenceLink?: string
-  referenceLinkLabel?: string
-} = JSON.parse(readFileSync(CONFIG_PATH, 'utf-8'))
+// ---------------------------------------------------------------------------
+// Folder discovery
+// ---------------------------------------------------------------------------
+
+/**
+ * Recursively finds all folders under `baseDir` that directly contain at least
+ * one .json file other than config.json. These are treated as spec source folders.
+ */
+function findSpecFolders(baseDir: string): string[] {
+  const result: string[] = []
+  function walk(dir: string) {
+    const entries = readdirSync(dir, { withFileTypes: true })
+    const hasSource = entries.some(
+      (e) => e.isFile() && e.name.endsWith('.json') && e.name !== 'config.json'
+    )
+    if (hasSource) result.push(dir)
+    for (const e of entries) {
+      if (e.isDirectory()) walk(join(dir, e.name))
+    }
+  }
+  walk(baseDir)
+  return result
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 function escapeMdxProse(text: string): string {
   // Escape { and } outside code blocks/spans so MDX doesn't treat them as JSX.
@@ -24,6 +44,35 @@ function escapeMdxProse(text: string): string {
 function prop(value: unknown): string {
   return `{${JSON.stringify(value)}}`
 }
+
+function toSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+// ---------------------------------------------------------------------------
+// Sections builder
+// ---------------------------------------------------------------------------
+
+function buildSections(categories: SpecCategory[]): object[] {
+  return categories.map(({ category, definitions }) => ({
+    id: toSlug(category),
+    type: 'category',
+    title: category,
+    items: definitions.map((def) => ({
+      id: def.name,
+      type: 'function',
+      title: def.name,
+      slug: def.name,
+    })),
+  }))
+}
+
+// ---------------------------------------------------------------------------
+// MDX builder
+// ---------------------------------------------------------------------------
 
 let exampleCounter = 0
 
@@ -86,14 +135,16 @@ function generateExamplesBlock(examples: any[]): string[] {
   return lines
 }
 
-function generateMdx(categories: ReturnType<typeof processSpec>): string {
+function generateMdx(categories: SpecCategory[], config: SpecConfig): string {
   const fmVal = (v: string) => `"${v.replace(/"/g, '\\"')}"`
   const frontmatter = [
     '---',
     `title: ${fmVal(config.title ?? 'Reference')}`,
     ...(config.subtitle ? [`subtitle: ${fmVal(config.subtitle)}`] : []),
     ...(config.referenceLink ? [`referenceLink: ${fmVal(config.referenceLink)}`] : []),
-    ...(config.referenceLinkLabel ? [`referenceLinkLabel: ${fmVal(config.referenceLinkLabel)}`] : []),
+    ...(config.referenceLinkLabel
+      ? [`referenceLinkLabel: ${fmVal(config.referenceLinkLabel)}`]
+      : []),
     '---',
     '',
     '',
@@ -145,13 +196,43 @@ function generateMdx(categories: ReturnType<typeof processSpec>): string {
   return lines.join('\n')
 }
 
-const processed = processSpec()
-const mdx = generateMdx(processed)
+// ---------------------------------------------------------------------------
+// Main: discover and process all spec folders
+// ---------------------------------------------------------------------------
 
-const outPath = join(__dirname, '../content/reference/javascript.mdx')
-mkdirSync(dirname(outPath), { recursive: true })
-writeFileSync(outPath, mdx)
-console.log(`MDX written to ${outPath}`)
-console.log(
-  `${processed.length} categories, ${processed.flatMap((c) => c.definitions).length} definitions`
-)
+const specRefDir = join(__dirname, '../spec/reference')
+const contentRefDir = join(__dirname, '../content/reference')
+
+const specFolders = findSpecFolders(specRefDir)
+
+if (specFolders.length === 0) {
+  console.warn(`No spec folders found under ${specRefDir}`)
+  process.exit(0)
+}
+
+for (const specDir of specFolders) {
+  exampleCounter = 0 // reset per spec so IDs don't bleed across files
+
+  const { categories, config } = processSpec(specDir)
+
+  // Mirror the folder path: spec/reference/<rel> → content/reference/<rel>
+  const rel = relative(specRefDir, specDir)
+  const outDir = join(contentRefDir, rel)
+  mkdirSync(outDir, { recursive: true })
+
+  // Write MDX
+  const mdx = generateMdx(categories, config)
+  const mdxPath = join(outDir, 'index.mdx')
+  writeFileSync(mdxPath, mdx)
+
+  // Write sections
+  const sections = buildSections(categories)
+  const sectionsPath = join(outDir, 'sections.json')
+  writeFileSync(sectionsPath, JSON.stringify(sections, null, 2))
+
+  console.log(`[${rel}] MDX → ${mdxPath}`)
+  console.log(`[${rel}] sections → ${sectionsPath}`)
+  console.log(
+    `[${rel}] ${categories.length} categories, ${categories.flatMap((c) => c.definitions).length} definitions`
+  )
+}

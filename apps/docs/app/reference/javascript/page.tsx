@@ -36,7 +36,7 @@ export type LibKey = keyof typeof libs
  */
 async function getReferenceContent(library: string, version: string | undefined) {
   const libKey = getLibKey(library, version)
-  const filePath = join(REFERENCE_DIRECTORY, `${libKey}.mdx`)
+  const filePath = join(REFERENCE_DIRECTORY, libKey, 'index.mdx')
   const fileContent = await fs.readFile(filePath, 'utf-8')
   const { data: meta, content } = matter(fileContent)
   return { meta, content } as { content: string; meta: GuideFrontmatter }
@@ -44,7 +44,7 @@ async function getReferenceContent(library: string, version: string | undefined)
 
 async function getReferenceSections(library: string, version: string | undefined) {
   const libKey = getLibKey(library, version)
-  const filePath = join(REFERENCE_DIRECTORY, `${libKey}.sections.json`)
+  const filePath = join(REFERENCE_DIRECTORY, libKey, 'sections.json')
   const fileContent = await fs.readFile(filePath, 'utf-8')
   return JSON.parse(fileContent) as AbbrevApiReferenceSection[]
 }
@@ -79,7 +79,7 @@ async function ReferencePage() {
   const { library, version } = params
   const libKey = `${library}${version ? `-${version}` : ''}` as LibKey
   const { name, icon, currentVersion, isLatestVersion } = libs[libKey]
-  // const sections = await getReferenceSections(library, version)
+  const sections = await getReferenceSections(library, version)
   const { meta, content } = await getReferenceContent(library, version)
 
   return (
@@ -89,7 +89,7 @@ async function ReferencePage() {
       library={library}
       version={currentVersion}
       isLatestVersion={isLatestVersion}
-      sections={[]}
+      sections={sections}
       meta={meta}
       content={content}
     />

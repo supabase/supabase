@@ -1,8 +1,5 @@
-import { readFileSync, writeFileSync } from 'fs'
-import { join, dirname, resolve } from 'path'
-import { fileURLToPath } from 'url'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
+import { readFileSync, readdirSync } from 'fs'
+import { join } from 'path'
 
 type ContentItem = { kind: string; text: string }
 type BlockTag = { tag: string; name?: string; content?: ContentItem[] }
@@ -167,6 +164,7 @@ function parseExamples(blockTags: BlockTag[]): any[] {
     const responseTag = findByName(responses, title) ?? responses[i]
     const descTag = findByName(descs, title) ?? descs[i]
 
+    // Use findLast so inline code spans (e.g. `select()`) before the fenced block are skipped
     const sqlBlock = sqlTag?.content?.findLast((c) => c.kind === 'code')
     const responseBlock = responseTag?.content?.findLast((c) => c.kind === 'code')
     const notes = descTag?.content
@@ -205,29 +203,39 @@ function collectDeclarations(node: any): any[] {
   return out
 }
 
-const SOURCE_FILES = [
-  'functions.json',
-  'gotrue.json',
-  'postgrest.json',
-  'realtime.json',
-  'storage.json',
-  'supabase.json',
-]
+export interface SpecConfig {
+  title?: string
+  subtitle?: string
+  referenceLink?: string
+  referenceLinkLabel?: string
+  ignoreDefinitions?: string[]
+  categoryOrder?: string[]
+}
 
-export function processSpec() {
-  const specDir = join(__dirname, '../spec/enrichments/tsdoc_v2')
+export interface SpecCategory {
+  category: string
+  definitions: any[]
+}
 
-  const config: { ignoreDefinitions?: string[]; categoryOrder?: string[] } = (() => {
+export function processSpec(specDir: string): { categories: SpecCategory[]; config: SpecConfig } {
+  // Load config (optional — missing config is fine)
+  const config: SpecConfig = (() => {
     try {
       return JSON.parse(readFileSync(join(specDir, 'config.json'), 'utf-8'))
     } catch {
       return {}
     }
   })()
+
   const ignoredNames = new Set(config.ignoreDefinitions ?? [])
   const categoryOrder = config.categoryOrder ?? []
 
-  const roots = SOURCE_FILES.map((f) => JSON.parse(readFileSync(join(specDir, f), 'utf-8')))
+  // Discover all JSON source files in the spec folder, excluding config.json
+  const sourceFiles = readdirSync(specDir)
+    .filter((f) => f.endsWith('.json') && f !== 'config.json')
+    .map((f) => join(specDir, f))
+
+  const roots = sourceFiles.map((f) => JSON.parse(readFileSync(f, 'utf-8')))
 
   // Build a per-file targetMap so IDs from different packages don't collide
   const fileMaps = roots.map((root) => buildTargetMap(root))
@@ -244,13 +252,13 @@ export function processSpec() {
     if (!categoryTag) continue // skip internal declarations with no category
     const category = (categoryTag.content?.[0]?.text ?? '').split('\n')[0].trim()
 
+    if (ignoredNames.has(decl.name)) continue
+
     if (!categoryMap.has(category)) categoryMap.set(category, [])
 
     const sig = decl.signatures[0]
     const remarkTags = blockTags.filter((t) => t.tag === '@remarks')
     const examples = parseExamples(blockTags)
-
-    if (ignoredNames.has(decl.name)) continue
 
     const definition: any = {
       name: decl.name,
@@ -266,7 +274,7 @@ export function processSpec() {
     categoryMap.get(category)!.push(definition)
   }
 
-  const result = Array.from(categoryMap.entries())
+  const categories = Array.from(categoryMap.entries())
     .map(([category, definitions]) => ({ category, definitions }))
     .sort((a, b) => {
       const ai = categoryOrder.indexOf(a.category)
@@ -281,20 +289,5 @@ export function processSpec() {
       return 0
     })
 
-  console.log(result)
-
-  return result
-}
-
-// Only write to disk when run directly
-const isMain = fileURLToPath(import.meta.url) === resolve(process.argv[1])
-if (isMain) {
-  const output = processSpec()
-  writeFileSync(
-    join(__dirname, '../spec/enrichments/tsdoc_v2/processed.json'),
-    JSON.stringify(output, null, 2)
-  )
-  console.log(
-    `Done: ${output.length} categories, ${output.flatMap((c) => c.definitions).length} declarations`
-  )
+  return { categories, config }
 }
