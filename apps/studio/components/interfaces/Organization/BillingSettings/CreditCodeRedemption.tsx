@@ -26,6 +26,7 @@ import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { getTotalCreditBalanceCents } from './helpers'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
@@ -59,6 +60,12 @@ export const CreditCodeRedemption = ({
   const { data: org, isLoading: isOrgLoading } = useOrganizationQuery({ slug })
   const { data: customerProfile, isLoading: isCustomerProfileLoading } =
     useOrganizationCustomerProfileQuery({ slug })
+  const combinedCreditBalanceCents = customerProfile
+    ? getTotalCreditBalanceCents({
+        customerBalance: customerProfile.balance,
+        prepaidCreditsBalance: customerProfile.prepaid_credits_balance,
+      })
+    : undefined
 
   const { can: canRedeemCode, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -282,12 +289,12 @@ export const CreditCodeRedemption = ({
                       )}
                     />
 
-                    {customerProfile && customerProfile.balance < 0 && (
+                    {combinedCreditBalanceCents !== undefined && combinedCreditBalanceCents > 0 && (
                       <div className="flex w-full justify-between items-center">
                         <span className="text-sm">Current Balance</span>
                         <div className="flex items-center gap-x-1">
                           <p className="opacity-50 text-sm">$</p>
-                          <p className="text-2xl">{customerProfile.balance / -100}</p>
+                          <p className="text-2xl">{combinedCreditBalanceCents / 100}</p>
                           <p className="opacity-50 text-sm">/credits</p>
                         </div>
                       </div>
