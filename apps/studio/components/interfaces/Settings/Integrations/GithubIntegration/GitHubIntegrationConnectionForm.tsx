@@ -30,6 +30,7 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import * as z from 'zod'
 
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -583,18 +584,29 @@ export const GitHubIntegrationConnectionForm = ({
                           layout="flex-row-reverse"
                           label="Working directory"
                           description={
-                            <>
-                              <span>
-                                Relative path to the directory that contains your{' '}
-                                <code>supabase</code> folder (not the <code>supabase</code> folder
-                                itself).
+                            <span>
+                              Relative path to the directory that contains your{' '}
+                              <code className="text-code-inline !break-keep">supabase</code> folder{' '}
+                              <span className="inline-flex align-middle [&>button]:ml-1 [&>button]:-translate-y-[2px]">
+                                <InfoTooltip side="bottom" className="w-72">
+                                  <p>Examples:</p>
+                                  <ul className="list-disc pl-4 space-y-1">
+                                    <li>
+                                      <code className="text-code-inline">.</code> if repository root
+                                      contains <code className="text-code-inline">supabase/</code>
+                                    </li>
+                                    <li>
+                                      <code className="text-code-inline">apps/web</code> if{' '}
+                                      <code className="text-code-inline">supabase/</code> is nested
+                                      at{' '}
+                                      <code className="text-code-inline !break-keep">
+                                        apps/web/supabase/
+                                      </code>
+                                    </li>
+                                  </ul>
+                                </InfoTooltip>
                               </span>
-                              <span className="mt-1 block">
-                                For example, enter <code>.</code> if <code>supabase/</code> is at
-                                the repository root, or a path like <code>apps/web</code> if your
-                                layout is <code>apps/web/supabase/</code>.
-                              </span>
-                            </>
+                            </span>
                           }
                         >
                           <FormControl_Shadcn_>
