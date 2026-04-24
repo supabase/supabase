@@ -460,7 +460,7 @@ export const GitHubIntegrationConnectionForm = ({
                 render={({ field }) => (
                   <FormItemLayout
                     layout="flex-row-reverse"
-                    label="GitHub Repository"
+                    label="GitHub repository"
                     description={
                       connection
                         ? 'Change the connected repository'
@@ -488,7 +488,7 @@ export const GitHubIntegrationConnectionForm = ({
                           >
                             {selectedRepository || connection
                               ? selectedRepository?.name || connection?.repository.name
-                              : 'Choose GitHub Repository'}
+                              : 'Choose GitHub repository'}
                           </Button>
                         </FormControl_Shadcn_>
                       </PopoverTrigger_Shadcn_>
