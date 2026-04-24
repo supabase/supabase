@@ -9,12 +9,15 @@ import {
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
 import { Code, ListTodo } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
   Button,
+  cn,
   DialogSectionSeparator,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -23,16 +26,21 @@ import {
   SheetSection,
   SheetTitle,
   SheetTrigger,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { RoleImpersonationPopover } from '../../RoleImpersonationSelector/RoleImpersonationPopover'
 import { checkIfAppendLimitRequired, suffixWithLimit } from '../../SQLEditor/SQLEditor.utils'
 import { Results } from '../../SQLEditor/UtilityPanel/Results'
 import { RLSTableCard } from './RLSTableCard'
+import { UserSelector } from './UserSelector'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useParseClientCodeMutation } from '@/data/ai/parse-client-code-mutation'
 import type { User } from '@/data/auth/users-infinite-query'
@@ -72,12 +80,13 @@ interface RLSTesterSheetProps {
 
 export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { role } = useRoleImpersonationStateSnapshot()
+  const { role, setRole } = useRoleImpersonationStateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const impersonatedRoleState = getImpersonatedRoleState()
 
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [selectedOption, setSelectedOption] = useState<'anon' | 'authenticated'>('anon')
 
   const [format, setFormat] = useState<'sql' | 'lib'>('sql')
   const [inferredSQL, setInferredSQL] = useState<string>()
@@ -114,6 +123,24 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
 
   const onRunQuery = async () => {
     if (!project) return console.error('Project is required')
+
+    const user =
+      impersonatedRoleState.role?.type === 'postgrest' &&
+      impersonatedRoleState.role.role === 'authenticated' &&
+      impersonatedRoleState.role.userType === 'native'
+        ? impersonatedRoleState.role.user
+        : undefined
+    const externalAuth =
+      impersonatedRoleState.role?.type === 'postgrest' &&
+      impersonatedRoleState.role.role === 'authenticated' &&
+      impersonatedRoleState.role.userType === 'external' &&
+      impersonatedRoleState.role.externalAuth
+        ? impersonatedRoleState.role.externalAuth.sub
+        : undefined
+
+    if (selectedOption === 'authenticated' && !user) {
+      return toast('Select which user to test as before running the query')
+    }
 
     try {
       setIsLoading(true)
@@ -177,19 +204,6 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
           queryKey: ['rls-tester'],
         })
 
-        const user =
-          impersonatedRoleState.role?.type === 'postgrest' &&
-          impersonatedRoleState.role.role === 'authenticated' &&
-          impersonatedRoleState.role.userType === 'native'
-            ? impersonatedRoleState.role.user
-            : undefined
-        const externalAuth =
-          impersonatedRoleState.role?.type === 'postgrest' &&
-          impersonatedRoleState.role.role === 'authenticated' &&
-          impersonatedRoleState.role.userType === 'external' &&
-          impersonatedRoleState.role.externalAuth
-            ? impersonatedRoleState.role.externalAuth.sub
-            : undefined
         setParseQueryResults({
           tables,
           operation: data.operation,
@@ -208,6 +222,15 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
     }
   }
 
+  useEffect(() => {
+    setRole({ type: 'postgrest', role: 'anon' })
+
+    // Flip back to service role
+    return () => {
+      setRole(undefined)
+    }
+  }, [setRole])
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
@@ -218,18 +241,45 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
 
       <SheetContent className="!w-[600px] flex flex-col gap-y-0">
         <SheetHeader>
-          <SheetTitle>Test RLS policies</SheetTitle>
+          <SheetTitle>What data can my users see?</SheetTitle>
           <SheetDescription>
-            Preview query results as a specific user to validate your RLS policies
+            See what data a user is allowed to read based on your RLS policies
           </SheetDescription>
         </SheetHeader>
 
         <div className="flex-grow overflow-y-auto flex flex-col">
           <SheetSection className="px-0 py-0">
+            <div className="flex flex-col p-5 pt-4 gap-y-4">
+              <FormItemLayout isReactForm={false} label="Test as">
+                <RadioGroupStacked defaultValue={role?.role ?? 'anon'}>
+                  <RadioGroupStackedItem
+                    value="anon"
+                    id="anon"
+                    label="Anonymous user"
+                    description="Not logged in"
+                    onClick={() => {
+                      setSelectedOption('anon')
+                      setRole({ type: 'postgrest', role: 'anon' })
+                    }}
+                  />
+                  <RadioGroupStackedItem
+                    value="authenticated"
+                    id="authenticated"
+                    label="Authenticated user"
+                    description="A specific logged in user"
+                    onClick={() => {
+                      setSelectedOption('authenticated')
+                    }}
+                  />
+                </RadioGroupStacked>
+              </FormItemLayout>
+              {selectedOption === 'authenticated' && <UserSelector />}
+            </div>
+
+            <DialogSectionSeparator />
+
             <div className="flex items-center justify-between px-5 py-2">
-              <p className="text-sm font-mono uppercase tracking-tight text-foreground-light">
-                Query
-              </p>
+              <p className="text-sm">Query</p>
               <div className="flex items-center gap-x-2">
                 <Select value={format} onValueChange={(x) => setFormat(x as 'sql' | 'lib')}>
                   <SelectTrigger size="tiny">
@@ -243,11 +293,10 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-                <RoleImpersonationPopover title="Run SQL query as" serviceRoleLabel="postgres" />
               </div>
             </div>
 
-            <div className="h-44 relative">
+            <div className="h-40 relative">
               <CodeEditor
                 id="rls-tester"
                 language="pgsql"
@@ -272,10 +321,9 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
 
           {format === 'lib' && !!inferredSQL && (
             <div>
-              <div className="flex items-center justify-between px-4 py-2 border-y">
-                <p className="text-sm font-mono uppercase tracking-tight text-foreground-light">
-                  Inferred SQL:
-                </p>
+              <DialogSectionSeparator />
+              <div className="flex items-center justify-between px-4 py-2">
+                <p className="text-sm">Inferred SQL:</p>
                 <Tooltip>
                   <TooltipTrigger>
                     <Badge variant="warning">Generated</Badge>
@@ -335,14 +383,30 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
               </p>
             </div>
           ) : (
-            <>
-              <div className="p-5 pt-4">
-                <p className="mb-2 text-sm font-mono uppercase tracking-tight text-foreground-light">
-                  Summary
-                </p>
+            <div className="p-5 pt-4">
+              <div className="flex items-center gap-x-2 mb-2">
+                <p className="text-sm">Summary</p>
+                {!isServiceRole && !!tableWithRLSEnabledButNoPolicies ? (
+                  <Badge variant="destructive">No access</Badge>
+                ) : (
+                  <Badge variant="success">
+                    {results.length > 0 ? 'Can access' : 'Has access'}
+                  </Badge>
+                )}
+              </div>
+
+              <Tabs_Shadcn_ defaultValue="policies">
+                <TabsList_Shadcn_ className="gap-x-3">
+                  <TabsTrigger_Shadcn_ value="policies" className="px-2">
+                    Policies applied
+                  </TabsTrigger_Shadcn_>
+                  <TabsTrigger_Shadcn_ value="data" className="px-2">
+                    Data preview
+                  </TabsTrigger_Shadcn_>
+                </TabsList_Shadcn_>
 
                 {!!parseQueryResults && (
-                  <div className="border rounded flex items-center justify-between px-3 py-2 mb-4">
+                  <div className="border rounded flex items-center justify-between px-3 py-1.5 mt-3">
                     <div className="flex items-center gap-x-2">
                       <p className="text-xs text-foreground-light">Ran as</p>
                       {!parseQueryResults.role ? (
@@ -353,9 +417,9 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
                         <p className="text-sm truncate max-w-52">
                           {parseQueryResults.externalAuth}
                         </p>
-                      ) : (
-                        <code className="text-code-inline">{parseQueryResults.role}</code>
-                      )}
+                      ) : parseQueryResults.role === 'anon' ? (
+                        <p className="text-xs">an Anonymous user</p>
+                      ) : null}
                     </div>
 
                     {parseQueryResults.role === 'anon' && (
@@ -367,72 +431,73 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
                   </div>
                 )}
 
-                {!isServiceRole && !!tableWithRLSEnabledButNoPolicies && (
-                  <Admonition showIcon={false} type="default" className="mb-4">
-                    <p className="!mb-0.5">
-                      Query returns no rows for the{' '}
-                      <code className="text-code-inline">{parseQueryResults.role}</code> role
-                    </p>
-                    <p className="text-foreground-light">
-                      The table{' '}
-                      <code className="text-code-inline">
-                        {tableWithRLSEnabledButNoPolicies.schema}.
-                        {tableWithRLSEnabledButNoPolicies.table}
-                      </code>{' '}
-                      has RLS enabled but no policies set up for this role.
-                    </p>
-                  </Admonition>
-                )}
+                <TabsContent_Shadcn_ value="policies">
+                  {!isServiceRole && !!tableWithRLSEnabledButNoPolicies && (
+                    <Admonition showIcon={false} type="default">
+                      <p className="!mb-0.5">
+                        Anonymous users do not have access to data from this query
+                      </p>
+                      <p className="text-foreground-light">
+                        The table{' '}
+                        <code className="text-code-inline">
+                          {tableWithRLSEnabledButNoPolicies.schema}.
+                          {tableWithRLSEnabledButNoPolicies.table}
+                        </code>{' '}
+                        has RLS enabled but no policies set up for this role.
+                      </p>
+                    </Admonition>
+                  )}
 
-                {isServiceRole ? (
-                  <Admonition showIcon={false} type="default" className="mb-4">
-                    <p className="!mb-0.5">
-                      Query returns all rows for the{' '}
-                      <code className="text-code-inline">postgres</code> role
-                    </p>
-                    <p className="text-foreground-light">
-                      The role has admin privileges and bypasses all RLS policies.
-                    </p>
-                  </Admonition>
-                ) : (
-                  <>
-                    <p className="text-sm font-mono uppercase tracking-tight text-foreground-light mb-2">
-                      Policies applied
-                    </p>
-                    <div className="flex flex-col gap-y-2">
-                      {parseQueryResults?.tables.map((x) => {
-                        const { schema, table, tablePolicies, isRLSEnabled } = x
-                        return (
-                          <RLSTableCard
-                            key={`${schema}.${table}`}
-                            table={{ schema, name: table, isRLSEnabled }}
-                            role={parseQueryResults.role}
-                            policies={tablePolicies}
-                            handleSelectEditPolicy={handleSelectEditPolicy}
-                          />
-                        )
-                      })}
-                    </div>
-                  </>
-                )}
-              </div>
+                  {isServiceRole && (
+                    <Admonition showIcon={false} type="default">
+                      <p className="!mb-0.5">
+                        Query returns all rows for the{' '}
+                        <code className="text-code-inline">postgres</code> role
+                      </p>
+                      <p className="text-foreground-light">
+                        The role has admin privileges and bypasses all RLS policies.
+                      </p>
+                    </Admonition>
+                  )}
 
-              <div className="px-5 py-3 flex items-center justify-between border-t">
-                <span className="text-sm font-mono uppercase tracking-tight text-foreground-light">
-                  Results
-                </span>
-                {results.length > 0 && (
-                  <span className="font-mono text-xs text-foreground-light">
-                    {results.length} row{results.length > 1 ? 's' : ''}
-                    {autoLimit && results.length >= limit && ` (Limited to only ${limit} rows)`}
-                  </span>
-                )}
-              </div>
-
-              <div className="flex-grow flex flex-col h-56 border-t">
-                <Results rows={results} />
-              </div>
-            </>
+                  <div className="flex flex-col gap-y-2 mt-4">
+                    <p className="text-sm">Table access</p>
+                    {!isServiceRole && (
+                      <div className="flex flex-col gap-y-2">
+                        {parseQueryResults?.tables.map((x) => {
+                          const { schema, table, tablePolicies, isRLSEnabled } = x
+                          return (
+                            <RLSTableCard
+                              key={`${schema}.${table}`}
+                              table={{ schema, name: table, isRLSEnabled }}
+                              role={parseQueryResults.role}
+                              policies={tablePolicies}
+                              handleSelectEditPolicy={handleSelectEditPolicy}
+                            />
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </TabsContent_Shadcn_>
+                <TabsContent_Shadcn_ value="data" className="mt-3">
+                  <div
+                    className={cn(
+                      'flex-grow flex flex-col border overflow-hidden',
+                      results.length === 0 ? 'rounded h-32' : 'rounded-t h-56'
+                    )}
+                  >
+                    <Results rows={results} />
+                  </div>
+                  {results.length > 0 && (
+                    <p className="border border-t-0 rounded-b font-mono text-xs text-foreground-light p-2">
+                      {results.length} row{results.length > 1 ? 's' : ''}
+                      {autoLimit && results.length >= limit && ` (Limited to only ${limit} rows)`}
+                    </p>
+                  )}
+                </TabsContent_Shadcn_>
+              </Tabs_Shadcn_>
+            </div>
           )}
         </div>
 
