@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import {
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Label_Shadcn_,
   Select_Shadcn_,
@@ -60,15 +60,15 @@ const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
   const kind = form.watch('kind')
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form id={CREATE_AWS_MANAGED_ORG_FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-4">
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItemLayout label="Name" layout="horizontal">
-                <FormControl_Shadcn_>
+                <FormControl>
                   <>
                     <Input_Shadcn_ {...field} placeholder="Organization name" />
                     <div className="mt-1">
@@ -80,16 +80,16 @@ const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
                       </Label_Shadcn_>
                     </div>
                   </>
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
             )}
           />
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="kind"
             render={({ field }) => (
               <FormItemLayout label="Type" layout="horizontal">
-                <FormControl_Shadcn_>
+                <FormControl>
                   <>
                     <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger_Shadcn_>
@@ -112,17 +112,17 @@ const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
                       </Label_Shadcn_>
                     </div>
                   </>
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
             )}
           />
           {kind == 'COMPANY' && (
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="size"
               render={({ field }) => (
                 <FormItemLayout label="Company size" layout="horizontal">
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <>
                       <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger_Shadcn_>
@@ -145,14 +145,14 @@ const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
                         </Label_Shadcn_>
                       </div>
                     </>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
           )}
         </div>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }
 

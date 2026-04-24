@@ -7,9 +7,9 @@ import {
   cn,
   DialogFooter,
   DialogSection,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   SheetFooter,
   SheetSection,
@@ -194,9 +194,9 @@ export const CreateAnalyticsBucketForm = ({
   return (
     <>
       <Section className="flex flex-col !p-0 flex-grow">
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField_Shadcn_
+            <FormField
               key="name"
               name="name"
               control={form.control}
@@ -208,7 +208,7 @@ export const CreateAnalyticsBucketForm = ({
                   labelOptional="Cannot be changed after creation"
                   description="Must be between 3 – 63 characters. Only lowercase letters, numbers, and hyphens are allowed."
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Input_Shadcn_
                       id="name"
                       data-1p-ignore
@@ -218,7 +218,7 @@ export const CreateAnalyticsBucketForm = ({
                       {...field}
                       placeholder="Enter bucket name"
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -259,7 +259,7 @@ export const CreateAnalyticsBucketForm = ({
               </Admonition>
             )}
           </form>
-        </Form_Shadcn_>
+        </Form>
       </Section>
 
       <Footer>

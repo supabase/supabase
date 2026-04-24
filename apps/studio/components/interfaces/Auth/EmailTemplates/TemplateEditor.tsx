@@ -10,9 +10,9 @@ import {
   Button,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Label_Shadcn_,
   Tooltip,
@@ -227,14 +227,14 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   }, [hasChanges])
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <CardContent>
           {Object.keys(properties).map((x: string) => {
             const property = properties[x]
             if (property.type === 'string' && x !== messageSlug) {
               return (
-                <FormField_Shadcn_
+                <FormField
                   key={x}
                   control={form.control}
                   name={x}
@@ -258,9 +258,9 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                         ) : null
                       }
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_ id={x} {...field} disabled={!canUpdateConfig} />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -367,6 +367,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
         )}
       </form>
       <PreventNavigationOnUnsavedChanges hasChanges={hasChanges} />
-    </Form_Shadcn_>
+    </Form>
   )
 }
