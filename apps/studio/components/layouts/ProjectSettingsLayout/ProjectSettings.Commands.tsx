@@ -48,7 +48,9 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-project-settings-auth',
         name: 'Auth Settings',
-        route: authenticationSignInProviders ? `/project/${ref}/auth/providers` : `/project/${ref}/auth/users`,
+        route: authenticationSignInProviders
+          ? `/project/${ref}/auth/providers`
+          : `/project/${ref}/auth/users`,
         defaultHidden: true,
       },
       ...(platformWebhooksEnabled
