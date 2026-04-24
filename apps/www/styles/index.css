@@ -16,12 +16,118 @@
   }
 }
 
+@theme {
+  --color-purple-sos-100: hsl(293 80% 97%);
+  --color-purple-sos-200: hsl(293 85% 91%);
+  --color-purple-sos-300: hsl(293 90% 80%);
+  --color-purple-sos-400: hsl(293 95% 67%);
+  --color-purple-sos-500: hsl(293 100% 54%);
+  --color-purple-sos-600: hsl(293 100% 44%);
+  --color-purple-sos-700: hsl(293 100% 34%);
+  --color-purple-sos-800: hsl(293 95% 22%);
+  --color-purple-sos-900: hsl(293 90% 12%);
+
+  --animate-flash-code: flash-code 1s forwards;
+  --animate-flash-code-slow: flash-code 2s forwards;
+  --animate-spinner: spinner 1s both infinite;
+  --animate-marquee: marquee 35s linear infinite;
+  --animate-marquee-vertical: marquee-vertical 180s linear infinite both;
+  --animate-pulse-radar: pulse-radar 3s linear infinite;
+  --animate-slide-in: slideIn 250ms ease-in both;
+}
+
+@keyframes flash-code {
+  0% {
+    background-color: rgba(63, 207, 142, 0.1);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translate3d(0, -100%, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes marquee-reverse {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes marquee-vertical {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes pulse-radar {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(100%);
+    opacity: 0;
+  }
+}
+
 @layer utilities {
   .run {
     animation-play-state: running;
   }
   .pause {
     animation-play-state: paused;
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: hsl(var(--border-default));
   }
 }
 
