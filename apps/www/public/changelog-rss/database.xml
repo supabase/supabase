@@ -1,0 +1,40 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · Database</title>
+      <link>https://supabase.com/changelog</link>
+      <description>Database updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Wed, 29 Nov 2023 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/database.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19298</guid>
+  <title>Directly updating rows in the `cron.job` table is no longer allowed</title>
+  <link>https://supabase.com/changelog/19298</link>
+  <pubDate>Wed, 29 Nov 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19700</guid>
+  <title>Platform Update February 2023</title>
+  <link>https://supabase.com/changelog/19700</link>
+  <pubDate>Thu, 09 Mar 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19697</guid>
+  <title>Platform updates: October 2022</title>
+  <link>https://supabase.com/changelog/19697</link>
+  <pubDate>Wed, 02 Nov 2022 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19693</guid>
+  <title>September Beta 2021</title>
+  <link>https://supabase.com/changelog/19693</link>
+  <pubDate>Mon, 04 Oct 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19690</guid>
+  <title>June Beta 2021</title>
+  <link>https://supabase.com/changelog/19690</link>
+  <pubDate>Sun, 04 Jul 2021 00:00:00 -0700</pubDate>
+</item>
+    </channel>
+  </rss>

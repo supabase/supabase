@@ -1,0 +1,82 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · supabase-js</title>
+      <link>https://supabase.com/changelog</link>
+      <description>supabase-js updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Mon, 20 Apr 2026 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/supabase-js.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/45071</guid>
+  <title>Automatic PostgREST retries for transient errors</title>
+  <link>https://supabase.com/changelog/45071</link>
+  <pubDate>Mon, 20 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/39773</guid>
+  <title>Enhanced Type Inference for Embedded Functions (Computed Relationships)</title>
+  <link>https://supabase.com/changelog/39773</link>
+  <pubDate>Wed, 22 Oct 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/39197</guid>
+  <title>Supabase JS Client Libs: Migration to Monorepo</title>
+  <link>https://supabase.com/changelog/39197</link>
+  <pubDate>Thu, 02 Oct 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/37415</guid>
+  <title>supabase v17.4.1.062 was withdrawn</title>
+  <link>https://supabase.com/changelog/37415</link>
+  <pubDate>Wed, 23 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/37217</guid>
+  <title>Deprecation Notice: Dropping Support for Node.js 18</title>
+  <link>https://supabase.com/changelog/37217</link>
+  <pubDate>Wed, 16 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/32925</guid>
+  <title>Enhanced Type Inference for JSON Fields in supabase-js</title>
+  <link>https://supabase.com/changelog/32925</link>
+  <pubDate>Mon, 20 Jan 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/32677</guid>
+  <title>Type validation for query filter values in supabase-js</title>
+  <link>https://supabase.com/changelog/32677</link>
+  <pubDate>Thu, 09 Jan 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/30324</guid>
+  <title>`supabase-js` release candidate `2.46.2-rc.3` incoming types inferences for PostgREST fixes and feedbacks</title>
+  <link>https://supabase.com/changelog/30324</link>
+  <pubDate>Wed, 06 Nov 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19700</guid>
+  <title>Platform Update February 2023</title>
+  <link>https://supabase.com/changelog/19700</link>
+  <pubDate>Thu, 09 Mar 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19697</guid>
+  <title>Platform updates: October 2022</title>
+  <link>https://supabase.com/changelog/19697</link>
+  <pubDate>Wed, 02 Nov 2022 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19694</guid>
+  <title>October Beta 2021</title>
+  <link>https://supabase.com/changelog/19694</link>
+  <pubDate>Mon, 08 Nov 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19693</guid>
+  <title>September Beta 2021</title>
+  <link>https://supabase.com/changelog/19693</link>
+  <pubDate>Mon, 04 Oct 2021 00:00:00 -0700</pubDate>
+</item>
+    </channel>
+  </rss>

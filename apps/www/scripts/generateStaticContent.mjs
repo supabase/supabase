@@ -8,6 +8,52 @@ import advancedFormat from 'dayjs/plugin/advancedFormat.js'
 import utc from 'dayjs/plugin/utc.js'
 import matter from 'gray-matter'
 
+function loadLocalEnvFiles(rootDir) {
+  const parseValue = (raw) => {
+    const val = raw.trim()
+    if (val.startsWith('"') && val.endsWith('"')) {
+      return val.slice(1, -1).replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\')
+    }
+    if (val.startsWith("'") && val.endsWith("'")) {
+      return val.slice(1, -1).replace(/\\n/g, '\n').replace(/\\'/g, "'").replace(/\\\\/g, '\\')
+    }
+    return val
+  }
+
+  const applyLine = (line, override) => {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) return
+    const eq = trimmed.indexOf('=')
+    if (eq === -1) return
+    const key = trimmed
+      .slice(0, eq)
+      .trim()
+      .replace(/^export\s+/i, '')
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) return
+    const value = parseValue(trimmed.slice(eq + 1))
+    if (override || process.env[key] === undefined) {
+      process.env[key] = value
+    }
+  }
+
+  for (const name of ['.env', '.env.local']) {
+    try {
+      const fp = path.join(rootDir, name)
+      const raw = fsSync.readFileSync(fp, 'utf8')
+      const override = name === '.env.local'
+      for (const line of raw.split(/\r?\n/)) {
+        applyLine(line, override)
+      }
+    } catch {
+      /* file missing — skip silently */
+    }
+  }
+}
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const wwwRoot = path.join(__dirname, '..')
+loadLocalEnvFiles(wwwRoot)
+
 dayjs.extend(utc)
 dayjs.extend(advancedFormat)
 
@@ -234,7 +280,6 @@ try {
 }
 
 // Create folder for static content
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const folderPath = path.join(__dirname, '../.generated/staticContent')
 try {
   await fs.mkdir(folderPath, { recursive: true })
