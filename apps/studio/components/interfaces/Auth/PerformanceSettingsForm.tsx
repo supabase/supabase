@@ -3,19 +3,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   Card,
@@ -24,8 +11,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  FormInputGroupInput,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -34,6 +23,19 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { ScaffoldSection, ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const FormSchema = z.object({
   API_MAX_REQUEST_DURATION: z.coerce
@@ -44,9 +46,27 @@ const FormSchema = z.object({
   DB_MAX_POOL_SIZE_UNIT: z.enum(['percent', 'connections']),
 })
 
+export const DatabaseFormSchema = z
+  .object({
+    DB_MAX_POOL_SIZE: z.coerce.number().min(1),
+    DB_MAX_POOL_SIZE_UNIT: z.enum(['percent', 'connections']),
+  })
+  .superRefine((data, ctx) => {
+    if (data.DB_MAX_POOL_SIZE_UNIT === 'percent') {
+      if (data.DB_MAX_POOL_SIZE < 1 || data.DB_MAX_POOL_SIZE > 100) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['DB_MAX_POOL_SIZE'],
+          message: 'Percentage must be between 1 and 100',
+        })
+      }
+    }
+  })
+
 export const PerformanceSettingsForm = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
+  const { hasAccess: hasAccessToPerformance, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('auth.performance_settings')
   const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
@@ -72,8 +92,7 @@ export const PerformanceSettingsForm = () => {
   })
   const maxConnectionLimit = maxConnData?.maxConnections ?? 60
 
-  const isProPlan = organization?.plan.id !== 'free'
-  const promptProPlanUpgrade = IS_PLATFORM && !isProPlan
+  const promptUpgrade = IS_PLATFORM && !isLoadingEntitlement && !hasAccessToPerformance
 
   const { mutate: updateAuthConfig, isPending: isSaving } = useAuthConfigUpdateMutation()
 
@@ -85,12 +104,7 @@ export const PerformanceSettingsForm = () => {
   })
 
   const databaseForm = useForm({
-    resolver: zodResolver(
-      z.object({
-        DB_MAX_POOL_SIZE: FormSchema.shape.DB_MAX_POOL_SIZE,
-        DB_MAX_POOL_SIZE_UNIT: FormSchema.shape.DB_MAX_POOL_SIZE_UNIT,
-      })
-    ),
+    resolver: zodResolver(DatabaseFormSchema),
     defaultValues: {
       DB_MAX_POOL_SIZE: 10,
       DB_MAX_POOL_SIZE_UNIT: 'connections',
@@ -101,7 +115,7 @@ export const PerformanceSettingsForm = () => {
 
   const onSubmitRequestDurationForm = (values: any) => {
     if (!project?.ref) return console.error('Project ref is required')
-    if (!isProPlan) return
+    if (!hasAccessToPerformance) return
 
     setIsUpdatingRequestDurationForm(true)
 
@@ -155,7 +169,7 @@ export const PerformanceSettingsForm = () => {
       if (!isUpdatingDatabaseForm) {
         databaseForm.reset({
           DB_MAX_POOL_SIZE:
-            authConfig?.DB_MAX_POOL_SIZE !== null ? authConfig?.DB_MAX_POOL_SIZE ?? 10 : 10,
+            authConfig?.DB_MAX_POOL_SIZE !== null ? (authConfig?.DB_MAX_POOL_SIZE ?? 10) : 10,
           DB_MAX_POOL_SIZE_UNIT:
             authConfig?.DB_MAX_POOL_SIZE_UNIT !== null
               ? authConfig?.DB_MAX_POOL_SIZE_UNIT
@@ -181,7 +195,7 @@ export const PerformanceSettingsForm = () => {
     )
   }
 
-  if (isLoadingAuthConfig) {
+  if (isLoadingAuthConfig || isLoadingEntitlement) {
     return (
       <ScaffoldSection isFullWidth>
         <GenericSkeletonLoader />
@@ -192,18 +206,18 @@ export const PerformanceSettingsForm = () => {
   return (
     <>
       <ScaffoldSection isFullWidth>
-        {promptProPlanUpgrade && (
+        {promptUpgrade && (
           <UpgradeToPro
             source="authPerformance"
             featureProposition="configure advanced Auth server settings"
-            primaryText="Configuring Auth server performance is only available on the Pro plan and above"
-            secondaryText="Upgrade to the Pro plan to configure settings for your Auth server"
+            primaryText="Only available on the Pro Plan and above"
+            secondaryText="Upgrade to the Pro Plan to configure Auth server performance settings."
           />
         )}
       </ScaffoldSection>
 
       <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Request Duration</ScaffoldSectionTitle>
+        <ScaffoldSectionTitle className="mb-4">Request duration</ScaffoldSectionTitle>
 
         <Form_Shadcn_ {...requestDurationForm}>
           <form onSubmit={requestDurationForm.handleSubmit(onSubmitRequestDurationForm)}>
@@ -217,28 +231,34 @@ export const PerformanceSettingsForm = () => {
                       layout="flex-row-reverse"
                       label="Maximum allowed duration for an Auth request"
                       description={
-                        <>
-                          <p>
-                            Requests that exceed this time limit will be terminated. Used to manage
-                            server load.
-                          </p>
-                          <p>We recommend a minimum of 10 seconds.</p>
-                        </>
+                        <p className="text-balance">
+                          Requests that exceed this time limit are terminated to help manage server
+                          load.
+                        </p>
                       }
                     >
-                      <FormControl_Shadcn_>
+                      <div className="flex flex-col gap-2">
                         <div className="relative">
-                          <PrePostTab postTab="seconds">
-                            <Input_Shadcn_
-                              type="number"
-                              min={5}
-                              max={30}
-                              {...field}
-                              disabled={!canUpdateConfig || promptProPlanUpgrade}
-                            />
-                          </PrePostTab>
+                          <FormControl_Shadcn_>
+                            <InputGroup>
+                              <FormInputGroupInput
+                                type="number"
+                                min={5}
+                                max={30}
+                                {...field}
+                                disabled={!canUpdateConfig || promptUpgrade}
+                              />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>seconds</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl_Shadcn_>
                         </div>
-                      </FormControl_Shadcn_>
+
+                        <p className="text-xs text-right text-foreground-muted">
+                          10+ seconds recommended
+                        </p>
+                      </div>
                     </FormItemLayout>
                   )}
                 />
@@ -251,13 +271,13 @@ export const PerformanceSettingsForm = () => {
                   </Button>
                 )}
                 <Button
-                  type="primary"
+                  type={promptUpgrade ? 'default' : 'primary'}
                   htmlType="submit"
                   disabled={
                     !canUpdateConfig ||
                     isUpdatingRequestDurationForm ||
                     !requestDurationForm.formState.isDirty ||
-                    promptProPlanUpgrade
+                    promptUpgrade
                   }
                   loading={isUpdatingRequestDurationForm}
                 >
@@ -270,7 +290,7 @@ export const PerformanceSettingsForm = () => {
       </ScaffoldSection>
 
       <ScaffoldSection isFullWidth>
-        <ScaffoldSectionTitle className="mb-4">Connection Management</ScaffoldSectionTitle>
+        <ScaffoldSectionTitle className="mb-4">Connection management</ScaffoldSectionTitle>
 
         <Form_Shadcn_ {...databaseForm}>
           <form onSubmit={databaseForm.handleSubmit(onSubmitDatabaseForm)} className="space-y-4">
@@ -284,15 +304,11 @@ export const PerformanceSettingsForm = () => {
                       layout="flex-row-reverse"
                       label="Allocation strategy"
                       description={
-                        <>
-                          <p>
-                            Choose to allocate a percentage or an absolute number of connections to
-                            the Auth server.
-                          </p>
-                          <p>
-                            We recommend a percentage strategy as it grows with your instance size.
-                          </p>
-                        </>
+                        <p className="text-balance">
+                          Choose whether to allocate a percentage or a fixed number of connections
+                          to the Auth server. We recommend a percentage, as it scales automatically
+                          with your instance size.
+                        </p>
                       }
                     >
                       <FormControl_Shadcn_>
@@ -326,7 +342,7 @@ export const PerformanceSettingsForm = () => {
                         >
                           <SelectTrigger_Shadcn_
                             size="small"
-                            disabled={!canUpdateConfig || promptProPlanUpgrade}
+                            disabled={!canUpdateConfig || promptUpgrade}
                           >
                             <SelectValue_Shadcn_>
                               {field.value === 'percent' ? 'Percentage' : 'Absolute'}
@@ -345,6 +361,8 @@ export const PerformanceSettingsForm = () => {
                     </FormItemLayout>
                   )}
                 />
+              </CardContent>
+              <CardContent>
                 <FormField_Shadcn_
                   control={databaseForm.control}
                   name="DB_MAX_POOL_SIZE"
@@ -353,51 +371,47 @@ export const PerformanceSettingsForm = () => {
                       layout="flex-row-reverse"
                       label="Maximum connections"
                       description={
-                        <>
-                          <p>
-                            Maximum number of connections that the Auth server will take up under
-                            highest load.
-                          </p>
-                          <p>
-                            <em className="text-brand !not-italic">Connections are not reserved</em>{' '}
-                            and returned to Postgres a few minutes after being idle.
-                          </p>
-                        </>
+                        <p className="text-balance">
+                          The maximum number of connections the Auth server can use under peak load.{' '}
+                          <em className="text-foreground-light font-medium not-italic">
+                            Connections are not reserved
+                          </em>{' '}
+                          and are returned to Postgres after a short idle period.
+                        </p>
                       }
                     >
-                      <FormControl_Shadcn_>
-                        <div className="flex flex-col gap-2">
-                          <div className="relative">
-                            <PrePostTab postTab={chosenUnit === 'percent' ? '%' : 'connections'}>
-                              <Input_Shadcn_
+                      <div className="flex flex-col gap-2">
+                        <div className="relative">
+                          <FormControl_Shadcn_>
+                            <InputGroup>
+                              <FormInputGroupInput
                                 type="number"
                                 {...field}
-                                min={3}
-                                max={
-                                  chosenUnit === 'percent'
-                                    ? 80
-                                    : Math.floor(maxConnectionLimit * 0.8)
-                                }
-                                disabled={!canUpdateConfig || promptProPlanUpgrade}
+                                disabled={!canUpdateConfig || promptUpgrade}
                               />
-                            </PrePostTab>
-                          </div>
-                          {isLoadingMaxConns ? (
-                            <ShimmeringLoader className="py-2 w-16 ml-auto" />
-                          ) : (
-                            <div className="text-xs text-muted w-full text-end">
-                              <span className="text-brand">
-                                {chosenUnit === 'percent'
-                                  ? Math.floor(
-                                      maxConnectionLimit * (Math.min(100, field.value!) / 100)
-                                    ).toString()
-                                  : Math.min(maxConnectionLimit, field.value!)}
-                              </span>{' '}
-                              / {maxConnectionLimit} max
-                            </div>
-                          )}
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>
+                                  {chosenUnit === 'percent' ? '%' : 'connections'}
+                                </InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl_Shadcn_>
                         </div>
-                      </FormControl_Shadcn_>
+                        {isLoadingMaxConns ? (
+                          <ShimmeringLoader className="py-2 w-16 ml-auto" />
+                        ) : (
+                          <p className="text-xs text-right text-foreground-muted">
+                            <span className="text-foreground-light">
+                              {chosenUnit === 'percent'
+                                ? Math.floor(
+                                    maxConnectionLimit * (Math.min(100, field.value!) / 100)
+                                  ).toString()
+                                : Math.min(maxConnectionLimit, field.value!)}
+                            </span>{' '}
+                            / {maxConnectionLimit}
+                          </p>
+                        )}
+                      </div>
                     </FormItemLayout>
                   )}
                 />
@@ -410,7 +424,7 @@ export const PerformanceSettingsForm = () => {
                   </Button>
                 )}
                 <Button
-                  type="primary"
+                  type={promptUpgrade ? 'default' : 'primary'}
                   htmlType="submit"
                   disabled={
                     !canUpdateConfig || isUpdatingDatabaseForm || !databaseForm.formState.isDirty

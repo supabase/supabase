@@ -1,30 +1,33 @@
+import { useParams } from 'common'
 import { ExternalLink, Loader2 } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { forwardRef } from 'react'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { useParams } from 'common'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import CopyButton from 'components/ui/CopyButton'
-import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { AiIconAnimation, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import Results from './Results'
+import { getSqlErrorLines } from './UtilityTabResults.utils'
+import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import CopyButton from '@/components/ui/CopyButton'
+import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export type UtilityTabResultsProps = {
   id: string
   isExecuting?: boolean
   isDisabled?: boolean
   onDebug: () => void
+  buildDebugPrompt: () => string
   isDebugging?: boolean
 }
 
 const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
-  ({ id, isExecuting, isDisabled, isDebugging, onDebug }) => {
+  ({ id, isExecuting, isDisabled, isDebugging, onDebug, buildDebugPrompt }) => {
     const { ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
     const { data: organization } = useSelectedOrganizationQuery()
@@ -53,9 +56,7 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
         </div>
       )
     } else if (result?.error) {
-      const formattedError = (result.error?.formattedError?.split('\n') ?? []).filter(
-        (x: string) => x.length > 0
-      )
+      const errorLines = getSqlErrorLines(result.error)
       const readReplicaError =
         state.selectedDatabaseId !== ref &&
         result.error.message.includes('in a read-only transaction')
@@ -94,8 +95,8 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
               </div>
             ) : (
               <div className="flex flex-col gap-y-1">
-                {formattedError.length > 0 ? (
-                  formattedError.map((x: string, i: number) => (
+                {errorLines.length > 0 ? (
+                  errorLines.map((x: string, i: number) => (
                     <pre key={`error-${i}`} className="font-mono text-sm text-wrap">
                       {x}
                     </pre>
@@ -138,16 +139,16 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                   type="default"
                   onClick={() => {
                     state.setSelectedDatabaseId(ref)
-                    snapV2.resetResult(id)
+                    snapV2.resetResults(id)
                   }}
                 >
                   Switch to primary database
                 </Button>
               )}
-              {formattedError.length > 0 && (
+              {errorLines.length > 0 && (
                 <Tooltip>
                   <TooltipTrigger>
-                    <CopyButton iconOnly type="default" text={formattedError.join('\n')} />
+                    <CopyButton iconOnly type="default" text={errorLines.join('\n')} />
                   </TooltipTrigger>
                   <TooltipContent side="bottom" align="center">
                     <span>Copy error</span>
@@ -155,13 +156,14 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                 </Tooltip>
               )}
               {!hasHipaaAddon && (
-                <Button
-                  icon={<AiIconAnimation size={16} loading={isDebugging} />}
+                <AiAssistantDropdown
+                  label="Debug with Assistant"
+                  buildPrompt={buildDebugPrompt}
+                  onOpenAssistant={onDebug}
+                  telemetrySource="sql_debug"
                   disabled={!!isDisabled || isDebugging}
-                  onClick={onDebug}
-                >
-                  Debug with Assistant
-                </Button>
+                  loading={isDebugging}
+                />
               )}
             </div>
           </div>

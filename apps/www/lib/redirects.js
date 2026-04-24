@@ -1,8 +1,28 @@
 module.exports = [
   {
     permanent: true,
+    source: '/ui/docs/ai-editors-rules/prompts',
+    destination: '/ui/docs/ai-editors-rules/skills',
+  },
+  {
+    permanent: true,
     source: '/auth/Auth',
     destination: '/auth',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
+    destination: '/docs/guides/api/custom-claims-and-role-based-access-control-rbac',
   },
   {
     permanent: true,
@@ -1300,8 +1320,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/auth-helpers/auth-ui-overview',
-    destination: '/docs/guides/auth/auth-helpers/auth-ui',
+    source: '/docs/guides/auth/auth-helpers/:path*',
+    destination: '/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
   },
   {
     permanent: false,
@@ -2157,11 +2177,7 @@ module.exports = [
     source: '/customers/mendableai',
     destination: '/customers/firecrawl',
   },
-  {
-    permanent: true,
-    source: '/docs/guides/auth/auth-helpers/nextjs-server-components',
-    destination: '/docs/guides/auth/auth-helpers/nextjs',
-  },
+
   {
     permanent: true,
     source: '/docs/guides/getting-started/openai/vector-search',
@@ -2180,7 +2196,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/realtime/rate-limits',
-    destination: '/docs/guides/realtime/quotas',
+    destination: '/docs/guides/realtime/limits',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/quotas',
+    destination: '/docs/guides/realtime/limits',
   },
   {
     permanent: true,
@@ -2210,7 +2231,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/realtime/guides/client-side-throttling',
-    destination: '/docs/guides/realtime/quotas',
+    destination: '/docs/guides/realtime/limits',
   },
   {
     permanent: true,
@@ -2642,8 +2663,18 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/replication/etl-destinations',
+    destination: '/docs/guides/database/replication/replication-setup',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/analytics/replication',
+    destination: '/docs/guides/database/replication/replication-setup',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/server-side-rendering',
-    destination: '/docs/guides/auth/server-side',
+    destination: '/docs/guides/auth/server-side/advanced-guide',
   },
   {
     permanent: true,
@@ -2653,12 +2684,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
-    destination: '/docs/guides/auth/server-side',
+    destination: '/docs/guides/auth/passwords',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
-    destination: '/docs/guides/auth/server-side',
+    destination: '/docs/guides/auth/social-login',
   },
   {
     permanent: true,
@@ -2817,7 +2848,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/oauth-apps/oauth-scopes',
-    destination: '/docs/guides/integrations/build-a-supabase-integration/oauth-scopes',
+    destination: '/docs/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes',
   },
   {
     permanent: true,
@@ -3056,5 +3087,44 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/platform/fly-postgres',
     destination: '/docs/guides/database/overview',
+  },
+
+  // design
+  {
+    permanent: true,
+    source: '/:path*',
+    has: [
+      {
+        type: 'host',
+        value: 'supabase.design',
+      },
+    ],
+    destination: 'https://supabase.com/design-system/:path*',
+  },
+  {
+    permanent: true,
+    source: '/design',
+    destination: '/design-system',
+  },
+  {
+    source: '/redeem',
+    has: [
+      {
+        type: 'query',
+        key: 'code',
+      },
+    ],
+    destination: '/dashboard/redeem?code=:code',
+    permanent: false,
+  },
+  {
+    permanent: true,
+    source: '/docs/llms.txt',
+    destination: '/llms.txt',
+  },
+  {
+    permanent: true,
+    source: '/docs/llms-full.txt',
+    destination: '/llms-full.txt',
   },
 ]

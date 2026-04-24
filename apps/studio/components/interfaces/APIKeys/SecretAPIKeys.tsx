@@ -1,16 +1,10 @@
-import dayjs from 'dayjs'
-import { useMemo, useRef } from 'react'
-import { toast } from 'sonner'
-
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
-import type { APIKeysData } from 'data/api-keys/api-keys-query'
-import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
-import { Card, EyeOffIcon } from 'ui'
+import dayjs from 'dayjs'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useRef } from 'react'
+import { toast } from 'sonner'
+import { Card } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   Table,
@@ -19,9 +13,17 @@ import {
   TableHeader,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
+
 import { APIKeyRow } from './APIKeyRow'
-import CreateSecretAPIKeyDialog from './CreateSecretAPIKeyDialog'
-import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
+import { CreateSecretAPIKeyDialog } from './CreateSecretAPIKeyDialog'
+import { AlertError } from '@/components/ui/AlertError'
+import { FormHeader } from '@/components/ui/Forms/FormHeader'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
+import type { APIKeysData } from '@/data/api-keys/api-keys-query'
+import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface LastSeenData {
   [hash: string]: { timestamp: number; relative: string }
@@ -67,11 +69,15 @@ function useLastSeen({ projectRef, enabled }: { projectRef: string; enabled?: bo
 
 export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+    PermissionAction.SECRETS_READ,
+    '*'
+  )
 
-  const { canReadAPIKeys, isLoading: isLoadingPermissions } = useApiKeysVisibility()
   const {
     data: apiKeysData,
     error,
+    isSuccess: isSuccessApiKeys,
     isPending: isLoadingApiKeys,
     isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
@@ -92,33 +98,32 @@ export const SecretAPIKeys = () => {
 
   const empty = secretApiKeys?.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
 
-  // Track the ID being deleted to exclude it from error checking
-  const deletingAPIKeyIdRef = useRef<string | null>(null)
+  const [deleteId, setDeleteId] = useQueryState('deleteSecretKey', parseAsString)
+  const apiKeyToDelete = secretApiKeys?.find((key) => key.id === deleteId)
 
-  const { setValue: setAPIKeyToDelete, value: apiKeyToDelete } = useQueryStateWithSelect({
-    urlKey: 'delete',
-    select: (id: string) => (id ? secretApiKeys?.find((key) => key.id === id) : undefined),
-    enabled: !!secretApiKeys?.length,
-    onError: (_error, selectedId) =>
-      handleErrorOnDelete(deletingAPIKeyIdRef, selectedId, `API Key not found`),
-  })
-
-  const { mutate: deleteAPIKey, isPending: isDeletingAPIKey } = useAPIKeyDeleteMutation({
+  const {
+    mutate: deleteAPIKey,
+    isPending: isDeletingAPIKey,
+    isSuccess: isDeleteSuccess,
+  } = useAPIKeyDeleteMutation({
     onSuccess: () => {
-      toast.success(`Successfully deleted API key`)
-      setAPIKeyToDelete(null)
-    },
-    onError: () => {
-      deletingAPIKeyIdRef.current = null
+      toast.success('Successfully deleted secret key')
+      setDeleteId(null)
     },
   })
 
   const onDeleteAPIKey = (apiKey: Extract<APIKeysData[number], { type: 'secret' }>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!apiKey.id) return console.error('API key ID is required')
-    deletingAPIKeyIdRef.current = apiKey.id
     deleteAPIKey({ projectRef, id: apiKey.id })
   }
+
+  useEffect(() => {
+    if (isSuccessApiKeys && !!deleteId && !apiKeyToDelete && !isDeleteSuccess) {
+      toast('Unable to find secret key')
+      setDeleteId(null)
+    }
+  }, [apiKeyToDelete, deleteId, isDeleteSuccess, isSuccessApiKeys, setDeleteId])
 
   return (
     <div className="pb-30">
@@ -129,17 +134,7 @@ export const SecretAPIKeys = () => {
       />
 
       {!canReadAPIKeys && !isLoadingPermissions ? (
-        <Card>
-          <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
-            <EyeOffIcon />
-            <p className="text-sm text-foreground">
-              You do not have permission to read API Secret Keys
-            </p>
-            <p className="text-foreground-light">
-              Contact your organization owner/admin to request access.
-            </p>
-          </div>
-        </Card>
+        <NoPermission resourceText="view API keys" />
       ) : isLoadingApiKeys || isLoadingPermissions ? (
         <GenericSkeletonLoader />
       ) : isErrorApiKeys ? (
@@ -176,7 +171,7 @@ export const SecretAPIKeys = () => {
                   isLoadingLastSeen={isLoadingLastSeen}
                   isDeleting={apiKeyToDelete?.id === apiKey.id && isDeletingAPIKey}
                   onDelete={() => onDeleteAPIKey(apiKey)}
-                  setKeyToDelete={setAPIKeyToDelete}
+                  setKeyToDelete={setDeleteId}
                   isDeleteModalOpen={apiKeyToDelete?.id === apiKey.id}
                 />
               ))}

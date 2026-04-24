@@ -1,9 +1,11 @@
 'use client'
 
-import { RegistryNode } from '@/lib/process-registry'
 import { File } from 'lucide-react'
 import { useState } from 'react'
-import { CodeBlock, TreeView, TreeViewItem, flattenTree } from 'ui'
+import { flattenTree, TreeView, TreeViewItem } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
+import { RegistryNode } from '@/lib/process-registry'
 
 interface BlockItemCodeProps {
   files: RegistryNode[]

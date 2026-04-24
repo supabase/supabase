@@ -6,34 +6,34 @@ import dayjs from 'dayjs'
 import { ArrowDown, ArrowUp, RefreshCw, User } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { useEffect, useMemo, useState } from 'react'
-
-import { LogDetailsPanel } from 'components/interfaces/AuditLogs/LogDetailsPanel'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import NoPermission from 'components/ui/NoPermission'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import {
-  AuditLog,
-  useOrganizationAuditLogsQuery,
-} from 'data/organizations/organization-audit-logs-query'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   WarningIcon,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { LogDetailsPanel } from '@/components/interfaces/AuditLogs/LogDetailsPanel'
+import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import Table from '@/components/to-be-cleaned/Table'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FilterPopover } from '@/components/ui/FilterPopover'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
+import {
+  AuditLog,
+  useOrganizationAuditLogsQuery,
+} from '@/data/organizations/organization-audit-logs-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit logs.'
 
@@ -76,6 +76,7 @@ export const AuditLogs = () => {
     isSuccess,
     isError,
     isRefetching,
+    fetchStatus,
     refetch,
   } = useOrganizationAuditLogsQuery(
     {
@@ -134,11 +135,14 @@ export const AuditLogs = () => {
     })
     ?.filter((log) => {
       if (filters.projects.length > 0) {
-        return filters.projects.includes(log.target.metadata.project_ref || '')
+        return filters.projects.includes(log.target.metadata.ref || '')
       } else {
         return log
       }
     })
+
+  const shouldShowLoadingState =
+    (isLoading && fetchStatus !== 'idle') || isLoadingPermissions || isLoadingEntitlements
 
   // This feature depends on the subscription tier of the user.
   // The API limits the logs to maximum of 62 days and 5 minutes so when the page is
@@ -159,7 +163,7 @@ export const AuditLogs = () => {
 
   if (isLogsNotAvailableBasedOnPlan) {
     return (
-      <ScaffoldContainer>
+      <ScaffoldContainer className="px-6 xl:px-10">
         <ScaffoldSection isFullWidth>
           <UpgradeToPro
             plan="Team"
@@ -175,7 +179,7 @@ export const AuditLogs = () => {
 
   return (
     <>
-      <ScaffoldContainer>
+      <ScaffoldContainer className="px-6 xl:px-10">
         <ScaffoldSection isFullWidth>
           <div className="space-y-4 flex flex-col">
             {showFilters && (
@@ -256,7 +260,7 @@ export const AuditLogs = () => {
               </div>
             )}
 
-            {isLoading || isLoadingPermissions || isLoadingEntitlements ? (
+            {shouldShowLoadingState ? (
               <div className="space-y-2">
                 <ShimmeringLoader />
                 <ShimmeringLoader className="w-3/4" />

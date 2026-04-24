@@ -27,7 +27,7 @@ When connecting via an SSH tunnel to the Studio Docker container, the source IP 
 
 Determine the Docker bridge gateway IP on the host running your Supabase containers:
 
-```bash
+```sh
 docker inspect supabase-kong \
   --format '{{range .NetworkSettings.Networks}}{{println .Gateway}}{{end}}'
 ```
@@ -43,7 +43,7 @@ Add the IP address you discovered to the Kong configuration by editing the follo
 3. Add your local IP to the 'allow' list.
 4. Your edited configuration should look like the example below.
 
-```yaml
+```yaml name=volumes/api/kong.yml
 ## MCP endpoint - local access
 - name: mcp
   _comment: 'MCP: /mcp -> http://studio:3000/api/mcp (local access)'
@@ -79,7 +79,7 @@ Add the IP address you discovered to the Kong configuration by editing the follo
 
 After you've added the local IP address as above, restart the Kong container:
 
-```bash
+```sh
 docker compose restart kong
 ```
 
@@ -87,7 +87,7 @@ docker compose restart kong
 
 From your local machine, create an SSH tunnel to your Supabase host:
 
-```bash
+```sh
 ssh -L localhost:8080:localhost:8000 you@your-supabase-host
 ```
 
@@ -111,7 +111,7 @@ Edit the settings for your MCP client and add the following to `"mcpServers": {}
 
 From your local machine, check that the MCP server is reachable:
 
-```bash
+```sh
 curl http://localhost:8080/mcp \
   -X POST \
   -H "Content-Type: application/json" \

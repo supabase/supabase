@@ -1,18 +1,7 @@
+import { useParams } from 'common'
 import { ChevronRight, Info, Loader2, MoreVertical, Plus, RefreshCw, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
-import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
-import { useIcebergNamespaceDeleteMutation } from 'data/storage/iceberg-namespace-delete-mutation'
-import { useIcebergNamespaceTableDeleteMutation } from 'data/storage/iceberg-namespace-table-delete-mutation'
-import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
 import {
   Button,
   Card,
@@ -34,12 +23,22 @@ import {
   TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { HIDE_REPLICATION_USER_FLOW } from '../AnalyticsBucketDetails.constants'
 import { getNamespaceTableNameFromPostgresTableName } from '../AnalyticsBucketDetails.utils'
 import { InitializeForeignSchemaDialog } from '../InitializeForeignSchemaDialog'
 import { UpdateForeignSchemaDialog } from '../UpdateForeignSchemaDialog'
 import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssociatedEntities'
 import { TableRowComponent } from './TableRowComponent'
+import { FormattedWrapperTable } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { ImportForeignSchemaDialog } from '@/components/interfaces/Storage/ImportForeignSchemaDialog'
+import { useFDWDropForeignTableMutation } from '@/data/fdw/fdw-drop-foreign-table-mutation'
+import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
+import { useIcebergNamespaceDeleteMutation } from '@/data/storage/iceberg-namespace-delete-mutation'
+import { useIcebergNamespaceTableDeleteMutation } from '@/data/storage/iceberg-namespace-table-delete-mutation'
+import { useIcebergNamespaceTablesQuery } from '@/data/storage/iceberg-namespace-tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
 
 type NamespaceWithTablesProps = {
   namespace: string
@@ -66,7 +65,6 @@ export const NamespaceWithTables = ({
   const [showConfirmDeleteNamespace, setShowConfirmDeleteNamespace] = useState(false)
   const [isDeletingNamespace, setIsDeletingNamespace] = useState(false)
 
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
   const { publication, icebergWrapper } = useAnalyticsBucketAssociatedEntities({
     projectRef,
     bucketId,

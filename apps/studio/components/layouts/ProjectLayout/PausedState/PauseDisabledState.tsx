@@ -1,17 +1,8 @@
+import { useParams } from 'common'
+import { Database, Storage } from 'icons'
 import { ChevronDown, Download, ExternalLink } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
-import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
-import { useStorageArchiveCreateMutation } from 'data/storage/storage-archive-create-mutation'
-import { useStorageArchiveQuery } from 'data/storage/storage-archive-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Database, Storage } from 'icons'
-import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -19,7 +10,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition, TimestampInfo } from 'ui-patterns'
+
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
+import { useProjectPauseStatusQuery } from '@/data/projects/project-pause-status-query'
+import { useStorageArchiveCreateMutation } from '@/data/storage/storage-archive-create-mutation'
+import { useStorageArchiveQuery } from '@/data/storage/storage-archive-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
 
 export const PauseDisabledState = () => {
   const { ref } = useParams()
@@ -121,10 +121,10 @@ export const PauseDisabledState = () => {
       <Admonition
         showIcon={false}
         type="warning"
-        className="rounded-none border-0 px-6"
+        className="rounded-none border-0 px-6 [&>div>div>div]:flex [&>div>div>div]:flex-col [&>div>div>div]:gap-y-3"
         title="Project can no longer be restored through the dashboard"
       >
-        <p className="!leading-normal !mb-3">
+        <p className="!leading-normal">
           This project has been paused for over{' '}
           <span className="text-foreground">
             {pauseStatus?.max_days_till_restore_disabled ?? 90} days
@@ -132,6 +132,17 @@ export const PauseDisabledState = () => {
           and cannot be restored through the dashboard. However, your data remains intact and can be
           downloaded as a backup.
         </p>
+
+        {!!pauseStatus?.last_paused_on && (
+          <p className="text-foreground-lighter text-sm">
+            Project last paused on{' '}
+            <TimestampInfo
+              className="text-sm"
+              labelFormat="DD MMM YYYY"
+              utcTimestamp={pauseStatus.last_paused_on}
+            />
+          </p>
+        )}
 
         <div>
           <p className="!leading-normal !mb-1">Recovery options:</p>
@@ -153,7 +164,7 @@ export const PauseDisabledState = () => {
           </ul>
         </div>
       </Admonition>
-      <div className="border-t flex justify-between items-center px-6 py-4 bg-alternative">
+      <div className="border-t flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center px-6 py-4 bg-alternative">
         <div>
           <p className="text-sm">Export your data</p>
           <p className="text-sm text-foreground-lighter">

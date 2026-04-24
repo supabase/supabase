@@ -1,33 +1,37 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useFlag } from 'common'
 import { ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useFlag } from 'common'
-import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useSetProjectStatus } from 'data/projects/project-detail-query'
-import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
-import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  cn,
 } from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useProjectRestartMutation } from '@/data/projects/project-restart-mutation'
+import { useProjectRestartServicesMutation } from '@/data/projects/project-restart-services-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import {
+  useIsAwsK8sCloudProvider,
+  useIsProjectActive,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 const RestartServerButton = () => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const isProjectActive = useIsProjectActive()
+  const canRestart = isProjectActive || project?.status === PROJECT_STATUS.ACTIVE_UNHEALTHY
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const { setProjectStatus } = useSetProjectStatus()
 
@@ -100,12 +104,12 @@ const RestartServerButton = () => {
             type="default"
             className={cn(
               'px-3 hover:z-10',
-              canRestartProject && isProjectActive ? 'rounded-r-none' : ''
+              canRestartProject && canRestart ? 'rounded-r-none' : ''
             )}
             disabled={
               project === undefined ||
               !canRestartProject ||
-              !isProjectActive ||
+              !canRestart ||
               projectRestartDisabled ||
               isAwsK8s
             }
@@ -117,7 +121,7 @@ const RestartServerButton = () => {
                   ? 'Project restart is currently disabled'
                   : !canRestartProject
                     ? 'You need additional permissions to restart this project'
-                    : !isProjectActive
+                    : !canRestart
                       ? 'Unable to restart project as project is not active'
                       : isAwsK8s
                         ? 'Project restart is not supported for AWS (Revamped) projects'
@@ -127,7 +131,7 @@ const RestartServerButton = () => {
           >
             Restart project
           </ButtonTooltip>
-          {canRestartProject && isProjectActive && !projectRestartDisabled && (
+          {canRestartProject && canRestart && !projectRestartDisabled && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -169,22 +173,21 @@ const RestartServerButton = () => {
         </Button>
       )}
 
-      <ConfirmModal
-        danger
+      <ConfirmationModal
         visible={serviceToRestart !== undefined}
+        variant="destructive"
         title={`Restart ${serviceToRestart}`}
-        // @ts-ignore
         description={
           <>
-            Are you sure you want to restart the{' '}
-            <span className="text-foreground">{serviceToRestart}</span>? There will be a few minutes
-            of downtime.
+            Are you sure you want to restart your {serviceToRestart}? There will be a few minutes of
+            downtime.
           </>
         }
-        buttonLabel="Restart"
-        buttonLoadingLabel="Restarting"
-        onSelectCancel={() => setServiceToRestart(undefined)}
-        onSelectConfirm={async () => {
+        confirmLabel="Restart"
+        confirmLabelLoading="Restarting"
+        loading={isLoading}
+        onCancel={() => setServiceToRestart(undefined)}
+        onConfirm={async () => {
           if (serviceToRestart === 'project') {
             await requestProjectRestart()
           } else if (serviceToRestart === 'database') {

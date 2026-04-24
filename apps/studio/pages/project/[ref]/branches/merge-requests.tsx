@@ -1,34 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { partition } from 'lodash'
 import { ArrowRight, GitMerge, MessageCircle, MoreVertical, Shield, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import {
-  BranchManagementSection,
-  BranchRow,
-} from 'components/interfaces/BranchManagement/BranchPanels'
-import { BranchSelector } from 'components/interfaces/BranchManagement/BranchSelector'
-import { PullRequestsEmptyState } from 'components/interfaces/BranchManagement/EmptyStates'
-import BranchLayout from 'components/layouts/BranchLayout/BranchLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import NoPermission from 'components/ui/NoPermission'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -39,12 +15,34 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import {
+  BranchManagementSection,
+  BranchRow,
+} from '@/components/interfaces/BranchManagement/BranchPanels'
+import { BranchSelector } from '@/components/interfaces/BranchManagement/BranchSelector'
+import { PullRequestsEmptyState } from '@/components/interfaces/BranchManagement/EmptyStates'
+import BranchLayout from '@/components/layouts/BranchLayout/BranchLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import NoPermission from '@/components/ui/NoPermission'
+import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
+import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
+import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
+
 const MergeRequestsPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
-  const gitlessBranching = useIsBranching2Enabled()
 
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
@@ -68,7 +66,6 @@ const MergeRequestsPage: NextPageWithLayout = () => {
     error: branchesError,
     isPending: isLoadingBranches,
     isError: isErrorBranches,
-    isSuccess: isSuccessBranches,
   } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranchesUnsorted] = partition(branches, (branch) => branch.is_default)
   const previewBranches = previewBranchesUnsorted.sort((a, b) =>
@@ -190,30 +187,26 @@ const MergeRequestsPage: NextPageWithLayout = () => {
 
                 {!isError && (
                   <div className="space-y-4">
-                    {gitlessBranching && (
-                      <>
-                        {isBranch && !isCurrentBranchReadyForReview && currentBranch && (
-                          <div className="rounded border rounded-lg bg-background px-6 py-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2 text-sm text-foreground-light">
-                                <GitMerge strokeWidth={1.5} size={16} className="text-brand" />
-                                <span className="text-foreground">{currentBranch.name}</span>
-                                last viewed
-                              </div>
-                              <Button
-                                type="primary"
-                                size="tiny"
-                                loading={currentBranch && isUpdating}
-                                onClick={() =>
-                                  currentBranch && handleMarkBranchForReview(currentBranch)
-                                }
-                              >
-                                Create merge request
-                              </Button>
-                            </div>
+                    {isBranch && !isCurrentBranchReadyForReview && currentBranch && (
+                      <div className="rounded border rounded-lg bg-background px-6 py-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-sm text-foreground-light">
+                            <GitMerge strokeWidth={1.5} size={16} className="text-brand" />
+                            <span className="text-foreground">{currentBranch.name}</span>
+                            last viewed
                           </div>
-                        )}
-                      </>
+                          <Button
+                            type="primary"
+                            size="tiny"
+                            loading={currentBranch && isUpdating}
+                            onClick={() =>
+                              currentBranch && handleMarkBranchForReview(currentBranch)
+                            }
+                          >
+                            Create merge request
+                          </Button>
+                        </div>
+                      </div>
                     )}
                     <BranchManagementSection
                       header={`${mergeRequestBranches.length} merge requests`}
@@ -297,12 +290,11 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                       ) : (
                         <PullRequestsEmptyState
                           url={generateCreatePullRequestURL()}
-                          gitlessBranching={gitlessBranching}
                           projectRef={projectRef ?? '_'}
                           branches={previewBranches}
                           onBranchSelected={handleMarkBranchForReview}
                           isUpdating={isUpdating}
-                          githubConnection={githubConnection}
+                          hasGithubConnection={!!githubConnection}
                         />
                       )}
                     </BranchManagementSection>
@@ -322,7 +314,6 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
-  const gitlessBranching = useIsBranching2Enabled()
 
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
@@ -373,36 +364,36 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
     )
   }
 
-  const primaryActions = gitlessBranching ? (
-    <BranchSelector
-      branches={previewBranches}
-      onBranchSelected={handleMarkBranchForReview}
-      disabled={!projectRef}
-      isUpdating={isUpdating}
-    />
-  ) : null
-
-  const secondaryActions = (
-    <div className="flex items-center gap-x-2">
-      <Button asChild type="text" icon={<MessageCircle className="text-muted" strokeWidth={1} />}>
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href="https://github.com/orgs/supabase/discussions/18937"
-        >
-          Branching Feedback
-        </a>
-      </Button>
-      <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
-    </div>
-  )
-
   return (
     <PageLayout
       title="Merge requests"
       subtitle="Review and merge changes from one branch into another"
-      primaryActions={primaryActions}
-      secondaryActions={secondaryActions}
+      primaryActions={
+        <BranchSelector
+          branches={previewBranches}
+          onBranchSelected={handleMarkBranchForReview}
+          disabled={!projectRef}
+          isUpdating={isUpdating}
+        />
+      }
+      secondaryActions={
+        <div className="flex items-center gap-x-2">
+          <Button
+            asChild
+            type="text"
+            icon={<MessageCircle className="text-muted" strokeWidth={1} />}
+          >
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://github.com/orgs/supabase/discussions/18937"
+            >
+              Branching feedback
+            </a>
+          </Button>
+          <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
+        </div>
+      }
     >
       {children}
     </PageLayout>

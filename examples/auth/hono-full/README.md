@@ -34,7 +34,7 @@ for select to authenticated
 using (true);
 ```
 
-- [Enable anonymous sign-ins](https://supabase.com/dashboard/project/_/settings/auth) in the Auth settings.
+- [Enable anonymous sign-ins](https://supabase.com/dashboard/project/_/auth/providers) in the Auth settings.
 
 ## Setup
 

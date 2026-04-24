@@ -1,18 +1,20 @@
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { noop } from 'lodash'
 import { useQueryState } from 'nuqs'
 import {
-  PropsWithChildren,
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
+  type PropsWithChildren,
 } from 'react'
 
-import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { EMPTY_OBJ } from 'lib/void'
-import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
+import { useFeaturePreviews } from './useFeaturePreviews'
+import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
   flags: { [key: string]: boolean }
@@ -28,41 +30,44 @@ export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
   const { hasLoaded } = useContext(FeatureFlagContext)
-
-  // [Joshen] Similar logic to feature flagging previews, we can use flags to default opt in previews
-  const isDefaultOptIn = (feature: (typeof FEATURE_PREVIEWS)[number]) => {
-    switch (feature.key) {
-      default:
-        return false
-    }
-  }
+  const featurePreviews = useFeaturePreviews()
 
   const [flags, setFlags] = useState(() =>
-    FEATURE_PREVIEWS.reduce((a, b) => {
-      return { ...a, [b.key]: false }
-    }, {})
+    featurePreviews.reduce((a, b) => ({ ...a, [b.key]: false }), {})
   )
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setFlags(
-        FEATURE_PREVIEWS.reduce((a, b) => {
-          const defaultOptIn = isDefaultOptIn(b)
-          const localStorageValue = localStorage.getItem(b.key)
+  const initializeFlags = useStaticEffectEvent(() => {
+    setFlags(
+      featurePreviews.reduce((a, b) => {
+        const defaultOptIn = b.isDefaultOptIn
+        try {
+          const localStorageValue = window.localStorage.getItem(b.key)
           return {
             ...a,
             [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
           }
-        }, {})
-      )
+        } catch {
+          return { ...a, [b.key]: defaultOptIn }
+        }
+      }, {})
+    )
+  })
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      initializeFlags()
     }
-  }, [hasLoaded])
+  }, [hasLoaded, initializeFlags])
 
   const value = {
     flags,
     onUpdateFlag: (key: string, value: boolean) => {
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, value.toString())
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem(key, value ? 'true' : 'false')
+        }
+      } catch {
+        // Silently fail in restricted storage modes (e.g. Safari private browsing)
       }
       const updatedFlags = { ...flags, [key]: value }
       setFlags(updatedFlags)
@@ -74,11 +79,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
 
 // Helpers
 
-export const useIsAPIDocsSidePanelEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]
-}
-
 export const useIsColumnLevelPrivilegesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
@@ -86,18 +86,26 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 
 export const useUnifiedLogsPreview = () => {
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
+  const { hasLoaded: flagsHaveLoaded } = useContext(FeatureFlagContext)
+  const unifiedLogsEnabled = useFlag('unifiedLogs')
 
-  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const { isEligible: isEnterpriseOrSupabaseOrg, isLoading: isOrgLoading } =
+    useIsEnterpriseOrSupabaseOrg()
+
+  const isLoading = !flagsHaveLoaded || isOrgLoading
+  const isEligible = unifiedLogsEnabled && isEnterpriseOrSupabaseOrg
+  const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
 
-  return { isEnabled, enable, disable }
+  return { isEnabled, isEligible, isLoading, enable, disable }
 }
 
-export const useIsBranching2Enabled = () => {
+export const useIsPgDeltaDiffEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
+  const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
+  return pgDeltaDiffEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]
 }
 
 export const useIsAdvisorRulesEnabled = () => {
@@ -105,80 +113,64 @@ export const useIsAdvisorRulesEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
 }
 
-export const useFeaturePreviewModal = () => {
-  const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
+export const useIsPlatformWebhooksEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const platformWebhooksEnabled = useFlag('platformWebhooks')
+  return platformWebhooksEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]
+}
 
-  const gitlessBranchingEnabled = useFlag('gitlessBranching')
-  const advisorRulesEnabled = useFlag('advisorRules')
-  const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
+export const useIsJitDbAccessEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const jitDbAccessEnabled = useFlag('jitDbAccess')
+  return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
+}
+
+// [Joshen] Temporarily leaving this in, will eventually clean up this flag + old Header component completely
+export const useIsTableFilterBarEnabled = () => true
+
+export const useIsFloatingMobileToolbarEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
+
+  return showFloatingMobileToolbar && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR]
+}
+
+export const useFeaturePreviewModal = () => {
+  const featurePreviews = useFeaturePreviews()
+  const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
 
   const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
   const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
 
-  // [Joshen] Use this if we want to feature flag previews
-  const isFeaturePreviewReleasedToPublic = useCallback(
-    (feature: (typeof FEATURE_PREVIEWS)[number]) => {
-      switch (feature.key) {
-        case 'supabase-ui-branching-2-0':
-          return gitlessBranchingEnabled
-        case 'supabase-ui-advisor-rules':
-          return advisorRulesEnabled
-        case 'supabase-ui-preview-unified-logs':
-          return isUnifiedLogsPreviewAvailable
-        default:
-          return true
-      }
-    },
-    [gitlessBranchingEnabled, advisorRulesEnabled, isUnifiedLogsPreviewAvailable]
-  )
-
   const selectedFeatureKey = (
-    !selectedFeatureKeyFromQuery
-      ? FEATURE_PREVIEWS.filter((feature) => isFeaturePreviewReleasedToPublic(feature))[0].key
-      : selectedFeatureKeyFromQuery
-  ) as (typeof FEATURE_PREVIEWS)[number]['key']
+    !selectedFeatureKeyFromQuery ? featurePreviews[0].key : selectedFeatureKeyFromQuery
+  ) as (typeof featurePreviews)[number]['key']
 
   const selectFeaturePreview = useCallback(
-    (featureKey: (typeof FEATURE_PREVIEWS)[number]['key']) => {
+    (featureKey: (typeof featurePreviews)[number]['key']) => {
       setFeaturePreviewModal(featureKey)
     },
     [setFeaturePreviewModal]
   )
 
-  const openFeaturePreviewModal = useCallback(() => {
-    selectFeaturePreview(selectedFeatureKey)
-  }, [selectFeaturePreview, selectedFeatureKey])
-
-  const closeFeaturePreviewModal = useCallback(() => {
-    setFeaturePreviewModal(null)
-  }, [setFeaturePreviewModal])
-
-  const toggleFeaturePreviewModal = useCallback(() => {
-    if (showFeaturePreviewModal) {
-      closeFeaturePreviewModal()
-    } else {
-      openFeaturePreviewModal()
-    }
-  }, [showFeaturePreviewModal, openFeaturePreviewModal, closeFeaturePreviewModal])
+  const toggleFeaturePreviewModal = useCallback(
+    (value: boolean) => {
+      if (!value) {
+        setFeaturePreviewModal(null)
+      } else {
+        selectFeaturePreview(selectedFeatureKey)
+      }
+    },
+    [selectFeaturePreview, setFeaturePreviewModal, selectedFeatureKey]
+  )
 
   return useMemo(
     () => ({
       showFeaturePreviewModal,
       selectedFeatureKey,
       selectFeaturePreview,
-      openFeaturePreviewModal,
-      closeFeaturePreviewModal,
       toggleFeaturePreviewModal,
-      isFeaturePreviewReleasedToPublic,
     }),
-    [
-      showFeaturePreviewModal,
-      selectedFeatureKey,
-      selectFeaturePreview,
-      openFeaturePreviewModal,
-      closeFeaturePreviewModal,
-      toggleFeaturePreviewModal,
-      isFeaturePreviewReleasedToPublic,
-    ]
+    [showFeaturePreviewModal, selectedFeatureKey, selectFeaturePreview, toggleFeaturePreviewModal]
   )
 }

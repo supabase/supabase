@@ -1,23 +1,17 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { object, string } from 'yup'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -29,9 +23,15 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import * as z from 'zod'
 
-const schema = object({
-  SITE_URL: string().required('Must have a Site URL'),
+import AlertError from '@/components/ui/AlertError'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+
+const schema = z.object({
+  SITE_URL: z.string().min(1, 'Must have a Site URL'),
 })
 
 const SiteUrl = () => {
@@ -51,11 +51,12 @@ const SiteUrl = () => {
   )
 
   const siteUrlForm = useForm({
-    resolver: yupResolver(schema),
+    resolver: zodResolver(schema),
     defaultValues: {
       SITE_URL: '',
     },
   })
+  const { isDirty } = siteUrlForm.formState
 
   useEffect(() => {
     if (authConfig && !isUpdatingSiteUrl) {
@@ -112,9 +113,9 @@ const SiteUrl = () => {
       </PageSectionMeta>
       <PageSectionContent>
         <Form_Shadcn_ {...siteUrlForm}>
-          <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)} className="space-y-4">
+          <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)}>
             <Card>
-              <CardContent className="pt-6">
+              <CardContent>
                 <FormField_Shadcn_
                   control={siteUrlForm.control}
                   name="SITE_URL"
@@ -133,7 +134,7 @@ const SiteUrl = () => {
               </CardContent>
 
               <CardFooter className="justify-end space-x-2">
-                {siteUrlForm.formState.isDirty && (
+                {isDirty && (
                   <Button type="default" onClick={() => siteUrlForm.reset()}>
                     Cancel
                   </Button>
@@ -141,7 +142,7 @@ const SiteUrl = () => {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  disabled={!canUpdateConfig || isUpdatingSiteUrl || !siteUrlForm.formState.isDirty}
+                  disabled={!canUpdateConfig || isUpdatingSiteUrl || !isDirty}
                   loading={isUpdatingSiteUrl}
                 >
                   Save changes

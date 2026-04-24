@@ -1,8 +1,8 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type ToolUIPart } from 'ai'
 import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
-
 import { cn } from 'ui'
+
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { Tool } from './elements/Tool'
@@ -235,7 +235,9 @@ export function MessagePartSwitcher({
       return <MessagePart.Dynamic toolPart={part} />
     }
     case 'tool-list_policies':
-    case 'tool-search_docs': {
+    case 'tool-search_docs':
+    case 'tool-get_active_incidents':
+    case 'tool-load_knowledge': {
       return <MessagePart.Tool toolPart={part} />
     }
     case 'reasoning':

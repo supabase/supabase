@@ -1,16 +1,6 @@
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
-import { Pipeline } from 'data/replication/pipelines-query'
-import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-helper'
-import { useUpdatePipelineVersionMutation } from 'data/replication/update-pipeline-version-mutation'
 import { ChevronDown } from 'lucide-react'
-import {
-  PipelineStatusRequestStatus,
-  usePipelineRequestStatus,
-} from 'state/replication-pipeline-request-status'
+import { toast } from 'sonner'
 import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
@@ -18,8 +8,18 @@ import {
   DialogSectionSeparator,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
+import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
+import { Pipeline } from '@/data/replication/pipelines-query'
+import { useRestartPipelineHelper } from '@/data/replication/restart-pipeline-helper'
+import { useUpdatePipelineVersionMutation } from '@/data/replication/update-pipeline-version-mutation'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
 
 interface UpdateVersionModalProps {
   visible: boolean
@@ -47,7 +47,7 @@ export const UpdateVersionModal = ({
   const statusName = getStatusName(pipelineStatus)
   const isStopped = statusName === PipelineStatusName.STOPPED
 
-  const { data: versionData } = useReplicationPipelineVersionQuery({
+  const { data: versionData, isPending: isLoadingVersion } = useReplicationPipelineVersionQuery({
     projectRef,
     pipelineId: pipeline?.id,
   })
@@ -125,11 +125,15 @@ export const UpdateVersionModal = ({
           <div className="flex flex-col gap-y-2 mt-2 pb-2">
             <div className="text-sm text-foreground prose max-w-full">
               <p className="text-foreground-light mb-1">Current version:</p>{' '}
-              <code className="text-code-inline">{currentVersionName ?? 'Unknown'}</code>
+              <code className="text-code-inline">
+                {isLoadingVersion ? 'Loading...' : (currentVersionName ?? 'Unknown')}
+              </code>
             </div>
             <div className="text-sm text-foreground prose max-w-full">
               <p className="text-foreground-light mb-1">New version:</p>{' '}
-              <code className="text-code-inline">{newVersionName ?? 'Unknown'}</code>
+              <code className="text-code-inline">
+                {isLoadingVersion ? 'Loading...' : (newVersionName ?? 'Unknown')}
+              </code>
             </div>
           </div>
         </CollapsibleContent_Shadcn_>

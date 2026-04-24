@@ -1,13 +1,13 @@
 import { InfiniteData, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 
-import { getUnifiedLogsQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { logsKeys } from './keys'
+import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import {
   PageParam,
   QuerySearchParamsType,
-} from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
-import { logsKeys } from './keys'
+} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
 type LogLevel = 'success' | 'warning' | 'error'

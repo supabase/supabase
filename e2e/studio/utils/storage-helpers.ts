@@ -1,17 +1,8 @@
 import { expect, Page } from '@playwright/test'
-import { waitForApiResponse } from './wait-for-response.js'
-import { toUrl } from './to-url.js'
 
-/**
- * Dismisses any visible toast notifications
- */
-export const dismissToastsIfAny = async (page: Page) => {
-  const closeButtons = page.getByRole('button', { name: 'Close toast' })
-  const count = await closeButtons.count()
-  for (let i = 0; i < count; i++) {
-    await closeButtons.nth(i).click()
-  }
-}
+import { dismissToastsIfAny } from './dismiss-toast.js'
+import { toUrl } from './to-url.js'
+import { waitForApiResponse } from './wait-for-response.js'
 
 /**
  * Navigates to a the storage home view
@@ -185,14 +176,14 @@ export const uploadFile = async (page: Page, filePath: string, fileName: string)
   const fileInput = page.locator('input[type="file"]')
   await fileInput.setInputFiles(filePath)
 
-  // Wait for upload to complete - file should appear in the explorer
-  await page.waitForTimeout(15_000) // Allow time for upload to process
-
+  await expect(page.getByRole('status')).not.toBeVisible()
   // Verify file appears in the explorer by title
   await expect(
     page.getByTitle(fileName),
     `File ${fileName} should be visible in explorer after upload`
   ).toBeVisible()
+  // Verify its action button is visible too as it means the upload is indeed complete
+  await expect(page.getByRole('button', { name: `${fileName} actions` })).toBeVisible()
 }
 
 /**

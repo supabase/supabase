@@ -1,12 +1,11 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
 import styleHandler from '../../lib/theme/styleHandler'
-import { useFormContext } from '../Form/FormContext'
 
 interface OptionProps {
   value: string
@@ -60,8 +59,6 @@ function Select({
   labelOptional,
   layout,
   name = '',
-  onChange,
-  onBlur,
   placeholder,
   required,
   value = undefined,
@@ -72,32 +69,6 @@ function Select({
   validation,
   ...props
 }: Props) {
-  const { formContextOnChange, values, errors, handleBlur, touched, fieldLevelValidation } =
-    useFormContext()
-
-  if (values && !value) value = values[id]
-  function handleBlurEvent(e: React.FocusEvent<HTMLSelectElement>) {
-    if (handleBlur) handleBlur(e)
-    if (onBlur) onBlur(e)
-  }
-
-  if (!error) {
-    if (errors && !error) error = errors[id || name]
-    error = touched && touched[id || name] ? error : undefined
-  }
-
-  function onInputChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    if (onChange) onChange(e)
-    // update form
-    if (formContextOnChange) formContextOnChange(e)
-    // run field level validation
-    if (validation) fieldLevelValidation(id, validation(e.target.value))
-  }
-
-  useEffect(() => {
-    if (validation) fieldLevelValidation(id, validation(value))
-  }, [])
-
   const __styles = styleHandler('select')
 
   let classesContainer = [__styles.container]
@@ -133,8 +104,6 @@ function Select({
           autoComplete={autoComplete}
           autoFocus={autofocus}
           className={classes.join(' ')}
-          onChange={onInputChange}
-          onBlur={handleBlurEvent}
           ref={inputRef}
           value={value}
           disabled={disabled}

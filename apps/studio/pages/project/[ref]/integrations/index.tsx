@@ -1,19 +1,6 @@
 import { Search } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
-
-import {
-  IntegrationCard,
-  IntegrationLoadingCard,
-} from 'components/interfaces/Integrations/Landing/IntegrationCard'
-import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import { AlertError } from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -26,13 +13,28 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent, PageSectionMeta } from 'ui-patterns/PageSection'
 
-const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_wrapper']
+import {
+  IntegrationCard,
+  IntegrationLoadingCard,
+} from '@/components/interfaces/Integrations/Landing/IntegrationCard'
+import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
+import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
+import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
+
+const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_sync_engine']
 
 // Featured integration images
 const FEATURED_INTEGRATION_IMAGES: Record<string, string> = {
   cron: 'img/integrations/covers/cron-cover.webp',
   queues: 'img/integrations/covers/queues-cover.png',
   stripe_wrapper: 'img/integrations/covers/stripe-cover.png',
+  stripe_sync_engine: 'img/integrations/covers/stripe-cover.png',
 }
 
 const IntegrationsPage: NextPageWithLayout = () => {
@@ -45,10 +47,22 @@ const IntegrationsPage: NextPageWithLayout = () => {
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
   )
 
-  const { availableIntegrations, installedIntegrations, error, isError, isLoading, isSuccess } =
-    useInstalledIntegrations()
+  const {
+    data: availableIntegrations,
+    error,
+    isPending: isLoadingAvailableIntegrations,
+    isError,
+    isSuccess: isSuccessAvailableIntegrations,
+  } = useAvailableIntegrations()
 
+  const {
+    installedIntegrations,
+    isLoading: isLoadingInstalledIntegrations,
+    isSuccess: isSuccessInstalledIntegrations,
+  } = useInstalledIntegrations()
   const installedIds = installedIntegrations.map((i) => i.id)
+  const isLoading = isLoadingAvailableIntegrations || isLoadingInstalledIntegrations
+  const isSuccess = isSuccessAvailableIntegrations && isSuccessInstalledIntegrations
 
   // Dynamic page content based on selected category
   const pageContent = useMemo(() => {
@@ -77,10 +91,12 @@ const IntegrationsPage: NextPageWithLayout = () => {
   }, [selectedCategory])
 
   const filteredAndSortedIntegrations = useMemo(() => {
-    let filtered = availableIntegrations
+    let filtered = availableIntegrations ?? []
 
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter((i) => i.type === selectedCategory)
+      filtered = filtered.filter(
+        (i) => i.type === selectedCategory || i.categories?.includes(selectedCategory)
+      )
     }
 
     if (search.length > 0) {
@@ -107,6 +123,7 @@ const IntegrationsPage: NextPageWithLayout = () => {
     const featured = filteredAndSortedIntegrations.filter((i) =>
       FEATURED_INTEGRATIONS.includes(i.id)
     )
+
     const allIntegrations = filteredAndSortedIntegrations // Include all integrations, including featured
 
     return {
@@ -114,47 +131,6 @@ const IntegrationsPage: NextPageWithLayout = () => {
       allIntegrations,
     }
   }, [filteredAndSortedIntegrations, selectedCategory, search])
-
-  // Helper component to render featured integrations grid
-  const FeaturedIntegrationsGrid = ({
-    integrations,
-  }: {
-    integrations: typeof filteredAndSortedIntegrations
-  }) => (
-    <div
-      className="grid grid-cols-2 @4xl:grid-cols-3 gap-4 mb-4 items-stretch pb-6 mb-6 border-b"
-      style={{ gridAutoRows: 'minmax(110px, auto)' }}
-    >
-      {integrations.map((integration) => (
-        <IntegrationCard
-          key={integration.id}
-          {...integration}
-          isInstalled={installedIds.includes(integration.id)}
-          featured={true}
-          image={FEATURED_INTEGRATION_IMAGES[integration.id]}
-        />
-      ))}
-    </div>
-  )
-
-  // Helper component to render all integrations grid
-  const AllIntegrationsGrid = ({
-    integrations,
-  }: {
-    integrations: typeof filteredAndSortedIntegrations
-  }) => (
-    <div className="grid @xl:grid-cols-3 @6xl:grid-cols-4 gap-4">
-      {integrations.map((integration) => (
-        <IntegrationCard
-          key={integration.id}
-          {...integration}
-          isInstalled={installedIds.includes(integration.id)}
-          featured={false}
-          image={FEATURED_INTEGRATION_IMAGES[integration.id]}
-        />
-      ))}
-    </div>
-  )
 
   return (
     <>
@@ -213,19 +189,52 @@ const IntegrationsPage: NextPageWithLayout = () => {
                   <>
                     {/* Featured Integrations */}
                     {groupedIntegrations.featured.length > 0 && (
-                      <FeaturedIntegrationsGrid integrations={groupedIntegrations.featured} />
+                      <div
+                        className="grid grid-cols-2 @4xl:grid-cols-3 gap-4 mb-4 items-stretch pb-6 border-b"
+                        style={{ gridAutoRows: 'minmax(110px, auto)' }}
+                      >
+                        {groupedIntegrations.featured.map((integration) => (
+                          <IntegrationCard
+                            key={integration.id}
+                            {...integration}
+                            isInstalled={installedIds.includes(integration.id)}
+                            featured={true}
+                            image={FEATURED_INTEGRATION_IMAGES[integration.id]}
+                          />
+                        ))}
+                      </div>
                     )}
 
                     {/* All Integrations */}
                     {groupedIntegrations.allIntegrations.length > 0 && (
-                      <AllIntegrationsGrid integrations={groupedIntegrations.allIntegrations} />
+                      <div className="grid @xl:grid-cols-3 @6xl:grid-cols-4 gap-4">
+                        {groupedIntegrations.allIntegrations.map((integration) => (
+                          <IntegrationCard
+                            key={integration.id}
+                            {...integration}
+                            isInstalled={installedIds.includes(integration.id)}
+                            featured={false}
+                            image={FEATURED_INTEGRATION_IMAGES[integration.id]}
+                          />
+                        ))}
+                      </div>
                     )}
                   </>
                 )}
 
                 {/* Single List View (Category filtered or searching) */}
                 {!groupedIntegrations && filteredAndSortedIntegrations.length > 0 && (
-                  <AllIntegrationsGrid integrations={filteredAndSortedIntegrations} />
+                  <div className="grid @xl:grid-cols-3 @6xl:grid-cols-4 gap-4">
+                    {filteredAndSortedIntegrations.map((integration) => (
+                      <IntegrationCard
+                        key={integration.id}
+                        {...integration}
+                        isInstalled={installedIds.includes(integration.id)}
+                        featured={false}
+                        image={FEATURED_INTEGRATION_IMAGES[integration.id]}
+                      />
+                    ))}
+                  </div>
                 )}
               </>
             )}
@@ -238,7 +247,7 @@ const IntegrationsPage: NextPageWithLayout = () => {
 
 IntegrationsPage.getLayout = (page) => (
   <DefaultLayout>
-    <IntegrationsLayout>{page}</IntegrationsLayout>
+    <ProjectIntegrationsLayout>{page}</ProjectIntegrationsLayout>
   </DefaultLayout>
 )
 

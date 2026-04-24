@@ -2,10 +2,11 @@ import type { FetchPreviousPageOptions } from '@tanstack/react-query'
 import { CirclePause, CirclePlay } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect } from 'react'
-
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { Button, cn } from 'ui'
+
 import { useDataTable } from './providers/DataTableProvider'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const REFRESH_INTERVAL = 10_000
 
@@ -17,7 +18,7 @@ interface LiveButtonProps {
 export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButtonProps) {
   const [{ live, date, sort }, setSearch] = useQueryStates(searchParamsParser)
   const { table } = useDataTable()
-  useHotKey(handleClick, 'j')
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE, handleClick)
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout

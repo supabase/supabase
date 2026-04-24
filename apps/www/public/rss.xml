@@ -4,9 +4,170 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 08 Dec 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Wed, 22 Apr 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-is-now-iso-27001-certified</guid>
+  <title>Supabase is now ISO 27001 certified</title>
+  <link>https://supabase.com/blog/supabase-is-now-iso-27001-certified</link>
+  <description>Supabase is certified to ISO/IEC 27001:2022. The certificate covers our information security management system across the entire platform.</description>
+  <pubDate>Wed, 22 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/stripe-sync-engine-transfer</guid>
+  <title>We&apos;re Transferring the Stripe Sync Engine to Stripe</title>
+  <link>https://supabase.com/blog/stripe-sync-engine-transfer</link>
+  <description>We&apos;re transferring the Stripe Sync Engine from supabase/stripe-sync-engine to stripe/sync-engine</description>
+  <pubDate>Tue, 14 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-agent-skills</guid>
+  <title>AI Agents Know About Supabase. They Don&apos;t Always Use It Right.</title>
+  <link>https://supabase.com/blog/supabase-agent-skills</link>
+  <description>Introducing Supabase Agent Skills: an open-source set of instructions that teach AI coding agents how to build on Supabase correctly.</description>
+  <pubDate>Thu, 09 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/custom-oauth-oidc-providers</guid>
+  <title>Custom OIDC Providers for Supabase Auth</title>
+  <link>https://supabase.com/blog/custom-oauth-oidc-providers</link>
+  <description>Connect any OpenID Connect identity provider to your Supabase project: GitHub Enterprise, regional providers, and more.</description>
+  <pubDate>Wed, 08 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/100000-github-stars</guid>
+  <title>100,000 GitHub stars</title>
+  <link>https://supabase.com/blog/100000-github-stars</link>
+  <description>Supabase hits 100,000 GitHub stars. A reflection on community, open source, and what got us here.</description>
+  <pubDate>Thu, 02 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-docs-over-ssh</guid>
+  <title>Supabase docs over SSH</title>
+  <link>https://supabase.com/blog/supabase-docs-over-ssh</link>
+  <description>Browse Supabase docs with grep, find, and cat.</description>
+  <pubDate>Wed, 01 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/navigating-regional-network-blocks</guid>
+  <title>Navigating Regional Network Blocks</title>
+  <link>https://supabase.com/blog/navigating-regional-network-blocks</link>
+  <description>A look at recent ISP and government-directed blocks of Supabase domains in three regions—what triggered them, how we worked with authorities and customers to restore access, and what multi-tenant platforms can do to prepare.</description>
+  <pubDate>Thu, 26 Mar 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-joins-the-stripe-projects-developer-preview</guid>
+  <title>Supabase Joins the Stripe Projects Developer Preview</title>
+  <link>https://supabase.com/blog/supabase-joins-the-stripe-projects-developer-preview</link>
+  <description>Supabase is a co-design partner in the Stripe Projects developer preview.</description>
+  <pubDate>Thu, 19 Mar 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/log-drains-now-available-on-pro</guid>
+  <title>Log Drains: Now available on Pro</title>
+  <link>https://supabase.com/blog/log-drains-now-available-on-pro</link>
+  <description>Supabase Pro users can now send their Supabase logs to their own logging backend, enabling them to debug in the same place as the rest of their stack.</description>
+  <pubDate>Thu, 05 Mar 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-storage-performance-security-reliability-updates</guid>
+  <title>Supabase Storage: major performance, security, and reliability updates</title>
+  <link>https://supabase.com/blog/supabase-storage-performance-security-reliability-updates</link>
+  <description>Storage ships a rewritten object listing system, path traversal prevention, idempotent migrations, OpenTelemetry metrics, and fixes for the most common reliability issues.</description>
+  <pubDate>Thu, 05 Mar 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-incident-on-february-12-2026</guid>
+  <title>Supabase incident on February 12, 2026</title>
+  <link>https://supabase.com/blog/supabase-incident-on-february-12-2026</link>
+  <description>A detailed account of the February 12 outage in us-east-2, what caused it, and the steps we are taking to prevent it from happening again.</description>
+  <pubDate>Fri, 13 Feb 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/hydra-joins-supabase</guid>
+  <title>Hydra joins Supabase</title>
+  <link>https://supabase.com/blog/hydra-joins-supabase</link>
+  <description>The Hydra team, maintainers of pg_duckdb, is joining Supabase to focus on Postgres + Analytics and Open Warehouse Architecture.</description>
+  <pubDate>Tue, 10 Feb 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/x-twitter-oauth-2-provider</guid>
+  <title>X / Twitter OAuth 2.0 is now available for Supabase Auth</title>
+  <link>https://supabase.com/blog/x-twitter-oauth-2-provider</link>
+  <description>You can now add &quot;Sign in with X&quot; to your application using the new X / Twitter (OAuth 2.0) provider in Supabase Auth.</description>
+  <pubDate>Fri, 06 Feb 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/bknd-joins-supabase</guid>
+  <title>BKND joins Supabase</title>
+  <link>https://supabase.com/blog/bknd-joins-supabase</link>
+  <description>Dennis Senn, creator of BKND, is joining Supabase to build a Lite offering for agentic workloads.</description>
+  <pubDate>Tue, 03 Feb 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-is-now-an-official-claude-connector</guid>
+  <title>Supabase is now an official Claude connector</title>
+  <link>https://supabase.com/blog/supabase-is-now-an-official-claude-connector</link>
+  <description>Connect your Supabase projects to Claude and manage your entire database infrastructure by telling Claude what you need.</description>
+  <pubDate>Tue, 03 Feb 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-privatelink-available</guid>
+  <title>Supabase PrivateLink is now available</title>
+  <link>https://supabase.com/blog/supabase-privatelink-available</link>
+  <description>Connect to your Supabase database without touching the public internet.</description>
+  <pubDate>Tue, 27 Jan 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-best-practices-for-ai-agents</guid>
+  <title>Introducing: Postgres Best Practices</title>
+  <link>https://supabase.com/blog/postgres-best-practices-for-ai-agents</link>
+  <description>We are releasing Agent Skills for Postgres Best Practices to help AI coding agents write high quality, correct Postgres code.</description>
+  <pubDate>Wed, 21 Jan 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/read-replicas-vs-bigger-compute</guid>
+  <title>When to use Read Replicas vs. bigger compute</title>
+  <link>https://supabase.com/blog/read-replicas-vs-bigger-compute</link>
+  <description>A practical guide to diagnosing database slowdowns and choosing between vertical scaling and Read Replicas based on your workload, budget, and performance bottlenecks.</description>
+  <pubDate>Thu, 15 Jan 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/introducing-trae-solo-integration</guid>
+  <title>Introducing TRAE SOLO integration with Supabase</title>
+  <link>https://supabase.com/blog/introducing-trae-solo-integration</link>
+  <description>TRAE IDE now integrates with Supabase, enabling developers to manage their entire backend infrastructure without leaving the IDE. Browse databases, manage storage, configure auth, and more.</description>
+  <pubDate>Thu, 08 Jan 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-security-2025-retro</guid>
+  <title>Supabase Security Retro: 2025</title>
+  <link>https://supabase.com/blog/supabase-security-2025-retro</link>
+  <description>A summary of Supabase platform security changes made in 2025 and the security defaults planned for 2026.</description>
+  <pubDate>Wed, 07 Jan 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/stripe-sync-engine-integration</guid>
+  <title>Sync Stripe Data to Your Supabase Database in One Click</title>
+  <link>https://supabase.com/blog/stripe-sync-engine-integration</link>
+  <description>Announcing official support for the Stripe Sync Engine in the Supabase Dashboard. Get a one-click integration that syncs your Stripe data directly into your Supabase database.</description>
+  <pubDate>Fri, 19 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/building-chatgpt-apps-with-supabase</guid>
+  <title>Building ChatGPT Apps with Supabase Edge Functions and mcp-use</title>
+  <link>https://supabase.com/blog/building-chatgpt-apps-with-supabase</link>
+  <description>Learn how to build a ChatGPT app that connects to your Supabase database using mcp-use and Edge Functions. Create interactive widgets for schema exploration, data viewing, and SQL queries.</description>
+  <pubDate>Wed, 17 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/metrics-api-observability</guid>
+  <title>Own Your Observability: Supabase Metrics API</title>
+  <link>https://supabase.com/blog/metrics-api-observability</link>
+  <description>Stream your Supabase database telemetry into any Prometheus-compatible observability stack with the Metrics API. Full control over monitoring, visualization, and alerting.</description>
+  <pubDate>Tue, 16 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/introducing-iceberg-js</guid>
   <title>Introducing iceberg-js: A JavaScript Client for Apache Iceberg</title>
   <link>https://supabase.com/blog/introducing-iceberg-js</link>
@@ -2415,6 +2576,34 @@
   <pubDate>Thu, 25 Mar 2021 00:00:00 -0700</pubDate>
 </item>
 <item>
+  <guid>https://supabase.com/blog/postgresql-views</guid>
+  <title>Postgres Views</title>
+  <link>https://supabase.com/blog/postgresql-views</link>
+  <description>Creating and using a view in PostgreSQL.</description>
+  <pubDate>Wed, 18 Nov 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/continuous-postgresql-backup-walg</guid>
+  <title>Continuous PostgreSQL Backups using WAL-G</title>
+  <link>https://supabase.com/blog/continuous-postgresql-backup-walg</link>
+  <description>Have you ever wanted to restore your database&apos;s state to a particular moment in time? This post explains how, using WAL-G.</description>
+  <pubDate>Sun, 02 Aug 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgresql-templates</guid>
+  <title>What are PostgreSQL Templates?</title>
+  <link>https://supabase.com/blog/postgresql-templates</link>
+  <description>What are PostgreSQL templates and what are they used for?</description>
+  <pubDate>Thu, 09 Jul 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgresql-physical-logical-backups</guid>
+  <title>Physical vs Logical Backups in PostgreSQL</title>
+  <link>https://supabase.com/blog/postgresql-physical-logical-backups</link>
+  <description>What are physical and logical backups in Postgres?</description>
+  <pubDate>Tue, 07 Jul 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-dashboard-performance</guid>
   <title>Making the Supabase Dashboard Supa-fast</title>
   <link>https://supabase.com/blog/supabase-dashboard-performance</link>
@@ -2427,13 +2616,6 @@
   <link>https://supabase.com/blog/improved-dx</link>
   <description>We&apos;re releasing a new version of our Supabase client with some awesome new improvements.</description>
   <pubDate>Fri, 30 Oct 2020 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/postgresql-views</guid>
-  <title>Postgres Views</title>
-  <link>https://supabase.com/blog/postgresql-views</link>
-  <description>Creating and using a view in PostgreSQL.</description>
-  <pubDate>Wed, 18 Nov 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/case-study-monitoro</guid>
@@ -2506,13 +2688,6 @@
   <pubDate>Wed, 05 Aug 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/continuous-postgresql-backup-walg</guid>
-  <title>Continuous PostgreSQL Backups using WAL-G</title>
-  <link>https://supabase.com/blog/continuous-postgresql-backup-walg</link>
-  <description>Have you ever wanted to restore your database&apos;s state to a particular moment in time? This post explains how, using WAL-G.</description>
-  <pubDate>Sun, 02 Aug 2020 00:00:00 -0700</pubDate>
-</item>
-<item>
   <guid>https://supabase.com/blog/supabase-alpha-july-2020</guid>
   <title>Supabase Alpha July 2020</title>
   <link>https://supabase.com/blog/supabase-alpha-july-2020</link>
@@ -2525,20 +2700,6 @@
   <link>https://supabase.com/blog/alpha-launch-postmortem</link>
   <description>Everything that went wrong with Supabase&apos;s launch</description>
   <pubDate>Fri, 10 Jul 2020 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/postgresql-templates</guid>
-  <title>What are PostgreSQL Templates?</title>
-  <link>https://supabase.com/blog/postgresql-templates</link>
-  <description>What are PostgreSQL templates and what are they used for?</description>
-  <pubDate>Thu, 09 Jul 2020 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/postgresql-physical-logical-backups</guid>
-  <title>Physical vs Logical Backups in PostgreSQL</title>
-  <link>https://supabase.com/blog/postgresql-physical-logical-backups</link>
-  <description>What are physical and logical backups in Postgres?</description>
-  <pubDate>Tue, 07 Jul 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-steve-chavez</guid>

@@ -1,4 +1,4 @@
-import { MainNavItem, SidebarNavItem } from 'types/nav'
+import { MainNavItem, SidebarNavItem } from '@/types/nav'
 
 interface DocsConfig {
   mainNav?: MainNavItem[]
@@ -9,31 +9,28 @@ export const docsConfig: DocsConfig = {
   sidebarNav: [
     {
       title: 'Getting Started',
-      sortOrder: 'manual',
+      sortOrder: 'alphabetical',
       items: [
         {
           title: 'Introduction',
           href: '/docs',
+          priority: true,
           items: [],
         },
         {
-          title: 'Tailwind Classes',
-          href: '/docs/tailwind-classes',
+          title: 'Accessibility',
+          href: '/docs/accessibility',
           items: [],
         },
+
         {
           title: 'Color Usage',
           href: '/docs/color-usage',
           items: [],
         },
         {
-          title: 'Typography',
-          href: '/docs/typography',
-          items: [],
-        },
-        {
-          title: 'Theming',
-          href: '/docs/theming',
+          title: 'Copywriting',
+          href: '/docs/copywriting',
           items: [],
         },
         {
@@ -42,8 +39,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Accessibility',
-          href: '/docs/accessibility',
+          title: 'Tailwind Classes',
+          href: '/docs/tailwind-classes',
+          items: [],
+        },
+        {
+          title: 'Theming',
+          href: '/docs/theming',
+          items: [],
+        },
+        {
+          title: 'Typography',
+          href: '/docs/typography',
           items: [],
         },
       ],
@@ -54,7 +61,7 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/ui-patterns/ui-patterns',
+          href: '/docs/ui-patterns/introduction',
           items: [],
           priority: true,
         },
@@ -79,8 +86,13 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Navigation',
+          href: '/docs/ui-patterns/modality',
+          title: 'Modality',
+          items: [],
+        },
+        {
           href: '/docs/ui-patterns/navigation',
+          title: 'Navigation',
           items: [],
         },
         {
@@ -96,7 +108,7 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/fragments/fragment-components',
+          href: '/docs/fragments/introduction',
           items: [],
           priority: true,
         },
@@ -111,7 +123,7 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'EmptyStatePresentational',
+          title: 'Empty State Presentational',
           href: '/docs/fragments/empty-state-presentational',
           items: [],
         },
@@ -156,6 +168,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Error Display',
+          href: '/docs/fragments/error-display',
+          items: [],
+        },
+        {
           title: 'Form Item Layout',
           href: '/docs/fragments/form-item-layout',
           items: [],
@@ -185,6 +202,26 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/toc',
           items: [],
         },
+        {
+          title: 'Confirmation Modal',
+          href: '/docs/fragments/confirmation-modal',
+          items: [],
+        },
+        {
+          title: 'Status Codes',
+          href: '/docs/fragments/status-codes',
+          items: [],
+        },
+        {
+          title: 'Key/Value Field Array',
+          href: '/docs/fragments/key-value-field-array',
+          items: [],
+        },
+        {
+          title: 'Single Value Field Array',
+          href: '/docs/fragments/single-value-field-array',
+          items: [],
+        },
       ],
     },
     {
@@ -193,7 +230,7 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/components/atom-components',
+          href: '/docs/components/introduction',
           items: [],
           priority: true,
         },
@@ -346,7 +383,7 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'NavMenu',
+          title: 'Nav Menu',
           href: '/docs/components/nav-menu',
           items: [],
         },
@@ -473,6 +510,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Expanding Textarea',
           href: '/docs/components/expanding-textarea',
+          items: [],
+        },
+        {
+          title: 'Keyboard Shortcut',
+          href: '/docs/components/keyboard-shortcut',
           items: [],
         },
       ],

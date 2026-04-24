@@ -1,35 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
-import Link from 'next/link'
 import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
-
-import { keepPreviousData } from '@tanstack/react-query'
-import { useParams } from 'common'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import { useTableSort } from 'components/grid/hooks/useTableSort'
-import { GridHeaderActions } from 'components/interfaces/TableGridEditor/GridHeaderActions'
-import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import {
-  useExportAllRowsAsCsv,
-  useExportAllRowsAsJson,
-  useExportAllRowsAsSql,
-} from 'components/layouts/TableEditorLayout/ExportAllRows'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { RoleImpersonationState } from 'lib/role-impersonation'
-import {
-  useRoleImpersonationStateSnapshot,
-  useSubscribeToImpersonatedRole,
-} from 'state/role-impersonation-state'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   cn,
@@ -40,26 +14,35 @@ import {
   DropdownMenuTrigger,
   Separator,
 } from 'ui'
+
 import { ExportDialog } from './ExportDialog'
 import { FilterPopover } from './filter/FilterPopover'
 import { formatRowsForCSV } from './Header.utils'
 import { SortPopover } from './sort/SortPopover'
-
-// [Joshen] CSV exports require this guard as a fail-safe if the table is
-// just too large for a browser to keep all the rows in memory before
-// exporting. Either that or export as multiple CSV sheets with max n rows each
-export const MAX_EXPORT_ROW_COUNT = 500000
-export const MAX_EXPORT_ROW_COUNT_MESSAGE = (
-  <>
-    Sorry! We're unable to support exporting row counts larger than{' '}
-    {MAX_EXPORT_ROW_COUNT.toLocaleString('en-US')} at the moment. Alternatively, you may consider
-    using{' '}
-    <Link href={`${DOCS_URL}/reference/cli/supabase-db-dump`} target="_blank">
-      pg_dump
-    </Link>{' '}
-    via our CLI instead.
-  </>
-)
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
+import { useTableSort } from '@/components/grid/hooks/useTableSort'
+import { GridHeaderActions } from '@/components/interfaces/TableGridEditor/GridHeaderActions'
+import { formatTableRowsToSQL } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import {
+  useExportAllRowsAsCsv,
+  useExportAllRowsAsJson,
+  useExportAllRowsAsSql,
+} from '@/components/layouts/TableEditorLayout/ExportAllRows'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
+import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { RoleImpersonationState } from '@/lib/role-impersonation'
+import {
+  useRoleImpersonationStateSnapshot,
+  useSubscribeToImpersonatedRole,
+} from '@/state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export type HeaderProps = {
   customHeader: ReactNode
@@ -238,9 +221,13 @@ type RowHeaderProps = {
 }
 
 const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
+  const { id: _id } = useParams()
+  const tableId = _id ? Number(_id) : undefined
+
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
+  const { deleteRows } = useTableRowOperations()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const isImpersonatingRole = roleImpersonationState.role !== undefined
@@ -251,14 +238,16 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   const [isExporting, setIsExporting] = useState(false)
   const [showExportModal, setShowExportModal] = useState(false)
 
+  const preflightCheck = !tableEditorSnap.tablesToIgnorePreflightCheck.includes(tableId ?? -1)
+
   const { data } = useTableRowsQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId: snap.table.id,
       sorts,
       filters,
       page: snap.page,
+      preflightCheck,
       limit: tableEditorSnap.rowsPerPage,
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
@@ -268,7 +257,6 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   const { data: countData } = useTableRowsCountQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId: snap.table.id,
       filters,
       enforceExactCount: snap.enforceExactCount,
@@ -285,15 +273,16 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   }
 
   const onRowsDelete = () => {
-    const numRows = snap.allRowsSelected ? totalRows : snap.selectedRows.size
     const rowIdxs = Array.from(snap.selectedRows) as number[]
     const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
 
-    tableEditorSnap.onDeleteRows(rows, {
+    deleteRows({
+      rows,
+      table: snap.originalTable,
       allRowsSelected: snap.allRowsSelected,
-      numRows,
+      totalRows,
       callback: () => {
-        snap.setSelectedRows(new Set())
+        snap.resetSelectedRows()
       },
     })
   }
@@ -397,13 +386,9 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
     setIsExporting(false)
   }
 
-  function deselectRows() {
-    snap.setSelectedRows(new Set())
-  }
-
   useSubscribeToImpersonatedRole(() => {
     if (snap.allRowsSelected || snap.selectedRows.size > 0) {
-      deselectRows()
+      snap.resetSelectedRows()
     }
   })
 

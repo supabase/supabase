@@ -1,12 +1,10 @@
-import { Lock } from 'lucide-react'
-
 import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
+
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export function useAuthGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -29,26 +27,6 @@ export function useAuthGotoCommands(options?: CommandOptions) {
     'authentication:attack_protection',
     'authentication:performance',
   ])
-
-  useRegisterCommands(
-    'Actions',
-    [
-      {
-        id: 'create-rls-policy',
-        name: 'Create RLS policy',
-        value: 'Create RLS (Row Level Security) policy',
-        route: `/project/${ref}/auth/policies`,
-        icon: () => <Lock />,
-      },
-    ],
-    {
-      ...options,
-      deps: [ref],
-      enabled: (options?.enabled ?? true) && ref !== '_',
-      orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 3 },
-    }
-  )
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.NAVIGATE,

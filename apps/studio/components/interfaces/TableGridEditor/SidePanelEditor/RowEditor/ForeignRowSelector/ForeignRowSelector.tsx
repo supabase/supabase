@@ -1,40 +1,38 @@
-import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
-
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
+import { Loader2, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Button, SidePanel } from 'ui'
+
+import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
+import { convertByteaToHex } from '../RowEditor.utils'
+import Pagination from './Pagination'
+import SelectorGrid from './SelectorGrid'
+import { FilterPopoverPrimitive } from '@/components/grid/components/header/filter/FilterPopoverPrimitive'
+import { RefreshButton } from '@/components/grid/components/header/RefreshButton'
+import { SortPopoverPrimitive } from '@/components/grid/components/header/sort/SortPopoverPrimitive'
 import {
   formatSortURLParams,
   loadTableEditorStateFromLocalStorage,
   saveTableEditorStateToLocalStorage,
   sortsToUrlParams,
-} from 'components/grid/SupabaseGrid.utils'
-import { RefreshButton } from 'components/grid/components/header/RefreshButton'
-import { FilterPopoverPrimitive } from 'components/grid/components/header/filter/FilterPopoverPrimitive'
-import { SortPopoverPrimitive } from 'components/grid/components/header/sort/SortPopoverPrimitive'
-import type { Filter, Sort } from 'components/grid/types'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+} from '@/components/grid/SupabaseGrid.utils'
+import type { Filter, Sort } from '@/components/grid/types'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import {
   RoleImpersonationState,
   useRoleImpersonationStateSnapshot,
-} from 'state/role-impersonation-state'
-import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
-import { Button, SidePanel } from 'ui'
-import { ActionBar } from '../../ActionBar'
-import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
-import { convertByteaToHex } from '../RowEditor.utils'
-import Pagination from './Pagination'
-import SelectorGrid from './SelectorGrid'
+} from '@/state/role-impersonation-state'
+import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
 
 const FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX = '__frselector'
 
 export interface ForeignRowSelectorProps {
   visible: boolean
   foreignKey?: ForeignKey
+  isSaving?: boolean
   onSelect: (value?: { [key: string]: any }) => void
   closePanel: () => void
 }
@@ -42,6 +40,7 @@ export interface ForeignRowSelectorProps {
 export const ForeignRowSelector = ({
   visible,
   foreignKey,
+  isSaving,
   onSelect,
   closePanel,
 }: ForeignRowSelectorProps) => {
@@ -109,7 +108,6 @@ export const ForeignRowSelector = ({
   } = useTableRowsQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId: table?.id,
       sorts,
       filters,
@@ -130,12 +128,7 @@ export const ForeignRowSelector = ({
     if (!project?.ref || !table?.name || !table?.schema) return
 
     try {
-      const persistenceTableName = table.name + FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX
-      const savedState = loadTableEditorStateFromLocalStorage(
-        project.ref,
-        persistenceTableName,
-        table.schema
-      )
+      const savedState = loadTableEditorStateFromLocalStorage(project.ref, table.id)
       const urlSorts = savedState?.sorts ?? []
       const parsedSorts = formatSortURLParams(table.name, urlSorts)
       if (parsedSorts.length > 0) {
@@ -146,39 +139,48 @@ export const ForeignRowSelector = ({
     } finally {
       setShouldSaveSorts(true)
     }
-  }, [project?.ref, table?.schema, table?.name])
+  }, [project?.ref, table?.schema, table?.name, table?.id])
 
   // Persist sorts to local storage
   useEffect(() => {
-    if (!project?.ref || !table?.name || !table?.schema || !shouldSaveSorts) return
+    if (!project?.ref || !table?.id || !shouldSaveSorts) return
     try {
       const urlSorts = sortsToUrlParams(sorts)
-      const persistenceTableName = table.name + FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX
       saveTableEditorStateToLocalStorage({
         projectRef: project.ref,
-        tableName: persistenceTableName,
-        schema: table.schema,
+        tableId: table.id,
         sorts: urlSorts,
       })
     } catch (e) {
       console.error(e)
     }
-  }, [shouldSaveSorts, sorts, project?.ref, table?.schema, table?.name])
+  }, [shouldSaveSorts, sorts, project?.ref, table?.id])
 
   return (
     <SidePanel
+      hideFooter
       visible={visible}
       size="large"
       header={
-        <div>
-          Select a record to reference from{' '}
-          <code className="text-code-inline !text-sm">
-            {schemaName}.{tableName}
-          </code>
+        <div className="flex items-center justify-between">
+          <p>
+            Select a record to reference from{' '}
+            <code className="text-code-inline !text-sm">
+              {schemaName}.{tableName}
+            </code>
+          </p>
+          <div className="flex items-center gap-x-4">
+            {isSaving && (
+              <div className="flex items-center gap-x-2">
+                <Loader2 className="animate-spin" size={12} />
+                <p className="text-xs text-foreground-light">Saving</p>
+              </div>
+            )}
+            <Button type="text" icon={<X />} className="w-7" onClick={closePanel} />
+          </div>
         </div>
       }
       onCancel={closePanel}
-      customFooter={<ActionBar hideApply backButtonLabel="Cancel" closePanel={closePanel} />}
     >
       <SidePanel.Content className="h-full !px-0">
         <div className="h-full">
@@ -211,18 +213,8 @@ export const ForeignRowSelector = ({
                 <div className="flex items-center justify-between my-2 mx-3">
                   <div className="flex items-center">
                     <RefreshButton tableId={table?.id} isRefetching={isRefetching} />
-                    <FilterPopoverPrimitive
-                      portal={false}
-                      filters={filters}
-                      onApplyFilters={onApplyFilters}
-                    />
-                    <DndProvider backend={HTML5Backend} context={window}>
-                      <SortPopoverPrimitive
-                        portal={false}
-                        sorts={sorts}
-                        onApplySorts={onApplySorts}
-                      />
-                    </DndProvider>
+                    <FilterPopoverPrimitive filters={filters} onApplyFilters={onApplyFilters} />
+                    <SortPopoverPrimitive sorts={sorts} onApplySorts={onApplySorts} />
                   </div>
 
                   <div className="flex items-center gap-x-3 divide-x">
@@ -252,15 +244,19 @@ export const ForeignRowSelector = ({
                   <SelectorGrid
                     rows={data.rows}
                     onRowSelect={(row) => {
-                      const value = columns?.reduce((a, b) => {
-                        const targetColumn = selectedTable?.columns.find((x) => x.name === b.target)
-                        const value =
-                          targetColumn?.format === 'bytea'
-                            ? convertByteaToHex(row[b.target])
-                            : row[b.target]
-                        return { ...a, [b.source]: value }
-                      }, {})
-                      onSelect(value)
+                      if (!isSaving) {
+                        const value = columns?.reduce((a, b) => {
+                          const targetColumn = selectedTable?.columns.find(
+                            (x) => x.name === b.target
+                          )
+                          const value =
+                            targetColumn?.format === 'bytea'
+                              ? convertByteaToHex(row[b.target])
+                              : row[b.target]
+                          return { ...a, [b.source]: value }
+                        }, {})
+                        onSelect(value)
+                      }
                     }}
                   />
                 ) : (

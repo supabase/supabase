@@ -1,5 +1,6 @@
-import { IS_PLATFORM } from 'lib/constants'
 import type { NextRequest } from 'next/server'
+
+import { IS_PLATFORM } from '@/lib/constants'
 
 export const config = {
   matcher: '/api/:function*',
@@ -8,14 +9,15 @@ export const config = {
 // [Joshen] Return 404 for all next.js API endpoints EXCEPT the ones we use in hosted:
 const HOSTED_SUPPORTED_API_URLS = [
   '/ai/sql/generate-v4',
+  '/ai/sql/policy',
   '/ai/feedback/rate',
   '/ai/code/complete',
   '/ai/sql/cron-v2',
   '/ai/sql/title-v2',
+  '/ai/sql/filter-v1',
   '/ai/onboarding/design',
   '/ai/feedback/classify',
   '/ai/docs',
-  '/ai/table-quickstart/generate-schemas',
   '/get-ip-address',
   '/get-utc-time',
   '/get-deployment-commit',
@@ -23,6 +25,11 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/edge-functions/test',
   '/edge-functions/body',
   '/generate-attachment-url',
+  '/incident-status',
+  '/incident-banner',
+  '/status-override',
+  '/api/integrations/stripe-sync',
+  '/content/graphql',
 ]
 
 export function proxy(request: NextRequest) {

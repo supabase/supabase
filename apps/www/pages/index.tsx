@@ -10,7 +10,10 @@ const CustomerStories = dynamic(() => import('components/CustomerStories'))
 const BuiltWithSupabase = dynamic(() => import('components/BuiltWithSupabase'))
 const DashboardFeatures = dynamic(() => import('~/components/DashboardFeatures'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
+const OpenSourceSection = dynamic(() => import('~/components/OpenSourceSection'))
 const CTABanner = dynamic(() => import('components/CTABanner/index'))
+
+// When updating page content, also update public/llms/homepage.txt
 
 const Index = () => {
   const content = getContent()
@@ -25,6 +28,7 @@ const Index = () => {
       <BuiltWithSupabase />
       <DashboardFeatures {...content.dashboardFeatures} />
       <TwitterSocialSection {...content.twitterSocialSection} />
+      <OpenSourceSection />
       <CTABanner className="border-none" />
     </Layout>
   )

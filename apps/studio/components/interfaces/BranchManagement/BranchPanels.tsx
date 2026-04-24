@@ -1,14 +1,15 @@
 import dayjs from 'dayjs'
 import { Github } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import type { Branch } from 'data/branches/branches-query'
-import Link from 'next/link'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { WorkflowLogs } from './WorkflowLogs'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import type { Branch } from '@/data/branches/branches-query'
 
 interface BranchManagementSectionProps {
   header: string | ReactNode
@@ -81,6 +82,10 @@ export const BranchRow = ({
   const page = router.pathname.split('/').pop()
 
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
+  const willBeDeletedIn = branch.deletion_scheduled_at
+    ? dayjs(branch.deletion_scheduled_at).diff(dayjs(), 'minutes')
+    : null
+  const isDeletionPending = willBeDeletedIn !== null && willBeDeletedIn < 0
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
   const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
@@ -125,10 +130,22 @@ export const BranchRow = ({
         </Tooltip>
       </div>
       <div className="flex items-center gap-x-4">
-        <p className="text-xs text-foreground-lighter">
-          {daysFromNow > 1 ? `Updated on ${formattedUpdatedAt}` : `Updated ${formattedTimeFromNow}`}
-        </p>
-        <WorkflowLogs projectRef={branch.project_ref} status={branch.status} />
+        {branch.deletion_scheduled_at ? (
+          <p className="text-xs text-foreground-lighter">
+            {isDeletionPending
+              ? 'Deletion pending...'
+              : `Will be deleted in ${willBeDeletedIn} minutes`}
+          </p>
+        ) : (
+          <p className="text-xs text-foreground-lighter">
+            {daysFromNow > 1 ? 'Updated on' : 'Updated'}{' '}
+            <TimestampInfo
+              utcTimestamp={branch.updated_at}
+              label={daysFromNow <= 1 ? formattedTimeFromNow : undefined}
+            />
+          </p>
+        )}
+        <WorkflowLogs branch={branch} />
         {rowActions}
       </div>
     </div>

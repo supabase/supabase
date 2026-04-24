@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { forwardRef, type CSSProperties } from 'react'
 import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 export interface ShimmeringLoader {
@@ -8,23 +8,22 @@ export interface ShimmeringLoader {
   animationDelay?: number
 }
 
-export const ShimmeringLoader = ({
-  className,
-  style,
-  delayIndex = 0,
-  animationDelay = 150,
-}: ShimmeringLoader) => {
-  return (
-    <div
-      className={cn('shimmering-loader rounded py-3', className)}
-      style={{
-        ...style,
-        animationFillMode: 'backwards',
-        animationDelay: `${delayIndex * animationDelay}ms`,
-      }}
-    />
-  )
-}
+export const ShimmeringLoader = forwardRef<HTMLDivElement, ShimmeringLoader>(
+  ({ className, style, delayIndex = 0, animationDelay = 150 }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn('shimmering-loader rounded py-3', className)}
+        style={{
+          ...style,
+          animationFillMode: 'backwards',
+          animationDelay: `${delayIndex * animationDelay}ms`,
+        }}
+      />
+    )
+  }
+)
+ShimmeringLoader.displayName = 'ShimmeringLoader'
 
 interface GenericSkeletonLoaderProps {
   className?: string

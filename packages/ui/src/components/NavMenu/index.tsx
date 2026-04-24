@@ -1,4 +1,5 @@
-import { HTMLAttributes, PropsWithChildren, forwardRef } from 'react'
+import { forwardRef, HTMLAttributes, PropsWithChildren } from 'react'
+
 import { cn } from '../../lib/utils/cn'
 
 interface NavMenuProps extends HTMLAttributes<HTMLDivElement> {}
@@ -20,11 +21,10 @@ export const NavMenu = forwardRef<HTMLDivElement, NavMenuProps>(
   }
 )
 
-interface NavMenuItemProps
-  extends PropsWithChildren<{
-    className?: string
-    active: boolean
-  }> {}
+interface NavMenuItemProps extends PropsWithChildren<{
+  className?: string
+  active: boolean
+}> {}
 
 export const NavMenuItem = forwardRef<HTMLLIElement, NavMenuItemProps>(
   ({ children, className, active, ...props }, ref) => (

@@ -1,11 +1,6 @@
+import { useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ResourceList } from 'components/ui/Resource/ResourceList'
-import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -21,9 +16,14 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
 import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import type { Provider } from './AuthProvidersForm.types'
 import { ProviderForm } from './ProviderForm'
+import AlertError from '@/components/ui/AlertError'
+import { ResourceList } from '@/components/ui/Resource/ResourceList'
+import { HorizontalShimmerWithIcon } from '@/components/ui/Shimmers'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 
 export const AuthProvidersForm = () => {
   const { ref: projectRef } = useParams()
@@ -105,6 +105,10 @@ export const AuthProvidersForm = () => {
                     isActive = authConfig && (authConfig as any)['EXTERNAL_SLACK_OIDC_ENABLED']
                   } else if (providerSchema.title.includes('Web3')) {
                     isActive = authConfig && (authConfig as any)['EXTERNAL_WEB3_SOLANA_ENABLED']
+                  } else if (providerSchema.title.includes('X / Twitter (OAuth 2.0)')) {
+                    isActive = authConfig && (authConfig as any)['EXTERNAL_X_ENABLED']
+                  } else if (providerSchema.title === 'Twitter (Deprecated)') {
+                    isActive = authConfig && (authConfig as any)['EXTERNAL_TWITTER_ENABLED']
                   } else {
                     isActive =
                       authConfig &&

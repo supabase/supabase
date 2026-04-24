@@ -3,16 +3,16 @@ import { Pause } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useSetProjectStatus } from 'data/projects/project-detail-query'
-import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useProjectPauseMutation } from '@/data/projects/project-pause-mutation'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 const PauseProjectButton = () => {
   const router = useRouter()
@@ -21,6 +21,7 @@ const PauseProjectButton = () => {
   const { setProjectStatus } = useSetProjectStatus()
 
   const isProjectActive = useIsProjectActive()
+  const isProjectUnhealthy = project?.status === PROJECT_STATUS.ACTIVE_UNHEALTHY
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const projectRef = project?.ref ?? ''
@@ -30,10 +31,12 @@ const PauseProjectButton = () => {
     'queue_jobs.projects.pause'
   )
 
-  const isAwsK8s = useIsAwsK8sCloudProvider()
   const isFreePlan = organization?.plan.id === 'free'
   const isBranch = Boolean(project?.parent_project_ref)
-  const isPaidAndNotAwsK8s = !isBranch && !isFreePlan && !isAwsK8s
+  const { hasAccess: projectPausingAllowedInOrg } = useCheckEntitlements(
+    'project_pausing',
+    organization?.slug
+  )
 
   const { mutate: pauseProject, isPending: isPausing } = useProjectPauseMutation({
     onSuccess: (_, variables) => {
@@ -51,7 +54,24 @@ const PauseProjectButton = () => {
   }
 
   const buttonDisabled =
-    isPaidAndNotAwsK8s || project === undefined || isPaused || !canPauseProject || !isProjectActive
+    isBranch ||
+    !projectPausingAllowedInOrg ||
+    project === undefined ||
+    isPaused ||
+    !canPauseProject ||
+    !isProjectActive
+
+  function getTooltipText() {
+    if (isPaused) return 'Your project is already paused'
+    if (!canPauseProject) return 'You need additional permissions to pause this project'
+    if (isProjectUnhealthy)
+      return 'Your project is unhealthy — restart it instead to restore normal operation'
+    if (!isProjectActive) return 'Unable to pause project as project is not active'
+    if (isBranch) return 'Branch projects cannot be paused'
+    if (!projectPausingAllowedInOrg && !isFreePlan)
+      return 'Projects on a paid plan will always be running'
+    return undefined
+  }
 
   return (
     <>
@@ -64,15 +84,7 @@ const PauseProjectButton = () => {
         tooltip={{
           content: {
             side: 'bottom',
-            text: isPaused
-              ? 'Your project is already paused'
-              : !canPauseProject
-                ? 'You need additional permissions to pause this project'
-                : !isProjectActive
-                  ? 'Unable to pause project as project is not active'
-                  : isPaidAndNotAwsK8s
-                    ? 'Projects on a paid plan will always be running'
-                    : undefined,
+            text: getTooltipText(),
           },
         }}
       >

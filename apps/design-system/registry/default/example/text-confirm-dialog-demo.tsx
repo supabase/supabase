@@ -1,46 +1,36 @@
 'use client'
 
 import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { Button } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
-const TextConfirmModalPrimary = () => {
+export default function TextConfirmDialogDemo() {
   const [visible, setVisible] = useState(false)
-  const [loading, setLoading] = useState(false)
-
-  function onVisibleChange() {
-    setVisible(!visible)
-  }
-
-  function onSubmit() {
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-      setVisible(false)
-      toast('Updated project', { description: 'Friday, February 10, 2023 at 5:57 PM' })
-    }, 3000)
-  }
+  const bucketName = 'profile-pictures'
 
   return (
     <>
-      <Button type="default" onClick={onVisibleChange}>
-        Open text confirm dialog
+      <Button type="danger" onClick={() => setVisible(true)}>
+        Show Text Confirm Dialog
       </Button>
+
       <TextConfirmModal
-        key="primary"
-        confirmString="project name"
         visible={visible}
-        title="Are you sure you want to delete?"
         size="small"
-        onCancel={onVisibleChange}
-        loading={loading}
-        confirmPlaceholder='Type "project name" to confirm'
-        onConfirm={onSubmit}
-      />
+        variant="destructive"
+        title="Delete bucket"
+        confirmPlaceholder={bucketName}
+        confirmString={bucketName}
+        confirmLabel="Delete bucket"
+        loading={false}
+        onConfirm={() => setVisible(false)}
+        onCancel={() => setVisible(false)}
+      >
+        <p className="text-sm">
+          Your bucket <span className="font-medium text-foreground">{bucketName}</span> and all of
+          its contents will be permanently deleted. This action cannot be undone.
+        </p>
+      </TextConfirmModal>
     </>
   )
 }
-
-export default TextConfirmModalPrimary

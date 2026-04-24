@@ -1,33 +1,33 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { CreditCardIcon, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { useParams } from 'common'
-import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import ChangePaymentMethodModal from './ChangePaymentMethodModal'
+import CreditCard from './CreditCard'
+import DeletePaymentMethodModal from './DeletePaymentMethodModal'
+import AddNewPaymentMethodModal from '@/components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
-import NoPermission from 'components/ui/NoPermission'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
-import { getURL } from 'lib/helpers'
-import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
-import ChangePaymentMethodModal from './ChangePaymentMethodModal'
-import CreditCard from './CreditCard'
-import DeletePaymentMethodModal from './DeletePaymentMethodModal'
+} from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import { FormPanel } from '@/components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
+import NoPermission from '@/components/ui/NoPermission'
+import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
+import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
+import { useOrganizationPaymentMethodsQuery } from '@/data/organizations/organization-payment-methods-query'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { getURL } from '@/lib/helpers'
 
 const PaymentMethods = () => {
   const { slug } = useParams()
@@ -53,6 +53,9 @@ const PaymentMethods = () => {
     PermissionAction.BILLING_WRITE,
     'stripe.payment_methods'
   )
+  const isPartnerBilledOrganization = isPartnerBillingOrganization(
+    selectedOrganization?.billing_partner
+  )
 
   return (
     <>
@@ -66,8 +69,7 @@ const PaymentMethods = () => {
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {selectedOrganization?.managed_by !== undefined &&
-          selectedOrganization?.managed_by !== MANAGED_BY.SUPABASE ? (
+          {selectedOrganization && isPartnerBilledOrganization ? (
             <PartnerManagedResource
               managedBy={selectedOrganization?.managed_by}
               resource="Payment Methods"

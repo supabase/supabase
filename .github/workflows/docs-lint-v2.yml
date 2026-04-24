@@ -46,17 +46,17 @@ jobs:
       - name: cache cargo
         id: cache-cargo
         if: steps.filter.outputs.docs == 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5
         with:
           path: |
             ~/.cargo/bin/
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: 301e0d4b35f8f0c8553b4e93917b8b2685ef2627
+          key: 6b08233ff8bca855f6a38246b2a8049332219188
       - name: install linter
         if: steps.filter.outputs.docs == 'true' && steps.cache-cargo.outputs.cache-hit != 'true'
-        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 301e0d4b35f8f0c8553b4e93917b8b2685ef2627
+        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 6b08233ff8bca855f6a38246b2a8049332219188
       - name: install reviewdog
         if: steps.filter.outputs.docs == 'true'
         uses: reviewdog/action-setup@3f401fe1d58fe77e10d665ab713057375e39b887 # v1.3.0

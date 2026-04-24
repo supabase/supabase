@@ -1,26 +1,17 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { boolean, object } from 'yup'
-
-import { useParams } from 'common'
-import { AlertError } from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Switch,
 } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
@@ -32,9 +23,18 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import * as z from 'zod'
 
-const schema = object({
-  AUDIT_LOG_DISABLE_POSTGRES: boolean().required(),
+import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+const schema = z.object({
+  AUDIT_LOG_DISABLE_POSTGRES: z.boolean(),
 })
 
 const AUDIT_LOG_ENTRIES_TABLE = 'audit_log_entries'
@@ -73,9 +73,10 @@ export const AuditLogsForm = () => {
   })
 
   const form = useForm({
-    resolver: yupResolver(schema),
+    resolver: zodResolver(schema),
     defaultValues: { AUDIT_LOG_DISABLE_POSTGRES: false },
   })
+  const { isDirty } = form.formState
   const { AUDIT_LOG_DISABLE_POSTGRES: formValueDisablePostgres } = form.watch()
   const currentlyDisabled = authConfig?.AUDIT_LOG_DISABLE_POSTGRES ?? false
   const isDisabling = !currentlyDisabled && formValueDisablePostgres
@@ -192,7 +193,7 @@ export const AuditLogsForm = () => {
               </CardContent>
 
               <CardFooter className="justify-end space-x-2">
-                {form.formState.isDirty && (
+                {isDirty && (
                   <Button type="default" onClick={() => form.reset()}>
                     Cancel
                   </Button>
@@ -200,7 +201,7 @@ export const AuditLogsForm = () => {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
+                  disabled={!canUpdateConfig || isUpdatingConfig || !isDirty}
                   loading={isUpdatingConfig}
                 >
                   Save changes

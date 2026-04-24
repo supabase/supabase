@@ -369,6 +369,14 @@
             "type": "function"
           },
           {
+            "id": "strip-nulls",
+            "title": "Strip null values",
+            "slug": "db-strip-nulls",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function"
+          },
+          {
             "id": "returns",
             "title": "Override type of successful response",
             "slug": "db-returns",
@@ -816,13 +824,6 @@
             "type": "function"
           },
           {
-            "id": "send-mobile-otp",
-            "title": "Send a one-time passcode",
-            "slug": "auth-api-sendmobileotp",
-            "product": "auth-server",
-            "type": "function"
-          },
-          {
             "id": "update-user-by-id",
             "title": "Update a user",
             "slug": "auth-admin-updateuserbyid",
@@ -833,13 +834,6 @@
             "id": "auth-js-gotrueadminapi-signout",
             "title": "Sign out a user (admin)",
             "slug": "auth-admin-signout",
-            "product": "auth-admin",
-            "type": "function"
-          },
-          {
-            "id": "mfa-list-factors",
-            "title": "List all factors for a user",
-            "slug": "auth-admin-mfa-listfactors",
             "product": "auth-admin",
             "type": "function"
           },
@@ -907,6 +901,48 @@
                 "slug": "auth-admin-oauth-regenerateclientsecret",
                 "product": "auth-admin",
                 "type": "function"
+              },
+              {
+                "id": "admin-oauth-list-clients",
+                "title": "List OAuth clients",
+                "slug": "auth-admin-oauth-listclients",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-create-client",
+                "title": "Create OAuth client",
+                "slug": "auth-admin-oauth-createclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-get-client",
+                "title": "Get OAuth client",
+                "slug": "auth-admin-oauth-getclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-update-client",
+                "title": "Update OAuth client",
+                "slug": "auth-admin-oauth-updateclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-delete-client",
+                "title": "Delete OAuth client",
+                "slug": "auth-admin-oauth-deleteclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-regenerate-client-secret",
+                "title": "Regenerate client secret",
+                "slug": "auth-admin-oauth-regenerateclientsecret",
+                "product": "auth-admin",
+                "type": "function"
               }
             ]
           }
@@ -922,6 +958,20 @@
         "id": "invoke",
         "title": "Invokes a Supabase Edge Function.",
         "slug": "functions-invoke",
+        "product": "functions",
+        "type": "function"
+      },
+      {
+        "id": "cors-headers",
+        "title": "CORS headers for Edge Functions",
+        "slug": "functions-cors-headers",
+        "product": "functions",
+        "type": "function"
+      },
+      {
+        "id": "functions-setauth",
+        "title": "Update authorization token",
+        "slug": "functions-setauth",
         "product": "functions",
         "type": "function"
       }
@@ -997,6 +1047,13 @@
         "id": "broadcast-message",
         "title": "Broadcast a message",
         "slug": "broadcastmessage",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "realtime-setauth",
+        "title": "Set authentication token",
+        "slug": "realtime-setauth",
         "product": "realtime",
         "type": "function"
       }

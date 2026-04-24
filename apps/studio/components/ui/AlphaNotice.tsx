@@ -1,9 +1,10 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-
-import { BASE_PATH } from 'lib/constants'
+import { PropsWithChildren } from 'react'
 import { Badge, Button } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { BASE_PATH } from '@/lib/constants'
 
 interface AlphaNoticeProps {
   entity: string
@@ -11,7 +12,12 @@ interface AlphaNoticeProps {
   className?: string
 }
 
-export const AlphaNotice = ({ entity, feedbackUrl, className }: AlphaNoticeProps) => {
+export const AlphaNotice = ({
+  entity,
+  feedbackUrl,
+  className,
+  children,
+}: PropsWithChildren<AlphaNoticeProps>) => {
   return (
     <Admonition
       showIcon={false}
@@ -55,6 +61,7 @@ export const AlphaNotice = ({ entity, feedbackUrl, className }: AlphaNoticeProps
             changes, limited features, and possible breaking updates. Please share feedback as we
             refine the experience and expand access.
           </p>
+          {children}
         </div>
       </div>
     </Admonition>

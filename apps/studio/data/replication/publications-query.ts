@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { replicationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ReplicationPublicationsParams = { projectRef?: string; sourceId?: number }
 
@@ -29,7 +29,15 @@ async function fetchReplicationPublications(
     handleError(error)
   }
 
-  return data.publications.filter((pub) => pub.name !== 'supabase_realtime')
+  // Filter out:
+  // 1. supabase_realtime (internal publication)
+  // 2. Publications with no tables (would cause validation to fail)
+  const filteredPublications = data.publications.filter(
+    (pub) => pub.name !== 'supabase_realtime' && pub.tables.length > 0
+  )
+
+  // Sort publications alphabetically by name
+  return filteredPublications.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 export type ReplicationPublicationsData = Awaited<ReturnType<typeof fetchReplicationPublications>>

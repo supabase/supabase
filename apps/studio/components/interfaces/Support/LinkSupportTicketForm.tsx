@@ -4,9 +4,6 @@ import { useEffect } from 'react'
 import type { SubmitHandler } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-
-import { useLinkSupportTicketMutation } from 'data/feedback/link-support-ticket-mutation'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import {
   Button,
   DialogSectionSeparator,
@@ -16,6 +13,7 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { CategoryAndSeverityInfo } from './CategoryAndSeverityInfo'
 import {
   LinkSupportTicketFormSchema,
@@ -23,8 +21,10 @@ import {
 } from './LinkSupportTicketForm.schema'
 import { OrganizationSelector } from './OrganizationSelector'
 import { ProjectAndPlanInfo } from './ProjectAndPlanInfo'
-import { SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessToggle'
+import { DISABLE_SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessToggle'
 import { getOrgSubscriptionPlan, NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
+import { useLinkSupportTicketMutation } from '@/data/feedback/link-support-ticket-mutation'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 
 interface LinkSupportTicketFormProps {
   conversationId: string
@@ -88,9 +88,10 @@ export const LinkSupportTicketForm = ({
           ? values.projectRef
           : undefined,
       category: values.category,
-      allow_support_access: SUPPORT_ACCESS_CATEGORIES.includes(values.category)
-        ? values.allowSupportAccess
-        : false,
+      allow_support_access:
+        values.category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
+          ? values.allowSupportAccess
+          : false,
     })
   }
 
@@ -153,7 +154,7 @@ export const LinkSupportTicketForm = ({
 
         <DialogSectionSeparator />
 
-        {SUPPORT_ACCESS_CATEGORIES.includes(category) && (
+        {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
           <>
             <div className="py-4">
               <SupportAccessToggle form={form as any} />

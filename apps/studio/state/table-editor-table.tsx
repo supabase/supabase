@@ -1,25 +1,25 @@
-import { PropsWithChildren, createContext, useContext, useEffect, useRef } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useRef } from 'react'
 import { CalculatedColumn } from 'react-data-grid'
 import { proxy, ref, subscribe, useSnapshot } from 'valtio'
 import { proxySet } from 'valtio/utils'
 
-import { useFlag } from 'common'
+import { useTableEditorStateSnapshot } from './table-editor'
+import { TableIndexAdvisorProvider } from '@/components/grid/context/TableIndexAdvisorContext'
 import {
   loadTableEditorStateFromLocalStorage,
   parseSupaTable,
   saveTableEditorStateToLocalStorageDebounced,
-} from 'components/grid/SupabaseGrid.utils'
-import { TableIndexAdvisorProvider } from 'components/grid/context/TableIndexAdvisorContext'
-import { SupaRow } from 'components/grid/types'
-import { getInitialGridColumns } from 'components/grid/utils/column'
-import { getGridColumns } from 'components/grid/utils/gridColumns'
-import { Entity } from 'data/table-editor/table-editor-types'
-import { useTableEditorStateSnapshot } from './table-editor'
+} from '@/components/grid/SupabaseGrid.utils'
+import { Filter, SupaRow } from '@/components/grid/types'
+import { getInitialGridColumns } from '@/components/grid/utils/column'
+import { getGridColumns } from '@/components/grid/utils/gridColumns'
+import { Entity } from '@/data/table-editor/table-editor-types'
 
 export const createTableEditorTableState = ({
   projectRef,
   table: originalTable,
   editable = true,
+  preflightCheck = true,
   onAddColumn,
   onExpandJSONEditor,
   onExpandTextEditor,
@@ -28,13 +28,14 @@ export const createTableEditorTableState = ({
   table: Entity
   /** If set to true, render an additional "+" column to support adding a new column in the grid editor */
   editable?: boolean
+  preflightCheck?: boolean
   onAddColumn: () => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
   onExpandTextEditor: (column: string, row: SupaRow) => void
 }) => {
   const table = parseSupaTable(originalTable)
 
-  const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
+  const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.id)
   const gridColumns = getInitialGridColumns(
     getGridColumns(table, {
       tableId: table.id,
@@ -84,16 +85,28 @@ export const createTableEditorTableState = ({
       state.allRowsSelected = selectAll ?? false
       state.selectedRows = proxySet(rows)
     },
+    resetSelectedRows: () => {
+      state.allRowsSelected = false
+      state.selectedRows = proxySet(new Set())
+    },
 
     /* Columns */
     gridColumns,
     moveColumn: (fromKey: string, toKey: string) => {
       const fromIdx = state.gridColumns.findIndex((x) => x.key === fromKey)
       const toIdx = state.gridColumns.findIndex((x) => x.key === toKey)
+      if (fromIdx === -1 || toIdx === -1) return
       const moveItem = state.gridColumns[fromIdx]
+      const overItem = state.gridColumns[toIdx]
+      if (moveItem.frozen || overItem.frozen) return
 
       state.gridColumns.splice(fromIdx, 1)
       state.gridColumns.splice(toIdx, 0, moveItem)
+
+      // Update idx values to match new positions
+      state.gridColumns.forEach((col, i) => {
+        ;(col as CalculatedColumn<any, any> & { idx: number }).idx = i
+      })
     },
     updateColumnSize: (index: number, width: number) => {
       if (state.gridColumns[index]) {
@@ -102,17 +115,35 @@ export const createTableEditorTableState = ({
     },
     freezeColumn: (columnKey: string) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      if (state.gridColumns[index]) {
-        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
-          true
-      }
+      if (index === -1) return
+      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen = true
+
+      // Move the column to just after the last currently-frozen column
+      const lastFrozenIdx = state.gridColumns.reduce(
+        (last, col, i) => (col.frozen && i !== index ? i : last),
+        -1
+      )
+      const col = state.gridColumns[index]
+      state.gridColumns.splice(index, 1)
+      state.gridColumns.splice(lastFrozenIdx + 1, 0, col)
+      state.gridColumns.forEach((col, i) => {
+        ;(col as CalculatedColumn<any, any> & { idx: number }).idx = i
+      })
     },
     unfreezeColumn: (columnKey: string) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      if (state.gridColumns[index]) {
-        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
-          false
-      }
+      if (index === -1) return
+      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
+        false
+
+      // Move the column to just after the remaining frozen columns
+      const col = state.gridColumns[index]
+      state.gridColumns.splice(index, 1)
+      const lastFrozenIdx = state.gridColumns.reduce((last, col, i) => (col.frozen ? i : last), -1)
+      state.gridColumns.splice(lastFrozenIdx + 1, 0, col)
+      state.gridColumns.forEach((col, i) => {
+        ;(col as CalculatedColumn<any, any> & { idx: number }).idx = i
+      })
     },
     updateColumnIdx: (columnKey: string, columnIdx: number) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
@@ -158,6 +189,18 @@ export const createTableEditorTableState = ({
         { gridColumns: state.gridColumns }
       )
     },
+
+    /* Filters (NOTE: this is only for the new AI filter bar) */
+    filters: [] as Filter[],
+    setFilters: (filters: Filter[]) => {
+      state.filters = filters
+    },
+    clearFilters: () => {
+      state.filters = []
+    },
+
+    preflightCheck,
+    setPreflightCheck: (value: boolean) => (state.preflightCheck = value),
   })
 
   return state
@@ -178,7 +221,6 @@ export const TableEditorTableStateContextProvider = ({
   table,
   ...props
 }: PropsWithChildren<TableEditorTableStateContextProviderProps>) => {
-  const showIndexAdvisor = useFlag('ShowIndexAdvisorOnTableEditor')
   const tableEditorSnap = useTableEditorStateSnapshot()
   const state = useRef(
     createTableEditorTableState({
@@ -205,8 +247,7 @@ export const TableEditorTableStateContextProvider = ({
         saveTableEditorStateToLocalStorageDebounced({
           gridColumns: state.gridColumns,
           projectRef,
-          tableName: state.table.name,
-          schema: state.table.schema,
+          tableId: state.table.id,
         })
       })
     }
@@ -229,7 +270,7 @@ export const TableEditorTableStateContextProvider = ({
 
   return (
     <TableEditorTableStateContext.Provider value={state}>
-      {showIndexAdvisor && state.table.schema ? (
+      {state.table.schema ? (
         <TableIndexAdvisorProvider schema={state.table.schema ?? 'public'} table={state.table.name}>
           {children}
         </TableIndexAdvisorProvider>

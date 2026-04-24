@@ -1,8 +1,8 @@
+import { Auth, EdgeFunctions, Storage } from 'icons'
 import { Clock, Database, Globe, LucideIcon, Server } from 'lucide-react'
 
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import { Auth, EdgeFunctions, Storage } from 'icons'
 import { getStatusLevel } from '../../../UnifiedLogs.utils'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
 // Type for icon components (covers both lucide-react and our icon library)
 type IconComponent = LucideIcon | React.ComponentType<any>

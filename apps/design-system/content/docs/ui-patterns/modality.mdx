@@ -1,0 +1,132 @@
+---
+title: Modality
+description: Present ephemeral information and demand action.
+---
+
+Modal elements interrupt the user’s current task to ask for input, a decision, or focused attention. They appear at the top of the visual stack and (by default) render everything beneath them inactive.
+
+Given their highly interruptive nature, modal elements should be used sparingly. Common use cases include:
+
+- Requiring confirmation from the user
+- Requiring an ephemeral form submission from the user before an action can be completed
+- Alerting or slowing the user down before a destructive action
+
+We have two main ways of handling modality:
+
+- [Dialogs](#dialogs)
+- [Sheets](#sheets)
+
+As a general rule: use dialogs for short, focused tasks and use sheets for longer forms or more detailed views.
+
+## Dialogs
+
+Dialogs are centered overlays used for short, focused tasks. All dialogs should follow these best practices:
+
+- **Reiterative:** Dialog header and confirmation button text and should match the action and flow on from the entry point.
+- **Simple:** No layered elements like subtitles or admonitions unless necessary. Put all the focus on the actions to get out of the dialog.
+- **Accessible:** Always provide clear labels and descriptions via semantic HTML and the correct ARIA attributes. Ensure keyboard navigation works correctly.
+
+### Components
+
+There are quite a few dialog components, each suited to a different task or context:
+
+- [Alert Dialog](../components/alert-dialog) contains a single, short paragraph and an explicit action.
+- [Text Confirm Dialog](../fragments/text-confirm-dialog) requires a textual response before the action is enabled.
+- [Confirmation Modal](../fragments/confirmation-modal) provides more flexible dialog body contents.
+- [Dialog](../components/dialog) is a generalized component for bespoke purposes.
+
+#### Alert Dialog
+
+[Alert Dialog](../components/alert-dialog) is used to confirm or acknowledge a critical action with a single, short paragraph and a clear decision.
+
+<ComponentPreview name="alert-dialog-demo" />
+
+#### Text Confirm Dialog
+
+[Text Confirm Dialog](../fragments/text-confirm-dialog) adds a deliberate speed bump for highly destructive actions by requiring the user to type an exact confirmation string before proceeding. The confirm action remains disabled until the input matches.
+
+<ComponentPreview name="text-confirm-dialog-demo" />
+
+#### Confirmation Modal
+
+[Confirmation Modal](../fragments/confirmation-modal) is a convenience wrapper for less-critical confirmations that require more than a single paragraph, such as additional context, callouts, or simple form elements.
+
+<ComponentPreview name="confirmation-modal-demo" />
+
+#### Dialog
+
+[Dialog](../components/dialog) is a general-purpose modal for bespoke flows such as forms, pickers, or non-critical interactions where dismissal is acceptable.
+
+<ComponentPreview name="dialog-demo" />
+
+## Sheets
+
+Sheets are dialogs presented as side panels. Use them for content that is larger than a few fields, or when a centered dialog would feel cramped.
+
+- **Use for**: multi-field forms, editors, settings panels, and detailed views.
+- **Prefer the default**: sheets slide in from the right unless you have a strong reason to use another side.
+- **Group content**: use header/sections/footer so the user can scan and act quickly.
+
+### Components
+
+#### Sheet
+
+[Sheet](../components/sheet) is modal by default, blocking interaction with the underlying page.
+
+<ComponentPreview name="sheet-demo" />
+
+## Best practices
+
+### Dirty form dismissal
+
+When a dialog or sheet contains a form, keep all normal dismissal affordances enabled (backdrop click, Escape key, close icon, and footer `Cancel` button).
+
+Decision flow:
+
+1. User attempts to close the dialog/sheet.
+2. If the form is clean, close immediately.
+3. If the form is dirty, show a discard-confirmation dialog.
+4. `Keep editing` returns to the form.
+5. `Discard changes` closes and resets the form.
+
+Implementation checklist:
+
+- Intercept close attempts from `onOpenChange`.
+- Route footer `Cancel` through the same close guard.
+- Render a separate discard confirmation dialog when dirty.
+- Keep `Cancel` non-destructive; use `Discard`/`Discard changes` for one-click destructive exits.
+- Guard controlled close attempts only; do not try to block route changes or arbitrary unmounts.
+- If dismissal is route-driven or tied to page unload, use a navigation guard that composes the same discard-confirmation UI instead of extending the dialog/sheet close guard.
+
+Studio implementation (preferred in Studio code):
+
+```tsx
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
+
+const form = useForm(...)
+// Always destructure formState values otherwise they won't be updated
+// See https://react-hook-form.com/docs/useform/formstate
+const { isDirty } = form.formState
+
+const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+  checkIsDirty: () => isDirty,
+  onClose,
+})
+
+<Sheet open={visible} onOpenChange={handleOpenChange}>
+  ...
+  <Button type="default" onClick={confirmOnClose}>
+    Cancel
+  </Button>
+  ...
+  <DiscardChangesConfirmationDialog {...modalProps} />
+</Sheet>
+```
+
+Generic implementation (outside Studio):
+
+- If Studio-only helpers are unavailable, recreate the same behavior with `AlertDialog`.
+- The demo below shows the same flow and API shape (`confirmOnClose`, `handleOpenChange`, `modalProps`).
+
+<ComponentPreview name="sheet-confirm-on-close-demo" />

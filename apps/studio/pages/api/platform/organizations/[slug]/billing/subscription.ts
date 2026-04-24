@@ -1,7 +1,7 @@
+import { paths } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { paths } from 'api-types'
-import apiWrapper from 'lib/api/apiWrapper'
+import apiWrapper from '@/lib/api/apiWrapper'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -38,7 +38,6 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>
     billing_partner: 'fly',
     scheduled_plan_change: null,
     customer_balance: 0,
-    cached_egress_enabled: false,
   }
 
   return res.status(200).json(response)

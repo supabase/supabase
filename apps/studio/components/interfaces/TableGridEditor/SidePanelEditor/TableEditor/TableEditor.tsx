@@ -1,38 +1,22 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { isEmpty, isUndefined, noop } from 'lodash'
+import { isEmpty, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { DocsButton } from 'components/ui/DocsButton'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { CONSTRAINT_TYPE, useTableConstraintsQuery } from 'data/database/constraints-query'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useChanged } from 'hooks/misc/useChanged'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { RealtimeButtonVariant, useRealtimeExperiment } from 'hooks/misc/useRealtimeExperiment'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useUrlState } from 'hooks/ui/useUrlState'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { DOCS_URL } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
-import { type PlainObject } from 'lib/type-helpers'
-import { TableEditorStateContext, useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import type { SaveTableParams } from '../SidePanelEditor'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { SpreadsheetImport } from '../SpreadsheetImport/SpreadsheetImport'
-import ColumnManagement from './ColumnManagement'
+import { ApiAccessToggle, type TableApiAccessHandlerWithHistoryReturn } from './ApiAccessToggle'
+import { ColumnManagement } from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import { HeaderTitle } from './HeaderTitle'
-import RLSDisableModalContent from './RLSDisableModal'
+import { RLSDisableModalContent } from './RLSDisableModal'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
 import {
@@ -41,6 +25,23 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { CONSTRAINT_TYPE, useTableConstraintsQuery } from '@/data/database/constraints-query'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useChanged } from '@/hooks/misc/useChanged'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useUrlState } from '@/hooks/ui/useUrlState'
+import { useVisibleKey } from '@/hooks/ui/useVisibleKey'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { type PlainObject } from '@/lib/type-helpers'
+import { TableEditorStateContext, useTableEditorStateSnapshot } from '@/state/table-editor'
 
 type SaveTableParamsFor<Action extends SaveTableParams['action']> = Extract<
   SaveTableParams,
@@ -58,6 +59,7 @@ export interface TableEditorProps {
   closePanel: () => void
   saveChanges: (params: SaveTableParams) => void
   updateEditorDirty: () => void
+  apiAccessToggleHandler: TableApiAccessHandlerWithHistoryReturn
 }
 
 export const TableEditor = ({
@@ -68,25 +70,30 @@ export const TableEditor = ({
   closePanel = noop,
   saveChanges = noop,
   updateEditorDirty = noop,
+  apiAccessToggleHandler,
 }: TableEditorProps) => {
-  const tableEditorApi = useContext(TableEditorStateContext)
-  const snap = useTableEditorStateSnapshot()
-
-  const { data: project } = useSelectedProjectQuery()
-  const { selectedSchema } = useQuerySchemaState()
-  const isNewRecord = isUndefined(table)
-  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const track = useTrack()
-
+  const snap = useTableEditorStateSnapshot()
+  const tableEditorApi = useContext(TableEditorStateContext)
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
   const [params, setParams] = useUrlState()
-  useEffect(() => {
-    if (params.create === 'table' && snap.ui.open === 'none') {
-      tableEditorApi.onAddTable()
-      setParams({ ...params, create: undefined })
-    }
-  }, [tableEditorApi, setParams, snap.ui.open, params])
+  const { data: project } = useSelectedProjectQuery()
+  const { selectedSchema } = useQuerySchemaState()
+
+  const isNewRecord = table === undefined
+  const visibleChanged = useChanged(visible)
+
+  const [errors, setErrors] = useState<PlainObject>({})
+  const [tableFields, setTableFields] = useState<TableField>()
+  const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+
+  const [isDuplicateRows, setIsDuplicateRows] = useState<boolean>(false)
+  const [importContent, setImportContent] = useState<ImportContent>()
+  const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
+  const spreadsheetImportKey = useVisibleKey(isImportingSpreadsheet)
+  const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
 
   const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
@@ -109,21 +116,6 @@ export const TableEditor = ({
     ? false
     : realtimeEnabledTables.some((t) => t.id === table?.id)
 
-  const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
-    projectInsertedAt: project?.inserted_at,
-    isTable: !isNewRecord,
-    isRealtimeEnabled,
-  })
-
-  const [errors, setErrors] = useState<PlainObject>({})
-  const [tableFields, setTableFields] = useState<TableField>()
-  const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
-
-  const [isDuplicateRows, setIsDuplicateRows] = useState<boolean>(false)
-  const [importContent, setImportContent] = useState<ImportContent>()
-  const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
-  const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
-
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -134,11 +126,16 @@ export const TableEditor = ({
   )
 
   const { data: foreignKeyMeta, isSuccess: isSuccessForeignKeyMeta } =
-    useForeignKeyConstraintsQuery({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      schema: table?.schema,
-    })
+    useForeignKeyConstraintsQuery(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        schema: table?.schema,
+      },
+      {
+        enabled: !isNewRecord && !!table?.schema,
+      }
+    )
   const foreignKeys = useMemo(
     () =>
       (foreignKeyMeta ?? []).filter(
@@ -186,15 +183,11 @@ export const TableEditor = ({
     setFkRelations(relations)
   }
 
-  const onSaveChanges = (resolve: () => void) => {
+  const onSaveChanges = async (resolve: () => void) => {
     if (tableFields) {
       const errors = validateFields(tableFields)
-      if (errors.name) {
-        toast.error(errors.name)
-      }
-      if (errors.columns) {
-        toast.error(errors.columns)
-      }
+      if (errors.name) toast.error(errors.name)
+      if (errors.columns) toast.error(errors.columns)
       setErrors(errors)
 
       const isNameChanged = tableFields.name.trim() !== table?.name
@@ -228,6 +221,7 @@ export const TableEditor = ({
             columns,
             foreignKeyRelations: fkRelations,
             resolve,
+            generatedPolicies: [],
           })
         } else if (isDuplicating) {
           const payload: SaveTablePayloadFor<'duplicate'> = {
@@ -241,6 +235,7 @@ export const TableEditor = ({
             columns,
             foreignKeyRelations: fkRelations,
             resolve,
+            generatedPolicies: [],
           })
         } else {
           const payload: SaveTablePayloadFor<'update'> = {
@@ -255,6 +250,7 @@ export const TableEditor = ({
             columns,
             foreignKeyRelations: fkRelations,
             resolve,
+            generatedPolicies: [],
           })
         }
       } else {
@@ -263,7 +259,13 @@ export const TableEditor = ({
     }
   }
 
-  const visibleChanged = useChanged(visible)
+  useEffect(() => {
+    if (params.create === 'table' && snap.ui.open === 'none') {
+      tableEditorApi.onAddTable()
+      setParams({ ...params, create: undefined })
+    }
+  }, [tableEditorApi, setParams, snap.ui.open, params])
+
   useEffect(() => {
     if (visibleChanged && visible) {
       setErrors({})
@@ -327,7 +329,7 @@ export const TableEditor = ({
   return (
     <SidePanel
       data-testid="table-editor-side-panel"
-      size="large"
+      size="xlarge"
       key="TableEditor"
       visible={visible}
       header={<HeaderTitle schema={selectedSchema} table={table} isDuplicating={isDuplicating} />}
@@ -340,6 +342,7 @@ export const TableEditor = ({
           applyButtonLabel="Save"
           closePanel={closePanel}
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
+          visible={visible}
         />
       }
     >
@@ -347,22 +350,26 @@ export const TableEditor = ({
         <Input
           data-testid="table-name-input"
           label="Name"
+          id="name"
           layout="horizontal"
           type="text"
           error={errors.name ? String(errors.name) : undefined}
           value={tableFields?.name}
-          onChange={(event: any) => onUpdateField({ name: event.target.value })}
+          onChange={(event) => onUpdateField({ name: event.target.value })}
         />
         <Input
           label="Description"
+          id="description"
           placeholder="Optional"
           layout="horizontal"
           type="text"
           value={tableFields?.comment ?? ''}
-          onChange={(event: any) => onUpdateField({ comment: event.target.value })}
+          onChange={(event) => onUpdateField({ comment: event.target.value })}
         />
       </SidePanel.Content>
+
       <SidePanel.Separator />
+
       <SidePanel.Content className="space-y-10 py-6">
         <Checkbox
           id="enable-rls"
@@ -425,7 +432,7 @@ export const TableEditor = ({
           </Admonition>
         )}
 
-        {activeRealtimeVariant !== RealtimeButtonVariant.HIDE_BUTTON && realtimeEnabled && (
+        {realtimeEnabled && (
           <Checkbox
             id="enable-realtime"
             label="Enable Realtime"
@@ -436,7 +443,9 @@ export const TableEditor = ({
                 newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
                 origin: 'tableSidePanel',
               })
-              onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })
+              onUpdateField({
+                isRealtimeEnabled: !tableFields.isRealtimeEnabled,
+              })
             }}
             size="medium"
           />
@@ -477,9 +486,8 @@ export const TableEditor = ({
         )}
 
         <SpreadsheetImport
+          key={spreadsheetImportKey}
           visible={isImportingSpreadsheet}
-          headers={importContent?.headers}
-          rows={importContent?.rows}
           saveContent={(prefillData: ImportContent) => {
             setImportContent(prefillData)
             setIsImportingSpreadsheet(false)
@@ -516,6 +524,19 @@ export const TableEditor = ({
           </SidePanel.Content>
         </>
       )}
+
+      <SidePanel.Separator />
+      <SidePanel.Content className="py-6 space-y-6">
+        <ApiAccessToggle
+          projectRef={project?.ref}
+          schemaName={isNewRecord ? selectedSchema : table?.schema}
+          tableName={
+            isNewRecord || isDuplicating ? tableFields.name : tableFields.name || table?.name
+          }
+          isNewRecord={isNewRecord || isDuplicating}
+          handler={apiAccessToggleHandler}
+        />
+      </SidePanel.Content>
     </SidePanel>
   )
 }

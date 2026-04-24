@@ -1,17 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { WRAPPERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
-import { getVectorURI } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
+import { WRAPPERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import { getVectorURI } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import {
   getVectorBucketFDWName,
-  getVectorBucketFDWSchemaName,
+  getVectorBucketFDWServerName,
   getVectorBucketS3KeyName,
-} from 'components/interfaces/Storage/VectorBuckets/VectorBuckets.utils'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { FDWCreateVariables, useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
+} from '@/components/interfaces/Storage/VectorBuckets/VectorBuckets.utils'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { FDWCreateVariables, useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const useS3VectorsWrapperCreateMutation = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -39,6 +39,7 @@ export const useS3VectorsWrapperCreateMutation = () => {
     })
 
     const wrapperName = getVectorBucketFDWName(bucketName)
+    const serverName = getVectorBucketFDWServerName(bucketName)
 
     const params: FDWCreateVariables = {
       projectRef: project?.ref,
@@ -46,12 +47,11 @@ export const useS3VectorsWrapperCreateMutation = () => {
       wrapperMeta: wrapperMeta!,
       formState: {
         wrapper_name: wrapperName,
-        server_name: `${wrapperName}_server`,
+        server_name: serverName,
         vault_access_key_id: createS3KeyData?.access_key,
         vault_secret_access_key: createS3KeyData?.secret_key,
         aws_region: settings!.region,
         endpoint_url: getVectorURI(project?.ref ?? '', protocol, endpoint),
-        supabase_target_schema: getVectorBucketFDWSchemaName(bucketName),
       },
       mode: 'skip',
       tables: [],

@@ -16,8 +16,9 @@ permissions:
 
 jobs:
   typecheck:
-    # Uses larger hosted runner as it significantly decreases build times
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
 
     steps:
       - name: Checkout
@@ -38,7 +39,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run TypeScript type check
-        run: pnpm exec turbo run typecheck
+        run: pnpm run typecheck
 
       - name: Run Lint
-        run: pnpm exec turbo run lint
+        run: pnpm run lint

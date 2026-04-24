@@ -1,36 +1,27 @@
 import Link from 'next/link'
-import { ReactNode } from 'react'
 import { Badge, Button, Menu } from 'ui'
 
+import { ProductMenuGroupItem } from './ProductMenu.types'
+
 interface ProductMenuItemProps {
-  name: string | ReactNode
+  item: ProductMenuGroupItem
   isActive: boolean
-  isExternal?: boolean
-  icon?: ReactNode
-  rightIcon?: ReactNode
-  url?: string
   target?: '_blank' | '_self'
-  onClick?: () => void
-  textClassName?: string
   hoverText?: string
-  label?: string
+  onClick?: () => void
 }
 
-const ProductMenuItem = ({
-  name = '',
+export const ProductMenuItem = ({
+  item,
   isActive,
-  isExternal,
-  icon,
-  rightIcon,
-  url = '',
   target = '_self',
-  onClick,
-  textClassName = '',
   hoverText = '',
-  label,
+  onClick,
 }: ProductMenuItemProps) => {
+  const { name = '', url = '', icon, rightIcon, isExternal, label, disabled } = item
+
   const menuItem = (
-    <Menu.Item icon={icon} rounded active={isActive} onClick={onClick}>
+    <Menu.Item icon={icon} active={isActive} onClick={onClick}>
       <div className="flex w-full items-center justify-between gap-1">
         <div
           className="flex items-center gap-1 min-w-0 flex-1"
@@ -39,8 +30,8 @@ const ProductMenuItem = ({
           <span className="truncate flex-1 min-w-0">{name}</span>
           {label !== undefined && (
             <Badge
-              variant={label.toLowerCase() === 'new' ? 'success' : 'warning'}
               className="flex-shrink-0"
+              variant={label.toLowerCase() === 'new' ? 'success' : 'warning'}
             >
               {label}
             </Badge>
@@ -50,6 +41,10 @@ const ProductMenuItem = ({
       </div>
     </Menu.Item>
   )
+
+  if (disabled) {
+    return <div className="opacity-50 pointer-events-none">{menuItem}</div>
+  }
 
   if (url) {
     if (isExternal) {
@@ -63,7 +58,7 @@ const ProductMenuItem = ({
     }
 
     return (
-      <Link href={url} className="block" target={target}>
+      <Link href={url} className="block" target={target} onClick={onClick}>
         {menuItem}
       </Link>
     )
@@ -71,5 +66,3 @@ const ProductMenuItem = ({
 
   return menuItem
 }
-
-export default ProductMenuItem

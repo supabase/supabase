@@ -1,8 +1,6 @@
-import type { UseFormReturn } from 'react-hook-form'
 // End of third-party imports
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { InlineLink } from 'components/ui/InlineLink'
+import type { UseFormReturn } from 'react-hook-form'
 import {
   cn,
   FormControl_Shadcn_,
@@ -16,13 +14,15 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import {
   CATEGORY_OPTIONS,
-  type ExtendedSupportCategories,
   SEVERITY_OPTIONS,
+  type ExtendedSupportCategories,
 } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 interface CategoryAndSeverityInfoProps {
   form: UseFormReturn<SupportFormValues>
@@ -91,7 +91,7 @@ function CategorySelector({ form }: CategorySelectorProps) {
                 </SelectTrigger_Shadcn_>
                 <SelectContent_Shadcn_>
                   <SelectGroup_Shadcn_>
-                    {CATEGORY_OPTIONS.filter((option) => !option.hidden).map((option) => (
+                    {CATEGORY_OPTIONS.map((option) => (
                       <SelectItem_Shadcn_ key={option.value} value={option.value}>
                         {option.label}
                         <span className="block text-xs text-foreground-lighter">

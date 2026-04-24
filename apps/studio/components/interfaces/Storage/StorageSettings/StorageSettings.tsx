@@ -1,48 +1,34 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useFlag, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormMessage_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
+
+import { StorageFileSizeLimitErrorMessage } from './StorageFileSizeLimitErrorMessage'
 import {
   StorageListV2MigratingCallout,
   StorageListV2MigrationCallout,
@@ -52,7 +38,25 @@ import {
   STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED,
   StorageSizeUnits,
 } from './StorageSettings.constants'
-import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
+import {
+  convertFromBytes,
+  convertToBytes,
+  encodeBucketLimitErrorMessage,
+} from './StorageSettings.utils'
+import { ValidateSizeLimit } from './StorageSettings.ValidateSizeLimit'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useProjectStorageConfigUpdateUpdateMutation } from '@/data/config/project-storage-config-update-mutation'
+import { useLargestBucketSizeLimitsCheck } from '@/data/storage/buckets-max-size-limit-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { formatBytes } from '@/lib/helpers'
 
 const formId = 'storage-settings-form'
 
@@ -64,6 +68,8 @@ interface StorageSettingsState {
 
 export const StorageSettings = () => {
   const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
   const showMigrationCallout = useFlag('storageMigrationCallout')
 
   const { can: canReadStorageSettings, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -78,7 +84,7 @@ export const StorageSettings = () => {
   const {
     data: config,
     error,
-    isPending: isLoading,
+    isPending: isLoadingProjectStorageConfig,
     isSuccess,
     isError,
   } = useProjectStorageConfigQuery({ projectRef })
@@ -87,28 +93,39 @@ export const StorageSettings = () => {
   const isListV2Upgrading =
     !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'canary'
 
+  const {
+    runCondition: sizeLimitCheckCondition,
+    runQuery: sizeLimitCheckQuery,
+    isEstimatePending: isBucketEstimatePending,
+  } = useLargestBucketSizeLimitsCheck({
+    projectRef,
+    connectionString: project?.connectionString ?? undefined,
+  })
+  const shouldAutoValidateBucketLimits = sizeLimitCheckCondition === 'auto'
+
   const { data: organization } = useSelectedOrganizationQuery()
-  const { getEntitlementNumericValue, isEntitlementUnlimited } =
-    useCheckEntitlements('storage.max_file_size')
-  const isFreeTier = organization?.plan.id === 'free'
+  const {
+    getEntitlementNumericValue,
+    isEntitlementUnlimited,
+    isLoading: isLoadingMaxFileSizeEntitlement,
+  } = useCheckEntitlements('storage.max_file_size')
+  const { hasAccess: hasAccessToFileSizeConfiguration, isLoading: isLoadingFileSizeConfigurable } =
+    useCheckEntitlements('storage.max_file_size.configurable')
+  const {
+    hasAccess: hasAccessToImageTransformations,
+    isLoading: isLoadingImageTransformationEntitlement,
+  } = useCheckEntitlements('storage.image_transformations')
+
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
+  const hasLimitedStorageAccess =
+    !hasAccessToImageTransformations && !hasAccessToFileSizeConfiguration
 
-  const { data: buckets = [], isPending: isLoadingBuckets } = useBucketsQuery({ projectRef })
-
-  // Calculate the minimum file size limit from existing buckets
-  const minBucketFileSizeLimit = useMemo(() => {
-    const bucketLimits = buckets
-      .filter((bucket: any) => bucket.file_size_limit && bucket.file_size_limit > 0)
-      .map((bucket: any) => bucket.file_size_limit!)
-
-    return bucketLimits.length > 0 ? Math.min(...bucketLimits) : 0
-  }, [buckets])
-
+  const [isUpdating, setIsUpdating] = useState(false)
   const [initialValues, setInitialValues] = useState<StorageSettingsState>({
     fileSizeLimit: 0,
     unit: StorageSizeUnits.MB,
-    imageTransformationEnabled: !isFreeTier,
+    imageTransformationEnabled: false,
   })
 
   const maxBytes = useMemo(() => {
@@ -119,6 +136,12 @@ export const StorageSettings = () => {
     }
   }, [organization, isEntitlementUnlimited, getEntitlementNumericValue])
 
+  const isLoading =
+    isLoadingProjectStorageConfig ||
+    isLoadingPermissions ||
+    isLoadingMaxFileSizeEntitlement ||
+    isLoadingFileSizeConfigurable ||
+    isLoadingImageTransformationEntitlement
   const FormSchema = z
     .object({
       fileSizeLimit: z.coerce.number(),
@@ -136,56 +159,70 @@ export const StorageSettings = () => {
           path: ['fileSizeLimit'],
         })
       }
-
-      // Validate that global limit is not smaller than any bucket's limit
-      if (minBucketFileSizeLimit > 0 && !isLoadingBuckets && buckets.length > 0) {
-        const { value: formattedMinBucketLimit } = convertFromBytes(minBucketFileSizeLimit, unit)
-
-        if (fileSizeLimit < formattedMinBucketLimit) {
-          // Get buckets that would be affected by this too-small global limit
-          const affectedBuckets = buckets
-            .filter((bucket) => bucket.file_size_limit && bucket.file_size_limit > 0)
-            .filter(
-              (bucket) => convertFromBytes(bucket.file_size_limit!, unit).value > fileSizeLimit
-            )
-            .sort((a, b) => (b.file_size_limit ?? 0) - (a.file_size_limit ?? 0))
-
-          if (affectedBuckets.length > 0) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `bucketLimit:${affectedBuckets.map((x) => x.name).join(',')}`,
-              path: ['fileSizeLimit'],
-            })
-          }
-        }
-      }
     })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: initialValues,
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
   })
 
   const { unit: storageUnit } = form.watch()
-  const { fileSizeLimit: fileSizeLimitError } = form.formState.errors
-  const isBucketLimitError = !!fileSizeLimitError?.message?.startsWith('bucketLimit')
-  const affectedBuckets = isBucketLimitError
-    ? (fileSizeLimitError?.message ?? '').split(':')[1].split(',')
-    : []
-  const firstAffectBucketLimit = convertFromBytes(
-    buckets.find((x) => x.name === affectedBuckets[0])?.file_size_limit ?? 0
-  )
+  const fileSizeLimitError = form.formState.errors.fileSizeLimit
 
-  const { mutate: updateStorageConfig, isPending: isUpdating } =
-    useProjectStorageConfigUpdateUpdateMutation({
-      onSuccess: () => {
-        toast.success('Successfully updated storage settings')
-      },
-    })
+  const { mutate: updateStorageConfig } = useProjectStorageConfigUpdateUpdateMutation({
+    onSuccess: () => {
+      toast.success('Successfully updated storage settings')
+      setIsUpdating(false)
+    },
+    onError: (error) => {
+      toast.error(`Failed to update storage settings: ${error.message}`)
+      setIsUpdating(false)
+    },
+  })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!config) return console.error('Storage config is required')
+
+    setIsUpdating(true)
+
+    if (shouldAutoValidateBucketLimits) {
+      try {
+        const buckets = await sizeLimitCheckQuery()
+        const globalLimitInBytes = convertToBytes(data.fileSizeLimit, data.unit)
+        const failingBuckets = buckets.filter(
+          (bucket) => bucket.file_size_limit > globalLimitInBytes
+        )
+
+        if (failingBuckets.length > 0) {
+          setIsUpdating(false)
+          form.setError('fileSizeLimit', {
+            type: 'manual',
+            message: encodeBucketLimitErrorMessage(
+              failingBuckets.map((bucket) => ({
+                name: bucket.name,
+                limit: bucket.file_size_limit,
+              }))
+            ),
+          })
+          return
+        }
+
+        form.clearErrors('fileSizeLimit')
+      } catch (error) {
+        setIsUpdating(false)
+        const message =
+          error instanceof Error && error.message.length > 0 ? error.message : 'Unexpected error'
+
+        form.setError('fileSizeLimit', {
+          type: 'manual',
+          message: `Failed to validate bucket limits automatically: ${message}`,
+        })
+        return
+      }
+    }
 
     updateStorageConfig({
       projectRef,
@@ -198,10 +235,11 @@ export const StorageSettings = () => {
   }
 
   useEffect(() => {
-    if (isSuccess && config) {
+    if (isSuccess && config && !isLoading) {
       const { fileSizeLimit, features } = config
       const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
-      const imageTransformationEnabled = features?.imageTransformation?.enabled ?? !isFreeTier
+      const imageTransformationEnabled =
+        features?.imageTransformation?.enabled ?? hasAccessToImageTransformations
 
       setInitialValues({
         fileSizeLimit: value,
@@ -216,14 +254,21 @@ export const StorageSettings = () => {
         imageTransformationEnabled,
       })
     }
-  }, [isSuccess, config])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess, config, isLoading, hasAccessToImageTransformations])
 
   return (
     <PageContainer>
       <PageSection>
         <PageSectionContent className="flex flex-col gap-y-8">
           <Form_Shadcn_ {...form}>
-            {isLoading || isLoadingPermissions ? (
+            {!IS_PLATFORM ? (
+              <Admonition
+                type="default"
+                title="Storage settings are not available for self-hosted projects"
+                description="Storage settings are only available for Supabase Platform projects."
+              />
+            ) : isLoading ? (
               <GenericSkeletonLoader />
             ) : (
               <>
@@ -244,9 +289,9 @@ export const StorageSettings = () => {
                         {isListV2Upgrading && <StorageListV2MigratingCallout />}
                       </>
                     )}
-                    <form id={formId} className="" onSubmit={form.handleSubmit(onSubmit)}>
+                    <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
                       <Card>
-                        <CardContent className="pt-6">
+                        <CardContent>
                           <FormField_Shadcn_
                             control={form.control}
                             name="imageTransformationEnabled"
@@ -269,8 +314,10 @@ export const StorageSettings = () => {
                                 <FormControl_Shadcn_>
                                   <Switch
                                     size="large"
-                                    disabled={isFreeTier}
-                                    checked={field.value}
+                                    disabled={
+                                      !hasAccessToImageTransformations || !canUpdateStorageSettings
+                                    }
+                                    checked={hasAccessToImageTransformations && field.value}
                                     onCheckedChange={field.onChange}
                                   />
                                 </FormControl_Shadcn_>
@@ -288,6 +335,7 @@ export const StorageSettings = () => {
                                 hideMessage
                                 layout="flex-row-reverse"
                                 label="Global file size limit"
+                                className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div]:min-w-100"
                                 description={
                                   <>
                                     Restrict the size of files uploaded across all buckets.{' '}
@@ -297,16 +345,29 @@ export const StorageSettings = () => {
                                       Learn more
                                     </InlineLink>
                                     .
+                                    {!shouldAutoValidateBucketLimits && (
+                                      <p>
+                                        Ensure that the global limit is greater than that of
+                                        individual buckets
+                                      </p>
+                                    )}
                                   </>
                                 }
                               >
                                 <FormControl_Shadcn_>
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center justify-end">
                                     <Input_Shadcn_
                                       type="number"
                                       {...field}
-                                      className="w-full"
-                                      disabled={isFreeTier || !canUpdateStorageSettings}
+                                      onChange={(e) => {
+                                        field.onChange(e)
+                                        form.clearErrors('fileSizeLimit')
+                                      }}
+                                      className="w-32 rounded-r-none border-r-0"
+                                      disabled={
+                                        !hasAccessToFileSizeConfiguration ||
+                                        !canUpdateStorageSettings
+                                      }
                                     />
                                     <FormField_Shadcn_
                                       control={form.control}
@@ -314,10 +375,16 @@ export const StorageSettings = () => {
                                       render={({ field: unitField }) => (
                                         <Select_Shadcn_
                                           value={unitField.value}
-                                          onValueChange={unitField.onChange}
-                                          disabled={isFreeTier || !canUpdateStorageSettings}
+                                          onValueChange={(val) => {
+                                            unitField.onChange(val)
+                                            form.clearErrors('fileSizeLimit')
+                                          }}
+                                          disabled={
+                                            !hasAccessToFileSizeConfiguration ||
+                                            !canUpdateStorageSettings
+                                          }
                                         >
-                                          <SelectTrigger_Shadcn_ className="w-[180px]">
+                                          <SelectTrigger_Shadcn_ className="w-[90px] text-xs font-mono rounded-l-none bg-surface-300">
                                             <SelectValue_Shadcn_ placeholder="Choose a prefix">
                                               {storageUnit}
                                             </SelectValue_Shadcn_>
@@ -326,7 +393,7 @@ export const StorageSettings = () => {
                                             {Object.values(StorageSizeUnits).map((unit: string) => (
                                               <SelectItem_Shadcn_
                                                 key={unit}
-                                                disabled={isFreeTier}
+                                                disabled={!hasAccessToFileSizeConfiguration}
                                                 value={unit}
                                               >
                                                 {unit}
@@ -338,79 +405,32 @@ export const StorageSettings = () => {
                                     />
                                   </div>
                                 </FormControl_Shadcn_>
+                                {sizeLimitCheckCondition === 'confirm' && (
+                                  <ValidateSizeLimit
+                                    onValidate={sizeLimitCheckQuery}
+                                    projectRef={projectRef}
+                                    isLoadingBucketEstimate={isBucketEstimatePending}
+                                  />
+                                )}
                               </FormItemLayout>
                             )}
                           />
                           {fileSizeLimitError && (
                             <FormMessage_Shadcn_ className="ml-auto mt-2 text-right w-1/2">
-                              {isBucketLimitError ? (
-                                <>
-                                  <p>
-                                    Global limit must be greater than that of individual buckets.
-                                  </p>
-                                  <p>
-                                    Remove or decrease the limit on{' '}
-                                    <InlineLink
-                                      href={`/project/${projectRef}/storage/files/buckets/${affectedBuckets[0]}`}
-                                      className="text-destructive decoration-destructive-500 hover:decoration-destructive"
-                                    >
-                                      {affectedBuckets[0]}
-                                    </InlineLink>{' '}
-                                    ({firstAffectBucketLimit.value}
-                                    {firstAffectBucketLimit.unit})
-                                    {affectedBuckets.length > 1 && (
-                                      <>
-                                        {' '}
-                                        and{' '}
-                                        <Tooltip>
-                                          <TooltipTrigger asChild>
-                                            <span className="underline underline-offset-2 decoration-dotted decoration-destructive-500 hover:decoration-destructive cursor-default">
-                                              +{affectedBuckets.length - 1} other bucket
-                                              {affectedBuckets.length > 2 ? 's' : ''}
-                                            </span>
-                                          </TooltipTrigger>
-                                          <TooltipContent side="bottom">
-                                            <ul>
-                                              {affectedBuckets.slice(1).map((name) => {
-                                                const bucket = buckets.find((x) => x.name === name)
-                                                const formattedLimit = convertFromBytes(
-                                                  bucket?.file_size_limit ?? 0
-                                                )
-                                                return (
-                                                  <li
-                                                    key={name}
-                                                    className="hover:underline underline-offset-2"
-                                                  >
-                                                    <Link
-                                                      href={`/project/${projectRef}/storage/files/buckets/${name}`}
-                                                    >
-                                                      {bucket?.name} ({formattedLimit.value}
-                                                      {formattedLimit.unit})
-                                                    </Link>
-                                                  </li>
-                                                )
-                                              })}
-                                            </ul>
-                                          </TooltipContent>
-                                        </Tooltip>{' '}
-                                        first
-                                      </>
-                                    )}
-                                    .
-                                  </p>
-                                </>
-                              ) : (
-                                fileSizeLimitError.message
-                              )}
+                              <StorageFileSizeLimitErrorMessage
+                                error={fileSizeLimitError}
+                                projectRef={projectRef}
+                              />
                             </FormMessage_Shadcn_>
                           )}
                         </CardContent>
-                        {isFreeTier && (
+                        {hasLimitedStorageAccess && (
                           <UpgradeToPro
                             fullWidth
+                            variant="primary"
                             source="storageSizeLimit"
                             featureProposition="configure upload file size limits in Storage"
-                            primaryText="Free Plan has a fixed upload file size limit of 50 MB."
+                            primaryText="Free Plan has a fixed upload file size limit of 50 MB"
                             secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(
                               STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
                             )} and unlock image transformations.`}
@@ -420,11 +440,12 @@ export const StorageSettings = () => {
                           <UpgradeToPro
                             fullWidth
                             addon="spendCap"
+                            variant="default"
                             source="storageSizeLimit"
                             featureProposition="increase the file upload size limits in Storage"
-                            buttonText="Disable Spend Cap"
-                            primaryText="Reduced max upload file size limit due to Spend Cap"
-                            secondaryText={`Disable your Spend Cap to allow file uploads of up to ${formatBytes(
+                            buttonText="Disable spend cap"
+                            primaryText="Reduced max upload file size limit due to spend cap"
+                            secondaryText={`Disable your spend cap to allow file uploads of up to ${formatBytes(
                               STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
                             )}.`}
                           />
@@ -452,7 +473,7 @@ export const StorageSettings = () => {
                             </Button>
                           )}
                           <Button
-                            type="primary"
+                            type={hasLimitedStorageAccess ? 'default' : 'primary'}
                             htmlType="submit"
                             loading={isUpdating}
                             disabled={
