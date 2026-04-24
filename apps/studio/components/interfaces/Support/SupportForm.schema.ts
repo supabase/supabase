@@ -21,6 +21,7 @@ export const SupportFormSchema = z
     allowSupportAccess: z.boolean(),
     attachDashboardLogs: z.boolean(),
     dashboardSentryIssueId: z.string().optional(),
+    branchRef: z.string().optional(),
   })
   .refine(
     (data) => {

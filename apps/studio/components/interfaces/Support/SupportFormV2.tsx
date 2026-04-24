@@ -124,7 +124,8 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
     dispatch({ type: 'SUBMIT' })
 
-    const { attachDashboardLogs: formAttachDashboardLogs, ...values } = formValues
+    const { attachDashboardLogs: formAttachDashboardLogs, branchRef, ...values } = formValues
+    const effectiveProjectRef = branchRef || values.projectRef
     const attachDashboardLogs =
       formAttachDashboardLogs && DASHBOARD_LOG_CATEGORIES.includes(values.category)
 
@@ -146,7 +147,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
     const payload = {
       ...values,
       organizationSlug: values.organizationSlug ?? NO_ORG_MARKER,
-      projectRef: values.projectRef ?? NO_PROJECT_MARKER,
+      projectRef: effectiveProjectRef ?? NO_PROJECT_MARKER,
       allowSupportAccess:
         values.category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
           ? values.allowSupportAccess
@@ -175,10 +176,10 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
       dashboardStudioVersion: commit ? formatStudioVersion(commit) : undefined,
     }
 
-    if (values.projectRef !== NO_PROJECT_MARKER) {
+    if (effectiveProjectRef !== NO_PROJECT_MARKER) {
       try {
         const authConfig = await getProjectAuthConfig({
-          projectRef: values.projectRef,
+          projectRef: effectiveProjectRef,
         })
         payload.siteUrl = authConfig.SITE_URL
         payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST

@@ -13,6 +13,11 @@ import {
   CommandItem_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -23,6 +28,7 @@ import type { SupportFormValues } from './SupportForm.schema'
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
 import CopyButton from '@/components/ui/CopyButton'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface ProjectAndPlanProps {
@@ -43,11 +49,14 @@ export function ProjectAndPlanInfo({
   showPlanExpectationInfo = true,
 }: ProjectAndPlanProps) {
   const hasProjectSelected = projectRef && projectRef !== NO_PROJECT_MARKER
+  const branchRef = form.watch('branchRef')
+  const displayedRef = branchRef || projectRef
 
   return (
     <div className="flex flex-col gap-y-2">
       <ProjectSelector form={form} orgSlug={orgSlug} projectRef={projectRef} />
-      <ProjectRefHighlighted projectRef={projectRef} />
+      <BranchSelector form={form} projectRef={projectRef} />
+      <ProjectRefHighlighted projectRef={displayedRef} />
 
       {!hasProjectSelected && <Admonition type="default" title="No project has been selected" />}
 
@@ -89,7 +98,10 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                 if (!urlProjectRef && (!projectRef || projectRef === NO_PROJECT_MARKER))
                   field.onChange(projects[0]?.ref ?? NO_PROJECT_MARKER)
               }}
-              onSelect={(project) => field.onChange(project.ref)}
+              onSelect={(project) => {
+                field.onChange(project.ref)
+                form.setValue('branchRef', undefined)
+              }}
               renderTrigger={({ isLoading, project, listboxId, open }) => {
                 return (
                   <Button
@@ -130,6 +142,60 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                 </CommandGroup_Shadcn_>
               )}
             />
+          </FormControl_Shadcn_>
+        </FormItemLayout>
+      )}
+    />
+  )
+}
+
+interface BranchSelectorProps {
+  form: UseFormReturn<SupportFormValues>
+  projectRef: string | null
+}
+
+function BranchSelector({ form, projectRef }: BranchSelectorProps) {
+  const { data: branches, isLoading } = useBranchesQuery(
+    { projectRef: projectRef ?? undefined },
+    { enabled: !!projectRef && projectRef !== NO_PROJECT_MARKER }
+  )
+
+  const nonDefaultBranches = (branches ?? []).filter((b) => !b.is_default)
+
+  if (
+    !projectRef ||
+    projectRef === NO_PROJECT_MARKER ||
+    (!isLoading && nonDefaultBranches.length === 0)
+  ) {
+    return null
+  }
+
+  return (
+    <FormField_Shadcn_
+      name="branchRef"
+      control={form.control}
+      render={({ field }) => (
+        <FormItemLayout hideMessage layout="vertical" label="Is this a branch project issue?">
+          <FormControl_Shadcn_>
+            <Select_Shadcn_
+              value={field.value ?? 'no-branch'}
+              onValueChange={(val) => field.onChange(val === 'no-branch' ? undefined : val)}
+            >
+              <SelectTrigger_Shadcn_ size="small">
+                <SelectValue_Shadcn_ placeholder="No, the issue is with the main project" />
+              </SelectTrigger_Shadcn_>
+              <SelectContent_Shadcn_>
+                <SelectItem_Shadcn_ value="no-branch">
+                  No, the issue is with the main project
+                </SelectItem_Shadcn_>
+                {nonDefaultBranches.map((branch) => (
+                  <SelectItem_Shadcn_ key={branch.id} value={branch.project_ref}>
+                    {branch.name}
+                    {branch.git_branch ? ` (${branch.git_branch})` : ''}
+                  </SelectItem_Shadcn_>
+                ))}
+              </SelectContent_Shadcn_>
+            </Select_Shadcn_>
           </FormControl_Shadcn_>
         </FormItemLayout>
       )}
