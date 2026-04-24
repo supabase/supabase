@@ -16,6 +16,7 @@ import { useGitHubConnectionsQuery } from '@/data/integrations/github-connection
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
 import { EMPTY_ARR } from '@/lib/void'
 
 export const ActivityStats = () => {
@@ -77,6 +78,14 @@ export const ActivityStats = () => {
   const githubConnection = githubConnections?.find(
     (connection) => connection.project.ref === parentProjectRef
   )
+  const isProjectComingUp = [PROJECT_STATUS.COMING_UP, PROJECT_STATUS.UNKNOWN].includes(
+    project?.status ?? PROJECT_STATUS.UNKNOWN
+  )
+  const githubLabelText = githubConnection?.repository.name
+    ? githubConnection.repository.name
+    : isProjectComingUp
+      ? 'Waiting for project...'
+      : 'No repository connected'
   const integrationsPath = parentProjectRef
     ? `/project/${parentProjectRef}/settings/integrations`
     : undefined
@@ -113,10 +122,10 @@ export const ActivityStats = () => {
           label={<span>GitHub</span>}
           value={
             <p
-              className={cn('truncate', githubConnection ? 'text-foreground' : 'text-brand')}
-              title={githubConnection?.repository.name ?? 'Connect a repo'}
+              className={cn('truncate', !githubConnection && 'text-foreground-lighter')}
+              title={githubLabelText}
             >
-              {githubConnection?.repository.name ?? 'Connect a repo'}
+              {githubLabelText}
             </p>
           }
         />
