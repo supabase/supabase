@@ -152,10 +152,10 @@ describe('PaymentMethods', () => {
 
     expect(screen.getByText('Expires: 12/2028')).toBeInTheDocument()
     expect(screen.queryByText(/Card expires:/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/Shared Payment Token/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Via Stripe Projects/i)).not.toBeInTheDocument()
   })
 
-  it('shows separate card and shared payment token details for Stripe Projects payment methods', () => {
+  it('shows Stripe Projects payment method details separately from the underlying card', () => {
     mockPaymentMethodsQuery.mockReturnValue({
       data: {
         data: [
