@@ -29,7 +29,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER,
       name: 'RLS Tester',
-      discussionsUrl: undefined, // will definitely need to add
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/45233',
       enabled: rlsTesterEnabled,
       isNew: true,
       isPlatformOnly: false,
