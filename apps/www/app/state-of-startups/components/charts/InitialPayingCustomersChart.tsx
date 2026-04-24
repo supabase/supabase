@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { buildWhereClause, SurveyChart } from '../SurveyChart'
 
 function generateInitialPayingCustomersSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
@@ -21,7 +21,7 @@ function generateInitialPayingCustomersSQL(activeFilters: Record<string, string>
       END AS source_clean
     FROM (
       SELECT id, unnest(initial_paying_customers) AS source
-      FROM responses_2025
+      FROM responses_2026
       ${whereClause}
     ) sub
   )
@@ -39,7 +39,7 @@ export function InitialPayingCustomersChart() {
       title="Where did your startup’s initial paying customers come from?"
       targetColumn="initial_paying_customers"
       filterColumns={['person_age', 'location', 'team_size']}
-      functionName="get_initial_paying_customers_stats"
+      functionName="get_initial_paying_customers_stats_2026"
       generateSQLQuery={generateInitialPayingCustomersSQL}
     />
   )

@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { buildWhereClause, SurveyChart } from '../SurveyChart'
 
 function generateAIModelsSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
@@ -23,7 +23,7 @@ function generateAIModelsSQL(activeFilters: Record<string, string>) {
       END AS technology_clean
     FROM (
       SELECT id, unnest(ai_models_used) AS technology
-      FROM responses_2025
+      FROM responses_2026
       ${whereClause}
     ) sub
   )
@@ -41,7 +41,7 @@ export function AIModelsChart() {
       title="Which AI models are you using or planning to use?"
       targetColumn="ai_models_used"
       filterColumns={['person_age', 'team_size', 'money_raised']}
-      functionName="get_ai_models_stats"
+      functionName="get_ai_models_stats_2026"
       generateSQLQuery={generateAIModelsSQL}
     />
   )

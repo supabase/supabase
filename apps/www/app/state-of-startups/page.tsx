@@ -4,7 +4,7 @@ import { RegisterContent } from './register/RegisterContent'
 import StateOfStartups2026Content from './StateOfStartups2026Content'
 
 // TODO (alan): set this to true once results are available.
-const SHOW_RESULTS = false
+const SHOW_RESULTS = true
 
 export const metadata: Metadata = SHOW_RESULTS
   ? {

@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { buildWhereClause, SurveyChart } from '../SurveyChart'
 
 function generateAcceleratorParticipationSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters, ['accelerator_participation IS NOT NULL'])
@@ -11,7 +11,7 @@ function generateAcceleratorParticipationSQL(activeFilters: Record<string, strin
       WHEN accelerator_participation = 'Did not participate in an accelerator' THEN NULL
       ELSE 'Other'
     END AS accelerator_clean
-  FROM responses_2025
+  FROM responses_2026
   ${whereClause ? '\n  ' + whereClause : ''}
 )
 SELECT 
@@ -29,7 +29,7 @@ export function AcceleratorParticipationChart() {
       title="If your startup has participated in an accelerator, which one?"
       targetColumn="accelerator_participation"
       filterColumns={['person_age', 'location', 'money_raised']}
-      functionName="get_accelerator_stats"
+      functionName="get_accelerator_stats_2026"
       generateSQLQuery={generateAcceleratorParticipationSQL}
     />
   )

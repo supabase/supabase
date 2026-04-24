@@ -1,25 +1,30 @@
 'use client'
 
 import { useAccent } from './accent-context'
-import { SurveyStatCard } from './SurveyStatCard'
-import { SurveyWordCloud } from './SurveyWordCloud'
-import { SurveySummarizedAnswer } from './SurveySummarizedAnswer'
+import { AcceleratorParticipationChart } from './charts/AcceleratorParticipationChart'
+import { AICodebasePercentChart } from './charts/AICodebasePercentChart'
+import { AICodingToolsChart } from './charts/AICodingToolsChart'
+import { AIModelsChart } from './charts/AIModelsChart'
+import { AuthProviderChart } from './charts/AuthProviderChart'
+import { BiggestChallengeChart } from './charts/BiggestChallengeChart'
+import { BuildingAgentsChart } from './charts/BuildingAgentsChart'
+import { DatabasesChart } from './charts/DatabasesChart'
+import { FundingStageChart } from './charts/FundingStageChart'
+import { IndustryChart } from './charts/IndustryChart'
+import { InitialPayingCustomersChart } from './charts/InitialPayingCustomersChart'
+import { LocationChart } from './charts/LocationChart'
+import { MCPAdoptionChart } from './charts/MCPAdoptionChart'
+import { NewIdeasChart } from './charts/NewIdeasChart'
+import { PaidSubscriptionsChart } from './charts/PaidSubscriptionsChart'
+import { RegularSocialMediaUseChart } from './charts/RegularSocialMediaUseChart'
+import { RoleChart } from './charts/RoleChart'
+import { SalesToolsChart } from './charts/SalesToolsChart'
+import { WorldOutlookChart } from './charts/WorldOutlookChart'
 import { SurveyRankedAnswersPair } from './SurveyRankedAnswersPair'
 import { SurveySectionBreak } from './SurveySectionBreak'
-import { AcceleratorParticipationChart } from './charts/AcceleratorParticipationChart'
-import { RoleChart } from './charts/RoleChart'
-import { IndustryChart } from './charts/IndustryChart'
-import { FundingStageChart } from './charts/FundingStageChart'
-import { DatabasesChart } from './charts/DatabasesChart'
-import { AIModelsChart } from './charts/AIModelsChart'
-import { LocationChart } from './charts/LocationChart'
-import { SalesToolsChart } from './charts/SalesToolsChart'
-import { AICodingToolsChart } from './charts/AICodingToolsChart'
-import { RegularSocialMediaUseChart } from './charts/RegularSocialMediaUseChart'
-import { NewIdeasChart } from './charts/NewIdeasChart'
-import { InitialPayingCustomersChart } from './charts/InitialPayingCustomersChart'
-import { WorldOutlookChart } from './charts/WorldOutlookChart'
-import { BiggestChallengeChart } from './charts/BiggestChallengeChart'
+import { SurveyStatCard } from './SurveyStatCard'
+import { SurveySummarizedAnswer } from './SurveySummarizedAnswer'
+import { SurveyWordCloud } from './SurveyWordCloud'
 
 interface SurveyChapterSectionProps {
   title: string
@@ -54,20 +59,25 @@ export function SurveyChapterSection({
   const eyebrowColor = 'text-brand-link dark:text-brand'
 
   const chartComponents = {
-    RoleChart,
-    IndustryChart,
-    FundingStageChart,
     AcceleratorParticipationChart,
-    DatabasesChart,
+    AICodebasePercentChart,
     AICodingToolsChart,
     AIModelsChart,
-    RegularSocialMediaUseChart,
-    NewIdeasChart,
+    AuthProviderChart,
+    BiggestChallengeChart,
+    BuildingAgentsChart,
+    DatabasesChart,
+    FundingStageChart,
+    IndustryChart,
     InitialPayingCustomersChart,
+    LocationChart,
+    MCPAdoptionChart,
+    NewIdeasChart,
+    PaidSubscriptionsChart,
+    RegularSocialMediaUseChart,
+    RoleChart,
     SalesToolsChart,
     WorldOutlookChart,
-    BiggestChallengeChart,
-    LocationChart,
   }
 
   return (

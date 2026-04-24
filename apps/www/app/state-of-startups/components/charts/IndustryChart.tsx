@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { buildWhereClause, SurveyChart } from '../SurveyChart'
 
 function generateIndustrySQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters, ['industry IS NOT NULL'])
@@ -12,7 +12,7 @@ function generateIndustrySQL(activeFilters: Record<string, string>) {
       WHEN industry IN ('SaaS', 'Dev tools', 'AI / ML', 'Consumer', 'Education', 'eCommerce', 'Fintech', 'Healthtech') THEN industry
       ELSE 'Other'
     END AS industry_clean
-  FROM responses_2025
+  FROM responses_2026
   ${whereClause}
 )
 SELECT 
@@ -29,7 +29,7 @@ export function IndustryChart() {
       title="What is your startup’s primary industry or target customer segment?"
       targetColumn="industry"
       filterColumns={['person_age', 'location', 'money_raised']}
-      functionName="get_industry_stats"
+      functionName="get_industry_stats_2026"
       generateSQLQuery={generateIndustrySQL}
     />
   )

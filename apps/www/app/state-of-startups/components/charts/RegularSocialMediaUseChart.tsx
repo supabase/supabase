@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { buildWhereClause, SurveyChart } from '../SurveyChart'
 
 function generateRegularSocialMediaUseSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
@@ -24,7 +24,7 @@ function generateRegularSocialMediaUseSQL(activeFilters: Record<string, string>)
       END AS platform_clean
     FROM (
       SELECT id, unnest(regular_social_media_use) AS platform
-      FROM responses_2025
+      FROM responses_2026
       ${whereClause}
     ) sub
   )
@@ -42,7 +42,7 @@ export function RegularSocialMediaUseChart() {
       title="Which social media platforms do you use at least 3× per week?"
       targetColumn="regular_social_media_use"
       filterColumns={['person_age', 'location', 'money_raised']}
-      functionName="get_regular_social_media_use_stats"
+      functionName="get_regular_social_media_use_stats_2026"
       generateSQLQuery={generateRegularSocialMediaUseSQL}
     />
   )

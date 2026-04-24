@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { buildWhereClause, SurveyChart } from '../SurveyChart'
 
 function generateFundingStageSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
@@ -6,7 +6,7 @@ function generateFundingStageSQL(activeFilters: Record<string, string>) {
   return `SELECT
     funding_stage,
     COUNT(*) AS total
-  FROM responses_2025${whereClause ? '\n' + whereClause : ''}
+  FROM responses_2026${whereClause ? '\n' + whereClause : ''}
   GROUP BY funding_stage
   ORDER BY CASE 
       WHEN funding_stage = 'Bootstrapped' THEN 1
@@ -26,7 +26,7 @@ export function FundingStageChart() {
       title="What stage of funding is your startup in?"
       targetColumn="funding_stage"
       filterColumns={['person_age', 'location', 'team_size']}
-      functionName="get_funding_stage_stats"
+      functionName="get_funding_stage_stats_2026"
       generateSQLQuery={generateFundingStageSQL}
     />
   )

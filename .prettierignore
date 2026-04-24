@@ -4,6 +4,7 @@ node_modules
 pnpm-lock.yaml
 docker*
 apps/**/out
+.context/**
 # prettier-plugin-sql-cst only supports sqlite syntax
 **/supabase/migrations/*.sql
 apps/www/schema.sql

@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { buildWhereClause, SurveyChart } from '../SurveyChart'
 
 function generateSalesToolsSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
@@ -20,7 +20,7 @@ function generateSalesToolsSQL(activeFilters: Record<string, string>) {
       END AS tool_clean
     FROM (
       SELECT id, unnest(sales_tools) AS tool
-      FROM responses_2025
+      FROM responses_2026
       ${whereClause}
     ) sub
   )
@@ -38,7 +38,7 @@ export function SalesToolsChart() {
       title="What tools are you using to manage your sales process?"
       targetColumn="sales_tools"
       filterColumns={['person_age', 'location', 'team_size']}
-      functionName="get_sales_tools_stats"
+      functionName="get_sales_tools_stats_2026"
       generateSQLQuery={generateSalesToolsSQL}
     />
   )

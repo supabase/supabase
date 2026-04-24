@@ -1,4 +1,4 @@
-import { SurveyChart, buildWhereClause } from '../SurveyChart'
+import { buildWhereClause, SurveyChart } from '../SurveyChart'
 
 function generateNewIdeasSQL(activeFilters: Record<string, string>) {
   const whereClause = buildWhereClause(activeFilters)
@@ -23,7 +23,7 @@ function generateNewIdeasSQL(activeFilters: Record<string, string>) {
       END AS avenue_clean
     FROM (
       SELECT id, unnest(new_ideas) AS avenue
-      FROM responses_2025
+      FROM responses_2026
       ${whereClause}
     ) sub
   )
@@ -41,7 +41,7 @@ export function NewIdeasChart() {
       title="Where do you usually discover new dev tools or startup ideas?"
       targetColumn="new_ideas"
       filterColumns={['person_age', 'location', 'money_raised']}
-      functionName="get_new_ideas_stats"
+      functionName="get_new_ideas_stats_2026"
       generateSQLQuery={generateNewIdeasSQL}
     />
   )
