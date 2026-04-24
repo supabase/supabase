@@ -24,6 +24,8 @@ const PolicyAllowedOperation = ({
             id="allowed-operation"
             name="allowed-operation"
             className="flex flex-wrap gap-3"
+            value={operation}
+            onValueChange={(value) => onSelectOperation(value)}
           >
             {['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'ALL'].map((op) => (
               <RadioGroupCardItem key={op} value={op} id={`r${op}`} label={op} className="w-24" />
