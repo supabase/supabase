@@ -70,7 +70,7 @@ export const RLSTableCard = ({
           <p className="text-xs font-mono text-foreground-light uppercase border-b px-3 py-2">
             {policies.length} {policies.length > 1 ? 'policies' : 'policy'} applied
           </p>
-          <ul className="">
+          <ul>
             {policies.map((policy) => (
               <li key={policy.id} className="px-3 py-2 flex justify-between items-center">
                 <div>
