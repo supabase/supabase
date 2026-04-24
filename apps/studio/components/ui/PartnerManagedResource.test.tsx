@@ -96,7 +96,9 @@ describe('PartnerManagedResource', () => {
       />
     )
 
-    expect(screen.getByText('Organization plans are managed by Vercel Marketplace')).toBeInTheDocument()
+    expect(
+      screen.getByText('Organization plans are managed by Vercel Marketplace')
+    ).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /view organization plans/i })).toBeNull()
   })
 })
