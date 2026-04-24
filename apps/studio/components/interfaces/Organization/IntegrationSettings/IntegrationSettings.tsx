@@ -23,8 +23,8 @@ import NoPermission from '@/components/ui/NoPermission'
 import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
 import { useGitHubConnectionDeleteMutation } from '@/data/integrations/github-connection-delete-mutation'
 import {
-  type GitHubConnection,
   useGitHubConnectionsQuery,
+  type GitHubConnection,
 } from '@/data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'

@@ -3,8 +3,8 @@ import { useParams } from 'common'
 import { useMemo } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { GitHubIntegrationConnectionForm } from './GitHubIntegrationConnectionForm'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
+import { GitHubIntegrationConnectionForm } from './GitHubIntegrationConnectionForm'
 import {
   ScaffoldContainer,
   ScaffoldSection,
