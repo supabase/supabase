@@ -101,7 +101,7 @@ const AiIconAnimationComponent = ({
           initial={{ rotate: 0 }}
           animate={outerAnimate}
           transition={outerTransition}
-          style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
+          style={{ transformBox: 'view-box', transformOrigin: 'center' }}
         />
         <motion.path
           fillRule="evenodd"
@@ -115,7 +115,7 @@ const AiIconAnimationComponent = ({
           style={{
             x: springX,
             y: springY,
-            transformBox: 'fill-box',
+            transformBox: 'view-box',
             transformOrigin: 'center',
           }}
           transition={innerTransition}
