@@ -191,7 +191,7 @@ describe('ProjectNeedsSecuring', () => {
     expect(screen.queryByRole('link', { name: 'View policies' })).not.toBeInTheDocument()
     expect(screen.queryByText('profiles')).not.toBeInTheDocument()
     expect(screen.queryByText('customers')).not.toBeInTheDocument()
-    expect(screen.getByText('Skip to dashboard')).toBeInTheDocument()
+    expect(screen.getByText('Skip to home')).toBeInTheDocument()
     expect(screen.queryByTestId('project-children')).not.toBeInTheDocument()
   })
 
