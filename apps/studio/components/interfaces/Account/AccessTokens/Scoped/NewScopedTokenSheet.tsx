@@ -7,7 +7,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
+  Form,
   ScrollArea,
   Separator,
   Sheet,
@@ -287,7 +287,7 @@ export const NewScopedTokenSheet = ({
               </div>
             )}
 
-            <Form_Shadcn_ {...form}>
+            <Form {...form}>
               <div className="flex flex-col gap-0 overflow-visible">
                 <BasicInfo
                   control={form.control}
@@ -309,7 +309,7 @@ export const NewScopedTokenSheet = ({
                   setResourceSearchOpen={setResourceSearchOpen}
                 />
               </div>
-            </Form_Shadcn_>
+            </Form>
           </div>
         </ScrollArea>
         <SheetFooter className="!justify-end w-full mt-auto py-4 border-t">

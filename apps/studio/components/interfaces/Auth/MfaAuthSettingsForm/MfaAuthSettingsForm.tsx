@@ -11,9 +11,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
@@ -350,11 +350,11 @@ export const MfaAuthSettingsForm = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form_Shadcn_ {...totpForm}>
+          <Form {...totpForm}>
             <form onSubmit={totpForm.handleSubmit(onSubmitTotpForm)} className="space-y-4">
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={totpForm.control}
                     name="MFA_TOTP"
                     render={({ field }) => (
@@ -363,7 +363,7 @@ export const MfaAuthSettingsForm = () => {
                         label="TOTP (App Authenticator)"
                         description="Control use of TOTP (App Authenticator) factors"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Select_Shadcn_
                             value={field.value}
                             onValueChange={field.onChange}
@@ -380,14 +380,14 @@ export const MfaAuthSettingsForm = () => {
                               ))}
                             </SelectContent_Shadcn_>
                           </Select_Shadcn_>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
 
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={totpForm.control}
                     name="MFA_MAX_ENROLLED_FACTORS"
                     render={({ field }) => (
@@ -396,7 +396,7 @@ export const MfaAuthSettingsForm = () => {
                         label="Maximum number of per-user MFA factors"
                         description="How many MFA factors can be enrolled at once per user."
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <InputGroup>
                             <FormInputGroupInput
                               type="number"
@@ -413,7 +413,7 @@ export const MfaAuthSettingsForm = () => {
                               <InputGroupText>factors</InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -436,7 +436,7 @@ export const MfaAuthSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
 
@@ -447,7 +447,7 @@ export const MfaAuthSettingsForm = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form_Shadcn_ {...phoneForm}>
+          <Form {...phoneForm}>
             <form
               onSubmit={(e) => {
                 e.preventDefault()
@@ -456,7 +456,7 @@ export const MfaAuthSettingsForm = () => {
             >
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={phoneForm.control}
                     name="MFA_PHONE"
                     render={({ field }) => (
@@ -465,7 +465,7 @@ export const MfaAuthSettingsForm = () => {
                         label="Phone"
                         description="Control use of phone factors"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Select_Shadcn_
                             value={field.value}
                             onValueChange={field.onChange}
@@ -482,7 +482,7 @@ export const MfaAuthSettingsForm = () => {
                               ))}
                             </SelectContent_Shadcn_>
                           </Select_Shadcn_>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -498,7 +498,7 @@ export const MfaAuthSettingsForm = () => {
                 </CardContent>
 
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={phoneForm.control}
                     name="MFA_PHONE_OTP_LENGTH"
                     render={({ field }) => (
@@ -507,7 +507,7 @@ export const MfaAuthSettingsForm = () => {
                         label="Phone OTP Length"
                         description="Number of digits in OTP"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <InputGroup>
                             <FormInputGroupInput
                               type="number"
@@ -524,14 +524,14 @@ export const MfaAuthSettingsForm = () => {
                               <InputGroupText>digits</InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
 
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={phoneForm.control}
                     name="MFA_PHONE_TEMPLATE"
                     render={({ field }) => (
@@ -540,7 +540,7 @@ export const MfaAuthSettingsForm = () => {
                         label="Phone verification message"
                         description="To format the OTP code use `{{ .Code }}`"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Input_Shadcn_
                             type="text"
                             {...field}
@@ -550,7 +550,7 @@ export const MfaAuthSettingsForm = () => {
                             data-form-type="other" // Dashlane
                             data-bwignore // Bitwarden
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -588,7 +588,7 @@ export const MfaAuthSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
 
@@ -619,11 +619,11 @@ export const MfaAuthSettingsForm = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form_Shadcn_ {...securityForm}>
+          <Form {...securityForm}>
             <form onSubmit={securityForm.handleSubmit(onSubmitSecurityForm)}>
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={securityForm.control}
                     name="MFA_ALLOW_LOW_AAL"
                     render={({ field }) => (
@@ -632,13 +632,13 @@ export const MfaAuthSettingsForm = () => {
                         label="Limit duration of AAL1 sessions"
                         description="A user's session will be terminated unless they verify one of their factors within 15 minutes of initial sign in. Recommendation: ON"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={!field.value}
                             onCheckedChange={(value) => field.onChange(!value)}
                             disabled={!canUpdateConfig || !hasAccessToEnhanceSecurity}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -673,7 +673,7 @@ export const MfaAuthSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
     </>

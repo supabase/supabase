@@ -12,9 +12,9 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -173,10 +173,10 @@ export const CreateVectorBucketDialog = ({
 
         <DialogSectionSeparator />
 
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <DialogSection className="flex flex-col !p-0">
-              <FormField_Shadcn_
+              <FormField
                 key="name"
                 name="name"
                 control={form.control}
@@ -188,7 +188,7 @@ export const CreateVectorBucketDialog = ({
                     labelOptional="Cannot be changed after creation"
                     description="Must be between 3–63 characters. Only lowercase letters, numbers, and hyphens are allowed"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         id="name"
                         data-1p-ignore
@@ -198,7 +198,7 @@ export const CreateVectorBucketDialog = ({
                         {...field}
                         placeholder="Enter bucket name"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -216,7 +216,7 @@ export const CreateVectorBucketDialog = ({
               </Admonition>
             </DialogSection>
           </form>
-        </Form_Shadcn_>
+        </Form>
 
         <DialogFooter>
           <Button type="default" disabled={isLoading} onClick={() => setVisible(false)}>
