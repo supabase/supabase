@@ -6,7 +6,6 @@ import { ChartConfig } from './ChartConfig'
 import { UtilityActions } from './UtilityActions'
 import { UtilityTabExplain } from './UtilityTabExplain'
 import { UtilityTabResults } from './UtilityTabResults'
-import { UtilityTabRls } from './UtilityTabRls'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
@@ -147,9 +146,6 @@ export const UtilityPanel = ({
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
             <span className="translate-y-[1px]">Explain</span>
           </TabsTrigger_Shadcn_>
-          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="rls">
-            <span className="translate-y-[1px]">RLS</span>
-          </TabsTrigger_Shadcn_>
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
             <span className="translate-y-[1px]">Chart</span>
           </TabsTrigger_Shadcn_>
@@ -210,10 +206,6 @@ export const UtilityPanel = ({
 
       <TabsContent_Shadcn_ asChild value="explain" className="mt-0 flex-grow">
         <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
-      </TabsContent_Shadcn_>
-
-      <TabsContent_Shadcn_ asChild value="rls" className="mt-0 flex-grow">
-        <UtilityTabRls id={id} isExecuting={isExplainExecuting} ranQuery={ranQuery} />
       </TabsContent_Shadcn_>
 
       <TabsContent_Shadcn_ asChild value="chart" className="mt-0 flex-grow">
