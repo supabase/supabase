@@ -39,9 +39,7 @@ import {
 
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
-import { useIsAPIDocsSidePanelEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
-import { APIDocsButton } from '@/components/ui/APIDocsButton'
 import CopyButton from '@/components/ui/CopyButton'
 import { DocsButton } from '@/components/ui/DocsButton'
 import NoPermission from '@/components/ui/NoPermission'
@@ -69,7 +67,6 @@ const EdgeFunctionDetailsLayout = ({
   const { functionSlug, ref } = useParams()
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { isLoading, can: canReadFunctions } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
     '*'
@@ -332,16 +329,6 @@ const EdgeFunctionDetailsLayout = ({
 
             <PageHeaderAside>
               <div className="flex items-center space-x-2">
-                {isNewAPIDocsEnabled && (
-                  <APIDocsButton
-                    section={
-                      functionSlug !== undefined
-                        ? ['edge-functions', functionSlug]
-                        : ['edge-functions']
-                    }
-                    source="edge-functions"
-                  />
-                )}
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
                 <Popover_Shadcn_>
                   <PopoverTrigger_Shadcn_ asChild>

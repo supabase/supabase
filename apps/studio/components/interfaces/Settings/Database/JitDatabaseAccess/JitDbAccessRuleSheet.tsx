@@ -6,9 +6,9 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   ScrollArea,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -232,15 +232,15 @@ export function JitDbAccessRuleSheet({
             </SheetDescription>
           </SheetHeader>
 
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
               <div className="space-y-8 px-5 py-6 sm:px-6">
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="memberId"
                   render={({ field }) => (
                     <FormItemLayout layout="vertical" label="Member">
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Select_Shadcn_
                           value={field.value}
                           disabled={
@@ -268,7 +268,7 @@ export function JitDbAccessRuleSheet({
                             ))}
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
 
                       {mode === 'add' && availableMembersForAddCount === 0 && (
                         <p className="mt-2 text-foreground-lighter">
@@ -280,7 +280,7 @@ export function JitDbAccessRuleSheet({
                   )}
                 />
 
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="grants"
                   render={() => (
@@ -324,7 +324,7 @@ export function JitDbAccessRuleSheet({
                 />
               </div>
             </ScrollArea>
-          </Form_Shadcn_>
+          </Form>
 
           <SheetFooter className="mt-auto w-full border-t py-4">
             <Button type="default" onClick={confirmOnClose} disabled={isSubmitting}>

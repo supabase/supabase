@@ -6,7 +6,7 @@ import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, DialogSectionSeparator, Form_Shadcn_, SheetFooter, SheetSection } from 'ui'
+import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 'ui'
 import * as z from 'zod'
 
 import {
@@ -510,7 +510,7 @@ export const DestinationForm = ({
         {hasNoAvailableDestinations && !editMode ? (
           <NoDestinationsAvailable />
         ) : (
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
               <div className="p-5 flex flex-col gap-y-6">
                 <p className="text-sm font-medium text-foreground">Destination details</p>
@@ -555,7 +555,7 @@ export const DestinationForm = ({
                 </>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
         )}
       </SheetSection>
 

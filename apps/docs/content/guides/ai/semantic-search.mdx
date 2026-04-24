@@ -154,6 +154,44 @@ In this scenario, you'll likely use a Postgres client library to establish a dir
 
 As your database scales, you will need an index on your vector columns to maintain fast query speeds. See [Vector indexes](/docs/guides/ai/vector-indexes) for an in-depth guide on the different types of indexes and how they work.
 
+For larger datasets, choosing and tuning the right index is critical for maintaining fast and accurate semantic search.
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+## pgvector index tuning
+
+When working with embedding datasets at scale (100k+ rows), index selection and tuning can significantly impact query latency and accuracy.
+
+Supabase uses Postgres with the `pgvector` extension, which supports two primary index types for vector similarity search: IVFFlat and HNSW.
+
+### IVFFlat index
+
+**Best for:**
+
+- Large datasets (100k-10M rows)
+- Fast approximate search
+- Lower memory usage
+
+```sql
+create index on documents
+using ivfflat (embedding vector_cosine_ops)
+with (lists = 100);
+```
+
+### HNSW index
+
+**Best for:**
+
+- High accuracy requirements
+- Read-heavy workloads
+- Low-latency semantic search
+- Scenarios where recall is more important than memory usage
+
+```sql
+create index on documents
+using hnsw (embedding vector_cosine_ops);
+```
+
 ## See also
 
 - [Embedding concepts](/docs/guides/ai/concepts)

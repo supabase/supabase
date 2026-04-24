@@ -12,6 +12,7 @@ import { FileExplorerHeader } from './FileExplorerHeader'
 import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
 import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
+import { useStoragePreference } from './useStoragePreference'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import type { Bucket } from '@/data/storage/buckets-query'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
@@ -23,7 +24,6 @@ export const StorageExplorer = () => {
   const storageExplorerRef = useRef(null)
   const {
     projectRef,
-    view,
     columns,
     selectedItems,
     openedFolders,
@@ -41,6 +41,7 @@ export const StorageExplorer = () => {
     setSelectedFilePreview,
     setSelectedItemsToMove,
   } = useStorageExplorerStateSnapshot()
+  const { view } = useStoragePreference(projectRef)
 
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { data: bucket, isLoading: isBucketQueryLoading } = useSelectedBucket()

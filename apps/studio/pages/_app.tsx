@@ -1,20 +1,19 @@
 import 'react-data-grid/lib/styles.css'
-import 'styles/code.scss'
-import 'styles/contextMenu.scss'
-import 'styles/editor.scss'
-import 'styles/focus.scss'
-import 'styles/graphiql-base.scss'
-import 'styles/grid.scss'
-import 'styles/main.scss'
-import 'styles/markdown-preview.scss'
-import 'styles/monaco.scss'
-import 'styles/react-data-grid-logs.scss'
-import 'styles/reactflow.scss'
-import 'styles/storage.scss'
-import 'styles/stripe.scss'
-import 'styles/toast.scss'
-import 'styles/typography.scss'
-import 'styles/ui.scss'
+import '@/styles/code.css'
+import '@/styles/editor.css'
+import '@/styles/focus.css'
+import '@/styles/graphiql-base.css'
+import '@/styles/grid.css'
+import '@/styles/main.css'
+import '@/styles/markdown-preview.css'
+import '@/styles/monaco.css'
+import '@/styles/react-data-grid-logs.css'
+import '@/styles/reactflow.css'
+import '@/styles/storage.css'
+import '@/styles/stripe.css'
+import '@/styles/toast.css'
+import '@/styles/typography.css'
+import '@/styles/ui.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
@@ -37,7 +36,8 @@ import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { DevToolbar, DevToolbarProvider } from 'dev-tools'
+import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
+import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback, type ComponentProps } from 'react'
@@ -53,6 +53,7 @@ import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidat
 import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { useRootQueryClient } from '@/data/query-client'
 import { customFont, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
@@ -70,6 +71,20 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
+
+// Keep dev-only components out of the production bundle
+const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+const IS_DEV_TOOLBAR_ENABLED = env === 'local' || env === 'staging'
+
+const ResourceWarningsTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() =>
+      import('@/components/ui/DevToolbar/ResourceWarningsTab').then((m) => m.ResourceWarningsTab)
+    )
+  : () => null
+
+const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
+  ? [{ id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> }]
+  : []
 
 const FeatureFlagProviderWithOrgContext = ({
   children,
@@ -183,6 +198,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                 <MainScrollContainerProvider>
                                   {getLayout(<Component {...pageProps} />)}
                                 </MainScrollContainerProvider>
+                                <GlobalShortcuts />
                                 <StudioCommandMenu />
                                 <FeaturePreviewModal />
                                 <UpdateBillingAddressModal />
@@ -191,7 +207,8 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                               <MonacoThemeProvider />
                             </CommandProvider>
                           </AiAssistantStateContextProvider>
-                          <DevToolbar />
+                          <DevToolbar extraTabs={devToolbarExtraTabs} />
+                          <DevToolbarTrigger />
                         </DevToolbarProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>

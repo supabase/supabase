@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, del } from 'data/fetchers'
-import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { orgSSOKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type SSOConfigDeleteVariables = {
   slug: string

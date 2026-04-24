@@ -1,11 +1,12 @@
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
-import { Blocks, FileText, Lightbulb, List, Settings, Telescope } from 'lucide-react'
+import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import type { Route } from '@/components/ui/ui.types'
 import { EditorIndexPageLink } from '@/data/prefetchers/project.$ref.editor'
 import type { Project } from '@/data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface RouteContext {
   ref?: string
@@ -26,7 +27,6 @@ interface OtherFeatures {
   isPlatform?: boolean
   unifiedLogs?: boolean
   showReports?: boolean
-  apiDocsSidePanel?: boolean
 }
 
 interface SettingsFeatures {
@@ -53,6 +53,7 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
       icon: <TableEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
       linkElement: <EditorIndexPageLink projectRef={ref} />,
+      shortcutId: SHORTCUT_IDS.NAV_TABLE_EDITOR,
     },
     {
       key: 'sql',
@@ -60,6 +61,7 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
       disabled: !isProjectActive,
       icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
+      shortcutId: SHORTCUT_IDS.NAV_SQL_EDITOR,
     },
   ]
 }
@@ -90,6 +92,7 @@ export const generateProductRoutes = (
           : isProjectActive
             ? `/project/${ref}/database/schemas`
             : `/project/${ref}/database/backups/scheduled`),
+      shortcutId: SHORTCUT_IDS.NAV_DATABASE,
     },
     ...(authEnabled
       ? [
@@ -105,6 +108,7 @@ export const generateProductRoutes = (
                 : authOverviewPageEnabled
                   ? `/project/${ref}/auth/overview`
                   : `/project/${ref}/auth/users`),
+            shortcutId: SHORTCUT_IDS.NAV_AUTH,
           },
         ]
       : []),
@@ -116,6 +120,7 @@ export const generateProductRoutes = (
             disabled: !isProjectActive,
             icon: <Storage size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/storage/files`),
+            shortcutId: SHORTCUT_IDS.NAV_STORAGE,
           },
         ]
       : []),
@@ -127,6 +132,7 @@ export const generateProductRoutes = (
             disabled: false,
             icon: <EdgeFunctions size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && `/project/${ref}/functions`,
+            shortcutId: SHORTCUT_IDS.NAV_FUNCTIONS,
           },
         ]
       : []),
@@ -138,6 +144,7 @@ export const generateProductRoutes = (
             disabled: !isProjectActive,
             icon: <Realtime size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/inspector`),
+            shortcutId: SHORTCUT_IDS.NAV_REALTIME,
           },
         ]
       : []),
@@ -154,8 +161,6 @@ export const generateOtherRoutes = (
   const isPlatform = features?.isPlatform ?? IS_PLATFORM
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
-  const apiDocsSidePanelEnabled = features?.apiDocsSidePanel ?? false
-
   return [
     {
       key: 'advisors',
@@ -163,6 +168,7 @@ export const generateOtherRoutes = (
       disabled: !isProjectActive,
       icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
+      shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
     },
     // Observability is only available on the platform, not for self-hosted/CLI
     ...(isPlatform && reportsEnabled
@@ -173,6 +179,7 @@ export const generateOtherRoutes = (
             disabled: !isProjectActive,
             icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
+            shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY,
           },
         ]
       : []),
@@ -182,26 +189,15 @@ export const generateOtherRoutes = (
       disabled: false,
       icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (unifiedLogsEnabled ? `/project/${ref}/logs` : `/project/${ref}/logs/explorer`),
+      shortcutId: SHORTCUT_IDS.NAV_LOGS,
     },
-    ...(apiDocsSidePanelEnabled
-      ? [
-          {
-            key: 'api',
-            label: 'API Docs',
-            disabled: !isProjectActive,
-            icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link:
-              ref &&
-              (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/data_api/docs`),
-          },
-        ]
-      : []),
     {
       key: 'integrations',
       label: 'Integrations',
       disabled: !isProjectActive,
       icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations`),
+      shortcutId: SHORTCUT_IDS.NAV_INTEGRATIONS,
     },
   ]
 }
@@ -218,6 +214,7 @@ export const generateSettingsRoutes = (ref?: string, features?: SettingsFeatures
         ref &&
         (isPlatform ? `/project/${ref}/settings/general` : `/project/${ref}/settings/log-drains`),
       disabled: false,
+      shortcutId: SHORTCUT_IDS.NAV_SETTINGS,
     },
   ]
 }

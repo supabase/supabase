@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { useMemo } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import { FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
+import { FormControl, FormField } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -36,7 +36,7 @@ export const PublicationSelection = ({
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
 
   return (
-    <FormField_Shadcn_
+    <FormField
       control={form.control}
       name="publicationName"
       render={({ field }) => (
@@ -45,14 +45,14 @@ export const PublicationSelection = ({
           label="Publication"
           description="Tables in the selected publication will be replicated to this destination"
         >
-          <FormControl_Shadcn_>
+          <FormControl>
             <PublicationsComboBox
               publications={publications}
               isLoadingPublications={isLoadingPublications}
               field={field}
               onNewPublicationClick={() => onSelectNewPublication()}
             />
-          </FormControl_Shadcn_>
+          </FormControl>
           {isSelectedPublicationMissing && (
             <Admonition type="warning" className="mt-2">
               <p className="!leading-normal">

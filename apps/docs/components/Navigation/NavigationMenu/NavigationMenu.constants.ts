@@ -357,6 +357,10 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/reactjs',
         },
         {
+          name: 'Astro',
+          url: '/guides/getting-started/quickstarts/astrojs',
+        },
+        {
           name: 'Nuxt',
           url: '/guides/getting-started/quickstarts/nuxtjs',
         },
@@ -708,6 +712,10 @@ export const auth: NavMenuConstant = {
           name: 'Next.js',
           url: '/guides/auth/quickstarts/nextjs' as `/${string}`,
         },
+        {
+          name: 'Astro',
+          url: '/guides/auth/quickstarts/astrojs',
+        },
         { name: 'React', url: '/guides/auth/quickstarts/react', items: [] },
         {
           name: 'React Native',
@@ -1046,6 +1054,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Implementing cascade deletes',
           url: '/guides/database/postgres/cascade-deletes' as `/${string}`,
+        },
+        {
+          name: 'Deleting data and dropping objects safely',
+          url: '/guides/database/postgres/data-deletion' as `/${string}`,
         },
         { name: 'Managing enums', url: '/guides/database/postgres/enums' },
         {
@@ -1418,7 +1430,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/first-row-in-group' as `/${string}`,
         },
         {
-          name: 'Print PostgreSQL Version',
+          name: 'Print Postgres Version',
           url: '/guides/database/postgres/which-version-of-postgres' as `/${string}`,
         },
         {
@@ -1497,7 +1509,7 @@ export const api: NavMenuConstant = {
       items: [
         { name: 'How API Keys work', url: '/guides/api/api-keys' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
-        { name: 'Hardening the Data API', url: '/guides/api/hardening-data-api' },
+        { name: 'Data API', url: '/guides/database/data-api' },
         {
           name: 'Custom Claims & RBAC',
           url: '/guides/api/custom-claims-and-role-based-access-control-rbac',
@@ -1999,6 +2011,7 @@ export const storage: NavMenuConstant = {
           items: [
             { name: 'Copy / Move Objects', url: '/guides/storage/management/copy-move-objects' },
             { name: 'Delete Objects', url: '/guides/storage/management/delete-objects' },
+            { name: 'Download Objects', url: '/guides/storage/management/download-objects' },
           ],
         },
         {
@@ -2487,7 +2500,7 @@ export const security: NavMenuConstant = {
           url: '/guides/deployment/shared-responsibility-model' as `/${string}`,
         },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
-        { name: 'Hardening the Data API', url: '/guides/api/hardening-data-api' },
+        { name: 'Data API', url: '/guides/database/data-api' },
       ],
     },
   ],
@@ -2590,12 +2603,28 @@ export const platform: NavMenuConstant = {
           enabled: fullPlatformEnabled,
           items: [
             { name: 'Overview', url: '/guides/platform/sso' as `/${string}` },
+            {
+              name: 'Understanding Login Flows',
+              url: '/guides/platform/sso/login-flows' as `/${string}`,
+            },
+            {
+              name: 'Choosing a Login Flow',
+              url: '/guides/platform/sso/choosing-login-flow' as `/${string}`,
+            },
             { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure' },
             {
               name: 'SSO with Google Workspace',
               url: '/guides/platform/sso/gsuite' as `/${string}`,
             },
             { name: 'SSO with Okta', url: '/guides/platform/sso/okta' },
+            {
+              name: 'Multiple SSO Providers',
+              url: '/guides/platform/sso/multiple-providers' as `/${string}`,
+            },
+            {
+              name: 'Testing and Best Practices',
+              url: '/guides/platform/sso/testing-best-practices' as `/${string}`,
+            },
           ],
         },
       ],
@@ -2871,6 +2900,8 @@ export const self_hosting: NavMenuConstant = {
           name: 'Add Reverse Proxy with HTTPS',
           url: '/guides/self-hosting/self-hosted-proxy-https',
         },
+        { name: 'Envoy API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
+        { name: 'Upgrade to Postgres 17', url: '/guides/self-hosting/postgres-upgrade-17' },
         {
           name: 'Restore Project from Platform',
           url: '/guides/self-hosting/restore-from-platform',
@@ -2882,6 +2913,7 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
+        { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
       ],
     },
     {

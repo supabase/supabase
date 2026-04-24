@@ -679,7 +679,7 @@ export const createTable = async ({
                 { id: toastId }
               )
             },
-            treatEmptyAsNull: importContent.treatEmptyAsNull,
+            emptyStringAsNullHeaders: importContent.emptyStringAsNullHeaders,
           })
 
           if (error !== undefined) {
@@ -715,7 +715,7 @@ export const createTable = async ({
                 { id: toastId }
               )
             },
-            treatEmptyAsNull: importContent.treatEmptyAsNull,
+            emptyStringAsNullHeaders: importContent.emptyStringAsNullHeaders,
           })
         }
 
@@ -970,12 +970,12 @@ export const formatRowsForInsert = ({
   rows,
   headers,
   columns = [],
-  treatEmptyAsNull = true,
+  emptyStringAsNullHeaders = headers,
 }: {
   rows: unknown[]
   headers: string[]
   columns?: RetrieveTableResult['columns']
-  treatEmptyAsNull?: boolean
+  emptyStringAsNullHeaders?: string[]
 }) => {
   return rows.map((row) => {
     const formattedRow: Record<string, unknown> = {}
@@ -988,9 +988,7 @@ export const formatRowsForInsert = ({
 
       const originalValue = row[header]
 
-      if (originalValue === '' && treatEmptyAsNull && column?.is_nullable) {
-        formattedRow[header] = null
-      } else if ((column?.format ?? '').includes('json')) {
+      if ((column?.format ?? '').includes('json')) {
         formattedRow[header] = tryParseJson(originalValue)
       } else if ((column?.data_type ?? '') === 'ARRAY') {
         if (
@@ -1004,7 +1002,8 @@ export const formatRowsForInsert = ({
           formattedRow[header] = tryParseJson(originalValue)
         }
       } else if (originalValue === '') {
-        formattedRow[header] = ''
+        formattedRow[header] =
+          column?.is_nullable && emptyStringAsNullHeaders.includes(header) ? null : ''
       } else {
         formattedRow[header] = originalValue
       }
@@ -1019,16 +1018,16 @@ export async function insertRowsViaSpreadsheet({
   file,
   table,
   selectedHeaders,
+  emptyStringAsNullHeaders = selectedHeaders,
   onProgressUpdate,
-  treatEmptyAsNull = true,
 }: {
   projectRef: string
   connectionString: string | undefined | null
   file: File
   table: RetrieveTableResult
   selectedHeaders: string[]
+  emptyStringAsNullHeaders?: string[]
   onProgressUpdate: (progress: number) => void
-  treatEmptyAsNull: boolean
 }): Promise<{ error: unknown }> {
   let chunkNumber = 0
   let insertError: unknown = undefined
@@ -1048,7 +1047,7 @@ export async function insertRowsViaSpreadsheet({
           rows: results.data,
           headers: selectedHeaders,
           columns: table.columns,
-          treatEmptyAsNull,
+          emptyStringAsNullHeaders,
         })
 
         const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
@@ -1073,6 +1072,40 @@ export async function insertRowsViaSpreadsheet({
         console.log(
           `Total time taken for importing spreadsheet: ${(t2.getTime() - t1.getTime()) / 1000} seconds`
         )
+        if (insertError === undefined) {
+          const sequenceColumns = (table.columns ?? []).filter(
+            (column) =>
+              column.is_identity ||
+              (typeof column.default_value === 'string' &&
+                column.default_value.includes('nextval('))
+          )
+
+          if (sequenceColumns.length === 0) {
+            resolve({ error: insertError })
+            return
+          }
+
+          const updateSequenceSQL = sequenceColumns
+            .map((column) =>
+              getUpdateIdentitySequenceSQL({
+                schema: table.schema,
+                table: table.name,
+                column: column.name,
+              })
+            )
+            .join(';\n')
+
+          executeSql({
+            projectRef,
+            connectionString,
+            sql: updateSequenceSQL,
+            queryKey: ['sequences', 'update-batch'],
+          })
+            .then(() => resolve({ error: insertError }))
+            .catch((error) => resolve({ error }))
+          return
+        }
+
         resolve({ error: insertError })
       },
     })
@@ -1085,16 +1118,16 @@ export async function insertTableRows({
   table,
   rows,
   selectedHeaders,
+  emptyStringAsNullHeaders = selectedHeaders,
   onProgressUpdate,
-  treatEmptyAsNull = true,
 }: {
   projectRef: string
   connectionString: string | undefined | null
   table: RetrieveTableResult
   rows: unknown[]
   selectedHeaders: string[]
+  emptyStringAsNullHeaders?: string[]
   onProgressUpdate: (progress: number) => void
-  treatEmptyAsNull: boolean
 }): Promise<{ error: unknown }> {
   let insertError: unknown = undefined
   let insertProgress = 0
@@ -1103,7 +1136,7 @@ export async function insertTableRows({
     rows,
     headers: selectedHeaders,
     columns: table.columns,
-    treatEmptyAsNull,
+    emptyStringAsNullHeaders,
   })
 
   const batches = chunk(formattedRows, BATCH_SIZE)
@@ -1130,11 +1163,49 @@ export async function insertTableRows({
   const batchedPromises = chunk(tasks, 10)
   for (const batchedPromise of batchedPromises) {
     const res = await Promise.allSettled(batchedPromise.map((batch) => batch()))
-    const hasFailedBatch = find(res, { status: 'rejected' })
-    if (hasFailedBatch) break
+    const failedBatch = res.find((result) => result.status === 'rejected')
+    if (failedBatch?.status === 'rejected') {
+      if (insertError === undefined) insertError = failedBatch.reason
+      break
+    }
     onProgressUpdate(insertProgress * 100)
   }
-  return { error: insertError }
+
+  if (insertError !== undefined) {
+    return { error: insertError }
+  }
+
+  const sequenceColumns = (table.columns ?? []).filter(
+    (column) =>
+      column.is_identity ||
+      (typeof column.default_value === 'string' && column.default_value.includes('nextval('))
+  )
+
+  if (sequenceColumns.length === 0) {
+    return { error: insertError }
+  }
+
+  const updateSequenceSQL = sequenceColumns
+    .map((column) =>
+      getUpdateIdentitySequenceSQL({
+        schema: table.schema,
+        table: table.name,
+        column: column.name,
+      })
+    )
+    .join(';\n')
+
+  try {
+    await executeSql({
+      projectRef,
+      connectionString,
+      sql: updateSequenceSQL,
+      queryKey: ['sequences', 'update-batch'],
+    })
+    return { error: insertError }
+  } catch (error) {
+    return { error }
+  }
 }
 
 const updateForeignKeys = async ({

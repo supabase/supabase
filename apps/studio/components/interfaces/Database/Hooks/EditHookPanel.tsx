@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { keyword } from '@supabase/pg-meta'
 import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
 import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
@@ -7,7 +8,7 @@ import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form_Shadcn_, SidePanel } from 'ui'
+import { Button, Form, SidePanel } from 'ui'
 
 import { FormSchema, WebhookFormValues } from './EditHookPanel.constants'
 import { FormContents } from './FormContents'
@@ -275,7 +276,11 @@ export const EditHookPanel = () => {
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           originalTrigger: selectedHook,
-          updatedTrigger: { ...payload, enabled_mode: 'ORIGIN' },
+          updatedTrigger: {
+            ...payload,
+            enabled_mode: 'ORIGIN',
+            events: payload.events.map(keyword),
+          },
         })
       }
     } catch (error) {
@@ -334,11 +339,11 @@ export const EditHookPanel = () => {
           </div>
         }
       >
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
             <FormContents form={form} selectedHook={selectedHook} />
           </form>
-        </Form_Shadcn_>
+        </Form>
       </SidePanel>
       <DiscardChangesConfirmationDialog {...modalProps} />
     </>

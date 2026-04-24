@@ -664,13 +664,13 @@ export function ComposedChart({
             }}
           />
         </RechartComposedChart>
-        <ChartHighlightActions
-          chartHighlight={chartHighlight}
-          updateDateRange={updateDateRange}
-          actions={highlightActions}
-          chartId={chartId}
-        />
       </Container>
+      <ChartHighlightActions
+        chartHighlight={chartHighlight}
+        updateDateRange={updateDateRange}
+        actions={highlightActions}
+        chartId={chartId}
+      />
       {data && (
         <div
           className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs"

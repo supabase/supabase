@@ -1,5 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
-import { FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
+import { FormControl, FormField } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -45,7 +45,7 @@ export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
 
   return (
     <Panel.Content>
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="dbPass"
         render={({ field }) => {
@@ -68,7 +68,7 @@ export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
                 </>
               }
             >
-              <FormControl_Shadcn_>
+              <FormControl>
                 <Input
                   copy={field.value.length > 0}
                   type="password"
@@ -82,7 +82,7 @@ export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
                     updatePasswordStrength(form, newValue)
                   }}
                 />
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )
         }}

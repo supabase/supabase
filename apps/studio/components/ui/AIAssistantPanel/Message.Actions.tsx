@@ -5,9 +5,9 @@ import { useForm } from 'react-hook-form'
 import {
   Button,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -176,14 +176,14 @@ function MessageActionsThumbsDown({
         {form.formState.isSubmitSuccessful ? (
           <p className="text-sm">We appreciate your feedback!</p>
         ) : (
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="reason"
                 render={({ field }) => (
                   <FormItemLayout label="What went wrong?" labelOptional="optional">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <TextArea_Shadcn_
                         placeholder="Describe why the response was not helpful..."
                         autoComplete="off"
@@ -191,7 +191,7 @@ function MessageActionsThumbsDown({
                         autoFocus
                         {...field}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -201,7 +201,7 @@ function MessageActionsThumbsDown({
                 </Button>
               </div>
             </form>
-          </Form_Shadcn_>
+          </Form>
         )}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>

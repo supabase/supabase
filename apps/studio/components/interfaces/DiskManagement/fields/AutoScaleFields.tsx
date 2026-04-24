@@ -3,11 +3,11 @@ import { useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
 import {
   cn,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -44,14 +44,14 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
     200
   )
 
-  const totalSizeAfterGrowth = autoscaleGrowValue + totalSize
+  const totalSizeAfterGrowth = Math.max(autoscaleGrowValue + totalSize, 8)
   const formattedTotalSizeAfterGrowth =
     totalSizeAfterGrowth < _maxSizeGb ? totalSizeAfterGrowth : _maxSizeGb
   const formattedGrowValue = formattedTotalSizeAfterGrowth - totalSize
 
   return (
     <>
-      <FormField_Shadcn_
+      <FormField
         name="growthPercent"
         control={control}
         render={({ field }) => {
@@ -68,12 +68,9 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
               }
               className="[&>div>span]:text-foreground-lighter"
             >
-              <FormControl_Shadcn_ className="max-w-20">
+              <FormControl className="max-w-20">
                 <InputGroup>
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupText>%</InputGroupText>
-                  </InputGroupAddon>
-                  <InputGroupInput
+                  <FormInputGroupInput
                     {...field}
                     type="number"
                     value={field.value ?? undefined}
@@ -90,14 +87,17 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     }}
                     placeholder={String(DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent)}
                   />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupText>%</InputGroupText>
+                  </InputGroupAddon>
                 </InputGroup>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )
         }}
       />
 
-      <FormField_Shadcn_
+      <FormField
         name="minIncrementGb"
         control={control}
         render={({ field }) => {
@@ -114,12 +114,9 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
               }
               className="[&>div>span]:text-foreground-lighter"
             >
-              <FormControl_Shadcn_ className="max-w-32">
+              <FormControl className="max-w-32">
                 <InputGroup>
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupText>GB</InputGroupText>
-                  </InputGroupAddon>
-                  <InputGroupInput
+                  <FormInputGroupInput
                     {...field}
                     type="number"
                     value={field.value ?? undefined}
@@ -136,14 +133,17 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     }}
                     placeholder={String(DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize)}
                   />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupText>GB</InputGroupText>
+                  </InputGroupAddon>
                 </InputGroup>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )
         }}
       />
 
-      <FormField_Shadcn_
+      <FormField
         name="maxSizeGb"
         control={control}
         render={({ field }) => {
@@ -155,12 +155,9 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
               labelOptional="Maximum size that the disk can grow to"
               className="[&>div>span]:text-foreground-lighter"
             >
-              <FormControl_Shadcn_ className="max-w-32">
+              <FormControl className="max-w-32">
                 <InputGroup>
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupText>GB</InputGroupText>
-                  </InputGroupAddon>
-                  <InputGroupInput
+                  <FormInputGroupInput
                     {...field}
                     type="number"
                     value={field.value ?? undefined}
@@ -173,8 +170,11 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     }}
                     placeholder={String(DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb)}
                   />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupText>GB</InputGroupText>
+                  </InputGroupAddon>
                 </InputGroup>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )
         }}

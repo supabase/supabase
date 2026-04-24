@@ -9,9 +9,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
   Tooltip,
   TooltipContent,
@@ -131,11 +131,11 @@ export const SecuritySettings = () => {
             )}
 
             {isSuccessMfa && hasAccessToEnforceMfa && (
-              <Form_Shadcn_ {...form}>
+              <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                   <Card>
                     <CardContent>
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="enforceMfa"
                         render={({ field }) => (
@@ -144,7 +144,7 @@ export const SecuritySettings = () => {
                             label="Require MFA to access organization"
                             description="Team members must have MFA enabled and a valid MFA session to access the organization and any projects."
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Switch
@@ -171,7 +171,7 @@ export const SecuritySettings = () => {
                                   </TooltipContent>
                                 )}
                               </Tooltip>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -205,7 +205,7 @@ export const SecuritySettings = () => {
                     </CardFooter>
                   </Card>
                 </form>
-              </Form_Shadcn_>
+              </Form>
             )}
           </>
         )}

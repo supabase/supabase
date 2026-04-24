@@ -1,9 +1,9 @@
+import { Query } from '@supabase/pg-meta/src/query'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { Query } from '@supabase/pg-meta/src/query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type GetCellValueVariables = {
   projectRef: string

@@ -13,9 +13,9 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -39,6 +39,7 @@ import {
   useAccessTokenCreateMutation,
   type NewAccessToken,
 } from '@/data/access-tokens/access-tokens-create-mutation'
+import { useTrack } from '@/lib/telemetry/track'
 
 const formId = 'new-access-token-form'
 
@@ -71,6 +72,7 @@ export const NewTokenDialog = ({
     defaultValues: { tokenName: '', expiresAt: EXPIRES_AT_OPTIONS['month'].value },
     mode: 'onChange',
   })
+  const track = useTrack()
   const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
@@ -86,6 +88,10 @@ export const NewTokenDialog = ({
       { name: values.tokenName, scope: tokenScope, expires_at: expiresAt },
       {
         onSuccess: (data) => {
+          track('access_token_created', {
+            tokenType: 'classic',
+            expiryPreset: values.expiresAt || 'never',
+          })
           toast.success('Access token created successfully')
           onCreateToken(data)
           handleClose()
@@ -170,36 +176,36 @@ export const NewTokenDialog = ({
           />
         )}
         <DialogSection className="flex flex-col gap-4">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={formId}
               className="flex flex-col gap-4"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              <FormField
                 key="tokenName"
                 name="tokenName"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout name="tokenName" label="Name">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         id="tokenName"
                         {...field}
                         placeholder="Provide a name for your token"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 key="expiresAt"
                 name="expiresAt"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout name="expiresAt" label="Expires in">
                     <div className="flex gap-2">
-                      <FormControl_Shadcn_ className="flex-grow">
+                      <FormControl className="flex-grow">
                         <Select_Shadcn_ value={field.value} onValueChange={handleExpiryChange}>
                           <SelectTrigger_Shadcn_>
                             <SelectValue_Shadcn_ placeholder="Expires at" />
@@ -214,7 +220,7 @@ export const NewTokenDialog = ({
                             )}
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                       {isCustomExpiry && (
                         <DatePicker
                           selectsRange={false}
@@ -241,7 +247,7 @@ export const NewTokenDialog = ({
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
         <DialogFooter>
           <Button

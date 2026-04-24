@@ -121,6 +121,7 @@ export const QueueTab = () => {
             onClick={() => setPurgeQueueModalShown(true)}
             icon={<Paintbrush />}
             title="Purge messages"
+            aria-label="Purge messages"
             tooltip={{ content: { side: 'bottom', text: 'Purge messages' } }}
           />
 
@@ -130,6 +131,7 @@ export const QueueTab = () => {
             onClick={() => setDeleteQueueModalShown(true)}
             icon={<Trash2 />}
             title="Delete queue"
+            aria-label="Delete queue"
             tooltip={{ content: { side: 'bottom', text: 'Delete queue' } }}
           />
 

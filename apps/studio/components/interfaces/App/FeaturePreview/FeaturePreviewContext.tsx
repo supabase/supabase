@@ -12,6 +12,7 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
+import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { EMPTY_OBJ } from '@/lib/void'
 
@@ -39,10 +40,14 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
     setFlags(
       featurePreviews.reduce((a, b) => {
         const defaultOptIn = b.isDefaultOptIn
-        const localStorageValue = localStorage.getItem(b.key)
-        return {
-          ...a,
-          [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
+        try {
+          const localStorageValue = window.localStorage.getItem(b.key)
+          return {
+            ...a,
+            [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
+          }
+        } catch {
+          return { ...a, [b.key]: defaultOptIn }
         }
       }, {})
     )
@@ -57,8 +62,12 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
   const value = {
     flags,
     onUpdateFlag: (key: string, value: boolean) => {
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, value.toString())
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem(key, value ? 'true' : 'false')
+        }
+      } catch {
+        // Silently fail in restricted storage modes (e.g. Safari private browsing)
       }
       const updatedFlags = { ...flags, [key]: value }
       setFlags(updatedFlags)
@@ -70,11 +79,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
 
 // Helpers
 
-export const useIsAPIDocsSidePanelEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]
-}
-
 export const useIsColumnLevelPrivilegesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
@@ -82,19 +86,20 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 
 export const useUnifiedLogsPreview = () => {
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
+  const { hasLoaded: flagsHaveLoaded } = useContext(FeatureFlagContext)
   const unifiedLogsEnabled = useFlag('unifiedLogs')
 
+  const { isEligible: isEnterpriseOrSupabaseOrg, isLoading: isOrgLoading } =
+    useIsEnterpriseOrSupabaseOrg()
+
+  const isLoading = !flagsHaveLoaded || isOrgLoading
+  const isEligible = unifiedLogsEnabled && isEnterpriseOrSupabaseOrg
   const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
 
-  return { isEnabled, enable, disable }
-}
-
-export const useIsBranching2Enabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
+  return { isEnabled, isEligible, isLoading, enable, disable }
 }
 
 export const useIsPgDeltaDiffEnabled = () => {
@@ -106,11 +111,6 @@ export const useIsPgDeltaDiffEnabled = () => {
 export const useIsAdvisorRulesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
-}
-
-export const useIsQueueOperationsEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]
 }
 
 export const useIsPlatformWebhooksEnabled = () => {
@@ -125,10 +125,8 @@ export const useIsJitDbAccessEnabled = () => {
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
-export const useIsTableFilterBarEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]
-}
+// [Joshen] Temporarily leaving this in, will eventually clean up this flag + old Header component completely
+export const useIsTableFilterBarEnabled = () => true
 
 export const useIsFloatingMobileToolbarEnabled = () => {
   const { flags } = useFeaturePreviewContext()
