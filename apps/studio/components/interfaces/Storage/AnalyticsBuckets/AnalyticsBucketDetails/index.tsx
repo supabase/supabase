@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { uniq } from 'lodash'
-import { Loader2, SquarePlus } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -14,7 +14,6 @@ import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
 import { useSelectedAnalyticsBucket } from '../useSelectedAnalyticsBucket'
 import { HIDE_REPLICATION_USER_FLOW } from './AnalyticsBucketDetails.constants'
 import { BucketHeader } from './BucketHeader'
-import { ConnectTablesDialog } from './ConnectTablesDialog'
 import { CreateTableInstructions } from './CreateTable/CreateTableInstructions'
 import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
@@ -202,13 +201,7 @@ export const AnalyticBucketDetails = () => {
           ) : state === 'added' && wrapperInstance ? (
             <>
               <ScaffoldSection isFullWidth>
-                <BucketHeader
-                  namespaces={namespaces}
-                  onSuccessConnectTables={() => {
-                    setPollIntervalNamespaces(4000)
-                    setPollIntervalNamespaceTables(4000)
-                  }}
-                />
+                <BucketHeader />
 
                 {isLoadingNamespaces || isLoadingWrapperInstance ? (
                   <GenericTableLoader headers={['Name']} />
@@ -228,20 +221,7 @@ export const AnalyticBucketDetails = () => {
                         title="Connecting table(s) to bucket"
                         description="Tables will be shown here once the connection is complete"
                       />
-                    ) : (
-                      <EmptyStatePresentational
-                        icon={SquarePlus}
-                        title="Connect database tables"
-                        description="Stream table data for continuous backups and analysis"
-                      >
-                        <ConnectTablesDialog
-                          onSuccessConnectTables={() => {
-                            setPollIntervalNamespaces(4000)
-                            setPollIntervalNamespaceTables(4000)
-                          }}
-                        />
-                      </EmptyStatePresentational>
-                    )}
+                    ) : null}
                   </>
                 ) : (
                   <>
