@@ -38,7 +38,6 @@ export * from './src/lib/utils'
 
 export * from './src/components/Select'
 export * from './src/components/Listbox'
-export * from './src/components/Checkbox'
 export * from './src/components/Input'
 export * from './src/components/Radio'
 export * from './src/components/Toggle'
