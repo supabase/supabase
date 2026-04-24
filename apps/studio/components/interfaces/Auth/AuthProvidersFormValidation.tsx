@@ -269,10 +269,7 @@ const makeProviderOptionalWhenSMSHookEnabled = (
 // getPhoneProviderValidationSchema generate the validation schema for the SMS providers
 // based on whether the SMS hook is enabled
 export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) => {
-  const twilioSchema = makeProviderOptionalWhenSMSHookEnabled(
-    config,
-    getTwilioPhoneProviderSchema
-  )
+  const twilioSchema = makeProviderOptionalWhenSMSHookEnabled(config, getTwilioPhoneProviderSchema)
     .merge(
       z.object({
         SMS_PROVIDER: z.literal('twilio'),
@@ -316,10 +313,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
     .merge(getVonagePhoneProviderSchema(true).partial())
     .merge(getTextlocalPhoneProviderSchema(true).partial())
 
-  const vonageSchema = makeProviderOptionalWhenSMSHookEnabled(
-    config,
-    getVonagePhoneProviderSchema
-  )
+  const vonageSchema = makeProviderOptionalWhenSMSHookEnabled(config, getVonagePhoneProviderSchema)
     .merge(
       z.object({
         SMS_PROVIDER: z.literal('vonage'),
