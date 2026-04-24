@@ -280,6 +280,9 @@ const PITRSidePanel = () => {
                 />
               ) : null}
 
+              <label className="block text-sm text-foreground-light mb-4" htmlFor="pitr">
+                Choose the duration of recovery
+              </label>
               <RadioGroupCard
                 id="pitr"
                 className="flex flex-wrap gap-3"
