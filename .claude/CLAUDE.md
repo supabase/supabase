@@ -31,7 +31,7 @@ pnpm typecheck                        # typecheck all packages
 
 **Styling** — Tailwind only, semantic tokens (`bg-muted`, `text-foreground-light`), no hardcoded colors.
 
-**Language** — U.S. English in code.
+**Language** — Use U.S. English everywhere.
 
 ## Studio
 
