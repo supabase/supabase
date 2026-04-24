@@ -65,7 +65,7 @@ const CreditCard = ({
       return {
         label: 'Token expired',
         variant: 'destructive' as const,
-        description: 'Shared Payment Token has expired',
+        description: 'Stripe Projects token has expired',
       }
     }
     if (isCardExpired) {
@@ -85,7 +85,7 @@ const CreditCard = ({
     return {
       label: 'Active',
       variant: 'success' as const,
-      description: 'Shared Payment Token is active',
+      description: 'Stripe Projects token is active',
     }
   })()
 
@@ -129,9 +129,9 @@ const CreditCard = ({
             {isSpt && spt && (
               <div className="mt-2.5 flex items-center gap-2 border-t border-border-light pt-2.5 text-xs text-foreground-light">
                 <p className="m-0">
-                  Via Shared Payment Token ending in{' '}
+                  Via Stripe Projects · Token ending in{' '}
                   <code className="text-code-inline">{spt.last4}</code>
-                  {tokenExpiry && <span> · Token expires: {tokenExpiry}</span>}
+                  {tokenExpiry && <span> expires: {tokenExpiry}</span>}
                 </p>
               </div>
             )}
