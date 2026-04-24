@@ -34,14 +34,16 @@ import type { FormSchema } from '@/types'
 
 interface TemplateEditorProps {
   template: FormSchema
+  isReadOnly?: boolean
 }
 
-export const TemplateEditor = ({ template }: TemplateEditorProps) => {
+export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
+  const canEdit = canUpdateConfig && !isReadOnly
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
 
   // [Joshen] Error state is handled in the parent
@@ -259,7 +261,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                       }
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_ id={x} {...field} disabled={!canUpdateConfig} />
+                        <Input_Shadcn_ id={x} {...field} disabled={!canEdit} />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -289,7 +291,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                     <CodeEditor
                       id="code-id"
                       language="html"
-                      isReadOnly={!canUpdateConfig}
+                      isReadOnly={!canEdit}
                       className="!mb-0 relative h-96 outline-none outline-offset-0 outline-width-0 outline-0"
                       onInputChange={(e: string | undefined) => {
                         setBodyValue(e ?? '')
@@ -357,7 +359,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
               <Button
                 type="primary"
                 htmlType="submit"
-                disabled={!canUpdateConfig || isSavingTemplate || !hasChanges}
+                disabled={!canEdit || isSavingTemplate || !hasChanges}
                 loading={isSavingTemplate}
               >
                 Save changes

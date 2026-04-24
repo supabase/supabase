@@ -199,16 +199,14 @@ export const EmailTemplates = () => {
               <PageSectionSummary>
                 <PageSectionTitle>Authentication</PageSectionTitle>
               </PageSectionSummary>
-              {!isTemplateEditBlocked && (
-                <Button
-                  type="default"
-                  size="tiny"
-                  icon={<Paintbrush size={14} />}
-                  onClick={() => setBrandingSheetOpen(true)}
-                >
-                  Customize branding
-                </Button>
-              )}
+              <Button
+                type="default"
+                size="tiny"
+                icon={<Paintbrush size={14} />}
+                onClick={() => setBrandingSheetOpen(true)}
+              >
+                Customize branding
+              </Button>
             </PageSectionMeta>
             <PageSectionContent>
               <Card>

@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { Paintbrush } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -51,7 +52,6 @@ import { TemplateEditor } from '@/components/interfaces/Auth/EmailTemplates/Temp
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { InlineLink } from '@/components/ui/InlineLink'
 import NoPermission from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
@@ -203,6 +203,14 @@ const RedirectToTemplates = () => {
             </PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
+            <Button
+              type="default"
+              size="tiny"
+              icon={<Paintbrush size={14} />}
+              onClick={() => setBrandingSheetOpen(true)}
+            >
+              Customize branding
+            </Button>
             <DocsButton
               href={`${DOCS_URL}/guides/local-development/customizing-email-templates#${isSecurityTemplate ? 'security' : 'auth'}emailtemplate${templateIdForDocs}`}
             />
@@ -285,38 +293,9 @@ const RedirectToTemplates = () => {
                 </PageSectionMeta>
               )}
               <PageSectionContent>
-                {isTemplateEditBlocked ? (
-                  <Admonition
-                    type="default"
-                    title="Raw template editing is not available on the free plan"
-                    description={
-                      <p>
-                        Free-tier projects using Supabase's shared email service cannot modify raw
-                        email template HTML. Customize your branding attributes instead, or set up
-                        custom SMTP to unlock full template editing.{' '}
-                        <InlineLink
-                          href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}
-                        >
-                          Learn more
-                        </InlineLink>
-                      </p>
-                    }
-                    actions={
-                      <div className="flex flex-col gap-2 sm:flex-row">
-                        <Button type="primary" onClick={() => setBrandingSheetOpen(true)}>
-                          Customize branding
-                        </Button>
-                        <Button asChild type="default">
-                          <Link href={`/project/${ref}/auth/smtp`}>Set up SMTP</Link>
-                        </Button>
-                      </div>
-                    }
-                  />
-                ) : (
-                  <Card>
-                    <TemplateEditor template={template} />
-                  </Card>
-                )}
+                <Card>
+                  <TemplateEditor template={template} isReadOnly={isTemplateEditBlocked} />
+                </Card>
               </PageSectionContent>
             </PageSection>
           </>
