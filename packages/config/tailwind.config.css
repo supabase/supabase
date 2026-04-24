@@ -1,0 +1,26 @@
+/*
+ * Shared Tailwind v4 config for all Supabase apps.
+ *
+ * This file is the CSS-first orchestration layer. The imperative theme
+ * configuration (colors, typography, keyframes, custom plugins, etc.) still
+ * lives in the sibling `tailwind.config.js` and is loaded via the `@config`
+ * directive from each app's main CSS entry. That will migrate here in a
+ * follow-up commit.
+ */
+
+/* Core CSS variable definitions for the Supabase design system. Defines
+ * --foreground-*, --background-*, --border-*, etc. */
+@import '../ui/build/css/source/global.css';
+
+/* Per-mode overrides for the CSS variables above. */
+@import '../ui/build/css/themes/dark.css';
+@import '../ui/build/css/themes/light.css';
+@import '../ui/build/css/themes/classic-dark.css';
+
+/* v4-native port of the custom `hit-area-*` utilities (from bazza.dev). */
+@import './tailwind-utilities/hit-area.css';
+
+/* Dark mode: matches v3's `darkMode: ['class', '[data-theme*="dark"]']` —
+ * activates on `.dark` or `[data-theme*='dark']`, on the element itself
+ * or any ancestor. `:where()` keeps specificity at 0. */
+@custom-variant dark (&:where(.dark, .dark *, [data-theme*='dark'], [data-theme*='dark'] *));

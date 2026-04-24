@@ -1,11 +1,6 @@
 @import 'tailwindcss';
+@import './../../../packages/config/tailwind.config.css';
 @import './tailwind.config.css';
-@import './../../../packages/config/tailwind-utilities/hit-area.css';
-
-@import './../../../packages/ui/build/css/source/global.css';
-@import './../../../packages/ui/build/css/themes/dark.css';
-@import './../../../packages/ui/build/css/themes/light.css';
-@import './../../../packages/ui/build/css/themes/classic-dark.css';
 
 @import 'config/typography.css';
 
