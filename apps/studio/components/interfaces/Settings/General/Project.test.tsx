@@ -155,7 +155,7 @@ describe('Project settings availability', () => {
 
     render(<Project />)
 
-    expect(screen.getByText('View project dashboard')).toBeInTheDocument()
+    expect(screen.getAllByText('View project dashboard')).toHaveLength(2)
     expect(
       screen.getByText(
         'This project can no longer be resumed here. Open the dashboard to download backups and view recovery options.'
