@@ -7,7 +7,7 @@ subtitle: 'Authentication patterns for Edge Functions'
 
 <Admonition type="caution">
 
-The patterns in this guide assume your project uses the new [JWT signing keys](/docs/guides/auth/signing-keys) and the new [API keys](https://github.com/orgs/supabase/discussions/29260). If you're still on legacy JWTs, see the [Legacy JWT Secret guide](/docs/guides/functions/auth-legacy-jwt).
+The patterns in this guide assume your project uses the new [JWT signing keys](/docs/guides/getting-started/api-keys) and the new [API keys](https://github.com/orgs/supabase/discussions/29260). If you're still on legacy JWTs, see the [Legacy JWT Secret guide](/docs/guides/functions/auth-legacy-jwt).
 
 </Admonition>
 
@@ -15,26 +15,28 @@ Every request to an Edge Function passes through two layers of auth. First, a pl
 
 ## Understanding authorization headers
 
-Edge Functions care about two request headers. Sending the wrong credential in the wrong header is the most common source of 401s.
+Edge Functions care about two request headers. Sending the wrong credential in the wrong header is the most common source of 401 errors.
 
 | Header          | Value                                   | Used for                               |
 | --------------- | --------------------------------------- | -------------------------------------- |
 | `Authorization` | `Bearer <user-jwt>`                     | A user signed in through Supabase Auth |
 | `apikey`        | `sb_publishable_...` or `sb_secret_...` | Calls from clients or services         |
 
-A common mistake is sending a publishable or secret key as a bearer token: `Authorization: Bearer sb_publishable_...`. The new API keys are not JWTs. The platform check can't validate them, and your handler can't verify them as JWTs either. Put API keys in the `apikey` header.
+A common mistake is sending a publishable or secret key as a bearer token: `Authorization: Bearer sb_publishable_...`. The new API keys are not JWTs. The platform check can't validate them, and your handler can't verify them as JWTs either. Instead, put API keys in the `apikey` header.
 
-Both headers can travel together. A signed-in user calling your function through `supabase-js`, for example, sends their session JWT in `Authorization` and the project's publishable key in `apikey`.
+You can send both headers together. A signed-in user calling your function through `supabase-js`, for example, sends their session JWT in `Authorization` and the project's publishable key in `apikey`.
 
 ## The `verify_jwt` platform check
 
-When `verify_jwt` is on (the default), the platform inspects the `Authorization` header of every request before your function runs. It expects a valid user JWT. If the header is missing, malformed, or signed with a different key, the platform returns a 401 and your code never executes.
+When `verify_jwt` is enabled (the default), the platform inspects the `Authorization` header of every request before your function runs. It expects a valid user JWT. If the header is missing, malformed, or signed with a different key, the platform returns a 401 error, and your code never executes.
 
-The check validates legacy HS256 JWTs and JWTs signed with the new asymmetric [signing keys](/docs/guides/auth/signing-keys). What it will not accept is an API key. Publishable and secret keys are not JWTs, so callers that send one on `Authorization` fail the check before their request reaches your handler.
+The check validates legacy HS256 JWTs and JWTs signed with the new asymmetric [signing keys](/docs/guides/auth/signing-keys).
 
-Use the flag to match how the function is called:
+The check does not accept an API key. Publishable and secret keys are not JWTs, so callers that send one in the `Authorization` header fail the check before their request reaches your handler.
 
-- **Leave `verify_jwt` on** for functions that are only called with a user JWT, such as functions invoked from the client through `supabase.functions.invoke`. The platform rejects anonymous requests before they reach your code, and your handler can trust that a valid JWT is present.
+Use the `verify_jwt` flag to match how the function is called:
+
+- **Leave `verify_jwt` on** for functions that are only called with a user JWT, such as functions invoked from the client through `supabase.functions.invoke`. The platform rejects unauthenticated requests before they reach your code, and your handler can trust that a valid JWT is present.
 - **Turn `verify_jwt` off** for functions that are called without an `Authorization` header, such as webhooks from external providers, or service-to-service calls that authenticate with an API key. These patterns are covered later in the guide.
 
 Set the flag per function in `supabase/config.toml`:
@@ -52,7 +54,7 @@ The sections below show the four patterns you'll reach for most often, written w
 
 ### Authenticated user calls
 
-Keep `verify_jwt` on. The platform validates the JWT before your handler runs. Forward the `Authorization` header into the Supabase client so queries run under the caller's RLS policies.
+Keep `verify_jwt` enabled. The platform validates the JWT before your handler runs. Forward the `Authorization` header to the Supabase client so queries run under the caller's RLS policies.
 
 ```toml
 [functions.notes]
@@ -78,7 +80,7 @@ Deno.serve((req) => {
 
 ### Service-to-service calls
 
-Cron jobs, workers, `pg_net`, or another Edge Function call in with a secret key on the `apikey` header. These callers don't send a user JWT, so turn `verify_jwt` off and validate the key yourself.
+Cron jobs, workers, `pg_net`, or another Edge Functions make calls with a secret key on the `apikey` header. These callers don't send a user JWT, so disable `verify_jwt` and validate the key yourself.
 
 ```toml
 [functions.run-automations]
@@ -102,11 +104,15 @@ Deno.serve((req) => {
 })
 ```
 
+<Admonition type="tip">
+
 Never expose a secret key to the browser. Store it as a [function secret](/docs/guides/functions/secrets).
+
+<Admonition>
 
 ### Public functions
 
-For a genuinely public function, like a health check, no credential is required. Turn `verify_jwt` off so anonymous callers can reach the handler.
+For a genuinely public function, like a health check, no credential is required. Disable `verify_jwt` so anonymous callers can reach the handler.
 
 ```toml
 [functions.health]
@@ -122,7 +128,7 @@ Deno.serve(() => {
 
 ### External webhooks
 
-External providers like Stripe or GitHub don't send Supabase credentials. They sign the request body with their own shared secret. Turn `verify_jwt` off and verify the signature before acting on the payload.
+External providers like Stripe or GitHub don't send Supabase credentials. They sign the request body with their own shared secret. Disable `verify_jwt` and verify the signature before acting on the payload.
 
 ```toml
 [functions.stripe-webhook]
@@ -159,7 +165,11 @@ The [`@supabase/server`](https://github.com/supabase/server) package wraps your 
 | `'secret:<name>'` | A named secret key on `apikey`             |
 | `'always'`        | Any caller, no check (for signed webhooks) |
 
+<Admonition type="tip">
+
 See the [`@supabase/server` docs](https://github.com/supabase/server) for the full list of modes.
+
+</Admonition>
 
 ### Authenticated user calls
 
@@ -193,7 +203,7 @@ export default {
 
 <Admonition type="tip">
 
-Create a named secret key for each caller in your project's [API keys settings](/dashboard/project/_/settings/api-keys). Give it a name like `automations`, and share the generated `sb_secret_...` value with the service that calls this function.
+Create a named secret key for each caller in the [**Settings > API keys**](/dashboard/project/_/settings/api-keys) section of the Dashboard. Give it a name like "automations", and share the generated `sb_secret_...` value with the service that calls this function.
 
 ![A secret key named "automations" listed under Secret keys in the Supabase dashboard.](/docs/img/guides/functions/secret-keys-automations.png)
 
