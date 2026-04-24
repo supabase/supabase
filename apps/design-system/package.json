@@ -29,7 +29,7 @@
     "markdown-wasm": "^1.2.0",
     "next": "catalog:",
     "next-contentlayer2": "0.4.6",
-    "next-themes": "^0.3.0",
+    "next-themes": "catalog:",
     "react": "catalog:",
     "react-data-grid": "7.0.0-beta.47",
     "react-day-picker": "^9.11.1",
