@@ -27,7 +27,7 @@ const DeleteConfirmationDialogs = ({
 }: DeleteConfirmationDialogsProps) => {
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
-  const { filters, onApplyFilters } = useTableFilter()
+  const { filters, setFilters } = useTableFilter()
 
   const removeDeletedColumnFromFiltersAndSorts = ({
     columnName,
@@ -37,7 +37,7 @@ const DeleteConfirmationDialogs = ({
     schema?: string
     columnName: string
   }) => {
-    onApplyFilters(filters.filter((filter) => filter.column !== columnName))
+    setFilters(filters.filter((filter) => filter.column !== columnName))
   }
 
   const { mutate: deleteColumn } = useDatabaseColumnDeleteMutation({
