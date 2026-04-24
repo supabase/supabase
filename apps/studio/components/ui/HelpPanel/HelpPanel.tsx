@@ -71,7 +71,6 @@ export const HelpPanel = ({
             onFinish={() => {
               setView('home')
             }}
-            onAssistantClick={openAssistant}
           />
         ) : (
           <div className="flex h-full flex-col overflow-y-auto pb-5">

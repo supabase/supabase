@@ -5,8 +5,6 @@ import { useCallback, useReducer } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { AIAssistantOption } from './AIAssistantOption'
-import { DiscordCTACard } from './DiscordCTACard'
 import { IncidentAdmonition } from './IncidentAdmonition'
 import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
@@ -48,12 +46,11 @@ function useSupportFormTelemetry() {
 interface SupportFormProps {
   initialParams?: Partial<SupportFormUrlKeys>
   onFinish?: () => void
-  onAssistantClick?: () => void
 }
 
-export function SupportForm({ initialParams, onFinish, onAssistantClick }: SupportFormProps) {
+export function SupportForm({ initialParams, onFinish }: SupportFormProps) {
   const [state, dispatch] = useReducer(supportFormReducer, undefined, createInitialSupportFormState)
-  const { form, initialError, projectRef, orgSlug } = useSupportForm(dispatch, initialParams)
+  const { form, initialError, projectRef } = useSupportForm(dispatch, initialParams)
 
   const {
     data: allStatusPageEvents,
@@ -90,17 +87,6 @@ export function SupportForm({ initialParams, onFinish, onAssistantClick }: Suppo
       />
       <div className="min-h-full px-5 pt-5">
         <div className="flex flex-col gap-y-8">
-          {!isSuccess && !hasActiveIncidents && (
-            <div className="flex flex-col gap-y-4">
-              <AIAssistantOption
-                projectRef={projectRef}
-                organizationSlug={orgSlug}
-                onClick={onAssistantClick}
-              />
-              <DiscordCTACard organizationSlug={orgSlug} />
-            </div>
-          )}
-
           {isSuccess ? (
             <div className="pt-2">
               <Success
