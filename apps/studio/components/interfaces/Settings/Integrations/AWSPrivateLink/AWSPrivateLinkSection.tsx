@@ -25,7 +25,7 @@ export const AWSPrivateLinkSection = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: accounts } = useAWSAccountsQuery({ projectRef: project?.ref })
 
-  const [selectedAccount, setSelectedAccount] = useState<AWSAccount | null>(null)
+  const [selectedAccount, setSelectedAccount] = useState<AWSAccount>()
   const [showForm, setShowForm] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
@@ -33,7 +33,7 @@ export const AWSPrivateLinkSection = () => {
     onSuccess: () => {
       toast.success('Account will be deleted shortly')
       setShowDeleteModal(false)
-      setSelectedAccount(null)
+      setSelectedAccount(undefined)
     },
   })
 
@@ -41,7 +41,7 @@ export const AWSPrivateLinkSection = () => {
   const promptPlanUpgrade = IS_PLATFORM && !hasPrivateLinkAccess
 
   const onAddAccount = () => {
-    setSelectedAccount(null)
+    setSelectedAccount(undefined)
     setShowForm(true)
   }
 
