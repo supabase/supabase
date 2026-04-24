@@ -94,6 +94,12 @@ We do not permit use of public domains like `gmail.com`, `yahoo.com`.
 
 </Admonition>
 
+<Admonition type="note">
+
+Each SSO provider can be configured with different email domains. For multi-environment setups (Dev/Staging/Prod), we recommend using IdP-initiated flow with multiple SAML apps under the same domain rather than domain-based routing. For more details, see the [Multiple SSO Providers guide](/docs/guides/platform/sso/multiple-providers).
+
+</Admonition>
+
 ## Step 9: Configure metadata [#dashboard-configure-metadata]
 
 Enter the metadata URL you obtained from [Step 6](#idp-metadata-url) into the Metadata URL field:
@@ -114,11 +120,17 @@ If you did not customize your settings you may save some time by clicking the **
 
 ## Step 11: Join organization on signup (optional) [#dashboard-configure-autojoin]
 
+<Admonition type="tip">
+
+**Recommended workflow:** Start with auto-join **disabled** to test your SSO configuration. Once SSO login is working correctly, enable auto-join if desired.
+
+</Admonition>
+
 By default this setting is disabled, users logging in via SSO will not be added to your organization automatically.
 
 ![Auto-join disabled](/docs/img/sso-dashboard-configure-autojoin-disabled.png)
 
-Toggle this on if you want SSO-authenticated users to be **automatically added to your organization** when they log in via SSO.
+Toggle this on if you want SSO-authenticated users to be **automatically added to your organization** when they log in via SSO. Auto-join applies on **every login**, not just first signup - this makes it safe to test SSO before enabling this feature.
 
 ![Auto-join enable](/docs/img/sso-dashboard-configure-autojoin-enabled.png)
 
@@ -126,7 +138,7 @@ When auto-join is enabled, you can choose the **default role** for new users:
 
 ![Auto-join role selection](/docs/img/sso-dashboard-configure-autojoin-enabled-role.png)
 
-Choose a role that fits the level of access you want to grant to new members.
+We recommend choosing **Developer** as the default role (principle of least privilege) and promoting users individually as needed.
 
 <Admonition type="note">
 
@@ -134,10 +146,26 @@ Visit [access-control](/docs/guides/platform/access-control) documentation for d
 
 </Admonition>
 
-## Step 12: Save changes and test single sign-on [#dashboard-configure-save]
+## Step 12: Save changes [#dashboard-configure-save]
 
 When you click **Save changes**, your new SSO configuration is applied immediately. From that moment, any user with an email address matching one of your configured domains who visits your organization's sign-in URL will be routed through the SSO flow.
 
-We recommend asking a few users to test signing in via their Okta account. They can do this by entering their email address on the [Sign in with SSO](/dashboard/sign-in-sso) page.
+<Admonition type="tip">
 
-If SSO sign-in doesn't work as expected, contact your Supabase support representative for assistance.
+**Next step: Test your SSO configuration**
+
+Before rolling out SSO to your organization, we strongly recommend thorough testing. Visit our [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices) guide for:
+
+- Step-by-step testing instructions
+- How to verify auto-join works correctly
+- Common issues and troubleshooting
+- Security best practices
+- Pre-launch checklist
+
+</Admonition>
+
+<Admonition type="note">
+
+**Testing in Okta sandbox:** If your organization has an Okta sandbox environment, consider testing your SSO configuration there first before applying to production.
+
+</Admonition>

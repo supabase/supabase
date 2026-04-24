@@ -32,7 +32,6 @@ import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-const
 import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useChanged } from '@/hooks/misc/useChanged'
-import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -78,8 +77,6 @@ export const TableEditor = ({
   const tableEditorApi = useContext(TableEditorStateContext)
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
-
-  const isApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
 
   const [params, setParams] = useUrlState()
   const { data: project } = useSelectedProjectQuery()
@@ -528,22 +525,18 @@ export const TableEditor = ({
         </>
       )}
 
-      {isApiGrantTogglesEnabled && (
-        <>
-          <SidePanel.Separator />
-          <SidePanel.Content className="py-6 space-y-6">
-            <ApiAccessToggle
-              projectRef={project?.ref}
-              schemaName={isNewRecord ? selectedSchema : table?.schema}
-              tableName={
-                isNewRecord || isDuplicating ? tableFields.name : tableFields.name || table?.name
-              }
-              isNewRecord={isNewRecord || isDuplicating}
-              handler={apiAccessToggleHandler}
-            />
-          </SidePanel.Content>
-        </>
-      )}
+      <SidePanel.Separator />
+      <SidePanel.Content className="py-6 space-y-6">
+        <ApiAccessToggle
+          projectRef={project?.ref}
+          schemaName={isNewRecord ? selectedSchema : table?.schema}
+          tableName={
+            isNewRecord || isDuplicating ? tableFields.name : tableFields.name || table?.name
+          }
+          isNewRecord={isNewRecord || isDuplicating}
+          handler={apiAccessToggleHandler}
+        />
+      </SidePanel.Content>
     </SidePanel>
   )
 }

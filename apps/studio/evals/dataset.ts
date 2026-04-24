@@ -142,6 +142,34 @@ export const dataset: AssistantEvalCase[] = [
     metadata: { category: ['rls_policies'] },
   },
   {
+    input: {
+      prompt: "I have an orders table but now I can't query it through the API. What's wrong?",
+      mockTables: {
+        public: [
+          {
+            name: 'orders',
+            rls_enabled: false,
+            columns: [
+              { name: 'id', data_type: 'bigint' },
+              { name: 'user_id', data_type: 'uuid' },
+              { name: 'total', data_type: 'numeric' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredKnowledge: ['rls'],
+      correctAnswer:
+        'The anon/authenticated roles may not have been granted access to the table. Check privileges and use GRANT to expose the table via the Data API.',
+    },
+    metadata: {
+      category: ['rls_policies', 'debugging'],
+      description:
+        'Verifies the assistant identifies missing grants as the likely cause of an inaccessible table and guides the user to fix it',
+    },
+  },
+  {
     input: { prompt: 'Write an edge function that sends a welcome email when a user signs up' },
     expected: {
       requiredTools: ['deploy_edge_function'],

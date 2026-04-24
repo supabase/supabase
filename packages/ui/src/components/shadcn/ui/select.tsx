@@ -54,6 +54,7 @@ const SelectTrigger = React.forwardRef<
       SelectTriggerVariants({ size }),
       className
     )}
+    tabIndex={0}
     {...props}
   >
     {children}

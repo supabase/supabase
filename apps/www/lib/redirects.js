@@ -1,13 +1,23 @@
 module.exports = [
   {
     permanent: true,
+    source: '/ui/docs/ai-editors-rules/prompts',
+    destination: '/ui/docs/ai-editors-rules/skills',
+  },
+  {
+    permanent: true,
     source: '/auth/Auth',
     destination: '/auth',
   },
   {
     permanent: true,
     source: '/docs/guides/database/hardening-data-api',
-    destination: '/docs/guides/api/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
   },
   {
     permanent: true,

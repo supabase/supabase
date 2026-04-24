@@ -44,7 +44,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
     200
   )
 
-  const totalSizeAfterGrowth = autoscaleGrowValue + totalSize
+  const totalSizeAfterGrowth = Math.max(autoscaleGrowValue + totalSize, 8)
   const formattedTotalSizeAfterGrowth =
     totalSizeAfterGrowth < _maxSizeGb ? totalSizeAfterGrowth : _maxSizeGb
   const formattedGrowValue = formattedTotalSizeAfterGrowth - totalSize
