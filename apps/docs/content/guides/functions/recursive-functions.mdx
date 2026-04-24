@@ -44,7 +44,7 @@ When the rate limit is exceeded, calling another Edge Function throws a `RateLim
 ```typescript
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 
-const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!)
+const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_PUBLISHABLE_KEY')!)
 
 Deno.serve(async (req) => {
   try {
@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
     const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/other-function`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`,
+        Authorization: `Bearer ${Deno.env.get('SUPABASE_PUBLISHABLE_KEY')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ foo: 'bar' }),
@@ -130,7 +130,7 @@ You can also use `retryAfterMs` to implement automatic retries within your funct
 ```typescript
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 
-const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!)
+const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_PUBLISHABLE_KEY')!)
 
 async function invokeWithRetry(functionName: string, payload: object, maxRetries = 3) {
   for (let attempt = 0; attempt < maxRetries; attempt++) {

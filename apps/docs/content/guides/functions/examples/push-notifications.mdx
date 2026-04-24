@@ -73,7 +73,7 @@ Push notifications are an important part of any mobile app. They allow you to se
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      Deno.env.get('SUPABASE_SECRET_KEY')!
     )
 
     Deno.serve(async (req) => {
@@ -185,7 +185,7 @@ Push notifications are an important part of any mobile app. They allow you to se
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      Deno.env.get('SUPABASE_SECRET_KEY')!
     )
 
     Deno.serve(async (req) => {
