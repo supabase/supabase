@@ -328,3 +328,150 @@ try {
 } catch (error) {
   console.warn('Error generating RSS feed:', error)
 }
+
+// Changelog RSS → public/changelog-rss.xml + public/changelog-rss/<tag>.xml
+try {
+  const appId = process.env.GITHUB_CHANGELOG_APP_ID
+  const installationId = process.env.GITHUB_CHANGELOG_APP_INSTALLATION_ID
+  const privateKey = process.env.GITHUB_CHANGELOG_APP_PRIVATE_KEY
+
+  if (!appId || !installationId || !privateKey) {
+    console.warn('Skipping changelog RSS: missing GITHUB_CHANGELOG_APP_* env vars')
+  } else {
+    const { createAppAuth } = await import('@octokit/auth-app')
+    const { Octokit } = await import('@octokit/core')
+    const { paginateGraphql } = await import('@octokit/plugin-paginate-graphql')
+    const { generateChangelogRssXml, generateChangelogTagRssXml, labelToFileSlug } =
+      await import('../lib/changelog-rss.mjs')
+
+    const rewritesPath = path.join(__dirname, 'data/changelog-deleted-discussions.json')
+    const rewrites = JSON.parse(await fs.readFile(rewritesPath, 'utf8'))
+    const discussionDisplayDate = (item) => {
+      const match = rewrites.find(
+        (r) => item.title && r.title && item.title.includes(r.title)
+      )
+      return match ? match.createdAt : item.createdAt
+    }
+
+    /** Must stay in sync with CHANGELOG_PRODUCT_TAGS in apps/www/pages/changelog.tsx */
+    const CHANGELOG_PRODUCT_TAGS = [
+      { slug: 'database', label: 'Database' },
+      { slug: 'auth', label: 'Auth' },
+      { slug: 'storage', label: 'Storage' },
+      { slug: 'realtime', label: 'Realtime' },
+      { slug: 'edge functions', label: 'Edge Functions' },
+      { slug: 'postgres', label: 'postgres' },
+      { slug: 'postgrest', label: 'PostgREST' },
+      { slug: 'ai', label: 'AI & Vector' },
+      { slug: 'billing', label: 'Billing' },
+      { slug: 'breaking-change', label: 'Breaking Change' },
+      { slug: 'cli', label: 'CLI' },
+      { slug: 'frontend', label: 'Dashboard' },
+      { slug: 'documentation', label: 'Docs' },
+      { slug: 'infra', label: 'Infra' },
+      { slug: 'self-hosted', label: 'Self-hosted' },
+      { slug: 'javascript', label: 'supabase-js' },
+      { slug: 'swift', label: 'supabase-swift' },
+      { slug: 'flutter', label: 'supabase-flutter' },
+      { slug: 'python', label: 'supabase-py' },
+    ]
+
+    const CHANGELOG_CATEGORY_ID = 'DIC_kwDODMpXOc4CAFUr'
+    const changelogQuery = `
+      query changelogDiscussionMetadata($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
+        repository(owner: $owner, name: $repo) {
+          discussions(
+            first: 100
+            after: $cursor
+            categoryId: $categoryId
+            orderBy: { field: CREATED_AT, direction: DESC }
+          ) {
+            nodes {
+              number
+              title
+              createdAt
+              url
+              labels(first: 25) {
+                nodes {
+                  name
+                }
+              }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+      }
+    `
+
+    const ExtendedOctokit = Octokit.plugin(paginateGraphql)
+    const octokit = new ExtendedOctokit({
+      authStrategy: createAppAuth,
+      auth: {
+        appId,
+        installationId,
+        privateKey: privateKey.replace(/\\n/g, '\n'),
+      },
+    })
+
+    const collected = []
+    let cursor = null
+    let hasNextPage = true
+    while (hasNextPage) {
+      const {
+        repository: {
+          discussions: { nodes, pageInfo },
+        },
+      } = await octokit.graphql(changelogQuery, {
+        owner: 'supabase',
+        repo: 'supabase',
+        categoryId: CHANGELOG_CATEGORY_ID,
+        cursor,
+      })
+      collected.push(...nodes)
+      hasNextPage = pageInfo.hasNextPage
+      cursor = pageInfo.endCursor
+    }
+
+    const entries = collected.map((item) => ({
+      number: item.number,
+      title: item.title,
+      url: item.url,
+      sortDate: discussionDisplayDate({ title: item.title, createdAt: item.createdAt }),
+      labels: (item.labels?.nodes ?? []).map((l) => l.name.toLowerCase()),
+    }))
+
+    // Main feed
+    const changelogXml = generateChangelogRssXml(entries)
+    const changelogRssPath = path.join(__dirname, '../public/changelog-rss.xml')
+    await fs.writeFile(changelogRssPath, changelogXml.trim(), 'utf8')
+    const visibleCount = entries.filter((e) => !e.title.includes('[d]')).length
+    console.log(`✅ Generated changelog RSS with ${visibleCount} entries`)
+
+    // Per-tag feeds → public/changelog-rss/<label-slug>.xml
+    const tagFeedsDir = path.join(__dirname, '../public/changelog-rss')
+    await fs.mkdir(tagFeedsDir, { recursive: true })
+    const tagResults = await Promise.allSettled(
+      CHANGELOG_PRODUCT_TAGS.map(async ({ slug, label }) => {
+        const fileSlug = labelToFileSlug(label)
+        const tagXml = generateChangelogTagRssXml(entries, {
+          githubLabelSlug: slug,
+          displayLabel: label,
+        })
+        await fs.writeFile(path.join(tagFeedsDir, `${fileSlug}.xml`), tagXml.trim(), 'utf8')
+        const count = entries.filter(
+          (e) => !e.title.includes('[d]') && e.labels.includes(slug.toLowerCase())
+        ).length
+        return { label, fileSlug, count }
+      })
+    )
+    const succeeded = tagResults.filter((r) => r.status === 'fulfilled').length
+    console.log(
+      `✅ Generated ${succeeded}/${CHANGELOG_PRODUCT_TAGS.length} per-tag changelog RSS feeds`
+    )
+  }
+} catch (error) {
+  console.warn('Error generating changelog RSS:', error)
+}
