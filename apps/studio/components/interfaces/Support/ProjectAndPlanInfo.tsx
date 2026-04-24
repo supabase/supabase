@@ -177,8 +177,8 @@ export const PlanExpectationInfoContent = ({
       {planId === 'free' && (
         <p>
           Support on the Free plan is provided through the community and by the team on a
-          best-effort basis. For a guaranteed response time, we recommend upgrading to the Pro
-          plan. Enhanced support SLAs are available on the Enterprise plan.
+          best-effort basis. For a guaranteed response time, we recommend upgrading to the Pro plan.
+          Enhanced support SLAs are available on the Enterprise plan.
         </p>
       )}
 
@@ -191,10 +191,10 @@ export const PlanExpectationInfoContent = ({
 
       {planId === 'team' && (
         <p>
-          The Team plan includes email support with prioritized ticketing and escalation to
-          product engineering. Low, normal, and high-severity tickets are typically handled within
-          1 business day. Urgent issues are handled within 1 day, 365 days a year. Enhanced
-          support SLAs are available on the Enterprise plan.
+          The Team plan includes email support with prioritized ticketing and escalation to product
+          engineering. Low, normal, and high-severity tickets are typically handled within 1
+          business day. Urgent issues are handled within 1 day, 365 days a year. Enhanced support
+          SLAs are available on the Enterprise plan.
         </p>
       )}
 

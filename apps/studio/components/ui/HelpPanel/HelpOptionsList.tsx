@@ -6,7 +6,10 @@ import { AiIconAnimation } from 'ui'
 
 import type { HelpOptionId } from './HelpPanel.constants'
 import { HELP_OPTION_IDS } from './HelpPanel.constants'
-import { createSupportFormUrl, type SupportFormUrlKeys } from '@/components/interfaces/Support/SupportForm.utils'
+import {
+  createSupportFormUrl,
+  type SupportFormUrlKeys,
+} from '@/components/interfaces/Support/SupportForm.utils'
 import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { takeBreadcrumbSnapshot } from '@/lib/breadcrumbs'

@@ -8,8 +8,11 @@ import { Button } from 'ui'
 
 import { ASSISTANT_SUGGESTIONS } from './HelpPanel.constants'
 import { HelpSection } from './HelpSection'
-import { SupportForm, SupportFormStatusButton } from '@/components/interfaces/Support/SupportSidebarForm'
 import type { SupportFormUrlKeys } from '@/components/interfaces/Support/SupportForm.utils'
+import {
+  SupportForm,
+  SupportFormStatusButton,
+} from '@/components/interfaces/Support/SupportSidebarForm'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'

@@ -8,7 +8,11 @@ export interface ResourceListProps extends HTMLAttributes<HTMLDivElement> {
 export const ResourceList = forwardRef<HTMLDivElement, ResourceListProps>(
   ({ children, className, ...props }, ref) => {
     return (
-      <Card ref={ref} className={['overflow-hidden', className].filter(Boolean).join(' ')} {...props}>
+      <Card
+        ref={ref}
+        className={['overflow-hidden', className].filter(Boolean).join(' ')}
+        {...props}
+      >
         {children}
       </Card>
     )

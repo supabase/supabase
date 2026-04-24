@@ -22,7 +22,6 @@ import { DashboardLogsToggle } from './DashboardLogsToggle'
 import { MessageField } from './MessageField'
 import { OrganizationSelector } from './OrganizationSelector'
 import { PlanExpectationInfoContent, ProjectAndPlanInfo } from './ProjectAndPlanInfo'
-import { SupportFormDirectEmailContent } from './SupportFormDirectEmailInfo'
 import { SubjectAndSuggestionsInfo } from './SubjectAndSuggestionsInfo'
 import { SubmitButton } from './SubmitButton'
 import { DISABLE_SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessToggle'
@@ -35,6 +34,7 @@ import {
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
 } from './SupportForm.utils'
+import { SupportFormDirectEmailContent } from './SupportFormDirectEmailInfo'
 import { getProjectAuthConfig } from '@/data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from '@/data/feedback/support-ticket-send'
 import { type OrganizationPlanID } from '@/data/organizations/organization-query'

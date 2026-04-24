@@ -24,7 +24,10 @@ export interface ResourceItemProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
-  ({ media, meta, onClick, children, className, actions, onKeyDown, role, tabIndex, ...props }, ref) => {
+  (
+    { media, meta, onClick, children, className, actions, onKeyDown, role, tabIndex, ...props },
+    ref
+  ) => {
     const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
       onKeyDown?.(event)
 

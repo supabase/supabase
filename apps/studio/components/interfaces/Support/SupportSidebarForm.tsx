@@ -10,10 +10,7 @@ import { DiscordCTACard } from './DiscordCTACard'
 import { IncidentAdmonition } from './IncidentAdmonition'
 import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
-import {
-  createInitialSupportFormState,
-  supportFormReducer,
-} from './SupportForm.state'
+import { createInitialSupportFormState, supportFormReducer } from './SupportForm.state'
 import type { SupportFormUrlKeys } from './SupportForm.utils'
 import { SupportFormV3 } from './SupportFormV3'
 import { useSupportForm } from './useSupportForm'
