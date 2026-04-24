@@ -1,4 +1,5 @@
 import { ExternalLink } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 
 import PartnerIcon from './PartnerIcon'
@@ -10,6 +11,7 @@ interface PartnerManagedResourceProps {
   managedBy: ManagedBy
   resource: string
   title?: string
+  details?: ReactNode
   cta?: {
     installationId?: string
     organizationSlug?: string
@@ -26,7 +28,13 @@ export const PARTNER_TO_NAME = {
   [MANAGED_BY.SUPABASE]: 'Supabase',
 } as const
 
-function PartnerManagedResource({ managedBy, resource, title, cta }: PartnerManagedResourceProps) {
+function PartnerManagedResource({
+  managedBy,
+  resource,
+  title,
+  details,
+  cta,
+}: PartnerManagedResourceProps) {
   const ctaEnabled = cta !== undefined
   const supportsRedirectCta =
     managedBy === MANAGED_BY.VERCEL_MARKETPLACE || managedBy === MANAGED_BY.AWS_MARKETPLACE
@@ -74,6 +82,8 @@ function PartnerManagedResource({ managedBy, resource, title, cta }: PartnerMana
       <PartnerIcon organization={{ managed_by: managedBy }} showTooltip={false} size="large" />
 
       <AlertTitle_Shadcn_ className="text-sm font-normal">{partnerHeading}</AlertTitle_Shadcn_>
+
+      {details && <div className="text-sm text-foreground-light text-center">{details}</div>}
 
       {showCta && (
         <Button asChild type="default" iconRight={<ExternalLink />}>

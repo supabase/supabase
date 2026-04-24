@@ -16,10 +16,7 @@ import { ExitSurveyModal } from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
-import {
-  STRIPE_DASHBOARD_URL,
-  STRIPE_PROJECTS_DOCS_URL,
-} from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
+import { STRIPE_PROJECTS_DOCS_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
 import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
@@ -54,6 +51,11 @@ const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
       organizationSlug: selectedOrganization?.slug,
     }
   }
+}
+
+const getStripeProjectsUpgradeCommand = (planId: string | null | undefined) => {
+  const currentTier = planId ?? 'free'
+  return `stripe projects upgrade supabase/${currentTier}`
 }
 
 export const PlanUpdateSidePanel = () => {
@@ -195,6 +197,9 @@ export const PlanUpdateSidePanel = () => {
   const planMeta = selectedTier
     ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
     : null
+  const stripeProjectsUpgradeCommand = getStripeProjectsUpgradeCommand(
+    selectedOrganization?.plan?.id ?? subscription?.plan?.id
+  )
 
   return (
     <>
@@ -220,9 +225,15 @@ export const PlanUpdateSidePanel = () => {
               managedBy={MANAGED_BY.STRIPE_PROJECTS}
               resource="Organization plans"
               title="Organization plans are managed through Stripe."
+              details={
+                <>
+                  Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code> in
+                  your project directory.
+                </>
+              }
               cta={{
                 overrideUrl: `${STRIPE_PROJECTS_DOCS_URL}#upgrade-a-service-tier`,
-                message: 'Change plan via Stripe CLI',
+                message: 'Stripe Projects docs',
               }}
             />
           ) : isPartnerBilledOrganization ? (
