@@ -429,7 +429,6 @@ const uiConfig = ui({
   plugins: [
     require('@tailwindcss/typography'),
     require('tailwindcss-animate'),
-    require('./tailwind-plugins/hit-area'),
     require('./tailwind-plugins/motion-safe-transition'),
     function ({ addVariant }) {
       addVariant('not-disabled', '&:not(:disabled)')
