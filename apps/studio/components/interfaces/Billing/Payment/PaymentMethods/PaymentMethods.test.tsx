@@ -190,7 +190,7 @@ describe('PaymentMethods', () => {
     expect(screen.getByText('**** **** **** 4242')).toBeInTheDocument()
     expect(screen.getByText('Card expires: 12/2028')).toBeInTheDocument()
     expect(screen.getByText('VOLZ')).toBeInTheDocument()
-    expect(screen.getByText(/Token expires: 12\/2028/i, { selector: 'span' })).toBeInTheDocument()
+    expect(screen.getByText(/expires: 12\/2028/i, { selector: 'span' })).toBeInTheDocument()
     expect(screen.getByText('Active')).toBeInTheDocument()
   })
 })
