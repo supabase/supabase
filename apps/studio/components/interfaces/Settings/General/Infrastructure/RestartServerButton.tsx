@@ -103,7 +103,6 @@ const RestartServerButton = () => {
         <div className="flex w-full @lg:w-auto">
           <ButtonTooltip
             type="default"
-            icon={hasRestartDropdown ? undefined : <RefreshCw />}
             className={cn(
               'flex-1 px-3 hover:z-10 @lg:flex-none',
               canRestartProject && canRestart ? 'rounded-r-none' : ''

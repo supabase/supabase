@@ -26,6 +26,7 @@ vi.mock('ui', () => ({
   Button: ({
     children,
     asChild,
+    type: _type,
     ...props
   }: {
     children: ReactNode
@@ -154,6 +155,7 @@ describe('Project settings availability', () => {
 
     render(<Project />)
 
+    expect(screen.getByText('View project dashboard')).toBeInTheDocument()
     expect(
       screen.getByText(
         'This project can no longer be resumed here. Open the dashboard to download backups and view recovery options.'

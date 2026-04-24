@@ -37,7 +37,9 @@ export const Project = () => {
     isPaused && (isPauseStatusError || (isPauseStatusSuccess && !pauseStatus.can_restore))
 
   const primaryActionLabel = isPaused
-    ? 'Resume project'
+    ? shouldShowDashboardLink
+      ? 'View project dashboard'
+      : 'Resume project'
     : projectSettingsRestartProject
       ? 'Restart project'
       : 'Restart database'

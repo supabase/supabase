@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
-import { type ComponentPropsWithoutRef, useState } from 'react'
+import { useState, type ComponentPropsWithoutRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
@@ -67,10 +67,7 @@ export const ResumeProjectButton = ({
     data: pauseStatus,
     isPending: isPauseStatusPending,
     isSuccess: isPauseStatusSuccess,
-  } = useProjectPauseStatusQuery(
-    { ref },
-    { enabled: project?.status === PROJECT_STATUS.INACTIVE }
-  )
+  } = useProjectPauseStatusQuery({ ref }, { enabled: project?.status === PROJECT_STATUS.INACTIVE })
 
   const isRestoreDisabled = isPauseStatusSuccess && !pauseStatus.can_restore
 
@@ -236,14 +233,14 @@ export const ResumeProjectButton = ({
           </DialogHeader>
           <DialogSection className="text-sm">
             <p className="text-foreground-light">
-              The following members have reached their maximum limits for the number of active
-              free plan projects within organizations where they are an administrator or owner:
+              The following members have reached their maximum limits for the number of active free
+              plan projects within organizations where they are an administrator or owner:
             </p>
             <ul className="my-4 list-disc list-inside">
               {(membersExceededLimit ?? []).map((member, idx: number) => (
                 <li key={`member-${idx}`}>
-                  {member.username || member.primary_email} (Limit: {member.free_project_limit}{' '}
-                  free projects)
+                  {member.username || member.primary_email} (Limit: {member.free_project_limit} free
+                  projects)
                 </li>
               ))}
             </ul>
