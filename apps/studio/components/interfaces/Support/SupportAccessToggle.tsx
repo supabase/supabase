@@ -26,9 +26,10 @@ export const DISABLE_SUPPORT_ACCESS_CATEGORIES: ExtendedSupportCategories[] = [
 interface SupportAccessToggleProps {
   form: UseFormReturn<SupportFormValues>
   align?: 'left' | 'right'
+  className?: string
 }
 
-export function SupportAccessToggle({ form, align = 'left' }: SupportAccessToggleProps) {
+export function SupportAccessToggle({ form, align = 'left', className }: SupportAccessToggleProps) {
   return (
     <FormField_Shadcn_
       name="allowSupportAccess"
@@ -38,6 +39,7 @@ export function SupportAccessToggle({ form, align = 'left' }: SupportAccessToggl
           <FormItemLayout
             hideMessage
             name="allowSupportAccess"
+            className={className}
             layout="flex"
             align={align}
             label={

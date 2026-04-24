@@ -243,7 +243,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
 
         {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
           <>
-            <SupportAccessToggle form={form} />
+            <SupportAccessToggle form={form} className="px-6" />
             <DialogSectionSeparator />
           </>
         )}
