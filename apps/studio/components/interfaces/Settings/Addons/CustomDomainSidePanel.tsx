@@ -14,6 +14,7 @@ import {
   SidePanel,
 } from 'ui'
 
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useProjectAddonRemoveMutation } from '@/data/subscriptions/project-addon-remove-mutation'
@@ -206,6 +207,7 @@ const CustomDomainSidePanel = () => {
                 />
               ))}
             </RadioGroupCard>
+            <TaxDisclaimer className="mt-3" />
           </div>
 
           {hasChanges && selectedOption !== 'cd_none' && (

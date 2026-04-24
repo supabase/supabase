@@ -16,6 +16,7 @@ import {
 } from 'ui'
 
 import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
@@ -318,6 +319,7 @@ const PITRSidePanel = () => {
                   />
                 ))}
               </RadioGroupCard>
+              <TaxDisclaimer className="mt-3" />
             </div>
           )}
 
