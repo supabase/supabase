@@ -11,11 +11,4 @@ module.exports = config({
     './../../packages/ui/src/**/*.{tsx,ts,js}',
     './../../packages/ui-patterns/src/**/*.{tsx,ts,js}',
   ],
-  theme: {
-    extend: {
-      maxWidth: {
-        site: '128rem',
-      },
-    },
-  },
 })
