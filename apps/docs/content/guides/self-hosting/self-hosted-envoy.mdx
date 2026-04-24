@@ -10,14 +10,22 @@ This guide explains the architecture, configuration layout, and security posture
 
 ## Before you begin
 
-- A working self-hosted Supabase installation - see [Self-Hosting with Docker](/docs/guides/self-hosting/docker)
-- To enable opaque `sb_` key translation, complete [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys)
+- Complete the [Self-Hosting with Docker](/docs/guides/self-hosting/docker) setup
+- To enable opaque `sb_` key translation, see [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys)
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## Enabling the Envoy gateway
 
-The Envoy gateway is provided as a Docker Compose override. Start your stack with both the base compose file and the Envoy override:
+The Envoy gateway is provided as a Docker Compose override.
+
+<Admonition type="note">
+
+  If your stack is already running from the initial setup, bring it down first with `docker compose down`.
+
+</Admonition>
+
+Start your self-hosted Supabase stack with both the base compose file and the Envoy override:
 
 ```sh
 docker compose -f docker-compose.yml -f docker-compose.envoy.yml up -d
