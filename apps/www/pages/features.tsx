@@ -1,17 +1,15 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/compat/router'
-import { NextSeo } from 'next-seo'
-import { motion } from 'framer-motion'
-import { Search } from 'lucide-react'
-import { debounce } from 'lib/helpers'
-
-import { Button, Checkbox, cn, Input } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
-
 import { features } from '~/data/features'
+import { motion } from 'framer-motion'
+import { debounce } from 'lib/helpers'
+import { Search } from 'lucide-react'
+import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/compat/router'
+import Link from 'next/link'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Button, Checkbox_Shadcn_ as Checkbox, cn, Input } from 'ui'
 
 function FeaturesPage() {
   const router = useRouter()
@@ -139,7 +137,7 @@ function FeaturesPage() {
                   <Checkbox
                     id="self-hosted-filter"
                     checked={showSelfHostedOnly}
-                    onChange={() => setShowSelfHostedOnly(!showSelfHostedOnly)}
+                    onCheckedChange={() => setShowSelfHostedOnly(!showSelfHostedOnly)}
                     className="[&_input]:m-0"
                   />
                   <label
@@ -163,7 +161,7 @@ function FeaturesPage() {
                         <Checkbox
                           id={product}
                           checked={selectedProducts.includes(product)}
-                          onChange={() => handleProductChange(product)}
+                          onCheckedChange={() => handleProductChange(product)}
                           className="[&_input]:m-0"
                         />
                         <label

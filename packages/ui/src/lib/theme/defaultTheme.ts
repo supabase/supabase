@@ -465,65 +465,6 @@ export default {
     textarea_actions_container_items: 'flex items-center',
   },
 
-  /*
-   *  Checkbox
-   *
-   *
-   * This Checkbox requires a plugin in your config:
-
-    ```
-    // tailwind.config.js
-    module.exports = {
-      // ...
-      plugins: [
-        // ...
-        require('@tailwindcss/forms'),
-      ],
-    }
-    ```
-   *
-   *
-  */
-
-  checkbox: {
-    base: `
-      bg-transparent
-      ${defaults.focus}
-      focus:ring-border-muted
-      text-brand
-      border-strong
-      shadow-sm
-      rounded
-      cursor-pointer
-    `,
-    container: `flex cursor-pointer leading-none`,
-    size: {
-      tiny: `h-3 w-3 mt-1 mr-3`,
-      small: `h-3.5 w-3.5 mt-0.5 mr-3.5`,
-      medium: `h-4 w-4 mt-0.5 mr-3.5`,
-      large: `h-5 w-5 mt-0.5 mr-4`,
-      xlarge: `h-5 w-5 mt-0.5 mr-4`,
-    },
-    disabled: 'opacity-50',
-    label: {
-      base: `text-foreground-light cursor-pointer`,
-      ...defaults.size.text,
-    },
-    label_before: {
-      base: 'text-border',
-      ...defaults.size.text,
-    },
-    label_after: {
-      base: 'text-border',
-      ...defaults.size.text,
-    },
-    description: {
-      base: `text-foreground-lighter`,
-      ...defaults.size.text,
-    },
-    group: `space-y-3`,
-  },
-
   sidepanel: {
     base: `
       z-50
