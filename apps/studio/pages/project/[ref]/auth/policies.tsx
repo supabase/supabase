@@ -20,6 +20,7 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { useIsRLSTesterEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from '@/components/interfaces/Auth/Policies/Policies'
 import { PoliciesDataProvider } from '@/components/interfaces/Auth/Policies/PoliciesDataContext'
 import { getGeneralPolicyTemplates } from '@/components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
@@ -110,7 +111,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
+
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
+  const rlsTesterEnabled = useIsRLSTesterEnabled()
+
   const { openSidebar } = useSidebarManagerSnapshot()
   const {
     setValue: setEditorPanelValue,
@@ -275,7 +279,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           </PageHeaderSummary>
           <PageHeaderAside>
             <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
-            <RLSTesterSheet handleSelectEditPolicy={handleSelectEditPolicy} />
+            {rlsTesterEnabled && <RLSTesterSheet handleSelectEditPolicy={handleSelectEditPolicy} />}
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>

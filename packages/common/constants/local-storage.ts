@@ -25,6 +25,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_FLOATING_MOBILE_TOOLBAR: 'supabase-ui-floating-mobile-toolbar',
   UI_PREVIEW_PLATFORM_WEBHOOKS: 'supabase-ui-platform-webhooks',
   UI_PREVIEW_JIT_DB_ACCESS: 'supabase-ui-jit-db-access',
+  UI_PREVIEW_RLS_TESTER: 'supabase-ui-rls-tester',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
