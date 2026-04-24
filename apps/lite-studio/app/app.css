@@ -1,5 +1,5 @@
 @import './../../../packages/ui/build/css/source/global.css';
-@import './../../../packages/ui/build/css/themes/dark-combined.css';
+@import './../../../packages/ui/build/css/themes/dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
 @tailwind components;

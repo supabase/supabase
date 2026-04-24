@@ -3835,6 +3835,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/replication/{ref}/tenants': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * Delete tenant
+     * @description Delete the replication tenant for the project. Requires bearer auth.
+     */
+    delete: operations['ReplicationTenantsController_deleteTenant']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/replication/{ref}/tenants-sources': {
     parameters: {
       query?: never
@@ -6126,6 +6146,23 @@ export interface components {
     }
     DeclineAuthorizationResponse: {
       id: string
+    }
+    DeleteDestinationPipelineResponse: {
+      /**
+       * @description Whether the destination was deleted. True when no other pipelines remain attached to it.
+       * @example true
+       */
+      destination_deleted: boolean
+      /**
+       * @description Destination id
+       * @example 2001
+       */
+      destination_id: number
+      /**
+       * @description Pipeline id
+       * @example 1012
+       */
+      pipeline_id: number
     }
     DeleteOAuthAppResponse: {
       client_id: string
@@ -23703,7 +23740,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['DeleteDestinationPipelineResponse']
+        }
       }
       /** @description Unauthorized */
       401: {
@@ -23714,6 +23753,20 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Pipeline or destination not found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Pipeline is still active. */
+      409: {
         headers: {
           [name: string]: unknown
         }
@@ -23873,6 +23926,20 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Destination not found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Destination has an active or attached pipeline. */
+      409: {
         headers: {
           [name: string]: unknown
         }
@@ -24193,6 +24260,20 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Pipeline not found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Pipeline is still active. */
+      409: {
         headers: {
           [name: string]: unknown
         }
@@ -24946,6 +25027,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Source not found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Rate limit exceeded */
       429: {
         headers: {
@@ -25007,6 +25095,69 @@ export interface operations {
         content?: never
       }
       /** @description Unexpected error while listing tables. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationTenantsController_deleteTenant: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Tenant deleted. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Tenant not found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Tenant has active pipelines. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while deleting tenant. */
       500: {
         headers: {
           [name: string]: unknown

@@ -462,6 +462,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
                 />
               )}
+              <p className="text-center text-xs text-foreground-muted mt-6">
+                Supabase AI may not always produce correct answers. Double check responses.
+              </p>
             </ConversationContent>
             <ConversationScrollButton />
           </Conversation>
