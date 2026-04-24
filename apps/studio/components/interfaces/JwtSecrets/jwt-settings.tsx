@@ -34,9 +34,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
@@ -220,7 +220,7 @@ export const JWTSettings = () => {
         }
       >
         <Panel.Content className="border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={formId}
               onSubmit={form.handleSubmit(onUpdateJwtExp)}
@@ -308,7 +308,7 @@ export const JWTSettings = () => {
                     />
                   </FormItemLayout>
 
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="JWT_EXP"
                     disabled={!canUpdateConfig || isLoadingAuthConfig}
@@ -327,7 +327,7 @@ export const JWTSettings = () => {
                           </>
                         }
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <InputGroup>
                             <FormInputGroupInput
                               {...field}
@@ -345,14 +345,14 @@ export const JWTSettings = () => {
                               <InputGroupText>seconds</InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
 
           {!isPending && !legacyKey && (
             <>
@@ -656,7 +656,7 @@ export const JWTSettings = () => {
         }
       >
         <Modal.Content>
-          <Form_Shadcn_ {...customJwtSecretForm}>
+          <Form {...customJwtSecretForm}>
             <form
               id={customJwtSecretFormId}
               onSubmit={customJwtSecretForm.handleSubmit((values) => {
@@ -671,7 +671,7 @@ export const JWTSettings = () => {
                 Pick a new custom JWT secret. Make sure it is a strong combination of characters
                 that cannot be guessed easily.
               </p>
-              <FormField_Shadcn_
+              <FormField
                 control={customJwtSecretForm.control}
                 name="customToken"
                 render={({ field }) => (
@@ -680,14 +680,14 @@ export const JWTSettings = () => {
                     label="Custom JWT secret"
                     description="Minimally 32 characters long, '@' and '$' are not allowed."
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input copy reveal icon={<Key />} className="w-full text-left" {...field} />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </Modal.Content>
       </Modal>
     </>

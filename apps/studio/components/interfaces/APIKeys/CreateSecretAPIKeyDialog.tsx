@@ -18,9 +18,9 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -99,13 +99,13 @@ export const CreateSecretAPIKeyDialog = () => {
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-4">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               className="flex flex-col gap-4"
               id={FORM_ID}
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              <FormField
                 key="name"
                 name="name"
                 control={form.control}
@@ -114,29 +114,29 @@ export const CreateSecretAPIKeyDialog = () => {
                     label="Name"
                     description="A short, unique name of lowercased letters, digits and underscore"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_ {...field} placeholder="Example: my_super_secret_key_123" />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 key="description"
                 name="description"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout label="Description" labelOptional="Optional">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         {...field}
                         placeholder="Short notes on how or where this key will be used"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
           <Alert_Shadcn_ variant="warning">
             <ShieldCheck />
             <AlertTitle_Shadcn_>Securing your API key</AlertTitle_Shadcn_>

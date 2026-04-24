@@ -12,11 +12,11 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   Input,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
@@ -74,25 +74,25 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
 
   return (
     <SheetSection className="flex flex-col gap-6">
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="values.method"
         render={({ field }) => (
-          <FormItem_Shadcn_>
-            <FormLabel_Shadcn_>Method</FormLabel_Shadcn_>
+          <FormItem>
+            <FormLabel>Method</FormLabel>
             <Select_Shadcn_ onValueChange={field.onChange} value={field.value}>
-              <FormControl_Shadcn_>
+              <FormControl>
                 <SelectTrigger_Shadcn_>
                   <SelectValue_Shadcn_ placeholder="Select a method for the API call" />
                 </SelectTrigger_Shadcn_>
-              </FormControl_Shadcn_>
+              </FormControl>
               <SelectContent_Shadcn_>
                 <SelectItem_Shadcn_ value="GET">GET</SelectItem_Shadcn_>
                 <SelectItem_Shadcn_ value="POST">POST</SelectItem_Shadcn_>
               </SelectContent_Shadcn_>
             </Select_Shadcn_>
-            <FormMessage_Shadcn_ />
-          </FormItem_Shadcn_>
+            <FormMessage />
+          </FormItem>
         )}
       />
 
@@ -113,18 +113,18 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
           )}
         </div>
       ) : edgeFunctions.length > 0 ? (
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="values.edgeFunctionName"
           render={({ field }) => {
             const selectedFunction = edgeFunctions.find((fn) => fn.url === field.value)
 
             return (
-              <FormItem_Shadcn_>
-                <FormLabel_Shadcn_>Edge Function</FormLabel_Shadcn_>
+              <FormItem>
+                <FormLabel>Edge Function</FormLabel>
                 <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
                   <PopoverTrigger_Shadcn_ asChild>
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Button
                         type="default"
                         role="combobox"
@@ -146,7 +146,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
                           ? selectedFunction.name
                           : 'Select which edge function to trigger'}
                       </Button>
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </PopoverTrigger_Shadcn_>
                   <PopoverContent_Shadcn_ id={listboxId} className="p-0" sameWidthAsTrigger>
                     <Command_Shadcn_>
@@ -181,13 +181,13 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
                     </Command_Shadcn_>
                   </PopoverContent_Shadcn_>
                 </Popover_Shadcn_>
-                <FormMessage_Shadcn_ />
-              </FormItem_Shadcn_>
+                <FormMessage />
+              </FormItem>
             )
           }}
         />
       ) : null}
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="values.timeoutMs"
         render={({ field: { ref, ...rest } }) => (

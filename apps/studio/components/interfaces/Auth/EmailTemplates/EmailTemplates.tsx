@@ -11,9 +11,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -192,7 +192,7 @@ export const EmailTemplates = () => {
               </PageSectionSummary>
             </PageSectionMeta>
             <PageSectionContent>
-              <Form_Shadcn_ {...notificationsForm}>
+              <Form {...notificationsForm}>
                 <form onSubmit={notificationsForm.handleSubmit(onSubmit)} className="space-y-4">
                   <Card>
                     {TEMPLATES_SCHEMAS.filter((t) => t.misc?.emailTemplateType === 'security').map(
@@ -219,17 +219,17 @@ export const EmailTemplates = () => {
                             </Link>
 
                             <div className="flex items-center gap-4 h-full pl-2 relative">
-                              <FormField_Shadcn_
+                              <FormField
                                 control={notificationsForm.control}
                                 name={templateEnabledKey}
                                 render={({ field }) => (
-                                  <FormControl_Shadcn_>
+                                  <FormControl>
                                     <Switch
                                       checked={field.value}
                                       onCheckedChange={field.onChange}
                                       disabled={!canUpdateConfig}
                                     />
-                                  </FormControl_Shadcn_>
+                                  </FormControl>
                                 )}
                               />
 
@@ -265,7 +265,7 @@ export const EmailTemplates = () => {
                     </CardFooter>
                   </Card>
                 </form>
-              </Form_Shadcn_>
+              </Form>
             </PageSectionContent>
           </PageSection>
         </>

@@ -8,9 +8,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -258,11 +258,11 @@ export const SSOConfig = () => {
           />
         ) : isSuccess || isSSOProviderNotFound ? (
           <>
-            <Form_Shadcn_ {...form}>
+            <Form {...form}>
               <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
                 <Card>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="enabled"
                       render={({ field }) => (
@@ -282,13 +282,13 @@ export const SSOConfig = () => {
                             </>
                           }
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Switch
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               size="large"
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -297,7 +297,7 @@ export const SSOConfig = () => {
                   {isSSOEnabled && (
                     <>
                       <CardContent>
-                        <FormField_Shadcn_
+                        <FormField
                           control={form.control}
                           name="enableSpInitiated"
                           render={({ field }) => (
@@ -306,9 +306,9 @@ export const SSOConfig = () => {
                               label="Enable SP-initiated login"
                               description="Allow users to start the login flow from the Supabase dashboard by entering their email address. Requires configuring email domains below."
                             >
-                              <FormControl_Shadcn_>
+                              <FormControl>
                                 <Switch checked={field.value} onCheckedChange={field.onChange} />
-                              </FormControl_Shadcn_>
+                              </FormControl>
                             </FormItemLayout>
                           )}
                         />
@@ -406,7 +406,7 @@ export const SSOConfig = () => {
                   </CardFooter>
                 </Card>
               </form>
-            </Form_Shadcn_>
+            </Form>
 
             <TextConfirmModal
               visible={isDeleteModalVisible}

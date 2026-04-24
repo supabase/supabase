@@ -11,9 +11,9 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input,
   Input_Shadcn_,
 } from 'ui'
@@ -102,7 +102,7 @@ export const CreateNewProjectDialog = ({
             This process will create a new project and restore your database to it.
           </DialogDescription>
         </DialogHeader>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             id={'create-new-project-form'}
             onSubmit={form.handleSubmit((data) => {
@@ -134,23 +134,23 @@ export const CreateNewProjectDialog = ({
             })}
           >
             <DialogSection className="pb-6 space-y-4 text-sm">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItemLayout label="New Project Name">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_ placeholder="Enter a name" type="text" {...field} />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="password"
                 render={({ field }) => (
                   <FormItemLayout>
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input
                         id="db-password"
                         label="Database password"
@@ -175,7 +175,7 @@ export const CreateNewProjectDialog = ({
                           />
                         }
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -190,7 +190,7 @@ export const CreateNewProjectDialog = ({
               </Button>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

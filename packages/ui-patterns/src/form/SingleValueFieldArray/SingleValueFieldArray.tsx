@@ -11,10 +11,10 @@ import {
 import {
   Button,
   cn,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
   Input_Shadcn_,
 } from 'ui'
 
@@ -97,12 +97,12 @@ export const SingleValueFieldArray = <
       <div className={rowsClassName}>
         {typedFields.map((field, index) => (
           <div key={field.fieldId} className={cn('flex items-start space-x-2', rowClassName)}>
-            <FormField_Shadcn_
+            <FormField
               control={control}
               name={toFieldPath<TFieldValues>(`${name}.${index}.${valueFieldName}`)}
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex-1">
-                  <FormControl_Shadcn_>
+                <FormItem className="flex-1">
+                  <FormControl>
                     <Input_Shadcn_
                       {...field}
                       size={inputSize}
@@ -111,9 +111,9 @@ export const SingleValueFieldArray = <
                       placeholder={placeholder}
                       disabled={disabled}
                     />
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 

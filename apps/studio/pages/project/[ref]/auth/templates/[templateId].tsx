@@ -11,9 +11,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
 } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
@@ -214,11 +214,11 @@ const RedirectToTemplates = () => {
                   </PageSectionSummary>
                 </PageSectionMeta>
                 <PageSectionContent>
-                  <Form_Shadcn_ {...templateForm}>
+                  <Form {...templateForm}>
                     <form onSubmit={templateForm.handleSubmit(onSubmit)} className="space-y-4">
                       <Card>
                         <CardContent>
-                          <FormField_Shadcn_
+                          <FormField
                             control={templateForm.control}
                             name={templateEnabledKey as keyof z.infer<typeof TemplateFormSchema>}
                             render={({ field }) => (
@@ -227,13 +227,13 @@ const RedirectToTemplates = () => {
                                 label="Enable notification"
                                 description="Send this email to users when triggered"
                               >
-                                <FormControl_Shadcn_>
+                                <FormControl>
                                   <Switch
                                     checked={field.value}
                                     onCheckedChange={field.onChange}
                                     disabled={!canUpdateConfig}
                                   />
-                                </FormControl_Shadcn_>
+                                </FormControl>
                               </FormItemLayout>
                             )}
                           />
@@ -259,7 +259,7 @@ const RedirectToTemplates = () => {
                         </CardFooter>
                       </Card>
                     </form>
-                  </Form_Shadcn_>
+                  </Form>
                 </PageSectionContent>
               </PageSection>
             )}

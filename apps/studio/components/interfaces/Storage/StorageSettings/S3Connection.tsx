@@ -13,9 +13,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
   Table,
   TableBody,
@@ -149,14 +149,14 @@ export const S3Connection = () => {
               />
             )}
 
-            <Form_Shadcn_ {...form}>
+            <Form {...form}>
               <form id="s3-connection-form" onSubmit={form.handleSubmit(onSubmit)}>
                 {projectIsLoading ? (
                   <GenericSkeletonLoader />
                 ) : isProjectActive ? (
                   <Card>
                     <CardContent>
-                      <FormField_Shadcn_
+                      <FormField
                         name="s3ConnectionEnabled"
                         control={form.control}
                         render={({ field }) => (
@@ -166,14 +166,14 @@ export const S3Connection = () => {
                             label="S3 protocol connection"
                             description="Allow clients to connect to Supabase Storage via the S3 protocol"
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch
                                 size="large"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                                 disabled={!isSuccessStorageConfig || field.disabled}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -257,7 +257,7 @@ export const S3Connection = () => {
                   </Alert_Shadcn_>
                 )}
               </form>
-            </Form_Shadcn_>
+            </Form>
           </PageSectionContent>
         </PageSection>
 
