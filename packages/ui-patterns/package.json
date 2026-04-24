@@ -823,6 +823,7 @@
     "sonner": "^1.5.0",
     "sql-formatter": "^15.0.0",
     "sse.js": "^2.2.0",
+    "tailwindcss": "^4.2.4",
     "tsconfig": "workspace:*",
     "ui": "workspace:*",
     "unist-util-visit": "^5.0.0",

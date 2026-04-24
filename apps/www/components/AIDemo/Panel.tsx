@@ -1,10 +1,10 @@
 // components/AIDemoPanel.tsx
-import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Button, Input } from 'ui'
-import { AiIconAnimation, cn } from 'ui'
-import errorGif from 'public/images/ai/error.gif'
+import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
+import errorGif from 'public/images/ai/error.gif'
+import { useEffect, useRef, useState } from 'react'
+import { AiIconAnimation, Button, cn, Input } from 'ui'
+
 import styles from './assistant.module.css'
 
 interface DemoMessage {

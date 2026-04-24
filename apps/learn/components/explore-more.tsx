@@ -69,7 +69,7 @@ export function ExploreMore({ items }: ExploreMoreProps) {
             const description = item.description || getDescription(item.itemType)
 
             const cardContent = (
-              <div className="relative bg-background border border-border rounded-lg shadow-sm p-6 h-full hover:shadow-md transition-shadow group">
+              <div className="relative bg-background border border-border rounded-lg shadow-xs p-6 h-full hover:shadow-md transition-shadow group">
                 <div className="absolute top-4 right-4">
                   <ExternalLink className="h-4 w-4 text-foreground-lighter opacity-50 group-hover:opacity-100 transition-opacity" />
                 </div>

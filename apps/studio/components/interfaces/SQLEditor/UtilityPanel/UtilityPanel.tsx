@@ -188,7 +188,6 @@ export const UtilityPanel = ({
           executeQuery={executeQuery}
         />
       </TabsList_Shadcn_>
-
       <TabsContent_Shadcn_ asChild value="results" className="mt-0 grow">
         <UtilityTabResults
           id={id}

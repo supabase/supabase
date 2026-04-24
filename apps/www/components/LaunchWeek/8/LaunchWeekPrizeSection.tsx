@@ -1,7 +1,8 @@
+import Image from 'next/image'
 import React from 'react'
+
 import LabelBadge from './LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
-import Image from 'next/image'
 
 export default function LaunchWeekPrizeSection({
   className,

@@ -47,17 +47,19 @@
 }
 
 .sbui-close-button--success {
-  @apply text-green-500 hover:bg-green-600 hover:bg-green-600/10;
+    @apply text-green-500 hover:bg-green-600/10;
 }
 
 .sbui-close-button--danger {
-  @apply text-red-500 hover:bg-red-600 hover:bg-red-600/10;
+  @apply text-red-500 hover:bg-red-600/10;
 }
 
 .sbui-close-button--warning {
-  @apply text-yellow-500 hover:bg-yellow-600 hover:bg-yellow-600/10;
+  @apply text-yellow-500 hover:bg-yellow-600/10;
 }
 
 .sbui-close-button--info {
-  @apply text-blue-500 hover:bg-blue-600 hover:bg-blue-600/10;
+  @apply text-blue-500 hover:bg-blue-600/10;
+}
+
 } */

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { Badge, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import type content from '../../Connect/content/drizzle/content'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { convertKVStringArrayToJson, formatWrapperTables } from './Wrappers.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'

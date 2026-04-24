@@ -87,7 +87,7 @@
     "rimraf": "^4.1.3",
     "shadcn": "^3.0.0",
     "shiki": "^1.1.7",
-    "tailwindcss": "catalog:",
+    "tailwindcss": "4.2.4",
     "tsconfig": "workspace:*",
     "tsx": "catalog:",
     "typescript": "catalog:",

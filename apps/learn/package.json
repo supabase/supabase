@@ -33,6 +33,7 @@
     "remark": "^14.0.3",
     "remark-code-import": "^1.2.0",
     "remark-gfm": "^4.0.0",
+    "tailwindcss": "^4.2.4",
     "ui": "workspace:*",
     "ui-patterns": "workspace:*",
     "unist-util-visit": "^5.0.0"

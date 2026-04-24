@@ -1,7 +1,6 @@
 'use client'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import SupabaseWordmark from './SupabaseWordmark'
 import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
@@ -11,6 +10,7 @@ import { Accordion, Button } from 'ui'
 import { TextLink } from 'ui-patterns/TextLink'
 
 import MenuItem from './MenuItem'
+import SupabaseWordmark from './SupabaseWordmark'
 import staticContent from '@/.generated/staticContent/_index.json'
 import ProductModulesData from '@/data/ProductModules'
 import { DEFAULT_EASE } from '@/lib/animations'

@@ -12,7 +12,7 @@ interface NextUpProps {
 export function NextUp({ title, description, href, chapterNumber }: NextUpProps) {
   return (
     <div className="mt-16 mb-8 grow">
-      <div className="bg-background border border-border rounded-lg shadow-sm p-8 max-w-2xl">
+      <div className="bg-background border border-border rounded-lg shadow-xs p-8 max-w-2xl">
         <div className="grid gap-4">
           <p className="text-sm text-foreground-lighter">Next Up</p>
           <h2 className="text-xl font-bold text-foreground">

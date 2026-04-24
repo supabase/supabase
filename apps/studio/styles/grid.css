@@ -1,5 +1,4 @@
 @reference "./main.css";
-
 .sb-grid {
   @apply flex h-full flex-col;
 }

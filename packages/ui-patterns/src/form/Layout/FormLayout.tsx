@@ -370,7 +370,7 @@ export const FormLayout = React.forwardRef<
                   htmlFor={props.name || id}
                 >
                   <LabelContents />
-                </FormLabel>
+                </>
               ) : (
                 <Label_Shadcn_
                   className="text-foreground flex gap-2 items-center wrap-break-word leading-normal"

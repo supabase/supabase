@@ -1,6 +1,5 @@
 import { useMDXComponent } from 'next-contentlayer2/hooks'
 import Link from 'next/link'
-
 import {
   Accordion_Shadcn_ as Accordion,
   AccordionContent_Shadcn_ as AccordionContent,
@@ -8,6 +7,7 @@ import {
   AccordionTrigger_Shadcn_ as AccordionTrigger,
   cn,
 } from 'ui'
+
 import { Callout } from './callout'
 import { CopyButton } from './copy-button'
 import TanStackBeta from './tanstack-beta'
