@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -45,15 +45,19 @@ import {
 import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/AuthTemplatesValidation'
+import { EmailBrandingSheet } from '@/components/interfaces/Auth/EmailTemplates/EmailBrandingSheet'
 import { slugifyTitle } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
 import { TemplateEditor } from '@/components/interfaces/Auth/EmailTemplates/TemplateEditor'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
 import NoPermission from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
@@ -65,6 +69,7 @@ const RedirectToTemplates = () => {
   const router = useRouter()
   const { templateId, ref } = router.query
   const { ref: projectRef } = useParams()
+  const [brandingSheetOpen, setBrandingSheetOpen] = useState(false)
 
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -77,6 +82,13 @@ const RedirectToTemplates = () => {
   )
 
   const { data: authConfig, isPending: isLoadingConfig } = useAuthConfigQuery({ projectRef })
+
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
+  const isFreeTier = subscription?.plan?.id === 'free'
+  const builtInSMTP =
+    authConfig && (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
+  const isTemplateEditBlocked = isFreeTier && builtInSMTP
 
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
@@ -273,14 +285,45 @@ const RedirectToTemplates = () => {
                 </PageSectionMeta>
               )}
               <PageSectionContent>
-                <Card>
-                  <TemplateEditor template={template} />
-                </Card>
+                {isTemplateEditBlocked ? (
+                  <Admonition
+                    type="default"
+                    title="Raw template editing is not available on the free plan"
+                    description={
+                      <p>
+                        Free-tier projects using Supabase's shared email service cannot modify raw
+                        email template HTML. Customize your branding attributes instead, or set up
+                        custom SMTP to unlock full template editing.{' '}
+                        <InlineLink
+                          href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}
+                        >
+                          Learn more
+                        </InlineLink>
+                      </p>
+                    }
+                    actions={
+                      <div className="flex flex-col gap-2 sm:flex-row">
+                        <Button type="primary" onClick={() => setBrandingSheetOpen(true)}>
+                          Customize branding
+                        </Button>
+                        <Button asChild type="default">
+                          <Link href={`/project/${ref}/auth/smtp`}>Set up SMTP</Link>
+                        </Button>
+                      </div>
+                    }
+                  />
+                ) : (
+                  <Card>
+                    <TemplateEditor template={template} />
+                  </Card>
+                )}
               </PageSectionContent>
             </PageSection>
           </>
         )}
       </PageContainer>
+
+      <EmailBrandingSheet visible={brandingSheetOpen} onClose={() => setBrandingSheetOpen(false)} />
     </>
   )
 }
