@@ -38,7 +38,6 @@ export function SupportAccessToggle({ form, align = 'left' }: SupportAccessToggl
           <FormItemLayout
             hideMessage
             name="allowSupportAccess"
-            className="px-6"
             layout="flex"
             align={align}
             label={
