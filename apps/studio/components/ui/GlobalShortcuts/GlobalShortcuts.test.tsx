@@ -17,9 +17,9 @@ vi.mock('@/state/shortcuts/useShortcut', () => ({
   useShortcut: mockUseShortcut,
 }))
 
-vi.mock('./ShortcutsReferenceDialog', () => ({
-  ShortcutsReferenceDialog: ({ open }: { open: boolean }) => (
-    <div data-testid="shortcuts-reference-dialog" data-open={open} />
+vi.mock('./ShortcutsReferenceSheet', () => ({
+  ShortcutsReferenceSheet: ({ open }: { open: boolean }) => (
+    <div data-testid="shortcuts-reference-sheet" data-open={open} />
   ),
 }))
 
@@ -38,13 +38,13 @@ describe('GlobalShortcuts', () => {
     )
   })
 
-  it('closes the command palette and opens the shortcuts reference dialog', () => {
+  it('closes the command palette and opens the shortcuts reference sheet', () => {
     render(<GlobalShortcuts />)
 
     const openReference = mockUseShortcut.mock.calls[0][1]
     act(() => openReference())
 
     expect(mockSetCommandMenuOpen).toHaveBeenCalledWith(false)
-    expect(screen.getByTestId('shortcuts-reference-dialog')).toHaveAttribute('data-open', 'true')
+    expect(screen.getByTestId('shortcuts-reference-sheet')).toHaveAttribute('data-open', 'true')
   })
 })

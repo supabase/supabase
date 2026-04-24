@@ -5,7 +5,7 @@ import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS } from '@/state/shortcuts/registry'
 import type { ShortcutDefinition } from '@/state/shortcuts/types'
 
-interface ShortcutsReferenceDialogProps {
+interface ShortcutsReferenceSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
@@ -73,7 +73,7 @@ const ShortcutSequence = ({ sequence }: Pick<ShortcutDefinition, 'sequence'>) =>
   </div>
 )
 
-export function ShortcutsReferenceDialog({ open, onOpenChange }: ShortcutsReferenceDialogProps) {
+export function ShortcutsReferenceSheet({ open, onOpenChange }: ShortcutsReferenceSheetProps) {
   const groups = groupDefinitions()
 
   return (

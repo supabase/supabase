@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
-import { ShortcutsReferenceDialog } from './ShortcutsReferenceDialog'
+import { ShortcutsReferenceSheet } from './ShortcutsReferenceSheet'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -20,5 +20,5 @@ export function GlobalShortcuts() {
     }
   )
 
-  return <ShortcutsReferenceDialog open={referenceOpen} onOpenChange={setReferenceOpen} />
+  return <ShortcutsReferenceSheet open={referenceOpen} onOpenChange={setReferenceOpen} />
 }
