@@ -24,6 +24,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import {
   PageSection,
+  PageSectionAside,
   PageSectionContent,
   PageSectionMeta,
   PageSectionSummary,
@@ -106,15 +107,6 @@ export const ProjectNeedsSecuringView = ({
             <PageHeaderDescription>{formatRlsDescription(issueCount)}</PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
-            <AiAssistantDropdown
-              label="Ask Assistant"
-              size="tiny"
-              buildPrompt={() => promptMarkdown}
-              onOpenAssistant={handleOpenAssistant}
-              onCopyPrompt={() => onTrackAction('copy_prompt')}
-              copyLabel="Copy Markdown"
-              disabled={isLoading}
-            />
             <Button asChild type="default" iconRight={<ArrowRight />}>
               <Link
                 href={`/project/${projectRef}`}
@@ -136,6 +128,17 @@ export const ProjectNeedsSecuringView = ({
             <PageSectionSummary>
               <PageSectionTitle>Review and fix</PageSectionTitle>
             </PageSectionSummary>
+            <PageSectionAside>
+              <AiAssistantDropdown
+                label="Ask Assistant"
+                size="tiny"
+                buildPrompt={() => promptMarkdown}
+                onOpenAssistant={handleOpenAssistant}
+                onCopyPrompt={() => onTrackAction('copy_prompt')}
+                copyLabel="Copy Markdown"
+                disabled={isLoading}
+              />
+            </PageSectionAside>
           </PageSectionMeta>
           <PageSectionContent>
             {isLoading ? (
