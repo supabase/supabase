@@ -107,6 +107,8 @@ describe('Project settings availability', () => {
 
     expect(screen.getByText('Restart project')).toBeInTheDocument()
     expect(screen.getByText('RestartServerButton')).toBeInTheDocument()
+    expect(screen.getByText('Pause project')).toBeInTheDocument()
+    expect(screen.getByText('PauseProjectButton')).toBeInTheDocument()
     expect(screen.queryByText('ResumeProjectButton')).not.toBeInTheDocument()
   })
 
@@ -128,10 +130,10 @@ describe('Project settings availability', () => {
     render(<Project />)
 
     expect(screen.getByText('Resume project')).toBeInTheDocument()
-    expect(
-      screen.getByText('Bring your paused project back online without leaving Project Settings.')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Bring your paused project back online.')).toBeInTheDocument()
     expect(screen.getByText('ResumeProjectButton')).toBeInTheDocument()
+    expect(screen.queryByText('Pause project')).not.toBeInTheDocument()
+    expect(screen.queryByText('PauseProjectButton')).not.toBeInTheDocument()
     expect(screen.queryByText('RestartServerButton')).not.toBeInTheDocument()
   })
 
@@ -161,6 +163,8 @@ describe('Project settings availability', () => {
       'href',
       '/project/paused-project'
     )
+    expect(screen.queryByText('Pause project')).not.toBeInTheDocument()
+    expect(screen.queryByText('PauseProjectButton')).not.toBeInTheDocument()
     expect(screen.queryByText('ResumeProjectButton')).not.toBeInTheDocument()
   })
 })
