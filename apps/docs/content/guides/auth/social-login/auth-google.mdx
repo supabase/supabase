@@ -808,7 +808,7 @@ chrome.identity.launchWebAuthFlow(
     } else {
       // auth was successful, extract the ID token from the redirectedTo URL
       const url = new URL(redirectedTo)
-      const params = new URLSearchParams(url.hash)
+      const params = new URLSearchParams(url.hash.slice(1))
 
       const { data, error } = await supabase.auth.signInWithIdToken({
         provider: 'google',
