@@ -22,7 +22,7 @@ Check and review issues in your database using [Security Advisor](/dashboard/pro
   - Tables that do not have RLS enabled with reasonable policies allow any client to access and modify their data. This is usually not what you want.
   - [Learn more about RLS](/docs/guides/database/postgres/row-level-security).
 - Enable replication on tables containing sensitive data by enabling RLS and setting row security policies:
-  - Go to the [**Authentication > Policies**](/dashboard/project/_/auth/policies) section of the Supabase Dashboard to enable RLS and create security policies.
+  - Go to the [**Database > Policies**](/dashboard/project/_/database/policies) section of the Supabase Dashboard to enable RLS and create security policies.
   - Go to the [**Database > Publications**](/dashboard/project/_/database/publications) section of the Supabase Dashboard to manage replication tables.
 - Turn on [SSL Enforcement](/docs/guides/platform/ssl-enforcement) from the [**Database > Settings > SSL Configuration**](/dashboard/project/_/database/settings#ssl-configuration) section of the dashboard.
 - Enable [Network Restrictions](/docs/guides/platform/network-restrictions) for the database from the [**Database > Settings > Network Restrictions**](/dashboard/project/_/database/settings#network-restrictions) section of the dashboard.
