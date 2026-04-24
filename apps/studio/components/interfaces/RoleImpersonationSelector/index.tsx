@@ -18,7 +18,6 @@ export const RoleImpersonationSelector = ({
   serviceRoleLabel,
   padded = true,
   disallowAuthenticatedOption = false,
-  title = 'Database role settings',
 }: RoleImpersonationSelectorProps) => {
   const state = useRoleImpersonationStateSnapshot()
 
@@ -61,7 +60,7 @@ export const RoleImpersonationSelector = ({
   return (
     <>
       <div className={cn('flex flex-col gap-3', padded ? 'p-5' : 'pb-5')}>
-        <p className="text-foreground text-base">{title}</p>
+        <p className="text-foreground text-base">Database role settings</p>
 
         <form
           onSubmit={(e) => {
