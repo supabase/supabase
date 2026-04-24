@@ -55,7 +55,8 @@ const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
 
 const getStripeProjectsUpgradeCommand = (planId: string | null | undefined) => {
   const currentTier = planId ?? 'free'
-  return `stripe projects upgrade supabase/${currentTier}`
+  const action = currentTier === 'team' ? 'downgrade' : 'upgrade'
+  return `stripe projects ${action} supabase/${currentTier}`
 }
 
 export const PlanUpdateSidePanel = () => {

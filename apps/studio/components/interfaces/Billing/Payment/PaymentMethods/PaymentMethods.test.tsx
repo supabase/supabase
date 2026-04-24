@@ -151,8 +151,7 @@ describe('PaymentMethods', () => {
     render(<PaymentMethods />)
 
     expect(screen.getByText('Expires: 12/2028')).toBeInTheDocument()
-    expect(screen.queryByText(/Card expires:/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/Via Stripe Projects/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Managed via Stripe Projects/i)).not.toBeInTheDocument()
   })
 
   it('shows Stripe Projects payment method details separately from the underlying card', () => {
@@ -188,9 +187,10 @@ describe('PaymentMethods', () => {
     render(<PaymentMethods />)
 
     expect(screen.getByText('**** **** **** 4242')).toBeInTheDocument()
-    expect(screen.getByText('Card expires: 12/2028')).toBeInTheDocument()
+    expect(screen.getByText('Expires: 12/2028')).toBeInTheDocument()
+    expect(screen.getByText(/Managed via Stripe Projects/i)).toBeInTheDocument()
     expect(screen.getByText('VOLZ')).toBeInTheDocument()
-    expect(screen.getByText(/expires: 12\/2028/i, { selector: 'span' })).toBeInTheDocument()
+    expect(screen.getByText(/Expires 12\/2028/i, { selector: 'span' })).toBeInTheDocument()
     expect(screen.getByText('Active')).toBeInTheDocument()
   })
 })

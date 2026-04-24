@@ -122,16 +122,15 @@ const CreditCard = ({
             <div className="flex items-center gap-8">
               <p className="prose text-sm font-mono">**** **** **** {paymentMethod.card.last4}</p>
               <p className="text-sm tabular-nums">
-                {isSpt ? 'Card expires:' : 'Expires:'} {paymentMethod.card.exp_month}/
-                {paymentMethod.card.exp_year}
+                Expires: {paymentMethod.card.exp_month}/{paymentMethod.card.exp_year}
               </p>
             </div>
             {isSpt && spt && (
               <div className="mt-2.5 flex items-center gap-2 border-t border-border-light pt-2.5 text-xs text-foreground-light">
                 <p className="m-0">
-                  Via Stripe Projects · Token ending in{' '}
+                  Managed via Stripe Projects · Token ending in{' '}
                   <code className="text-code-inline">{spt.last4}</code>
-                  {tokenExpiry && <span> expires: {tokenExpiry}</span>}
+                  {tokenExpiry && <span> · Expires {tokenExpiry}</span>}
                 </p>
               </div>
             )}

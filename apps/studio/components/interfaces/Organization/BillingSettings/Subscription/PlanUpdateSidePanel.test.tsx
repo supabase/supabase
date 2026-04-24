@@ -154,6 +154,22 @@ describe('PlanUpdateSidePanel', () => {
     expect(screen.getByText('stripe projects upgrade supabase/pro')).toBeInTheDocument()
   })
 
+  it('uses the Stripe Projects downgrade command for team plans', () => {
+    mockSelectedOrganization.mockReturnValue(
+      createMockOrganization({
+        slug: 'stripe-org',
+        billing_partner: null,
+        integration_source: 'stripe_projects',
+        managed_by: MANAGED_BY.STRIPE_PROJECTS,
+        plan: { id: 'team', name: 'Team' },
+      })
+    )
+
+    render(<PlanUpdateSidePanel />)
+
+    expect(screen.getByText('stripe projects downgrade supabase/team')).toBeInTheDocument()
+  })
+
   it('still shows partner-managed messaging for billing-partner orgs', () => {
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
