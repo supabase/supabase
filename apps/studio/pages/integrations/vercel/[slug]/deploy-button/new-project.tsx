@@ -337,7 +337,7 @@ const CreateProject = () => {
           />
           <div className="grid gap-1.5 leading-none">
             <label
-              htmlFor="enable-realtime"
+              htmlFor="dataApiDefaultPrivileges"
               className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
               Automatically expose new tables and functions
