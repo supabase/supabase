@@ -392,9 +392,7 @@ try {
     const rewritesPath = path.join(__dirname, 'data/changelog-deleted-discussions.json')
     const rewrites = JSON.parse(await fs.readFile(rewritesPath, 'utf8'))
     const discussionDisplayDate = (item) => {
-      const match = rewrites.find(
-        (r) => item.title && r.title && item.title.includes(r.title)
-      )
+      const match = rewrites.find((r) => item.title && r.title && item.title.includes(r.title))
       return match ? match.createdAt : item.createdAt
     }
 
@@ -407,7 +405,7 @@ try {
       { slug: 'edge functions', label: 'Edge Functions' },
       { slug: 'postgres', label: 'postgres' },
       { slug: 'postgrest', label: 'PostgREST' },
-      { slug: 'ai', label: 'AI & Vector' },
+      { slug: 'ai', label: 'AI' },
       { slug: 'billing', label: 'Billing' },
       { slug: 'breaking-change', label: 'Breaking Change' },
       { slug: 'cli', label: 'CLI' },

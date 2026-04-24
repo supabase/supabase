@@ -1,11 +1,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-      <title>Supabase Changelog · AI & Vector</title>
+      <title>Supabase Changelog · AI</title>
       <link>https://supabase.com/changelog</link>
-      <description>AI & Vector updates and improvements from Supabase</description>
+      <description>AI updates and improvements from Supabase</description>
       <language>en</language>
       <lastBuildDate>Thu, 05 Feb 2026 00:00:00 -0700</lastBuildDate>
-      <atom:link href="https://supabase.com/changelog-rss/ai-vector.xml" rel="self" type="application/rss+xml"/>
+      <atom:link href="https://supabase.com/changelog-rss/ai.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid isPermaLink="true">https://supabase.com/changelog/42531</guid>
   <title>Developer Update - February 2026</title>
