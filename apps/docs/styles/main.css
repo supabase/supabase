@@ -6,7 +6,7 @@
 @import './../../../packages/ui/build/css/themes/dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
-@config '../tailwind.config.cjs';
+@config '../../../packages/config/tailwind.config.js';
 
 @layer base {
   *,

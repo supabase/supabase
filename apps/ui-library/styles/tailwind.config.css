@@ -1,3 +1,10 @@
+@source '../app/**/*.{js,ts,jsx,tsx}';
+@source '../components/**/*.{js,ts,jsx,tsx}';
+@source '../registry/**/*.{js,ts,jsx,tsx}';
+@source '../../../packages/ui/src/**/*.{tsx,ts,js}';
+@source '../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+@source '../content/**/*.mdx',
+
 @theme {
   --container-site: 128rem;
   --radius-lg: var(--radius);

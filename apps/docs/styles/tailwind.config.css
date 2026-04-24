@@ -1,3 +1,13 @@
+@source '../app/**/*.{ts,tsx,mdx}';
+@source '../components/**/*.tsx';
+@source '../content/**/*.{ts,tsx,mdx}';
+@source '../docs/**/*.{tsx,mdx}';
+@source '../features/**/*.{ts,tsx,mdx}';
+@source '../layouts/**/*.tsx';
+@source '../pages/**/*.{tsx,mdx}';
+@source '../../../packages/ui/src/**/*.{tsx,ts,js}';
+@source '../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+
 @utility prose--remove-p-margin {
   /* prose (tailwind typography) helper for removing margins in prose styled sections */
   & p {

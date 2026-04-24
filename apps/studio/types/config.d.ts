@@ -1,6 +1,6 @@
 declare module 'config/tailwind.config' {
   import type { Config } from 'tailwindcss'
-  const wrapper: (tailwindConfig: Partial<Config>) => Config
+  const config: Config
   // eslint-disable-next-line no-restricted-exports
-  export default wrapper
+  export default config
 }

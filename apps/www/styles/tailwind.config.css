@@ -1,3 +1,14 @@
+@source '../_blog/*.mdx';
+@source '../components/**/*.tsx';
+@source '../data/**/*.tsx';
+@source '../layouts/**/*.tsx';
+@source '../lib/mdx/mdxComponents.tsx';
+@source '../pages/**/*.{tsx,mdx}';
+@source '../app/**/*.{tsx,ts,js}';
+@source '../../../packages/ui/src/**/*.{tsx,ts,js}';
+@source '../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+@source '../../../packages/marketing/src/**/*.{tsx,ts,js}';
+
 @theme {
   --color-purple-sos-100: hsl(293 80% 97%);
   --color-purple-sos-200: hsl(293 85% 91%);

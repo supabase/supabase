@@ -9,7 +9,7 @@
 
 @import 'config/typography.css';
 
-@config '../tailwind.config.ts';
+@config '../../../packages/config/tailwind.config.js';
 
 :root {
   --chart-1: var(--brand-default);
