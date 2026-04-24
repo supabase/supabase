@@ -1,13 +1,10 @@
 'use client'
 
-import { isFeatureEnabled } from 'common'
-import { Menu } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import Link from 'next/link'
 import React, { Fragment } from 'react'
+import Link from 'next/link'
+import { useTheme } from 'next-themes'
+import { Menu } from 'lucide-react'
 import {
-  buttonVariants,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -17,10 +14,13 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Theme,
+  buttonVariants,
+  cn,
   themes,
 } from 'ui'
-
 import MenuIconPicker from './MenuIconPicker'
+import { isFeatureEnabled } from 'common'
 
 const menu = [
   [
@@ -105,11 +105,13 @@ const TopNavDropdown = () => {
               setTheme(value)
             }}
           >
-            {themes.map((theme) => (
-              <DropdownMenuRadioItem key={`topnav-theme-${theme.value}`} value={theme.value}>
-                {theme.name}
-              </DropdownMenuRadioItem>
-            ))}
+            {themes
+              .filter((x) => x.value === 'light' || x.value === 'dark' || x.value === 'system')
+              .map((theme: Theme) => (
+                <DropdownMenuRadioItem key={`topnav-theme-${theme.value}`} value={theme.value}>
+                  {theme.name}
+                </DropdownMenuRadioItem>
+              ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
       </DropdownMenuContent>

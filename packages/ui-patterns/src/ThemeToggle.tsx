@@ -65,11 +65,13 @@ export const ThemeToggle = ({
               setTheme(value)
             }}
           >
-            {themes.map((theme) => (
-              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                {theme.name}
-              </DropdownMenuRadioItem>
-            ))}
+            {themes
+              .filter((x) => x.value === 'dark' || x.value === 'light' || x.value === 'system')
+              .map((theme: Theme) => (
+                <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                  {theme.name}
+                </DropdownMenuRadioItem>
+              ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
       </DropdownMenuContent>
