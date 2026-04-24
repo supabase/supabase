@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { literal, safeSql } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -115,7 +116,9 @@ export const InitializeForeignSchemaDialog = () => {
         serverName: wrapperInstance.server_name,
         sourceSchema: updatedImportForeignSchemaSyntax ? bucketId : values.schema,
         targetSchema: values.schema,
-        schemaOptions: updatedImportForeignSchemaSyntax ? undefined : [`bucket_name '${bucketId}'`],
+        schemaOptions: updatedImportForeignSchemaSyntax
+          ? undefined
+          : [safeSql`bucket_name ${literal(bucketId)}`],
       })
 
       toast.success(

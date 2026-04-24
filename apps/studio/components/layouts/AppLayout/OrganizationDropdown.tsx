@@ -8,6 +8,7 @@ import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { AppLayoutDropdownError, AppLayoutDropdownWithPopover } from './AppLayoutDropdown'
 import { OrganizationDropdownCommandContent } from './OrganizationDropdownCommandContent'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
+import PartnerIcon from '@/components/ui/PartnerIcon'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -75,6 +76,7 @@ export const OrganizationDropdown = ({
           >
             {orgName ?? 'Select an organization'}
           </span>
+          {!!selectedOrganization && <PartnerIcon organization={selectedOrganization} />}
           {!!selectedOrganization && (
             <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
           )}

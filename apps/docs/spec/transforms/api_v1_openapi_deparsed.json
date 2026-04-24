@@ -947,7 +947,7 @@
     },
     "/v1/projects": {
       "get": {
-        "description": "Returns a list of all projects you've previously created.\n\nUse `/v1/organizations/{slug}/projects` instead when possible to get more precise results and pagination support.",
+        "description": "Returns a list of all projects you've previously created.",
         "operationId": "v1-list-all-projects",
         "parameters": [],
         "responses": {
@@ -1054,6 +1054,15 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -1321,6 +1330,15 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -1610,6 +1628,15 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
           "500": {
             "description": "Unexpected error listing organizations"
           }
@@ -1684,6 +1711,15 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Unexpected error creating an organization"
@@ -2050,6 +2086,15 @@
         "responses": {
           "204": {
             "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -2220,6 +2265,15 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
           "500": {
             "description": "Failed to list user's SQL snippets"
           }
@@ -2365,6 +2419,15 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to retrieve SQL snippet"
@@ -4010,15 +4073,6 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden action"
-          },
-          "429": {
-            "description": "Rate limit exceeded"
-          },
           "500": {
             "description": "Failed to retrieve database branches"
           }
@@ -4258,15 +4312,6 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden action"
-          },
-          "429": {
-            "description": "Rate limit exceeded"
-          },
           "500": {
             "description": "Failed to create database branch"
           }
@@ -4485,15 +4530,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden action"
-          },
-          "429": {
-            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Failed to fetch database branch"
@@ -5411,7 +5447,7 @@
             "description": "Rate limit exceeded"
           },
           "500": {
-            "description": "Failed to retrieve project's JIT access config"
+            "description": "Failed to retrieve project's temporary access configuration."
           }
         },
         "security": [
@@ -5422,7 +5458,7 @@
             "fga_permissions": ["project_admin_read"]
           }
         ],
-        "summary": "[Beta] Get project's just-in-time access configuration.",
+        "summary": "[Beta] Get project's temporary access configuration.",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -5459,7 +5495,7 @@
                 "properties": {
                   "state": {
                     "type": "string",
-                    "enum": ["enabled", "disabled", "unavailable"]
+                    "enum": ["enabled", "disabled"]
                   }
                 },
                 "required": ["state"],
@@ -5543,7 +5579,7 @@
             "description": "Rate limit exceeded"
           },
           "500": {
-            "description": "Failed to update project's just-in-time access configuration."
+            "description": "Failed to update project's temporary access configuration."
           }
         },
         "security": [
@@ -5554,7 +5590,7 @@
             "fga_permissions": ["project_admin_write"]
           }
         ],
-        "summary": "[Beta] Update project's just-in-time access configuration.",
+        "summary": "[Beta] Update project's temporary access configuration.",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -21593,6 +21629,7 @@
                                   "security.audit_logs_days",
                                   "security.questionnaire",
                                   "security.soc2_report",
+                                  "security.iso27001_certificate",
                                   "security.private_link",
                                   "security.enforce_mfa",
                                   "log.retention_days",
@@ -21722,7 +21759,7 @@
             "bearer": []
           },
           {
-            "fga_permissions": ["organization_projects_read"]
+            "fga_permissions": ["organization_admin_read"]
           }
         ],
         "summary": "Get entitlements for an organization",
@@ -22361,6 +22398,15 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
           "500": {
             "description": "Failed to retrieve projects"
           }
@@ -22375,7 +22421,14 @@
         ],
         "summary": "Gets all projects for the given organization",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"]
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:read",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["management-api"],
+        "x-oauth-scope": "projects:read"
       }
     }
   },
@@ -22641,126 +22694,6 @@
           }
         },
         "required": ["message"]
-      },
-      "V1ListProjectsPaginatedResponse": {
-        "type": "object",
-        "properties": {
-          "projects": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "number"
-                },
-                "cloud_provider": {
-                  "type": "string"
-                },
-                "inserted_at": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "name": {
-                  "type": "string"
-                },
-                "organization_id": {
-                  "type": "number"
-                },
-                "organization_slug": {
-                  "type": "string"
-                },
-                "ref": {
-                  "type": "string"
-                },
-                "region": {
-                  "type": "string"
-                },
-                "status": {
-                  "type": "string"
-                },
-                "subscription_id": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "is_branch_enabled": {
-                  "type": "boolean"
-                },
-                "is_physical_backups_enabled": {
-                  "type": "boolean",
-                  "nullable": true
-                },
-                "preview_branch_refs": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "disk_volume_size_gb": {
-                  "type": "number"
-                },
-                "infra_compute_size": {
-                  "type": "string",
-                  "enum": [
-                    "pico",
-                    "nano",
-                    "micro",
-                    "small",
-                    "medium",
-                    "large",
-                    "xlarge",
-                    "2xlarge",
-                    "4xlarge",
-                    "8xlarge",
-                    "12xlarge",
-                    "16xlarge",
-                    "24xlarge",
-                    "24xlarge_optimized_memory",
-                    "24xlarge_optimized_cpu",
-                    "24xlarge_high_memory",
-                    "48xlarge",
-                    "48xlarge_optimized_memory",
-                    "48xlarge_optimized_cpu",
-                    "48xlarge_high_memory"
-                  ]
-                }
-              },
-              "required": [
-                "id",
-                "cloud_provider",
-                "inserted_at",
-                "name",
-                "organization_id",
-                "organization_slug",
-                "ref",
-                "region",
-                "status",
-                "subscription_id",
-                "is_branch_enabled",
-                "is_physical_backups_enabled",
-                "preview_branch_refs"
-              ]
-            }
-          },
-          "pagination": {
-            "type": "object",
-            "properties": {
-              "count": {
-                "type": "number",
-                "description": "Total number of projects. Use this to calculate the total number of pages."
-              },
-              "limit": {
-                "type": "number",
-                "description": "Maximum number of projects per page (actual number may be less)"
-              },
-              "offset": {
-                "type": "number",
-                "description": "Number of projects skipped in this response"
-              }
-            },
-            "required": ["count", "limit", "offset"]
-          }
-        },
-        "required": ["projects", "pagination"]
       },
       "V1ProjectWithDatabaseResponse": {
         "type": "object",
@@ -24137,7 +24070,7 @@
         "properties": {
           "state": {
             "type": "string",
-            "enum": ["enabled", "disabled", "unavailable"]
+            "enum": ["enabled", "disabled"]
           }
         },
         "required": ["state"],
@@ -30838,6 +30771,7 @@
                         "security.audit_logs_days",
                         "security.questionnaire",
                         "security.soc2_report",
+                        "security.iso27001_certificate",
                         "security.private_link",
                         "security.enforce_mfa",
                         "log.retention_days",

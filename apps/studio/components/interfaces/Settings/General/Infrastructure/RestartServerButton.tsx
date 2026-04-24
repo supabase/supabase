@@ -31,6 +31,7 @@ const RestartServerButton = () => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const isProjectActive = useIsProjectActive()
+  const canRestart = isProjectActive || project?.status === PROJECT_STATUS.ACTIVE_UNHEALTHY
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const { setProjectStatus } = useSetProjectStatus()
 
@@ -103,12 +104,12 @@ const RestartServerButton = () => {
             type="default"
             className={cn(
               'px-3 hover:z-10',
-              canRestartProject && isProjectActive ? 'rounded-r-none' : ''
+              canRestartProject && canRestart ? 'rounded-r-none' : ''
             )}
             disabled={
               project === undefined ||
               !canRestartProject ||
-              !isProjectActive ||
+              !canRestart ||
               projectRestartDisabled ||
               isAwsK8s
             }
@@ -120,7 +121,7 @@ const RestartServerButton = () => {
                   ? 'Project restart is currently disabled'
                   : !canRestartProject
                     ? 'You need additional permissions to restart this project'
-                    : !isProjectActive
+                    : !canRestart
                       ? 'Unable to restart project as project is not active'
                       : isAwsK8s
                         ? 'Project restart is not supported for AWS (Revamped) projects'
@@ -130,7 +131,7 @@ const RestartServerButton = () => {
           >
             Restart project
           </ButtonTooltip>
-          {canRestartProject && isProjectActive && !projectRestartDisabled && (
+          {canRestartProject && canRestart && !projectRestartDisabled && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

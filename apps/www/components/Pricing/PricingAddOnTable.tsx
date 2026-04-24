@@ -1,10 +1,11 @@
 'use client'
 
 import classNames from 'classnames'
-import { Fragment, useMemo, useState } from 'react'
-import { Collapsible } from 'ui'
-import { Check } from './PricingIcons'
 import { ChevronUp } from 'lucide-react'
+import { Fragment, useMemo, useState, type ReactNode } from 'react'
+import { Collapsible } from 'ui'
+
+import { Check } from './PricingIcons'
 
 interface PricingAddOnTableProps {
   pricing: {
@@ -18,7 +19,7 @@ interface PricingAddOnTableProps {
       }[]
     }[]
   }
-  icon: JSX.Element
+  icon: ReactNode
 }
 
 const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {

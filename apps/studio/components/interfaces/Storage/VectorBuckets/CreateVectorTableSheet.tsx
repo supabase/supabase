@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { literal, safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus, Trash2 } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -171,7 +172,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
           serverName: wrapperInstance.server_name,
           sourceSchema: schema,
           targetSchema: schema,
-          schemaOptions: [`bucket_name '${bucketName}'`],
+          schemaOptions: [safeSql`bucket_name ${literal(bucketName)}`],
         })
       }
     } catch (error: any) {

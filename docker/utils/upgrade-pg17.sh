@@ -24,7 +24,7 @@
 #   DO NOT DELETE it until you have verified the upgrade was successful.
 #
 # Rollback (if the upgrade fails or you want to revert):
-#   1. docker compose down
+#   1. docker compose -f docker-compose.yml -f docker-compose.pg17.yml down
 #   2. rm -rf ./volumes/db/data
 #   3. mv ./volumes/db/data.bak.pg15 ./volumes/db/data
 #   4. docker compose run --rm db chown -R postgres:postgres /etc/postgresql-custom/
@@ -332,22 +332,45 @@ build_tarball() {
             echo "  Copying libraries..."
             PKGLIBDIR=$(pg_config --pkglibdir)
             LIBDIR=$(pg_config --libdir)
-            cp -L "$PKGLIBDIR"/*.so /export/17/lib/ 2>/dev/null || true
-            cp -L "$LIBDIR"/*.so* /export/17/lib/ 2>/dev/null || true
-            cp -L /nix/var/nix/profiles/default/lib/*.so* /export/17/lib/ 2>/dev/null || true
+
+            # These paths may overlap (PKGLIBDIR and LIBDIR often point to the
+            # same nix store path). Use cp -Lf to handle overwrites from
+            # read-only nix store source files.
+            cp -Lf "$PKGLIBDIR"/*.so /export/17/lib/ || echo "  Warning: cp from $PKGLIBDIR failed" >&2
+            cp -Lf "$LIBDIR"/*.so* /export/17/lib/ || echo "  Warning: cp from $LIBDIR failed" >&2
+            cp -Lf /nix/var/nix/profiles/default/lib/*.so* /export/17/lib/ || echo "  Warning: cp from nix profile lib failed" >&2
 
             echo "  Copying share data..."
+
             # Nix-built binaries resolve share dir relative to their location:
             #   <bindir>/../share/postgresql/
             # so we need share/postgresql/ not just share/
             mkdir -p /export/17/share/postgresql
-            cp -rL /usr/share/postgresql/* /export/17/share/postgresql/ 2>/dev/null || true
+
+            # Remove cyclic symlink (timezonesets/timezonesets -> timezonesets).
+            rm -f /usr/share/postgresql/timezonesets/timezonesets 2>/dev/null || true
+
+            # Pre-create subdirectories so cp -rL does not need to mkdir them.
+            # On macOS with Docker Desktop bind mount rejects mkdir with the nix store
+            # read-only (dr-xr-xr-x) permissions; pre-creating with default
+            # writable permissions fixed this
+            mkdir -p /export/17/share/postgresql/{extension,timezonesets,tsearch_data}
+            mkdir -p /export/17/share/postgresql/extension/{functions,procedures,tables,types}
+
+            cp -rL /usr/share/postgresql/* /export/17/share/postgresql/ || echo "  Warning: cp share data had errors" >&2
 
             # initiate.sh copies .control/.sql from PGLIBNEW to PGSHARENEW/extension/
             echo "  Copying extension definitions to lib..."
             SHAREDIR=$(pg_config --sharedir)
-            cp "$SHAREDIR"/extension/*.control /export/17/lib/ 2>/dev/null || true
-            cp "$SHAREDIR"/extension/*.sql /export/17/lib/ 2>/dev/null || true
+            cp "$SHAREDIR"/extension/*.control /export/17/lib/ || echo "  Warning: cp .control from $SHAREDIR/extension failed" >&2
+            cp "$SHAREDIR"/extension/*.sql /export/17/lib/ || echo "  Warning: cp .sql from $SHAREDIR/extension failed" >&2
+
+            # Verify critical files before creating tarball
+            echo "  Checking for key files..."
+            [ -f /export/17/bin/postgres ] || { echo "Error: bin/postgres missing"; exit 1; }
+            [ -f /export/17/share/postgresql/timezonesets/Default ] || { echo "Error: timezonesets/Default missing"; exit 1; }
+            ls /export/17/share/postgresql/extension/*.control >/dev/null 2>&1 || { echo "Error: no .control files in extension/"; exit 1; }
+            ls /export/17/lib/*.so >/dev/null 2>&1 || { echo "Error: no .so files in lib/"; exit 1; }
 
             echo "  Creating tarball (this may take several minutes)..."
             cd /export && tar czf pg_upgrade_bin.tar.gz 17/

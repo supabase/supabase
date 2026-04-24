@@ -46,6 +46,10 @@ type IntegrationStep = {
   description?: string
 }
 
+type InstallUrlType = 'get' | 'post'
+
+type InstallIdentificationMethod = 'secret_key_prefix'
+
 /**
  * [Joshen] For marketplace, we probably need to revisit this definition
  * What properties are obsolete, what properties we need from remote source
@@ -97,6 +101,13 @@ export type IntegrationDefinition = {
   inputs?: IntegrationInputs
   /** Purely visual, just to show what are the changes on the project from installing the integration */
   steps?: IntegrationStep[]
+
+  /** These are for OAuth Integrations */
+  installUrl?: string | null
+  installUrlType?: InstallUrlType
+  installIdentificationMethod?: InstallIdentificationMethod
+  secretKeyPrefix?: string
+  listingId?: string
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
