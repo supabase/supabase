@@ -9,11 +9,15 @@ import { useProfile } from '@/lib/profile'
 interface SuccessProps {
   sentCategory?: string
   selectedProject?: string
+  onFinish?: () => void
+  finishLabel?: string
 }
 
 export const Success = ({
   sentCategory = '',
   selectedProject = NO_PROJECT_MARKER,
+  onFinish,
+  finishLabel = 'Finish',
 }: SuccessProps) => {
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
@@ -76,9 +80,15 @@ export const Success = ({
         <Separator />
       </div>
       <div className="w-full pb-4 px-4 flex items-center justify-end">
-        <Button asChild type="default">
-          <Link href="/">Finish</Link>
-        </Button>
+        {onFinish ? (
+          <Button type="default" onClick={onFinish}>
+            {finishLabel}
+          </Button>
+        ) : (
+          <Button asChild type="default">
+            <Link href="/">{finishLabel}</Link>
+          </Button>
+        )}
       </div>
     </div>
   )

@@ -50,9 +50,10 @@ function useSupportFormTelemetry() {
 
 interface SupportFormProps {
   initialParams?: Partial<SupportFormUrlKeys>
+  onFinish?: () => void
 }
 
-export function SupportForm({ initialParams }: SupportFormProps) {
+export function SupportForm({ initialParams, onFinish }: SupportFormProps) {
   const [state, dispatch] = useReducer(supportFormReducer, undefined, createInitialSupportFormState)
   const { form, initialError, projectRef, orgSlug } = useSupportForm(dispatch, initialParams)
 
@@ -103,6 +104,8 @@ export function SupportForm({ initialParams }: SupportFormProps) {
               <Success
                 selectedProject={projectRef ?? undefined}
                 sentCategory={state.sentCategory}
+                onFinish={onFinish}
+                finishLabel={onFinish ? 'Done' : undefined}
               />
             </div>
           ) : (

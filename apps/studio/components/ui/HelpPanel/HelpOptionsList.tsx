@@ -21,7 +21,7 @@ type HelpOptionsListProps = {
   projectRef: string | undefined
   supportLinkQueryParams: Partial<SupportFormUrlKeys> | undefined
   onAssistantClick?: () => void
-  onSupportClick?: () => void
+  onSupportClick?: () => boolean | void
 }
 
 export const HelpOptionsList = ({
@@ -50,8 +50,8 @@ export const HelpOptionsList = ({
   }
 
   const handleSupportClick = () => {
-    if (onSupportClick) {
-      onSupportClick()
+    const shouldNavigate = onSupportClick?.()
+    if (shouldNavigate === false) {
       return
     }
 

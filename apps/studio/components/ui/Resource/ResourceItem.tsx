@@ -1,5 +1,5 @@
 import { ChevronRight, MoreVertical } from 'lucide-react'
-import { forwardRef, HTMLAttributes, ReactNode } from 'react'
+import { forwardRef, HTMLAttributes, KeyboardEvent, ReactNode } from 'react'
 import {
   Button,
   CardContent,
@@ -24,7 +24,18 @@ export interface ResourceItemProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
-  ({ media, meta, onClick, children, className, actions, ...props }, ref) => {
+  ({ media, meta, onClick, children, className, actions, onKeyDown, role, tabIndex, ...props }, ref) => {
+    const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+      onKeyDown?.(event)
+
+      if (event.defaultPrevented || !onClick) return
+
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        onClick()
+      }
+    }
+
     return (
       <CardContent
         ref={ref}
@@ -35,6 +46,9 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
           className
         )}
         onClick={onClick}
+        onKeyDown={handleKeyDown}
+        role={onClick ? 'button' : role}
+        tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
         {...props}
       >
         {media && (
