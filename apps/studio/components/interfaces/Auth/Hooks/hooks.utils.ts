@@ -1,3 +1,5 @@
+import { ident } from '@supabase/pg-meta/src/pg-format'
+
 import { Hook } from './hooks.constants'
 
 export const extractMethod = (
@@ -36,8 +38,8 @@ export const isValidHook = (h: Hook) => {
  */
 export const getRevokePermissionStatements = (schema: string, functionName: string): string[] => {
   return [
-    `-- Revoke access to function from supabase_auth_admin\nrevoke execute on function ${schema}.${functionName} from supabase_auth_admin;`,
-    `-- Revoke access to schema from supabase_auth_admin\nrevoke usage on schema ${schema} from supabase_auth_admin;`,
-    `-- Restore function permissions to authenticated, anon and public\ngrant execute on function ${schema}.${functionName} to authenticated, anon, public;`,
+    `-- Revoke access to function from supabase_auth_admin\nrevoke execute on function ${ident(schema)}.${ident(functionName)} from supabase_auth_admin;`,
+    `-- Revoke access to schema from supabase_auth_admin\nrevoke usage on schema ${ident(schema)} from supabase_auth_admin;`,
+    `-- Restore function permissions to authenticated, anon and public\ngrant execute on function ${ident(schema)}.${ident(functionName)} to authenticated, anon, public;`,
   ]
 }
