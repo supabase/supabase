@@ -110,7 +110,7 @@ Add the IP address you discovered to the Kong configuration by editing the follo
 Add the IP address you discovered to the Envoy configuration by editing the `/mcp` route in `./volumes/api/envoy/lds.template.yaml`:
 
 1. Find the route with `prefix: /mcp`.
-2. Replace the `rbac` block that denies all traffic with an allow-list policy.
+2. Comment out the `rbac` block that denies all traffic and uncomment the allow-list policy below.
 3. Keep loopback entries (`127.0.0.1` and `::1`) and add your Docker bridge gateway IP.
 4. Your edited configuration should look like the example below.
 
