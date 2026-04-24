@@ -493,7 +493,7 @@ export const TableEditor = ({
               <Checkbox_Shadcn_
                 id="duplicate-rows"
                 checked={isDuplicateRows}
-                onChange={() => setIsDuplicateRows(!isDuplicateRows)}
+                onCheckedChange={() => setIsDuplicateRows(!isDuplicateRows)}
               />
               <div className="grid gap-1.5 leading-none">
                 <label
