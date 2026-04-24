@@ -12,9 +12,10 @@ import { IconPanelWithIconPicker } from '@/features/ui/IconPanelWithIconPicker'
 import HomeLayout from '@/layouts/HomeLayout'
 import { BASE_PATH } from '@/lib/constants'
 
-const { sdkCsharp, sdkDart, sdkKotlin, sdkPython, sdkSwift } = isFeatureEnabled([
+const { sdkCsharp, sdkDart, sdkElixir, sdkKotlin, sdkPython, sdkSwift } = isFeatureEnabled([
   'sdk:csharp',
   'sdk:dart',
+  'sdk:elixir',
   'sdk:kotlin',
   'sdk:python',
   'sdk:swift',
@@ -172,6 +173,12 @@ const clientLibraries = [
     icon: 'reference-kotlin',
     href: '/reference/kotlin/introduction',
     enabled: sdkKotlin,
+  },
+  {
+    title: 'Elixir',
+    icon: 'reference-elixir',
+    href: '/reference/elixir/introduction',
+    enabled: sdkElixir,
   },
 ]
 

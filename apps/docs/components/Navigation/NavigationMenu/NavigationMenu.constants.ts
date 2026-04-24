@@ -28,6 +28,7 @@ const {
   integrationsPartners: integrationsEnabled,
   sdkCsharp: sdkCsharpEnabled,
   sdkDart: sdkDartEnabled,
+  sdkElixir: sdkElixirEnabled,
   sdkKotlin: sdkKotlinEnabled,
   sdkPython: sdkPythonEnabled,
   sdkSwift: sdkSwiftEnabled,
@@ -53,13 +54,19 @@ const {
   'integrations:partners',
   'sdk:csharp',
   'sdk:dart',
+  'sdk:elixir',
   'sdk:kotlin',
   'sdk:python',
   'sdk:swift',
 ])
 
 const jsOnly =
-  !sdkCsharpEnabled && !sdkDartEnabled && !sdkKotlinEnabled && !sdkPythonEnabled && !sdkSwiftEnabled
+  !sdkCsharpEnabled &&
+  !sdkDartEnabled &&
+  !sdkElixirEnabled &&
+  !sdkKotlinEnabled &&
+  !sdkPythonEnabled &&
+  !sdkSwiftEnabled
 
 export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
@@ -262,6 +269,14 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'reference_kotlin',
             community: true,
             enabled: sdkKotlinEnabled,
+          },
+          {
+            label: 'Elixir',
+            icon: 'reference-elixir',
+            href: '/reference/elixir' as `/${string}`,
+            level: 'reference_elixir',
+            community: true,
+            enabled: sdkElixirEnabled,
           },
         ],
         [
@@ -3128,6 +3143,14 @@ export const reference = {
           icon: '/img/icons/menu/reference-kotlin' as `/${string}`,
           enabled: sdkKotlinEnabled,
         },
+        {
+          name: 'supabase-ex',
+          url: '/reference/elixir/start',
+          level: 'reference_elixir',
+          items: [],
+          icon: '/img/icons/menu/reference-elixir' as `/${string}`,
+          enabled: sdkElixirEnabled,
+        },
       ],
     },
     {
@@ -3212,6 +3235,17 @@ export const reference_csharp_v1 = {
   pkg: {
     name: 'supabase',
     repo: 'https://github.com/supabase-community/supabase-csharp',
+  },
+}
+
+export const reference_elixir_v0 = {
+  icon: 'reference-elixir',
+  title: 'Elixir',
+  url: '/guides/reference/elixir',
+  parent: '/reference',
+  pkg: {
+    name: 'supabase_potion',
+    repo: 'https://github.com/supabase-community/supabase-ex',
   },
 }
 
@@ -3382,6 +3416,14 @@ export const references = [
         icon: '/docs/img/icons/kotlin-icon.svg',
         url: '/reference/kotlin/start',
         enabled: sdkKotlinEnabled,
+      },
+      {
+        label: 'supabase-ex',
+        versions: ['v0'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/elixir-icon.svg',
+        url: '/reference/elixir/start',
+        enabled: sdkElixirEnabled,
       },
     ],
   },
