@@ -1,7 +1,6 @@
 'use client'
 
 import { IS_PLATFORM } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import {
   Clock5,
   Code2,
@@ -39,6 +38,7 @@ import {
   getIntegrationRoute,
   useCreateCommandsConfig,
 } from './CreateCommands.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 
 const AiIconAnimation = dynamic(() => import('ui').then((mod) => mod.AiIconAnimation))
 const Badge = dynamic(() => import('ui').then((mod) => mod.Badge))
@@ -46,7 +46,6 @@ const EdgeFunctions = dynamic(() => import('icons').then((mod) => mod.EdgeFuncti
 const AnalyticsBucket = dynamic(() => import('icons').then((mod) => mod.AnalyticsBucket))
 const FilesBucket = dynamic(() => import('icons').then((mod) => mod.FilesBucket))
 const VectorBucket = dynamic(() => import('icons').then((mod) => mod.VectorBucket))
-const Graphql = dynamic(() => import('icons').then((mod) => mod.Graphql))
 
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 

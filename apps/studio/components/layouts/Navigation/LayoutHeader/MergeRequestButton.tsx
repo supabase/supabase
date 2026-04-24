@@ -1,13 +1,14 @@
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { GitMerge } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
+import { useBranchesQuery } from '@/data/branches/branches-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const MergeRequestButton = () => {
   const { ref } = useParams()

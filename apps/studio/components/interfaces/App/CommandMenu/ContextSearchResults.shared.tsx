@@ -1,11 +1,11 @@
 'use client'
 
-import { CommandList_Shadcn_, cn } from 'ui'
+import { cn, CommandList_Shadcn_ } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
+import { TextHighlighter } from 'ui-patterns/CommandMenu'
 import { CommandItem } from 'ui-patterns/CommandMenu/internal/Command'
 import { CommandGroup } from 'ui-patterns/CommandMenu/internal/CommandGroup'
-import { TextHighlighter } from 'ui-patterns/CommandMenu'
-import type { IRouteCommand, IActionCommand } from 'ui-patterns/CommandMenu/internal/types'
+import type { IActionCommand, IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
 
 export interface SearchResult {
   id: string

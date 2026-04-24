@@ -1,14 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { AlertError } from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { NoPermission } from 'components/ui/NoPermission'
-import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
-import type { APIKeysData } from 'data/api-keys/api-keys-query'
-import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import dayjs from 'dayjs'
-import { useLogsQuery } from 'hooks/analytics/useLogsQuery'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
 import { toast } from 'sonner'
@@ -24,6 +16,14 @@ import {
 
 import { APIKeyRow } from './APIKeyRow'
 import { CreateSecretAPIKeyDialog } from './CreateSecretAPIKeyDialog'
+import { AlertError } from '@/components/ui/AlertError'
+import { FormHeader } from '@/components/ui/Forms/FormHeader'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
+import type { APIKeysData } from '@/data/api-keys/api-keys-query'
+import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface LastSeenData {
   [hash: string]: { timestamp: number; relative: string }

@@ -1,16 +1,16 @@
-import { literal } from './pg-format'
+import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
 
-export const coalesceRowsToArray = (source: string, filter: string) => {
-  return `
+export const coalesceRowsToArray = (source: string, filter: SafeSqlFragment) => {
+  return safeSql`
 COALESCE(
   (
     SELECT
-      array_agg(row_to_json(${source})) FILTER (WHERE ${filter})
+      array_agg(row_to_json(${ident(source)})) FILTER (WHERE ${filter})
     FROM
-      ${source}
+      ${ident(source)}
   ),
   '{}'
-) AS ${source}`
+) AS ${ident(source)}`
 }
 
 export function filterByList(include?: string[], exclude?: string[], defaultExclude?: string[]) {
@@ -18,13 +18,13 @@ export function filterByList(include?: string[], exclude?: string[], defaultExcl
     exclude = defaultExclude.concat(exclude ?? [])
   }
   if (include?.length) {
-    return `IN (${include.map(literal).join(',')})`
+    return safeSql`IN (${joinSqlFragments(include.map(literal), ',')})`
   } else if (exclude?.length) {
-    return `NOT IN (${exclude.map(literal).join(',')})`
+    return safeSql`NOT IN (${joinSqlFragments(exclude.map(literal), ',')})`
   }
-  return ''
+  return safeSql``
 }
 
 export function exceptionIdentifierNotFound(entityName: string, whereClause: string) {
-  return `raise exception 'Cannot find ${entityName} with: %', ${literal(whereClause)};`
+  return safeSql`raise exception 'Cannot find ${ident(entityName)} with: %', ${literal(whereClause)};`
 }

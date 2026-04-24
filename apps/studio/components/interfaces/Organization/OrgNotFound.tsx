@@ -1,7 +1,8 @@
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { Skeleton } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
 import { OrganizationCard } from './OrganizationCard'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 
 export const OrgNotFound = ({ slug }: { slug?: string }) => {
   const {

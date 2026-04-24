@@ -1,13 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import {
-  PlanRequest,
-  useSendUpgradeRequestMutation,
-} from 'data/organizations/request-upgrade-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useTrack } from 'lib/telemetry/track'
 import { PropsWithChildren, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -34,6 +25,16 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
+import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import {
+  PlanRequest,
+  useSendUpgradeRequestMutation,
+} from '@/data/organizations/request-upgrade-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
+
 const FormSchema = z.object({
   note: z.string().optional(),
 })
@@ -47,6 +48,7 @@ interface RequestUpgradeToBillingOwnersProps {
   /** Used in the default message template, e.g: "Upgrade to ..." */
   featureProposition?: string
   className?: string
+  type?: 'primary' | 'default'
 }
 
 export const RequestUpgradeToBillingOwners = ({
@@ -56,6 +58,7 @@ export const RequestUpgradeToBillingOwners = ({
   featureProposition,
   children,
   className,
+  type = 'primary',
 }: PropsWithChildren<RequestUpgradeToBillingOwnersProps>) => {
   const [open, setOpen] = useState(false)
   const track = useTrack()
@@ -120,10 +123,8 @@ export const RequestUpgradeToBillingOwners = ({
 
   const defaultValues = {
     note: !!addon
-      ? addon === 'spendCap'
-        ? `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
-        : `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
-      : `We'd like to upgrade to the ${plan} plan ${!!featureProposition ? ` to ${featureProposition} ` : ''}${target}`,
+      ? `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
+      : `We'd like to upgrade to the ${plan} plan ${!!featureProposition ? `to ${featureProposition} ` : ''}${target}`,
   }
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -161,7 +162,7 @@ export const RequestUpgradeToBillingOwners = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button block={block} type="primary" className={className}>
+        <Button block={block} type={type} className={className}>
           {buttonText}
         </Button>
       </DialogTrigger>

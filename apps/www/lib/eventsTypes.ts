@@ -45,10 +45,12 @@ export interface SupabaseEvent {
   timezone: string
   location: string
   hosts: EventHost[]
-  source: 'luma' | 'supabase' | 'file'
+  source: 'luma' | 'notion'
   end_date?: string
   onDemand?: boolean
   disable_page_build?: boolean
+  isSpeaking?: boolean
+  meetingLink?: string
   link?: {
     href: string
     target?: '_blank' | '_self'

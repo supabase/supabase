@@ -8,8 +8,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -125,9 +127,12 @@ export default function PageLayoutSettings() {
                           description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="seconds">
-                              <Input_Shadcn_ type="number" min={0} {...field} />
-                            </PrePostTab>
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>seconds</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput type="number" min={0} {...field} />
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
@@ -196,9 +201,14 @@ export default function PageLayoutSettings() {
                         >
                           <div className="flex items-center">
                             <FormControl_Shadcn_>
-                              <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
-                                <Input_Shadcn_ type="number" min={0} {...field} />
-                              </PrePostTab>
+                              <InputGroup>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>
+                                    <HoursOrNeverText value={field.value || 0} />
+                                  </InputGroupText>
+                                </InputGroupAddon>
+                                <InputGroupInput type="number" min={0} {...field} />
+                              </InputGroup>
                             </FormControl_Shadcn_>
                           </div>
                         </FormItemLayout>
@@ -218,9 +228,14 @@ export default function PageLayoutSettings() {
                         >
                           <div className="flex items-center">
                             <FormControl_Shadcn_>
-                              <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
-                                <Input_Shadcn_ type="number" {...field} />
-                              </PrePostTab>
+                              <InputGroup>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>
+                                    <HoursOrNeverText value={field.value || 0} />
+                                  </InputGroupText>
+                                </InputGroupAddon>
+                                <InputGroupInput type="number" {...field} />
+                              </InputGroup>
                             </FormControl_Shadcn_>
                           </div>
                         </FormItemLayout>

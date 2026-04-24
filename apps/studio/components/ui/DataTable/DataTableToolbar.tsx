@@ -1,4 +1,3 @@
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { ReactNode, useMemo } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -9,6 +8,8 @@ import { DataTableResetButton } from './DataTableResetButton'
 import { DataTableViewOptions } from './DataTableViewOptions'
 import { Kbd } from './primitives/Kbd'
 import { useDataTable } from './providers/DataTableProvider'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface DataTableToolbarProps {
   renderActions?: () => ReactNode
@@ -24,7 +25,7 @@ export function DataTableToolbar({
   const { table, isLoading, columnFilters } = useDataTable()
   const filters = table.getState().columnFilters
 
-  useHotKey(() => setIsFilterBarOpen((prev) => !prev), 'b')
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev))
 
   const rows = useMemo(
     () => ({

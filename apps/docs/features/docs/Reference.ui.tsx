@@ -1,16 +1,3 @@
-import { isEqual } from 'lodash-es'
-import { ChevronRight, XCircle } from 'lucide-react'
-import type { HTMLAttributes, PropsWithChildren } from 'react'
-import ReactMarkdown from 'react-markdown'
-
-import {
-  Badge,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-} from 'ui'
-
 import ApiSchema from '~/components/ApiSchema'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { MDXRemoteRefs } from '~/features/docs/Reference.mdx'
@@ -23,6 +10,18 @@ import type {
 import { TYPESPEC_NODE_ANONYMOUS } from '~/features/docs/Reference.typeSpec'
 import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
+import { isEqual } from 'lodash-es'
+import { ChevronRight, XCircle } from 'lucide-react'
+import type { HTMLAttributes, PropsWithChildren } from 'react'
+import ReactMarkdown from 'react-markdown'
+import {
+  Badge,
+  cn,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+} from 'ui'
+
 import { getTypeDisplayFromSchema, IApiEndPoint, type ISchema } from './Reference.api.utils'
 import { API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES } from './Reference.ui.shared'
 
@@ -353,7 +352,9 @@ export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['paramete
         )}
       </div>
       {param.description && (
-        <ReactMarkdown className="prose break-words text-sm">{param.description}</ReactMarkdown>
+        <div className="prose break-words text-sm">
+          <ReactMarkdown>{param.description}</ReactMarkdown>
+        </div>
       )}
       {param.schema && <ApiSchemaParamSubdetails schema={param.schema} />}
     </li>

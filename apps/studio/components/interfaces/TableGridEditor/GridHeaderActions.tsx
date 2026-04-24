@@ -1,49 +1,49 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { Lightbulb, Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import {
+  Button,
+  cn,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { useParams } from 'common'
-import { RefreshButton } from 'components/grid/components/header/RefreshButton'
-import { useTableIndexAdvisor } from 'components/grid/context/TableIndexAdvisorContext'
-import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
-import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import { APIDocsButton } from 'components/ui/APIDocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
+import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
+import { RefreshButton } from '@/components/grid/components/header/RefreshButton'
+import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
+import { EnableIndexAdvisorButton } from '@/components/interfaces/QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
+import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import { APIDocsButton } from '@/components/ui/APIDocsButton'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
+import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import {
   Entity,
   isTableLike,
   isForeignTable as isTableLikeForeignTable,
   isMaterializedView as isTableLikeMaterializedView,
   isView as isTableLikeView,
-} from 'data/table-editor/table-editor-types'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { DOCS_URL } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import {
-  Button,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  cn,
-} from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
-import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
+} from '@/data/table-editor/table-editor-types'
+import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface GridHeaderActionsProps {
   table: Entity

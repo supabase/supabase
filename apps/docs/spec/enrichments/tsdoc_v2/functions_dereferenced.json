@@ -6,167 +6,15 @@
   "flags": {},
   "children": [
     {
-      "id": 69,
+      "id": 93,
       "name": "FunctionRegion",
       "variant": "declaration",
       "kind": 8,
       "flags": {},
       "children": [
         {
-          "id": 70,
+          "id": 94,
           "name": "Any",
-          "variant": "declaration",
-          "kind": 16,
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "packages/core/functions-js/src/types.ts",
-              "line": 88,
-              "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L88"
-            }
-          ],
-          "type": {
-            "type": "literal",
-            "value": "any"
-          }
-        },
-        {
-          "id": 71,
-          "name": "ApNortheast1",
-          "variant": "declaration",
-          "kind": 16,
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "packages/core/functions-js/src/types.ts",
-              "line": 89,
-              "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L89"
-            }
-          ],
-          "type": {
-            "type": "literal",
-            "value": "ap-northeast-1"
-          }
-        },
-        {
-          "id": 72,
-          "name": "ApNortheast2",
-          "variant": "declaration",
-          "kind": 16,
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "packages/core/functions-js/src/types.ts",
-              "line": 90,
-              "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L90"
-            }
-          ],
-          "type": {
-            "type": "literal",
-            "value": "ap-northeast-2"
-          }
-        },
-        {
-          "id": 73,
-          "name": "ApSouth1",
-          "variant": "declaration",
-          "kind": 16,
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "packages/core/functions-js/src/types.ts",
-              "line": 91,
-              "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L91"
-            }
-          ],
-          "type": {
-            "type": "literal",
-            "value": "ap-south-1"
-          }
-        },
-        {
-          "id": 74,
-          "name": "ApSoutheast1",
-          "variant": "declaration",
-          "kind": 16,
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "packages/core/functions-js/src/types.ts",
-              "line": 92,
-              "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L92"
-            }
-          ],
-          "type": {
-            "type": "literal",
-            "value": "ap-southeast-1"
-          }
-        },
-        {
-          "id": 75,
-          "name": "ApSoutheast2",
-          "variant": "declaration",
-          "kind": 16,
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "packages/core/functions-js/src/types.ts",
-              "line": 93,
-              "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L93"
-            }
-          ],
-          "type": {
-            "type": "literal",
-            "value": "ap-southeast-2"
-          }
-        },
-        {
-          "id": 76,
-          "name": "CaCentral1",
-          "variant": "declaration",
-          "kind": 16,
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "packages/core/functions-js/src/types.ts",
-              "line": 94,
-              "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L94"
-            }
-          ],
-          "type": {
-            "type": "literal",
-            "value": "ca-central-1"
-          }
-        },
-        {
-          "id": 77,
-          "name": "EuCentral1",
-          "variant": "declaration",
-          "kind": 16,
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "packages/core/functions-js/src/types.ts",
-              "line": 95,
-              "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L95"
-            }
-          ],
-          "type": {
-            "type": "literal",
-            "value": "eu-central-1"
-          }
-        },
-        {
-          "id": 78,
-          "name": "EuWest1",
           "variant": "declaration",
           "kind": 16,
           "flags": {},
@@ -175,17 +23,17 @@
               "fileName": "packages/core/functions-js/src/types.ts",
               "line": 96,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L96"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L96"
             }
           ],
           "type": {
             "type": "literal",
-            "value": "eu-west-1"
+            "value": "any"
           }
         },
         {
-          "id": 79,
-          "name": "EuWest2",
+          "id": 95,
+          "name": "ApNortheast1",
           "variant": "declaration",
           "kind": 16,
           "flags": {},
@@ -194,17 +42,17 @@
               "fileName": "packages/core/functions-js/src/types.ts",
               "line": 97,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L97"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L97"
             }
           ],
           "type": {
             "type": "literal",
-            "value": "eu-west-2"
+            "value": "ap-northeast-1"
           }
         },
         {
-          "id": 80,
-          "name": "EuWest3",
+          "id": 96,
+          "name": "ApNortheast2",
           "variant": "declaration",
           "kind": 16,
           "flags": {},
@@ -213,17 +61,17 @@
               "fileName": "packages/core/functions-js/src/types.ts",
               "line": 98,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L98"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L98"
             }
           ],
           "type": {
             "type": "literal",
-            "value": "eu-west-3"
+            "value": "ap-northeast-2"
           }
         },
         {
-          "id": 81,
-          "name": "SaEast1",
+          "id": 97,
+          "name": "ApSouth1",
           "variant": "declaration",
           "kind": 16,
           "flags": {},
@@ -232,17 +80,17 @@
               "fileName": "packages/core/functions-js/src/types.ts",
               "line": 99,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L99"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L99"
             }
           ],
           "type": {
             "type": "literal",
-            "value": "sa-east-1"
+            "value": "ap-south-1"
           }
         },
         {
-          "id": 82,
-          "name": "UsEast1",
+          "id": 98,
+          "name": "ApSoutheast1",
           "variant": "declaration",
           "kind": 16,
           "flags": {},
@@ -251,17 +99,17 @@
               "fileName": "packages/core/functions-js/src/types.ts",
               "line": 100,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L100"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L100"
             }
           ],
           "type": {
             "type": "literal",
-            "value": "us-east-1"
+            "value": "ap-southeast-1"
           }
         },
         {
-          "id": 83,
-          "name": "UsWest1",
+          "id": 99,
+          "name": "ApSoutheast2",
           "variant": "declaration",
           "kind": 16,
           "flags": {},
@@ -270,17 +118,17 @@
               "fileName": "packages/core/functions-js/src/types.ts",
               "line": 101,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L101"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L101"
             }
           ],
           "type": {
             "type": "literal",
-            "value": "us-west-1"
+            "value": "ap-southeast-2"
           }
         },
         {
-          "id": 84,
-          "name": "UsWest2",
+          "id": 100,
+          "name": "CaCentral1",
           "variant": "declaration",
           "kind": 16,
           "flags": {},
@@ -289,7 +137,159 @@
               "fileName": "packages/core/functions-js/src/types.ts",
               "line": 102,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L102"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L102"
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "ca-central-1"
+          }
+        },
+        {
+          "id": 101,
+          "name": "EuCentral1",
+          "variant": "declaration",
+          "kind": 16,
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 103,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L103"
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "eu-central-1"
+          }
+        },
+        {
+          "id": 102,
+          "name": "EuWest1",
+          "variant": "declaration",
+          "kind": 16,
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 104,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L104"
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "eu-west-1"
+          }
+        },
+        {
+          "id": 103,
+          "name": "EuWest2",
+          "variant": "declaration",
+          "kind": 16,
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 105,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L105"
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "eu-west-2"
+          }
+        },
+        {
+          "id": 104,
+          "name": "EuWest3",
+          "variant": "declaration",
+          "kind": 16,
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 106,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L106"
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "eu-west-3"
+          }
+        },
+        {
+          "id": 105,
+          "name": "SaEast1",
+          "variant": "declaration",
+          "kind": 16,
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 107,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L107"
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "sa-east-1"
+          }
+        },
+        {
+          "id": 106,
+          "name": "UsEast1",
+          "variant": "declaration",
+          "kind": 16,
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 108,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L108"
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "us-east-1"
+          }
+        },
+        {
+          "id": 107,
+          "name": "UsWest1",
+          "variant": "declaration",
+          "kind": 16,
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 109,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L109"
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "us-west-1"
+          }
+        },
+        {
+          "id": 108,
+          "name": "UsWest2",
+          "variant": "declaration",
+          "kind": 16,
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 110,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L110"
             }
           ],
           "type": {
@@ -301,15 +301,15 @@
       "groups": [
         {
           "title": "Enumeration Members",
-          "children": [70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84]
+          "children": [94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108]
         }
       ],
       "sources": [
         {
           "fileName": "packages/core/functions-js/src/types.ts",
-          "line": 87,
+          "line": 95,
           "character": 12,
-          "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L87"
+          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L95"
         }
       ]
     },
@@ -337,9 +337,9 @@
           "sources": [
             {
               "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
-              "line": 34,
+              "line": 44,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L34"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L44"
             }
           ],
           "signatures": [
@@ -359,10 +359,30 @@
                 "blockTags": [
                   {
                     "tag": "@example",
+                    "name": "Using supabase-js (recommended)",
                     "content": [
                       {
                         "kind": "code",
-                        "text": "```ts\nimport { FunctionsClient, FunctionRegion } from '@supabase/functions-js'\n\nconst functions = new FunctionsClient('https://xyzcompany.supabase.co/functions/v1', {\n  headers: { apikey: 'public-anon-key' },\n  region: FunctionRegion.UsEast1,\n})\n```"
+                        "text": "```ts\nimport { createClient } from '@supabase/supabase-js'\n\nconst supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key')\nconst { data, error } = await supabase.functions.invoke('hello-world')\n```"
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@category",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "Functions"
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@example",
+                    "name": "Standalone import for bundle-sensitive environments",
+                    "content": [
+                      {
+                        "kind": "code",
+                        "text": "```ts\nimport { FunctionsClient, FunctionRegion } from '@supabase/functions-js'\n\nconst functions = new FunctionsClient('https://xyzcompany.supabase.co/functions/v1', {\n  headers: { apikey: 'publishable-or-anon-key' },\n  region: FunctionRegion.UsEast1,\n})\n```"
                       }
                     ]
                   }
@@ -371,9 +391,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
-                  "line": 34,
+                  "line": 44,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L34"
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L44"
                 }
               ],
               "parameters": [
@@ -414,9 +434,9 @@
                           "sources": [
                             {
                               "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
-                              "line": 42,
+                              "line": 52,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L42"
+                              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L52"
                             }
                           ],
                           "type": {
@@ -643,9 +663,9 @@
                           "sources": [
                             {
                               "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
-                              "line": 41,
+                              "line": 51,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L41"
+                              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L51"
                             }
                           ],
                           "type": {
@@ -680,14 +700,14 @@
                           "sources": [
                             {
                               "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
-                              "line": 43,
+                              "line": 53,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L43"
+                              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L53"
                             }
                           ],
                           "type": {
                             "type": "reference",
-                            "target": 69,
+                            "target": 93,
                             "name": "FunctionRegion",
                             "package": "@supabase/functions-js"
                           },
@@ -703,9 +723,9 @@
                       "sources": [
                         {
                           "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
-                          "line": 40,
+                          "line": 50,
                           "character": 7,
-                          "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L40"
+                          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L50"
                         }
                       ]
                     }
@@ -735,7 +755,7 @@
               "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
               "line": 19,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L19"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L19"
             }
           ],
           "type": {
@@ -964,7 +984,7 @@
               "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
               "line": 17,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L17"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L17"
             }
           ],
           "type": {
@@ -1000,12 +1020,12 @@
               "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
               "line": 18,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L18"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L18"
             }
           ],
           "type": {
             "type": "reference",
-            "target": 69,
+            "target": 93,
             "name": "FunctionRegion",
             "package": "@supabase/functions-js"
           }
@@ -1023,7 +1043,7 @@
               "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
               "line": 16,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L16"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L16"
             }
           ],
           "type": {
@@ -1040,9 +1060,9 @@
           "sources": [
             {
               "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
-              "line": 75,
+              "line": 202,
               "character": 8,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L75"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L202"
             }
           ],
           "signatures": [
@@ -1068,15 +1088,424 @@
                         "text": "```ts\nconst { data, error } = await functions.invoke('hello-world', {\n  body: { name: 'Ada' },\n})\n```"
                       }
                     ]
+                  },
+                  {
+                    "tag": "@category",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "Functions"
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@remarks",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "- Requires an Authorization header.\n- Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.\n- When you pass in a body to your function, we automatically attach the Content-Type header for "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`Blob`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": ", "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`ArrayBuffer`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": ", "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`File`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": ", "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FormData`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " and "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`String`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": ". If it doesn't match any of these types we assume the payload is "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`json`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": ", serialize it and attach the "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`Content-Type`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " header as "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`application/json`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": ". You can override this behavior by passing in a "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`Content-Type`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " header of your own.\n- Responses are automatically parsed as "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`json`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": ", "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`blob`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " and "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`form-data`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " depending on the "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`Content-Type`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " header sent by your function. Responses are parsed as "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`text`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " by default."
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@example",
+                    "name": "Basic invocation",
+                    "content": [
+                      {
+                        "kind": "code",
+                        "text": "```js\nconst { data, error } = await supabase.functions.invoke('hello', {\n  body: { foo: 'bar' }\n})\n```"
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@exampleDescription",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "Error handling\nA "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionsHttpError`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " error is returned if your function throws an error, "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionsRelayError`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " if the Supabase Relay has an error processing your function and "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionsFetchError`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " if there is a network error in calling your function."
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@example",
+                    "name": "Error handling",
+                    "content": [
+                      {
+                        "kind": "code",
+                        "text": "```js\nimport { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from \"@supabase/supabase-js\";\n\nconst { data, error } = await supabase.functions.invoke('hello', {\n  headers: {\n    \"my-custom-header\": 'my-custom-header-value'\n  },\n  body: { foo: 'bar' }\n})\n\nif (error instanceof FunctionsHttpError) {\n  const errorMessage = await error.context.json()\n  console.log('Function returned an error', errorMessage)\n} else if (error instanceof FunctionsRelayError) {\n  console.log('Relay error:', error.message)\n} else if (error instanceof FunctionsFetchError) {\n  console.log('Fetch error:', error.message)\n}\n```"
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@exampleDescription",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "Passing custom headers\nYou can pass custom headers to your function. Note: supabase-js automatically passes the "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`Authorization`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " header with the signed in user's JWT."
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@example",
+                    "name": "Passing custom headers",
+                    "content": [
+                      {
+                        "kind": "code",
+                        "text": "```js\nconst { data, error } = await supabase.functions.invoke('hello', {\n  headers: {\n    \"my-custom-header\": 'my-custom-header-value'\n  },\n  body: { foo: 'bar' }\n})\n```"
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@exampleDescription",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "Calling with DELETE HTTP verb\nYou can also set the HTTP verb to "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`DELETE`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " when calling your Edge Function."
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@example",
+                    "name": "Calling with DELETE HTTP verb",
+                    "content": [
+                      {
+                        "kind": "code",
+                        "text": "```js\nconst { data, error } = await supabase.functions.invoke('hello', {\n  headers: {\n    \"my-custom-header\": 'my-custom-header-value'\n  },\n  body: { foo: 'bar' },\n  method: 'DELETE'\n})\n```"
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@exampleDescription",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "Invoking a Function in the UsEast1 region\nHere are the available regions:\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.Any`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": "\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.ApNortheast1`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": "\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.ApNortheast2`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": "\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.ApSouth1`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": "\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.ApSoutheast1`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": "\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.ApSoutheast2`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": "\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.CaCentral1`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": "\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.EuCentral1`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": "\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.EuWest1`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": "\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.EuWest2`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": "\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.EuWest3`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": "\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.SaEast1`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": "\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.UsEast1`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": "\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.UsWest1`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": "\n- "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`FunctionRegion.UsWest2`"
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@example",
+                    "name": "Invoking a Function in the UsEast1 region",
+                    "content": [
+                      {
+                        "kind": "code",
+                        "text": "```js\nimport { createClient, FunctionRegion } from '@supabase/supabase-js'\n\nconst { data, error } = await supabase.functions.invoke('hello', {\n  body: { foo: 'bar' },\n  region: FunctionRegion.UsEast1\n})\n```"
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@exampleDescription",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "Calling with GET HTTP verb\nYou can also set the HTTP verb to "
+                      },
+                      {
+                        "kind": "code",
+                        "text": "`GET`"
+                      },
+                      {
+                        "kind": "text",
+                        "text": " when calling your Edge Function."
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@example",
+                    "name": "Calling with GET HTTP verb",
+                    "content": [
+                      {
+                        "kind": "code",
+                        "text": "```js\nconst { data, error } = await supabase.functions.invoke('hello', {\n  headers: {\n    \"my-custom-header\": 'my-custom-header-value'\n  },\n  method: 'GET'\n})\n```"
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "@example",
+                    "name": "Example 7",
+                    "content": [
+                      {
+                        "kind": "code",
+                        "text": "```ts\nconst { data, error } = await functions.invoke('hello-world', {\n  body: { name: 'Ada' },\n})\n```"
+                      }
+                    ]
                   }
                 ]
               },
               "sources": [
                 {
                   "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
-                  "line": 75,
+                  "line": 202,
                   "character": 8,
-                  "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L75"
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L202"
                 }
               ],
               "typeParameters": [
@@ -1144,7 +1573,7 @@
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "target": 85,
+                    "target": 109,
                     "typeArguments": [
                       {
                         "type": "reference",
@@ -1173,9 +1602,9 @@
           "sources": [
             {
               "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
-              "line": 60,
+              "line": 73,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L60"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L73"
             }
           ],
           "signatures": [
@@ -1194,7 +1623,17 @@
                 ],
                 "blockTags": [
                   {
+                    "tag": "@category",
+                    "content": [
+                      {
+                        "kind": "text",
+                        "text": "Functions"
+                      }
+                    ]
+                  },
+                  {
                     "tag": "@example",
+                    "name": "Setting the authorization header",
                     "content": [
                       {
                         "kind": "code",
@@ -1207,9 +1646,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
-                  "line": 60,
+                  "line": 73,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L60"
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L73"
                 }
               ],
               "parameters": [
@@ -1255,12 +1694,22 @@
           "children": [31, 28]
         }
       ],
+      "categories": [
+        {
+          "title": "Functions",
+          "children": [2, 31, 28]
+        },
+        {
+          "title": "Other",
+          "children": [20, 18, 19, 17]
+        }
+      ],
       "sources": [
         {
           "fileName": "packages/core/functions-js/src/FunctionsClient.ts",
           "line": 15,
           "character": 13,
-          "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/FunctionsClient.ts#L15"
+          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/FunctionsClient.ts#L15"
         }
       ]
     },
@@ -1301,7 +1750,7 @@
               "fileName": "packages/core/functions-js/src/types.ts",
               "line": 32,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L32"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L32"
             }
           ],
           "signatures": [
@@ -1316,7 +1765,7 @@
                   "fileName": "packages/core/functions-js/src/types.ts",
                   "line": 32,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L32"
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L32"
                 }
               ],
               "parameters": [
@@ -1387,13 +1836,128 @@
               "fileName": "packages/core/functions-js/src/types.ts",
               "line": 31,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L31"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L31"
             }
           ],
           "type": {
             "type": "intrinsic",
             "name": "any"
           }
+        },
+        {
+          "id": 54,
+          "name": "toJSON",
+          "variant": "declaration",
+          "kind": 2048,
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 38,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+            }
+          ],
+          "signatures": [
+            {
+              "id": 55,
+              "name": "toJSON",
+              "variant": "signature",
+              "kind": 4096,
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "packages/core/functions-js/src/types.ts",
+                  "line": 38,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                }
+              ],
+              "type": {
+                "type": "reflection",
+                "declaration": {
+                  "id": 56,
+                  "name": "__type",
+                  "variant": "declaration",
+                  "kind": 65536,
+                  "flags": {},
+                  "children": [
+                    {
+                      "id": 59,
+                      "name": "context",
+                      "variant": "declaration",
+                      "kind": 1024,
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "packages/core/functions-js/src/types.ts",
+                          "line": 38,
+                          "character": 45,
+                          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    },
+                    {
+                      "id": 58,
+                      "name": "message",
+                      "variant": "declaration",
+                      "kind": 1024,
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "packages/core/functions-js/src/types.ts",
+                          "line": 38,
+                          "character": 28,
+                          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 57,
+                      "name": "name",
+                      "variant": "declaration",
+                      "kind": 1024,
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "packages/core/functions-js/src/types.ts",
+                          "line": 38,
+                          "character": 14,
+                          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    }
+                  ],
+                  "groups": [
+                    {
+                      "title": "Properties",
+                      "children": [59, 58, 57]
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "packages/core/functions-js/src/types.ts",
+                      "line": 38,
+                      "character": 12,
+                      "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
         }
       ],
       "groups": [
@@ -1404,6 +1968,10 @@
         {
           "title": "Properties",
           "children": [53]
+        },
+        {
+          "title": "Methods",
+          "children": [54]
         }
       ],
       "sources": [
@@ -1411,7 +1979,7 @@
           "fileName": "packages/core/functions-js/src/types.ts",
           "line": 30,
           "character": 13,
-          "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L30"
+          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L30"
         }
       ],
       "extendedTypes": [
@@ -1428,23 +1996,23 @@
       "extendedBy": [
         {
           "type": "reference",
-          "target": 54,
+          "target": 60,
           "name": "FunctionsFetchError"
         },
         {
           "type": "reference",
-          "target": 59,
+          "target": 71,
           "name": "FunctionsHttpError"
         },
         {
           "type": "reference",
-          "target": 64,
+          "target": 82,
           "name": "FunctionsRelayError"
         }
       ]
     },
     {
-      "id": 54,
+      "id": 60,
       "name": "FunctionsFetchError",
       "variant": "declaration",
       "kind": 128,
@@ -1470,7 +2038,7 @@
       },
       "children": [
         {
-          "id": 55,
+          "id": 61,
           "name": "constructor",
           "variant": "declaration",
           "kind": 512,
@@ -1478,14 +2046,14 @@
           "sources": [
             {
               "fileName": "packages/core/functions-js/src/types.ts",
-              "line": 50,
+              "line": 58,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L50"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L58"
             }
           ],
           "signatures": [
             {
-              "id": 56,
+              "id": 62,
               "name": "FunctionsFetchError",
               "variant": "signature",
               "kind": 16384,
@@ -1493,14 +2061,14 @@
               "sources": [
                 {
                   "fileName": "packages/core/functions-js/src/types.ts",
-                  "line": 50,
+                  "line": 58,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L50"
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L58"
                 }
               ],
               "parameters": [
                 {
-                  "id": 57,
+                  "id": 63,
                   "name": "context",
                   "variant": "param",
                   "kind": 32768,
@@ -1513,7 +2081,7 @@
               ],
               "type": {
                 "type": "reference",
-                "target": 54,
+                "target": 60,
                 "name": "FunctionsFetchError",
                 "package": "@supabase/functions-js"
               },
@@ -1531,7 +2099,7 @@
           }
         },
         {
-          "id": 58,
+          "id": 64,
           "name": "context",
           "variant": "declaration",
           "kind": 1024,
@@ -1543,7 +2111,7 @@
               "fileName": "packages/core/functions-js/src/types.ts",
               "line": 31,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L31"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L31"
             }
           ],
           "type": {
@@ -1555,24 +2123,157 @@
             "target": 53,
             "name": "FunctionsError.context"
           }
+        },
+        {
+          "id": 65,
+          "name": "toJSON",
+          "variant": "declaration",
+          "kind": 2048,
+          "flags": {
+            "isInherited": true
+          },
+          "sources": [
+            {
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 38,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+            }
+          ],
+          "signatures": [
+            {
+              "id": 66,
+              "name": "toJSON",
+              "variant": "signature",
+              "kind": 4096,
+              "flags": {
+                "isInherited": true
+              },
+              "sources": [
+                {
+                  "fileName": "packages/core/functions-js/src/types.ts",
+                  "line": 38,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                }
+              ],
+              "type": {
+                "type": "reflection",
+                "declaration": {
+                  "id": 67,
+                  "name": "__type",
+                  "variant": "declaration",
+                  "kind": 65536,
+                  "flags": {},
+                  "children": [
+                    {
+                      "id": 70,
+                      "name": "context",
+                      "variant": "declaration",
+                      "kind": 1024,
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "packages/core/functions-js/src/types.ts",
+                          "line": 38,
+                          "character": 45,
+                          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    },
+                    {
+                      "id": 69,
+                      "name": "message",
+                      "variant": "declaration",
+                      "kind": 1024,
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "packages/core/functions-js/src/types.ts",
+                          "line": 38,
+                          "character": 28,
+                          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 68,
+                      "name": "name",
+                      "variant": "declaration",
+                      "kind": 1024,
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "packages/core/functions-js/src/types.ts",
+                          "line": 38,
+                          "character": 14,
+                          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    }
+                  ],
+                  "groups": [
+                    {
+                      "title": "Properties",
+                      "children": [70, 69, 68]
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "packages/core/functions-js/src/types.ts",
+                      "line": 38,
+                      "character": 12,
+                      "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                    }
+                  ]
+                }
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "target": 55,
+                "name": "FunctionsError.toJSON"
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "target": 54,
+            "name": "FunctionsError.toJSON"
+          }
         }
       ],
       "groups": [
         {
           "title": "Constructors",
-          "children": [55]
+          "children": [61]
         },
         {
           "title": "Properties",
-          "children": [58]
+          "children": [64]
+        },
+        {
+          "title": "Methods",
+          "children": [65]
         }
       ],
       "sources": [
         {
           "fileName": "packages/core/functions-js/src/types.ts",
-          "line": 49,
+          "line": 57,
           "character": 13,
-          "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L49"
+          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L57"
         }
       ],
       "extendedTypes": [
@@ -1585,7 +2286,7 @@
       ]
     },
     {
-      "id": 59,
+      "id": 71,
       "name": "FunctionsHttpError",
       "variant": "declaration",
       "kind": 128,
@@ -1611,7 +2312,7 @@
       },
       "children": [
         {
-          "id": 60,
+          "id": 72,
           "name": "constructor",
           "variant": "declaration",
           "kind": 512,
@@ -1619,14 +2320,14 @@
           "sources": [
             {
               "fileName": "packages/core/functions-js/src/types.ts",
-              "line": 82,
+              "line": 90,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L82"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L90"
             }
           ],
           "signatures": [
             {
-              "id": 61,
+              "id": 73,
               "name": "FunctionsHttpError",
               "variant": "signature",
               "kind": 16384,
@@ -1634,14 +2335,14 @@
               "sources": [
                 {
                   "fileName": "packages/core/functions-js/src/types.ts",
-                  "line": 82,
+                  "line": 90,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L82"
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L90"
                 }
               ],
               "parameters": [
                 {
-                  "id": 62,
+                  "id": 74,
                   "name": "context",
                   "variant": "param",
                   "kind": 32768,
@@ -1654,7 +2355,7 @@
               ],
               "type": {
                 "type": "reference",
-                "target": 59,
+                "target": 71,
                 "name": "FunctionsHttpError",
                 "package": "@supabase/functions-js"
               },
@@ -1672,7 +2373,7 @@
           }
         },
         {
-          "id": 63,
+          "id": 75,
           "name": "context",
           "variant": "declaration",
           "kind": 1024,
@@ -1684,7 +2385,7 @@
               "fileName": "packages/core/functions-js/src/types.ts",
               "line": 31,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L31"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L31"
             }
           ],
           "type": {
@@ -1696,24 +2397,157 @@
             "target": 53,
             "name": "FunctionsError.context"
           }
+        },
+        {
+          "id": 76,
+          "name": "toJSON",
+          "variant": "declaration",
+          "kind": 2048,
+          "flags": {
+            "isInherited": true
+          },
+          "sources": [
+            {
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 38,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+            }
+          ],
+          "signatures": [
+            {
+              "id": 77,
+              "name": "toJSON",
+              "variant": "signature",
+              "kind": 4096,
+              "flags": {
+                "isInherited": true
+              },
+              "sources": [
+                {
+                  "fileName": "packages/core/functions-js/src/types.ts",
+                  "line": 38,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                }
+              ],
+              "type": {
+                "type": "reflection",
+                "declaration": {
+                  "id": 78,
+                  "name": "__type",
+                  "variant": "declaration",
+                  "kind": 65536,
+                  "flags": {},
+                  "children": [
+                    {
+                      "id": 81,
+                      "name": "context",
+                      "variant": "declaration",
+                      "kind": 1024,
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "packages/core/functions-js/src/types.ts",
+                          "line": 38,
+                          "character": 45,
+                          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    },
+                    {
+                      "id": 80,
+                      "name": "message",
+                      "variant": "declaration",
+                      "kind": 1024,
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "packages/core/functions-js/src/types.ts",
+                          "line": 38,
+                          "character": 28,
+                          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 79,
+                      "name": "name",
+                      "variant": "declaration",
+                      "kind": 1024,
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "packages/core/functions-js/src/types.ts",
+                          "line": 38,
+                          "character": 14,
+                          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    }
+                  ],
+                  "groups": [
+                    {
+                      "title": "Properties",
+                      "children": [81, 80, 79]
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "packages/core/functions-js/src/types.ts",
+                      "line": 38,
+                      "character": 12,
+                      "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                    }
+                  ]
+                }
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "target": 55,
+                "name": "FunctionsError.toJSON"
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "target": 54,
+            "name": "FunctionsError.toJSON"
+          }
         }
       ],
       "groups": [
         {
           "title": "Constructors",
-          "children": [60]
+          "children": [72]
         },
         {
           "title": "Properties",
-          "children": [63]
+          "children": [75]
+        },
+        {
+          "title": "Methods",
+          "children": [76]
         }
       ],
       "sources": [
         {
           "fileName": "packages/core/functions-js/src/types.ts",
-          "line": 81,
+          "line": 89,
           "character": 13,
-          "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L81"
+          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L89"
         }
       ],
       "extendedTypes": [
@@ -1726,7 +2560,7 @@
       ]
     },
     {
-      "id": 64,
+      "id": 82,
       "name": "FunctionsRelayError",
       "variant": "declaration",
       "kind": 128,
@@ -1752,7 +2586,7 @@
       },
       "children": [
         {
-          "id": 65,
+          "id": 83,
           "name": "constructor",
           "variant": "declaration",
           "kind": 512,
@@ -1760,14 +2594,14 @@
           "sources": [
             {
               "fileName": "packages/core/functions-js/src/types.ts",
-              "line": 66,
+              "line": 74,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L66"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L74"
             }
           ],
           "signatures": [
             {
-              "id": 66,
+              "id": 84,
               "name": "FunctionsRelayError",
               "variant": "signature",
               "kind": 16384,
@@ -1775,14 +2609,14 @@
               "sources": [
                 {
                   "fileName": "packages/core/functions-js/src/types.ts",
-                  "line": 66,
+                  "line": 74,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L66"
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L74"
                 }
               ],
               "parameters": [
                 {
-                  "id": 67,
+                  "id": 85,
                   "name": "context",
                   "variant": "param",
                   "kind": 32768,
@@ -1795,7 +2629,7 @@
               ],
               "type": {
                 "type": "reference",
-                "target": 64,
+                "target": 82,
                 "name": "FunctionsRelayError",
                 "package": "@supabase/functions-js"
               },
@@ -1813,7 +2647,7 @@
           }
         },
         {
-          "id": 68,
+          "id": 86,
           "name": "context",
           "variant": "declaration",
           "kind": 1024,
@@ -1825,7 +2659,7 @@
               "fileName": "packages/core/functions-js/src/types.ts",
               "line": 31,
               "character": 2,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L31"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L31"
             }
           ],
           "type": {
@@ -1837,24 +2671,157 @@
             "target": 53,
             "name": "FunctionsError.context"
           }
+        },
+        {
+          "id": 87,
+          "name": "toJSON",
+          "variant": "declaration",
+          "kind": 2048,
+          "flags": {
+            "isInherited": true
+          },
+          "sources": [
+            {
+              "fileName": "packages/core/functions-js/src/types.ts",
+              "line": 38,
+              "character": 2,
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+            }
+          ],
+          "signatures": [
+            {
+              "id": 88,
+              "name": "toJSON",
+              "variant": "signature",
+              "kind": 4096,
+              "flags": {
+                "isInherited": true
+              },
+              "sources": [
+                {
+                  "fileName": "packages/core/functions-js/src/types.ts",
+                  "line": 38,
+                  "character": 2,
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                }
+              ],
+              "type": {
+                "type": "reflection",
+                "declaration": {
+                  "id": 89,
+                  "name": "__type",
+                  "variant": "declaration",
+                  "kind": 65536,
+                  "flags": {},
+                  "children": [
+                    {
+                      "id": 92,
+                      "name": "context",
+                      "variant": "declaration",
+                      "kind": 1024,
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "packages/core/functions-js/src/types.ts",
+                          "line": 38,
+                          "character": 45,
+                          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    },
+                    {
+                      "id": 91,
+                      "name": "message",
+                      "variant": "declaration",
+                      "kind": 1024,
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "packages/core/functions-js/src/types.ts",
+                          "line": 38,
+                          "character": 28,
+                          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "id": 90,
+                      "name": "name",
+                      "variant": "declaration",
+                      "kind": 1024,
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "packages/core/functions-js/src/types.ts",
+                          "line": 38,
+                          "character": 14,
+                          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    }
+                  ],
+                  "groups": [
+                    {
+                      "title": "Properties",
+                      "children": [92, 91, 90]
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "packages/core/functions-js/src/types.ts",
+                      "line": 38,
+                      "character": 12,
+                      "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L38"
+                    }
+                  ]
+                }
+              },
+              "inheritedFrom": {
+                "type": "reference",
+                "target": 55,
+                "name": "FunctionsError.toJSON"
+              }
+            }
+          ],
+          "inheritedFrom": {
+            "type": "reference",
+            "target": 54,
+            "name": "FunctionsError.toJSON"
+          }
         }
       ],
       "groups": [
         {
           "title": "Constructors",
-          "children": [65]
+          "children": [83]
         },
         {
           "title": "Properties",
-          "children": [68]
+          "children": [86]
+        },
+        {
+          "title": "Methods",
+          "children": [87]
         }
       ],
       "sources": [
         {
           "fileName": "packages/core/functions-js/src/types.ts",
-          "line": 65,
+          "line": 73,
           "character": 13,
-          "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L65"
+          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L73"
         }
       ],
       "extendedTypes": [
@@ -1875,9 +2842,9 @@
       "sources": [
         {
           "fileName": "packages/core/functions-js/src/types.ts",
-          "line": 105,
+          "line": 113,
           "character": 12,
-          "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L105"
+          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L113"
         }
       ],
       "type": {
@@ -1908,9 +2875,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/functions-js/src/types.ts",
-                  "line": 121,
+                  "line": 129,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L121"
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L129"
                 }
               ],
               "type": {
@@ -2017,9 +2984,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/functions-js/src/types.ts",
-                  "line": 109,
+                  "line": 117,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L109"
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L117"
                 }
               ],
               "type": {
@@ -2033,9 +3000,9 @@
                   "sources": [
                     {
                       "fileName": "packages/core/functions-js/src/types.ts",
-                      "line": 109,
+                      "line": 117,
                       "character": 12,
-                      "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L109"
+                      "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L117"
                     }
                   ],
                   "indexSignatures": [
@@ -2048,9 +3015,9 @@
                       "sources": [
                         {
                           "fileName": "packages/core/functions-js/src/types.ts",
-                          "line": 109,
+                          "line": 117,
                           "character": 14,
-                          "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L109"
+                          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L117"
                         }
                       ],
                       "parameters": [
@@ -2094,9 +3061,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/functions-js/src/types.ts",
-                  "line": 113,
+                  "line": 121,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L113"
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L121"
                 }
               ],
               "type": {
@@ -2144,14 +3111,14 @@
               "sources": [
                 {
                   "fileName": "packages/core/functions-js/src/types.ts",
-                  "line": 117,
+                  "line": 125,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L117"
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L125"
                 }
               ],
               "type": {
                 "type": "reference",
-                "target": 69,
+                "target": 93,
                 "name": "FunctionRegion",
                 "package": "@supabase/functions-js"
               }
@@ -2175,9 +3142,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/functions-js/src/types.ts",
-                  "line": 132,
+                  "line": 140,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L132"
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L140"
                 }
               ],
               "type": {
@@ -2209,9 +3176,9 @@
               "sources": [
                 {
                   "fileName": "packages/core/functions-js/src/types.ts",
-                  "line": 137,
+                  "line": 145,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L137"
+                  "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L145"
                 }
               ],
               "type": {
@@ -2229,16 +3196,16 @@
           "sources": [
             {
               "fileName": "packages/core/functions-js/src/types.ts",
-              "line": 105,
+              "line": 113,
               "character": 36,
-              "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L105"
+              "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L113"
             }
           ]
         }
       }
     },
     {
-      "id": 85,
+      "id": 109,
       "name": "FunctionsResponse",
       "variant": "declaration",
       "kind": 2097152,
@@ -2248,12 +3215,12 @@
           "fileName": "packages/core/functions-js/src/types.ts",
           "line": 16,
           "character": 12,
-          "url": "https://github.com/supabase/supabase-js/blob/b835e3c870f3767980776cc25fd16df72fa416be/packages/core/functions-js/src/types.ts#L16"
+          "url": "https://github.com/supabase/supabase-js/blob/116fe12c648f156d2748487abbf82a7e662d35bb/packages/core/functions-js/src/types.ts#L16"
         }
       ],
       "typeParameters": [
         {
-          "id": 86,
+          "id": 110,
           "name": "T",
           "variant": "typeParam",
           "kind": 131072,
@@ -2272,7 +3239,7 @@
             "typeArguments": [
               {
                 "type": "reference",
-                "target": 86,
+                "target": 110,
                 "name": "T",
                 "package": "@supabase/functions-js",
                 "refersToTypeParameter": true
@@ -2297,15 +3264,15 @@
   "groups": [
     {
       "title": "Enumerations",
-      "children": [69]
+      "children": [93]
     },
     {
       "title": "Classes",
-      "children": [1, 47, 54, 59, 64]
+      "children": [1, 47, 60, 71, 82]
     },
     {
       "title": "Type Aliases",
-      "children": [36, 85]
+      "children": [36, 109]
     }
   ],
   "packageName": "@supabase/functions-js",
@@ -2603,133 +3570,229 @@
     },
     "54": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionsFetchError"
+      "qualifiedName": "FunctionsError.toJSON"
     },
     "55": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionsFetchError.__constructor"
+      "qualifiedName": "FunctionsError.toJSON"
     },
     "56": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionsFetchError"
+      "qualifiedName": "__type"
     },
     "57": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "context"
+      "qualifiedName": "__type.name"
     },
     "58": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionsError.context"
+      "qualifiedName": "__type.message"
     },
     "59": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionsHttpError"
+      "qualifiedName": "__type.context"
     },
     "60": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionsHttpError.__constructor"
+      "qualifiedName": "FunctionsFetchError"
     },
     "61": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionsHttpError"
+      "qualifiedName": "FunctionsFetchError.__constructor"
     },
     "62": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "context"
+      "qualifiedName": "FunctionsFetchError"
     },
     "63": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionsError.context"
+      "qualifiedName": "context"
     },
     "64": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionsRelayError"
+      "qualifiedName": "FunctionsError.context"
     },
     "65": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionsRelayError.__constructor"
+      "qualifiedName": "FunctionsError.toJSON"
     },
     "66": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionsRelayError"
+      "qualifiedName": "FunctionsError.toJSON"
     },
     "67": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "context"
+      "qualifiedName": "__type"
     },
     "68": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionsError.context"
+      "qualifiedName": "__type.name"
     },
     "69": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion"
+      "qualifiedName": "__type.message"
     },
     "70": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.Any"
+      "qualifiedName": "__type.context"
     },
     "71": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.ApNortheast1"
+      "qualifiedName": "FunctionsHttpError"
     },
     "72": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.ApNortheast2"
+      "qualifiedName": "FunctionsHttpError.__constructor"
     },
     "73": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.ApSouth1"
+      "qualifiedName": "FunctionsHttpError"
     },
     "74": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.ApSoutheast1"
+      "qualifiedName": "context"
     },
     "75": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.ApSoutheast2"
+      "qualifiedName": "FunctionsError.context"
     },
     "76": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.CaCentral1"
+      "qualifiedName": "FunctionsError.toJSON"
     },
     "77": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.EuCentral1"
+      "qualifiedName": "FunctionsError.toJSON"
     },
     "78": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.EuWest1"
+      "qualifiedName": "__type"
     },
     "79": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.EuWest2"
+      "qualifiedName": "__type.name"
     },
     "80": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.EuWest3"
+      "qualifiedName": "__type.message"
     },
     "81": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.SaEast1"
+      "qualifiedName": "__type.context"
     },
     "82": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.UsEast1"
+      "qualifiedName": "FunctionsRelayError"
     },
     "83": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.UsWest1"
+      "qualifiedName": "FunctionsRelayError.__constructor"
     },
     "84": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionRegion.UsWest2"
+      "qualifiedName": "FunctionsRelayError"
     },
     "85": {
       "sourceFileName": "src/types.ts",
-      "qualifiedName": "FunctionsResponse"
+      "qualifiedName": "context"
     },
     "86": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsError.context"
+    },
+    "87": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsError.toJSON"
+    },
+    "88": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsError.toJSON"
+    },
+    "89": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "__type"
+    },
+    "90": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "__type.name"
+    },
+    "91": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "__type.message"
+    },
+    "92": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "__type.context"
+    },
+    "93": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion"
+    },
+    "94": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.Any"
+    },
+    "95": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.ApNortheast1"
+    },
+    "96": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.ApNortheast2"
+    },
+    "97": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.ApSouth1"
+    },
+    "98": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.ApSoutheast1"
+    },
+    "99": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.ApSoutheast2"
+    },
+    "100": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.CaCentral1"
+    },
+    "101": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.EuCentral1"
+    },
+    "102": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.EuWest1"
+    },
+    "103": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.EuWest2"
+    },
+    "104": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.EuWest3"
+    },
+    "105": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.SaEast1"
+    },
+    "106": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.UsEast1"
+    },
+    "107": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.UsWest1"
+    },
+    "108": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionRegion.UsWest2"
+    },
+    "109": {
+      "sourceFileName": "src/types.ts",
+      "qualifiedName": "FunctionsResponse"
+    },
+    "110": {
       "sourceFileName": "src/types.ts",
       "qualifiedName": "T"
     }

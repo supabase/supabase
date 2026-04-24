@@ -1,12 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { tableRowKeys } from 'data/table-rows/keys'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Undo2 } from 'lucide-react'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Card, CardContent, CardHeader } from 'ui'
 
 import { formatOperationItemValue } from './OperationQueueSidePanel.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { tableRowKeys } from '@/data/table-rows/keys'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { EditCellContentPayload } from '@/state/table-editor-operation-queue.types'
 
 interface OperationItemProps {
@@ -59,7 +59,7 @@ export const OperationItem = ({ operationId, tableId, content }: OperationItemPr
         </div>
         <ButtonTooltip
           type="text"
-          aria-label="Revert change"
+          aria-label="Discard change"
           className="px-1.5"
           icon={<Undo2 />}
           onClick={handleDelete}
@@ -67,7 +67,7 @@ export const OperationItem = ({ operationId, tableId, content }: OperationItemPr
             content: {
               side: 'left',
               align: 'end',
-              text: 'Revert change',
+              text: 'Discard change',
             },
           }}
         />

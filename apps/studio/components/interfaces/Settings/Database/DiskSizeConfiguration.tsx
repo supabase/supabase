@@ -1,20 +1,5 @@
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
-import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import Panel from 'components/ui/Panel'
-import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
-import { useDatabaseSizeQuery } from 'data/database/database-size-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useIsAwsNimbusCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useUrlState } from 'hooks/ui/useUrlState'
-import { DOCS_URL } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
 import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { SetStateAction } from 'react'
@@ -27,6 +12,25 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns'
+
+import { Markdown } from '@/components/interfaces/Markdown'
+import DiskSizeConfigurationModal from '@/components/interfaces/Settings/Database/DiskSizeConfigurationModal'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import Panel from '@/components/ui/Panel'
+import { useProjectDiskResizeMutation } from '@/data/config/project-disk-resize-mutation'
+import { useDatabaseSizeQuery } from '@/data/database/database-size-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import {
+  useIsAwsNimbusCloudProvider,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
+import { useUrlState } from '@/hooks/ui/useUrlState'
+import { DOCS_URL } from '@/lib/constants'
+import { formatBytes } from '@/lib/helpers'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean

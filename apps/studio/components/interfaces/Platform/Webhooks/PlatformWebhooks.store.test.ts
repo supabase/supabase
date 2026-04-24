@@ -126,12 +126,28 @@ describe('PlatformWebhooks.store', () => {
       'project-delivery-2',
       { now: '2026-03-17T02:15:00.000Z' }
     )
+    const endpointDeliveries = filterWebhookDeliveries(
+      nextState.deliveries,
+      '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12',
+      ''
+    )
 
+    expect(endpointDeliveries).toHaveLength(8)
+    expect(endpointDeliveries.map((delivery) => delivery.id).slice(0, 3)).toEqual([
+      'project-delivery-2',
+      'project-delivery-1',
+      'project-delivery-3',
+    ])
     expect(
-      filterWebhookDeliveries(nextState.deliveries, '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12', '').map(
-        (delivery) => delivery.id
-      )
-    ).toEqual(['project-delivery-2', 'project-delivery-1', 'project-delivery-3'])
+      endpointDeliveries.every((delivery, index) => {
+        if (index === 0) return true
+
+        return (
+          new Date(endpointDeliveries[index - 1].attemptAt).getTime() >=
+          new Date(delivery.attemptAt).getTime()
+        )
+      })
+    ).toBe(true)
   })
 
   it('does not retry successful deliveries', () => {

@@ -6,11 +6,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Modal } from 'ui'
 
-import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
 import { getStripeElementsAppearanceOptions } from './Payment.utils'
+import { useOrganizationPaymentMethodSetupIntent } from '@/data/organizations/organization-payment-method-setup-intent-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 
 interface AddNewPaymentMethodModalProps {
   visible: boolean

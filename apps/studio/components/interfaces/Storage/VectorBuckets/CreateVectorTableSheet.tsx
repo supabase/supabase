@@ -1,19 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { literal, safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus, Trash2 } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
-import { useVectorBucketIndexCreateMutation } from 'data/storage/vector-bucket-index-create-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Form_Shadcn_,
@@ -33,8 +25,17 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { inverseValidBucketNameRegex } from '../CreateBucketModal.utils'
 import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
+import { useVectorBucketIndexCreateMutation } from '@/data/storage/vector-bucket-index-create-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 const isStagingLocal = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
@@ -171,7 +172,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
           serverName: wrapperInstance.server_name,
           sourceSchema: schema,
           targetSchema: schema,
-          schemaOptions: [`bucket_name '${bucketName}'`],
+          schemaOptions: [safeSql`bucket_name ${literal(bucketName)}`],
         })
       }
     } catch (error: any) {

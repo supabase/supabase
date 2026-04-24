@@ -1,39 +1,37 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
-import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
-import {
-  ReportsSelectFilter,
-  selectFilterSchema,
-} from 'components/interfaces/Reports/v2/ReportsSelectFilter'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { useDatabaseFunctionDeleteMutation } from 'data/database-functions/database-functions-delete-mutation'
-import type { DatabaseFunction } from 'data/database-functions/database-functions-query'
-import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { Search } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
+import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { CreateFunction } from '@/components/interfaces/Database/Functions/CreateFunction'
+import {
+  ReportsSelectFilter,
+  selectFilterSchema,
+} from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import SchemaSelector from '@/components/ui/SchemaSelector'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useDatabaseFunctionDeleteMutation } from '@/data/database-functions/database-functions-delete-mutation'
+import type { DatabaseFunction } from '@/data/database-functions/database-functions-query'
+import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 const createFunctionSnippet = `create function function_name()
 returns void
@@ -45,8 +43,6 @@ end;
 $$;`
 
 export const FunctionsList = () => {
-  const router = useRouter()
-  const { search } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
@@ -96,7 +92,10 @@ export const FunctionsList = () => {
     }
   }
 
-  const filterString = search ?? ''
+  const [filterString, setFilterString] = useQueryState(
+    'search',
+    parseAsString.withDefault('').withOptions({ clearOnDefault: true })
+  )
 
   // Filters
   const [returnTypeFilter, setReturnTypeFilter] = useQueryState(
@@ -107,16 +106,6 @@ export const FunctionsList = () => {
     'security',
     parseAsJson(selectFilterSchema.parse)
   )
-
-  const setFilterString = (str: string) => {
-    const url = new URL(document.URL)
-    if (str === '') {
-      url.searchParams.delete('search')
-    } else {
-      url.searchParams.set('search', str)
-    }
-    router.push(url)
-  }
 
   const { can: canCreateFunctions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -235,8 +224,8 @@ export const FunctionsList = () => {
             disabledMessage="You need additional permissions to create functions"
           >
             <p className="text-sm text-foreground-light">
-              PostgreSQL functions, also known as stored procedures, is a set of SQL and procedural
-              commands such as declarations, assignments, loops, flow-of-control, etc.
+              PostgreSQL functions are a set of SQL and procedural commands such as declarations,
+              assignments, loops, flow-of-control, etc.
             </p>
             <p className="text-sm text-foreground-light">
               It's stored on the database server and can be invoked using the SQL interface.
@@ -254,10 +243,7 @@ export const FunctionsList = () => {
                 selectedSchemaName={selectedSchema}
                 onSelectSchema={(schema) => {
                   setFilterString('')
-                  // Wait for the filter to be cleared from the URL
-                  setTimeout(() => {
-                    setSelectedSchema(schema)
-                  }, 50)
+                  setSelectedSchema(schema)
                 }}
               />
               <Input

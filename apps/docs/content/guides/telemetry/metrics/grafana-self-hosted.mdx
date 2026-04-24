@@ -31,7 +31,7 @@ scrape_configs:
     metrics_path: /customer/v1/privileged/metrics
     scheme: https
     basic_auth:
-      username: service_role
+      username: username
       password: '<secret API key (sb_secret_...)>'
     static_configs:
       - targets:

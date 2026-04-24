@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
-import { ident, literal } from './pg-format'
+import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { SCHEMAS_SQL } from './sql/schemas'
 
 const pgSchemaZod = z.object({
@@ -22,18 +22,18 @@ function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgSchemaArrayZod
 } {
   let sql = SCHEMAS_SQL
   if (!includeSystemSchemas) {
-    sql = `${sql} and not (n.nspname in (${DEFAULT_SYSTEM_SCHEMAS.map(literal).join(',')}))`
+    sql = safeSql`${sql} and not (n.nspname in (${joinSqlFragments(DEFAULT_SYSTEM_SCHEMAS.map(literal), ',')}))`
   }
   if (limit) {
-    sql = `${sql} limit ${limit}`
+    sql = safeSql`${sql} limit ${literal(limit)}`
   }
   if (offset) {
-    sql = `${sql} offset ${offset}`
+    sql = safeSql`${sql} offset ${literal(offset)}`
   }
   return {
     sql,
@@ -41,20 +41,23 @@ function list({
   }
 }
 
-function retrieve({ id }: { id: number }): { sql: string; zod: typeof pgSchemaOptionalZod }
-function retrieve({ name }: { name: string }): { sql: string; zod: typeof pgSchemaOptionalZod }
+function retrieve({ id }: { id: number }): { sql: SafeSqlFragment; zod: typeof pgSchemaOptionalZod }
+function retrieve({ name }: { name: string }): {
+  sql: SafeSqlFragment
+  zod: typeof pgSchemaOptionalZod
+}
 function retrieve({ id, name }: { id?: number; name?: string }): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgSchemaOptionalZod
 } {
   if (id) {
-    const sql = `${SCHEMAS_SQL} and n.oid = ${literal(id)};`
+    const sql = safeSql`${SCHEMAS_SQL} and n.oid = ${literal(id)};`
     return {
       sql,
       zod: pgSchemaOptionalZod,
     }
   } else {
-    const sql = `${SCHEMAS_SQL} and n.nspname = ${literal(name)};`
+    const sql = safeSql`${SCHEMAS_SQL} and n.nspname = ${literal(name)};`
     return {
       sql,
       zod: pgSchemaOptionalZod,
@@ -66,9 +69,9 @@ type SchemaCreateParams = {
   name: string
   owner?: string
 }
-function create({ name, owner }: SchemaCreateParams): { sql: string } {
-  const sql = `create schema ${ident(name)}
-  ${owner === undefined ? '' : `authorization ${ident(owner)}`};
+function create({ name, owner }: SchemaCreateParams): { sql: SafeSqlFragment } {
+  const sql = safeSql`create schema ${ident(name)}
+  ${owner === undefined ? safeSql`` : safeSql`authorization ${ident(owner)}`};
 `
   return { sql }
 }
@@ -77,8 +80,8 @@ type SchemaUpdateParams = {
   name?: string
   owner?: string
 }
-function update({ id }: { id: number }, params: SchemaUpdateParams): { sql: string }
-function update({ name }: { name: string }, params: SchemaUpdateParams): { sql: string }
+function update({ id }: { id: number }, params: SchemaUpdateParams): { sql: SafeSqlFragment }
+function update({ name }: { name: string }, params: SchemaUpdateParams): { sql: SafeSqlFragment }
 function update(
   {
     id,
@@ -88,14 +91,14 @@ function update(
     name?: string
   },
   { name: newName, owner }: SchemaUpdateParams
-): { sql: string } {
-  const sql = `
+): { sql: SafeSqlFragment } {
+  const sql = safeSql`
 do $$
 declare
-  id oid := ${id === undefined ? `${literal(name)}::regnamespace` : literal(id)};
+  id oid := ${id === undefined ? safeSql`${literal(name)}::regnamespace` : literal(id)};
   old record;
-  new_name text := ${newName === undefined ? null : literal(newName)};
-  new_owner text := ${owner === undefined ? null : literal(owner)};
+  new_name text := ${newName === undefined ? literal(null) : literal(newName)};
+  new_owner text := ${owner === undefined ? literal(null) : literal(owner)};
 begin
   select * into old from pg_namespace where oid = id;
   if old is null then
@@ -119,8 +122,8 @@ $$;
 type SchemaRemoveParams = {
   cascade?: boolean
 }
-function remove({ id }: { id: number }, params?: SchemaRemoveParams): { sql: string }
-function remove({ name }: { name: string }, params?: SchemaRemoveParams): { sql: string }
+function remove({ id }: { id: number }, params?: SchemaRemoveParams): { sql: SafeSqlFragment }
+function remove({ name }: { name: string }, params?: SchemaRemoveParams): { sql: SafeSqlFragment }
 function remove(
   {
     id,
@@ -130,11 +133,11 @@ function remove(
     name?: string
   },
   { cascade = false }: SchemaRemoveParams = {}
-): { sql: string } {
-  const sql = `
+): { sql: SafeSqlFragment } {
+  const sql = safeSql`
 do $$
 declare
-  id oid := ${id === undefined ? `${literal(name)}::regnamespace` : literal(id)};
+  id oid := ${id === undefined ? safeSql`${literal(name)}::regnamespace` : literal(id)};
   old record;
   cascade bool := ${literal(cascade)};
 begin

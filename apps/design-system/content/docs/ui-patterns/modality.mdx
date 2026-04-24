@@ -104,8 +104,13 @@ Studio implementation (preferred in Studio code):
 import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 
+const form = useForm(...)
+// Always destructure formState values otherwise they won't be updated
+// See https://react-hook-form.com/docs/useform/formstate
+const { isDirty } = form.formState
+
 const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
-  checkIsDirty: () => form.formState.isDirty,
+  checkIsDirty: () => isDirty,
   onClose,
 })
 

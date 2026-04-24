@@ -1,35 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
-import { DocsButton } from 'components/ui/DocsButton'
-import { RequestUpgradeToBillingOwners } from 'components/ui/RequestUpgradeToBillingOwners'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import {
-  useDiskAttributesQuery,
-  useRemainingDurationForDiskAttributeUpdate,
-} from 'data/config/disk-attributes-query'
-import { useUpdateDiskAttributesMutation } from 'data/config/disk-attributes-update-mutation'
-import { useDiskAutoscaleCustomConfigQuery } from 'data/config/disk-autoscale-config-query'
-import { useUpdateDiskAutoscaleConfigMutation } from 'data/config/disk-autoscale-config-update-mutation'
-import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { useSetProjectStatus } from 'data/projects/project-detail-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { AddonVariantId } from 'data/subscriptions/types'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import {
-  useIsAwsCloudProvider,
-  useIsAwsK8sCloudProvider,
-  useIsAwsNimbusCloudProvider,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
-import { DOCS_URL, GB, PROJECT_STATUS } from 'lib/constants'
 import { ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -51,7 +23,7 @@ import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement
 import { DiskManagementMessage } from './DiskManagement.types'
 import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
-import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
+import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog/DiskManagementReviewAndSubmitDialog'
 import { AutoScaleFields } from './fields/AutoScaleFields'
 import { ComputeSizeField } from './fields/ComputeSizeField'
 import { DiskSizeField } from './fields/DiskSizeField'
@@ -66,10 +38,42 @@ import {
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
+import {
+  MAX_WIDTH_CLASSES,
+  PADDING_CLASSES,
+  ScaffoldContainer,
+} from '@/components/layouts/Scaffold'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import {
+  useDiskAttributesQuery,
+  useRemainingDurationForDiskAttributeUpdate,
+} from '@/data/config/disk-attributes-query'
+import { useUpdateDiskAttributesMutation } from '@/data/config/disk-attributes-update-mutation'
+import { useDiskAutoscaleCustomConfigQuery } from '@/data/config/disk-autoscale-config-query'
+import { useUpdateDiskAutoscaleConfigMutation } from '@/data/config/disk-autoscale-config-update-mutation'
+import { useDiskUtilizationQuery } from '@/data/config/disk-utilization-query'
+import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addon-update-mutation'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { AddonVariantId } from '@/data/subscriptions/types'
+import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import {
+  useIsAwsCloudProvider,
+  useIsAwsK8sCloudProvider,
+  useIsAwsNimbusCloudProvider,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, GB, PROJECT_STATUS } from '@/lib/constants'
 
 export function DiskManagementForm() {
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const { setProjectStatus } = useSetProjectStatus()
 
@@ -151,6 +155,7 @@ export function DiskManagementForm() {
       CreateDiskStorageSchema({
         defaultTotalSize: defaultValues.totalSize,
         cloudProvider: project?.cloud_provider as CloudProvider,
+        isSpendCapEnabled,
       })
     ),
     defaultValues,
@@ -219,19 +224,22 @@ export function DiskManagementForm() {
 
   const isBranch = project?.parent_project_ref !== undefined
 
-  const disableDiskInputs =
+  const disableDiskSizeInput =
     isRequestingChanges ||
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
-    isSpendCapEnabled ||
     !canUpdateDiskConfiguration ||
     !isAws
+
+  const disableDiskInputs = disableDiskSizeInput || isSpendCapEnabled
 
   const disableComputeInputs = isPlanUpgradeRequired
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const isProjectResizing = project?.status === PROJECT_STATUS.RESIZING
   const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
   const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration
+
+  const isDiskNoticeVisible = !isProjectPending && !(isAws || isAwsNimbus)
 
   const { mutateAsync: updateDiskConfiguration, isPending: isUpdatingDisk } =
     useUpdateDiskAttributesMutation({
@@ -375,14 +383,14 @@ export function DiskManagementForm() {
           <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
             <ComputeSizeField form={form} disabled={disableComputeInputs} />
 
-            {!(isAws || isAwsNimbus) && <Separator />}
+            {isDiskNoticeVisible && <Separator />}
 
-            <SpendCapDisabledSection />
+            <SpendCapDisabledSection currentDiskSizeGb={defaultValues.totalSize} />
 
             <div className="flex flex-col gap-y-4">
               <NoticeBar
                 type="default"
-                visible={!(isAws || isAwsNimbus)}
+                visible={isDiskNoticeVisible}
                 title="Disk configuration is only available for projects in the AWS cloud provider"
                 description={
                   isAwsK8s
@@ -427,7 +435,7 @@ export function DiskManagementForm() {
 
                   <DiskSizeField
                     form={form}
-                    disableInput={disableDiskInputs}
+                    disableInput={disableDiskSizeInput}
                     setAdvancedSettingsOpenState={setAdvancedSettingsOpenState}
                   />
                 </>

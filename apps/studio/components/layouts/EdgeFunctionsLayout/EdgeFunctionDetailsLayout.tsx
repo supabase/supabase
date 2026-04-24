@@ -1,21 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { IS_PLATFORM, useParams } from 'common'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { EdgeFunctionTesterSheet } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
-import { APIDocsButton } from 'components/ui/APIDocsButton'
-import { DocsButton } from 'components/ui/DocsButton'
-import NoPermission from 'components/ui/NoPermission'
-import { useProjectApiUrl } from 'data/config/project-endpoint-query'
-import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
-import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { withAuth } from 'hooks/misc/withAuth'
-import { DOCS_URL } from 'lib/constants'
 import { Clock, Download, FileArchive, Send } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -37,6 +24,7 @@ import {
   PopoverTrigger_Shadcn_,
   Separator,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageHeader,
@@ -51,7 +39,18 @@ import {
 
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
+import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
 import CopyButton from '@/components/ui/CopyButton'
+import { DocsButton } from '@/components/ui/DocsButton'
+import NoPermission from '@/components/ui/NoPermission'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
+import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { DOCS_URL } from '@/lib/constants'
 
 dayjs.extend(relativeTime)
 
@@ -68,7 +67,6 @@ const EdgeFunctionDetailsLayout = ({
   const { functionSlug, ref } = useParams()
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { isLoading, can: canReadFunctions } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
     '*'
@@ -293,23 +291,35 @@ const EdgeFunctionDetailsLayout = ({
                       </span>
                     </button>
                   </HoverCardTrigger>
-                  <HoverCardContent side="bottom" align="start" className="w-[320px] p-0">
+                  <HoverCardContent side="bottom" align="start" className="w-40 p-0">
                     {createdRelative && (
                       <div className="px-4 py-2 space-y-1">
                         <h3 className="heading-meta text-foreground-light">Created</h3>
-                        <p className="text-foreground">{createdRelative}</p>
+                        {!!selectedFunction && (
+                          <TimestampInfo
+                            className="text-sm"
+                            label={createdRelative}
+                            utcTimestamp={selectedFunction.created_at}
+                          />
+                        )}
                       </div>
                     )}
                     {updatedRelative && (
                       <div className="px-4 py-2 space-y-1">
                         <h3 className="heading-meta text-foreground-light">Last deployed</h3>
-                        <p className="text-foreground">{updatedRelative}</p>
+                        {!!selectedFunction && (
+                          <TimestampInfo
+                            className="text-sm"
+                            label={updatedRelative}
+                            utcTimestamp={selectedFunction.updated_at}
+                          />
+                        )}
                       </div>
                     )}
                     {selectedFunction?.version !== undefined && (
                       <div className="px-4 py-2 space-y-1">
                         <h3 className="heading-meta text-foreground-light">Deployments</h3>
-                        <p className="text-foreground">{selectedFunction.version}</p>
+                        <p className="text-sm text-foreground">{selectedFunction.version}</p>
                       </div>
                     )}
                   </HoverCardContent>
@@ -319,16 +329,6 @@ const EdgeFunctionDetailsLayout = ({
 
             <PageHeaderAside>
               <div className="flex items-center space-x-2">
-                {isNewAPIDocsEnabled && (
-                  <APIDocsButton
-                    section={
-                      functionSlug !== undefined
-                        ? ['edge-functions', functionSlug]
-                        : ['edge-functions']
-                    }
-                    source="edge-functions"
-                  />
-                )}
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
                 <Popover_Shadcn_>
                   <PopoverTrigger_Shadcn_ asChild>

@@ -2,6 +2,7 @@ import path from 'path'
 import { expect } from '@playwright/test'
 
 import { env } from '../env.config.js'
+import { expectClipboardValue } from '../utils/clipboard.js'
 import {
   createBucket,
   createFolder,
@@ -248,61 +249,55 @@ test.describe('Storage', () => {
     const folderFile = page.getByTitle(folderFileName)
     await folderFile.click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Get URL' }).click()
-    await expect(async () => {
-      const copiedUrl = await page.evaluate(() => navigator.clipboard.readText())
-      expect(copiedUrl).toContain(
-        `storage/v1/object/public/${bucketName}/${folderName}/${folderFileName}`
-      )
-    }).toPass({ timeout: 2000 })
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${folderName}/${folderFileName}`,
+    })
     await expect(page.getByRole('menuitem', { name: 'Get URL' })).not.toBeVisible()
 
     // Right-click on the root file to open context menu while the folder is still open
     const rootFile = page.getByTitle(rootFileName)
     await rootFile.click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Get URL' }).click()
-    await expect(async () => {
-      const copiedUrl = await page.evaluate(() => navigator.clipboard.readText())
-      expect(copiedUrl).toContain(`storage/v1/object/public/${bucketName}/${rootFileName}`)
-    }).toPass({ timeout: 2000 })
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${rootFileName}`,
+    })
     await expect(page.getByRole('menuitem', { name: 'Get URL' })).not.toBeVisible()
 
     // Click the actions button on the folder file to open dropdown menu
     await page.getByRole('button', { name: `${folderFileName} actions` }).click()
     await page.getByRole('menuitem', { name: 'Get URL' }).click()
-    await expect(async () => {
-      const copiedUrl = await page.evaluate(() => navigator.clipboard.readText())
-      expect(copiedUrl).toContain(
-        `storage/v1/object/public/${bucketName}/${folderName}/${folderFileName}`
-      )
-    }).toPass({ timeout: 2000 })
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${folderName}/${folderFileName}`,
+    })
     await expect(page.getByRole('menuitem', { name: 'Get URL' })).not.toBeVisible()
 
     // Click the actions button on the root file to open dropdown menu while the folder is still open
     await page.getByRole('button', { name: `${rootFileName} actions` }).click()
     await page.getByRole('menuitem', { name: 'Get URL' }).click()
-    await expect(async () => {
-      const copiedUrl = await page.evaluate(() => navigator.clipboard.readText())
-      expect(copiedUrl).toContain(`storage/v1/object/public/${bucketName}/${rootFileName}`)
-    }).toPass({ timeout: 2000 })
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${rootFileName}`,
+    })
     await expect(page.getByRole('menuitem', { name: 'Get URL' })).not.toBeVisible()
 
     // Click the folder file to open its preview pane
     await folderFile.click()
     await page.getByRole('button', { name: 'Get URL' }).click()
-    await expect(async () => {
-      const copiedUrl = await page.evaluate(() => navigator.clipboard.readText())
-      expect(copiedUrl).toContain(
-        `storage/v1/object/public/${bucketName}/${folderName}/${folderFileName}`
-      )
-    }).toPass({ timeout: 2000 })
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${folderName}/${folderFileName}`,
+    })
 
     // Click the root file to open its preview pane while folder is still open
     await rootFile.click()
     await page.getByRole('button', { name: 'Get URL' }).click()
-    await expect(async () => {
-      const copiedUrl = await page.evaluate(() => navigator.clipboard.readText())
-      expect(copiedUrl).toContain(`storage/v1/object/public/${bucketName}/${rootFileName}`)
-    }).toPass({ timeout: 2000 })
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${rootFileName}`,
+    })
   })
 
   test('resets folder name when renaming with empty string', async ({ page, ref }) => {
