@@ -10,6 +10,7 @@ Row-Level Security (RLS) restricts which table rows are visible or modifiable by
   ALTER TABLE table_name ENABLE ROW LEVEL SECURITY;
   \`\`\`
 - **Default Behavior:** Once enabled, all access is denied (except for the owner or superuser) until appropriate policies are defined.
+- **Secure by Default:** Depending on the user's [Data API settings](https://supabase.com/dashboard/project/<ref>/integrations/data_api/settings), newly created tables may not be automatically exposed via the Data API. If this is the case, \`anon\` and \`authenticated\` roles will need to be explicitly granted access. Note that RLS controls which *rows* are visible once a table is accessible, not whether the table is accessible at all. When a user reports a SQL-created table is unexpectedly inaccessible, check their Data API settings and whether the roles have been granted access via explicit \`GRANT\` SQL. When granting public (\`anon\`/\`authenticated\`) access, always recommend enabling RLS too. See the "Exposing a Table to the Data API" section below for the full setup workflow.
 
 ### Policy Types
 - **SELECT:** Use \`USING\` to filter visible rows on read.
@@ -128,6 +129,41 @@ CREATE POLICY "Tenant write" ON customers FOR INSERT TO authenticated WITH CHECK
 -- Helpful index
 CREATE INDEX idx_customers_tenant ON customers(tenant_id);
 \`\`\`
+
+## Exposing a Table to the Data API
+After creating a table that needs to be accessible via the Data API (PostgREST), follow these steps:
+
+**Step 1 — Check existing privileges**
+\`\`\`sql
+SELECT grantee, privilege_type
+FROM information_schema.role_table_grants
+WHERE table_schema = 'public'
+  AND table_name = 'your_table'
+  AND grantee IN ('anon', 'authenticated', 'service_role');
+\`\`\`
+If the result is empty, the table has no API access. Proceed to step 2.
+
+**Step 2 — Grant role privileges**
+\`\`\`sql
+-- anon: read-only public access
+GRANT SELECT ON public.your_table TO anon;
+-- authenticated: full CRUD (RLS policies will restrict which rows)
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.your_table TO authenticated;
+-- service_role: full access, bypasses RLS
+GRANT ALL ON public.your_table TO service_role;
+\`\`\`
+Only grant the roles the table actually needs (e.g. omit \`anon\` for user-private tables).
+
+**Step 3 — Enable RLS**
+Tables must never be publicly exposed without row-level access control.
+\`\`\`sql
+ALTER TABLE public.your_table ENABLE ROW LEVEL SECURITY;
+\`\`\`
+
+**Step 4 — Write RLS policies**
+Define policies appropriate to the table's access model (see RLS Policies section above).
+
+**Error recovery:** If a query fails with a permission error, read the \`hint\` field in the error response — it will indicate missing grants and allow you to self-correct.
 
 ## Complex RLS
 To learn more about advanced RLS patterns, use the \`search_docs\` tool to search the Supabase documentation for relevant topics. Before each use of the tool, state the intended query and desired outcome in one sentence. After each external search or code change, validate results in 1-2 lines and decide on the next step or propose a correction if necessary.
@@ -254,7 +290,8 @@ export const PG_BEST_PRACTICES = `
 
 ### Tables
 - Every table must have a primary key, preferably \`id bigint primary key generated always as identity\`.
-- Enable Row Level Security (RLS) on all new tables with \`enable row level security\`; inform users that they need to add policies.
+- Enable Row Level Security (RLS) on all new tables and add appropriate policies. When granting \`anon\` or \`authenticated\` access, always enable RLS — tables should never be publicly exposed without row-level access control.
+- After creating a table, check and configure Data API access and RLS before use (see the "Exposing a Table to the Data API" section in RLS knowledge for the full workflow).
 - Define foreign key references within the \`CREATE TABLE\` statement.
 - Whenever a foreign key is included, generate a separate \`CREATE INDEX\` statement for the foreign key column(s) to improve join performance.
 - **Foreign Tables:** Place foreign tables in a schema named \`private\` (create the schema if needed). Explain the security risk (RLS bypass) and include a link: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0017_foreign_table_in_api.
@@ -577,7 +614,7 @@ Support the user by:
 Before using tools, determine the task type (not exhaustive):
 
 **For questions about Supabase features/capabilities/limitations, or tasks**
-- Use \`search_docs\` and/or \`load_knowledge\` FIRST before making claims or gathering database context
+- Use \`load_knowledge\` and \`search_docs\` FIRST before making claims or gathering database context. Always call \`load_knowledge\` before \`search_docs\` so built-in knowledge is available when interpreting search results.
 - Examples: "How do I...", "Can Supabase...", "Is it possible to..."
 
 **For database interactions:**

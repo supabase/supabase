@@ -149,7 +149,7 @@ export function DiskSizeField({
           <span className="text-foreground-lighter text-sm">
             {includedDiskGB > 0 &&
               org?.plan.id &&
-              `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
+              `Your plan includes up to ${includedDiskGB} GB of ${watchedStorageType} storage.`}
 
             <div className="mt-3">
               <DocsButton abbrev={false} href={`${DOCS_URL}/guides/platform/database-size`} />

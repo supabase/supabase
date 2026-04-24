@@ -137,6 +137,13 @@ export const GitHubIntegrationConnectionForm = ({
       onSuccess: () => {
         toast.success('GitHub integration successfully updated')
       },
+      onError: (error) => {
+        // Don't show error toast when connection already exists - the branch
+        // settings update will still proceed and show its own success toast
+        if (!error.message?.includes('already exists')) {
+          toast.error(`Failed to create GitHub connection: ${error.message}`)
+        }
+      },
     })
 
   const { mutateAsync: deleteConnection, isPending: isDeletingConnection } =
@@ -453,7 +460,7 @@ export const GitHubIntegrationConnectionForm = ({
                 render={({ field }) => (
                   <FormItemLayout
                     layout="flex-row-reverse"
-                    label="GitHub Repository"
+                    label="GitHub repository"
                     description={
                       connection
                         ? 'Change the connected repository'
@@ -481,7 +488,7 @@ export const GitHubIntegrationConnectionForm = ({
                           >
                             {selectedRepository || connection
                               ? selectedRepository?.name || connection?.repository.name
-                              : 'Choose GitHub Repository'}
+                              : 'Choose GitHub repository'}
                           </Button>
                         </FormControl_Shadcn_>
                       </PopoverTrigger_Shadcn_>
@@ -575,12 +582,23 @@ export const GitHubIntegrationConnectionForm = ({
                         <FormItemLayout
                           layout="flex-row-reverse"
                           label="Working directory"
-                          description="Path to working directory with your supabase folder"
+                          description={
+                            <>
+                              Relative path to the directory containing your{' '}
+                              <code className="text-code-inline whitespace-nowrap">supabase/</code>{' '}
+                              folder.{' '}
+                              <InlineLink
+                                href={`${DOCS_URL}/guides/deployment/branching/github-integration#set-the-working-directory`}
+                              >
+                                Learn more
+                              </InlineLink>
+                            </>
+                          }
                         >
                           <FormControl_Shadcn_>
                             <Input_Shadcn_
                               {...field}
-                              placeholder="supabase"
+                              placeholder="."
                               autoComplete="off"
                               disabled={!canUpdateGitHubConnection}
                             />

@@ -2897,6 +2897,7 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
+        { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
       ],
     },
     {
