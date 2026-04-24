@@ -62,10 +62,12 @@ verify_jwt = true
 ```ts
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
+const SUPABASE_PUBLISHABLE_KEYS = JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')!)
+
 Deno.serve((req) => {
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_PUBLISHABLE_KEY')!,
+    SUPABASE_PUBLISHABLE_KEYS['default'],
     { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
   )
 
@@ -86,12 +88,17 @@ verify_jwt = false
 ```ts
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
+const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
+
 Deno.serve((req) => {
   if (req.headers.get('apikey') !== Deno.env.get('INTERNAL_AUTOMATIONS_KEY')) {
     return Response.json({ error: 'forbidden' }, { status: 401 })
   }
 
-  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SECRET_KEY')!)
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    SUPABASE_SECRET_KEYS['default'],
+  )
 
   // your business logic. queries run with the service role
   return Response.json({ ok: true })
