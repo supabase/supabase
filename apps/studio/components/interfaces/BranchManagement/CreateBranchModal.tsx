@@ -21,9 +21,9 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Label_Shadcn_ as Label,
   Switch,
@@ -291,7 +291,7 @@ export const CreateBranchModal = () => {
         </DialogHeader>
         <DialogSectionSeparator />
 
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             {promptPlanUpgrade && (
               <UpgradeToPro
@@ -309,18 +309,18 @@ export const CreateBranchModal = () => {
               padding="medium"
               className={cn('space-y-4', promptPlanUpgrade && 'opacity-25 pointer-events-none')}
             >
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="branchName"
                 render={({ field }) => (
                   <FormItemLayout label="Preview Branch Name">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         {...field}
                         placeholder="e.g. staging, dev-feature-x"
                         autoComplete="off"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -341,7 +341,7 @@ export const CreateBranchModal = () => {
 
               {isSuccessConnections &&
                 (githubConnection ? (
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="gitBranchName"
                     render={({ field }) => (
@@ -372,7 +372,7 @@ export const CreateBranchModal = () => {
                         description="Automatically deploy changes on every commit"
                       >
                         <div className="relative w-full">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Input_Shadcn_
                               {...field}
                               placeholder="e.g. main, feat/some-feature"
@@ -382,7 +382,7 @@ export const CreateBranchModal = () => {
                                 setIsGitBranchValid(false)
                               }}
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                           <div className="absolute top-2.5 right-3 flex items-center gap-2">
                             {field.value ? (
                               isCheckingGHBranchValidity ? (
@@ -411,7 +411,7 @@ export const CreateBranchModal = () => {
                 ))}
 
               {allowDataBranching && (
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="withData"
                   render={({ field }) => (
@@ -426,13 +426,13 @@ export const CreateBranchModal = () => {
                       className="[&>div>label]:mb-1"
                       description="Clone production data into this branch"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Switch
                           disabled={!hasPitrEnabled}
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -632,7 +632,7 @@ export const CreateBranchModal = () => {
               </ButtonTooltip>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

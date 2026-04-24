@@ -6,7 +6,7 @@ import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
+import { Button, Card, CardFooter, Form } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BillingCustomerDataForm } from './BillingCustomerDataForm'

@@ -11,9 +11,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -250,11 +250,11 @@ export const ProtectionAuthSettingsForm = () => {
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        <Form_Shadcn_ {...protectionForm}>
+        <Form {...protectionForm}>
           <form onSubmit={protectionForm.handleSubmit(onSubmitProtection)} className="space-y-4">
             <Card>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={protectionForm.control}
                   name="SECURITY_CAPTCHA_ENABLED"
                   render={({ field }) => (
@@ -263,13 +263,13 @@ export const ProtectionAuthSettingsForm = () => {
                       label="Enable Captcha protection"
                       description="Protect authentication endpoints from bots and abuse."
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Switch
                           checked={field.value}
                           onCheckedChange={field.onChange}
                           disabled={!canUpdateConfig}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -278,7 +278,7 @@ export const ProtectionAuthSettingsForm = () => {
               {SECURITY_CAPTCHA_ENABLED && (
                 <>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={protectionForm.control}
                       name="SECURITY_CAPTCHA_PROVIDER"
                       render={({ field }) => {
@@ -287,7 +287,7 @@ export const ProtectionAuthSettingsForm = () => {
                         )
                         return (
                           <FormItemLayout layout="flex-row-reverse" label="Choose Captcha Provider">
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Select_Shadcn_
                                 value={field.value}
                                 onValueChange={field.onChange}
@@ -304,7 +304,7 @@ export const ProtectionAuthSettingsForm = () => {
                                   ))}
                                 </SelectContent_Shadcn_>
                               </Select_Shadcn_>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                             <InlineLink
                               href={
                                 field.value === 'hcaptcha'
@@ -324,7 +324,7 @@ export const ProtectionAuthSettingsForm = () => {
                   </CardContent>
 
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={protectionForm.control}
                       name="SECURITY_CAPTCHA_SECRET"
                       render={({ field }) => (
@@ -333,9 +333,9 @@ export const ProtectionAuthSettingsForm = () => {
                           label="Captcha secret"
                           description="Obtain this secret from the provider."
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Input {...field} reveal copy disabled={!canUpdateConfig} />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -344,7 +344,7 @@ export const ProtectionAuthSettingsForm = () => {
               )}
 
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={protectionForm.control}
                   name="PASSWORD_HIBP_ENABLED"
                   render={({ field }) => (
@@ -383,7 +383,7 @@ export const ProtectionAuthSettingsForm = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </PageSectionContent>
     </PageSection>
   )

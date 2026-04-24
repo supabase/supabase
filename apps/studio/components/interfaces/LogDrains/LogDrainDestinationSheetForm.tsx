@@ -7,12 +7,11 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
   Input_Shadcn_,
   RadioGroupCard,
   RadioGroupCardItem,
@@ -273,14 +272,14 @@ function LogDrainFormItem({
   type?: string
 }) {
   return (
-    <FormField_Shadcn_
+    <FormField
       name={value}
       control={formControl}
       render={({ field }) => (
         <FormItemLayout layout="horizontal" label={label} description={description || ''}>
-          <FormControl_Shadcn_>
+          <FormControl>
             <Input_Shadcn_ type={type || 'text'} placeholder={placeholder} {...field} />
-          </FormControl_Shadcn_>
+          </FormControl>
         </FormItemLayout>
       )}
     />
@@ -382,7 +381,7 @@ export function LogDrainDestinationSheetForm({
           <SheetTitle>Add destination</SheetTitle>
         </SheetHeader>
         <SheetSection className="!px-0 !pb-0">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={FORM_ID}
               onSubmit={(e) => {
@@ -464,49 +463,49 @@ export function LogDrainDestinationSheetForm({
                         formControl={form.control}
                         placeholder="https://example.com/log-drain"
                       />
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="http"
                         render={({ field }) => (
                           <FormItemLayout layout="horizontal" label="HTTP Version">
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <RadioGroupCard
                                 className="flex gap-2"
                                 onValueChange={field.onChange}
                                 value={field.value}
                               >
-                                <FormItem_Shadcn_ asChild>
-                                  <FormControl_Shadcn_>
+                                <FormItem asChild>
+                                  <FormControl>
                                     <RadioGroupCardItem value="http1" label="HTTP/1" />
-                                  </FormControl_Shadcn_>
-                                </FormItem_Shadcn_>
-                                <FormItem_Shadcn_ asChild>
-                                  <FormControl_Shadcn_>
+                                  </FormControl>
+                                </FormItem>
+                                <FormItem asChild>
+                                  <FormControl>
                                     <RadioGroupCardItem value="http2" label="HTTP/2" />
-                                  </FormControl_Shadcn_>
-                                </FormItem_Shadcn_>
+                                  </FormControl>
+                                </FormItem>
                               </RadioGroupCard>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
                     </div>
 
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="gzip"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="space-y-2 px-4">
+                        <FormItem className="space-y-2 px-4">
                           <div className="flex gap-2 items-center">
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch checked={field.value} onCheckedChange={field.onChange} />
-                            </FormControl_Shadcn_>
-                            <FormLabel_Shadcn_ className="text-base">Gzip</FormLabel_Shadcn_>
+                            </FormControl>
+                            <FormLabel className="text-base">Gzip</FormLabel>
                             <InfoTooltip align="start">
                               Gzip compresses logs before sending it to the destination.
                             </InfoTooltip>
                           </div>
-                        </FormItem_Shadcn_>
+                        </FormItem>
                       )}
                     />
                   </>
@@ -532,7 +531,7 @@ export function LogDrainDestinationSheetForm({
                         </>
                       }
                     />
-                    <FormField_Shadcn_
+                    <FormField
                       name="region"
                       control={form.control}
                       render={({ field }) => (
@@ -554,7 +553,7 @@ export function LogDrainDestinationSheetForm({
                             </p>
                           }
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                               <SelectTrigger_Shadcn_ className="col-span-3">
                                 <SelectValue_Shadcn_ placeholder="Select a region" />
@@ -570,7 +569,7 @@ export function LogDrainDestinationSheetForm({
                                 </SelectGroup_Shadcn_>
                               </SelectContent_Shadcn_>
                             </Select_Shadcn_>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -700,7 +699,7 @@ export function LogDrainDestinationSheetForm({
                         formControl={form.control}
                         description="The HTTP endpoint for OTLP log ingestion (typically ends with /v1/logs)"
                       />
-                      <FormField_Shadcn_
+                      <FormField
                         name="protocol"
                         control={form.control}
                         render={({ field }) => (
@@ -709,7 +708,7 @@ export function LogDrainDestinationSheetForm({
                             label="Protocol"
                             description="Only HTTP with Protocol Buffers is currently supported"
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                                 <SelectTrigger_Shadcn_ className="col-span-3">
                                   <SelectValue_Shadcn_ placeholder="Select protocol" />
@@ -725,36 +724,34 @@ export function LogDrainDestinationSheetForm({
                                   </SelectGroup_Shadcn_>
                                 </SelectContent_Shadcn_>
                               </Select_Shadcn_>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
                     </div>
 
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="gzip"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="space-y-2 px-4">
+                        <FormItem className="space-y-2 px-4">
                           <div className="flex gap-2 items-center">
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch checked={field.value} onCheckedChange={field.onChange} />
-                            </FormControl_Shadcn_>
-                            <FormLabel_Shadcn_ className="text-base">
-                              Gzip Compression
-                            </FormLabel_Shadcn_>
+                            </FormControl>
+                            <FormLabel className="text-base">Gzip Compression</FormLabel>
                             <InfoTooltip align="start">
                               Enable gzip compression for log data sent to the OTLP endpoint.
                             </InfoTooltip>
                           </div>
-                        </FormItem_Shadcn_>
+                        </FormItem>
                       )}
                     />
                   </>
                 )}
                 {type === 'last9' && (
                   <div className="grid gap-4 px-content">
-                    <FormField_Shadcn_
+                    <FormField
                       name="region"
                       control={form.control}
                       render={({ field }) => (
@@ -768,7 +765,7 @@ export function LogDrainDestinationSheetForm({
                             </p>
                           }
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                               <SelectTrigger_Shadcn_ className="col-span-3">
                                 <SelectValue_Shadcn_ placeholder="Select a region" />
@@ -784,7 +781,7 @@ export function LogDrainDestinationSheetForm({
                                 </SelectGroup_Shadcn_>
                               </SelectContent_Shadcn_>
                             </Select_Shadcn_>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -808,7 +805,7 @@ export function LogDrainDestinationSheetForm({
                 )}
                 {HEADER_ENABLED_TYPES.includes(type as (typeof HEADER_ENABLED_TYPES)[number]) && (
                   <div className="px-content">
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="headerEntries"
                       render={({ fieldState }) => (
@@ -836,7 +833,7 @@ export function LogDrainDestinationSheetForm({
                 )}
               </div>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </SheetSection>
 
         <div className="mt-auto">

@@ -4,7 +4,7 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
-import { FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { FormControl, FormField, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DocsSuggestions } from './DocsSuggestions'
@@ -29,14 +29,14 @@ export function SubjectAndSuggestionsInfo({
 }: SubjectAndSuggestionsInfoProps) {
   return (
     <div className={'flex flex-col gap-y-2'}>
-      <FormField_Shadcn_
+      <FormField
         name="subject"
         control={form.control}
         render={({ field }) => (
           <FormItemLayout layout="vertical" label="Subject">
-            <FormControl_Shadcn_>
+            <FormControl>
               <Input_Shadcn_ {...field} placeholder="Summary of the problem you have" />
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )}
       />

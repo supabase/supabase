@@ -1,13 +1,6 @@
 import { cva } from 'class-variance-authority'
-import { motion } from 'framer-motion'
 import React from 'react'
-import {
-  cn,
-  FormDescription_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Label_Shadcn_,
-} from 'ui'
+import { cn, FormDescription, FormLabel, FormMessage, Label_Shadcn_ } from 'ui'
 import { SIZE } from 'ui/src/lib/constants'
 
 type Props = {
@@ -301,7 +294,7 @@ export const FormLayout = React.forwardRef<
     const hasLabel = Boolean(label || beforeLabel || afterLabel)
     const renderError =
       isReactForm && !hideMessage ? (
-        <FormMessage_Shadcn_
+        <FormMessage
           className={cn(
             'mt-2 transition-all duration-300 ease-in-out',
             layout === 'flex-row-reverse' && 'mt-0'
@@ -312,13 +305,13 @@ export const FormLayout = React.forwardRef<
 
     const renderDescription =
       description && isReactForm ? (
-        <FormDescription_Shadcn_
+        <FormDescription
           className={cn(DescriptionVariants({ size, layout }))}
           data-formlayout-id={'description'}
           id={`${id}-description`}
         >
           {description}
-        </FormDescription_Shadcn_>
+        </FormDescription>
       ) : description ? (
         <p
           className={cn(DescriptionVariants({ size, layout }), 'text-sm text-foreground-light')}
@@ -371,13 +364,13 @@ export const FormLayout = React.forwardRef<
               data-formlayout-id={'labelContainer'}
             >
               {hasLabel && isReactForm ? (
-                <FormLabel_Shadcn_
+                <FormLabel
                   className="text-foreground flex gap-2 items-center break-words"
                   data-formlayout-id="formLabel"
                   htmlFor={props.name || id}
                 >
                   <LabelContents />
-                </FormLabel_Shadcn_>
+                </FormLabel>
               ) : (
                 <Label_Shadcn_
                   className="text-foreground flex gap-2 items-center break-words leading-normal"

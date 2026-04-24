@@ -10,7 +10,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
+  Form,
 } from 'ui'
 
 import { AIOptInLevelSelector } from '@/components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
@@ -44,7 +44,7 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
   return (
     <Dialog open={visible} onOpenChange={onOpenChange}>
       <DialogContent size="large" aria-describedby={undefined}>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id="ai-opt-in-form" onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader padding="small">
               <DialogTitle>Update Supabase Assistant Opt-in Level</DialogTitle>
@@ -84,7 +84,7 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
               </div>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )
