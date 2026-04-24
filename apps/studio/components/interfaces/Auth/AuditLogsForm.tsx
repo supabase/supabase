@@ -4,16 +4,7 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  Form,
-  FormControl,
-  FormField,
-  Switch,
-} from 'ui'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {

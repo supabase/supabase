@@ -335,9 +335,7 @@ const FormContent = memo(function FormContent({
               name="areas_of_interest"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground">
-                    Product Areas of Interest *
-                  </FormLabel>
+                  <FormLabel className="text-foreground">Product Areas of Interest *</FormLabel>
                   <FormDescription className="text-foreground-lighter">
                     What specific areas would you like to help with? Leave blank if you&apos;re not
                     sure.
@@ -439,9 +437,7 @@ const FormContent = memo(function FormContent({
               name="monthly_commitment"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground">
-                    Monthly Commitment
-                  </FormLabel>
+                  <FormLabel className="text-foreground">Monthly Commitment</FormLabel>
                   <FormDescription className="text-foreground-lighter">
                     How many hours can you commit per month? If not sure, leave blank.
                   </FormDescription>
@@ -460,9 +456,7 @@ const FormContent = memo(function FormContent({
               name="languages_spoken"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground">
-                    Languages spoken *
-                  </FormLabel>
+                  <FormLabel className="text-foreground">Languages spoken *</FormLabel>
                   <FormDescription className="text-foreground-lighter">
                     What languages do you speak?
                   </FormDescription>

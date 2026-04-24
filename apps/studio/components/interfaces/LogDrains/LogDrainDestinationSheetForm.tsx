@@ -12,7 +12,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
   Input_Shadcn_,
   RadioGroupCard,
   RadioGroupCardItem,
@@ -740,9 +739,7 @@ export function LogDrainDestinationSheetForm({
                             <FormControl>
                               <Switch checked={field.value} onCheckedChange={field.onChange} />
                             </FormControl>
-                            <FormLabel className="text-base">
-                              Gzip Compression
-                            </FormLabel>
+                            <FormLabel className="text-base">Gzip Compression</FormLabel>
                             <InfoTooltip align="start">
                               Enable gzip compression for log data sent to the OTLP endpoint.
                             </InfoTooltip>

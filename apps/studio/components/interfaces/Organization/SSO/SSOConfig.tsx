@@ -3,16 +3,7 @@ import { Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  Form,
-  FormControl,
-  FormField,
-  Switch,
-} from 'ui'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'

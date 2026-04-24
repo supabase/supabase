@@ -1,13 +1,5 @@
 import type { UseFormReturn } from 'react-hook-form'
-import {
-  CardContent,
-  CardFooter,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  Switch,
-} from 'ui'
+import { CardContent, CardFooter, Form, FormControl, FormField, FormItem, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DataApiDisabledAlert } from './DataApiDisabledAlert'

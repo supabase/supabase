@@ -1,13 +1,6 @@
 import { cva } from 'class-variance-authority'
-import { motion } from 'framer-motion'
 import React from 'react'
-import {
-  cn,
-  FormDescription,
-  FormLabel,
-  FormMessage,
-  Label_Shadcn_,
-} from 'ui'
+import { cn, FormDescription, FormLabel, FormMessage, Label_Shadcn_ } from 'ui'
 import { SIZE } from 'ui/src/lib/constants'
 
 type Props = {

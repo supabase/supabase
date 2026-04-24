@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
-  Form as Form,
+  Form,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 

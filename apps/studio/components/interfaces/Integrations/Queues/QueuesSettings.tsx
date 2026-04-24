@@ -4,14 +4,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  Switch,
-} from 'ui'
+import { Button, Form, FormControl, FormField, FormItem, Switch } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'

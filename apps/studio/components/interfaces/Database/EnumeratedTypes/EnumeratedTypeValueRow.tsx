@@ -2,15 +2,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, Trash } from 'lucide-react'
 import type { Control, FieldPath, FieldValues } from 'react-hook-form'
-import {
-  Button,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  Input_Shadcn_,
-} from 'ui'
+import { Button, FormControl, FormField, FormItem, FormLabel, FormMessage, Input_Shadcn_ } from 'ui'
 
 interface EnumeratedTypeValueRowProps<
   TFieldValues extends FieldValues = FieldValues,

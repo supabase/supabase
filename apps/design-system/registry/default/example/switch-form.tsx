@@ -68,9 +68,7 @@ export default function SwitchForm() {
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">Security emails</FormLabel>
-                    <FormDescription>
-                      Receive emails about your account security.
-                    </FormDescription>
+                    <FormDescription>Receive emails about your account security.</FormDescription>
                   </div>
                   <FormControl>
                     <Switch

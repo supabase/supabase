@@ -159,9 +159,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                               disabled={field.disabled}
                             />
                           </FormControl>
-                          <FormLabel className="text-xs">
-                            Is channel private?
-                          </FormLabel>
+                          <FormLabel className="text-xs">Is channel private?</FormLabel>
                         </div>
                         <FormDescription className="text-xs text-foreground-lighter mt-2">
                           If the channel is marked as private, it will use RLS policies to filter
