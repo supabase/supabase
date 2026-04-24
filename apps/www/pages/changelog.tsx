@@ -1,364 +1,679 @@
-import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
-import { createAppAuth } from '@octokit/auth-app'
-import { Octokit } from '@octokit/core'
-import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
-import { Octokit as OctokitRest } from '@octokit/rest'
-import dayjs from 'dayjs'
-import { GitCommit } from 'lucide-react'
-import { GetServerSideProps } from 'next'
-import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { NextSeo } from 'next-seo'
-import Link from 'next/link'
+import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
+import {
+  ChangelogTimelineFlatList,
+  ChangelogTimelineList,
+} from '~/components/Changelog/ChangelogTimelineList'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
-import { deletedDiscussions } from '~/lib/changelog.utils'
+import {
+  createChangelogOctokit,
+  fetchChangelogDiscussionByNumber,
+  getChangelogTimelineSortedIndex,
+  type ChangelogLabel,
+  type ChangelogTimelineIndexItem,
+} from '~/lib/changelog-github'
+import {
+  changelogLabelDisplayName,
+  discussionDisplayDate,
+  githubChangelogLabelFilterUrl,
+} from '~/lib/changelog.utils'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
+import { useBreakpoint } from 'common'
+import dayjs from 'dayjs'
+import { GitCommit, ListFilter, X } from 'lucide-react'
+import type { GetServerSideProps } from 'next'
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { MDXRemote } from 'next-mdx-remote'
+import { NextSeo } from 'next-seo'
+import Link from 'next/link'
+import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState } from 'nuqs'
+import { NuqsAdapter } from 'nuqs/adapters/next/pages'
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import {
+  Badge,
+  Button,
+  cn,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  IconYCombinator,
+  Input,
+  Input_Shadcn_,
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTitle,
+} from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-export type Discussion = {
-  id: string
-  updatedAt: string
-  url: string
-  title: string
-  body: string
+import 'ui-patterns/ShimmeringLoader/index.css'
+
+const FEATURED_COUNT = 1
+
+/** GitHub changelog label slugs used for product filters. */
+const CHANGELOG_PRODUCT_TAGS = [
+  { slug: 'database', label: 'Database' },
+  { slug: 'auth', label: 'Auth' },
+  { slug: 'storage', label: 'Storage' },
+  { slug: 'realtime', label: 'Realtime' },
+  { slug: 'edge functions', label: 'Edge Functions' },
+  { slug: 'postgres', label: 'postgres' },
+  { slug: 'postgrest', label: 'PostgREST' },
+  { slug: 'ai', label: 'AI & Vector' },
+  { slug: 'billing', label: 'Billing' },
+  { slug: 'breaking-change', label: 'Breaking Change' },
+  { slug: 'cli', label: 'CLI' },
+  { slug: 'frontend', label: 'Dashboard' },
+  { slug: 'documentation', label: 'Docs' },
+  { slug: 'infra', label: 'Infra' },
+  { slug: 'self-hosted', label: 'Self-hosted' },
+  { slug: 'javascript', label: 'supabase-js' },
+  { slug: 'swift', label: 'supabase-swift' },
+  { slug: 'flutter', label: 'supabase-flutter' },
+  { slug: 'python', label: 'supabase-py' },
+] as const
+
+type ChangelogProductSlug = (typeof CHANGELOG_PRODUCT_TAGS)[number]['slug']
+
+const CHANGELOG_PRODUCT_SLUG_SET = new Set<string>(CHANGELOG_PRODUCT_TAGS.map((t) => t.slug))
+
+function isChangelogProductSlug(value: string): value is ChangelogProductSlug {
+  return CHANGELOG_PRODUCT_SLUG_SET.has(value)
 }
 
-type Entry = {
-  id: string
+type FeaturedEntry = {
+  number: number
   title: string
   url: string
   created_at: string
   source: MDXRemoteSerializeResult
-  type: string
+  labels: ChangelogLabel[]
 }
 
-export type DiscussionsResponse = {
-  repository: {
-    discussions: {
-      totalCount: number
-      nodes: Discussion[]
-      pageInfo: any
-    }
-  }
+type ModalPayload = {
+  title: string
+  url: string
+  created_at: string
+  source: MDXRemoteSerializeResult
 }
 
-// uses the graphql api
-async function fetchDiscussions(
-  owner: string,
-  repo: string,
-  categoryId: string,
-  cursor: string | null = null
-) {
-  const ExtendedOctokit = Octokit.plugin(paginateGraphql)
-  type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
-
-  const octokit = new ExtendedOctokit({
-    authStrategy: createAppAuth,
-    auth: {
-      appId: process.env.GITHUB_CHANGELOG_APP_ID,
-      installationId: process.env.GITHUB_CHANGELOG_APP_INSTALLATION_ID,
-      privateKey: process.env.GITHUB_CHANGELOG_APP_PRIVATE_KEY,
-    },
-  })
-
-  const query = `
-    query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
-      repository(owner: $owner, name: $repo) {
-        discussions(first: 10, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
-          totalCount
-          pageInfo {
-            hasPreviousPage
-            hasNextPage
-            startCursor
-            endCursor
-          }
-          nodes {
-            id
-            publishedAt
-            createdAt
-            url
-            title
-            body
-          }
-        }
-      }
-    }
-  `
-  const queryVars = {
-    owner,
-    repo,
-    categoryId,
-    cursor,
-  }
-
-  // fetch discussions
-  const {
-    repository: {
-      discussions: { nodes: discussions, pageInfo },
-    },
-  } = await octokit.graphql<DiscussionsResponse>(query, queryVars)
-
-  return { discussions, pageInfo }
+type PageProps = {
+  featured: FeaturedEntry[]
+  restIndex: ChangelogTimelineIndexItem[]
+  allIndex: ChangelogTimelineIndexItem[]
 }
 
-function isEncoded(uri: string | null | undefined) {
-  uri = uri ?? ''
-  return uri !== decodeURIComponent(uri)
-}
-
-// Decodes a URI if it is encoded
-const recursiveDecodeURI = (uri: string | null) => {
-  if (!uri) {
-    return uri
-  }
-  let tries = 0
-  while (isEncoded(uri)) {
-    uri = decodeURIComponent(uri)
-    tries++
-    if (tries > 10) {
-      break
-    }
-  }
-
-  return uri
-}
-
-/**
- * [Terry]
- * this page powers supabase.com/changelog
- * this page used to just be a feed of the releases endpoint
- * (https://api.github.com/repos/supabase/supabase/releases) (rest api)
- * but is now a blend of that legacy relases and the new Changelog category of the Discussions
- * https://github.com/orgs/supabase/discussions/categories/changelog (graphql api)
- * We should use the Changelog Discussions category for all future changelog entries and stop using releases
- */
-
-export const getServerSideProps: GetServerSideProps = async ({ res, query }) => {
-  // refresh every 15 minutes
+export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res }) => {
   res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
-  const encodedNext = (query.next ?? null) as string | null
-  // in some cases the next cursor is encoded twice or more times due to the user pasting the url, so we need to decode it multiple times.
-  const next = recursiveDecodeURI(encodedNext)
-  const restPage = query.restPage ? Number(query.restPage) : 1
 
-  const octokitRest = new OctokitRest({
-    authStrategy: createAppAuth,
-    auth: {
-      appId: process.env.GITHUB_CHANGELOG_APP_ID,
-      installationId: process.env.GITHUB_CHANGELOG_APP_INSTALLATION_ID,
-      privateKey: process.env.GITHUB_CHANGELOG_APP_PRIVATE_KEY,
-    },
-  })
+  try {
+    const changelogIndex = await getChangelogTimelineSortedIndex()
+    const visible = changelogIndex.filter((item) => !item.title.includes('[d]'))
+    const allIndex = visible
+    const firstMeta = visible.slice(0, FEATURED_COUNT)
+    const restIndex = visible.slice(FEATURED_COUNT)
 
-  // uses the rest api
-  async function fetchGitHubReleases() {
-    try {
-      const response = await octokitRest.repos.listReleases({
-        owner: 'supabase',
-        repo: 'supabase',
-        per_page: 10,
-        page: restPage,
-      })
-
-      return response.data || []
-    } catch (error) {
-      console.error(error)
-      return []
-    }
-  }
-
-  // Process as of Feb. 2024:
-  // create a Release each month and create a corresponding changelog discussion
-  // — we don't want to pull in both the changelog entry and the release entry
-  // — we want to ignore new releases and only show the old ones that don't have a corresponding changelog discussion
-  // — so we have this list of old releases that we want to show
-  const oldReleases = [
-    40981345, 39091930, 37212777, 35927141, 34612423, 33383788, 32302703, 30830915, 29357247,
-    28108378,
-  ]
-
-  const releases = (await fetchGitHubReleases()).filter(
-    (release) => release.id && oldReleases.includes(release.id)
-  )
-
-  const { discussions, pageInfo } = await fetchDiscussions(
-    'supabase',
-    'supabase',
-    'DIC_kwDODMpXOc4CAFUr', // 'Changelog' category
-    next
-  )
-
-  if (!discussions) {
-    return {
-      props: {
-        notFound: true,
-      },
-    }
-  }
-
-  // Process discussions
-  const formattedDiscussions = await Promise.all(
-    discussions.map(async (item: any): Promise<any> => {
-      try {
-        const discussionsMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
-        // Find a date rewrite for the current item's title
-        const dateRewrite = deletedDiscussions.find((rewrite) => {
-          return item.title && rewrite.title && item.title.includes(rewrite.title)
+    const octokit = createChangelogOctokit()
+    const featured = (
+      await Promise.all(
+        firstMeta.map(async (meta): Promise<FeaturedEntry | null> => {
+          try {
+            const discussion = await fetchChangelogDiscussionByNumber(
+              octokit,
+              'supabase',
+              'supabase',
+              meta.number
+            )
+            if (!discussion) return null
+            const source = await mdxSerialize(discussion.body)
+            const created_at =
+              discussionDisplayDate({
+                title: discussion.title,
+                createdAt: discussion.createdAt,
+              }) ?? discussion.createdAt
+            return {
+              number: meta.number,
+              title: discussion.title,
+              url: discussion.url ?? '',
+              created_at,
+              source,
+              labels: meta.labels,
+            }
+          } catch (e) {
+            console.error(e)
+            return null
+          }
         })
+      )
+    ).filter((e): e is FeaturedEntry => e != null)
 
-        // Use the createdAt date from dateRewrite if found, otherwise use item.createdAt
-        const created_at = dateRewrite ? dateRewrite.createdAt : item.createdAt
-
-        return {
-          ...item,
-          source: discussionsMdxSource,
-          type: 'discussion',
-          created_at,
-          url: item.url,
-        }
-      } catch (err) {
-        console.error(`Problem processing discussion MDX: ${err}`)
-      }
-    })
-  )
-
-  // Process releases
-  const formattedReleases = await Promise.all(
-    releases.map(async (item: any): Promise<any> => {
-      try {
-        const releasesMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
-
-        return {
-          ...item,
-          source: releasesMdxSource,
-          type: 'release',
-          created_at: item.created_at,
-          title: item.name ?? '',
-          url: item.html_url ?? '',
-        }
-      } catch (err) {
-        console.error(`Problem processing discussion MDX: ${err}`)
-      }
-    })
-  )
-
-  // Combine discussions and releases into a single array of entries
-  const combinedEntries = formattedDiscussions.concat(formattedReleases).filter(Boolean)
-
-  const sortedCombinedEntries = combinedEntries.sort((a: any, b: any) => {
-    const dateA = dayjs(a.created_at)
-    const dateB = dayjs(b.created_at)
-
-    if (dateA.isValid() && dateB.isValid()) {
-      return dateB.diff(dateA)
-    } else {
-      return 0
-    }
-  })
-
-  return {
-    props: {
-      changelog: sortedCombinedEntries,
-      pageInfo: pageInfo,
-      restPage: Number(restPage),
-    },
+    return { props: { featured, restIndex, allIndex } }
+  } catch (e) {
+    console.error(e)
+    return { props: { featured: [], restIndex: [], allIndex: [] } }
   }
 }
 
-interface ChangelogPageProps {
-  changelog: Entry[]
-  pageInfo: any
-  restPage: number
+export default function ChangelogProgressivePage(props: PageProps) {
+  return (
+    <NuqsAdapter>
+      <ChangelogProgressiveContent {...props} />
+    </NuqsAdapter>
+  )
 }
 
-function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
-  const { endCursor: end, hasNextPage, hasPreviousPage } = pageInfo
+function itemMatchesSearch(item: ChangelogTimelineIndexItem, q: string) {
+  const n = q.trim().toLowerCase()
+  if (!n) return true
+  if (item.title.toLowerCase().includes(n)) return true
+  return item.labels.some((l) => l.name.toLowerCase().includes(n))
+}
+
+function itemMatchesSelectedTags(
+  item: ChangelogTimelineIndexItem,
+  selected: Set<ChangelogProductSlug>
+) {
+  if (selected.size === 0) return true
+  const labelNames = new Set(item.labels.map((l) => l.name.toLowerCase()))
+  for (const slug of selected) {
+    if (labelNames.has(slug.toLowerCase())) return true
+  }
+  return false
+}
+
+function ChangelogDiscussionArticle({
+  loading,
+  payload,
+}: {
+  loading: boolean
+  payload: ModalPayload | null
+}) {
+  return (
+    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 md:px-5">
+      {loading && <GenericSkeletonLoader className="py-2" />}
+      {!loading && payload?.source && (
+        <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
+          <MDXRemote {...payload.source} components={mdxComponents('blog')} />
+        </article>
+      )}
+    </div>
+  )
+}
+
+const nuqsUrlOptions = { shallow: true, history: 'push' as const }
+
+function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProps) {
+  const isMobile = useBreakpoint('lg')
+
+  const [discussion, setDiscussion] = useQueryState(
+    'discussion',
+    parseAsInteger.withOptions(nuqsUrlOptions)
+  )
+
+  const [querySearch, setQuerySearch] = useQueryState(
+    'q',
+    parseAsString.withOptions(nuqsUrlOptions)
+  )
+  const [queryTags, setQueryTags] = useQueryState(
+    'tags',
+    parseAsArrayOf(parseAsString).withOptions(nuqsUrlOptions)
+  )
+
+  const [payload, setPayload] = useState<ModalPayload | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false)
+
+  const filterSearch = querySearch ?? ''
+  const selectedTags = useMemo(() => {
+    const next = new Set<ChangelogProductSlug>()
+    for (const raw of queryTags ?? []) {
+      if (isChangelogProductSlug(raw)) next.add(raw)
+    }
+    return next
+  }, [queryTags])
+
+  const hasNuqsFilters = useMemo(
+    () => filterSearch.trim().length > 0 || selectedTags.size > 0,
+    [filterSearch, selectedTags]
+  )
+
+  useEffect(() => {
+    if (hasNuqsFilters) setFilterPanelOpen(true)
+  }, [hasNuqsFilters])
+
+  /** Hash anchors (e.g. year deep-links) scroll the page behind the dialog/sheet; drop hash when opening a discussion. */
+  useLayoutEffect(() => {
+    if (discussion == null) return
+    const { pathname, search, hash } = window.location
+    if (!hash) return
+    window.history.replaceState(window.history.state, '', `${pathname}${search}`)
+  }, [discussion])
+
+  const filteredIndex = useMemo(() => {
+    const q = filterSearch
+    const hasSearch = q.trim().length > 0
+    const hasTags = selectedTags.size > 0
+    if (!hasSearch && !hasTags) return null
+    return allIndex
+      .filter((item) => itemMatchesSearch(item, q) && itemMatchesSelectedTags(item, selectedTags))
+      .sort((a, b) => dayjs(b.sortDate).diff(dayjs(a.sortDate)))
+  }, [allIndex, filterSearch, selectedTags])
+
+  const toggleProductTag = (slug: ChangelogProductSlug) => {
+    const current = (queryTags ?? []).filter(isChangelogProductSlug)
+    const has = current.includes(slug)
+    const next = has ? current.filter((t) => t !== slug) : [...current, slug]
+    void setQueryTags(next.length > 0 ? next : null)
+  }
+
+  const clearFilters = () => {
+    void setQuerySearch(null)
+    void setQueryTags(null)
+  }
+
+  const preview = useMemo(() => {
+    if (discussion == null) return null
+    const fromFeatured = featured.find((e) => e.number === discussion)
+    if (fromFeatured) {
+      return {
+        title: fromFeatured.title,
+        url: fromFeatured.url,
+        dateIso: fromFeatured.created_at,
+      }
+    }
+    const fromIndex = allIndex.find((e) => e.number === discussion)
+    if (fromIndex) {
+      return {
+        title: fromIndex.title,
+        url: fromIndex.url,
+        dateIso: fromIndex.sortDate,
+      }
+    }
+    return null
+  }, [discussion, featured, allIndex])
+
+  useEffect(() => {
+    if (discussion == null) {
+      setPayload(null)
+      setError(null)
+      setLoading(false)
+      return
+    }
+
+    const entry = featured.find((e) => e.number === discussion)
+    if (entry) {
+      setPayload({
+        title: entry.title,
+        url: entry.url,
+        created_at: entry.created_at,
+        source: entry.source,
+      })
+      setError(null)
+      setLoading(false)
+      return
+    }
+
+    let cancelled = false
+    setLoading(true)
+    setError(null)
+    setPayload(null)
+
+    void (async () => {
+      try {
+        const res = await fetch(`/api/changelog-discussion/${discussion}`)
+        if (cancelled) return
+        if (!res.ok) {
+          setError(res.status === 404 ? 'Discussion not found.' : 'Could not load this entry.')
+          return
+        }
+        const data = (await res.json()) as ModalPayload
+        if (!cancelled) setPayload(data)
+      } catch {
+        if (!cancelled) setError('Network error.')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [discussion, featured])
+
+  const open = discussion != null
+
+  const handleOpenChange = (next: boolean) => {
+    if (!next) void setDiscussion(null)
+  }
+
+  const displayTitle =
+    preview?.title ?? payload?.title ?? (discussion != null ? `Discussion #${discussion}` : '')
+  const displayDateIso = preview?.dateIso ?? payload?.created_at
+
+  const handleSelectFromList = (item: ChangelogTimelineIndexItem) => {
+    const { pathname, search, hash } = window.location
+    if (hash) {
+      window.history.replaceState(window.history.state, '', `${pathname}${search}`)
+    }
+    void setDiscussion(item.number)
+  }
 
   const TITLE = 'Changelog'
   const DESCRIPTION = 'New updates and improvements to Supabase'
+
   return (
     <>
       <NextSeo
         title={TITLE}
+        description={DESCRIPTION}
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: `https://supabase.com/changelog`,
+          url: 'https://supabase.com/changelog-progressive',
           type: 'article',
         }}
       />
       <DefaultLayout>
-        <div
-          className="
-            container mx-auto flex flex-col
-            gap-20
-            px-4 py-10 sm:px-16
-            xl:px-20
-          "
-        >
-          <div className="py-10">
+        <div className="container mx-auto max-w-5xl flex flex-col gap-8 px-4 py-10 sm:px-16 xl:px-20">
+          <div className="pb-4">
             <h1 className="h1">Changelog</h1>
-            <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-foreground-lighter text-lg">
+                New updates and product improvements
+              </p>
+              <div className="flex flex-wrap items-center gap-1">
+                <Button
+                  type={filterPanelOpen ? 'default' : 'text'}
+                  size="tiny"
+                  className="shrink-0"
+                  aria-expanded={filterPanelOpen}
+                  aria-controls="changelog-progressive-filters"
+                  icon={
+                    filterPanelOpen ? (
+                      <X className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                    ) : (
+                      <ListFilter className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                    )
+                  }
+                  onClick={() => {
+                    if (filterPanelOpen) setFilterPanelOpen(false)
+                    else setFilterPanelOpen(true)
+                  }}
+                >
+                  {filterPanelOpen ? 'Hide filters' : 'Filter changelog'}
+                </Button>
+                <ChangelogRssButton />
+              </div>
+            </div>
           </div>
 
-          {/* Content */}
-          <div className="grid gap-12 lg:gap-36">
-            {changelog.length > 0 &&
-              changelog
-                .filter((entry: Entry) => !entry.title.includes('[d]'))
-                .map((entry: Entry, i: number) => {
-                  return (
-                    <div key={i} className="border-muted grid border-l lg:grid-cols-12 lg:gap-8">
-                      <div
-                        className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
-                "
+          {filterPanelOpen && (
+            <div id="changelog-progressive-filters" className="flex flex-col gap-2 -mt-4 sm:mx-0">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="relative min-w-0 flex-1">
+                  <label htmlFor="changelog-filter-search" className="sr-only">
+                    Search changelog
+                  </label>
+                  <Input_Shadcn_
+                    id="changelog-filter-search"
+                    size="small"
+                    placeholder="Search changelog..."
+                    value={filterSearch}
+                    onChange={(e) => {
+                      const v = e.target.value
+                      void setQuerySearch(v.length === 0 ? null : v)
+                    }}
+                  />
+                  {(filterSearch.trim().length > 0 || selectedTags.size > 0) && (
+                    <Button
+                      type="outline"
+                      size="tiny"
+                      className="absolute inset-1 my-auto left-auto shrink-0"
+                      onClick={clearFilters}
+                      icon={<X className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
+                    >
+                      Clear filters
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <div>
+                <p className="sr-only">Filter by tags</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {CHANGELOG_PRODUCT_TAGS.map(({ slug, label }) => {
+                    const on = selectedTags.has(slug)
+                    return (
+                      <button key={slug} type="button" onClick={() => toggleProductTag(slug)}>
+                        <Badge
+                          variant={on ? 'success' : 'default'}
+                          className={cn(!on && 'hover:text-foreground')}
+                        >
+                          {label}
+                        </Badge>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {filteredIndex != null ? (
+            <section aria-label="Filtered changelog entries" className="min-w-0">
+              {filteredIndex.length === 0 ? (
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-foreground-lighter text-sm">No entries match your filters.</p>
+                  {!filterPanelOpen && (
+                    <Button
+                      type="text"
+                      size="tiny"
+                      className="shrink-0"
+                      icon={<X className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
+                      onClick={clearFilters}
+                    >
+                      Clear filters
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div className="text-foreground-lighter mb-3 flex flex-wrap items-center justify-between gap-2 text-sm">
+                    <p>
+                      {filteredIndex.length} {filteredIndex.length === 1 ? 'result' : 'results'}
+                    </p>
+                    {!filterPanelOpen && (
+                      <Button
+                        type="text"
+                        size="tiny"
+                        className="shrink-0"
+                        icon={<X className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
+                        onClick={clearFilters}
                       >
-                        <div className="flex w-full items-baseline gap-6">
-                          <div className="bg-border border-muted text-foreground-lighter -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
-                            <GitCommit size={14} strokeWidth={1.5} />
-                          </div>
-                          <div className="flex w-full flex-col gap-1">
-                            {entry.title && (
-                              <Link href={entry.url}>
-                                <h3 className="text-foreground text-2xl">{entry.title}</h3>{' '}
-                              </Link>
-                            )}
-                            <p className="text-muted text-lg">
-                              {dayjs(entry.created_at).format('MMM D, YYYY')}
-                            </p>
-                          </div>
+                        Clear filters
+                      </Button>
+                    )}
+                  </div>
+                  <ChangelogTimelineFlatList
+                    items={filteredIndex}
+                    mode="action"
+                    onSelect={handleSelectFromList}
+                    showFullDate
+                  />
+                </>
+              )}
+            </section>
+          ) : (
+            <div
+              className="border-muted relative lg:ml-2 lg:border-l lg:pl-8"
+              aria-label="Changelog timeline"
+            >
+              <div className="grid">
+                {featured.map((entry) => (
+                  <div
+                    key={entry.number}
+                    id={entry.number.toString()}
+                    className="grid pb-12 lg:grid-cols-12 lg:gap-8 lg:pb-36 scroll-mt-32"
+                  >
+                    <div className="col-span-12 lg:-ml-[31px] mb-8 lg:mb-0 self-start z-10 sticky top-[65px] lg:top-32 lg:col-span-4">
+                      <div className="flex w-full items-baseline relative bg-background pt-4 lg:pt-0 border-b pb-4 lg:gap-4 lg:border-none lg:pb-0">
+                        <div className="hidden lg:flex bg-border border-muted text-foreground-lighter -ml-2.5 h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
+                          <GitCommit size={14} strokeWidth={1.5} />
+                        </div>
+                        <div className="flex w-full flex-col gap-1">
+                          {entry.title && (
+                            <Link href={entry.url}>
+                              <h3 className="text-foreground text-lg">{entry.title}</h3>
+                            </Link>
+                          )}
+                          <p className="text-foreground-lighter font-mono text-xs">
+                            {dayjs(entry.created_at).format('MMM D, YYYY')}
+                          </p>
+                          {entry.labels && entry.labels.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 pt-1.5">
+                              {entry.labels.map((label) => (
+                                <a
+                                  key={`${entry.number}-${label.name}`}
+                                  href={githubChangelogLabelFilterUrl(label.name)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="group inline-flex no-underline focus-visible:ring-brand-default rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                                >
+                                  <Badge className="group-hover:text-foreground-light text-foreground-lighter group-hover:border-foreground-muted px-1.5 py-px text-[11px] lowercase">
+                                    {changelogLabelDisplayName(label.name)}
+                                  </Badge>
+                                </a>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
-                      <div className="col-span-8 ml-8 lg:ml-0 max-w-[calc(100vw-80px)]">
-                        <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
-                          <MDXRemote {...entry.source} components={mdxComponents('blog')} />
-                        </article>
-                      </div>
                     </div>
-                  )
-                })}
-          </div>
-          <div className="my-8 flex items-center gap-4">
-            {hasPreviousPage && (
-              <Link href={`/changelog`} className="flex items-center gap-2">
-                <ArrowLeftIcon width={14} /> Previous
-              </Link>
-            )}
-            {hasNextPage && (
-              <Link
-                href={`/changelog?next=${end}&restPage=${restPage + 1}`}
-                className="flex items-center gap-2"
-              >
-                Next <ArrowRightIcon width={14} />
-              </Link>
-            )}
-          </div>
-        </div>
+                    <div className="col-span-8 lg:max-w-[calc(100vw-80px)]">
+                      <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
+                        <MDXRemote {...entry.source} components={mdxComponents('blog')} />
+                      </article>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
+              {restIndex.length > 0 && (
+                <section aria-label="Earlier changelog entries" className="lg:pb-28">
+                  <ChangelogTimelineList
+                    items={restIndex}
+                    mode="link"
+                    hrefFor={(item) => `/changelog/${item.number}`}
+                    omitOuterTimelineBorder
+                  />
+                </section>
+              )}
+              <div className="hidden lg:grid">
+                <div className="col-span-12 -ml-8 mb-8 lg:mb-0 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32">
+                  <div className="flex w-full items-baseline border-b pb-4 lg:gap-4 lg:border-none lg:pb-0">
+                    <Link
+                      href="https://www.ycombinator.com/companies/supabase"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hidden lg:flex -ml-2 text-foreground-lighter hover:text-foreground"
+                      title="YCombinator —  Summer 2020"
+                    >
+                      <IconYCombinator size={16} className="text-current" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
         <CTABanner />
       </DefaultLayout>
+
+      {open && isMobile && (
+        <Sheet open={open} onOpenChange={handleOpenChange}>
+          <SheetContent
+            side="bottom"
+            size="content"
+            showClose={false}
+            className="flex h-[85dvh] max-h-[85dvh] flex-col gap-0 overflow-hidden rounded-t-lg border-0 p-0"
+          >
+            <SheetTitle className="sr-only">{displayTitle}</SheetTitle>
+            <div className="bg-dash-sidebar sticky top-0 z-10 shrink-0 border-b border-default">
+              <SheetClose
+                className={cn(
+                  'text-foreground ring-offset-background hover:opacity-100',
+                  'absolute right-3 top-3 z-20 rounded-sm p-1 opacity-70 transition-opacity',
+                  'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
+                )}
+              >
+                <X className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                <span className="sr-only">Close</span>
+              </SheetClose>
+              <div className="px-4 pb-3 pt-4 pr-12 md:px-5 md:pr-14">
+                <h2 className="text-foreground text-left text-xl">{displayTitle}</h2>
+                <div className="text-foreground-lighter flex flex-col gap-2 text-left">
+                  <div className="flex items-center flex-wrap gap-1.5">
+                    {displayDateIso && (
+                      <p className="font-mono text-xs">
+                        {dayjs(displayDateIso).format('MMM D, YYYY')}{' '}
+                        <span className="text-foreground-lighter text-xs">—</span>
+                      </p>
+                    )}
+                    <Link
+                      href={preview?.url ?? ''}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-foreground-lighter hover:text-foreground-light hover:underline text-sm"
+                    >
+                      View on GitHub
+                    </Link>
+                  </div>
+                  {error && <span className="text-destructive-600 text-sm">{error}</span>}
+                </div>
+              </div>
+            </div>
+            <ChangelogDiscussionArticle loading={loading} payload={payload} />
+          </SheetContent>
+        </Sheet>
+      )}
+
+      {open && !isMobile && (
+        <Dialog open={open} onOpenChange={handleOpenChange}>
+          <DialogContent className="flex max-h-[min(90vh,900px)] max-w-3xl flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl">
+            <div className="bg-dash-sidebar sticky top-0 shrink-0 border-b border-default">
+              <DialogHeader className="border-0">
+                <DialogTitle className="pr-8 text-left text-xl">{displayTitle}</DialogTitle>
+                <DialogDescription asChild>
+                  <div className="text-foreground-lighter flex flex-col gap-2 text-left">
+                    <div className="flex items-center flex-wrap gap-1.5">
+                      {displayDateIso && (
+                        <p className="font-mono text-xs">
+                          {dayjs(displayDateIso).format('MMM D, YYYY')}{' '}
+                          <span className="text-foreground-lighter text-xs">—</span>
+                        </p>
+                      )}
+                      <Link
+                        href={preview?.url ?? ''}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-foreground-lighter hover:text-foreground-light hover:underline text-sm"
+                      >
+                        View on GitHub
+                      </Link>
+                    </div>
+                    {error && <span className="text-destructive-600 text-sm">{error}</span>}
+                  </div>
+                </DialogDescription>
+              </DialogHeader>
+            </div>
+            <ChangelogDiscussionArticle loading={loading} payload={payload} />
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   )
 }
-
-export default ChangelogPage
