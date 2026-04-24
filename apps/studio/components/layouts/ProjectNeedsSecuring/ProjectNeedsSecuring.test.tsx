@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import type { MouseEventHandler, ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -15,6 +15,7 @@ const {
   mockUseTablePrivilegesQuery,
   mockUseLocalStorageQuery,
   mockUseRouter,
+  mockRouterPush,
 } = vi.hoisted(() => ({
   mockUseFlag: vi.fn(),
   mockUseProjectLintsQuery: vi.fn(),
@@ -24,6 +25,7 @@ const {
   mockUseTablePrivilegesQuery: vi.fn(),
   mockUseLocalStorageQuery: vi.fn(),
   mockUseRouter: vi.fn(),
+  mockRouterPush: vi.fn(),
 }))
 
 vi.mock('common', async () => {
@@ -109,6 +111,18 @@ const tables = [
     schema: 'public',
     rls_enabled: false,
   },
+  {
+    id: 2,
+    name: 'profiles',
+    schema: 'public',
+    rls_enabled: false,
+  },
+  {
+    id: 3,
+    name: 'customers',
+    schema: 'public',
+    rls_enabled: true,
+  },
 ]
 
 const tablePrivileges = [
@@ -128,7 +142,7 @@ describe('ProjectNeedsSecuring', () => {
   beforeEach(() => {
     mockAnimationsApi()
     mockUseFlag.mockReturnValue(true)
-    mockUseRouter.mockReturnValue({ pathname: '/project/[ref]' })
+    mockUseRouter.mockReturnValue({ pathname: '/project/[ref]', push: mockRouterPush })
     mockUseSelectedProjectQuery.mockReturnValue({
       data: { connectionString: 'postgresql://example' },
     })
@@ -173,12 +187,26 @@ describe('ProjectNeedsSecuring', () => {
       'href',
       '/project/project-ref/integrations/data_api/settings'
     )
-    expect(screen.getByRole('link', { name: 'View policies' })).toHaveAttribute(
-      'href',
+    expect(screen.queryByRole('columnheader', { name: 'Action' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'View policies' })).not.toBeInTheDocument()
+    expect(screen.queryByText('profiles')).not.toBeInTheDocument()
+    expect(screen.queryByText('customers')).not.toBeInTheDocument()
+    expect(screen.getByText('Skip to dashboard')).toBeInTheDocument()
+    expect(screen.queryByTestId('project-children')).not.toBeInTheDocument()
+  })
+
+  it('navigates to the table policies page when a table row is clicked', () => {
+    render(
+      <ProjectNeedsSecuring>
+        <div data-testid="project-children">Project content</div>
+      </ProjectNeedsSecuring>
+    )
+
+    fireEvent.click(screen.getByText('invoices'))
+
+    expect(mockRouterPush).toHaveBeenCalledWith(
       '/project/project-ref/auth/policies?schema=public&search=invoices'
     )
-    expect(screen.getByText('Skip to home')).toBeInTheDocument()
-    expect(screen.queryByTestId('project-children')).not.toBeInTheDocument()
   })
 
   it('renders the project content when the security gate has been dismissed', () => {

@@ -129,6 +129,7 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
     return sortTables(
       tables
         .filter((table) => exposedSchemas.includes(table.schema))
+        .filter((table) => !table.rls_enabled && rlsIssueKeys.has(getTableKey(table)))
         .map((table) => {
           const key = getTableKey(table)
 

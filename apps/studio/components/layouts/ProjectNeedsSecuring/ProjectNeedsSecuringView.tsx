@@ -1,5 +1,6 @@
-import { ArrowRight, Check, ExternalLink, Lightbulb, Lock, X } from 'lucide-react'
+import { ArrowRight, Check, ExternalLink, Lightbulb, X } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import {
   Button,
@@ -45,6 +46,7 @@ import {
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import AlertError from '@/components/ui/AlertError'
+import { createNavigationHandler } from '@/lib/navigation'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -76,6 +78,7 @@ export const ProjectNeedsSecuringView = ({
   onDismiss: () => void
   onTrackAction: (type: ProjectSecurityActionType, details?: ProjectSecurityActionDetails) => void
 }) => {
+  const router = useRouter()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
@@ -107,7 +110,7 @@ export const ProjectNeedsSecuringView = ({
             <PageHeaderDescription>{formatRlsDescription(issueCount)}</PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
-            <Button asChild type="default" iconRight={<ArrowRight />}>
+            <Button asChild type="text" iconRight={<ArrowRight />}>
               <Link
                 href={`/project/${projectRef}`}
                 onClick={() => {
@@ -172,45 +175,53 @@ export const ProjectNeedsSecuringView = ({
                         </div>
                       </TableHead>
                       <TableHead>RLS</TableHead>
-                      <TableHead className="text-right">Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {tables.map((table) => (
-                      <TableRow key={getTableKey(table)}>
-                        <TableCell className="font-medium">{table.name}</TableCell>
-                        <TableCell>{table.schema}</TableCell>
-                        <TableCell>
-                          <StatusCell
-                            enabled={table.dataApiAccessible}
-                            label={table.dataApiAccessible ? 'Accessible' : 'Not accessible'}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <StatusCell
-                            enabled={table.rlsEnabled}
-                            label={table.rlsEnabled ? 'Enabled' : 'Disabled'}
-                          />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {!table.rlsEnabled && (
-                            <Button asChild type="default" size="tiny" icon={<Lock size={14} />}>
-                              <Link
-                                href={`/project/${projectRef}/auth/policies?schema=${table.schema}&search=${table.name}`}
-                                onClick={() =>
-                                  onTrackAction('view_policies', {
-                                    schema: table.schema,
-                                    tableName: table.name,
-                                  })
-                                }
-                              >
-                                View policies
-                              </Link>
-                            </Button>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {tables.map((table) => {
+                      const policiesHref = `/project/${projectRef}/auth/policies?schema=${table.schema}&search=${table.name}`
+                      const handleNavigation = createNavigationHandler(policiesHref, router)
+                      const trackViewPolicies = () =>
+                        onTrackAction('view_policies', {
+                          schema: table.schema,
+                          tableName: table.name,
+                        })
+
+                      return (
+                        <TableRow
+                          key={getTableKey(table)}
+                          className="relative cursor-pointer inset-focus"
+                          onClick={(event) => {
+                            trackViewPolicies()
+                            handleNavigation(event)
+                          }}
+                          onAuxClick={(event) => {
+                            if (event.button === 1) trackViewPolicies()
+                            handleNavigation(event)
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') trackViewPolicies()
+                            handleNavigation(event)
+                          }}
+                          tabIndex={0}
+                        >
+                          <TableCell className="font-medium">{table.name}</TableCell>
+                          <TableCell>{table.schema}</TableCell>
+                          <TableCell>
+                            <StatusCell
+                              enabled={table.dataApiAccessible}
+                              label={table.dataApiAccessible ? 'Accessible' : 'Not accessible'}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <StatusCell
+                              enabled={table.rlsEnabled}
+                              label={table.rlsEnabled ? 'Enabled' : 'Disabled'}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
                   </TableBody>
                 </Table>
               </Card>
