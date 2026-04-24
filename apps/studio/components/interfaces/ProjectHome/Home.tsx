@@ -13,7 +13,7 @@ import { ProjectUsageSection as ProjectUsageSectionV2 } from './ProjectUsageSect
 import { ProjectUsageSection as ProjectUsageSectionV1 } from '@/components/interfaces/Home/ProjectUsageSection'
 import { SortableSection } from '@/components/interfaces/ProjectHome/SortableSection'
 import { TopSection } from '@/components/interfaces/ProjectHome/TopSection'
-import { ProjectNeedsSecuring } from '@/components/layouts/ProjectNeedsSecuring'
+import { ProjectNeedsSecuring } from '@/components/layouts/ProjectNeedsSecuring/ProjectNeedsSecuring'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
