@@ -1,11 +1,11 @@
 import { ReactNode } from 'react'
 import { Control } from 'react-hook-form'
-
-import { AIOptInFormValues } from 'hooks/forms/useAIOptInForm'
-import { FormField_Shadcn_, RadioGroup_Shadcn_, RadioGroupItem_Shadcn_ } from 'ui'
+import { FormField, RadioGroup_Shadcn_, RadioGroupItem_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { OptInToOpenAIToggle } from './OptInToOpenAIToggle'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { AIOptInFormValues } from '@/hooks/forms/useAIOptInForm'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface AIOptInLevelSelectorProps {
   control: Control<AIOptInFormValues>
@@ -96,7 +96,7 @@ export const AIOptInLevelSelector = ({
       }
     >
       <div className="max-w-xl">
-        <FormField_Shadcn_
+        <FormField
           control={control}
           name="aiOptInLevel"
           render={({ field }) => (

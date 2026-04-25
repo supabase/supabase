@@ -6,10 +6,10 @@ import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  FormField_Shadcn_,
+  FormField,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -29,7 +29,7 @@ interface SupportAccessToggleProps {
 
 export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
   return (
-    <FormField_Shadcn_
+    <FormField
       name="allowSupportAccess"
       control={form.control}
       render={({ field }) => {

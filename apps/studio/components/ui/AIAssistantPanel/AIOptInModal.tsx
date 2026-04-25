@@ -1,9 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect } from 'react'
-
-import { AIOptInLevelSelector } from 'components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
-import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   cn,
@@ -14,8 +10,12 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
+  Form,
 } from 'ui'
+
+import { AIOptInLevelSelector } from '@/components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
+import { useAIOptInForm } from '@/hooks/forms/useAIOptInForm'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface AIOptInModalProps {
   visible: boolean
@@ -44,7 +44,7 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
   return (
     <Dialog open={visible} onOpenChange={onOpenChange}>
       <DialogContent size="large" aria-describedby={undefined}>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id="ai-opt-in-form" onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader padding="small">
               <DialogTitle>Update Supabase Assistant Opt-in Level</DialogTitle>
@@ -84,7 +84,7 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
               </div>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

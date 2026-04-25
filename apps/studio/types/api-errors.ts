@@ -12,9 +12,10 @@ export class ConnectionTimeoutError extends ResponseError {
     requestId?: string,
     retryAfter?: number,
     requestPathname?: string,
-    metadata?: ErrorMetadata
+    metadata?: ErrorMetadata,
+    formattedError?: string
   ) {
-    super(message, code, requestId, retryAfter, requestPathname, metadata)
+    super(message, code, requestId, retryAfter, requestPathname, metadata, formattedError)
   }
 }
 
@@ -27,9 +28,10 @@ export class UnknownAPIResponseError extends ResponseError {
     requestId?: string,
     retryAfter?: number,
     requestPathname?: string,
-    metadata?: ErrorMetadata
+    metadata?: ErrorMetadata,
+    formattedError?: string
   ) {
-    super(message, code, requestId, retryAfter, requestPathname, metadata)
+    super(message, code, requestId, retryAfter, requestPathname, metadata, formattedError)
   }
 }
 

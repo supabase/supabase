@@ -1,8 +1,6 @@
+import { useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-
-import { useParams } from 'common'
-import { DOCS_URL } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -10,6 +8,8 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
+
+import { DOCS_URL } from '@/lib/constants'
 
 export const AuthAlert = ({
   title,

@@ -1,9 +1,3 @@
-import { EdgeFunctionSecrets } from 'components/interfaces/Functions/EdgeFunctionSecrets/EdgeFunctionSecrets'
-import { FunctionsSecretsEmptyStateLocal } from 'components/interfaces/Functions/FunctionsEmptyState'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
-import { IS_PLATFORM } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -13,6 +7,13 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+
+import { EdgeFunctionSecrets } from '@/components/interfaces/Functions/EdgeFunctionSecrets/EdgeFunctionSecrets'
+import { FunctionsSecretsEmptyStateLocal } from '@/components/interfaces/Functions/FunctionsEmptyState'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const SecretsPage: NextPageWithLayout = () => {
   return (

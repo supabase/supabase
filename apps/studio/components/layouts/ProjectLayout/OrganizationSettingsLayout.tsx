@@ -1,10 +1,11 @@
 import { useFlag, useParams } from 'common'
-import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import type { SidebarSection } from 'components/layouts/AccountLayout/AccountLayout.types'
-import { WithSidebar } from 'components/layouts/AccountLayout/WithSidebar'
-import { useCurrentPath } from 'hooks/misc/useCurrentPath'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { PropsWithChildren } from 'react'
+
+import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import type { SidebarSection } from '@/components/layouts/AccountLayout/AccountLayout.types'
+import { WithSidebar } from '@/components/layouts/AccountLayout/WithSidebar'
+import { useCurrentPath } from '@/hooks/misc/useCurrentPath'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface OrganizationSettingsMenuItemsProps {
   slug?: string

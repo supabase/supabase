@@ -1,20 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-
-import { useParams } from 'common'
-import { NoPermission } from 'components/ui/NoPermission'
-import Panel from 'components/ui/Panel'
-import { permissionKeys } from 'data/permissions/keys'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Badge,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -23,8 +16,15 @@ import {
   SelectValue_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { OrgNotFound } from '../Organization/OrgNotFound'
 import { CreateProjectForm } from './ProjectCreation.schema'
+import { NoPermission } from '@/components/ui/NoPermission'
+import Panel from '@/components/ui/Panel'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { permissionKeys } from '@/data/permissions/keys'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface OrganizationSelectorProps {
   form: UseFormReturn<CreateProjectForm>
@@ -50,7 +50,7 @@ export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
 
   return (
     <Panel.Content className="space-y-4">
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="organization"
         render={({ field }) => (
@@ -64,11 +64,11 @@ export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
                 value={field.value}
                 defaultValue={field.value}
               >
-                <FormControl_Shadcn_>
+                <FormControl>
                   <SelectTrigger_Shadcn_>
                     <SelectValue_Shadcn_ placeholder="Select an organization" />
                   </SelectTrigger_Shadcn_>
-                </FormControl_Shadcn_>
+                </FormControl>
                 <SelectContent_Shadcn_>
                   <SelectGroup_Shadcn_>
                     {organizations?.map((x) => (

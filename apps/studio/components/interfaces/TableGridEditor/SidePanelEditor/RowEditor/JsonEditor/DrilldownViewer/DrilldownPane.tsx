@@ -1,7 +1,7 @@
 import { isNull, noop } from 'lodash'
 import { ChevronRight } from 'lucide-react'
 
-import type { Dictionary } from 'types'
+import type { Dictionary } from '@/types'
 
 interface DrilldownPaneProps {
   pane: number

@@ -1,20 +1,21 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { useMemo } from 'react'
+import { Separator } from 'ui'
+
 import {
   ApiKeysCreateCallout,
   ApiKeysFeedbackBanner,
-} from 'components/interfaces/APIKeys/ApiKeysIllustrations'
-import { PublishableAPIKeys } from 'components/interfaces/APIKeys/PublishableAPIKeys'
-import { SecretAPIKeys } from 'components/interfaces/APIKeys/SecretAPIKeys'
-import ApiKeysLayout from 'components/layouts/APIKeys/APIKeysLayout'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import { DisableInteraction } from 'components/ui/DisableInteraction'
-import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useMemo } from 'react'
-import type { NextPageWithLayout } from 'types'
-import { Separator } from 'ui'
+} from '@/components/interfaces/APIKeys/ApiKeysIllustrations'
+import { PublishableAPIKeys } from '@/components/interfaces/APIKeys/PublishableAPIKeys'
+import { SecretAPIKeys } from '@/components/interfaces/APIKeys/SecretAPIKeys'
+import ApiKeysLayout from '@/components/layouts/APIKeys/APIKeysLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { DisableInteraction } from '@/components/ui/DisableInteraction'
+import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import type { NextPageWithLayout } from '@/types'
 
 const ApiKeysNewPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()

@@ -1,28 +1,34 @@
 import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
-import { isVercelUrl } from 'components/interfaces/Integrations/Vercel/VercelIntegration.utils'
-import { Markdown } from 'components/interfaces/Markdown'
-import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
-import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
-import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
-import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
-import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
-import { useDataApiGrantTogglesEnabled } from 'hooks/misc/useDataApiGrantTogglesEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH, PROVIDERS } from 'lib/constants'
-import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
-import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
-import { generateStrongPassword } from 'lib/project'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
-import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import type { NextPageWithLayout } from 'types'
-import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
+import { Alert, Button, Checkbox_Shadcn_, Input, Listbox } from 'ui'
+
+import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
+import { Markdown } from '@/components/interfaces/Markdown'
+import VercelIntegrationWindowLayout from '@/components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
+import { ScaffoldColumn, ScaffoldContainer } from '@/components/layouts/Scaffold'
+import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
+import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integrations/integrations-vercel-connections-create-mutation'
+import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProjectCreateMutation } from '@/data/projects/project-create-mutation'
+import {
+  useDataApiRevokeOnCreateDefaultEnabled,
+  useTrackDefaultPrivilegesExposure,
+} from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { usePHFlag } from '@/hooks/ui/useFlag'
+import { BASE_PATH, PROVIDERS } from '@/lib/constants'
+import { getInitialMigrationSQLFromGitHubRepo } from '@/lib/integration-utils'
+import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
+import { generateStrongPassword } from '@/lib/project'
+import { useTrack } from '@/lib/telemetry/track'
+import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
+import type { NextPageWithLayout } from '@/types'
 
 const VercelIntegration: NextPageWithLayout = () => {
   return (
@@ -61,8 +67,15 @@ const CreateProject = () => {
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
   const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region.displayName)
 
+  const track = useTrack()
   const snapshot = useIntegrationInstallationSnapshot()
-  const isDataApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
+  const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
+  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
+  const [dataApiDefaultPrivileges, setDataApiDefaultPrivileges] = useState(
+    !isDataApiRevokeOnCreateDefault
+  )
+
+  useTrackDefaultPrivilegesExposure({ surface: 'vercel' })
 
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)
@@ -122,6 +135,21 @@ const CreateProject = () => {
   const { mutate: createProject } = useProjectCreateMutation({
     onSuccess: (res) => {
       setNewProjectRef(res.ref)
+      track(
+        'project_creation_simple_version_submitted',
+        {
+          surface: 'vercel',
+          dataApiEnabled: true,
+          dataApiDefaultPrivilegesGranted: dataApiDefaultPrivileges,
+          ...(dataApiRevokeOnCreateDefaultFlag !== undefined && {
+            dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
+          }),
+        },
+        {
+          project: res.ref,
+          organization: res.organization_slug,
+        }
+      )
     },
     onError: (error) => {
       toast.error(error.message)
@@ -144,7 +172,7 @@ const CreateProject = () => {
       if (migrationSql) dbSqlParts.push(migrationSql)
       toast.success(`Done fetching initial migrations`, { id })
     }
-    if (isDataApiGrantTogglesEnabled) {
+    if (!dataApiDefaultPrivileges) {
       dbSqlParts.push(buildDefaultPrivilegesSql('revoke'))
     }
 
@@ -278,13 +306,48 @@ const CreateProject = () => {
         </div>
       </div>
       <div className="py-2 pb-4">
-        <Checkbox
-          name="shouldRunMigrations"
-          label="Create sample tables with seed data"
-          description="To get you started quickly, we can create new tables for you with seed (sample) data. You can delete these tables later."
-          checked={shouldRunMigrations}
-          onChange={(e) => setShouldRunMigrations(e.target.checked)}
-        />
+        <div className="items-top flex space-x-2">
+          <Checkbox_Shadcn_
+            id="shouldRunMigrations"
+            name="shouldRunMigrations"
+            checked={shouldRunMigrations}
+            onCheckedChange={(checked) => setShouldRunMigrations(!!checked)}
+          />
+          <div className="grid gap-1.5 leading-none">
+            <label
+              htmlFor="enable-realtime"
+              className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Create sample tables with seed data
+            </label>
+            <p className="text-sm text-foreground-muted">
+              To get you started quickly, we can create new tables for you with seed (sample) data.
+              You can delete these tables later.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="py-2 pb-4">
+        <div className="items-top flex space-x-2">
+          <Checkbox_Shadcn_
+            id="dataApiDefaultPrivileges"
+            name="dataApiDefaultPrivileges"
+            checked={dataApiDefaultPrivileges}
+            onCheckedChange={(checked) => setDataApiDefaultPrivileges(!!checked)}
+          />
+          <div className="grid gap-1.5 leading-none">
+            <label
+              htmlFor="dataApiDefaultPrivileges"
+              className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Automatically expose new tables and functions
+            </label>
+            <p className="text-sm text-foreground-muted">
+              Grants privileges to Data API roles by default, exposing new tables and functions. We
+              recommend disabling this to control access manually.
+            </p>
+          </div>
+        </div>
       </div>
       <div className="flex flex-row w-full justify-end">
         <Button

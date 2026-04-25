@@ -1,7 +1,8 @@
 import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
+
+import { InlineLink } from '@/components/ui/InlineLink'
+import { BASE_PATH } from '@/lib/constants'
 
 export const UnifiedLogsPreview = () => {
   const { ref = '_' } = useParams()
@@ -13,7 +14,7 @@ export const UnifiedLogsPreview = () => {
         unified view across all your services. Built for better performance and easier debugging.
       </p>
       <p className="text-foreground-light text-sm mb-4">
-        This interface will only be available for organizations on the Team plan or above.
+        This interface is only available for organizations on the Enterprise plan.
       </p>
 
       <Image

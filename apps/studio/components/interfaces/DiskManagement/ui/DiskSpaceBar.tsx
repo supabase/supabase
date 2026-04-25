@@ -1,19 +1,19 @@
 import MotionNumber from '@number-flow/react'
+import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { UseFormReturn } from 'react-hook-form'
-
-import { useParams } from 'common'
-import { useDiskBreakdownQuery } from 'data/config/disk-breakdown-query'
-import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { GB } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
 import { useMemo } from 'react'
+import { UseFormReturn } from 'react-hook-form'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
+import { useDiskBreakdownQuery } from '@/data/config/disk-breakdown-query'
+import { useDiskUtilizationQuery } from '@/data/config/disk-utilization-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { GB } from '@/lib/constants'
+import { formatBytes } from '@/lib/helpers'
 
 interface DiskSpaceBarProps {
   form: UseFormReturn<DiskStorageSchemaType>

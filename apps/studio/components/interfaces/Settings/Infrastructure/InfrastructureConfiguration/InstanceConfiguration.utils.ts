@@ -1,7 +1,5 @@
 import dagre from '@dagrejs/dagre'
 import { Edge, Node, Position } from '@xyflow/react'
-import type { LoadBalancer } from 'data/read-replicas/load-balancers-query'
-import type { Database } from 'data/read-replicas/replicas-query'
 import { groupBy } from 'lodash'
 import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
 
@@ -13,6 +11,8 @@ import {
   NODE_WIDTH,
   ReplicaNodeData,
 } from './InstanceConfiguration.constants'
+import type { LoadBalancer } from '@/data/read-replicas/load-balancers-query'
+import type { Database } from '@/data/read-replicas/replicas-query'
 
 // [Joshen] Just FYI the nodes generation assumes each project only has one load balancer
 // Will need to change if this eventually becomes otherwise

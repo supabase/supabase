@@ -13,20 +13,19 @@ import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
   cn,
-  CodeBlock,
   copyToClipboard,
   CriticalIcon,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -151,11 +150,11 @@ export const EdgeFunctionDetails = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form onSubmit={form.handleSubmit(onUpdateFunction)}>
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
@@ -164,9 +163,9 @@ export const EdgeFunctionDetails = () => {
                         layout="flex-row-reverse"
                         description="Your slug and endpoint URL will remain the same"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Input {...field} className="w-64" disabled={!canUpdateEdgeFunction} />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -174,7 +173,7 @@ export const EdgeFunctionDetails = () => {
                 {IS_PLATFORM && (
                   <>
                     <CardContent>
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="verify_jwt"
                         render={({ field }) => (
@@ -202,13 +201,13 @@ export const EdgeFunctionDetails = () => {
                               </>
                             }
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                                 disabled={!canUpdateEdgeFunction}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -233,7 +232,7 @@ export const EdgeFunctionDetails = () => {
                 )}
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
 

@@ -1,8 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { Background, ColorMode, ReactFlow, ReactFlowProvider, useReactFlow } from '@xyflow/react'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo } from 'react'
-import { Background, ColorMode, ReactFlow, ReactFlowProvider, useReactFlow } from '@xyflow/react'
 
 import { getStatusName } from '../Pipeline.utils'
 import { PrimaryDatabaseNode, ReadReplicaNode, ReplicationNode } from './Nodes'

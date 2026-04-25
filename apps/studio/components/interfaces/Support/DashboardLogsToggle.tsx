@@ -1,17 +1,17 @@
 import { ChevronRight } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-
 import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  FormField_Shadcn_,
+  FormField,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import type { SupportFormValues } from './SupportForm.schema'
+
 import { DASHBOARD_LOG_CATEGORIES } from './dashboard-logs'
+import type { SupportFormValues } from './SupportForm.schema'
 
 interface DashboardLogsToggleProps {
   form: UseFormReturn<SupportFormValues>
@@ -26,7 +26,7 @@ export function DashboardLogsToggle({ form, sanitizedLog }: DashboardLogsToggleP
   if (!DASHBOARD_LOG_CATEGORIES.includes(form.getValues('category'))) return
 
   return (
-    <FormField_Shadcn_
+    <FormField
       name="attachDashboardLogs"
       control={form.control}
       render={({ field }) => (

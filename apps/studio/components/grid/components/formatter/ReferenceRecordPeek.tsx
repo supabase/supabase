@@ -1,16 +1,6 @@
 import { PostgresTable } from '@supabase/postgres-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
-import type { SupaColumn, SupaRow } from 'components/grid/types'
-import {
-  ESTIMATED_CHARACTER_PIXEL_WIDTH,
-  getColumnDefaultWidth,
-} from 'components/grid/utils/gridColumns'
-import { isArrayColumn, isBinaryColumn, isJsonColumn } from 'components/grid/utils/types'
-import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Key } from 'lucide-react'
 import { useMemo, useRef } from 'react'
 import DataGrid, { CalculatedColumn, Column } from 'react-data-grid'
@@ -18,9 +8,25 @@ import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BinaryFormatter } from './BinaryFormatter'
+import { BooleanFormatter } from './BooleanFormatter'
 import { CellContextMenuWrapper } from './CellContextMenuWrapper'
 import { DefaultFormatter } from './DefaultFormatter'
 import { JsonFormatter } from './JsonFormatter'
+import { COLUMN_MIN_WIDTH } from '@/components/grid/constants'
+import type { SupaColumn, SupaRow } from '@/components/grid/types'
+import {
+  ESTIMATED_CHARACTER_PIXEL_WIDTH,
+  getColumnDefaultWidth,
+} from '@/components/grid/utils/gridColumns'
+import {
+  isArrayColumn,
+  isBinaryColumn,
+  isBoolColumn,
+  isJsonColumn,
+} from '@/components/grid/utils/types'
+import { EditorTablePageLink } from '@/data/prefetchers/project.$ref.editor.$id'
+import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface ReferenceRecordPeekProps {
   table: PostgresTable
@@ -93,6 +99,8 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
           <CellContextMenuWrapper value={props.row[props.column.key]}>
             {isBinaryColumn(column.data_type) ? (
               <BinaryFormatter {...props} />
+            ) : isBoolColumn(column.data_type) ? (
+              <BooleanFormatter {...props} />
             ) : isJsonColumn(column.data_type) && !isArrayColumn(column.data_type) ? (
               <JsonFormatter {...props} />
             ) : (

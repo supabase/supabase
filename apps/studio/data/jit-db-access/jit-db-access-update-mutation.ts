@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { handleError, put } from 'data/fetchers'
 import { toast } from 'sonner'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 import { jitDbAccessKeys } from './keys'
+import { handleError, put } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type JitDbAccessUpdateVariables = {
   projectRef: string
-  requestedConfig: { state: 'enabled' | 'disabled' | 'unavailable' }
+  requestedConfig: { state: 'enabled' | 'disabled' }
 }
 
 async function updateJitDbAccess({ projectRef, requestedConfig }: JitDbAccessUpdateVariables) {

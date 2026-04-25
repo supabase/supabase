@@ -1,21 +1,21 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { ChevronRight, ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import Table from 'components/to-be-cleaned/Table'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH, DOCS_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { ChevronRight, ExternalLink } from 'lucide-react'
 import { pricing } from 'shared-data/pricing'
-import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Button, Collapsible, SidePanel, cn } from 'ui'
+import { toast } from 'sonner'
+import { Button, cn, Collapsible, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
+import Table from '@/components/to-be-cleaned/Table'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subscription-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { BASE_PATH, DOCS_URL, PRICING_TIER_PRODUCT_IDS } from '@/lib/constants'
+import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -171,7 +171,11 @@ const SpendCapSidePanel = () => {
                               <p className="text-xs pl-4">{item.title}</p>
                             </Table.td>
                             <Table.td>
-                              <p className="text-xs pl-4">{item.plans['pro']}</p>
+                              <p className="text-xs pl-4">
+                                {Array.isArray(item.plans['pro'])
+                                  ? item.plans['pro']?.join(', ')
+                                  : item.plans['pro']}
+                              </p>
                             </Table.td>
                           </Table.tr>
                         )

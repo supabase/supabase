@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
-import { useWatch_Shadcn_ } from 'ui'
+import { useWatch } from 'ui'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 
 import { WebhookFormValues } from './EditHookPanel.constants'
+import { buildEdgeFunctionHeaderAddActions } from '@/components/interfaces/Functions/httpHeaderAddActions'
 import {
   FormSection,
   FormSectionContent,
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
-import { buildEdgeFunctionHeaderAddActions } from '@/components/interfaces/Functions/httpHeaderAddActions'
 import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { uuidv4 } from '@/lib/helpers'
@@ -31,7 +31,7 @@ export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
   const { serviceKey, secretKey } = getKeys(apiKeys)
   const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'
 
-  const functionType = useWatch_Shadcn_({ control: form.control, name: 'function_type' })
+  const functionType = useWatch({ control: form.control, name: 'function_type' })
   const addActions =
     functionType === 'supabase_function'
       ? buildEdgeFunctionHeaderAddActions({

@@ -1,11 +1,12 @@
-import type { UseFormReturn } from 'react-hook-form'
 // End of third-party imports
 
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
+import type { UseFormReturn } from 'react-hook-form'
+import { FormControl, FormField } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
-import { type ExtendedSupportCategories, SERVICE_OPTIONS } from './Support.constants'
+
+import { SERVICE_OPTIONS, type ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
 
 interface AffectedServicesSelectorProps {
@@ -22,12 +23,12 @@ export function AffectedServicesSelector({ form, category }: AffectedServicesSel
   if (CATEGORIES_WITHOUT_AFFECTED_SERVICES.includes(category)) return null
 
   return (
-    <FormField_Shadcn_
+    <FormField
       name="affectedServices"
       control={form.control}
       render={({ field }) => (
         <FormItemLayout hideMessage layout="vertical" label="Which services are affected?">
-          <FormControl_Shadcn_>
+          <FormControl>
             <MultiSelectV2
               options={SERVICE_OPTIONS}
               value={field.value.length === 0 ? [] : field.value?.split(', ')}
@@ -35,7 +36,7 @@ export function AffectedServicesSelector({ form, category }: AffectedServicesSel
               searchPlaceholder="Search for a service"
               onChange={(services) => form.setValue('affectedServices', services.join(', '))}
             />
-          </FormControl_Shadcn_>
+          </FormControl>
         </FormItemLayout>
       )}
     />

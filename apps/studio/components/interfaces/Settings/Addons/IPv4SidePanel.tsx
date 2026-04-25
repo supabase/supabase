@@ -1,22 +1,24 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { InlineLink } from 'components/ui/InlineLink'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
-import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import type { AddonVariantId } from 'data/subscriptions/types'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsAwsCloudProvider } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { formatCurrency } from 'lib/helpers'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { useAddonsPagePanel } from 'state/addons-page'
 import { cn, RadioGroup_Shadcn_, RadioGroupLargeItem_Shadcn_, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useProjectAddonRemoveMutation } from '@/data/subscriptions/project-addon-remove-mutation'
+import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addon-update-mutation'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import type { AddonVariantId } from '@/data/subscriptions/types'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsAwsCloudProvider } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { formatCurrency } from '@/lib/helpers'
+import { useAddonsPagePanel } from '@/state/addons-page'
 
 const IPv4SidePanel = () => {
   const isAws = useIsAwsCloudProvider()
@@ -197,6 +199,7 @@ const IPv4SidePanel = () => {
                   </RadioGroupLargeItem_Shadcn_>
                 ))}
               </RadioGroup_Shadcn_>
+              <TaxDisclaimer className="mt-3" />
             </div>
           )}
 

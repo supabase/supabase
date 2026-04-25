@@ -1,20 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import InformationBox from 'components/ui/InformationBox'
-import { organizationKeys } from 'data/organizations/keys'
-import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
-import { useMfaEnrollMutation } from 'data/profile/mfa-enroll-mutation'
-import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input, Input_Shadcn_ } from 'ui'
+import { Form, FormControl, FormField, Input, Input_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
+
+import InformationBox from '@/components/ui/InformationBox'
+import { organizationKeys } from '@/data/organizations/keys'
+import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
+import { useMfaEnrollMutation } from '@/data/profile/mfa-enroll-mutation'
+import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 type TOTP = { qr_code: string; secret: string; uri: string }
 
@@ -90,13 +91,13 @@ const FirstStep = ({ visible, isEnrolling, reset, enroll, onClose }: FirstStepPr
       onCancel={onClose}
       onConfirm={form.handleSubmit(onSubmit)}
     >
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form
           id="verify-otp-form"
           className="flex flex-col gap-4"
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <FormField_Shadcn_
+          <FormField
             key="name"
             name="name"
             control={form.control}
@@ -106,14 +107,14 @@ const FirstStep = ({ visible, isEnrolling, reset, enroll, onClose }: FirstStepPr
                 label="Provide a name to identify this app"
                 description="A string will be randomly generated if a name is not provided"
               >
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Input_Shadcn_ id="name" {...field} />
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
             )}
           />
         </form>
-      </Form_Shadcn_>
+      </Form>
     </ConfirmationModal>
   )
 }
@@ -235,19 +236,19 @@ const SecondStep = ({
             }
           />
 
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id="verify-otp-form"
               className="flex flex-col gap-4"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              <FormField
                 key="code"
                 name="code"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout name="code" label="Authentication code">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         id="code"
                         autoFocus
@@ -255,12 +256,12 @@ const SecondStep = ({
                         placeholder="XXXXXX"
                         className="font-mono"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </div>
       )}
     </ConfirmationModal>

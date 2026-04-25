@@ -2,16 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import NoPermission from 'components/ui/NoPermission'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsProjectActive, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -23,9 +13,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
   Table,
   TableBody,
@@ -54,6 +44,16 @@ import { CreateCredentialModal } from './CreateCredentialModal'
 import { RevokeCredentialModal } from './RevokeCredentialModal'
 import { StorageCredItem } from './StorageCredItem'
 import { getConnectionURL } from './StorageSettings.utils'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import NoPermission from '@/components/ui/NoPermission'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useProjectStorageConfigUpdateUpdateMutation } from '@/data/config/project-storage-config-update-mutation'
+import { useStorageCredentialsQuery } from '@/data/storage/s3-access-key-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const S3Connection = () => {
   const { ref: projectRef } = useParams()
@@ -149,14 +149,14 @@ export const S3Connection = () => {
               />
             )}
 
-            <Form_Shadcn_ {...form}>
+            <Form {...form}>
               <form id="s3-connection-form" onSubmit={form.handleSubmit(onSubmit)}>
                 {projectIsLoading ? (
                   <GenericSkeletonLoader />
                 ) : isProjectActive ? (
                   <Card>
                     <CardContent>
-                      <FormField_Shadcn_
+                      <FormField
                         name="s3ConnectionEnabled"
                         control={form.control}
                         render={({ field }) => (
@@ -166,14 +166,14 @@ export const S3Connection = () => {
                             label="S3 protocol connection"
                             description="Allow clients to connect to Supabase Storage via the S3 protocol"
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch
                                 size="large"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                                 disabled={!isSuccessStorageConfig || field.disabled}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -257,7 +257,7 @@ export const S3Connection = () => {
                   </Alert_Shadcn_>
                 )}
               </form>
-            </Form_Shadcn_>
+            </Form>
           </PageSectionContent>
         </PageSection>
 

@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import { ArrowRight, SearchIcon } from 'lucide-react'
 import { ReactNode, useEffect, useMemo, useState } from 'react'
-
 import {
   cn,
   DropdownMenu,
@@ -11,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+
 import { ChartHighlight } from './useChartHighlight'
 
 export type UpdateDateRange = (from: string, to: string) => void

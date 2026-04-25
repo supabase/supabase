@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { type ComponentProps, type ReactNode } from 'react'
 import { cn } from 'ui'
-
 import { Admonition } from 'ui-patterns'
 
 /**

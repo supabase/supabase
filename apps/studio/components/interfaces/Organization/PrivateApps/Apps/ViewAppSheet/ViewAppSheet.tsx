@@ -1,5 +1,3 @@
-import { usePlatformAppDeleteMutation } from 'data/platform-apps/platform-app-delete-mutation'
-import { usePlatformAppQuery } from 'data/platform-apps/platform-app-query'
 import { X } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -11,6 +9,8 @@ import { DeleteAppModal } from '../DeleteAppModal'
 import { ViewAppSheetDangerZone } from './ViewAppSheetDangerZone'
 import { ViewAppSheetInfo } from './ViewAppSheetInfo'
 import { ViewAppSheetPermissions } from './ViewAppSheetPermissions'
+import { usePlatformAppDeleteMutation } from '@/data/platform-apps/platform-app-delete-mutation'
+import { usePlatformAppQuery } from '@/data/platform-apps/platform-app-query'
 
 interface ViewAppSheetProps {
   app: PrivateApp | null

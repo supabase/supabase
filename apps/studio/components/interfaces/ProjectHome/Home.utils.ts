@@ -1,13 +1,4 @@
-import type { GettingStartedState } from './GettingStarted/GettingStarted.types'
-import type { ConnectSectionVariant } from './ConnectSection.config'
-
-export const DEFAULT_SECTION_ORDER = [
-  'connect',
-  'getting-started',
-  'usage',
-  'advisor',
-  'custom-report',
-]
+export const DEFAULT_SECTION_ORDER = ['connect', 'usage', 'advisor', 'custom-report']
 
 /**
  * Reconciles a stored section order with the canonical list.
@@ -32,24 +23,4 @@ export function mergeSectionOrder(stored: string[]): string[] {
     }
   }
   return merged
-}
-
-// Temporary: getSectionVisibility and related types support the connectSection
-// experiment (connect vs getting-started). Remove after the experiment concludes.
-interface SectionVisibilityInput {
-  connectSectionVariant: ConnectSectionVariant | false | undefined
-  isMatureProject: boolean
-  hasProject: boolean
-  gettingStartedState: GettingStartedState
-}
-
-export function getSectionVisibility(input: SectionVisibilityInput) {
-  const { connectSectionVariant, isMatureProject, hasProject, gettingStartedState } = input
-  const canShowEither = connectSectionVariant !== undefined && !isMatureProject && hasProject
-
-  return {
-    showConnectSection: canShowEither && connectSectionVariant === 'connect',
-    showGettingStarted:
-      canShowEither && connectSectionVariant !== 'connect' && gettingStartedState !== 'hidden',
-  }
 }

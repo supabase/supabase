@@ -3,20 +3,20 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { InlineLink } from 'components/ui/InlineLink'
-import { useEmailUpdateMutation } from 'data/profile/profile-update-email-mutation'
 import {
   Button,
   DialogFooter,
   DialogSection,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useEmailUpdateMutation } from '@/data/profile/profile-update-email-mutation'
 
 export const GitHubChangeEmailAddress = () => {
   return (
@@ -91,7 +91,7 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form id="update-email-form" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="self-center">
           <HCaptcha
@@ -104,7 +104,7 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
         </div>
 
         <DialogSection>
-          <FormField_Shadcn_
+          <FormField
             name="email"
             control={form.control}
             render={({ field }) => (
@@ -112,9 +112,9 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
                 label="Provide a new email address"
                 description="A confirmation email will be sent to the provided email address"
               >
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Input_Shadcn_ {...field} placeholder="example@email.com" />
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
             )}
           />
@@ -129,6 +129,6 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
           </Button>
         </DialogFooter>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

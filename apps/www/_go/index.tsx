@@ -13,7 +13,10 @@ import startupGrindContest from './events/startup-grind-2026/contest'
 import stripeSessionsContest from './events/stripe-sessions-2026/contest'
 import stripeExecDinner from './events/stripe-sessions-2026/exec-dinner'
 import stripeExecDinnerThankYou from './events/stripe-sessions-2026/exec-dinner-thank-you'
+import stripeMeetingScheduler from './events/stripe-sessions-2026/meeting-scheduler'
+import stripeParty from './events/stripe-sessions-2026/party'
 import sxswContest from './events/sxsw-2026/contest'
+import awsActivateOffer from './lead-gen/aws-activate-offer'
 import exampleLeadGen from './lead-gen/example-lead-gen'
 import amoe from './legal/amoe'
 import amoeThankYou from './legal/amoe-thankyou'
@@ -24,8 +27,10 @@ import boltWebinar from './webinar/bolt-webinar'
 import boltWebinarThankYou from './webinar/bolt-webinar-thank-you'
 import figmaWebinarMay2026 from './webinar/figma-webinar-may2026'
 import figmaWebinarMay2026ThankYou from './webinar/figma-webinar-may2026-thankyou'
+import promptToProdSentry from './webinar/prompt-to-prod-sentry'
 
 const pages: GoPageInput[] = [
+  awsActivateOffer,
   exampleLeadGen,
   byocEarlyAccess,
   amoe,
@@ -33,11 +38,14 @@ const pages: GoPageInput[] = [
   contestRules,
   figmaWebinarMay2026,
   figmaWebinarMay2026ThankYou,
+  promptToProdSentry, // remove after April 30, 2026
   boltWebinar, // remove after March 31, 2026
   boltWebinarThankYou, // remove after March 31, 2026
   stripeExecDinner, // remove after May 31, 2026
   stripeExecDinnerThankYou, // remove after May 31, 2026
+  stripeMeetingScheduler, // remove after May 31, 2026
   stripeSessionsContest, // remove after May 31, 2026
+  stripeParty, // remove after May 31, 2026
   sxswContest, // remove after April 30, 2026
   accentureContest, // remove after May 31, 2026
   postgresconfContest, // remove after May 31, 2026

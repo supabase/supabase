@@ -1,11 +1,11 @@
 import { includes, noop } from 'lodash'
 import { Edit, Eye } from 'lucide-react'
-
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
   Select,
@@ -17,6 +17,7 @@ import {
   SelectValue_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import { DateTimeInput } from './DateTimeInput'
 import type { EditValue, RowField } from './RowEditor.types'
@@ -28,6 +29,7 @@ const TRUNCATE_DESCRIPTION =
 export interface InputFieldProps {
   field: RowField
   errors: any
+  isNewRow?: boolean
   isEditable?: boolean
   onUpdateField?: (changes: object) => void
   onEditJson?: (data: any) => void
@@ -38,6 +40,7 @@ export interface InputFieldProps {
 export const InputField = ({
   field,
   errors,
+  isNewRow = false,
   isEditable = true,
   onUpdateField = noop,
   onEditJson = noop,
@@ -146,6 +149,11 @@ export const InputField = ({
   if (includes(TEXT_TYPES, field.format)) {
     const isTruncated = isValueTruncated(field.value)
 
+    /**
+     * Handle `undefined` as the default value of the input field
+     * Otherwise, NULL should be treated as NULL, empty strings should be treated as empty strings
+     */
+
     return (
       <div className="text-area-text-sm">
         <Input.TextArea
@@ -166,24 +174,38 @@ export const InputField = ({
           rows={5}
           value={field.value ?? ''}
           placeholder={
-            field.value === null && field.defaultValue === null
+            field.value === null
               ? 'NULL'
               : field.value === '' ||
                   (typeof field.defaultValue === 'string' && field.defaultValue.length === 0)
                 ? 'EMPTY'
-                : `Default: ${field.defaultValue}`
+                : `Default: ${field.defaultValue === null ? 'NULL' : field.defaultValue}`
           }
           actions={
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" icon={<Edit />} className="px-1.5" />
+                <Button
+                  data-testid={`${field.name}-field-actions`}
+                  type="default"
+                  icon={<Edit />}
+                  className="px-1.5"
+                />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-28">
                 {isEditable && (
-                  <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
-                    Set to NULL
-                  </DropdownMenuItem>
+                  <>
+                    <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
+                      Set to NULL
+                    </DropdownMenuItem>
+                    {isNewRow && (
+                      <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: undefined })}>
+                        Set to Default
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
+                  </>
                 )}
+
                 <DropdownMenuItem
                   onClick={() => onEditText({ column: field.name, value: field.value || '' })}
                 >

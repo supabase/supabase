@@ -1,28 +1,28 @@
 import { useFlag } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import Panel from 'components/ui/Panel'
-import { DOCS_URL } from 'lib/constants'
 import { ChevronRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
+  cn,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
+  FormControl,
+  FormField,
+  FormItem,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
+import { DocsButton } from '@/components/ui/DocsButton'
+import Panel from '@/components/ui/Panel'
+import { DOCS_URL } from '@/lib/constants'
 
 interface AdvancedConfigurationProps {
   form: UseFormReturn<CreateProjectForm>
@@ -39,7 +39,7 @@ export const AdvancedConfiguration = ({
 
   const content = (
     <>
-      <FormField_Shadcn_
+      <FormField
         name="useOrioleDb"
         control={form.control}
         render={({ field }) => (
@@ -49,15 +49,15 @@ export const AdvancedConfiguration = ({
               label="Postgres Type"
               className="[&>div>label]:!break-normal"
             >
-              <FormControl_Shadcn_>
+              <FormControl>
                 <RadioGroupStacked
                   // Due to radio group not supporting boolean values
                   // value is converted to boolean
                   onValueChange={(value) => field.onChange(value === 'true')}
                   defaultValue={field.value.toString()}
                 >
-                  <FormItem_Shadcn_ asChild>
-                    <FormControl_Shadcn_>
+                  <FormItem asChild>
+                    <FormControl>
                       <RadioGroupStackedItem
                         value="false"
                         // @ts-ignore
@@ -70,10 +70,10 @@ export const AdvancedConfiguration = ({
                         description="Recommended for production workloads"
                         className="[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2"
                       />
-                    </FormControl_Shadcn_>
-                  </FormItem_Shadcn_>
-                  <FormItem_Shadcn_ asChild>
-                    <FormControl_Shadcn_>
+                    </FormControl>
+                  </FormItem>
+                  <FormItem asChild>
+                    <FormControl>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <RadioGroupStackedItem
@@ -100,10 +100,10 @@ export const AdvancedConfiguration = ({
                           </TooltipContent>
                         )}
                       </Tooltip>
-                    </FormControl_Shadcn_>
-                  </FormItem_Shadcn_>
+                    </FormControl>
+                  </FormItem>
                 </RadioGroupStacked>
-              </FormControl_Shadcn_>
+              </FormControl>
               {form.getValues('useOrioleDb') && (
                 <Admonition
                   type="warning"

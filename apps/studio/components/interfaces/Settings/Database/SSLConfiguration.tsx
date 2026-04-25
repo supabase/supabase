@@ -1,16 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { InlineLinkClassName } from 'components/ui/InlineLink'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
-import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { template } from 'lodash'
 import { Download, Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -42,6 +31,18 @@ import {
   PageSectionTitle,
 } from 'ui-patterns'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useSSLEnforcementQuery } from '@/data/ssl-enforcement/ssl-enforcement-query'
+import { useSSLEnforcementUpdateMutation } from '@/data/ssl-enforcement/ssl-enforcement-update-mutation'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const SSLConfiguration = () => {
   const { ref } = useParams()
