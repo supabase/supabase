@@ -1,13 +1,13 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { handleError, post } from 'data/fetchers'
-import { captureCriticalError } from 'lib/error-reporting'
-import { PROVIDERS } from 'lib/constants'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
-import { projectKeys } from './keys'
 import { DesiredInstanceSize, PostgresEngine, ReleaseChannel } from './new-project.constants'
+import { useInvalidateProjectsInfiniteQuery } from './org-projects-infinite-query'
+import type { components } from '@/data/api'
+import { handleError, post } from '@/data/fetchers'
+import { PROVIDERS } from '@/lib/constants'
+import { captureCriticalError } from '@/lib/error-reporting'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type CreateProjectBody = components['schemas']['CreateProjectBody']
 type CloudProvider = CreateProjectBody['cloud_provider']
@@ -28,6 +28,7 @@ export type ProjectCreateVariables = {
   dataApiUseApiSchema?: boolean
   postgresEngine?: PostgresEngine
   releaseChannel?: ReleaseChannel
+  highAvailability?: boolean
 }
 
 export async function createProject({
@@ -45,6 +46,7 @@ export async function createProject({
   dataApiUseApiSchema,
   postgresEngine,
   releaseChannel,
+  highAvailability,
 }: ProjectCreateVariables) {
   const body: CreateProjectBody = {
     cloud_provider: cloudProvider as CloudProvider,
@@ -63,6 +65,7 @@ export async function createProject({
     data_api_use_api_schema: dataApiUseApiSchema,
     postgres_engine: postgresEngine,
     release_channel: releaseChannel,
+    high_availability: highAvailability,
   }
 
   const { data, error } = await post(`/platform/projects`, {
@@ -83,17 +86,12 @@ export const useProjectCreateMutation = ({
   UseCustomMutationOptions<ProjectCreateData, ResponseError, ProjectCreateVariables>,
   'mutationFn'
 > = {}) => {
-  const queryClient = useQueryClient()
+  const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
   return useMutation<ProjectCreateData, ResponseError, ProjectCreateVariables>({
     mutationFn: (vars) => createProject(vars),
     async onSuccess(data, variables, context) {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: projectKeys.list() }),
-        queryClient.invalidateQueries({
-          queryKey: projectKeys.infiniteListByOrg(variables.organizationSlug),
-        }),
-      ])
+      await invalidateProjectsQuery()
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

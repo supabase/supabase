@@ -1,46 +1,52 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { boolean, object, string } from 'yup'
-
-import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import NoPermission from 'components/ui/NoPermission'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from 'lib/constants'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
   CardFooter,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
   WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { NO_REQUIRED_CHARACTERS } from './Auth.constants'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
 
-const schema = object({
-  DISABLE_SIGNUP: boolean().required(),
-  EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean().required(),
-  SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
-  MAILER_AUTOCONFIRM: boolean().required(),
-  SITE_URL: string().required('Must have a Site URL'),
+import { NO_REQUIRED_CHARACTERS } from './Auth.constants'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import NoPermission from '@/components/ui/NoPermission'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
+
+const schema = z.object({
+  DISABLE_SIGNUP: z.boolean(),
+  EXTERNAL_ANONYMOUS_USERS_ENABLED: z.boolean(),
+  SECURITY_MANUAL_LINKING_ENABLED: z.boolean(),
+  MAILER_AUTOCONFIRM: z.boolean(),
+  SITE_URL: z.string().min(1, 'Must have a Site URL'),
 })
 
 export const BasicAuthSettingsForm = () => {
@@ -52,9 +58,9 @@ export const BasicAuthSettingsForm = () => {
     error: authConfigError,
     isError,
     isSuccess,
-    isLoading,
+    isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -66,7 +72,7 @@ export const BasicAuthSettingsForm = () => {
   )
 
   const form = useForm({
-    resolver: yupResolver(schema),
+    resolver: zodResolver(schema),
     defaultValues: {
       DISABLE_SIGNUP: true,
       EXTERNAL_ANONYMOUS_USERS_ENABLED: false,
@@ -75,6 +81,7 @@ export const BasicAuthSettingsForm = () => {
       SITE_URL: '',
     },
   })
+  const { isDirty } = form.formState
 
   useEffect(() => {
     if (authConfig) {
@@ -114,223 +121,230 @@ export const BasicAuthSettingsForm = () => {
   }
 
   return (
-    <ScaffoldSection isFullWidth>
-      <ScaffoldSectionTitle className="mb-4">User Signups</ScaffoldSectionTitle>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>User Signups</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        {isError && (
+          <AlertError
+            error={authConfigError}
+            subject="Failed to retrieve auth configuration for hooks"
+          />
+        )}
 
-      {isError && (
-        <AlertError
-          error={authConfigError}
-          subject="Failed to retrieve auth configuration for hooks"
-        />
-      )}
+        {isPermissionsLoaded && !canReadConfig && (
+          <div className="mt-8">
+            <NoPermission resourceText="view auth configuration settings" />
+          </div>
+        )}
 
-      {isPermissionsLoaded && !canReadConfig && (
-        <div className="mt-8">
-          <NoPermission resourceText="view auth configuration settings" />
-        </div>
-      )}
+        {isLoading && (
+          <Card>
+            <CardContent className="py-6">
+              <ShimmeringLoader />
+            </CardContent>
+            <CardContent className="py-6">
+              <ShimmeringLoader />
+            </CardContent>
+            <CardContent className="py-6">
+              <ShimmeringLoader />
+            </CardContent>
+            <CardContent className="py-7">
+              <ShimmeringLoader />
+            </CardContent>
+            <CardContent className="py-7"></CardContent>
+          </Card>
+        )}
 
-      {isLoading && (
-        <Card>
-          <CardContent className="py-6">
-            <ShimmeringLoader />
-          </CardContent>
-          <CardContent className="py-6">
-            <ShimmeringLoader />
-          </CardContent>
-          <CardContent className="py-6">
-            <ShimmeringLoader />
-          </CardContent>
-          <CardContent className="py-7">
-            <ShimmeringLoader />
-          </CardContent>
-          <CardContent className="py-7"></CardContent>
-        </Card>
-      )}
-
-      {isSuccess && (
-        <Form_Shadcn_ {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <Card>
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="DISABLE_SIGNUP"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Allow new users to sign up"
-                      description="If this is disabled, new users will not be able to sign up to your application"
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={!canUpdateConfig}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
-              {showManualLinking && (
+        {isSuccess && (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
-                    name="SECURITY_MANUAL_LINKING_ENABLED"
+                    name="DISABLE_SIGNUP"
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        label="Allow manual linking"
-                        description={
-                          <>
-                            Enable{' '}
-                            <InlineLink
-                              className="text-foreground-light hover:text-foreground"
-                              href={`${DOCS_URL}/guides/auth/auth-identity-linking#manual-linking-beta`}
-                            >
-                              manual linking APIs
-                            </InlineLink>{' '}
-                            for your project
-                          </>
-                        }
+                        label="Allow new users to sign up"
+                        description="If this is disabled, new users will not be able to sign up to your application"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
-              )}
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="EXTERNAL_ANONYMOUS_USERS_ENABLED"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Allow anonymous sign-ins"
-                      description={
-                        <>
-                          Enable{' '}
-                          <InlineLink
-                            className="text-foreground-light hover:text-foreground"
-                            href={`${DOCS_URL}/guides/auth/auth-anonymous`}
-                          >
-                            anonymous sign-ins
-                          </InlineLink>{' '}
-                          for your project
-                        </>
-                      }
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={!canUpdateConfig}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-
-                {form.watch('EXTERNAL_ANONYMOUS_USERS_ENABLED') && (
-                  <Alert_Shadcn_
-                    className="flex w-full items-center justify-between mt-4"
-                    variant="warning"
-                  >
-                    <WarningIcon />
-                    <div>
-                      <AlertTitle_Shadcn_>
-                        Anonymous users will use the <code className="text-xs">authenticated</code>{' '}
-                        role when signing in
-                      </AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
-                        <p>
-                          As a result, anonymous users will be subjected to RLS policies that apply
-                          to the <code className="text-xs">public</code> and{' '}
-                          <code className="text-xs">authenticated</code> roles. We strongly advise{' '}
-                          <Link
-                            href={`/project/${projectRef}/auth/policies`}
-                            className="text-foreground underline"
-                          >
-                            reviewing your RLS policies
-                          </Link>{' '}
-                          to ensure that access to your data is restricted where required.
-                        </p>
-                        <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
-                          <Link href={`${DOCS_URL}/guides/auth/auth-anonymous#access-control`}>
-                            View access control docs
-                          </Link>
-                        </Button>
-                      </AlertDescription_Shadcn_>
-                    </div>
-                  </Alert_Shadcn_>
+                {showManualLinking && (
+                  <CardContent>
+                    <FormField
+                      control={form.control}
+                      name="SECURITY_MANUAL_LINKING_ENABLED"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          layout="flex-row-reverse"
+                          label="Allow manual linking"
+                          description={
+                            <>
+                              Enable{' '}
+                              <InlineLink
+                                className="text-foreground-light hover:text-foreground"
+                                href={`${DOCS_URL}/guides/auth/auth-identity-linking#manual-linking-beta`}
+                              >
+                                manual linking APIs
+                              </InlineLink>{' '}
+                              for your project
+                            </>
+                          }
+                        >
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={!canUpdateConfig}
+                            />
+                          </FormControl>
+                        </FormItemLayout>
+                      )}
+                    />
+                  </CardContent>
                 )}
+                <CardContent>
+                  <FormField
+                    control={form.control}
+                    name="EXTERNAL_ANONYMOUS_USERS_ENABLED"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Allow anonymous sign-ins"
+                        description={
+                          <>
+                            Enable{' '}
+                            <InlineLink
+                              className="text-foreground-light hover:text-foreground"
+                              href={`${DOCS_URL}/guides/auth/auth-anonymous`}
+                            >
+                              anonymous sign-ins
+                            </InlineLink>{' '}
+                            for your project
+                          </>
+                        }
+                      >
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={!canUpdateConfig}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
 
-                {!authConfig?.SECURITY_CAPTCHA_ENABLED &&
-                  form.watch('EXTERNAL_ANONYMOUS_USERS_ENABLED') && (
-                    <Alert_Shadcn_ className="mt-4">
+                  {form.watch('EXTERNAL_ANONYMOUS_USERS_ENABLED') && (
+                    <Alert_Shadcn_
+                      className="flex w-full items-center justify-between mt-4"
+                      variant="warning"
+                    >
                       <WarningIcon />
-                      <AlertTitle_Shadcn_>
-                        We highly recommend{' '}
-                        <InlineLink href={`/project/${projectRef}/auth/protection`}>
-                          enabling captcha
-                        </InlineLink>{' '}
-                        for anonymous sign-ins
-                      </AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        This will prevent potential abuse on sign-ins which may bloat your database
-                        and incur costs for monthly active users (MAU)
-                      </AlertDescription_Shadcn_>
+                      <div>
+                        <AlertTitle_Shadcn_>
+                          Anonymous users will use the{' '}
+                          <code className="text-code-inline">authenticated</code> role when signing
+                          in
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
+                          <p>
+                            As a result, anonymous users will be subjected to RLS policies that
+                            apply to the <code className="text-code-inline">public</code> and{' '}
+                            <code className="text-code-inline">authenticated</code> roles. We
+                            strongly advise{' '}
+                            <Link
+                              href={`/project/${projectRef}/auth/policies`}
+                              className="text-foreground underline"
+                            >
+                              reviewing your RLS policies
+                            </Link>{' '}
+                            to ensure that access to your data is restricted where required.
+                          </p>
+                          <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
+                            <Link href={`${DOCS_URL}/guides/auth/auth-anonymous#access-control`}>
+                              View access control docs
+                            </Link>
+                          </Button>
+                        </AlertDescription_Shadcn_>
+                      </div>
                     </Alert_Shadcn_>
                   )}
-              </CardContent>
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="MAILER_AUTOCONFIRM"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Confirm email"
-                      description="Users will need to confirm their email address before signing in for the first time"
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={!canUpdateConfig}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
+
+                  {!authConfig?.SECURITY_CAPTCHA_ENABLED &&
+                    form.watch('EXTERNAL_ANONYMOUS_USERS_ENABLED') && (
+                      <Alert_Shadcn_ className="mt-4">
+                        <WarningIcon />
+                        <AlertTitle_Shadcn_>
+                          We highly recommend{' '}
+                          <InlineLink href={`/project/${projectRef}/auth/protection`}>
+                            enabling captcha
+                          </InlineLink>{' '}
+                          for anonymous sign-ins
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          This will prevent potential abuse on sign-ins which may bloat your
+                          database and incur costs for monthly active users (MAU)
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                    )}
+                </CardContent>
+                <CardContent>
+                  <FormField
+                    control={form.control}
+                    name="MAILER_AUTOCONFIRM"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Confirm email"
+                        description="Users will need to confirm their email address before signing in for the first time"
+                      >
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={!canUpdateConfig}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+                <CardFooter className="justify-end space-x-2">
+                  {isDirty && (
+                    <Button type="default" onClick={() => form.reset()}>
+                      Cancel
+                    </Button>
                   )}
-                />
-              </CardContent>
-              <CardFooter className="justify-end space-x-2">
-                {form.formState.isDirty && (
-                  <Button type="default" onClick={() => form.reset()}>
-                    Cancel
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={!canUpdateConfig || isUpdatingConfig || !isDirty}
+                    loading={isUpdatingConfig}
+                  >
+                    Save changes
                   </Button>
-                )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
-                  loading={isUpdatingConfig}
-                >
-                  Save changes
-                </Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </Form_Shadcn_>
-      )}
-    </ScaffoldSection>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form>
+        )}
+      </PageSectionContent>
+    </PageSection>
   )
 }

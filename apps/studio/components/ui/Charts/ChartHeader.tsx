@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import {
   Activity,
@@ -7,16 +8,14 @@ import {
   SquareTerminal,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { cn } from 'ui'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { formatBytes } from 'lib/helpers'
-import { numberFormatter } from './Charts.utils'
-import { useChartHoverState } from './useChartHoverState'
+import { Badge, cn } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
+import { formatPercentage, numberFormatter } from './Charts.utils'
+import { useChartHoverState } from './useChartHoverState'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { formatBytes } from '@/lib/helpers'
 
 export interface ChartHeaderProps {
   title?: string
@@ -46,6 +45,7 @@ export interface ChartHeaderProps {
   attributes?: any[]
   sql?: string
   titleTooltip?: string
+  showNewBadge?: boolean
 }
 
 export const ChartHeader = ({
@@ -76,14 +76,12 @@ export const ChartHeader = ({
   attributes,
   sql,
   titleTooltip,
+  showNewBadge,
 }: ChartHeaderProps) => {
-  const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } = useChartHoverState(
-    syncId || 'default'
-  )
+  const { ref } = useParams()
+  const { hoveredIndex, isHovered } = useChartHoverState(syncId || 'default')
   const [localHighlightedValue, setLocalHighlightedValue] = useState(highlightedValue)
   const [localHighlightedLabel, setLocalHighlightedLabel] = useState(highlightedLabel)
-  const { ref } = useParams()
-  const router = useRouter()
 
   const formatHighlightedValue = (value: any) => {
     if (typeof value !== 'number') {
@@ -99,7 +97,17 @@ export const ChartHeader = ({
       return formatBytes(bytesValue, valuePrecision)
     }
 
-    return numberFormatter(value, valuePrecision)
+    if (format === '%') {
+      return formatPercentage(value, valuePrecision)
+    }
+
+    const formattedValue = numberFormatter(value, valuePrecision)
+
+    if (typeof format === 'string' && format) {
+      return `${formattedValue} ${format}`
+    }
+
+    return formattedValue
   }
 
   useEffect(() => {
@@ -230,7 +238,10 @@ export const ChartHeader = ({
       )}
     >
       <div className="flex flex-col">
-        {title && chartTitle}
+        <div className="flex items-center gap-2">
+          {title && chartTitle}
+          {showNewBadge && <Badge variant="success">New</Badge>}
+        </div>
         <div className="h-4">
           {hasHighlightedValue && highlighted}
           {!hideHighlightedLabel && label}

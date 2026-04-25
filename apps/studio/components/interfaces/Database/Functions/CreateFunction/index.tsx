@@ -4,47 +4,50 @@ import { Plus, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
-import { DatabaseFunction } from 'data/database-functions/database-functions-query'
-import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import type { FormSchema } from 'types'
 import {
   Button,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Form_Shadcn_,
+  cn,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   Input_Shadcn_,
-  Radio,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   ScrollArea,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Separator,
   Sheet,
   SheetContent,
   SheetFooter,
   SheetSection,
   Toggle,
-  cn,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { convertArgumentTypes, convertConfigParams } from '../Functions.utils'
+import { CreateFunctionConfigParamsSection } from './CreateFunctionConfigParamsSection'
 import { CreateFunctionHeader } from './CreateFunctionHeader'
 import { FunctionEditor } from './FunctionEditor'
+import { POSTGRES_DATA_TYPES } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import SchemaSelector from '@/components/ui/SchemaSelector'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useDatabaseFunctionCreateMutation } from '@/data/database-functions/database-functions-create-mutation'
+import { DatabaseFunction } from '@/data/database-functions/database-functions-query'
+import { useDatabaseFunctionUpdateMutation } from '@/data/database-functions/database-functions-update-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import type { FormSchema } from '@/types'
 
 const FORM_ID = 'create-function-sidepanel'
 
@@ -76,7 +79,6 @@ export const CreateFunction = ({
   onClose,
 }: CreateFunctionProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
   const [focusedEditor, setFocusedEditor] = useState(false)
 
@@ -87,14 +89,15 @@ export const CreateFunction = ({
   })
   const language = form.watch('language')
 
-  const { mutate: createDatabaseFunction, isLoading: isCreating } =
-    useDatabaseFunctionCreateMutation()
-  const { mutate: updateDatabaseFunction, isLoading: isUpdating } =
-    useDatabaseFunctionUpdateMutation()
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => form.formState.isDirty,
+    onClose,
+  })
 
-  function isClosingSidePanel() {
-    form.formState.isDirty ? setIsClosingPanel(true) : onClose()
-  }
+  const { mutate: createDatabaseFunction, isPending: isCreating } =
+    useDatabaseFunctionCreateMutation()
+  const { mutate: updateDatabaseFunction, isPending: isUpdating } =
+    useDatabaseFunctionUpdateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!project) return console.error('Project is required')
@@ -151,12 +154,13 @@ export const CreateFunction = ({
         config_params: convertConfigParams(func?.config_params).value,
       })
     }
-  }, [visible, func])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, func?.id])
 
   const { data: protectedSchemas } = useProtectedSchemas()
 
   return (
-    <Sheet open={visible} onOpenChange={() => isClosingSidePanel()}>
+    <Sheet open={visible} onOpenChange={handleOpenChange}>
       <SheetContent
         showClose={false}
         size={'default'}
@@ -165,14 +169,14 @@ export const CreateFunction = ({
         <div className="flex flex-col grow w-full">
           <CreateFunctionHeader selectedFunction={func?.name} isDuplicating={isDuplicating} />
           <Separator />
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={FORM_ID}
               className="flex-grow overflow-auto"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
@@ -181,16 +185,16 @@ export const CreateFunction = ({
                       description="Name will also be used for the function name in postgres"
                       layout="horizontal"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_ {...field} placeholder="Name of function" />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </SheetSection>
               <Separator className={focusedEditor ? 'hidden' : ''} />
               <SheetSection className={focusedEditor ? 'hidden' : 'space-y-4'}>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="schema"
                   render={({ field }) => (
@@ -199,20 +203,19 @@ export const CreateFunction = ({
                       description="Tables made in the table editor will be in 'public'"
                       layout="horizontal"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <SchemaSelector
-                          portal={false}
                           selectedSchemaName={field.value}
                           excludedSchemas={protectedSchemas?.map((s) => s.name)}
                           size="small"
                           onSelectSchema={(name) => field.onChange(name)}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
                 {!isEditing && (
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="return_type"
                     render={({ field }) => (
@@ -245,21 +248,19 @@ export const CreateFunction = ({
               </SheetSection>
               <Separator className={focusedEditor ? 'hidden' : ''} />
               <SheetSection className={`${focusedEditor ? 'h-full' : ''} !px-0`}>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="definition"
                   render={({ field }) => (
-                    <FormItem_Shadcn_ className="space-y-4 flex flex-col h-full">
+                    <FormItem className="space-y-4 flex flex-col h-full">
                       <div className="px-content">
-                        <FormLabel_Shadcn_ className="text-base text-foreground">
-                          Definition
-                        </FormLabel_Shadcn_>
-                        <FormDescription_Shadcn_ className="text-sm text-foreground-light">
+                        <FormLabel className="text-base text-foreground">Definition</FormLabel>
+                        <FormDescription className="text-sm text-foreground-light">
                           <p>
                             The language below should be written in <code>{language}</code>.
                           </p>
                           {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
-                        </FormDescription_Shadcn_>
+                        </FormDescription>
                       </div>
                       <div
                         className={cn(
@@ -275,8 +276,8 @@ export const CreateFunction = ({
                         />
                       </div>
 
-                      <FormMessage_Shadcn_ className="px-content" />
-                    </FormItem_Shadcn_>
+                      <FormMessage className="px-content" />
+                    </FormItem>
                   )}
                 />
               </SheetSection>
@@ -299,7 +300,7 @@ export const CreateFunction = ({
                     <>
                       <SheetSection className={focusedEditor ? 'hidden' : 'space-y-2 pt-0'}>
                         <FormFieldLanguage />
-                        <FormField_Shadcn_
+                        <FormField
                           control={form.control}
                           name="behavior"
                           render={({ field }) => (
@@ -330,31 +331,27 @@ export const CreateFunction = ({
                       </SheetSection>
                       <Separator className={focusedEditor ? 'hidden' : ''} />
                       <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                        <FormFieldConfigParams readonly={isEditing} />
+                        <CreateFunctionConfigParamsSection />
                       </SheetSection>
                       <Separator className={focusedEditor ? 'hidden' : ''} />
                       <SheetSection className={focusedEditor ? 'hidden' : ''}>
                         <h5 className="text-base text-foreground mb-4">Type of Security</h5>
-                        <FormField_Shadcn_
+                        <FormField
                           control={form.control}
                           name="security_definer"
                           render={({ field }) => (
-                            <FormItem_Shadcn_>
-                              <FormControl_Shadcn_ className="col-span-8">
-                                {/* TODO: This RadioGroup imports Formik state, replace it with a clean component */}
-                                <Radio.Group
-                                  type="cards"
-                                  layout="vertical"
-                                  onChange={(event) =>
-                                    field.onChange(event.target.value == 'SECURITY_DEFINER')
+                            <FormItem>
+                              <FormControl className="col-span-8">
+                                <RadioGroupStacked
+                                  onValueChange={(value) =>
+                                    field.onChange(value == 'SECURITY_DEFINER')
                                   }
                                   value={field.value ? 'SECURITY_DEFINER' : 'SECURITY_INVOKER'}
                                 >
-                                  <Radio
+                                  <RadioGroupStackedItem
+                                    value="SECURITY_INVOKER"
                                     id="SECURITY_INVOKER"
                                     label="SECURITY INVOKER"
-                                    value="SECURITY_INVOKER"
-                                    checked={!field.value}
                                     description={
                                       <>
                                         Function is to be executed with the privileges of the user
@@ -362,11 +359,10 @@ export const CreateFunction = ({
                                       </>
                                     }
                                   />
-                                  <Radio
+                                  <RadioGroupStackedItem
+                                    value="SECURITY_DEFINER"
                                     id="SECURITY_DEFINER"
                                     label="SECURITY DEFINER"
-                                    value="SECURITY_DEFINER"
-                                    checked={field.value}
                                     description={
                                       <>
                                         Function is to be executed with the privileges of the user
@@ -374,10 +370,10 @@ export const CreateFunction = ({
                                       </>
                                     }
                                   />
-                                </Radio.Group>
-                              </FormControl_Shadcn_>
-                              <FormMessage_Shadcn_ />
-                            </FormItem_Shadcn_>
+                                </RadioGroupStacked>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
                           )}
                         />
                       </SheetSection>
@@ -386,9 +382,9 @@ export const CreateFunction = ({
                 </>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
           <SheetFooter>
-            <Button disabled={isCreating || isUpdating} type="default" onClick={isClosingSidePanel}>
+            <Button disabled={isCreating || isUpdating} type="default" onClick={confirmOnClose}>
               Cancel
             </Button>
             <Button
@@ -401,21 +397,7 @@ export const CreateFunction = ({
             </Button>
           </SheetFooter>
         </div>
-        <ConfirmationModal
-          visible={isClosingPanel}
-          title="Discard changes"
-          confirmLabel="Discard"
-          onCancel={() => setIsClosingPanel(false)}
-          onConfirm={() => {
-            setIsClosingPanel(false)
-            onClose()
-          }}
-        >
-          <p className="text-sm text-foreground-light">
-            There are unsaved changes. Are you sure you want to close the panel? Your changes will
-            be lost.
-          </p>
-        </ConfirmationModal>
+        <DiscardChangesConfirmationDialog {...modalProps} />
       </SheetContent>
     </Sheet>
   )
@@ -445,22 +427,22 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
         {fields.map((field, index) => {
           return (
             <div className="flex flex-row space-x-1" key={field.id}>
-              <FormField_Shadcn_
+              <FormField
                 name={`args.${index}.name`}
                 render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex-1">
-                    <FormControl_Shadcn_>
+                  <FormItem className="flex-1">
+                    <FormControl>
                       <Input_Shadcn_ {...field} disabled={readonly} placeholder="argument_name" />
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 name={`args.${index}.type`}
                 render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex-1">
-                    <FormControl_Shadcn_>
+                  <FormItem className="flex-1">
+                    <FormControl>
                       {readonly ? (
                         <Input_Shadcn_ value={field.value} disabled readOnly className="h-auto" />
                       ) : (
@@ -485,9 +467,9 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                           </Select_Shadcn_>
                         </>
                       )}
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
 
@@ -511,75 +493,6 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
             disabled={readonly}
           >
             Add a new argument
-          </Button>
-        )}
-      </div>
-    </>
-  )
-}
-
-interface FormFieldConfigParamsProps {
-  readonly?: boolean
-}
-
-const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
-  const { fields, append, remove } = useFieldArray<z.infer<typeof FormSchema>>({
-    name: 'config_params',
-  })
-
-  return (
-    <>
-      <h5 className="text-base text-foreground">Configuration Parameters</h5>
-      <div className="space-y-2 pt-4">
-        {readonly && isEmpty(fields) && (
-          <span className="text-foreground-lighter">No argument for this function</span>
-        )}
-        {fields.map((field, index) => {
-          return (
-            <div className="flex flex-row space-x-1" key={field.id}>
-              <FormField_Shadcn_
-                name={`config_params.${index}.name`}
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex-1">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="parameter_name" />
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
-                )}
-              />
-              <FormField_Shadcn_
-                name={`config_params.${index}.value`}
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex-1">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="parameter_value" />
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
-                )}
-              />
-
-              {!readonly && (
-                <Button
-                  type="danger"
-                  icon={<Trash size={12} />}
-                  onClick={() => remove(index)}
-                  className="h-[38px] w-[38px]"
-                />
-              )}
-            </div>
-          )
-        })}
-
-        {!readonly && (
-          <Button
-            type="default"
-            icon={<Plus size={12} />}
-            onClick={() => append({ name: '', type: '' })}
-            disabled={readonly}
-          >
-            Add a new config
           </Button>
         )}
       </div>
@@ -615,7 +528,7 @@ const FormFieldLanguage = () => {
   }, [enabledExtensions])
 
   return (
-    <FormField_Shadcn_
+    <FormField
       name="language"
       render={({ field }) => (
         <FormItemLayout label="Language" layout="horizontal">

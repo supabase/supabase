@@ -1,11 +1,13 @@
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { filterToolsByOptInLevel } from '../tool-filter'
-import { getFallbackTools } from './fallback-tools'
 import { ToolSet } from 'ai'
 import { IS_PLATFORM } from 'common'
+
+import { filterToolsByOptInLevel } from '../tool-filter'
+import { getFallbackTools } from './fallback-tools'
+import { getIncidentTools } from './incident-tools'
 import { getMcpTools } from './mcp-tools'
 import { getSchemaTools } from './schema-tools'
-import { getRenderingTools } from './rendering-tools'
+import { getStudioTools } from './studio-tools'
+import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 export const getTools = async ({
   projectRef,
@@ -13,15 +15,17 @@ export const getTools = async ({
   authorization,
   aiOptInLevel,
   accessToken,
+  baseUrl,
 }: {
   projectRef: string
   connectionString: string
   authorization?: string
   aiOptInLevel: AiOptInLevel
   accessToken?: string
+  baseUrl?: string
 }) => {
-  // Always include rendering tools
-  let tools: ToolSet = getRenderingTools()
+  // Always include studio tools
+  let tools: ToolSet = getStudioTools()
 
   // If self-hosted, only add fallback tools
   if (!IS_PLATFORM) {
@@ -50,6 +54,7 @@ export const getTools = async ({
         connectionString,
         authorization,
       }),
+      ...(baseUrl ? getIncidentTools({ baseUrl }) : {}),
     }
   }
 

@@ -1,24 +1,9 @@
+import { useParams } from 'common'
 import { Lock, Paintbrush, PlusCircle, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { DeleteQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
-import { PurgeQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
-import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
-import { QueueMessagesDataGrid } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueDataGrid'
-import { QueueFilters } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueFilters'
-import { QueueSettings } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueSettings'
-import { SendMessageModal } from 'components/interfaces/Integrations/Queues/SingleQueue/SendMessageModal'
-import { Markdown } from 'components/interfaces/Markdown'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useQueueMessagesInfiniteQuery } from 'data/database-queues/database-queue-messages-infinite-query'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   cn,
@@ -29,7 +14,23 @@ import {
   Separator,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { DeleteQueue } from '@/components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
+import { PurgeQueue } from '@/components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
+import { QUEUE_MESSAGE_TYPE } from '@/components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
+import { QueueMessagesDataGrid } from '@/components/interfaces/Integrations/Queues/SingleQueue/QueueDataGrid'
+import { QueueFilters } from '@/components/interfaces/Integrations/Queues/SingleQueue/QueueFilters'
+import { QueueSettings } from '@/components/interfaces/Integrations/Queues/SingleQueue/QueueSettings'
+import { SendMessageModal } from '@/components/interfaces/Integrations/Queues/SingleQueue/SendMessageModal'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useQueueMessagesInfiniteQuery } from '@/data/database-queues/database-queue-messages-infinite-query'
+import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
+import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const QueueTab = () => {
   const { childId: queueName, ref } = useParams()
@@ -37,12 +38,15 @@ export const QueueTab = () => {
 
   const [openRlsPopover, setOpenRlsPopover] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
-  const [sendMessageModalShown, setSendMessageModalShown] = useState(false)
+  const [sendMessageModalShown, setSendMessageModalShown] = useQueryState(
+    'new-message',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [purgeQueueModalShown, setPurgeQueueModalShown] = useState(false)
   const [deleteQueueModalShown, setDeleteQueueModalShown] = useState(false)
   const [selectedTypes, setSelectedTypes] = useState<QUEUE_MESSAGE_TYPE[]>([])
 
-  const { data: tables, isLoading: isLoadingTables } = useTablesQuery({
+  const { data: tables, isPending: isLoadingTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: 'pgmq',
@@ -62,7 +66,13 @@ export const QueueTab = () => {
     connectionString: project?.connectionString,
   })
 
-  const { data, error, isLoading, fetchNextPage, isFetching } = useQueueMessagesInfiniteQuery(
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    fetchNextPage,
+    isFetching,
+  } = useQueueMessagesInfiniteQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -74,7 +84,7 @@ export const QueueTab = () => {
   )
   const messages = useMemo(() => data?.pages.flatMap((p) => p), [data?.pages])
 
-  const { mutate: updateTable, isLoading: isUpdatingTable } = useTableUpdateMutation({
+  const { mutate: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
     onSettled: () => {
       toast.success(`Successfully enabled RLS for ${queueName}`)
       setRlsConfirmModalOpen(false)
@@ -111,6 +121,7 @@ export const QueueTab = () => {
             onClick={() => setPurgeQueueModalShown(true)}
             icon={<Paintbrush />}
             title="Purge messages"
+            aria-label="Purge messages"
             tooltip={{ content: { side: 'bottom', text: 'Purge messages' } }}
           />
 
@@ -120,6 +131,7 @@ export const QueueTab = () => {
             onClick={() => setDeleteQueueModalShown(true)}
             icon={<Trash2 />}
             title="Delete queue"
+            aria-label="Delete queue"
             tooltip={{ content: { side: 'bottom', text: 'Delete queue' } }}
           />
 
@@ -265,7 +277,7 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
 
       <ConfirmationModal
         visible={rlsConfirmModalOpen}
-        title="Confirm to enable Row Level Security"
+        title="Enable Row Level Security"
         confirmLabel="Enable RLS"
         confirmLabelLoading="Enabling RLS"
         loading={isUpdatingTable}

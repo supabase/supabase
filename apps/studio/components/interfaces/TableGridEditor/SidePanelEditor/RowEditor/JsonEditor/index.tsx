@@ -1,21 +1,21 @@
 import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
+import { useParams } from 'common'
 import { AlignLeft } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { Button, cn, SidePanel } from 'ui'
 
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { minifyJSON, prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
-import { Button, SidePanel, cn } from 'ui'
-import ActionBar from '../../ActionBar'
+import { ActionBar } from '../../ActionBar'
 import { isValueTruncated } from '../RowEditor.utils'
 import { DrilldownViewer } from './DrilldownViewer/DrilldownViewer'
 import { JsonCodeEditor } from './JsonCodeEditor'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { minifyJSON, prettifyJSON, removeJSONTrailingComma, tryParseJson } from '@/lib/helpers'
 
 interface JsonEditProps {
   row?: { [key: string]: any }
@@ -55,7 +55,7 @@ export const JsonEditor = ({
   const jsonString = typeof value === 'object' ? JSON.stringify(value) : (value as string)
   const isTruncated = isValueTruncated(jsonString)
 
-  const { mutate: getCellValue, isLoading, isSuccess, reset } = useGetCellValueMutation()
+  const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
 
   const validateJSON = async (resolve: () => void) => {
     try {
@@ -98,7 +98,8 @@ export const JsonEditor = ({
         connectionString: project?.connectionString,
       },
       {
-        onSuccess: (data) => {
+        onSuccess: (data: unknown | undefined) => {
+          if (data === undefined) return
           setJsonStr(JSON.stringify(data))
         },
       }
@@ -107,7 +108,7 @@ export const JsonEditor = ({
 
   useEffect(() => {
     if (visible) {
-      const temp = prettifyJSON(jsonString)
+      const temp = prettifyJSON(jsonString ?? '')
       setJsonStr(temp)
     }
   }, [visible])
@@ -173,7 +174,7 @@ export const JsonEditor = ({
               key={jsonString}
               readOnly={readOnly}
               onInputChange={(val) => setJsonStr(val ?? '')}
-              value={jsonStr.toString()}
+              value={(jsonStr ?? '').toString()}
             />
           </div>
         ) : (
@@ -194,7 +195,7 @@ export const JsonEditor = ({
                 performance issues
               </p>
             </div>
-            <Button type="default" loading={isLoading} onClick={loadFullValue}>
+            <Button type="default" loading={isPending} onClick={loadFullValue}>
               Load full JSON data
             </Button>
           </div>

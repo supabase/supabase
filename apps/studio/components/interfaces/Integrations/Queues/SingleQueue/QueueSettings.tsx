@@ -1,25 +1,9 @@
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { HelpCircle, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import {
-  TablePrivilegesGrant,
-  useTablePrivilegesGrantMutation,
-} from 'data/privileges/table-privileges-grant-mutation'
-import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
-import {
-  TablePrivilegesRevoke,
-  useTablePrivilegesRevokeMutation,
-} from 'data/privileges/table-privileges-revoke-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Sheet,
@@ -42,8 +26,24 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { getQueueFunctionsMapping } from './Queue.utils'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
+import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
+import {
+  TablePrivilegesGrant,
+  useTablePrivilegesGrantMutation,
+} from '@/data/privileges/table-privileges-grant-mutation'
+import { useTablePrivilegesQuery } from '@/data/privileges/table-privileges-query'
+import {
+  TablePrivilegesRevoke,
+  useTablePrivilegesRevokeMutation,
+} from '@/data/privileges/table-privileges-revoke-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const ACTIONS = ['select', 'insert', 'update', 'delete']
 const ROLES = ['anon', 'authenticated', 'postgres', 'service_role']
@@ -64,7 +64,13 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
     connectionString: project?.connectionString,
   })
 
-  const { data, error, isLoading, isSuccess, isError } = useDatabaseRolesQuery({
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+  } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -243,7 +249,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
             {isExposed && (
               <>
                 These will also determine access to each function available from the{' '}
-                <code className="text-xs">pgmq_public</code> schema.
+                <code className="text-code-inline">pgmq_public</code> schema.
               </>
             )}
           </SheetDescription>

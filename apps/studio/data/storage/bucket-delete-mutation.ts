@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { pollUntilBucketEmpty } from './bucket-util'
 import { storageKeys } from './keys'
+import { del, handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type BucketDeleteVariables = {
   projectRef: string
@@ -12,12 +13,14 @@ type BucketDeleteVariables = {
 
 async function deleteBucket({ projectRef, id }: BucketDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!id) throw new Error('Bucket name is requried')
+  if (!id) throw new Error('Bucket name is required')
 
   const { error: emptyBucketError } = await post('/platform/storage/{ref}/buckets/{id}/empty', {
     params: { path: { ref: projectRef, id } },
   })
   if (emptyBucketError) handleError(emptyBucketError)
+
+  await pollUntilBucketEmpty({ projectRef, bucketId: id })
 
   const { data, error: deleteBucketError } = await del('/platform/storage/{ref}/buckets/{id}', {
     params: { path: { ref: projectRef, id } },

@@ -1,20 +1,21 @@
 'use client'
+
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
-import { AlertTriangle, ArrowLeft, Command, Search } from 'lucide-react'
+import { useBreakpoint } from 'common'
+import useDragToClose from 'common/hooks/useDragToClose'
+import { AlertTriangle, ArrowLeft, Search } from 'lucide-react'
 import type { HTMLAttributes, MouseEvent, PropsWithChildren, ReactElement, ReactNode } from 'react'
 import { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-
-import { useBreakpoint } from 'common'
-import useDragToClose from 'common/hooks/useDragToClose'
 import {
   Button,
+  cn,
   Command_Shadcn_,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-  cn,
+  KeyboardShortcut,
 } from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
@@ -157,7 +158,7 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
       'inline-flex items-center justify-center',
       'whitespace-nowrap',
       'rounded-md border border-input bg-background',
-      'text-sm font-medium',
+      'text-sm',
       'hover:bg-accent hover:text-accent-foreground',
       'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
       'disabled:pointer-events-none disabled:opacity-50',
@@ -171,9 +172,11 @@ function CommandMenuTrigger({ children }: PropsWithChildren) {
 function CommandMenuTriggerInput({
   className,
   placeholder = 'Search...',
+  showShortcut = true,
 }: {
   className?: string
   placeholder?: string | React.ReactNode
+  showShortcut?: boolean
 }) {
   return (
     <CommandMenuTrigger>
@@ -185,25 +188,28 @@ function CommandMenuTriggerInput({
           'pl-1.5 md:pl-2 pr-1',
           'flex items-center justify-between',
           'bg-surface-100/75 text-foreground-lighter border',
-          'hover:bg-opacity-100 hover:border-strong',
-          'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
+          'hover:bg-opacity-100 hover:border-stronger',
+          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-border-strong focus-visible:ring-offset-1 focus-visible:ring-offset-background',
           'transition',
           className
         )}
       >
-        <div className="flex items-center space-x-2 text-foreground-muted">
-          <Search size={18} strokeWidth={2} />
-          <p className="flex text-sm pr-2">{placeholder}</p>
+        <div className="flex items-center space-x-1.5 text-foreground-lighter">
+          <Search
+            size={16}
+            strokeWidth={1.5}
+            className="group-hover:text-foreground-light transition-colors"
+          />
+          <p className="flex text-xs pr-2 text-foreground-muted">{placeholder}</p>
         </div>
-        <div className="command-shortcut hidden md:flex items-center space-x-1">
-          <div
-            aria-hidden="true"
-            className="md:flex items-center justify-center h-full px-1 border rounded bg-surface-300 gap-0.5"
-          >
-            <Command size={12} strokeWidth={1.5} />
-            <span className="text-[12px]">K</span>
-          </div>
-        </div>
+        {showShortcut && (
+          <span aria-hidden="true">
+            <KeyboardShortcut
+              keys={['Meta', 'k']}
+              className="command-shortcut hidden md:inline-flex h-full border border-default bg-surface-300 text-foreground-lighter shadow-xs shadow-background-surface-100"
+            />
+          </span>
+        )}
       </button>
     </CommandMenuTrigger>
   )
@@ -227,10 +233,23 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
   const query = useQuery()
   const setQuery = useSetQuery()
 
+  const telemetryContext = useCommandMenuTelemetryContext()
+
   const { ref: contentRef } = useTouchGestures({ toggleOpen: () => setOpen(!open) })
 
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen && open && telemetryContext?.onTelemetry) {
+      telemetryContext.onTelemetry({
+        action: 'command_menu_closed',
+        properties: { app: telemetryContext.app },
+        groups: {},
+      })
+    }
+    setOpen(newOpen)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       {trigger}
       <DialogContent
         id="command-menu-dialog-content"
@@ -238,10 +257,10 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
         forceMount
         ref={contentRef}
         onOpenAutoFocus={(e) => isMobile && e.preventDefault()}
-        onInteractOutside={() => setOpen(false)}
+        onInteractOutside={() => handleOpenChange(false)}
         onEscapeKeyDown={(e) => {
           e.preventDefault()
-          return query ? setQuery('') : page ? popPage() : setOpen(false)
+          return query ? setQuery('') : page ? popPage() : handleOpenChange(false)
         }}
         size={size}
         className={cn(

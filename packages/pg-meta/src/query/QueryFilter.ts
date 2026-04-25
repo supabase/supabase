@@ -44,6 +44,29 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
     return this._getQueryModifier().range(from, to)
   }
 
+  clone(): QueryFilter {
+    const clonedData = structuredClone({
+      table: this.table,
+      action: this.action,
+      actionValue: this.actionValue,
+      actionOptions: this.actionOptions,
+      filters: this.filters,
+      sorts: this.sorts,
+    })
+
+    const cloned = new QueryFilter(
+      clonedData.table,
+      clonedData.action,
+      clonedData.actionValue,
+      clonedData.actionOptions
+    )
+
+    cloned.filters = clonedData.filters
+    cloned.sorts = clonedData.sorts
+
+    return cloned
+  }
+
   toSql(options?: { isCTE: boolean; isFinal: boolean }) {
     return this._getQueryModifier().toSql(options)
   }

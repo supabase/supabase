@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type AuditLog = {
   action: {
     metadata: {
       method?: string
+      route?: string
       status?: number
     }[]
     name: string
@@ -17,13 +18,17 @@ export type AuditLog = {
     type: 'user' | string
     metadata: {
       email?: string
+      ip?: string
+      tokenType?: string
     }[]
   }
   target: {
     description: string
     metadata: {
       org_slug?: string
-      project_ref?: string
+      project_ref?: string | null
+      ref?: string | null
+      slug?: string | null
     }
   }
   occurred_at: string

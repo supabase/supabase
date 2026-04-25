@@ -1,26 +1,17 @@
 import { type PostgresColumn } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef } from 'react'
-
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
-import { useSqlSnippetsQuery, type SqlSnippet } from 'data/content/sql-snippets-query'
-import { usePrefetchTables, useTablesQuery, type TablesData } from 'data/tables/tables-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { useProfile } from 'lib/profile'
 import {
   cn,
-  CodeBlock,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import {
   Breadcrumb,
@@ -37,6 +28,15 @@ import {
   useSetCommandMenuSize,
   useSetPage,
 } from 'ui-patterns/CommandMenu'
+
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
+import { useSqlSnippetsQuery, type SqlSnippet } from '@/data/content/sql-snippets-query'
+import { usePrefetchTables, useTablesQuery, type TablesData } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import { useProfile } from '@/lib/profile'
 
 export function useSqlEditorGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -76,7 +76,7 @@ export function useSnippetCommands() {
     [
       {
         id: 'run-snippet',
-        name: 'Run snippet',
+        name: 'Run snippet...',
         icon: () => <Code />,
         action: () => setPage(SNIPPET_PAGE_NAME),
       },
@@ -93,7 +93,7 @@ function RunSnippetPage() {
   const { ref } = useParams()
   const {
     data: snippetPages,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useSqlSnippetsQuery({
@@ -208,6 +208,7 @@ function SnippetSelector({
           <CommandGroup_Shadcn_ className="flex-grow min-h-0 overflow-auto">
             {snippets.map((snippet) => (
               <CommandItem_Shadcn_
+                key={snippet.id}
                 id={`${snippet.id}-${snippet.name}`}
                 className={generateCommandClassNames(false)}
                 value={snippetValue(snippet)}
@@ -287,7 +288,7 @@ export function useQueryTableCommands(options?: CommandOptions) {
     [
       {
         id: 'query-table',
-        name: 'Query a table',
+        name: 'Query a table...',
         icon: () => <Table2 />,
         action: () => setPage(QUERY_TABLE_PAGE_NAME),
       },
@@ -302,7 +303,7 @@ function TableSelector() {
   const { data: protectedSchemas } = useProtectedSchemas()
   const {
     data: tablesData,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useTablesQuery({

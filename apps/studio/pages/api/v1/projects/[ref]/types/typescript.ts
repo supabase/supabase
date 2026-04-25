@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { constructHeaders } from 'lib/api/apiHelpers'
-import apiWrapper from 'lib/api/apiWrapper'
-import { generateTypescriptTypes } from 'lib/api/self-hosted/generate-types'
-import { ResponseError } from 'types'
+import { constructHeaders } from '@/lib/api/apiHelpers'
+import apiWrapper from '@/lib/api/apiWrapper'
+import { generateTypescriptTypes } from '@/lib/api/self-hosted/generate-types'
+import { ResponseError } from '@/types'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>
   apiWrapper(req, res, handler, { withAuth: true })
@@ -29,5 +29,5 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(response.code ?? 500).json({ message: response.message })
   }
 
-  return res.status(200).json(response)
+  return res.status(200).json({ types: response })
 }

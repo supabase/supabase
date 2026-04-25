@@ -173,7 +173,7 @@ This response will block the user creation and return the error message to the c
 
 ## Examples
 
-Each of the following examples shows how to use the `before-user-created` hook to control signup behavior. Each use case includes both a HTTP implementation (e.g. using an Edge Function) and a SQL implementation (Postgres function).
+Each of the following examples shows how to use the `before-user-created` hook to control signup behavior. Each use case includes both an HTTP implementation (e.g. using an Edge Function) and a SQL implementation (Postgres function).
 
 <Tabs
   scrollable
@@ -344,7 +344,7 @@ revoke execute
 </TabPanel>
 
 <TabPanel id="sql-allow-deny-by-cidr" label="Allow/Deny by IP or CIDR">
-This example shows how you might restrict sign up from a single IP address or a range of them using [PostgreSQL’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
+This example shows how you might restrict sign up from a single IP address or a range of them using [Postgres’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
 For instance: `123.123.123.123/32` represents only a single IP address, while `123.123.123.0/24` means all IP addresses starting with `123.123.123.`.
 
 The `before-user-created` hook solves this by:
@@ -599,7 +599,7 @@ Deno.serve(async (req) => {
 </TabPanel>
 
 <TabPanel id="http-allow-deny-by-cidr" label="Allow/Deny by IP or CIDR">
-This example shows how you might restrict sign up from a single IP address or a range of them using [PostgreSQL’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
+This example shows how you might restrict sign up from a single IP address or a range of them using [Postgres’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
 For instance: `123.123.123.123/32` represents only a single IP address, while `123.123.123.0/24` means all IP addresses starting with `123.123.123.`.
 
 The `before-user-created` hook solves this by:
@@ -727,7 +727,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js'
 
 const whSecret = Deno.env.get('BEFORE_USER_CREATED_HOOK_SECRET')?.replace('v1,whsec_', '')
 const supabaseUrl = Deno.env.get('SUPABASE_URL')
-const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+const supabaseKey = Deno.env.get('SUPABASE_SECRET_KEY')
 
 const wh = new Webhook(whSecret)
 const supabase = createClient(supabaseUrl, supabaseKey)

@@ -115,4 +115,115 @@ Some more text.
     const mdast = fromDocsMarkdown(markdown)
     await expect(partialsRemark()(mdast)).rejects.toThrowError(/valid JSON/)
   })
+
+  it('should error when required variable is missing', async () => {
+    const markdown = `
+# Embed partial
+
+<$Partial path="/_fixtures/variables.mdx" />
+
+Some more text.
+`.trim()
+
+    const mdast = fromDocsMarkdown(markdown)
+    await expect(partialsRemark()(mdast)).rejects.toThrowError(
+      /Missing required variable in \$Partial ".*variables\.mdx": "var"/
+    )
+  })
+
+  it('should error when unexpected variable is provided', async () => {
+    const markdown = `
+# Embed partial
+
+<$Partial path="/_fixtures/variables.mdx" variables={{ "var": "correct", "extra": "unexpected" }} />
+
+Some more text.
+`.trim()
+
+    const mdast = fromDocsMarkdown(markdown)
+    await expect(partialsRemark()(mdast)).rejects.toThrowError(
+      /Unexpected variable in \$Partial ".*variables\.mdx": "extra"/
+    )
+  })
+
+  it('should error with detailed message for multiple missing variables', async () => {
+    const markdown = `
+# Embed partial
+
+<$Partial path="/_fixtures/multiple-variables.mdx" variables={{ "var1": "value1" }} />
+
+Some more text.
+`.trim()
+
+    const mdast = fromDocsMarkdown(markdown)
+    await expect(partialsRemark()(mdast)).rejects.toThrowError(
+      /Missing required variables.*"var2".*"var3".*Expected variables.*"var1".*"var2".*"var3".*Provided variable: "var1"/s
+    )
+  })
+
+  it('should error with detailed message for multiple unexpected variables', async () => {
+    const markdown = `
+# Embed partial
+
+<$Partial path="/_fixtures/variables.mdx" variables={{ "var": "correct", "extra1": "wrong", "extra2": "also wrong" }} />
+
+Some more text.
+`.trim()
+
+    const mdast = fromDocsMarkdown(markdown)
+    await expect(partialsRemark()(mdast)).rejects.toThrowError(
+      /Unexpected variables.*"extra1".*"extra2".*Expected variable: "var".*Provided variables.*"var".*"extra1".*"extra2"/s
+    )
+  })
+
+  it('should succeed when all variables match exactly', async () => {
+    const markdown = `
+# Embed partial
+
+<$Partial path="/_fixtures/multiple-variables.mdx" variables={{ "var1": "first", "var2": "second", "var3": "third" }} />
+
+Some more text.
+`.trim()
+
+    const mdast = fromDocsMarkdown(markdown)
+    const transformed = await partialsRemark()(mdast)
+    const output = toMarkdown(transformed, { extensions: [mdxToMarkdown()] })
+
+    expect(output).toContain('first')
+    expect(output).toContain('second')
+    expect(output).toContain('third')
+  })
+
+  it('should support hyphenated variable names', async () => {
+    const markdown = `
+# Embed partial
+
+<$Partial path="/_fixtures/hyphenated-variables.mdx" variables={{ "my-var": "hyphenated value", "another_var": "underscored value", "myVar123": "alphanumeric value" }} />
+
+Some more text.
+`.trim()
+
+    const mdast = fromDocsMarkdown(markdown)
+    const transformed = await partialsRemark()(mdast)
+    const output = toMarkdown(transformed, { extensions: [mdxToMarkdown()] })
+
+    expect(output).toContain('hyphenated value')
+    expect(output).toContain('underscored value')
+    expect(output).toContain('alphanumeric value')
+  })
+
+  it('should error when hyphenated variable is missing', async () => {
+    const markdown = `
+# Embed partial
+
+<$Partial path="/_fixtures/hyphenated-variables.mdx" variables={{ "my-var": "value" }} />
+
+Some more text.
+`.trim()
+
+    const mdast = fromDocsMarkdown(markdown)
+    await expect(partialsRemark()(mdast)).rejects.toThrowError(
+      /Missing required variables.*"another_var".*"myVar123".*Expected variables.*"my-var".*"another_var".*"myVar123".*Provided variable: "my-var"/s
+    )
+  })
 })

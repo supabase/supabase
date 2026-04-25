@@ -1,20 +1,20 @@
 import { Editor } from '@monaco-editor/react'
 import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
+import { useParams } from 'common'
 import { Loader } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
+import { Button, cn, SidePanel } from 'ui'
 
-import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, SidePanel, cn } from 'ui'
-import ActionBar from '../ActionBar'
+import { ActionBar } from '../ActionBar'
 import { isValueTruncated } from './RowEditor.utils'
+import { Markdown } from '@/components/interfaces/Markdown'
+import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface TextEditorProps {
   visible: boolean
@@ -48,7 +48,7 @@ export const TextEditor = ({
   const value = row?.[column as keyof typeof row] as unknown as string
   const isTruncated = isValueTruncated(value)
 
-  const { mutate: getCellValue, isLoading, isSuccess, reset } = useGetCellValueMutation()
+  const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
 
   const loadFullValue = () => {
     if (
@@ -184,7 +184,7 @@ export const TextEditor = ({
                 performance issues
               </p>
             </div>
-            <Button type="default" loading={isLoading} onClick={loadFullValue}>
+            <Button type="default" loading={isPending} onClick={loadFullValue}>
               Load full text data
             </Button>
           </div>

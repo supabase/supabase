@@ -2,12 +2,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, getByText, render as originalRender, screen } from '@testing-library/react'
 import type React from 'react'
 import { useState } from 'react'
-
-// End of third-party imports
-
-import type { Project } from 'data/projects/project-detail-query'
-import type { Organization } from 'types'
 import { TooltipProvider } from 'ui'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
+
+import { ProjectInfoInfinite } from '@/data/projects/projects-infinite-query'
+import type { Organization } from '@/types'
 
 interface SelectorOptions {
   container?: HTMLElement
@@ -56,6 +55,7 @@ export const createMockOrganization = (details: Partial<Organization>): Organiza
     is_owner: true,
     billing_email: 'billing@example.com',
     billing_partner: null,
+    integration_source: null,
     usage_billing_enabled: false,
     stripe_customer_id: 'stripe-1',
     subscription_id: 'subscription-1',
@@ -64,13 +64,14 @@ export const createMockOrganization = (details: Partial<Organization>): Organiza
     restriction_status: null,
     restriction_data: null,
     organization_missing_address: false,
+    organization_missing_tax_id: false,
   }
 
   return Object.assign(base, details)
 }
 
-export const createMockProject = (details: Partial<Project>): Project => {
-  const base: Project = {
+export const createMockProject = (details: Partial<ProjectInfoInfinite>): ProjectInfoInfinite => {
+  const base: ProjectInfoInfinite = {
     id: 1,
     ref: 'abcdefghijklmnopqrst',
     name: 'Project 1',
@@ -80,10 +81,10 @@ export const createMockProject = (details: Partial<Project>): Project => {
     region: 'us-east-1',
     inserted_at: new Date().toISOString(),
     subscription_id: 'subscription-1',
-    db_host: 'db.supabase.co',
     is_branch_enabled: false,
     is_physical_backups_enabled: false,
-    restUrl: 'https://project-1.supabase.co',
+    organization_slug: 'slug',
+    preview_branch_refs: [],
   }
 
   return Object.assign(base, details)
@@ -102,18 +103,14 @@ const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) =
             retry: false,
           },
         },
-        logger: {
-          log: console.log,
-          warn: console.warn,
-          // ✅ no more errors on the console for tests
-          error: process.env.NODE_ENV === 'test' ? () => {} : console.error,
-        },
       })
   )
 
   return (
     <TooltipProvider>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <CommandProvider openKey="">{children}</CommandProvider>
+      </QueryClientProvider>
     </TooltipProvider>
   )
 }

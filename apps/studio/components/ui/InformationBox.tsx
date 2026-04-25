@@ -1,7 +1,6 @@
 import { ExternalLink, Maximize2, Minimize2 } from 'lucide-react'
 import Link from 'next/link'
 import { forwardRef, ReactNode, useState } from 'react'
-
 import { Button } from 'ui'
 
 interface InformationBoxProps {
@@ -16,6 +15,8 @@ interface InformationBoxProps {
   className?: string
   block?: boolean
 }
+
+/** @deprecated Use `Admonition` from 'ui-patterns' instead. */
 
 const InformationBox = forwardRef<HTMLDivElement, InformationBoxProps>(
   (

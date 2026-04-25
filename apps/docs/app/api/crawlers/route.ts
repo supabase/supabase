@@ -13,7 +13,7 @@ import {
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
 import { getRefMarkdown } from '~/features/docs/Reference.mdx'
-import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
+import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { BASE_PATH } from '~/lib/constants'
 
@@ -136,7 +136,7 @@ async function functionDetails(
   const fn = fns!.find((fn) => fn.id === section.id)
   if (!fn) return ''
 
-  let types: MethodTypes | undefined
+  let types: MethodTypes | VariableTypes | undefined
   if (libraryMeta.typeSpec && '$ref' in fn) {
     types = await getTypeSpec(fn['$ref'] as string)
   }
@@ -176,7 +176,7 @@ function mdxToHtml(markdown: string): string {
   return html
 }
 
-function parametersToHtml(fn: any, types: MethodTypes | undefined) {
+function parametersToHtml(fn: any, types: MethodTypes | VariableTypes | undefined) {
   let result = '<h2 id="parameters">Parameters</h2>'
 
   if ('overwriteParams' in fn || 'params' in fn) {
@@ -200,7 +200,7 @@ function parametersToHtml(fn: any, types: MethodTypes | undefined) {
     return result
   }
 
-  if (!types?.params || types.params.length === 0) return ''
+  if (!types || !('params' in types) || !types.params || types.params.length === 0) return ''
 
   result +=
     '<ul>' +

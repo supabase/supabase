@@ -2,10 +2,10 @@ import { useParams } from 'common'
 import { Lock } from 'lucide-react'
 import { toast } from 'sonner'
 import { Modal } from 'ui'
-
-import { useAuthorizedAppRevokeMutation } from 'data/oauth/authorized-app-revoke-mutation'
-import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
 import { Admonition } from 'ui-patterns'
+
+import { useAuthorizedAppRevokeMutation } from '@/data/oauth/authorized-app-revoke-mutation'
+import type { AuthorizedApp } from '@/data/oauth/authorized-apps-query'
 
 export interface RevokeAppModalProps {
   selectedApp?: AuthorizedApp
@@ -14,7 +14,7 @@ export interface RevokeAppModalProps {
 
 export const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
   const { slug } = useParams()
-  const { mutate: revokeAuthorizedApp, isLoading: isDeleting } = useAuthorizedAppRevokeMutation({
+  const { mutate: revokeAuthorizedApp, isPending: isDeleting } = useAuthorizedAppRevokeMutation({
     onSuccess: () => {
       toast.success(`Successfully revoked the app "${selectedApp?.name}"`)
       onClose()

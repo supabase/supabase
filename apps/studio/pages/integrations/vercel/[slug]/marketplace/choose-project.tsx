@@ -1,25 +1,25 @@
+import { useParams } from 'common'
 import { keyBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
-import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
-import { isVercelUrl } from 'components/interfaces/Integrations/Vercel/VercelIntegration.utils'
+import { ENV_VAR_RAW_KEYS } from '@/components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
+import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import ProjectLinker, {
   ForeignProject,
-} from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
-import { Markdown } from 'components/interfaces/Markdown'
-import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
-import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
-import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
-import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { BASE_PATH } from 'lib/constants'
-import { EMPTY_ARR } from 'lib/void'
-import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import type { NextPageWithLayout, Organization } from 'types'
+} from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
+import { Markdown } from '@/components/interfaces/Markdown'
+import VercelIntegrationWindowLayout from '@/components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
+import { ScaffoldColumn, ScaffoldContainer } from '@/components/layouts/Scaffold'
+import { vercelIcon } from '@/components/to-be-cleaned/ListIcons'
+import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
+import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integrations/integrations-vercel-connections-create-mutation'
+import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { BASE_PATH } from '@/lib/constants'
+import { EMPTY_ARR } from '@/lib/void'
+import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
+import type { NextPageWithLayout, Organization } from '@/types'
 
 const VERCEL_ICON = (
   <img src={`${BASE_PATH}/img/icons/vercel-icon.svg`} alt="Vercel Icon" className="w-4" />
@@ -46,7 +46,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       x.metadata?.configuration_id === configurationId
   )
 
-  const { data: vercelProjectsData, isLoading: isLoadingVercelProjectsData } =
+  const { data: vercelProjectsData, isPending: isLoadingVercelProjectsData } =
     useVercelProjectsQuery(
       {
         organization_integration_id: integration?.id,
@@ -77,7 +77,7 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const snapshot = useIntegrationInstallationSnapshot()
 
-  const { mutate: createConnections, isLoading: isCreatingConnection } =
+  const { mutate: createConnections, isPending: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
       onSuccess() {
         if (next && isVercelUrl(next)) {

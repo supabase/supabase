@@ -1,17 +1,15 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/compat/router'
-import { NextSeo } from 'next-seo'
-import { motion } from 'framer-motion'
-import { Search } from 'lucide-react'
-import { debounce } from 'lib/helpers'
-
-import { Button, Checkbox, cn, Input } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
-
 import { features } from '~/data/features'
+import { motion } from 'framer-motion'
+import { debounce } from 'lib/helpers'
+import { Search } from 'lucide-react'
+import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/compat/router'
+import Link from 'next/link'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Button, Checkbox_Shadcn_ as Checkbox, cn, Input } from 'ui'
 
 function FeaturesPage() {
   const router = useRouter()
@@ -19,21 +17,25 @@ function FeaturesPage() {
   const [selectedProducts, setSelectedProducts] = useState<string[]>(
     (router?.query.products as string)?.split(',') || []
   )
+  const [showSelfHostedOnly, setShowSelfHostedOnly] = useState<boolean>(
+    router?.query.selfHosted === 'true'
+  )
 
-  const HAS_ACTIVE_FILTERS = selectedProducts.length || searchTerm.length
+  const HAS_ACTIVE_FILTERS = selectedProducts.length || searchTerm.length || showSelfHostedOnly
 
   const products = Array.from(new Set(features.flatMap((feature) => feature.products)))
 
   // Debounced function to update URL params
   const updateQueryParamsDebounced = useCallback(
     debounce(() => updateQueryParams(), 300),
-    [searchTerm, selectedProducts]
+    [searchTerm, selectedProducts, showSelfHostedOnly]
   )
 
   const updateQueryParams = () => {
     const params = new URLSearchParams()
     if (searchTerm) params.set('q', searchTerm)
     if (selectedProducts.length > 0) params.set('products', selectedProducts.join(','))
+    if (showSelfHostedOnly) params.set('selfHosted', 'true')
 
     router?.replace({ pathname: '/features', query: params.toString() }, undefined, {
       shallow: true,
@@ -52,7 +54,9 @@ function FeaturesPage() {
     if (router?.query.products !== selectedProducts.join(',')) {
       setSelectedProducts((router?.query.products as string)?.split(',') || [])
     }
-  }, [router?.query.q, router?.query.products])
+    const selfHostedParam = router?.query.selfHosted === 'true'
+    if (selfHostedParam !== showSelfHostedOnly) setShowSelfHostedOnly(selfHostedParam)
+  }, [router?.query.q, router?.query.products, router?.query.selfHosted])
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +81,9 @@ function FeaturesPage() {
       selectedProducts.length === 0 ||
       feature.products.some((product) => selectedProducts.includes(product))
 
-    return matchesSearch && matchesProduct
+    const matchesSelfHosted = !showSelfHostedOnly || feature.status?.availableOnSelfHosted === true
+
+    return matchesSearch && matchesProduct && matchesSelfHosted
   })
 
   const meta = {
@@ -126,6 +132,22 @@ function FeaturesPage() {
                 onChange={handleSearchChange}
                 className="w-full [&_input]:text-base [&_input]:md:text-sm [&_input]:!leading-4"
               />
+              <div className="hidden md:flex flex-col gap-2.5">
+                <div className="flex items-center gap-2 text-foreground-light hover:text-foreground !cursor-pointer hover:!cursor-pointer transition-colors">
+                  <Checkbox
+                    id="self-hosted-filter"
+                    checked={showSelfHostedOnly}
+                    onCheckedChange={() => setShowSelfHostedOnly(!showSelfHostedOnly)}
+                    className="[&_input]:m-0"
+                  />
+                  <label
+                    htmlFor="self-hosted-filter"
+                    className="text-sm !leading-none flex-1 text-left"
+                  >
+                    Show only self-hosted features
+                  </label>
+                </div>
+              </div>
               <div className="hidden md:flex flex-col gap-4">
                 <h2 className="text-sm text-foreground-lighter">Filter by tags:</h2>
                 <div className="flex flex-col gap-2.5">
@@ -139,7 +161,7 @@ function FeaturesPage() {
                         <Checkbox
                           id={product}
                           checked={selectedProducts.includes(product)}
-                          onChange={() => handleProductChange(product)}
+                          onCheckedChange={() => handleProductChange(product)}
                           className="[&_input]:m-0"
                         />
                         <label
@@ -162,6 +184,7 @@ function FeaturesPage() {
                 onClick={() => {
                   setSelectedProducts([])
                   setSearchTerm('')
+                  setShowSelfHostedOnly(false)
                 }}
                 className={cn(
                   'opacity-0 transition-opacity hidden md:block',

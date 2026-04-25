@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
 import { MoreVertical } from 'lucide-react'
@@ -13,17 +14,7 @@ import {
   Marker,
   ZoomableGroup,
 } from 'react-simple-maps'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH } from 'lib/constants'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
@@ -34,8 +25,17 @@ import {
   DropdownMenuTrigger,
   ScrollArea,
 } from 'ui'
+
 import { AVAILABLE_REPLICA_REGIONS, REPLICA_STATUS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { Database, useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH } from '@/lib/constants'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 // [Joshen] Foresee that we'll skip this view for initial launch
 
@@ -276,7 +276,7 @@ const MapView = ({
                                 `(ID: ${formatDatabaseID(database.identifier)})`
                               }`}
                           {database.status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
-                            <Badge variant="brand">Healthy</Badge>
+                            <Badge variant="success">Healthy</Badge>
                           ) : database.status === REPLICA_STATUS.COMING_UP ? (
                             <Badge>Coming up</Badge>
                           ) : database.status === REPLICA_STATUS.RESTARTING ? (
@@ -315,7 +315,7 @@ const MapView = ({
                               disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
                             >
                               <Link
-                                href={`/project/${ref}/reports/database?db=${database.identifier}&chart=replication-lag`}
+                                href={`/project/${ref}/observability/database?db=${database.identifier}&chart=replication-lag`}
                               >
                                 View replication lag
                               </Link>

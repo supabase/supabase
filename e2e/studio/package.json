@@ -1,6 +1,7 @@
 {
   "name": "e2e-studio",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "e2e": "playwright test",
@@ -11,7 +12,15 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@playwright/test": "^1.52.0",
+    "@supabase/supabase-js": "catalog:",
+    "cross-fetch": "^4.1.0",
     "dotenv": "^16.5.0",
-    "@playwright/test": "^1.52.0"
+    "otpauth": "^9.4.1"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.9.0",
+    "api-types": "workspace:*",
+    "tsx": "catalog:"
   }
 }

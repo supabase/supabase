@@ -1,40 +1,43 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { PITRForm } from 'components/interfaces/Database/Backups/PITR/PITRForm'
-import { BackupsList } from 'components/interfaces/Database/Backups/RestoreToNewProject/BackupsList'
-import { ConfirmRestoreDialog } from 'components/interfaces/Database/Backups/RestoreToNewProject/ConfirmRestoreDialog'
-import { CreateNewProjectDialog } from 'components/interfaces/Database/Backups/RestoreToNewProject/CreateNewProjectDialog'
-import { projectSpecToMonthlyPrice } from 'components/interfaces/Database/Backups/RestoreToNewProject/RestoreToNewProject.utils'
-import { DiskType } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
-import { Markdown } from 'components/interfaces/Markdown'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import Panel from 'components/ui/Panel'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import { useCloneBackupsQuery } from 'data/projects/clone-query'
-import { useCloneStatusQuery } from 'data/projects/clone-status-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { PreviousRestoreItem } from './PreviousRestoreItem'
+import { PITRForm } from '@/components/interfaces/Database/Backups/PITR/PITRForm'
+import { BackupsList } from '@/components/interfaces/Database/Backups/RestoreToNewProject/BackupsList'
+import { ConfirmRestoreDialog } from '@/components/interfaces/Database/Backups/RestoreToNewProject/ConfirmRestoreDialog'
+import { CreateNewProjectDialog } from '@/components/interfaces/Database/Backups/RestoreToNewProject/CreateNewProjectDialog'
+import { projectSpecToMonthlyPrice } from '@/components/interfaces/Database/Backups/RestoreToNewProject/RestoreToNewProject.utils'
+import { DiskType } from '@/components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { Markdown } from '@/components/interfaces/Markdown'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import NoPermission from '@/components/ui/NoPermission'
+import Panel from '@/components/ui/Panel'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
+import { useCloneBackupsQuery } from '@/data/projects/clone-query'
+import { useCloneStatusQuery } from '@/data/projects/clone-status-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsK8sCloudProvider,
   useIsOrioleDb,
   useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
-import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
-import { getDatabaseMajorVersion } from 'lib/helpers'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
-import { Admonition } from 'ui-patterns'
-import { PreviousRestoreItem } from './PreviousRestoreItem'
+} from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
+import { getDatabaseMajorVersion } from '@/lib/helpers'
 
 export const RestoreToNewProject = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
-  const isFreePlan = organization?.plan?.id === 'free'
+  const { hasAccess: hasAccessToRestoreToNewProject, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('backup.restore_to_new_project')
   const isOrioleDb = useIsOrioleDb()
   const isAwsK8s = useIsAwsK8sCloudProvider()
 
@@ -47,9 +50,12 @@ export const RestoreToNewProject = () => {
   const {
     data: cloneBackups,
     error,
-    isLoading: cloneBackupsLoading,
+    isPending: cloneBackupsLoading,
     isError,
-  } = useCloneBackupsQuery({ projectRef: project?.ref }, { enabled: !isFreePlan })
+  } = useCloneBackupsQuery(
+    { projectRef: project?.ref },
+    { enabled: hasAccessToRestoreToNewProject }
+  )
 
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
@@ -74,7 +80,8 @@ export const RestoreToNewProject = () => {
   const {
     data: cloneStatus,
     refetch: refetchCloneStatus,
-    isLoading: cloneStatusLoading,
+    isPending: cloneStatusLoading,
+    isSuccess: isCloneStatusSuccess,
   } = useCloneStatusQuery(
     {
       projectRef: project?.ref,
@@ -82,37 +89,35 @@ export const RestoreToNewProject = () => {
     {
       refetchInterval,
       refetchOnWindowFocus: false,
-      onSuccess: (data) => {
-        const hasTransientState = data?.clones.some((c) => c.status === 'IN_PROGRESS')
-        if (!hasTransientState) setRefetchInterval(false)
-      },
       enabled: PHYSICAL_BACKUPS_ENABLED || PITR_ENABLED,
     }
   )
-  const IS_CLONED_PROJECT = cloneStatus?.cloned_from?.source_project?.ref ? true : false
   const isLoading = !isPermissionsLoaded || cloneBackupsLoading || cloneStatusLoading
+
+  useEffect(() => {
+    if (!isCloneStatusSuccess) return
+    const hasTransientState = cloneStatus.clones.some((c) => c.status === 'IN_PROGRESS')
+    if (!hasTransientState) {
+      setRefetchInterval(false)
+    }
+  }, [cloneStatus?.clones, isCloneStatusSuccess])
 
   const previousClones = cloneStatus?.clones
   const isRestoring = previousClones?.some((c) => c.status === 'IN_PROGRESS')
   const restoringClone = previousClones?.find((c) => c.status === 'IN_PROGRESS')
 
-  if (organization?.managed_by === 'vercel-marketplace') {
-    return (
-      <Admonition
-        type="default"
-        title="Restore to new project is not available for Vercel Marketplace organizations"
-        description="Restoring project backups to a new project created via Vercel Marketplace is not supported yet."
-      />
-    )
+  if (isLoadingEntitlement) {
+    return <GenericSkeletonLoader />
   }
 
-  if (isFreePlan) {
+  if (!hasAccessToRestoreToNewProject) {
     return (
       <UpgradeToPro
         buttonText="Upgrade"
         source="backupsRestoreToNewProject"
-        primaryText="Restore to a new project requires a pro plan or above."
-        secondaryText="To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled."
+        featureProposition="enable restoring to new project"
+        primaryText="Restore to a new project requires Pro Plan and above"
+        secondaryText="To restore to a new project, you need to upgrade to a Pro Plan and have physical backups enabled."
       />
     )
   }
@@ -165,19 +170,11 @@ export const RestoreToNewProject = () => {
     return (
       <Admonition
         type="default"
-        title="Restore to new project requires physical backups"
+        title="Physical backups are required"
         description={
           <>
-            Physical backups must be enabled to restore your database to a new project.
-            <br /> Find out more about how backups work at supabase{' '}
-            <Link
-              target="_blank"
-              className="underline"
-              href={`${DOCS_URL}/guides/platform/backups`}
-            >
-              in our docs
-            </Link>
-            .
+            Physical backups must be enabled to restore your database to a new project.{' '}
+            <InlineLink href={`${DOCS_URL}/guides/platform/backups`}>Learn more</InlineLink>
           </>
         }
       />
@@ -186,23 +183,6 @@ export const RestoreToNewProject = () => {
 
   if (isLoading) {
     return <GenericSkeletonLoader />
-  }
-
-  if (IS_CLONED_PROJECT) {
-    return (
-      <Admonition type="default" title="This project cannot be restored to a new project">
-        <Markdown
-          className="max-w-full [&>p]:!leading-normal"
-          content={`This is a temporary limitation whereby projects that were originally restored from another project cannot be restored to yet another project. 
-          If you need to restore from a restored project, please reach out via [support](/support/new?projectRef=${project?.ref}).`}
-        />
-        <Button asChild type="default">
-          <Link href={`/project/${cloneStatus?.cloned_from?.source_project?.ref || ''}`}>
-            Go to original project
-          </Link>
-        </Button>
-      </Admonition>
-    )
   }
 
   if (isError) {
@@ -268,6 +248,7 @@ export const RestoreToNewProject = () => {
         selectedBackupId={selectedBackupId}
         recoveryTimeTarget={recoveryTimeTarget}
         additionalMonthlySpend={additionalMonthlySpend}
+        hasAccess={hasAccessToRestoreToNewProject}
         onOpenChange={setShowNewProjectDialog}
         onCloneSuccess={() => {
           refetchCloneStatus()
@@ -296,7 +277,9 @@ export const RestoreToNewProject = () => {
         <div className="flex flex-col gap-2">
           <h3 className="text-sm font-medium">Previous restorations</h3>
           <Panel className="flex flex-col divide-y divide-border">
-            {previousClones?.map((c) => <PreviousRestoreItem key={c.inserted_at} clone={c} />)}
+            {previousClones?.map((c) => (
+              <PreviousRestoreItem key={c.inserted_at} clone={c} />
+            ))}
           </Panel>
         </div>
       ) : null}
@@ -319,6 +302,7 @@ export const RestoreToNewProject = () => {
       ) : (
         <BackupsList
           disabled={isRestoring}
+          hasAccess={hasAccessToRestoreToNewProject}
           onSelectRestore={(id) => {
             setSelectedBackupId(id)
             setShowConfirmationDialog(true)

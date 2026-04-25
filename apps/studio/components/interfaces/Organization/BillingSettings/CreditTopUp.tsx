@@ -4,22 +4,12 @@ import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult } from '@stripe/stripe-js'
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useDebounce } from '@uidotdev/usehooks'
 import { AlertCircle, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
-import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
-import { NO_PROJECT_MARKER } from 'components/interfaces/Support/SupportForm.utils'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useOrganizationCreditTopUpMutation } from 'data/organizations/organization-credit-top-up-mutation'
-import { subscriptionKeys } from 'data/subscriptions/keys'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -34,23 +24,39 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
 import type { PaymentMethodElementRef } from '../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import PaymentMethodSelection from './Subscription/PaymentMethodSelection'
+import { ChargeBreakdown } from '@/components/interfaces/Billing/ChargeBreakdown'
+import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
+import { PaymentConfirmation } from '@/components/interfaces/Billing/Payment/PaymentConfirmation'
+import { NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useOrganizationCreditTopUpMutation } from '@/data/organizations/organization-credit-top-up-mutation'
+import { useCreditTopUpPreview } from '@/data/organizations/organization-credit-top-up-preview'
+import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
+import { subscriptionKeys } from '@/data/subscriptions/keys'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 const FORM_ID = 'credit-top-up'
+const MIN_TOP_UP_AMOUNT = 300
+const MAX_TOP_UP_AMOUNT = 2000
 
 const FormSchema = z.object({
   amount: z.coerce
     .number()
-    .gte(100, 'Amount must be between $100 - $2000.')
-    .lte(2000, 'Amount must be between $100 - $2000.')
+    .gte(MIN_TOP_UP_AMOUNT, `Amount must be between $${MIN_TOP_UP_AMOUNT} - $${MAX_TOP_UP_AMOUNT}.`)
+    .lte(MAX_TOP_UP_AMOUNT, `Amount must be between $${MIN_TOP_UP_AMOUNT} - $${MAX_TOP_UP_AMOUNT}.`)
     .int('Amount must be a whole number.'),
   paymentMethod: z.string(),
 })
@@ -62,6 +68,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const queryClient = useQueryClient()
   const paymentMethodSelectionRef = useRef<{
     createPaymentMethod: PaymentMethodElementRef['createPaymentMethod']
+    validateBillingProfile: () => Promise<boolean>
   }>(null)
 
   const { can: canTopUpCredits, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
@@ -71,20 +78,67 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
   const {
     mutateAsync: topUpCredits,
-    isLoading: executingTopUp,
+    isPending: executingTopUp,
     error: errorInitiatingTopUp,
   } = useOrganizationCreditTopUpMutation({})
 
   const form = useForm<CreditTopUpForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      amount: 100,
+      amount: 300,
       paymentMethod: '',
     },
   })
 
   const [topUpModalVisible, setTopUpModalVisible] = useState(false)
+  const [useAsDefaultBillingAddress, setUseAsDefaultBillingAddress] = useState(true)
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
+
+  const [latestAddress, setLatestAddress] = useState<CustomerAddress>()
+  const [latestTaxId, setLatestTaxId] = useState<CustomerTaxId | null>()
+
+  const billingAddress = useAsDefaultBillingAddress ? latestAddress : undefined
+  const billingTaxId = useAsDefaultBillingAddress ? latestTaxId : null
+  const debouncedAddress = useDebounce(billingAddress, 1000)
+  const debouncedTaxId = useDebounce(billingTaxId, 1000)
+
+  const watchedAmount = form.watch('amount')
+  const debouncedAmount = useDebounce(watchedAmount, 1000)
+  const parsedAmount = Number(debouncedAmount)
+  const validAmount =
+    !Number.isNaN(parsedAmount) &&
+    Number.isInteger(parsedAmount) &&
+    parsedAmount >= MIN_TOP_UP_AMOUNT &&
+    parsedAmount <= MAX_TOP_UP_AMOUNT
+      ? parsedAmount
+      : undefined
+
+  const isPreviewStale =
+    watchedAmount !== debouncedAmount ||
+    billingAddress !== debouncedAddress ||
+    billingTaxId !== debouncedTaxId
+
+  const handleAddressChange = useCallback((address: CustomerAddress) => {
+    setLatestAddress(address)
+  }, [])
+
+  const handleTaxIdChange = useCallback((taxId: CustomerTaxId | null) => {
+    setLatestTaxId(taxId)
+  }, [])
+
+  const {
+    data: creditPreview,
+    isFetching: creditPreviewIsFetching,
+    isSuccess: creditPreviewInitialized,
+  } = useCreditTopUpPreview(
+    {
+      slug,
+      amount: validAmount,
+      address: debouncedAddress,
+      taxId: debouncedTaxId ?? undefined,
+    },
+    { enabled: topUpModalVisible && !!validAmount }
+  )
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
 
@@ -128,6 +182,9 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
     const token = await initHcaptcha()
 
+    const isValid = await paymentMethodSelectionRef.current?.validateBillingProfile()
+    if (!isValid) return
+
     const paymentMethodResult = await paymentMethodSelectionRef.current?.createPaymentMethod()
     if (!paymentMethodResult) {
       return
@@ -170,6 +227,8 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
       setCaptchaRef(null)
       setPaymentIntentConfirmation(undefined)
       setPaymentIntentSecret('')
+      setLatestAddress(undefined)
+      setLatestTaxId(null)
     }
   }
 
@@ -192,160 +251,182 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   }
 
   return (
-    <div className="flex items-center justify-end py-4 px-8">
-      <Dialog open={topUpModalVisible} onOpenChange={(open) => onTopUpDialogVisibilityChange(open)}>
-        <DialogTrigger asChild>
-          <ButtonTooltip
-            type="default"
-            className="pointer-events-auto"
-            disabled={!canTopUpCredits || !isPermissionsLoaded}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text:
-                  isPermissionsLoaded && !canTopUpCredits
-                    ? 'You need additional permissions to top up credits'
-                    : undefined,
-              },
-            }}
-          >
-            Top Up
-          </ButtonTooltip>
-        </DialogTrigger>
+    <Dialog open={topUpModalVisible} onOpenChange={(open) => onTopUpDialogVisibilityChange(open)}>
+      <DialogTrigger asChild>
+        <ButtonTooltip
+          type="default"
+          className="pointer-events-auto"
+          disabled={!canTopUpCredits || !isPermissionsLoaded}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text:
+                isPermissionsLoaded && !canTopUpCredits
+                  ? 'You need additional permissions to top up credits'
+                  : undefined,
+            },
+          }}
+        >
+          Top Up
+        </ButtonTooltip>
+      </DialogTrigger>
 
-        <DialogContent onInteractOutside={(e) => e.preventDefault()}>
-          <HCaptcha
-            ref={captchaRefCallback}
-            sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-            size="invisible"
-            onOpen={() => {
-              // [Joshen] This is to ensure that hCaptcha popup remains clickable
-              if (document !== undefined) document.body.classList.add('!pointer-events-auto')
-            }}
-            onClose={() => {
-              if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
-            }}
-            onVerify={(token) => {
-              setCaptchaToken(token)
-              if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
-            }}
-            onExpire={() => {
-              setCaptchaToken(null)
-            }}
-          />
-          <DialogHeader>
-            <DialogTitle>Top Up Credits</DialogTitle>
-            <DialogDescription className="space-y-2">
-              <p className="prose text-sm">
-                On successful payment, an invoice will be issued and you'll be granted credits.
-                Credits will be applied to future invoices only and are not refundable. The topped
-                up credits do not expire.
-              </p>
-              <p className="prose text-sm">
-                For larger discounted credit packages, please reach out to us via{' '}
-                <SupportLink
-                  queryParams={{
-                    orgSlug: slug,
-                    projectRef: NO_PROJECT_MARKER,
-                    subject: 'I would like to inquire about larger credit packages',
-                    category: SupportCategories.SALES_ENQUIRY,
-                  }}
-                >
-                  support
-                </SupportLink>
-                .
-              </p>
-            </DialogDescription>
-          </DialogHeader>
+      <DialogContent onInteractOutside={(e) => e.preventDefault()}>
+        <HCaptcha
+          ref={captchaRefCallback}
+          sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+          size="invisible"
+          onOpen={() => {
+            // [Joshen] This is to ensure that hCaptcha popup remains clickable
+            if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+          }}
+          onClose={() => {
+            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+          }}
+          onVerify={(token) => {
+            setCaptchaToken(token)
+            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+          }}
+          onExpire={() => {
+            setCaptchaToken(null)
+          }}
+        />
+        <DialogHeader>
+          <DialogTitle>Top Up Credits</DialogTitle>
+          <DialogDescription className="space-y-2">
+            <p className="prose text-sm">
+              On successful payment, an invoice will be issued and you'll be granted credits.
+              Credits will be applied to future invoices only and are not refundable. The topped up
+              credits do not expire.
+            </p>
+            <p className="prose text-sm">
+              For larger discounted credit packages, please reach out to us via{' '}
+              <SupportLink
+                queryParams={{
+                  orgSlug: slug,
+                  projectRef: NO_PROJECT_MARKER,
+                  subject: 'I would like to inquire about larger credit packages',
+                  category: SupportCategories.SALES_ENQUIRY,
+                }}
+              >
+                support
+              </SupportLink>
+              .
+            </p>
+          </DialogDescription>
+        </DialogHeader>
 
-          <DialogSectionSeparator />
+        <DialogSectionSeparator />
 
-          <Form_Shadcn_ {...form}>
-            <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-              <DialogSection className="flex flex-col gap-2">
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="amount"
-                  render={({ field }) => (
-                    <FormItemLayout label="Amount (USD)" className="gap-1">
-                      <Input_Shadcn_ {...field} type="number" placeholder="100" />
-                    </FormItemLayout>
-                  )}
-                />
-
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="paymentMethod"
-                  render={() => (
-                    <PaymentMethodSelection
-                      ref={paymentMethodSelectionRef}
-                      onSelectPaymentMethod={(pm) => form.setValue('paymentMethod', pm)}
-                      selectedPaymentMethod={form.getValues('paymentMethod')}
-                      readOnly={executingTopUp || paymentConfirmationLoading}
-                    />
-                  )}
-                />
-
-                {paymentIntentConfirmation && paymentIntentConfirmation.error && (
-                  <Alert_Shadcn_ variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle_Shadcn_>Error confirming payment</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      {paymentIntentConfirmation.error.message}
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
+        <Form {...form}>
+          <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogSection className="flex flex-col gap-2">
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItemLayout label="Amount (USD)" className="gap-1">
+                    <Input_Shadcn_ {...field} type="number" placeholder="300" />
+                  </FormItemLayout>
                 )}
-
-                {paymentIntentConfirmation?.paymentIntent &&
-                  paymentIntentConfirmation.paymentIntent.status === 'processing' && (
-                    <Alert_Shadcn_ variant="default">
-                      <Info className="h-4 w-4" />
-                      <AlertTitle_Shadcn_>Payment processing</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        Your payment is processing and we are waiting for a confirmation from your
-                        card issuer. If the payment goes through you'll automatically be credited.
-                        Please check back later.
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
-
-                {errorInitiatingTopUp && (
-                  <Alert_Shadcn_ variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle_Shadcn_>Error topping up balance</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      {errorInitiatingTopUp.message}
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
-              </DialogSection>
-
-              {!paymentIntentConfirmation?.paymentIntent && (
-                <DialogFooter>
-                  <Button
-                    htmlType="submit"
-                    type="primary"
-                    loading={executingTopUp || paymentConfirmationLoading}
-                  >
-                    Top Up
-                  </Button>
-                </DialogFooter>
-              )}
-            </form>
-          </Form_Shadcn_>
-          {stripePromise && paymentIntentSecret && (
-            <Elements stripe={stripePromise} options={options}>
-              <PaymentConfirmation
-                paymentIntentSecret={paymentIntentSecret}
-                onPaymentIntentConfirm={(paymentIntentConfirmation) =>
-                  paymentIntentConfirmed(paymentIntentConfirmation)
-                }
-                onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
               />
-            </Elements>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
+
+              <FormField
+                control={form.control}
+                name="paymentMethod"
+                render={() => (
+                  <PaymentMethodSelection
+                    ref={paymentMethodSelectionRef}
+                    onSelectPaymentMethod={(pm) => form.setValue('paymentMethod', pm)}
+                    selectedPaymentMethod={form.getValues('paymentMethod')}
+                    readOnly={executingTopUp || paymentConfirmationLoading}
+                    useAsDefaultBillingAddress={useAsDefaultBillingAddress}
+                    onUseAsDefaultBillingAddressChange={setUseAsDefaultBillingAddress}
+                    onAddressChange={handleAddressChange}
+                    onTaxIdChange={handleTaxIdChange}
+                  />
+                )}
+              />
+
+              {paymentIntentConfirmation && paymentIntentConfirmation.error && (
+                <Alert_Shadcn_ variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle_Shadcn_>Error confirming payment</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    {paymentIntentConfirmation.error.message}
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
+
+              {paymentIntentConfirmation?.paymentIntent &&
+                paymentIntentConfirmation.paymentIntent.status === 'processing' && (
+                  <Alert_Shadcn_ variant="default">
+                    <Info className="h-4 w-4" />
+                    <AlertTitle_Shadcn_>Payment processing</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      Your payment is processing and we are waiting for a confirmation from your
+                      card issuer. If the payment goes through you'll automatically be credited.
+                      Please check back later.
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
+
+              {errorInitiatingTopUp && (
+                <Alert_Shadcn_ variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle_Shadcn_>Error topping up balance</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    {errorInitiatingTopUp.message}
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
+
+              {creditPreviewInitialized && !!validAmount && (
+                <div className="mt-4">
+                  <ChargeBreakdown
+                    subtotal={creditPreview.amount}
+                    total={creditPreview.total}
+                    tax={
+                      creditPreview.tax
+                        ? {
+                            amount: creditPreview.tax.tax_amount,
+                            percentage: creditPreview.tax.tax_rate_percentage,
+                          }
+                        : undefined
+                    }
+                    taxStatus={creditPreview.tax_status}
+                    isFetching={creditPreviewIsFetching}
+                  />
+                </div>
+              )}
+            </DialogSection>
+
+            {!paymentIntentConfirmation?.paymentIntent && (
+              <DialogFooter>
+                <Button
+                  htmlType="submit"
+                  type="primary"
+                  loading={executingTopUp || paymentConfirmationLoading}
+                  disabled={isPreviewStale || creditPreviewIsFetching}
+                >
+                  Top Up
+                </Button>
+              </DialogFooter>
+            )}
+          </form>
+        </Form>
+        {stripePromise && paymentIntentSecret && (
+          <Elements stripe={stripePromise} options={options}>
+            <PaymentConfirmation
+              paymentIntentSecret={paymentIntentSecret}
+              onPaymentIntentConfirm={(paymentIntentConfirmation) =>
+                paymentIntentConfirmed(paymentIntentConfirmation)
+              }
+              onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
+            />
+          </Elements>
+        )}
+      </DialogContent>
+    </Dialog>
   )
 }

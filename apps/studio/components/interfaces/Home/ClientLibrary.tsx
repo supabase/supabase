@@ -1,7 +1,7 @@
 import { BookOpen, Github } from 'lucide-react'
-
-import { BASE_PATH } from 'lib/constants'
 import { Badge, Button } from 'ui'
+
+import { BASE_PATH } from '@/lib/constants'
 
 interface ClientLibraryProps {
   language: string
@@ -39,7 +39,7 @@ export const ClientLibrary = ({
             className="block md:hidden"
           />
           <h5 className="flex items-center gap-2 text-base text-foreground">
-            {language} {!officialSupport && <Badge variant="brand">Community</Badge>}
+            {language} {!officialSupport && <Badge variant="success">Community</Badge>}
           </h5>
         </div>
         <div className="flex gap-2">

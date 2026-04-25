@@ -1,8 +1,10 @@
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import { UseCustomQueryOptions } from 'types'
+import { useEffect } from 'react'
+
 import { configKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type JwtSecretUpdatingStatusVariables = {
   projectRef?: string
@@ -43,7 +45,7 @@ export async function getJwtSecretUpdatingStatus(
 }
 
 export type JwtSecretUpdatingStatusData = Awaited<ReturnType<typeof getJwtSecretUpdatingStatus>>
-export type JwtSecretUpdatingStatusError = unknown
+export type JwtSecretUpdatingStatusError = ResponseError
 
 export const useJwtSecretUpdatingStatusQuery = <TData = JwtSecretUpdatingStatusData>(
   { projectRef }: JwtSecretUpdatingStatusVariables,
@@ -54,24 +56,30 @@ export const useJwtSecretUpdatingStatusQuery = <TData = JwtSecretUpdatingStatusD
 ) => {
   const client = useQueryClient()
 
-  return useQuery<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData>({
+  const query = useQuery({
     queryKey: configKeys.jwtSecretUpdatingStatus(projectRef),
     queryFn: ({ signal }) => getJwtSecretUpdatingStatus({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
-    refetchInterval(data) {
+    refetchInterval: (query) => {
+      const data = query.state.data
       if (!data) {
         return false
       }
 
-      const { jwtSecretUpdateStatus } = data as unknown as JwtSecretUpdatingStatusResponse
+      const { jwtSecretUpdateStatus } = data
 
       const interval = jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating ? 1000 : false
 
       return interval
     },
-    onSuccess() {
-      client.invalidateQueries(configKeys.postgrest(projectRef))
-    },
+
     ...options,
   })
+
+  useEffect(() => {
+    if (!query.isSuccess) return
+    client.invalidateQueries({ queryKey: configKeys.postgrest(projectRef) })
+  }, [query.isSuccess, projectRef, client])
+
+  return query
 }

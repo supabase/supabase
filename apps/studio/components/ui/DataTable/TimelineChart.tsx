@@ -2,8 +2,8 @@ import { format } from 'date-fns'
 import { useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, ReferenceArea, XAxis } from 'recharts'
 import type { CategoricalChartFunc } from 'recharts/types/chart/generateCategoricalChart'
-
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
+
 import { useDataTable } from './providers/DataTableProvider'
 
 export type BaseChartSchema = { timestamp: number; [key: string]: number }
@@ -65,7 +65,7 @@ export function TimelineChart<TChart extends BaseChartSchema>({
     }
   }
 
-  const handleMouseUp: CategoricalChartFunc = (e) => {
+  const handleMouseUp: CategoricalChartFunc = () => {
     if (refAreaLeft && refAreaRight) {
       const [left, right] = [refAreaLeft, refAreaRight].sort(
         (a, b) => new Date(a).getTime() - new Date(b).getTime()

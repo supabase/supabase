@@ -1,37 +1,38 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
+import { useParams } from 'common'
 import { useTheme } from 'next-themes'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
-import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import type { AddonVariantId } from 'data/subscriptions/types'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { formatCurrency } from 'lib/helpers'
-import { useAddonsPagePanel } from 'state/addons-page'
 import {
-  Alert,
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
-  CriticalIcon,
-  Radio,
-  SidePanel,
   cn,
+  CriticalIcon,
+  RadioGroupCard,
+  RadioGroupCardItem,
+  SidePanel,
 } from 'ui'
+
+import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useProjectAddonRemoveMutation } from '@/data/subscriptions/project-addon-remove-mutation'
+import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addon-update-mutation'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import type { AddonVariantId } from '@/data/subscriptions/types'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { formatCurrency } from '@/lib/helpers'
+import { useAddonsPagePanel } from '@/state/addons-page'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -73,11 +74,11 @@ const PITRSidePanel = () => {
   const { panel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'pitr'
 
-  const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
+  const { data: addons, isPending: isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
-  const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
+  const { mutate: updateAddon, isPending: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully updated point in time recovery duration`)
       closePanel()
@@ -86,7 +87,7 @@ const PITRSidePanel = () => {
       toast.error(`Unable to update PITR: ${error.message}`)
     },
   })
-  const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
+  const { mutate: removeAddon, isPending: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled point in time recovery`)
       closePanel()
@@ -105,7 +106,7 @@ const PITRSidePanel = () => {
   const availableOptions = availableAddons.find((addon) => addon.type === 'pitr')?.variants ?? []
 
   const hasChanges = selectedOption !== (subscriptionPitr?.variant.identifier ?? 'pitr_0')
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const { hasAccess: hasAccessToPitrVariants } = useCheckEntitlements('pitr.available_variants')
   const selectedPitr = availableOptions.find((option) => option.identifier === selectedOption)
   const hasSufficientCompute =
     !!subscriptionCompute && subscriptionCompute.variant.identifier !== 'ci_micro'
@@ -147,7 +148,7 @@ const PITRSidePanel = () => {
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
       disabled={
-        isFreePlan ||
+        !hasAccessToPitrVariants ||
         isLoading ||
         !hasChanges ||
         isSubmitting ||
@@ -158,24 +159,16 @@ const PITRSidePanel = () => {
       tooltip={
         blockDowngradeDueToHipaa
           ? 'Unable to disable PITR with HIPAA add-on'
-          : isFreePlan
-            ? 'Unable to enable point in time recovery on a Free Plan'
+          : !hasAccessToPitrVariants
+            ? 'Unable to enable point in time recovery on your Plan'
             : !canUpdatePitr
               ? 'You do not have permission to update PITR'
               : undefined
       }
       header={
-        <div className="flex items-center justify-between">
+        <div className="flex w-full items-center justify-between">
           <h4>Point in Time Recovery</h4>
-          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-            <Link
-              href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              About point in time recovery
-            </Link>
-          </Button>
+          <DocsButton href={`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`} />
         </div>
       }
     >
@@ -194,7 +187,10 @@ const PITRSidePanel = () => {
                 return (
                   <div
                     key={option.id}
-                    className={cn('col-span-3 group space-y-1', isFreePlan && 'opacity-75')}
+                    className={cn(
+                      'col-span-3 group space-y-1',
+                      !hasAccessToPitrVariants && 'opacity-75'
+                    )}
                     onClick={() => {
                       setSelectedCategory(option.id)
                       if (option.id === 'off') {
@@ -267,78 +263,69 @@ const PITRSidePanel = () => {
 
           {selectedCategory === 'on' && (
             <div className="!mt-8 pb-4">
-              {isFreePlan ? (
-                <Alert
-                  withIcon
-                  variant="info"
+              {!hasAccessToPitrVariants ? (
+                <UpgradeToPro
                   className="mb-4"
-                  title="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
-                  actions={<UpgradePlanButton source="pitrSidePanel" plan="Pro" />}
-                >
-                  Upgrade your plan to change PITR for your project
-                </Alert>
+                  addon="pitr"
+                  primaryText="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
+                  secondaryText="Upgrade your plan to change PITR for your project."
+                  featureProposition="enable PITR"
+                />
               ) : !hasSufficientCompute ? (
-                <Alert
-                  withIcon
-                  variant="warning"
+                <UpgradeToPro
                   className="mb-4"
-                  title="Your project is required to minimally be on a Small compute size to enable PITR"
-                  actions={[
-                    <Button asChild key="change-compute" type="default">
-                      <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
-                        Change compute size
-                      </Link>
-                    </Button>,
-                  ]}
-                >
-                  This is to ensure that your project has enough resources to execute PITR
-                  successfully
-                </Alert>
+                  addon="computeSize"
+                  primaryText="Project needs to be at least on a Small compute size to enable PITR"
+                  secondaryText="This ensures enough resources to execute PITR successfully."
+                  featureProposition="enable PITR"
+                />
               ) : null}
 
-              <Radio.Group
-                type="large-cards"
-                size="tiny"
+              <label className="block text-sm text-foreground-light mb-4" htmlFor="pitr">
+                Choose the duration of recovery
+              </label>
+              <RadioGroupCard
                 id="pitr"
-                label={<p className="text-sm">Choose the duration of recovery</p>}
-                onChange={(event: any) => setSelectedOption(event.target.value)}
+                className="flex flex-wrap gap-3"
+                value={selectedOption}
+                onValueChange={(value) => setSelectedOption(value)}
+                disabled={!hasAccessToPitrVariants || subscriptionCompute === undefined}
               >
                 {availableOptions.map((option) => (
-                  <Radio
-                    name="pitr"
-                    disabled={isFreePlan || subscriptionCompute === undefined}
-                    className="col-span-4 !p-0"
+                  <RadioGroupCardItem
                     key={option.identifier}
-                    checked={selectedOption === option.identifier}
-                    label={<span className="text-sm">{option.name}</span>}
                     value={option.identifier}
-                  >
-                    <div className="w-full group">
-                      <div className="border-b border-default px-4 py-2">
-                        <p className="text-sm">{option.name}</p>
-                      </div>
-                      <div className="px-4 py-2">
-                        <p className="text-foreground-light">
-                          Allow database restorations to any time up to{' '}
-                          {option.identifier.split('_')[1]} days ago
-                        </p>
-                        <div className="flex items-center space-x-1 mt-2">
-                          <p className="text-foreground text-sm" translate="no">
-                            {formatCurrency(option.price)}
+                    id={option.identifier}
+                    label={
+                      <div className="w-full group">
+                        <div className="border-b border-default px-4 py-2">
+                          <p className="text-sm">{option.name}</p>
+                        </div>
+                        <div className="px-4 py-2">
+                          <p className="text-foreground-light">
+                            Allow database restorations to any time up to{' '}
+                            {option.identifier.split('_')[1]} days ago
                           </p>
-                          <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                          <div className="flex items-center space-x-1 mt-2">
+                            <p className="text-foreground text-sm" translate="no">
+                              {formatCurrency(option.price)}
+                            </p>
+                            <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Radio>
+                    }
+                    showIndicator={false}
+                  />
                 ))}
-              </Radio.Group>
+              </RadioGroupCard>
+              <TaxDisclaimer className="mt-3" />
             </div>
           )}
 
           {hasChanges && selectedOption !== 'pitr_0' && (
             <p className="text-sm text-foreground-light">
-              There are no immediate charges. The addon is billed at the end of your billing cycle
+              There are no immediate charges. The add-on is billed at the end of your billing cycle
               based on your usage and prorated to the hour.
             </p>
           )}

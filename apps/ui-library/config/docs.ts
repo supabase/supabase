@@ -1,4 +1,4 @@
-import { SidebarNavGroup } from 'types/nav'
+import { SidebarNavGroup } from '@/types/nav'
 
 export const gettingStarted: SidebarNavGroup = {
   title: 'Getting Started',
@@ -25,13 +25,14 @@ export const gettingStarted: SidebarNavGroup = {
 }
 
 export const aiEditorsRules: SidebarNavGroup = {
-  title: 'AI Editors Rules',
+  title: 'AI Skills',
   items: [
     {
-      title: 'Prompts',
-      href: '/docs/ai-editors-rules/prompts',
+      title: 'Skills',
+      href: '/docs/ai-editors-rules/skills',
       items: [],
-      commandItemLabel: 'AI Editors Rules',
+      new: true,
+      commandItemLabel: 'AI Skills',
     },
   ],
 }
@@ -61,14 +62,14 @@ export const componentPages: SidebarNavGroup = {
     },
     {
       title: 'Password-Based Auth',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/password-based-auth',
       items: [],
       commandItemLabel: 'Password-Based Auth',
     },
     {
       title: 'Social Auth',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/social-auth',
       items: [],
       new: true,
@@ -76,28 +77,35 @@ export const componentPages: SidebarNavGroup = {
     },
     {
       title: 'Dropzone',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/dropzone',
       items: [],
       commandItemLabel: 'Dropzone (File Upload)',
     },
     {
       title: 'Realtime Cursor',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/realtime-cursor',
       items: [],
       commandItemLabel: 'Realtime Cursor',
     },
     {
-      title: 'Current User Avatar',
+      title: 'Realtime Monaco',
       supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/realtime-monaco',
+      items: [],
+      commandItemLabel: 'Realtime Monaco',
+    },
+    {
+      title: 'Current User Avatar',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/current-user-avatar',
       items: [],
       commandItemLabel: 'Current User Avatar',
     },
     {
       title: 'Realtime Avatar Stack',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/realtime-avatar-stack',
       items: [],
       commandItemLabel: 'Realtime Avatar Stack',

@@ -88,6 +88,8 @@ alter role authenticator set pgrst.db_pre_request to 'filter_plan_requests';
 notify pgrst, 'reload config';
 ```
 
+<$Partial path="db_pre_request_warning.mdx" />
+
 Replace `'123.123.123.123'` with your actual IP address.
 
 ## Disabling explain

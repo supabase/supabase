@@ -1,25 +1,25 @@
+import { debounce } from 'lodash'
+import { Check, Code, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
 
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { debounce } from 'lodash'
-import { Check, Code, Loader } from 'lucide-react'
+import { useEntityTypesQuery } from '@/data/entity-types/entity-types-infinite-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface TableSelectorProps {
   className?: string
@@ -43,7 +43,14 @@ const TableSelector = ({
   const { data: project } = useSelectedProjectQuery()
   const [searchInput, setSearchInput] = useState('')
 
-  const { data, isLoading, isSuccess, isError, error, refetch } = useEntityTypesQuery({
+  const {
+    data,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    error,
+    refetch,
+  } = useEntityTypesQuery({
     projectRef: project?.ref,
     search: searchInput,
     connectionString: project?.connectionString,
@@ -125,7 +132,9 @@ const TableSelector = ({
                 <>
                   <CommandGroup_Shadcn_ forceMount>
                     <ScrollArea className={(entities || []).length > 7 ? 'h-[210px]' : ''}>
-                      <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
+                      {entities.length === 0 && (
+                        <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
+                      )}
                       {!searchInput && (
                         <CommandItem_Shadcn_
                           key="all-tables"

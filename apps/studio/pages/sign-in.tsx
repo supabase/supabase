@@ -2,18 +2,18 @@ import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-
-import { LastSignInWrapper } from 'components/interfaces/SignIn/LastSignInWrapper'
-import { SignInForm } from 'components/interfaces/SignIn/SignInForm'
-import { SignInWithCustom } from 'components/interfaces/SignIn/SignInWithCustom'
-import { SignInWithGitHub } from 'components/interfaces/SignIn/SignInWithGitHub'
-import { AuthenticationLayout } from 'components/layouts/AuthenticationLayout'
-import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
+
+import { LastSignInWrapper } from '@/components/interfaces/SignIn/LastSignInWrapper'
+import { SignInForm } from '@/components/interfaces/SignIn/SignInForm'
+import { SignInWithCustom } from '@/components/interfaces/SignIn/SignInWithCustom'
+import { SignInWithGitHub } from '@/components/interfaces/SignIn/SignInWithGitHub'
+import { AuthenticationLayout } from '@/components/layouts/AuthenticationLayout'
+import SignInLayout from '@/components/layouts/SignInLayout/SignInLayout'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -86,7 +86,7 @@ const SignInPage: NextPageWithLayout = () => {
       {signUpEnabled && (
         <div className="self-center my-8 text-sm">
           <div>
-            <span className="text-foreground-light">Don't have an account?</span>{' '}
+            <span className="text-foreground-light">Don’t have an account?</span>{' '}
             <Link
               href={{
                 pathname: '/sign-up',
@@ -94,7 +94,7 @@ const SignInPage: NextPageWithLayout = () => {
               }}
               className="underline transition text-foreground hover:text-foreground-light"
             >
-              Sign Up Now
+              Sign up
             </Link>
           </div>
         </div>

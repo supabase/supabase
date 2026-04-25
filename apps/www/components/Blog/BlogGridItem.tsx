@@ -1,10 +1,15 @@
-import authors from 'lib/authors.json'
+import dayjs from 'dayjs'
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
-import type Author from '~/types/author'
-import type PostTypes from '~/types/post'
-import dayjs from 'dayjs'
+
+import authors from '@/lib/authors.json'
+import {
+  BLOG_GRID_IMAGE_SIZES,
+  BLOG_PLACEHOLDER_IMAGE,
+  getBlogThumbnailImage,
+} from '@/lib/blog-images'
+import type Author from '@/types/author'
+import type PostTypes from '@/types/post'
 
 interface Props {
   post: PostTypes
@@ -24,30 +29,20 @@ const BlogGridItem = ({ post }: Props) => {
     }
   }
 
-  const imageUrl = post.isCMS
-    ? post.thumb
-      ? post.thumb
-      : post.image
-        ? post.image
-        : '/images/blog/blog-placeholder.png'
-    : post.thumb
-      ? `/images/blog/${post.thumb}`
-      : post.image
-        ? `/images/blog/${post.image}`
-        : '/images/blog/blog-placeholder.png'
+  const imageUrl = getBlogThumbnailImage(post) ?? BLOG_PLACEHOLDER_IMAGE
 
   return (
     <Link
       href={post.path}
+      prefetch={false}
       className="group inline-block min-w-full p-2 sm:p-4 h-full border border-transparent transition-all hover:bg-surface-200 dark:hover:bg-surface-75 rounded-xl"
     >
       <div className="flex flex-col space-y-2">
         <div className="flex flex-col space-y-1">
-          <div className="border-default relative mb-3 w-full aspect-[2/1] lg:aspect-[5/3] overflow-hidden rounded-lg border shadow-sm">
+          <div className="border-default relative mb-3 w-full aspect-[1.91/1] overflow-hidden rounded-lg border shadow-sm">
             <Image
               fill
-              sizes="100%"
-              quality={100}
+              sizes={BLOG_GRID_IMAGE_SIZES}
               src={imageUrl}
               className="scale-100 object-cover overflow-hidden"
               alt={`${post.title} thumbnail`}
@@ -59,7 +54,7 @@ const BlogGridItem = ({ post }: Props) => {
               <p>{dayjs(post.date).format('D MMM YYYY')}</p>
               {post.readingTime && (
                 <>
-                  <p>•</p>
+                  <p>·</p>
                   <p>{post.readingTime}</p>
                 </>
               )}

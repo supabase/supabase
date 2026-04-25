@@ -1,11 +1,13 @@
 import { useParams } from 'common'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useRouter } from 'next/compat/router'
+import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
+import type { NextPageWithLayout } from '@/types'
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -19,17 +21,19 @@ const IntegrationPage: NextPageWithLayout = () => {
   }, [router, ref, id])
 
   return (
-    <ScaffoldContainer size="full">
-      <ScaffoldSection isFullWidth>
-        <GenericSkeletonLoader />
-      </ScaffoldSection>
-    </ScaffoldContainer>
+    <PageContainer size="full">
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
+    </PageContainer>
   )
 }
 
 IntegrationPage.getLayout = (page) => (
   <DefaultLayout>
-    <IntegrationsLayout>{page}</IntegrationsLayout>
+    <ProjectIntegrationsLayout>{page}</ProjectIntegrationsLayout>
   </DefaultLayout>
 )
 

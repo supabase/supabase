@@ -1,48 +1,50 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { groupBy, isEqual, isNull } from 'lodash'
-import { ArrowRight, Plus, RefreshCw, Save } from 'lucide-react'
+import { Plus, RefreshCw, Save } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { DragEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { DateRangePicker } from 'components/ui/DateRangePicker'
-import NoPermission from 'components/ui/NoPermission'
-import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
-import { AnalyticsInterval } from 'data/analytics/constants'
-import { analyticsKeys } from 'data/analytics/keys'
-import { useContentQuery } from 'data/content/content-query'
-import {
-  UpsertContentPayload,
-  useContentUpsertMutation,
-} from 'data/content/content-upsert-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import type { Dashboards } from 'types'
 import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, LogoLoader } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { GridResize } from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
+import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { DateRangePicker } from '@/components/ui/DateRangePicker'
+import NoPermission from '@/components/ui/NoPermission'
+import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import { analyticsKeys } from '@/data/analytics/keys'
+import { useContentQuery } from '@/data/content/content-query'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from '@/data/content/content-upsert-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
+import { Metric, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
+import { uuidv4 } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import type { Dashboards } from '@/types'
 
 const DEFAULT_CHART_COLUMN_COUNT = 1
 const DEFAULT_CHART_ROW_COUNT = 1
 
 const Reports = () => {
   const router = useRouter()
-  const { id, ref } = useParams()
+  const { id: reportId, ref } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
@@ -56,18 +58,15 @@ const Reports = () => {
   const [hasEdits, setHasEdits] = useState<boolean>(false)
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
 
-  const [navigateUrl, setNavigateUrl] = useState<string>()
-  const [confirmNavigate, setConfirmNavigate] = useState(false)
-
   const {
     data: userContents,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
   } = useContentQuery({
     projectRef: ref,
     type: 'report',
   })
-  const { mutate: upsertContent, isLoading: isSaving } = useContentUpsertMutation({
+  const { mutate: upsertContent, isPending: isSaving } = useContentUpsertMutation({
     onSuccess: (_, vars) => {
       setHasEdits(false)
       if (vars.payload.type === 'report') toast.success('Successfully saved report!')
@@ -78,7 +77,7 @@ const Reports = () => {
   })
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const currentReport = userContents?.content.find((report) => report.id === id)
+  const currentReport = userContents?.content.find((report) => report.id === reportId)
   const currentReportContent = currentReport?.content as Dashboards.Content
 
   const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -311,16 +310,22 @@ const Reports = () => {
     if (!label || !sql) return console.error('SQL and Label required')
 
     const toastId = toast.loading(`Creating new query: ${label}`)
-    const id = uuidv4()
+
+    const payload = createSqlSnippetSkeletonV2({
+      name: label,
+      sql,
+      owner_id: profile?.id,
+      project_id: project?.id,
+    }) as UpsertContentPayload
 
     const updatedLayout = [...config.layout]
     updatedLayout.push({
-      id,
+      id: payload.id,
       label,
       x: 0,
       y: 0,
       chart_type: 'bar',
-      attribute: `new_snippet_${id}` as Dashboards.ChartType,
+      attribute: `new_snippet_${payload.id}` as Dashboards.ChartType,
       w: DEFAULT_CHART_COLUMN_COUNT,
       h: DEFAULT_CHART_ROW_COUNT,
       chartConfig: { ...DEFAULT_CHART_CONFIG, ...(sqlConfig ?? {}) },
@@ -329,22 +334,14 @@ const Reports = () => {
 
     setConfig({ ...config, layout: [...updatedLayout] })
 
-    const payload = createSqlSnippetSkeletonV2({
-      id,
-      name: label,
-      sql,
-      owner_id: profile?.id,
-      project_id: project?.id,
-    }) as UpsertContentPayload
-
     upsertContent(
       { projectRef: ref, payload },
       {
         onSuccess: () => {
           toast.success(`Successfully created new query: ${label}`, { id: toastId })
           const finalLayout = updatedLayout.map((x) => {
-            if (x.id === id) {
-              return { ...x, attribute: `snippet_${id}` as Dashboards.ChartType }
+            if (x.id === payload.id) {
+              return { ...x, attribute: `snippet_${payload.id}` as Dashboards.ChartType }
             } else return x
           })
           setConfig({ ...config, layout: finalLayout })
@@ -364,31 +361,6 @@ const Reports = () => {
   useEffect(() => {
     checkEditState()
   }, [config])
-
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasEdits) {
-        e.preventDefault()
-        e.returnValue = '' // deprecated, but older browsers still require this
-      }
-    }
-
-    const handleBrowseAway = (url: string) => {
-      if (hasEdits && !confirmNavigate) {
-        setNavigateUrl(url)
-        throw 'Route change declined' // Just to prevent the route change
-      } else {
-        setNavigateUrl(undefined)
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    router.events.on('routeChangeStart', handleBrowseAway)
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-      router.events.off('routeChangeStart', handleBrowseAway)
-    }
-  }, [hasEdits, confirmNavigate, router])
 
   if (isLoading || isLoadingPermissions) {
     return <LogoLoader />
@@ -451,20 +423,6 @@ const Reports = () => {
                   </div>
                 }
               />
-
-              {startDate && endDate && (
-                <div className="hidden items-center space-x-1 lg:flex ">
-                  <span className="text-sm text-foreground-light">
-                    {dayjs(startDate).format('MMM D, YYYY')}
-                  </span>
-                  <span className="text-foreground-lighter">
-                    <ArrowRight size={12} />
-                  </span>
-                  <span className="text-sm text-foreground-light">
-                    {dayjs(endDate).format('MMM D, YYYY')}
-                  </span>
-                </div>
-              )}
             </div>
           </div>
 
@@ -543,22 +501,7 @@ const Reports = () => {
           </div>
         )}
       </div>
-      <ConfirmationModal
-        visible={!!navigateUrl}
-        variant="warning"
-        title="You have unsaved changes in your report"
-        confirmLabel="Confirm"
-        onConfirm={() => {
-          setConfirmNavigate(true)
-          setNavigateUrl(undefined)
-          router.push(navigateUrl ?? '/')
-        }}
-        onCancel={() => setNavigateUrl(undefined)}
-      >
-        <p className="text-sm">
-          Unsaved changes will be lost, are you sure you want to navigate away?
-        </p>
-      </ConfirmationModal>
+      <PreventNavigationOnUnsavedChanges hasChanges={hasEdits} />
     </>
   )
 }

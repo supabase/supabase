@@ -1,9 +1,7 @@
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useLintRuleCreateMutation } from 'data/lint/create-lint-rule-mutation'
 import {
   Button,
   Dialog,
@@ -15,8 +13,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
+
 import { LintInfo } from '../Linter/Linter.constants'
 import { lintInfoMap } from '../Linter/Linter.utils'
+import { useLintRuleCreateMutation } from '@/data/lint/create-lint-rule-mutation'
 
 interface DisableRuleModalProps {
   lint: LintInfo
@@ -29,7 +29,7 @@ export const DisableRuleModal = ({ lint }: DisableRuleModalProps) => {
 
   const [open, setOpen] = useState(false)
 
-  const { mutate: createRule, isLoading: isCreating } = useLintRuleCreateMutation({
+  const { mutate: createRule, isPending: isCreating } = useLintRuleCreateMutation({
     onSuccess: (_, vars) => {
       const ruleLint = vars.exception.lint_name
       const ruleLintMeta = lintInfoMap.find((x) => x.name === ruleLint)

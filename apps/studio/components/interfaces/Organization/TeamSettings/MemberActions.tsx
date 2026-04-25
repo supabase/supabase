@@ -1,26 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { MoreVertical, Redo2, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
-import { useOrganizationDeleteInvitationMutation } from 'data/organization-members/organization-invitation-delete-mutation'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
-import {
-  useOrganizationMembersQuery,
-  type OrganizationMember,
-} from 'data/organizations/organization-members-query'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useProfile } from 'lib/profile'
 import {
   Button,
   DropdownMenu,
@@ -29,9 +11,25 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { LeaveTeamButton } from './LeaveTeamButton'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { useOrganizationCreateInvitationMutation } from '@/data/organization-members/organization-invitation-create-mutation'
+import { useOrganizationDeleteInvitationMutation } from '@/data/organization-members/organization-invitation-delete-mutation'
+import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
+import { useOrganizationMemberDeleteMutation } from '@/data/organizations/organization-member-delete-mutation'
+import {
+  useOrganizationMembersQuery,
+  type OrganizationMember,
+} from '@/data/organizations/organization-members-query'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useProfile } from '@/lib/profile'
 
 interface MemberActionsProps {
   member: OrganizationMember
@@ -48,11 +46,6 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const { data: permissions } = usePermissionsQuery()
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
   const { data: members } = useOrganizationMembersQuery({ slug })
-  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
-
-  // [Joshen] We only need this data if the org has project scoped roles
-  const { data } = useProjectsQuery({ enabled: isOptedIntoProjectLevelPermissions })
-  const allProjects = data?.projects ?? []
 
   const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
@@ -87,7 +80,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   )
   const canRevokeInvite = canDeleteUserInvites && hasOrgRole
 
-  const { mutate: deleteOrganizationMember, isLoading: isDeletingMember } =
+  const { mutate: deleteOrganizationMember, isPending: isDeletingMember } =
     useOrganizationMemberDeleteMutation({
       onSuccess: () => {
         toast.success(`Successfully removed ${member.primary_email}`)
@@ -95,7 +88,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       },
     })
 
-  const { mutate: inviteMember, isLoading: isCreatingInvite } =
+  const { mutate: inviteMember, isPending: isCreatingInvite } =
     useOrganizationCreateInvitationMutation({
       onSuccess: () => {
         toast.success('Resent the invitation.')
@@ -105,7 +98,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       },
     })
 
-  const { mutate: deleteInvitation, isLoading: isDeletingInvite } =
+  const { mutate: deleteInvitation, isPending: isDeletingInvite } =
     useOrganizationDeleteInvitationMutation()
 
   const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
@@ -128,19 +121,19 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       {
         onSuccess: () => {
           if (!member.primary_email) return toast.error('Email is required')
+
           const projectScopedRole = projectScopedRoles.find((role) => role.id === roleId)
+
           if (projectScopedRole !== undefined) {
-            const projects = (projectScopedRole?.project_ids ?? [])
-              .map((id) => allProjects?.find((p) => p.id === id)?.ref)
-              .filter(Boolean) as string[]
+            const projects = projectScopedRole.projects.map(({ ref }) => ref)
             inviteMember({
               slug,
-              email: member.primary_email,
+              emails: [member.primary_email],
               roleId: projectScopedRole.base_role_id,
               projects,
             })
           } else {
-            inviteMember({ slug, email: member.primary_email, roleId })
+            inviteMember({ slug, emails: [member.primary_email], roleId })
           }
         },
       }
@@ -154,7 +147,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
     deleteInvitation(
       { slug, id: invitedId },
-      { onSuccess: () => toast.success('Successfully revoked the invitation.') }
+      { onSuccess: () => toast.success('Successfully canceled the invitation') }
     )
   }
 
@@ -177,7 +170,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
             content: {
               side: 'bottom',
               text: isPendingInviteAcceptance
-                ? 'Role can only be changed after the user has accepted the invite'
+                ? 'Access can be managed after the invite is accepted'
                 : !canRemoveMember
                   ? 'You need additional permissions to manage this team member'
                   : undefined,

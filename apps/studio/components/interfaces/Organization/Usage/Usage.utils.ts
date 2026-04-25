@@ -1,10 +1,10 @@
 import dayjs from 'dayjs'
 import { groupBy } from 'lodash'
 
-import { DataPoint } from 'data/analytics/constants'
-import type { OrgDailyUsageResponse, PricingMetric } from 'data/analytics/org-daily-stats-query'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DataPoint } from '@/data/analytics/constants'
+import type { OrgDailyUsageResponse, PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 // [Joshen] This is just for development to generate some test data for chart rendering
 export const generateUsageData = (attribute: string, days: number): DataPoint[] => {
@@ -23,7 +23,7 @@ export function useGetUpgradeUrl(slug: string, subscription?: OrgSubscription, s
 
   if (!billingAll) {
     const subject = `Enquiry to upgrade plan for organization`
-    const message = `Organization Slug: ${slug}\nRequested plan: <Specify which plan to upgrade to: Pro | Team | Enterprise>`
+    const message = `Organization Slug: ${slug}\nRequested plan: <Specify which plan to upgrade to: Pro | Team | Enterprise | Platform>`
 
     return `/support/new?orgSlug=${slug}&projectRef=no-project&category=Plan_upgrade&subject=${subject}&message=${encodeURIComponent(message)}`
   }

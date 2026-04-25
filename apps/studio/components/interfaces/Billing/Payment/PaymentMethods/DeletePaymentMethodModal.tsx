@@ -1,10 +1,10 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
 import { Button, Modal } from 'ui'
-
-import { useOrganizationPaymentMethodDeleteMutation } from 'data/organizations/organization-payment-method-delete-mutation'
-import type { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
 import { Admonition } from 'ui-patterns'
+
+import { useOrganizationPaymentMethodDeleteMutation } from '@/data/organizations/organization-payment-method-delete-mutation'
+import type { OrganizationPaymentMethod } from '@/data/organizations/organization-payment-methods-query'
 
 export interface DeletePaymentMethodModalProps {
   selectedPaymentMethod?: OrganizationPaymentMethod
@@ -17,7 +17,7 @@ const DeletePaymentMethodModal = ({
 }: DeletePaymentMethodModalProps) => {
   const { slug } = useParams()
 
-  const { mutate: deletePayment, isLoading: isDeleting } =
+  const { mutate: deletePayment, isPending: isDeleting } =
     useOrganizationPaymentMethodDeleteMutation({
       onSuccess: () => {
         toast.success(

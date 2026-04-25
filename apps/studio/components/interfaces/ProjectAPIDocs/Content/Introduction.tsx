@@ -1,19 +1,22 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Button, Input, copyToClipboard } from 'ui'
-
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Copy } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { Button, copyToClipboard, Input } from 'ui'
+
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref })
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref }, { enabled: canReadAPIKeys })
   const { data } = useProjectSettingsV2Query({ projectRef: ref })
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
@@ -84,7 +87,7 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
               size="small"
               value={
                 showKeys
-                  ? serviceApiKey ?? 'SUPABASE_CLIENT_SERVICE_KEY'
+                  ? (serviceApiKey ?? 'SUPABASE_CLIENT_SERVICE_KEY')
                   : 'Reveal API keys via dropdown in the header'
               }
               className="w-full"

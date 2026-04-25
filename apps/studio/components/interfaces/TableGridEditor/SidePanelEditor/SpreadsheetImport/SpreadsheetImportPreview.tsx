@@ -1,17 +1,17 @@
 import { AlertCircle, ArrowRight, ChevronDown, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Badge,
   Button,
   cn,
   Collapsible,
   SidePanel,
-  Alert_Shadcn_,
-  AlertTitle_Shadcn_,
-  AlertDescription_Shadcn_,
   WarningIcon,
 } from 'ui'
+
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 import SpreadsheetPreviewGrid from './SpreadsheetPreviewGrid'
 
@@ -24,6 +24,7 @@ interface SpreadsheetImportPreviewProps {
   errors?: any[]
   selectedHeaders: string[]
   incompatibleHeaders: string[]
+  emptyStringAsNullHeaders: string[]
 }
 
 export const SpreadsheetImportPreview = ({
@@ -32,6 +33,7 @@ export const SpreadsheetImportPreview = ({
   errors = [],
   selectedHeaders,
   incompatibleHeaders,
+  emptyStringAsNullHeaders,
 }: SpreadsheetImportPreviewProps) => {
   const [expandPreview, setExpandPreview] = useState(false)
   const [expandedErrors, setExpandedErrors] = useState<string[]>([])
@@ -112,7 +114,12 @@ export const SpreadsheetImportPreview = ({
           </div>
           <div className="mb-4">
             {previewHeaders.length > 0 && previewRows.length > 0 ? (
-              <SpreadsheetPreviewGrid height={350} headers={previewHeaders} rows={previewRows} />
+              <SpreadsheetPreviewGrid
+                height={350}
+                headers={previewHeaders}
+                rows={previewRows}
+                emptyStringAsNullHeaders={emptyStringAsNullHeaders}
+              />
             ) : (
               <div className="flex items-center justify-center py-4 border border-control rounded-md space-x-2">
                 <AlertCircle size={16} strokeWidth={1.5} className="text-foreground-light" />
@@ -195,7 +202,7 @@ export const SpreadsheetImportPreview = ({
                                   <ul className="ml-2 list-disc">
                                     {errorData.__parsed_extra.map((value: string, i: number) => (
                                       <li key={i}>
-                                        <code className="text-xs">{value}</code>
+                                        <code className="text-code-inline">{value}</code>
                                       </li>
                                     ))}
                                   </ul>
@@ -218,6 +225,7 @@ export const SpreadsheetImportPreview = ({
                             <SpreadsheetPreviewGrid
                               headers={spreadsheetData.headers}
                               rows={[errorData]}
+                              emptyStringAsNullHeaders={emptyStringAsNullHeaders}
                             />
                           )}
                         </li>

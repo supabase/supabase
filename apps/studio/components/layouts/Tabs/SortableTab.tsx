@@ -3,12 +3,12 @@ import { CSS } from '@dnd-kit/utilities'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useMemo } from 'react'
-
-import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useTabsStateSnapshot, type Tab } from 'state/tabs'
 import { cn, TabsTrigger_Shadcn_ } from 'ui'
+
 import { useEditorType } from '../editors/EditorsLayout.hooks'
+import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useTabsStateSnapshot, type Tab } from '@/state/tabs'
 
 /**
  * Individual draggable tab component that handles:
@@ -60,7 +60,7 @@ export const SortableTab = ({
       layoutId={tab.id}
       transition={{ duration: 0.045 }}
       animate={{ opacity: isDragging ? 0 : 1 }}
-      className={cn('flex items-center h-10 first-of-type:border-l')}
+      className={cn('flex items-center h-[var(--header-height)] first-of-type:border-l')}
     >
       <TabsTrigger_Shadcn_
         value={tab.id}

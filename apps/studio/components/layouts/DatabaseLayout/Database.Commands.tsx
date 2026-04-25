@@ -1,12 +1,12 @@
-import { Blocks, Code, Database, History, Search } from 'lucide-react'
-
 import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { Blocks, Code, Database, History, Search } from 'lucide-react'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
+
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export function useDatabaseGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -81,21 +81,14 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
       ...(databaseReplication
         ? [
             {
-              id: 'nav-database-etl',
-              name: 'ETL Replication',
-              value: 'Database: ETL Replication',
-              route: `/project/${ref}/database/etl`,
+              id: 'nav-database-replication',
+              name: 'Replication',
+              value: 'Database: Replication',
+              route: `/project/${ref}/database/replication`,
               defaultHidden: true,
             } as IRouteCommand,
           ]
         : []),
-      {
-        id: 'nav-database-hooks',
-        name: 'Webhooks',
-        value: 'Database: Webhooks',
-        route: `/project/${ref}/integrations/webhooks`,
-        defaultHidden: true,
-      },
       {
         id: 'nav-database-backups',
         name: 'Backups',

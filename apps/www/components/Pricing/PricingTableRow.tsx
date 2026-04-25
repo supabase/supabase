@@ -38,8 +38,8 @@ export const pricingTooltips: PricingTooltips = {
   'database.egress': {
     main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period. Excludes cache hits.',
   },
-  'database.cachedEgress': {
-    main: 'Billing is based on the total sum of any outgoing traffic (includes Database, Storage, API, Edge Functions) in GB throughout your billing period that is served from our CDN cache.',
+  'storage.cachedEgress': {
+    main: 'Billing is based on the total sum of outgoing Storage traffic in GB throughout your billing period that is served from our CDN cache.',
   },
   'auth.totalUsers': {
     main: 'The maximum number of users your project can have',
@@ -63,6 +63,7 @@ export const pricingTooltips: PricingTooltips = {
   'auth.thirdPartyMAUs': {
     main: 'Users who use the Supabase platform through a third-party authentication provider (Firebase Auth, Auth0 or Cognito).\nBilling is based on the sum of distinct third-party users requesting your API through the billing period. Resets every billing cycle.',
   },
+
   'storage.size': {
     main: "The sum of all objects' size in your storage buckets.\nBilling is prorated down to the hour and will be displayed as GB-Hrs on your invoice.",
   },
@@ -91,6 +92,18 @@ export const pricingTooltips: PricingTooltips = {
   'security.hipaa': {
     main: 'Available as a paid add-on on Team Plan and above.',
   },
+  'security.privateLink': {
+    main: (
+      <span className="prose text-xs">
+        AWS PrivateLink enables private connectivity between your AWS VPC and Supabase, keeping
+        traffic within the AWS network. Read more in our{' '}
+        <Link href="/docs/guides/platform/privatelink" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
+  },
 
   'security.accessRoles': {
     main: (
@@ -107,6 +120,35 @@ export const pricingTooltips: PricingTooltips = {
 
   'security.customDomains': {
     enterprise: 'Volume discounts available.',
+  },
+
+  'auth.auditLogs': {
+    main: (
+      <span className="prose text-xs">
+        Auth Audit Logs provide comprehensive tracking of authentication events. Audit logs are
+        automatically captured for all authentication events and help you monitor user
+        authentication activities, detect suspicious behavior, and maintain compliance with security
+        requirements. Read more in our{' '}
+        <Link href="/docs/guides/auth/audit-logs" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
+  },
+
+  'security.platformAuditLogs': {
+    main: (
+      <span className="prose text-xs">
+        Any Platform API/Dashboard actions performed by organization members are logged
+        automatically for auditing and security purposes. Includes actions such as creating a new
+        project, inviting members or changing project settings. Read more in our{' '}
+        <Link href="/docs/guides/security/platform-audit-logs" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
   },
 }
 

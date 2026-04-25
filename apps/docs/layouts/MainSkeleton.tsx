@@ -107,11 +107,11 @@ const levelsData = {
   },
   reference_javascript_v1: {
     icon: 'reference-javascript',
-    name: 'Javascript Reference v1.0',
+    name: 'JavaScript Reference v1.0',
   },
   reference_javascript_v2: {
     icon: 'reference-javascript',
-    name: 'Javascript Reference v2.0',
+    name: 'JavaScript Reference v2.0',
   },
   reference_dart_v1: {
     icon: 'reference-dart',
@@ -236,7 +236,7 @@ const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
         {mobileMenuOpen
           ? 'Close'
           : 'menuId' in props
-            ? levelsData[props.menuId]?.name ?? levelsData['home'].name
+            ? (levelsData[props.menuId]?.name ?? levelsData['home'].name)
             : props.menuName}
       </span>
     </div>

@@ -179,7 +179,7 @@ export const MenuItem = React.forwardRef<
         <>
           {icon && <MenuIconPicker icon={icon} className="text-foreground-lighter" />}
           <span className="flex-1">{title}</span>
-          {community && <Badge size="small">Community</Badge>}
+          {community && <Badge>Community</Badge>}
         </>
       )}
     </Link>

@@ -1,10 +1,11 @@
 import { Code } from 'lucide-react'
 import Link from 'next/link'
 import type { DragEvent, ReactNode } from 'react'
+import { Button, cn } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
-import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
-import { Button, CodeBlock, type CodeBlockLang, cn } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { ReportBlockContainer } from '@/components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 
 interface EdgeFunctionBlockProps {
   /** Title of the EdgeFunctionBlock */
@@ -85,7 +86,7 @@ export const EdgeFunctionBlock = ({
       onDragStart={onDragStart}
       actions={
         hideDeployButton || !onDeploy ? (
-          actions ?? null
+          (actions ?? null)
         ) : (
           <>
             <Button
@@ -106,7 +107,7 @@ export const EdgeFunctionBlock = ({
       {showReplaceWarning && (
         <Admonition
           type="warning"
-          className="mb-0 rounded-none border-0 border-b shrink-0 bg-background-100"
+          className="rounded-none border-0 border-b shrink-0 bg-background-100"
         >
           <p>An edge function with the name "{functionName}" already exists.</p>
           <p className="text-foreground-light">

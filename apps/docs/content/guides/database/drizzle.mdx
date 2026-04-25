@@ -68,6 +68,8 @@ If you plan on solely using Drizzle instead of the Supabase Data API (PostgREST)
 
     From the project  [**Connect** panel](/dashboard/project/_?showConnect=true), copy the URI from the "Shared Pooler" option and save it as the `DATABASE_URL` environment variable. Remember to replace the password placeholder with your actual database password.
 
+    In local SUPABASE_DB_URL require to be adapted to work with Docker resolver
+
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -78,7 +80,12 @@ If you plan on solely using Drizzle instead of the Supabase Data API (PostgREST)
     import { drizzle } from 'drizzle-orm/postgres-js'
     import postgres from 'postgres'
 
-    const connectionString = process.env.DATABASE_URL
+    let connectionString = process.env.DATABASE_URL
+    if (host.includes('postgres:postgres@supabase_db_')) {
+      const url = URL.parse(host)!
+      url.hostname = url.hostname.split('_')[1]
+      connectionString = url.href
+    }
 
     // Disable prefetch as it is not supported for "Transaction" pool mode
     export const client = postgres(connectionString, { prepare: false })

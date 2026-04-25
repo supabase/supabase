@@ -1,4 +1,4 @@
-import { Card, Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from 'ui'
+import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 export default function EmptyStateZeroItemsTable() {
   return (
@@ -6,16 +6,18 @@ export default function EmptyStateZeroItemsTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="text-foreground-muted">Table name</TableHead>
-            <TableHead className="text-foreground-muted">Date created</TableHead>
-            <TableHead />
+            <TableHead className="text-foreground-muted">Name</TableHead>
+            <TableHead className="text-foreground-muted">Created</TableHead>
+            <TableHead className="text-foreground-muted">Updated</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           <TableRow className="[&>td]:hover:bg-inherit">
             <TableCell colSpan={3}>
-              <p className="text-sm text-foreground">No tables yet</p>
-              <p className="text-sm text-foreground-lighter">Connect a table from your database</p>
+              <p className="text-sm text-foreground">No results found</p>
+              <p className="text-sm text-foreground-lighter">
+                Your search for “test” did not return any results
+              </p>
             </TableCell>
           </TableRow>
         </TableBody>

@@ -2,10 +2,10 @@
 
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { DialogProps } from '@radix-ui/react-dialog'
+import { cva, VariantProps } from 'class-variance-authority'
 import { X } from 'lucide-react'
 import * as React from 'react'
 
-import { VariantProps, cva } from 'class-variance-authority'
 import { cn } from '../../../lib/utils/cn'
 
 export const DIALOG_PADDING_Y_SMALL = 'py-4'
@@ -161,7 +161,8 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('text-base leading-none font-normal', className)}
+    // [Danny] max-w to make space for the close button
+    className={cn('text-base leading-none font-normal max-w-[calc(100%-1rem)]', className)}
     {...props}
   />
 ))

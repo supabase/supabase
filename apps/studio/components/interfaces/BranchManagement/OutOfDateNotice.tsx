@@ -1,6 +1,3 @@
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { GitBranchIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -16,6 +13,10 @@ import {
   Button,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface OutOfDateNoticeProps {
   isBranchOutOfDateMigrations: boolean
@@ -109,7 +110,7 @@ export const OutOfDateNotice = ({
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Update branch with modified functions?</AlertDialogTitle>
+                <AlertDialogTitle>Update branch with modified functions</AlertDialogTitle>
                 <AlertDialogDescription>
                   This branch has {modifiedFunctionsCount} modified edge function
                   {modifiedFunctionsCount !== 1 ? 's' : ''} that will be overwritten when updating
@@ -119,7 +120,7 @@ export const OutOfDateNotice = ({
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => handleUpdate(true)}>
+                <AlertDialogAction variant="warning" onClick={() => handleUpdate(true)}>
                   Update anyway
                 </AlertDialogAction>
               </AlertDialogFooter>

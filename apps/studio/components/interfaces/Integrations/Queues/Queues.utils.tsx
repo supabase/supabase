@@ -1,7 +1,7 @@
 import { Column } from 'react-data-grid'
-
-import { PostgresQueue } from 'data/database-queues/database-queues-query'
 import { cn } from 'ui'
+import z from 'zod'
+
 import {
   QueueCreatedAtCell,
   QueueNameCell,
@@ -10,6 +10,7 @@ import {
   QueueTypeCell,
   QueueWithMetrics,
 } from './QueueCells'
+import { PostgresQueue } from '@/data/database-queues/database-queues-query'
 
 export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
   return [
@@ -106,4 +107,21 @@ export const prepareQueuesForDataGrid = (queues: PostgresQueue[]): QueueWithMetr
     ...queue,
     id: queue.queue_name, // Use queue_name as unique id
   }))
+}
+
+export const QueryNameSchema = z
+  .string()
+  .trim()
+  .min(1, 'Please provide a name for your queue')
+  .max(47, "The name can't be longer than 47 characters")
+  .regex(
+    /^[a-zA-Z0-9_-]+$/,
+    'Name must contain only alphanumeric characters, underscores, and hyphens'
+  )
+
+/**
+ * Checks if the queue name is valid. Returns a boolean.
+ */
+export const isQueueNameValid = (queueName: string) => {
+  return QueryNameSchema.safeParse(queueName).success
 }

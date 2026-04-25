@@ -1,22 +1,23 @@
+import { useParams } from 'common'
 import { X } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useRouter } from 'next/router'
+import { useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import ReactMarkdown from 'react-markdown'
+import { Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { useParams } from 'common'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
+import LintDetail from './LintDetail'
+import { EntityTypeIcon } from './Linter.utils'
+import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
 import {
   LintCategoryBadge,
   LintEntity,
-  NoIssuesFound,
   lintInfoMap,
-} from 'components/interfaces/Linter/Linter.utils'
-import { Lint } from 'data/lint/lint-query'
-import { useRouter } from 'next/router'
-import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { EntityTypeIcon } from './Linter.utils'
-import LintDetail from './LintDetail'
+  NoIssuesFound,
+} from '@/components/interfaces/Linter/Linter.utils'
+import { Lint } from '@/data/lint/lint-query'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface LinterDataGridProps {
   isLoading: boolean
@@ -34,6 +35,7 @@ const LinterDataGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const { ref } = useParams()
   const router = useRouter()
+  const track = useTrack()
 
   const lintCols = [
     {
@@ -69,7 +71,11 @@ const LinterDataGrid = ({
       name: 'Description',
       description: undefined,
       minWidth: 400,
-      value: (row: any) => <ReactMarkdown className="text-xs">{row.description}</ReactMarkdown>,
+      value: (row: any) => (
+        <div className="text-xs">
+          <ReactMarkdown>{row.description}</ReactMarkdown>
+        </div>
+      ),
     },
   ]
 
@@ -115,11 +121,11 @@ const LinterDataGrid = ({
 
   return (
     <ResizablePanelGroup
-      direction="horizontal"
+      orientation="horizontal"
       className="relative flex flex-grow bg-alternative min-h-0"
       autoSaveId="linter-layout-v1"
     >
-      <ResizablePanel defaultSize={1}>
+      <ResizablePanel>
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
@@ -148,6 +154,14 @@ const LinterDataGrid = ({
                       gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                       const { id, ...rest } = router.query
                       router.push({ ...router, query: { ...rest, id: props.row.cache_key } })
+
+                      track('advisor_detail_opened', {
+                        origin: 'advisors_page',
+                        advisorSource: 'lint',
+                        advisorCategory: props.row.categories[0],
+                        advisorType: props.row.name,
+                        advisorLevel: props.row.level,
+                      })
                     }
                   }}
                 />
@@ -167,9 +181,9 @@ const LinterDataGrid = ({
         <>
           <ResizableHandle withHandle />
           <ResizablePanel
-            defaultSize={30}
-            maxSize={45}
-            minSize={30}
+            defaultSize="30"
+            maxSize="45"
+            minSize="30"
             className="bg-studio border-t flex flex-col h-full"
           >
             <div className="flex items-center justify-between w-full border-b py-3 px-6">

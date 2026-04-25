@@ -1,11 +1,11 @@
+import { useParams } from 'common'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import SVG from 'react-inlinesvg'
-
-import { useParams } from 'common'
-import { BASE_PATH } from 'lib/constants'
 import { Badge, Button, cn } from 'ui'
+
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
+import { BASE_PATH } from '@/lib/constants'
 
 interface ForeignKeyProps {
   foreignKey: ForeignKey
@@ -49,7 +49,7 @@ export const ForeignKeyRow = ({
             {status !== undefined && (
               <Badge
                 variant={
-                  status === 'ADD' ? 'brand' : status === 'UPDATE' ? 'warning' : 'destructive'
+                  status === 'ADD' ? 'success' : status === 'UPDATE' ? 'warning' : 'destructive'
                 }
               >
                 {status}
@@ -96,7 +96,7 @@ export const ForeignKeyRow = ({
                 {x.source || '[column_name]'}
               </code>
               <ArrowRight size={16} />
-              <code className="text-xs">
+              <code className="text-code-inline">
                 {foreignKey.schema}.{foreignKey.table}.{x.target}
               </code>
             </div>

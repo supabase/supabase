@@ -9,10 +9,8 @@ import { data as content } from 'data/open-source/contributing/supasquad'
 import { Separator } from 'ui'
 
 const WhySupaSquad = dynamic(() => import('components/Supasquad/FeaturesSection'))
-const FeaturedSection = dynamic(() => import('components/Supasquad/FeaturesSection'))
-const PerfectTiming = dynamic(() => import('components/Supasquad/PerfectTiming'))
 const Benefits = dynamic(() => import('components/Supasquad/FeaturesSection'))
-const ApplicationFormSection = dynamic(() => import('components/Supasquad/ApplicationFormSection'))
+const CtaSection = dynamic(() => import('components/Supasquad/CtaSection'))
 
 const BeginnersPage: NextPage = () => {
   return (
@@ -23,7 +21,7 @@ const BeginnersPage: NextPage = () => {
         openGraph={{
           title: content.metadata.metaTitle,
           description: content.metadata.metaDescription,
-          url: `https://supabase.com/solutions/beginners`,
+          url: `https://supabase.com/supasquad`,
         }}
       />
       <Layout className="overflow-visible">
@@ -36,20 +34,8 @@ const BeginnersPage: NextPage = () => {
         <Separator />
         <WhySupaSquad {...content.why} />
         <Separator />
-        <FeaturedSection {...content.featured} />
-        <Separator />
-        <PerfectTiming
-          id={content.timing.id}
-          heading={content.timing.heading}
-          subheading={content.timing.subheading}
-          highlights={content.timing.highlights}
-        />
-        <Benefits className="md:mt-24" {...content.benefits} />
-        <ApplicationFormSection
-          id={content.ctaSection.id}
-          title={content.ctaSection.title}
-          cta={content.ctaSection.primaryCta}
-        />
+        <Benefits {...content.benefits} />
+        <CtaSection {...content.ctaSection} />
       </Layout>
     </>
   )

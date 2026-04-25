@@ -1,42 +1,15 @@
 import { getMultipartBoundary, parseMultipartStream } from '@mjackson/multipart-parser'
+import * as Sentry from '@sentry/nextjs'
 import { useQuery } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
-import { edgeFunctionsKeys } from './keys'
 
-export type EdgeFunctionBodyVariables = {
+import { edgeFunctionsKeys } from './keys'
+import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
+
+type EdgeFunctionBodyVariables = {
   projectRef?: string
   slug?: string
-}
-
-export type EdgeFunctionFile = {
-  name: string
-  content: string
-}
-
-export type EdgeFunctionBodyResponse = {
-  files: EdgeFunctionFile[]
-}
-
-async function streamToString(stream: ReadableStream<Uint8Array>) {
-  const reader = stream.getReader()
-  const decoder = new TextDecoder()
-  let result = ''
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      result += decoder.decode(value, { stream: true })
-    }
-    // Final decode to handle any remaining bytes
-    result += decoder.decode()
-    return result
-  } catch (error) {
-    console.error('Error reading stream:', error)
-    throw error
-  }
 }
 
 export async function getEdgeFunctionBody(
@@ -61,16 +34,38 @@ export async function getEdgeFunctionBody(
 
   if (!data || !boundary) return { files: [] }
 
-  for await (let part of parseMultipartStream(data, { boundary })) {
-    if (part.isFile) {
-      files.push({
-        name: part.filename,
-        content: part.text,
+  let metadata: {
+    deno2_entrypoint_path?: string | null
+  } = {}
+
+  try {
+    for await (let part of parseMultipartStream(data, {
+      boundary,
+      maxFileSize: 20 * 1024 * 1024,
+    })) {
+      if (part.isFile) {
+        files.push({
+          name: part.filename,
+          content: part.text,
+        })
+      } else {
+        // treat it as metadata
+        metadata = JSON.parse(part.text)
+      }
+    }
+
+    return {
+      metadata,
+      files: files as Omit<FileData, 'id' | 'selected' | 'state'>[],
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      Sentry.captureException(error, {
+        extra: { error, data, response, boundary },
       })
     }
+    throw error
   }
-
-  return { files: files as EdgeFunctionFile[] }
 }
 
 export type EdgeFunctionBodyData = Awaited<ReturnType<typeof getEdgeFunctionBody>>
@@ -86,7 +81,6 @@ export const useEdgeFunctionBodyQuery = <TData = EdgeFunctionBodyData>(
   useQuery<EdgeFunctionBodyData, EdgeFunctionBodyError, TData>({
     queryKey: edgeFunctionsKeys.body(projectRef, slug),
     queryFn: ({ signal }) => getEdgeFunctionBody({ projectRef, slug }, signal),
-    enabled:
-      IS_PLATFORM && enabled && typeof projectRef !== 'undefined' && typeof slug !== 'undefined',
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof slug !== 'undefined',
     ...options,
   })

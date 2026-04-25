@@ -1,18 +1,18 @@
+import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import { isEqual, isNull } from 'lodash'
-import type { Dictionary } from 'types'
-
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-import type { RetrievedTableColumn, RetrieveTableResult } from 'data/tables/table-retrieve-query'
-import { uuidv4 } from 'lib/helpers'
+import { isNull } from 'lodash'
 import { toast } from 'sonner'
+
 import {
   ColumnField,
   CreateColumnPayload,
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
+import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
+import type { RetrievedTableColumn, RetrieveTableResult } from '@/data/tables/table-retrieve-query'
+import { uuidv4 } from '@/lib/helpers'
+import type { Dictionary } from '@/types'
 
 const isSQLExpression = (input: string) => {
   if (['CURRENT_DATE'].includes(input)) return true
@@ -32,7 +32,9 @@ const isSQLExpression = (input: string) => {
   return false
 }
 
-export const generateColumnField = (field: any = {}): ColumnField => {
+export const generateColumnField = (
+  field: { name?: string; table?: string; schema?: string; format?: string } = {}
+): ColumnField => {
   const { name, table, schema, format } = field
   return {
     id: uuidv4(),
@@ -132,35 +134,40 @@ export const generateUpdateColumnPayload = (
   const payload: Partial<UpdateColumnPayload> = {}
   // [Joshen] Trimming on the original name as well so we don't rename columns that already
   // contain whitespaces (and accidentally bringing user apps down)
-  if (!isEqual(originalColumn.name.trim(), name)) {
+  if (originalColumn.name.trim() !== name) {
     payload.name = name
   }
-  if (!isEqual(originalColumn.comment?.trim(), comment)) {
+  if (originalColumn.comment?.trim() !== comment) {
     payload.comment = comment
   }
-  if (!isEqual(originalColumn.check?.trim(), check)) {
+  if (originalColumn.check?.trim() !== check) {
     payload.check = check
   }
 
-  if (!isEqual(originalColumn.format, type)) {
+  const originalFormat =
+    originalColumn.data_type === 'ARRAY'
+      ? `${originalColumn.format.replace(/^_/, '')}[]`
+      : originalColumn.format
+  if (originalFormat !== type) {
     payload.type = type
   }
-  if (!isEqual(originalColumn.default_value, field.defaultValue)) {
+
+  if (originalColumn.default_value !== field.defaultValue) {
     const defaultValue = field.defaultValue
     payload.defaultValue = defaultValue as unknown as Record<string, never> | undefined
     payload.defaultValueFormat =
       isNull(defaultValue) || isSQLExpression(defaultValue) ? 'expression' : 'literal'
   }
-  if (!isEqual(originalColumn.is_identity, field.isIdentity)) {
+  if (originalColumn.is_identity !== field.isIdentity) {
     payload.isIdentity = field.isIdentity
   }
-  if (!isEqual(originalColumn.is_nullable, field.isNullable)) {
+  if (originalColumn.is_nullable !== field.isNullable) {
     payload.isNullable = field.isNullable
   }
-  if (!isEqual(originalColumn.is_unique, field.isUnique)) {
+  if (originalColumn.is_unique !== field.isUnique) {
     payload.isUnique = field.isUnique
   }
-  if (!isEqual(isOriginallyPrimaryKey, field.isPrimaryKey)) {
+  if (isOriginallyPrimaryKey !== field.isPrimaryKey) {
     payload.isPrimaryKey = field.isPrimaryKey
   }
 
@@ -168,7 +175,7 @@ export const generateUpdateColumnPayload = (
 }
 
 export const validateFields = (field: ColumnField) => {
-  const errors = {} as Dictionary<any>
+  const errors = {} as Dictionary<string>
   if (field.name.length === 0) {
     errors['name'] = `Please assign a name for your column`
     toast.error(errors['name'])

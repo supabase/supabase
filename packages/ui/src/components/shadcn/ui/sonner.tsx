@@ -1,6 +1,5 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import { Toaster as Sonner } from 'sonner'
 
 import { cn } from '../../../lib/utils'
@@ -9,11 +8,9 @@ import { StatusIcon } from './../../StatusIcon'
 
 export const SONNER_DEFAULT_DURATION = 4000
 
-type ToasterProps = React.ComponentProps<typeof Sonner>
+type ToasterProps = React.ComponentProps<typeof Sonner> & { theme: 'light' | 'dark' | 'system' }
 
 const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
-  const { theme = 'system' } = useTheme()
-
   return (
     <Sonner
       icons={{
@@ -21,7 +18,6 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
         error: <StatusIcon variant="destructive" />,
         info: <StatusIcon variant="default" />,
       }}
-      theme={theme as ToasterProps['theme']}
       // pointer-events-auto is needed to fix the toast when above radix modals. Set the width to 420px to fix the toast
       // progress component (bottom row rendered in two lines).
       className="toaster group pointer-events-auto"

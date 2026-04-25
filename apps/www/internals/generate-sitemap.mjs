@@ -2,63 +2,6 @@ import { writeFileSync } from 'fs'
 import { globby } from 'globby'
 import prettier from 'prettier'
 
-/*
- * kudos to leerob from vercel
- * https://leerob.io/blog/nextjs-sitemap-robots
- */
-
-// Constants for CMS integration
-const CMS_SITE_ORIGIN =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-    ? 'https://cms.supabase.com'
-    : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
-        typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL?.replace('zone-www-dot-com-git-', 'cms-git-')}`
-      : 'http://localhost:3030'
-const CMS_API_KEY = process.env.CMS_API_KEY
-
-/**
- * Get CMS blog posts for sitemap
- */
-const getCMSBlogPosts = async () => {
-  try {
-    const response = await fetch(
-      `${CMS_SITE_ORIGIN}/api/posts?depth=0&draft=false&where[_status][equals]=published&limit=1000`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          ...(CMS_API_KEY && { Authorization: `Bearer ${CMS_API_KEY}` }),
-        },
-      }
-    )
-
-    if (!response.ok) {
-      console.warn(`[getCMSBlogPosts] HTTP error! status: ${response.status}`)
-      return []
-    }
-
-    const contentType = response.headers.get('content-type') || ''
-    if (!contentType.toLowerCase().includes('application/json')) {
-      console.warn(`[getCMSBlogPosts] Non-JSON response from CMS`)
-      return []
-    }
-
-    const data = await response.json()
-
-    const posts = data.docs
-      .filter((post) => post.slug && post.title && post._status === 'published')
-      .map((post) => ({
-        slug: post.slug,
-        updatedAt: post.updatedAt || new Date().toISOString(),
-      }))
-
-    return posts
-  } catch (error) {
-    console.warn('Error fetching CMS blog posts for sitemap:', error)
-    return []
-  }
-}
-
 async function generate() {
   const prettierConfig = await prettier.resolveConfig('./.prettierrc.js')
 
@@ -84,10 +27,6 @@ async function generate() {
   ])
 
   const pages = unsortedPages.sort((a, b) => a.localeCompare(b))
-
-  // Fetch CMS blog posts
-  const cmsBlogPosts = await getCMSBlogPosts()
-  console.log(`Found ${cmsBlogPosts.length} CMS blog posts for sitemap`)
 
   const blogUrl = 'blog'
   const caseStudiesUrl = 'case-studies'
@@ -176,23 +115,10 @@ async function generate() {
     })
     .filter(Boolean)
 
-  // Generate URLs for CMS blog posts
-  const cmsBlogUrls = cmsBlogPosts.map((post) => {
-    const lastmod = new Date(post.updatedAt).toISOString().split('T')[0]
-    return `
-      <url>
-          <loc>https://supabase.com/blog/${post.slug}</loc>
-          <lastmod>${lastmod}</lastmod>
-          <changefreq>weekly</changefreq>
-          <priority>0.7</priority>
-      </url>
-    `
-  })
-
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-        ${[...staticUrls, ...cmsBlogUrls].join('')}
+        ${[...staticUrls].join('')}
     </urlset>
     `
 

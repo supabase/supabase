@@ -1,22 +1,22 @@
-import { Pencil, ThumbsDown, ThumbsUp, Trash2 } from 'lucide-react'
-import { type PropsWithChildren, useState, useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Pencil, ThumbsDown, ThumbsUp, Trash2 } from 'lucide-react'
+import { useEffect, useState, type PropsWithChildren } from 'react'
 import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-
-import { ButtonTooltip } from '../ButtonTooltip'
 import {
-  cn,
   Button,
+  cn,
+  Form,
+  FormControl,
+  FormField,
   Popover_Shadcn_,
-  PopoverTrigger_Shadcn_,
   PopoverContent_Shadcn_,
-  Form_Shadcn_,
-  FormField_Shadcn_,
-  FormControl_Shadcn_,
+  PopoverTrigger_Shadcn_,
   TextArea_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { ButtonTooltip } from '../ButtonTooltip'
 
 export function MessageActions({
   children,
@@ -172,18 +172,18 @@ function MessageActionsThumbsDown({
           />
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ portal className="w-80" align="start">
+      <PopoverContent_Shadcn_ className="w-80" align="start">
         {form.formState.isSubmitSuccessful ? (
           <p className="text-sm">We appreciate your feedback!</p>
         ) : (
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="reason"
                 render={({ field }) => (
                   <FormItemLayout label="What went wrong?" labelOptional="optional">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <TextArea_Shadcn_
                         placeholder="Describe why the response was not helpful..."
                         autoComplete="off"
@@ -191,7 +191,7 @@ function MessageActionsThumbsDown({
                         autoFocus
                         {...field}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -201,7 +201,7 @@ function MessageActionsThumbsDown({
                 </Button>
               </div>
             </form>
-          </Form_Shadcn_>
+          </Form>
         )}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>

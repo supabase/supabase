@@ -1,21 +1,23 @@
-import ApiExamples from 'data/products/storage/api-examples'
-import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
-import StoragePermissionsData from 'data/products/storage/permissions-examples'
-import Solutions from '~/data/MainProducts'
 import { ArrowUpRight, Shuffle, Wifi, X } from 'lucide-react'
 import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PRODUCT_NAMES } from 'shared-data/products'
-import { Button, Image } from 'ui'
-import ImageCarousel from '~/components/Carousels/ImageCarousel'
-import FeatureColumn from '~/components/FeatureColumn'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import ProductIcon from '~/components/ProductIcon'
-import ProductsNav from '~/components/Products/ProductsNav'
-import ProductHeader from '~/components/Sections/ProductHeader'
-import dynamic from 'next/dynamic'
+import { Button } from 'ui'
+import { Image } from 'ui-patterns/Image'
+
+import ImageCarousel from '@/components/Carousels/ImageCarousel'
+import FeatureColumn from '@/components/FeatureColumn'
+import DefaultLayout from '@/components/Layouts/Default'
+import SectionContainer from '@/components/Layouts/SectionContainer'
+import ProductIcon from '@/components/ProductIcon'
+import ProductsNav from '@/components/Products/ProductsNav'
+import ProductHeader from '@/components/Sections/ProductHeader'
+import Solutions from '@/data/MainProducts'
+import ApiExamples from '@/data/products/storage/api-examples'
+import DashboardViewData from '@/data/products/storage/dashboard-carousel.json'
+import StoragePermissionsData from '@/data/products/storage/permissions-examples'
 
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
@@ -24,6 +26,8 @@ const SplitCodeBlockCarousel = dynamic(
   () => import('~/components/Carousels/SplitCodeBlockCarousel')
 )
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
+
+// When updating page content, also update public/llms/storage.txt
 
 function StoragePage() {
   // base path for images
@@ -119,10 +123,10 @@ function StoragePage() {
                   }
                 />
               </div>
-              <h4 className="h4">Multiple Protocol Support</h4>
+              <h4 className="h4">Multiple Bucket Types</h4>
 
               <p className="p">
-                S3, Resumable Uploads and Standard Uploads. Enterprise-level scalability.
+                Choose the right storage models for your application: Files, Analytics, or Vectors.
               </p>
             </div>
           </div>
@@ -191,6 +195,63 @@ function StoragePage() {
               </>
             }
           />
+        </SectionContainer>
+
+        <SectionContainer>
+          <div className="mb-12">
+            <h2 className="h3">Bucket types for every application</h2>
+            <p className="p text-lg">
+              Store, serve, or analyze data the way your app needs. Supabase Storage supports three
+              purpose-built bucket types so you can pick the right tools for the job without adding
+              extra systems.
+            </p>
+          </div>
+          <div className="grid grid-cols-12 gap-8">
+            <div className="col-span-12 lg:col-span-4">
+              <h4 className="h4">Files buckets</h4>
+              <p className="p">
+                Ideal for everyday assets and user content. Store images, videos, documents, PDFs,
+                archives, and more, then serve them fast from a global CDN with fine-grained access
+                controls.
+              </p>
+              <Button asChild size="small" type="default" className="mt-4" icon={<ArrowUpRight />}>
+                <Link href="/docs/guides/storage">Read the docs</Link>
+              </Button>
+            </div>
+            <div className="col-span-12 lg:col-span-4">
+              <h4 className="h4">Analytics buckets</h4>
+              <p className="p">
+                Built for large-scale analytical workloads on open table formats such as Apache
+                Iceberg. Keep historical or time-series data, logs, or ETL outputs in a format that
+                is efficient to query, partition, and transform, and optionally expose via Postgres.
+              </p>
+              <div className="mt-4 flex gap-2">
+                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                  <Link href="/docs/guides/storage/analytics/introduction">Read the docs</Link>
+                </Button>
+                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                  <Link href="/blog/analytics-buckets">Read the blog post</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="col-span-12 lg:col-span-4">
+              <h4 className="h4">Vector buckets</h4>
+              <p className="p">
+                Designed for AI and ML use cases that rely on semantic search or similarity
+                matching. Store and index vector embeddings with support for multiple distance
+                metrics, metadata filtering, and fast similarity queries for RAG systems, AI-powered
+                search, and more.
+              </p>
+              <div className="mt-4 flex gap-2">
+                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                  <Link href="/docs/guides/storage/vector/introduction">Read the docs</Link>
+                </Button>
+                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                  <Link href="/blog/vector-buckets">Read the blog post</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
         </SectionContainer>
 
         <SectionContainer className="pt-0">

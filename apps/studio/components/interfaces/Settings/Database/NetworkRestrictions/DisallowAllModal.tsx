@@ -1,8 +1,8 @@
 import { useParams } from 'common'
 import { Button, Modal } from 'ui'
 
-import InformationBox from 'components/ui/InformationBox'
-import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import InformationBox from '@/components/ui/InformationBox'
+import { useNetworkRestrictionsApplyMutation } from '@/data/network-restrictions/network-retrictions-apply-mutation'
 
 interface DisallowAllModalProps {
   visible: boolean
@@ -11,7 +11,7 @@ interface DisallowAllModalProps {
 
 const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
   const { ref } = useParams()
-  const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
+  const { mutate: applyNetworkRestrictions, isPending: isApplying } =
     useNetworkRestrictionsApplyMutation({ onSuccess: () => onClose() })
 
   const onSubmit = async () => {

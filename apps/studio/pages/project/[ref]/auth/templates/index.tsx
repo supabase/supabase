@@ -1,13 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { EmailTemplates } from 'components/interfaces/Auth/EmailTemplates/EmailTemplates'
-import { AuthEmailsLayout } from 'components/layouts/AuthLayout/AuthEmailsLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import NoPermission from 'components/ui/NoPermission'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { NextPageWithLayout } from 'types'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+
+import { EmailTemplates } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates'
+import { AuthEmailsLayout } from '@/components/layouts/AuthLayout/AuthEmailsLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import NoPermission from '@/components/ui/NoPermission'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import type { NextPageWithLayout } from '@/types'
 
 const TemplatesPage: NextPageWithLayout = () => {
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
@@ -20,15 +21,17 @@ const TemplatesPage: NextPageWithLayout = () => {
   }
 
   return (
-    <ScaffoldContainer bottomPadding>
+    <PageContainer size="default" className="pb-16">
       {!isPermissionsLoaded ? (
-        <ScaffoldSection isFullWidth>
-          <GenericSkeletonLoader />
-        </ScaffoldSection>
+        <PageSection>
+          <PageSectionContent>
+            <GenericSkeletonLoader />
+          </PageSectionContent>
+        </PageSection>
       ) : (
         <EmailTemplates />
       )}
-    </ScaffoldContainer>
+    </PageContainer>
   )
 }
 

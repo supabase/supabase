@@ -16,14 +16,13 @@ import {
   removeRedundantH1,
 } from '~/features/docs/GuidesMdx.utils'
 import { newEditLink } from '~/features/helpers.edit-link'
-import { REVALIDATION_TAGS } from '~/features/helpers.fetch'
 import { Guide, GuideArticle, GuideFooter, GuideHeader, GuideMdxContent } from '~/features/ui/guide'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter } from '~/lib/docs'
 import { linkTransform, type UrlTransformFunction } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
-import { octokit } from '~/lib/octokit'
+import { getGitHubFileContents, octokit } from '~/lib/octokit'
 import type { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 // We fetch these docs at build time from an external repo
@@ -85,13 +84,6 @@ async function getLatestRelease(after: string | null = null) {
       owner: org,
       name: repo,
       after,
-      request: {
-        fetch: (url: RequestInfo | URL, options?: RequestInit) =>
-          fetch(url, {
-            ...options,
-            next: { tags: [REVALIDATION_TAGS.WRAPPERS] },
-          }),
-      },
     })
 
     return (
@@ -226,6 +218,14 @@ const pageMap = [
     remoteFile: 's3.md',
   },
   {
+    slug: 's3_vectors',
+    meta: {
+      title: 'AWS S3 Vectors',
+      dashboardIntegrationPath: 's3_vectors_wrapper',
+    },
+    remoteFile: 's3vectors.md',
+  },
+  {
     slug: 'snowflake',
     meta: {
       title: 'Snowflake',
@@ -349,14 +349,14 @@ const getContent = async (params: Params) => {
       throw new Error('No latest release found for federated wrappers pages')
     }
 
-    const repoPath = `${org}/${repo}/${tag}/${docsDir}/${remoteFile}`
     editLink = `${org}/${repo}/blob/${tag}/${docsDir}/${remoteFile}`
 
-    const response = await fetch(`https://raw.githubusercontent.com/${repoPath}`, {
-      cache: 'force-cache',
-      next: { tags: [REVALIDATION_TAGS.WRAPPERS] },
+    let rawContent = await getGitHubFileContents({
+      org,
+      repo,
+      path: `${docsDir}/${remoteFile}`,
+      branch: tag,
     })
-    const rawContent = await response.text()
 
     assetsBaseUrl = `https://raw.githubusercontent.com/${org}/${repo}/${tag}/docs/assets/`
 

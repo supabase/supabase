@@ -1,47 +1,47 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useFlag, useParams } from 'common'
 import { AlertCircle, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { useFlag, useParams } from 'common'
-import { PLAN_DETAILS } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
-import { Markdown } from 'components/interfaces/Markdown'
-import { extractPostgresVersionDetails } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import {
-  ProjectUpgradeTargetVersion,
-  useProjectUpgradeEligibilityQuery,
-} from 'data/config/project-upgrade-eligibility-query'
-import { useSetProjectStatus } from 'data/projects/project-detail-query'
-import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
-import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Badge,
   Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Modal,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
+import { PLAN_DETAILS } from '@/components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { extractPostgresVersionDetails } from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
+import {
+  ProjectUpgradeTargetVersion,
+  useProjectUpgradeEligibilityQuery,
+} from '@/data/config/project-upgrade-eligibility-query'
+import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useProjectUpgradeMutation } from '@/data/projects/project-upgrade-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
 
 const formatValue = ({ postgres_version, release_channel }: ProjectUpgradeTargetVersion) => {
   return `${postgres_version}|${release_channel}`
@@ -70,7 +70,7 @@ export const ProjectUpgradeAlert = () => {
   const durationEstimateHours = data?.duration_estimate_hours || 1
   const legacyAuthCustomRoles = data?.legacy_auth_custom_roles || []
 
-  const { mutate: upgradeProject, isLoading: isUpgrading } = useProjectUpgradeMutation({
+  const { mutate: upgradeProject, isPending: isUpgrading } = useProjectUpgradeMutation({
     onSuccess: (res, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.UPGRADING })
       toast.success('Upgrading project')
@@ -120,14 +120,13 @@ export const ProjectUpgradeAlert = () => {
           Your project can be upgraded to the latest version of Postgres
         </AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>
-          <p className="mb-3">
-            The latest version of Postgres ({latestPgVersion}) is available for your project.
-          </p>
+          <p>The latest version of Postgres ({latestPgVersion}) is available for your project.</p>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 size="tiny"
                 type="primary"
+                className="mt-2"
                 onClick={() => setShowUpgradeModal(true)}
                 disabled={projectUpgradeDisabled}
               >
@@ -150,7 +149,7 @@ export const ProjectUpgradeAlert = () => {
         onCancel={() => setShowUpgradeModal(false)}
         header="Confirm to upgrade Postgres version"
       >
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onConfirmUpgrade)}>
             <Admonition
               type="warning"
@@ -239,12 +238,12 @@ export const ProjectUpgradeAlert = () => {
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 )}
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="postgresVersionSelection"
                   render={({ field }) => (
                     <FormItemLayout label="Select the version of Postgres to upgrade to">
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger_Shadcn_>
                             <SelectValue_Shadcn_ placeholder="Select a Postgres version" />
@@ -262,9 +261,7 @@ export const ProjectUpgradeAlert = () => {
                                     <div className="flex items-center gap-3">
                                       <span className="text-foreground">{postgresVersion}</span>
                                       {value.release_channel !== 'ga' && (
-                                        <Badge variant="warning" className="mr-1 capitalize">
-                                          {value.release_channel}
-                                        </Badge>
+                                        <Badge variant="warning">{value.release_channel}</Badge>
                                       )}
                                     </div>
                                   </SelectItem_Shadcn_>
@@ -273,7 +270,7 @@ export const ProjectUpgradeAlert = () => {
                             </SelectGroup_Shadcn_>
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -293,7 +290,7 @@ export const ProjectUpgradeAlert = () => {
               </Button>
             </Modal.Content>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </Modal>
     </>
   )

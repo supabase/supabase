@@ -1,12 +1,10 @@
-import type { UseFormReturn } from 'react-hook-form'
 // End of third-party imports
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { InlineLink } from 'components/ui/InlineLink'
+import type { UseFormReturn } from 'react-hook-form'
 import {
   cn,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -16,19 +14,23 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import {
   CATEGORY_OPTIONS,
-  type ExtendedSupportCategories,
   SEVERITY_OPTIONS,
+  type ExtendedSupportCategories,
 } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 interface CategoryAndSeverityInfoProps {
   form: UseFormReturn<SupportFormValues>
   category: ExtendedSupportCategories
-  severity: string
+  severity?: string
   projectRef: string
+  showSeverity?: boolean
+  showIssueSuggestion?: boolean
 }
 
 export function CategoryAndSeverityInfo({
@@ -36,18 +38,23 @@ export function CategoryAndSeverityInfo({
   category,
   severity,
   projectRef,
+  showSeverity = true,
+  showIssueSuggestion = true,
 }: CategoryAndSeverityInfoProps) {
   return (
-    <div className={cn('grid sm:grid-cols-2 sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2')}>
+    <div
+      className={cn(
+        'grid sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2',
+        showSeverity ? 'sm:grid-cols-2' : 'sm:grid-cols-1'
+      )}
+    >
       <CategorySelector form={form} />
-      <SeveritySelector form={form} />
-
-      <IssueSuggestion category={category} projectRef={projectRef} />
-
+      {showSeverity && <SeveritySelector form={form} />}
+      {showIssueSuggestion && <IssueSuggestion category={category} projectRef={projectRef} />}
       {(severity === 'Urgent' || severity === 'High') && (
         <Admonition
           type="default"
-          className="mb-0 sm:col-span-2"
+          className="sm:col-span-2"
           title="We do our best to respond to everyone as quickly as possible"
           description="Prioritization will be based on production status. We ask that you reserve High and Urgent severity for production-impacting issues only."
         />
@@ -62,14 +69,14 @@ interface CategorySelectorProps {
 
 function CategorySelector({ form }: CategorySelectorProps) {
   return (
-    <FormField_Shadcn_
+    <FormField
       name="category"
       control={form.control}
       render={({ field }) => {
         const { ref: _ref, ...fieldWithoutRef } = field
         return (
           <FormItemLayout hideMessage layout="vertical" label="What are you having issues with?">
-            <FormControl_Shadcn_>
+            <FormControl>
               <Select_Shadcn_
                 {...fieldWithoutRef}
                 defaultValue={field.value}
@@ -84,7 +91,7 @@ function CategorySelector({ form }: CategorySelectorProps) {
                 </SelectTrigger_Shadcn_>
                 <SelectContent_Shadcn_>
                   <SelectGroup_Shadcn_>
-                    {CATEGORY_OPTIONS.filter((option) => !option.hidden).map((option) => (
+                    {CATEGORY_OPTIONS.map((option) => (
                       <SelectItem_Shadcn_ key={option.value} value={option.value}>
                         {option.label}
                         <span className="block text-xs text-foreground-lighter">
@@ -95,7 +102,7 @@ function CategorySelector({ form }: CategorySelectorProps) {
                   </SelectGroup_Shadcn_>
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )
       }}
@@ -109,14 +116,14 @@ interface SeveritySelectorProps {
 
 function SeveritySelector({ form }: SeveritySelectorProps) {
   return (
-    <FormField_Shadcn_
+    <FormField
       name="severity"
       control={form.control}
       render={({ field }) => {
         const { ref, ...fieldWithoutRef } = field
         return (
           <FormItemLayout hideMessage layout="vertical" label="Severity">
-            <FormControl_Shadcn_>
+            <FormControl>
               <Select_Shadcn_
                 {...fieldWithoutRef}
                 defaultValue={field.value}
@@ -140,7 +147,7 @@ function SeveritySelector({ form }: SeveritySelectorProps) {
                   </SelectGroup_Shadcn_>
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )
       }}

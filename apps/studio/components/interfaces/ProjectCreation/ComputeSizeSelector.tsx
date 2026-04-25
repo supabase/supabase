@@ -1,14 +1,7 @@
 import { UseFormReturn } from 'react-hook-form'
-
-import { InlineLink } from 'components/ui/InlineLink'
-import Panel from 'components/ui/Panel'
-import { instanceSizeSpecs } from 'data/projects/new-project.constants'
-import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { DOCS_URL } from 'lib/constants'
 import { CloudProvider } from 'shared-data'
 import {
-  Badge,
-  FormField_Shadcn_,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -16,9 +9,16 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
+import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { sizes } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import { getCloudProviderArchitecture } from '@/lib/cloudprovider-utils'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ComputeSizeSelectorProps {
   form: UseFormReturn<CreateProjectForm>
@@ -27,7 +27,7 @@ interface ComputeSizeSelectorProps {
 export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
   return (
     <Panel.Content>
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="instanceSize"
         render={({ field }) => (
@@ -38,21 +38,11 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
               <>
                 <p>
                   The size for your dedicated database. You can change this later. Learn more about{' '}
-                  <InlineLink
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-inherit hover:text-foreground transition-colors"
-                    href={`${DOCS_URL}/guides/platform/compute-add-ons`}
-                  >
+                  <InlineLink href={`${DOCS_URL}/guides/platform/compute-add-ons`}>
                     compute add-ons
                   </InlineLink>{' '}
                   and{' '}
-                  <InlineLink
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-inherit hover:text-foreground transition-colors"
-                    href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
-                  >
+                  <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}>
                     compute billing
                   </InlineLink>
                   .
@@ -75,15 +65,11 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                     .map((option) => {
                       return (
                         <SelectItem_Shadcn_ key={option} value={option}>
-                          <div className="flex flex-row gap-2">
-                            <div className="text-center w-[80px]">
-                              <Badge
-                                variant={option === 'micro' ? 'default' : 'brand'}
-                                className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
-                              >
-                                {instanceSizeSpecs[option].label}
-                              </Badge>
+                          <div className="flex flex-row gap-4 items-center">
+                            <div className="w-14 flex items-center">
+                              <ComputeBadge infraComputeSize={option} />
                             </div>
+
                             <div className="text-sm">
                               <span className="text-foreground">
                                 {instanceSizeSpecs[option].ram} RAM /{' '}

@@ -1,9 +1,9 @@
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { useOrganizationPaymentMethodMarkAsDefaultMutation } from 'data/organizations/organization-payment-method-default-mutation'
-import type { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
+import { toast } from 'sonner'
 import { Button, Modal } from 'ui'
+
+import { useOrganizationPaymentMethodMarkAsDefaultMutation } from '@/data/organizations/organization-payment-method-default-mutation'
+import type { OrganizationPaymentMethod } from '@/data/organizations/organization-payment-methods-query'
 
 export interface ChangePaymentMethodModalProps {
   selectedPaymentMethod?: OrganizationPaymentMethod
@@ -15,7 +15,7 @@ const ChangePaymentMethodModal = ({
   onClose,
 }: ChangePaymentMethodModalProps) => {
   const { slug } = useParams()
-  const { mutate: markAsDefault, isLoading: isUpdating } =
+  const { mutate: markAsDefault, isPending: isUpdating } =
     useOrganizationPaymentMethodMarkAsDefaultMutation({
       onSuccess: () => {
         toast.success(

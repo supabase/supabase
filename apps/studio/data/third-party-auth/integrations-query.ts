@@ -1,17 +1,20 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
-import { keys } from './keys'
 
-export type GetThirdPartyAuthIntegrationsVariables = {
+import { keys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError } from '@/types'
+
+export type ThirdPartyAuthIntegrationsVariables = {
   projectRef?: string
 }
 
+export type ThirdPartyAuthIntegrationsError = ResponseError
+
 export type ThirdPartyAuthIntegration = components['schemas']['ThirdPartyAuth']
 
-export async function getThirdPartyAuthIntegrations(
-  { projectRef }: GetThirdPartyAuthIntegrationsVariables,
+async function getThirdPartyAuthIntegrations(
+  { projectRef }: ThirdPartyAuthIntegrationsVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -29,16 +32,13 @@ export type ThirdPartyAuthIntegrationsData = Awaited<
   ReturnType<typeof getThirdPartyAuthIntegrations>
 >
 
-export const useThirdPartyAuthIntegrationsQuery = <TData = ThirdPartyAuthIntegrationsData>(
-  { projectRef }: GetThirdPartyAuthIntegrationsVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<ThirdPartyAuthIntegrationsData, ResponseError, TData> = {}
-) =>
-  useQuery<ThirdPartyAuthIntegrationsData, ResponseError, TData>({
+export const thirdPartyAuthIntegrationsQueryOptions = (
+  { projectRef }: ThirdPartyAuthIntegrationsVariables,
+  { enabled = true }: { enabled?: boolean } = { enabled: true }
+) => {
+  return queryOptions({
     queryKey: keys.integrations(projectRef),
     queryFn: ({ signal }) => getThirdPartyAuthIntegrations({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
-    ...options,
   })
+}

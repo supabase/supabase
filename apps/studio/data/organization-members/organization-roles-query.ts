@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-
 import type { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export const FIXED_ROLE_ORDER = ['Owner', 'Administrator', 'Developer', 'Read-only']
 export type OrganizationRolesVariables = { slug?: string }
@@ -19,11 +19,14 @@ export async function getOrganizationRoles(
 
   const { data, error } = await get('/platform/organizations/{slug}/roles', {
     params: { path: { slug } },
+    headers: { Version: 2 },
     signal,
   })
 
   if (error) handleError(error)
-  return data
+
+  // [Joshen] Temp while API has versioning on this endpoint
+  return data as unknown as OrganizationRolesResponse
 }
 
 export type OrganizationRolesData = Awaited<ReturnType<typeof getOrganizationRoles>>

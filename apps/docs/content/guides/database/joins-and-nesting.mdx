@@ -211,6 +211,460 @@ GET https://[REF].supabase.co/rest/v1/orchestral_sections?select=id,name,instrum
 </TabPanel>
 </Tabs>
 
+## Join types and join modifiers
+
+By default, embedded relations use **left join** semantics from the parent table:
+
+- Parent rows are returned even if no related rows match.
+- The embedded relation is `[]` for one-to-many joins and `null` for many-to-one joins when nothing matches.
+
+To filter out parent rows that do not match the related table, use `!inner` on the embedded relation.
+
+### What `:` and `!` mean in join syntax
+
+| Syntax                          | Meaning                                                                                 | Example                                 |
+| ------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------- |
+| `alias:relation(columns)`       | Rename the embedded relation in the response.                                           | `start_scan:scans(id, badge_scan_time)` |
+| `relation!inner(columns)`       | Use `inner join` behavior for that embedded relation.                                   | `instruments!inner(id, name)`           |
+| `relation!foreign_key(columns)` | Choose which foreign key relationship to use when multiple foreign keys match the join. | `scans!scan_id_start(id)`               |
+
+### Example data for join types
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="table"
+  queryGroup="join-types-example"
+>
+<TabPanel id="table" label="Tables">
+
+#### Orchestral sections
+
+| `id` | `name`     |
+| ---- | ---------- |
+| 1    | strings    |
+| 2    | woodwinds  |
+| 3    | percussion |
+
+#### Instruments
+
+| `id` | `name` | `section_id` |
+| ---- | ------ | ------------ |
+| 1    | violin | 1            |
+| 2    | viola  | 1            |
+| 3    | flute  | 2            |
+| 4    | oboe   | 2            |
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+```sql
+create table orchestral_sections (
+  "id" serial primary key,
+  "name" text
+);
+
+insert into orchestral_sections
+  (id, name)
+values
+  (1, 'strings'),
+  (2, 'woodwinds'),
+  (3, 'percussion');
+
+create table instruments (
+  "id" serial primary key,
+  "name" text,
+  "section_id" int references orchestral_sections
+);
+
+insert into instruments
+  (id, name, section_id)
+values
+  (1, 'violin', 1),
+  (2, 'viola', 1),
+  (3, 'flute', 2),
+  (4, 'oboe', 2);
+```
+
+</TabPanel>
+</Tabs>
+
+### Left join (default)
+
+This query filters on a joined field (`instruments.name`) but still returns all parent rows:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="join-types-left"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase
+  .from('orchestral_sections')
+  .select(
+    `
+    id,
+    name,
+    instruments ( id, name )
+  `
+  )
+  .eq('instruments.name', 'flute')
+```
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase
+  .from('orchestral_sections')
+  .select('''
+    id,
+    name,
+    instruments ( id, name )
+  ''')
+  .eq('instruments.name', 'flute');
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+```swift
+try await supabase
+  .from("orchestral_sections")
+  .select(
+    """
+      id,
+      name,
+      instruments ( id, name )
+    """
+  )
+  .eq("instruments.name", value: "flute")
+  .execute()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val columns = Columns.raw("""
+    id,
+    name,
+    instruments ( id, name )
+""".trimIndent())
+
+val data = supabase.from("orchestral_sections").select(
+  columns = columns
+) {
+  filter {
+    eq("instruments.name", "flute")
+  }
+}
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+data = (
+  supabase.from_('orchestral_sections')
+  .select('id, name, instruments(id, name)')
+  .eq('instruments.name', 'flute')
+  .execute()
+)
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="url" label="URL">
+
+```bash
+GET https://[REF].supabase.co/rest/v1/orchestral_sections?select=id,name,instruments(id,name)&instruments.name=eq.flute
+```
+
+</TabPanel>
+</Tabs>
+
+#### Result
+
+```json
+[
+  {
+    "id": 1,
+    "name": "strings",
+    "instruments": []
+  },
+  {
+    "id": 2,
+    "name": "woodwinds",
+    "instruments": [{ "id": 3, "name": "flute" }]
+  },
+  {
+    "id": 3,
+    "name": "percussion",
+    "instruments": []
+  }
+]
+```
+
+### Inner join (`!inner`)
+
+Adding `!inner` filters out parent rows that don't match the joined filter:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="join-types-inner"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase
+  .from('orchestral_sections')
+  .select(
+    `
+    id,
+    name,
+    instruments!inner ( id, name )
+  `
+  )
+  .eq('instruments.name', 'flute')
+```
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase
+  .from('orchestral_sections')
+  .select('''
+    id,
+    name,
+    instruments!inner ( id, name )
+  ''')
+  .eq('instruments.name', 'flute');
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+```swift
+try await supabase
+  .from("orchestral_sections")
+  .select(
+    """
+      id,
+      name,
+      instruments!inner ( id, name )
+    """
+  )
+  .eq("instruments.name", value: "flute")
+  .execute()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val columns = Columns.raw("""
+    id,
+    name,
+    instruments!inner ( id, name )
+""".trimIndent())
+
+val data = supabase.from("orchestral_sections").select(
+  columns = columns
+) {
+  filter {
+    eq("instruments.name", "flute")
+  }
+}
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+data = (
+  supabase.from_('orchestral_sections')
+  .select('id, name, instruments!inner(id, name)')
+  .eq('instruments.name', 'flute')
+  .execute()
+)
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="url" label="URL">
+
+```bash
+GET https://[REF].supabase.co/rest/v1/orchestral_sections?select=id,name,instruments!inner(id,name)&instruments.name=eq.flute
+```
+
+</TabPanel>
+</Tabs>
+
+#### Result
+
+```json
+[
+  {
+    "id": 2,
+    "name": "woodwinds",
+    "instruments": [{ "id": 3, "name": "flute" }]
+  }
+]
+```
+
+### Filtering using joined fields
+
+Use `joined_table.column` in filters (for example `eq`, `neq`, and `in`):
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="join-types-filtering"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase
+  .from('instruments')
+  .select(
+    `
+    id,
+    name,
+    orchestral_sections!inner ( id, name )
+  `
+  )
+  .eq('orchestral_sections.name', 'woodwinds')
+```
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase
+  .from('instruments')
+  .select('''
+    id,
+    name,
+    orchestral_sections!inner ( id, name )
+  ''')
+  .eq('orchestral_sections.name', 'woodwinds');
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+```swift
+try await supabase
+  .from("instruments")
+  .select(
+    """
+      id,
+      name,
+      orchestral_sections!inner ( id, name )
+    """
+  )
+  .eq("orchestral_sections.name", value: "woodwinds")
+  .execute()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val columns = Columns.raw("""
+    id,
+    name,
+    orchestral_sections!inner ( id, name )
+""".trimIndent())
+
+val data = supabase.from("instruments").select(
+  columns = columns
+) {
+  filter {
+    eq("orchestral_sections.name", "woodwinds")
+  }
+}
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+data = (
+  supabase.from_('instruments')
+  .select('id, name, orchestral_sections!inner(id, name)')
+  .eq('orchestral_sections.name', 'woodwinds')
+  .execute()
+)
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="url" label="URL">
+
+```bash
+GET https://[REF].supabase.co/rest/v1/instruments?select=id,name,orchestral_sections!inner(id,name)&orchestral_sections.name=eq.woodwinds
+```
+
+</TabPanel>
+</Tabs>
+
+#### Result
+
+```json
+[
+  {
+    "id": 3,
+    "name": "flute",
+    "orchestral_sections": {
+      "id": 2,
+      "name": "woodwinds"
+    }
+  },
+  {
+    "id": 4,
+    "name": "oboe",
+    "orchestral_sections": {
+      "id": 2,
+      "name": "woodwinds"
+    }
+  }
+]
+```
+
 ## Many-to-many joins
 
 The data APIs will detect many-to-many joins. For example, if you have a database which stored teams of users (where each user could belong to many teams):

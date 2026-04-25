@@ -1,4 +1,8 @@
-import { DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from 'lib/constants'
+import { DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from '@/lib/constants'
+
+// This is the same as the ZXCVBNScore type from zxcvbn
+// but we need to define it here because we don't to import zxcvbn everywhere
+export type PasswordStrengthScore = 0 | 1 | 2 | 3 | 4
 
 export async function passwordStrength(value: string) {
   // [Alaister]: Lazy load zxcvbn to avoid bundling it with the main app (it's pretty chunky)
@@ -6,7 +10,7 @@ export async function passwordStrength(value: string) {
 
   let message: string = ''
   let warning: string = ''
-  let strength: number = 0
+  let strength: PasswordStrengthScore = 0
 
   if (value && value !== '') {
     if (value.length > 99) {

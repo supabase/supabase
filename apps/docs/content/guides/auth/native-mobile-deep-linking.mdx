@@ -97,7 +97,7 @@ With Deep Linking, you can configure this redirect to open a specific page. This
 
     export default function Auth() {
       // Handle linking into app from email app.
-      const url = Linking.useURL();
+      const url = Linking.useLinkingURL();
       if (url) createSessionFromUrl(url);
 
       return (
@@ -190,6 +190,8 @@ With Deep Linking, you can configure this redirect to open a specific page. This
       ```
 
       For more info: https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app
+
+      <$Partial path="universal_links_apple.mdx" />
 
     </TabPanel>
     <TabPanel id="windows" label="Windows">
@@ -342,6 +344,8 @@ With Deep Linking, you can configure this redirect to open a specific page. This
       </dict>
       </plist>
     ```
+
+    <$Partial path="universal_links_apple.mdx" />
 
   </TabPanel>
   </$Show>

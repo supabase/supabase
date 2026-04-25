@@ -2,12 +2,12 @@ import type { PostgresPublication, PostgresTable } from '@supabase/postgres-meta
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { Badge, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 
 interface PublicationsTableItemProps {
   table: PostgresTable
@@ -33,7 +33,7 @@ export const PublicationsTableItem = ({
     'publications'
   )
 
-  const { mutate: updatePublications, isLoading } = useDatabasePublicationUpdateMutation()
+  const { mutate: updatePublications, isPending } = useDatabasePublicationUpdateMutation()
 
   const toggleReplicationForTable = async (
     table: PostgresTable,
@@ -94,7 +94,7 @@ export const PublicationsTableItem = ({
               <TooltipTrigger>
                 <Switch
                   size="small"
-                  disabled={!canUpdatePublications || isLoading || isProtected}
+                  disabled={!canUpdatePublications || isPending || isProtected}
                   checked={checked}
                   onClick={() => toggleReplicationForTable(table, selectedPublication)}
                 />

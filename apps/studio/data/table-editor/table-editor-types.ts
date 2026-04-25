@@ -5,24 +5,34 @@ import type {
   PostgresTable,
   PostgresView,
 } from '@supabase/postgres-meta'
-import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+
+import { WRAPPER_HANDLERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 interface TableRelationship extends PostgresRelationship {
   deletion_action: 'a' | 'r' | 'c' | 'n' | 'd'
   update_action: 'a' | 'r' | 'c' | 'n' | 'd'
 }
 
+interface TableUniqueIndex {
+  schema: string
+  table_name: string
+  table_id: number
+  columns: string[]
+}
+
 export interface Table extends PostgresTable {
   entity_type: ENTITY_TYPE.TABLE
   columns: PostgresColumn[]
   relationships: TableRelationship[]
+  unique_indexes?: TableUniqueIndex[]
 }
 
 export interface PartitionedTable extends PostgresTable {
   entity_type: ENTITY_TYPE.PARTITIONED_TABLE
   columns: PostgresColumn[]
   relationships: TableRelationship[]
+  unique_indexes?: TableUniqueIndex[]
 }
 
 export interface View extends PostgresView {

@@ -4,26 +4,24 @@ interface HeaderTitleProps {
   isDuplicating: boolean
 }
 
-const HeaderTitle = ({ schema, table, isDuplicating }: HeaderTitleProps) => {
+export const HeaderTitle = ({ schema, table, isDuplicating }: HeaderTitleProps) => {
   if (!table) {
     return (
-      <>
-        Create a new table under <code className="text-sm">{schema}</code>
-      </>
+      <span>
+        Create a new table under <code className="text-code-inline !text-sm">{schema}</code>
+      </span>
     )
   }
   if (isDuplicating) {
     return (
-      <>
-        Duplicate table <code className="text-sm">{table?.name}</code>
-      </>
+      <span>
+        Duplicate table <code className="text-code-inline !text-sm">{table?.name}</code>
+      </span>
     )
   }
   return (
-    <>
-      Update table <code className="text-sm">{table?.name}</code>
-    </>
+    <span>
+      Update table <code className="text-code-inline !text-sm">{table?.name}</code>
+    </span>
   )
 }
-
-export default HeaderTitle

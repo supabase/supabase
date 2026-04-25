@@ -1,9 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Edit2, MoreVertical, Trash } from 'lucide-react'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import type { ProjectSecret } from 'data/secrets/secrets-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   DropdownMenu,
@@ -16,6 +12,10 @@ import {
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import type { ProjectSecret } from '@/data/secrets/secrets-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+
 interface EdgeFunctionSecretProps {
   secret: ProjectSecret
   onSelectDelete: () => void
@@ -25,7 +25,7 @@ interface EdgeFunctionSecretProps {
 const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFunctionSecretProps) => {
   const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
   // [Joshen] Following API's validation:
-  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/v1/projects/ref/secrets/secrets.controller.ts#L106
+  // https://github.com/supabase/platform/blob/develop/api/src/routes/v1/projects/ref/secrets/secrets.controller.ts#L106
   const isReservedSecret = !!secret.name.match(/^(SUPABASE_).*/)
 
   return (

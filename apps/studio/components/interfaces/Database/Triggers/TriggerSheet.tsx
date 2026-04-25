@@ -1,24 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { Terminal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { PostgresTrigger } from '@supabase/postgres-meta'
-import FormBoxEmpty from 'components/ui/FormBoxEmpty'
-import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
-import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import {
   Button,
   Checkbox_Shadcn_,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -33,6 +25,8 @@ import {
   SheetTitle,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
 import ChooseFunctionForm from './ChooseFunctionForm'
 import {
   TRIGGER_ENABLED_MODES,
@@ -40,7 +34,14 @@ import {
   TRIGGER_ORIENTATIONS,
   TRIGGER_TYPES,
 } from './Triggers.constants'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import FormBoxEmpty from '@/components/ui/FormBoxEmpty'
+import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
+import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 
 const formId = 'create-trigger'
 
@@ -89,10 +90,9 @@ export const TriggerSheet = ({
 }: TriggerSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [showFunctionSelector, setShowFunctionSelector] = useState(false)
 
-  const { mutate: createDatabaseTrigger, isLoading: isCreating } = useDatabaseTriggerCreateMutation(
+  const { mutate: createDatabaseTrigger, isPending: isCreating } = useDatabaseTriggerCreateMutation(
     {
       onSuccess: () => {
         toast.success(`Successfully created trigger`)
@@ -103,7 +103,7 @@ export const TriggerSheet = ({
       },
     }
   )
-  const { mutate: updateDatabaseTrigger, isLoading: isUpdating } = useDatabaseTriggerUpdateMutation(
+  const { mutate: updateDatabaseTrigger, isPending: isUpdating } = useDatabaseTriggerUpdateMutation(
     {
       onSuccess: () => {
         toast.success(`Successfully updated trigger`)
@@ -135,9 +135,10 @@ export const TriggerSheet = ({
   })
   const { function_name, function_schema } = form.watch()
 
-  function isClosingSidePanel() {
-    form.formState.isDirty ? setIsClosingPanel(true) : onClose()
-  }
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => form.formState.isDirty,
+    onClose,
+  })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
@@ -188,7 +189,7 @@ export const TriggerSheet = ({
 
   return (
     <>
-      <Sheet open={open} onOpenChange={isClosingSidePanel}>
+      <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetContent size="lg" className="flex flex-col gap-0">
           <SheetHeader>
             <SheetTitle>
@@ -200,13 +201,13 @@ export const TriggerSheet = ({
             </SheetTitle>
           </SheetHeader>
 
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={formId}
               className="flex-1 flex flex-col gap-y-6 overflow-auto py-6"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              <FormField
                 name="name"
                 control={form.control}
                 render={({ field }) => (
@@ -216,15 +217,15 @@ export const TriggerSheet = ({
                     label="Name of trigger"
                     description="Do not use spaces/whitespace."
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_ {...field} placeholder="Name of trigger" />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
 
               {isEditing ? (
-                <FormField_Shadcn_
+                <FormField
                   name="enabled_mode"
                   control={form.control}
                   render={({ field }) => (
@@ -234,7 +235,7 @@ export const TriggerSheet = ({
                       label="Enabled mode"
                       description="Determines if a trigger should or should not fire. Can also be used to disable a trigger, but not delete it."
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Select_Shadcn_ defaultValue={field.value} onValueChange={field.onChange}>
                           <SelectTrigger_Shadcn_ className="col-span-8">
                             {
@@ -251,7 +252,7 @@ export const TriggerSheet = ({
                             ))}
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -259,7 +260,7 @@ export const TriggerSheet = ({
                 <>
                   <Separator />
 
-                  <FormField_Shadcn_
+                  <FormField
                     name="tableId"
                     control={form.control}
                     render={({ field }) => (
@@ -269,7 +270,7 @@ export const TriggerSheet = ({
                         label="Table"
                         description="Trigger will watch for changes on this table"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Select_Shadcn_
                             defaultValue={field.value}
                             onValueChange={(val) => {
@@ -294,12 +295,12 @@ export const TriggerSheet = ({
                               ))}
                             </SelectContent_Shadcn_>
                           </Select_Shadcn_>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
 
-                  <FormField_Shadcn_
+                  <FormField
                     name="events"
                     control={form.control}
                     render={() => (
@@ -310,7 +311,7 @@ export const TriggerSheet = ({
                         description="These are the events that are watched by the trigger, only the events selected above will fire the trigger on the table you've selected."
                       >
                         {TRIGGER_EVENTS.map((event) => (
-                          <FormField_Shadcn_
+                          <FormField
                             key={event.value}
                             control={form.control}
                             name="events"
@@ -321,7 +322,7 @@ export const TriggerSheet = ({
                                 label={event.label}
                                 description={event.description}
                               >
-                                <FormControl_Shadcn_>
+                                <FormControl>
                                   <Checkbox_Shadcn_
                                     className="translate-y-[2px]"
                                     checked={field.value?.includes(event.value)}
@@ -333,7 +334,7 @@ export const TriggerSheet = ({
                                           )
                                     }}
                                   />
-                                </FormControl_Shadcn_>
+                                </FormControl>
                               </FormItemLayout>
                             )}
                           />
@@ -342,7 +343,7 @@ export const TriggerSheet = ({
                     )}
                   />
 
-                  <FormField_Shadcn_
+                  <FormField
                     name="activation"
                     control={form.control}
                     render={({ field }) => (
@@ -352,7 +353,7 @@ export const TriggerSheet = ({
                         label="Trigger type"
                         description="Determines when your trigger fires"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Select_Shadcn_ defaultValue={field.value} onValueChange={field.onChange}>
                             <SelectTrigger_Shadcn_ className="col-span-8">
                               {TRIGGER_TYPES.find((option) => option.value === field.value)?.label}
@@ -366,12 +367,12 @@ export const TriggerSheet = ({
                               ))}
                             </SelectContent_Shadcn_>
                           </Select_Shadcn_>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
 
-                  <FormField_Shadcn_
+                  <FormField
                     name="orientation"
                     control={form.control}
                     render={({ field }) => (
@@ -381,7 +382,7 @@ export const TriggerSheet = ({
                         label="Orientation"
                         description="Identifies whether the trigger fires once for each processed row or once for each statement"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Select_Shadcn_ defaultValue={field.value} onValueChange={field.onChange}>
                             <SelectTrigger_Shadcn_ className="col-span-8">
                               {
@@ -398,19 +399,19 @@ export const TriggerSheet = ({
                               ))}
                             </SelectContent_Shadcn_>
                           </Select_Shadcn_>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
 
                   <Separator />
 
-                  <FormField_Shadcn_
+                  <FormField
                     name="function_name"
                     control={form.control}
                     render={() => (
                       <FormItemLayout layout="vertical" className="px-5">
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <div className="flex flex-col gap-y-2">
                             <p className="text-sm">Function to trigger</p>
                             {function_name.length === 0 ? (
@@ -457,21 +458,21 @@ export const TriggerSheet = ({
                               </div>
                             )}
                           </div>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
 
           <SheetFooter className="shrink-0">
             <Button
               type="default"
               htmlType="reset"
               disabled={isCreating || isUpdating}
-              onClick={onClose}
+              onClick={confirmOnClose}
             >
               Cancel
             </Button>
@@ -480,21 +481,7 @@ export const TriggerSheet = ({
             </Button>
           </SheetFooter>
 
-          <ConfirmationModal
-            visible={isClosingPanel}
-            title="Discard changes"
-            confirmLabel="Discard"
-            onCancel={() => setIsClosingPanel(false)}
-            onConfirm={() => {
-              setIsClosingPanel(false)
-              onClose()
-            }}
-          >
-            <p className="text-sm text-foreground-light">
-              There are unsaved changes. Are you sure you want to close the panel? Your changes will
-              be lost.
-            </p>
-          </ConfirmationModal>
+          <DiscardChangesConfirmationDialog {...modalProps} />
         </SheetContent>
       </Sheet>
 
@@ -502,8 +489,8 @@ export const TriggerSheet = ({
         visible={showFunctionSelector}
         setVisible={setShowFunctionSelector}
         onChange={(fn) => {
-          form.setValue('function_name', fn.name)
-          form.setValue('function_schema', fn.schema)
+          form.setValue('function_name', fn.name, { shouldDirty: true })
+          form.setValue('function_schema', fn.schema, { shouldDirty: true })
         }}
       />
     </>

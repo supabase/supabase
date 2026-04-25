@@ -1,31 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { PauseCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { useFlag, useParams } from 'common'
-import {
-  extractPostgresVersionDetails,
-  PostgresVersionSelector,
-} from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { InlineLinkClassName } from 'components/ui/InlineLink'
-import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { useSetProjectStatus } from 'data/projects/project-detail-query'
-import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
-import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { usePHFlag } from 'hooks/ui/useFlag'
-import { PROJECT_STATUS } from 'lib/constants'
 import { AWS_REGIONS, CloudProvider } from 'shared-data'
+import { toast } from 'sonner'
 import {
   Button,
   Card,
@@ -38,8 +20,8 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
-  Form_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormField,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -47,7 +29,25 @@ import {
 import { TimestampInfo } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { z } from 'zod'
+
 import { PauseDisabledState } from './PauseDisabledState'
+import {
+  extractPostgresVersionDetails,
+  PostgresVersionSelector,
+} from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
+import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useProjectPauseStatusQuery } from '@/data/projects/project-pause-status-query'
+import { useProjectRestoreMutation } from '@/data/projects/project-restore-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePHFlag } from '@/hooks/ui/useFlag'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -70,7 +70,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     error: pauseStatusError,
     isError,
     isSuccess: isPauseStatusSuccess,
-    isLoading,
+    isPending: isLoading,
   } = useProjectPauseStatusQuery({ ref }, { enabled: project?.status === PROJECT_STATUS.INACTIVE })
 
   const finalDaysRemainingBeforeRestoreDisabled =
@@ -90,10 +90,10 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
 
-  const { mutate: restoreProject, isLoading: isRestoring } = useProjectRestoreMutation({
+  const { mutate: restoreProject, isPending: isRestoring } = useProjectRestoreMutation({
     onSuccess: (_, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.RESTORING })
-      toast.success('Restoring project')
+      toast.success('Restoring project, project will be ready in a few minutes')
     },
   })
 
@@ -141,7 +141,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   return (
     <>
-      <Card className="w-[40rem] mx-auto">
+      <Card className="w-full max-w-[40rem] mx-auto">
         <CardContent>
           <PauseCircle
             size={48}
@@ -185,11 +185,21 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                         ). After that, this project will not be resumable, but data will still be
                         available for download.
                       </p>
-                      <p className="text-sm text-foreground-lighter mt-4">
+                      <p className="text-sm mt-4">
                         {enableProBenefitWording === 'variant-a'
                           ? 'Upgrade to Pro to prevent pauses and unlock features like branching, compute upgrades, and daily backups.'
                           : 'To prevent future pauses, consider upgrading to Pro.'}
                       </p>
+                      {!!pauseStatus.last_paused_on && (
+                        <p className="text-foreground-lighter text-sm">
+                          Project last paused on{' '}
+                          <TimestampInfo
+                            className="text-sm"
+                            labelFormat="DD MMM YYYY"
+                            utcTimestamp={pauseStatus.last_paused_on}
+                          />
+                        </p>
+                      )}
                     </>
                   ) : (
                     <p className="text-sm">
@@ -225,7 +235,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
         )}
 
         {isPauseStatusSuccess && !isRestoreDisabled && (
-          <CardFooter className="flex justify-end items-center gap-x-2">
+          <CardFooter className="flex flex-wrap justify-end items-center gap-2">
             <ButtonTooltip
               size="tiny"
               type="default"
@@ -264,43 +274,46 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
       <ConfirmationModal
         visible={showConfirmRestore}
-        size="medium"
+        size="small"
         title="Resume this project"
-        description={
-          isFreePlan
-            ? "Your project's data will be restored to when it was initially paused."
-            : "Your project's data will be restored and billing will resume based on compute size and hours active."
-        }
         onCancel={() => setShowConfirmRestore(false)}
         onConfirm={() => form.handleSubmit(onConfirmRestore)()}
         loading={isRestoring}
-        confirmLabel="Confirm resume"
+        confirmLabel="Resume"
+        confirmLabelLoading="Resuming"
         cancelLabel="Cancel"
       >
-        <Form_Shadcn_ {...form}>
-          <form onSubmit={form.handleSubmit(onConfirmRestore)}>
-            {showPostgresVersionSelector && (
-              <div className="space-y-2">
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="postgresVersionSelection"
-                  render={({ field }) => (
-                    <PostgresVersionSelector
-                      field={field}
-                      form={form}
-                      type="unpause"
-                      label="Select the version of Postgres to resume to"
-                      layout="vertical"
-                      dbRegion={region?.displayName ?? ''}
-                      cloudProvider={(project?.cloud_provider ?? 'AWS') as CloudProvider}
-                      organizationSlug={selectedOrganization?.slug}
-                    />
-                  )}
-                />
-              </div>
-            )}
-          </form>
-        </Form_Shadcn_>
+        <div className={cn(showPostgresVersionSelector && 'flex flex-col gap-y-4')}>
+          <p className="text-sm">
+            {isFreePlan
+              ? 'Your project’s data will be restored to when it was initially paused.'
+              : 'Your project’s data will be restored and billing will resume based on compute size and hours active.'}
+          </p>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onConfirmRestore)}>
+              {showPostgresVersionSelector && (
+                <div className="space-y-2">
+                  <FormField
+                    control={form.control}
+                    name="postgresVersionSelection"
+                    render={({ field }) => (
+                      <PostgresVersionSelector
+                        field={field}
+                        form={form}
+                        type="unpause"
+                        label="Postgres version"
+                        layout="vertical"
+                        dbRegion={region?.displayName ?? ''}
+                        cloudProvider={(project?.cloud_provider ?? 'AWS') as CloudProvider}
+                        organizationSlug={selectedOrganization?.slug}
+                      />
+                    )}
+                  />
+                </div>
+              )}
+            </form>
+          </Form>
+        </div>
       </ConfirmationModal>
 
       <Dialog

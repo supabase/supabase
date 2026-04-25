@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { toast } from 'sonner'
 import { Modal } from 'ui'
 
-import { useDisableReadOnlyModeMutation } from 'data/config/project-temp-disable-read-only-mutation'
+import { useDisableReadOnlyModeMutation } from '@/data/config/project-temp-disable-read-only-mutation'
 
 interface ConfirmDisableReadOnlyModeModalProps {
   visible: boolean
@@ -14,7 +14,7 @@ const ConfirmDisableReadOnlyModeModal = ({
   onClose,
 }: ConfirmDisableReadOnlyModeModalProps) => {
   const { ref } = useParams()
-  const { mutate: disableReadOnlyMode, isLoading } = useDisableReadOnlyModeMutation({
+  const { mutate: disableReadOnlyMode, isPending } = useDisableReadOnlyModeMutation({
     onSuccess: () => {
       toast.success('Successfully disabled read-only mode for 15 minutes')
       onClose()
@@ -26,7 +26,7 @@ const ConfirmDisableReadOnlyModeModal = ({
       alignFooter="right"
       visible={visible}
       onCancel={onClose}
-      loading={isLoading}
+      loading={isPending}
       confirmText="Disable read-only mode"
       header="Confirm to temporarily disable read-only mode"
       onConfirm={() => {

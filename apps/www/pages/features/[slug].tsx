@@ -3,16 +3,16 @@ import { GetStaticPaths, GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
+import { Badge, Button, cn } from 'ui'
+import { Image } from 'ui-patterns/Image'
 
-import { Badge, Button, cn, Image } from 'ui'
-import DefaultLayout from '~/components/Layouts/Default'
-import ShareArticleActions from '~/components/Blog/ShareArticleActions'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import CTABanner from '~/components/CTABanner'
-import PrevNextFeatureNav from '~/components/PrevNextFeatureNav'
-
-import { features } from '~/data/features'
-import type { FeatureType } from '~/data/features'
+import ShareArticleActions from '@/components/Blog/ShareArticleActions'
+import CTABanner from '@/components/CTABanner'
+import DefaultLayout from '@/components/Layouts/Default'
+import SectionContainer from '@/components/Layouts/SectionContainer'
+import PrevNextFeatureNav from '@/components/PrevNextFeatureNav'
+import { features } from '@/data/features'
+import type { FeatureType } from '@/data/features'
 
 interface FeaturePageProps {
   feature: FeatureType
@@ -105,10 +105,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
               <div className="relative h-full flex flex-col items-start gap-2 w-full max-w-2xl mx-auto">
                 <div className="flex flex-wrap items-center space-x-1 mb-2">
                   <Link href="/features" passHref>
-                    <Badge
-                      className="p-0 h-[22px] w-[22px] rounded-full flex items-center justify-center text-foreground-lighter hover:text-foreground hover:border-foreground-lighter"
-                      size="small"
-                    >
+                    <Badge className="p-0 h-[22px] w-[22px] rounded-full flex items-center justify-center text-foreground-lighter hover:text-foreground hover:border-foreground-lighter">
                       <ChevronLeft className="w-3.5 h-3.5" />
                     </Badge>
                   </Link>
@@ -122,7 +119,6 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
                       <Badge
                         key={product}
                         className="capitalize hover:border-foreground-lighter hover:text-foreground"
-                        size="small"
                       >
                         {product}
                       </Badge>
@@ -226,10 +222,19 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
               <div className="prose prose-docs">
                 <ReactMarkdown>{feature.description}</ReactMarkdown>
               </div>
-              {feature.docsUrl && (
-                <Button type="default" iconRight={<ChevronRight />} asChild>
-                  <Link href={feature.docsUrl}>Read Documentation</Link>
-                </Button>
+              {(feature.docsUrl || feature.blogUrl) && (
+                <div className="flex flex-wrap gap-2">
+                  {feature.docsUrl && (
+                    <Button type="default" iconRight={<ChevronRight />} asChild>
+                      <Link href={feature.docsUrl}>Read Documentation</Link>
+                    </Button>
+                  )}
+                  {feature.blogUrl && (
+                    <Button type="default" iconRight={<ChevronRight />} asChild>
+                      <Link href={feature.blogUrl}>Read Blog Post</Link>
+                    </Button>
+                  )}
+                </div>
               )}
               <div className="w-full flex items-center justify-between text-foreground-lighter text-sm border-y py-4">
                 <span>Share</span>

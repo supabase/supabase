@@ -1,15 +1,6 @@
 import MotionNumber from '@number-flow/react'
 import Link from 'next/link'
 import { useMemo } from 'react'
-
-import AlertError from 'components/ui/AlertError'
-import Panel from 'components/ui/Panel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { PROJECT_STATUS } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -18,8 +9,17 @@ import {
   CriticalIcon,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
+import AlertError from '@/components/ui/AlertError'
+import Panel from '@/components/ui/Panel'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import { OrgUsageResponse } from '@/data/usage/org-usage-query'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export interface DiskUsageProps {
   slug: string
@@ -39,10 +39,13 @@ export const DiskUsage = ({
   usage,
   currentBillingCycleSelected,
 }: DiskUsageProps) => {
-  const { data, isError, isLoading, isSuccess, error } = useOrgProjectsInfiniteQuery(
-    { slug },
-    { enabled: currentBillingCycleSelected }
-  )
+  const {
+    data,
+    isError,
+    isPending: isLoading,
+    isSuccess,
+    error,
+  } = useOrgProjectsInfiniteQuery({ slug }, { enabled: currentBillingCycleSelected })
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) || [], [data?.pages])
 
   const relevantProjects = useMemo(() => {

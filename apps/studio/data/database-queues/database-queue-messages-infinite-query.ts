@@ -1,12 +1,14 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { literal } from '@supabase/pg-meta/src/pg-format'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { last } from 'lodash'
 
-import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { DATE_FORMAT } from 'lib/constants'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
+import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { QUEUE_MESSAGE_TYPE } from '@/components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { DATE_FORMAT } from '@/lib/constants'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 export type DatabaseQueueVariables = {
   projectRef?: string
@@ -32,8 +34,13 @@ export async function getDatabaseQueue({
   queueName,
   afterTimestamp,
   status,
-}: DatabaseQueueVariables & { afterTimestamp: string }) {
+}: DatabaseQueueVariables & { afterTimestamp: string | undefined }) {
   if (!projectRef) throw new Error('Project ref is required')
+  if (!isQueueNameValid(queueName)) {
+    throw new Error(
+      'Invalid queue name: must contain only alphanumeric characters, underscores, and hyphens'
+    )
+  }
 
   if (status.length === 0) {
     return []
@@ -61,7 +68,7 @@ export async function getDatabaseQueue({
         ${[queueQuery, archivedQuery].filter(Boolean).join(' UNION ALL ')}
       ) AS combined`
   if (afterTimestamp) {
-    query += ` WHERE enqueued_at > '${afterTimestamp}'`
+    query += ` WHERE enqueued_at > ${literal(afterTimestamp)}`
   }
 
   const { result } = await executeSql({
@@ -80,9 +87,15 @@ export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
   {
     enabled = true,
     ...options
-  }: UseCustomInfiniteQueryOptions<DatabaseQueueData, DatabaseQueueError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    DatabaseQueueData,
+    DatabaseQueueError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    string | undefined
+  > = {}
 ) =>
-  useInfiniteQuery<DatabaseQueueData, DatabaseQueueError, TData>({
+  useInfiniteQuery({
     queryKey: databaseQueuesKeys.getMessagesInfinite(projectRef, queueName, { status }),
     queryFn: ({ pageParam }) => {
       return getDatabaseQueue({
@@ -95,9 +108,9 @@ export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
     },
     staleTime: 0,
     enabled: enabled && typeof projectRef !== 'undefined',
-
+    initialPageParam: undefined,
     getNextPageParam(lastPage) {
-      const hasNextPage = lastPage.length <= QUEUE_MESSAGES_PAGE_SIZE
+      const hasNextPage = lastPage.length >= QUEUE_MESSAGES_PAGE_SIZE
       if (!hasNextPage) return undefined
       return last(lastPage)?.enqueued_at
     },

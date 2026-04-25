@@ -1,15 +1,7 @@
+import { useParams } from 'common'
 import { ChevronRight, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useLintRuleDeleteMutation } from 'data/lint/delete-lint-rule-mutation'
-import { useProjectLintRulesQuery } from 'data/lint/lint-rules-query'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Badge,
   Button,
@@ -22,11 +14,19 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { LintInfo } from '../Linter/Linter.constants'
 import { generateRuleText } from './AdvisorRules.utils'
 import { CreateRuleSheet } from './CreateRuleSheet'
 import { DisableRuleModal } from './DisableRuleModal'
 import { EnableRuleModal } from './EnableRuleModal'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useLintRuleDeleteMutation } from '@/data/lint/delete-lint-rule-mutation'
+import { useProjectLintRulesQuery } from '@/data/lint/lint-rules-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface AdvisorRuleItemProps {
   lint: LintInfo
@@ -50,7 +50,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
   const {
     data = { exceptions: [] },
     error,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
   } = useProjectLintRulesQuery({ projectRef })
@@ -59,7 +59,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
   const selectedRuleMeta = data.exceptions.find((x) => x.id === selectedRuleToDelete)
   const selectedMemberForRule = members.find((x) => x.gotrue_id === selectedRuleMeta?.assigned_to)
 
-  const { mutate: deleteRule, isLoading: isDeleting } = useLintRuleDeleteMutation({
+  const { mutate: deleteRule, isPending: isDeleting } = useLintRuleDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted rule')
       setSelectedRuleToDelete(undefined)

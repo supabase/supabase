@@ -1,12 +1,12 @@
+import { useParams } from 'common'
 import { ExternalLink, HelpCircle } from 'lucide-react'
 import { NextRouter, useRouter } from 'next/router'
 import { ReactNode } from 'react'
+import { Button, cn, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { useParams } from 'common'
-import Panel from 'components/ui/Panel'
-import { Button, Loading, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import type { LogsEndpointParams } from '../Settings/Logs/Logs.types'
 import type { BaseReportParams, ReportQueryType } from './Reports.types'
+import Panel from '@/components/ui/Panel'
 
 export interface ReportWidgetProps<T = any> {
   data: T[]
@@ -15,6 +15,8 @@ export interface ReportWidgetProps<T = any> {
   error?: string | Object | null
   tooltip?: string | ReactNode
   className?: string
+  contentClassName?: string
+  headerClassName?: string
   renderer: (props: ReportWidgetRendererProps) => ReactNode
   append?: (props: ReportWidgetRendererProps) => ReactNode
   // for overriding props, such as data
@@ -38,8 +40,8 @@ const ReportWidget = (props: ReportWidgetProps) => {
 
   return (
     <Panel noMargin noHideOverflow className={cn('pb-0', props.className)} wrapWithLoading={false}>
-      <Panel.Content className="space-y-4">
-        <div className="flex flex-row items-start justify-between">
+      <Panel.Content className={cn('space-y-4', props.contentClassName)}>
+        <div className={cn('flex flex-row items-start justify-between', props.headerClassName)}>
           <div className="gap-2">
             <div className="flex flex-row gap-2">
               <h3 className="w-full h-6">{props.title}</h3>{' '}

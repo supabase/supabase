@@ -1,24 +1,24 @@
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { useState } from 'react'
-
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
+
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface SchemaComboBoxProps {
   className?: string
@@ -47,7 +47,7 @@ export const SchemaComboBox = ({
   const { data: project } = useSelectedProjectQuery()
   const {
     data,
-    isLoading: isSchemasLoading,
+    isPending: isSchemasLoading,
     isSuccess: isSchemasSuccess,
     isError: isSchemasError,
     error: schemasError,

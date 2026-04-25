@@ -9,6 +9,14 @@ subtitle: 'Set up redirect urls with Supabase Auth.'
 
 Supabase Auth allows you to control how the [user sessions](/docs/guides/auth/sessions) are handled by your application.
 
+<Admonition type="note">
+
+**Looking for OAuth client redirect URIs?**
+
+This guide covers redirect URLs for users signing **into** your application (using social providers like Google, GitHub, etc.). If you're setting up your Supabase project as an **OAuth 2.1 provider** for third-party applications, see the [OAuth Server Redirect URI configuration](/docs/guides/auth/oauth-server/getting-started#redirect-uri-configuration) instead.
+
+</Admonition>
+
 When using [passwordless sign-ins](/docs/reference/javascript/auth-signinwithotp) or [third-party providers](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect), the Supabase client library provides a `redirectTo` parameter to specify where to redirect the user after authentication. The URL in `redirectTo` should match the [Redirect URLs](/dashboard/project/_/auth/url-configuration) list configuration.
 
 To configure allowed redirect URLs, go to the [URL Configuration](/dashboard/project/_/auth/url-configuration) page. Once you've added necessary URLs, you can use the URL you want the user to be redirected to in the `redirectTo` parameter.

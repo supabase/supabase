@@ -12,12 +12,6 @@ You can control client access to Realtime [Broadcast](/docs/guides/realtime/broa
 - Control which clients can publish their presence to a Channel
 - Control which clients can receive messages about the presence of other clients
 
-<Admonition type="caution">
-
-Realtime Authorization is in Public Beta. To use Authorization for your Realtime Channels, use `supabase-js` version `v2.44.0` or later.
-
-</Admonition>
-
 <Admonition type="note">
 
 To enforce private channels you need to disable the 'Allow public access' setting in [Realtime Settings](/dashboard/project/_/realtime/settings)
@@ -133,7 +127,7 @@ exists (
       rooms_users
     where
       user_id = (select auth.uid())
-      and topic = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast')
   )
 );
@@ -266,7 +260,7 @@ with check (
       rooms_users
     where
       user_id = (select auth.uid())
-      and topic = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast')
   )
 );
@@ -293,7 +287,7 @@ using (
       rooms_users
     where
       user_id = (select auth.uid())
-      and topic = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('presence')
   )
 );
@@ -316,7 +310,7 @@ with check (
       rooms_users
     where
       user_id = (select auth.uid())
-      and name = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('presence')
   )
 );
@@ -343,7 +337,7 @@ using (
       rooms_users
     where
       user_id = (select auth.uid())
-      and topic = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast', 'presence')
   )
 );
@@ -366,7 +360,7 @@ with check (
       rooms_users
     where
       user_id = (select auth.uid())
-      and name = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast', 'presence')
   )
 );

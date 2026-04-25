@@ -1,38 +1,31 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { useParams } from 'common'
-import { useIsSecurityNotificationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Switch,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-} from 'ui'
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
+
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
-import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import { slugifyTitle } from './EmailTemplates.utils'
-import { TemplateEditor } from './TemplateEditor'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
 
 const notificationEnabledKeys = TEMPLATES_SCHEMAS.filter(
   (t) => t.misc?.emailTemplateType === 'security'
@@ -52,7 +45,6 @@ const NotificationsFormSchema = z.object({
 
 export const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
-  const isSecurityNotificationsEnabled = useIsSecurityNotificationsEnabled()
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
@@ -61,12 +53,12 @@ export const EmailTemplates = () => {
   const {
     data: authConfig,
     error: authConfigError,
-    isLoading,
+    isPending: isLoading,
     isError,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
 
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to update settings: ${error?.message}`)
     },
@@ -106,70 +98,96 @@ export const EmailTemplates = () => {
   }, [authConfig])
 
   return (
-    <ScaffoldSection isFullWidth className="!pt-0">
+    <>
       {isError && (
-        <AlertError
-          className="mt-12"
-          error={authConfigError}
-          subject="Failed to retrieve auth configuration"
-        />
+        <PageSection>
+          <PageSectionContent>
+            <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+          </PageSectionContent>
+        </PageSection>
       )}
       {isLoading && (
-        <div className="w-[854px] mt-12">
-          <GenericSkeletonLoader />
-        </div>
+        <PageSection>
+          <PageSectionContent>
+            <GenericSkeletonLoader />
+          </PageSectionContent>
+        </PageSection>
       )}
       {isSuccess && (
-        <div className="my-12">
-          {builtInSMTP ? (
-            <div className="mb-12">
-              <EmailRateLimitsAlert />
-            </div>
-          ) : null}
-          {isSecurityNotificationsEnabled ? (
-            <div className="space-y-12">
-              <div>
-                <ScaffoldSectionTitle className="mb-4">Authentication</ScaffoldSectionTitle>
-                <Card>
-                  {TEMPLATES_SCHEMAS.filter(
-                    (t) => t.misc?.emailTemplateType === 'authentication'
-                  ).map((template) => {
-                    const templateSlug = slugifyTitle(template.title)
+        <>
+          <PageSection>
+            {builtInSMTP && (
+              <Admonition
+                type="warning"
+                title="Set up custom SMTP"
+                description={
+                  <p>
+                    You’re using the built-in email service. This service has rate limits and is not
+                    meant to be used for production apps.{' '}
+                    <InlineLink
+                      href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}
+                    >
+                      Learn more
+                    </InlineLink>{' '}
+                  </p>
+                }
+                layout="horizontal"
+                className="mb-4"
+                actions={
+                  <Button asChild type="default">
+                    <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
+                  </Button>
+                }
+              />
+            )}
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Authentication</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            <PageSectionContent>
+              <Card>
+                {TEMPLATES_SCHEMAS.filter(
+                  (t) => t.misc?.emailTemplateType === 'authentication'
+                ).map((template) => {
+                  const templateSlug = slugifyTitle(template.title)
 
-                    return (
-                      <CardContent key={`${template.id}`} className="p-0">
-                        <Link
-                          href={`/project/${projectRef}/auth/templates/${templateSlug}`}
-                          className="flex items-center justify-between hover:bg-surface-200 transition-colors py-4 px-6 w-full h-full"
-                        >
-                          <div className="flex flex-col">
-                            <h3 className="text-sm text-foreground">{template.title}</h3>
-                            {template.purpose && (
-                              <p className="text-sm text-foreground-lighter">{template.purpose}</p>
-                            )}
-                          </div>
+                  return (
+                    <CardContent key={`${template.id}`} className="p-0">
+                      <Link
+                        href={`/project/${projectRef}/auth/templates/${templateSlug}`}
+                        className="flex items-center justify-between hover:bg-surface-200 transition-colors py-4 px-6 w-full h-full"
+                      >
+                        <div className="flex flex-col">
+                          <h3 className="text-sm text-foreground">{template.title}</h3>
+                          {template.purpose && (
+                            <p className="text-sm text-foreground-lighter">{template.purpose}</p>
+                          )}
+                        </div>
 
-                          <div className="flex items-center gap-4 group">
-                            <ChevronRight
-                              size={16}
-                              className="text-foreground-muted group-hover:text-foreground transition-colors"
-                            />
-                          </div>
-                        </Link>
-                      </CardContent>
-                    )
-                  })}
-                </Card>
-              </div>
+                        <div className="flex items-center gap-4">
+                          <ChevronRight size={16} className="text-foreground-muted" />
+                        </div>
+                      </Link>
+                    </CardContent>
+                  )
+                })}
+              </Card>
+            </PageSectionContent>
+          </PageSection>
 
-              <div>
-                <ScaffoldSectionTitle className="mb-4">Security</ScaffoldSectionTitle>
-                <Form_Shadcn_ {...notificationsForm}>
-                  <form onSubmit={notificationsForm.handleSubmit(onSubmit)} className="space-y-4">
-                    <Card>
-                      {TEMPLATES_SCHEMAS.filter(
-                        (t) => t.misc?.emailTemplateType === 'security'
-                      ).map((template) => {
+          <PageSection>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Security</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            <PageSectionContent>
+              <Form {...notificationsForm}>
+                <form onSubmit={notificationsForm.handleSubmit(onSubmit)} className="space-y-4">
+                  <Card>
+                    {TEMPLATES_SCHEMAS.filter((t) => t.misc?.emailTemplateType === 'security').map(
+                      (template) => {
                         const templateSlug = slugifyTitle(template.title)
                         const templateEnabledKey =
                           `MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED` as keyof typeof authConfig
@@ -191,18 +209,18 @@ export const EmailTemplates = () => {
                               )}
                             </Link>
 
-                            <div className="flex items-center gap-4 group h-full pl-2">
-                              <FormField_Shadcn_
+                            <div className="flex items-center gap-4 h-full pl-2 relative">
+                              <FormField
                                 control={notificationsForm.control}
                                 name={templateEnabledKey}
                                 render={({ field }) => (
-                                  <FormControl_Shadcn_>
+                                  <FormControl>
                                     <Switch
                                       checked={field.value}
                                       onCheckedChange={field.onChange}
                                       disabled={!canUpdateConfig}
                                     />
-                                  </FormControl_Shadcn_>
+                                  </FormControl>
                                 )}
                               />
 
@@ -210,69 +228,39 @@ export const EmailTemplates = () => {
                                 href={`/project/${projectRef}/auth/templates/${templateSlug}`}
                                 className="py-6 pr-6"
                               >
-                                <ChevronRight
-                                  size={16}
-                                  className="text-foreground-muted hover:text-foreground transition-colors"
-                                />
+                                <ChevronRight size={16} className="text-foreground-muted" />
                               </Link>
                             </div>
                           </CardContent>
                         )
-                      })}
-                      <CardFooter className="justify-end space-x-2">
-                        {notificationsForm.formState.isDirty && (
-                          <Button type="default" onClick={() => notificationsForm.reset()}>
-                            Cancel
-                          </Button>
-                        )}
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          disabled={
-                            !canUpdateConfig ||
-                            isUpdatingConfig ||
-                            !notificationsForm.formState.isDirty
-                          }
-                          loading={isUpdatingConfig}
-                        >
-                          Save changes
+                      }
+                    )}
+                    <CardFooter className="justify-end space-x-2">
+                      {notificationsForm.formState.isDirty && (
+                        <Button type="default" onClick={() => notificationsForm.reset()}>
+                          Cancel
                         </Button>
-                      </CardFooter>
-                    </Card>
-                  </form>
-                </Form_Shadcn_>
-              </div>
-            </div>
-          ) : (
-            <Card>
-              <Tabs_Shadcn_ defaultValue={slugifyTitle(TEMPLATES_SCHEMAS[0].title)}>
-                <TabsList_Shadcn_ className="pt-2 px-6 gap-5 mb-0 overflow-x-scroll no-scrollbar mb-4">
-                  {TEMPLATES_SCHEMAS.filter(
-                    (t) => t.misc?.emailTemplateType === 'authentication'
-                  ).map((template) => (
-                    <TabsTrigger_Shadcn_
-                      key={`${template.id}`}
-                      value={slugifyTitle(template.title)}
-                    >
-                      {template.title}
-                    </TabsTrigger_Shadcn_>
-                  ))}
-                </TabsList_Shadcn_>
-                {TEMPLATES_SCHEMAS.filter(
-                  (t) => t.misc?.emailTemplateType === 'authentication'
-                ).map((template) => {
-                  const panelId = slugifyTitle(template.title)
-                  return (
-                    <TabsContent_Shadcn_ key={panelId} value={panelId} className="mt-0">
-                      <TemplateEditor key={template.title} template={template} />
-                    </TabsContent_Shadcn_>
-                  )
-                })}
-              </Tabs_Shadcn_>
-            </Card>
-          )}
-        </div>
+                      )}
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        disabled={
+                          !canUpdateConfig ||
+                          isUpdatingConfig ||
+                          !notificationsForm.formState.isDirty
+                        }
+                        loading={isUpdatingConfig}
+                      >
+                        Save changes
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form>
+            </PageSectionContent>
+          </PageSection>
+        </>
       )}
-    </ScaffoldSection>
+    </>
   )
 }

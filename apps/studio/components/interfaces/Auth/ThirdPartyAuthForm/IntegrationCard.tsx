@@ -1,9 +1,7 @@
 import { Check } from 'lucide-react'
 import Image from 'next/image'
-
-import { ThirdPartyAuthIntegration } from 'data/third-party-auth/integrations-query'
-import { DOCS_URL } from 'lib/constants'
 import { Badge, Button } from 'ui'
+
 import { AWS_IDP_REGIONS } from './AwsRegionSelector'
 import {
   getIntegrationType,
@@ -11,6 +9,8 @@ import {
   getIntegrationTypeLabel,
   INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
+import { ThirdPartyAuthIntegration } from '@/data/third-party-auth/integrations-query'
+import { DOCS_URL } from '@/lib/constants'
 
 interface IntegrationCardProps {
   integration: ThirdPartyAuthIntegration
@@ -208,14 +208,14 @@ export const IntegrationCard = ({
         </div>
         <div className="flex-1">
           {true ? (
-            <Badge className="space-x-1" size="large" variant="brand">
+            <Badge className="space-x-1" variant="success">
               <div className="h-3.5 w-3.5 bg-brand rounded-full flex justify-center items-center">
                 <Check className="h-2 w-2 text-background-overlay" strokeWidth={6} />
               </div>
               <span>Enabled</span>
             </Badge>
           ) : (
-            <Badge variant="warning" size="large">
+            <Badge variant="warning">
               <span>Disabled</span>
             </Badge>
           )}

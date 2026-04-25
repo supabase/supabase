@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react'
-import isEqual from 'lodash/isEqual'
-
 import { useParams } from 'common'
-import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
-import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
-import { ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import isEqual from 'lodash/isEqual'
+import { useEffect, useState } from 'react'
 
-import type { LogsEndpointParams } from 'components/interfaces/Settings/Logs/Logs.types'
+import { PRESET_CONFIG } from '@/components/interfaces/Reports/Reports.constants'
+import { ReportFilterItem } from '@/components/interfaces/Reports/Reports.types'
+import { queriesFactory } from '@/components/interfaces/Reports/Reports.utils'
+import type { LogsEndpointParams } from '@/components/interfaces/Settings/Logs/Logs.types'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export const useStorageReport = () => {
   const { ref: projectRef } = useParams()

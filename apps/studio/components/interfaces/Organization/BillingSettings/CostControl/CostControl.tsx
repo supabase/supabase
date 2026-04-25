@@ -1,29 +1,30 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useFlag, useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Alert, Alert_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { useFlag, useParams } from 'common'
+import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
+import SpendCapSidePanel from './SpendCapSidePanel'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import PartnerIcon from 'components/ui/PartnerIcon'
-import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
-import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
-import SpendCapSidePanel from './SpendCapSidePanel'
+} from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import NoPermission from '@/components/ui/NoPermission'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import { PARTNER_TO_NAME } from '@/components/ui/PartnerManagedResource'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 export interface CostControlProps {}
 
@@ -42,7 +43,7 @@ const CostControl = ({}: CostControlProps) => {
   const {
     data: subscription,
     error,
-    isLoading,
+    isPending: isLoading,
     isSuccess,
     isError,
   } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canReadSubscriptions })
@@ -51,7 +52,7 @@ const CostControl = ({}: CostControlProps) => {
   const isUsageBillingEnabled = subscription?.usage_billing_enabled ?? false
 
   const canChangeTier =
-    !projectUpdateDisabled && !['team', 'enterprise'].includes(currentPlan?.id || '')
+    !projectUpdateDisabled && !['team', 'enterprise', 'platform'].includes(currentPlan?.id || '')
 
   const costControlDisabled = selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE
 
@@ -64,13 +65,7 @@ const CostControl = ({}: CostControlProps) => {
               <p className="text-foreground text-base m-0">Cost Control</p>
               <p className="text-sm text-foreground-light m-0">
                 Allow scaling beyond your plan's{' '}
-                <Link
-                  href={`/org/${slug}/usage`}
-                  className="text-green-900 transition hover:text-green-1000"
-                >
-                  included quota
-                </Link>
-                .
+                <InlineLink href={`/org/${slug}/usage`}>included quota</InlineLink>.
               </p>
             </div>
             <div className="space-y-2">
@@ -122,7 +117,7 @@ const CostControl = ({}: CostControlProps) => {
 
               {isSuccess && !costControlDisabled && (
                 <div className="space-y-6">
-                  {['team', 'enterprise'].includes(currentPlan?.id || '') ? (
+                  {['team', 'enterprise', 'platform'].includes(currentPlan?.id || '') ? (
                     <Alert
                       withIcon
                       variant="info"
@@ -158,10 +153,10 @@ const CostControl = ({}: CostControlProps) => {
                             isUsageBillingEnabled
                               ? `${BASE_PATH}/img/spend-cap-off${
                                   resolvedTheme?.includes('dark') ? '' : '--light'
-                                }.png?v=3`
+                                }.png`
                               : `${BASE_PATH}/img/spend-cap-on${
                                   resolvedTheme?.includes('dark') ? '' : '--light'
-                                }.png?v=3`
+                                }.png`
                           }
                         />
                       </div>

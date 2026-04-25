@@ -1,11 +1,8 @@
 import type { UseFormReturn } from 'react-hook-form'
-// End of third-party imports
-
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import {
   Badge,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -14,8 +11,12 @@ import {
   SelectValue_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import type { SupportFormValues } from './SupportForm.schema'
 import { getOrgSubscriptionPlan, NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
+// End of third-party imports
+
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 
 interface OrganizationSelectorProps {
   form: UseFormReturn<SupportFormValues>
@@ -27,14 +28,14 @@ export function OrganizationSelector({ form, orgSlug }: OrganizationSelectorProp
   const subscriptionPlanId = getOrgSubscriptionPlan(organizations, orgSlug)
 
   return (
-    <FormField_Shadcn_
+    <FormField
       name="organizationSlug"
       control={form.control}
       render={({ field }) => {
         const { ref: _ref, ...fieldWithoutRef } = field
         return (
           <FormItemLayout hideMessage layout="vertical" label="Which organization is affected?">
-            <FormControl_Shadcn_>
+            <FormControl>
               <Select_Shadcn_
                 {...fieldWithoutRef}
                 disabled={!isSuccessOrganizations}
@@ -55,11 +56,7 @@ export function OrganizationSelector({ form, orgSlug }: OrganizationSelectorProp
                       ) : (
                         (organizations ?? []).find((o) => o.slug === field.value)?.name
                       )}
-                      {subscriptionPlanId && (
-                        <Badge variant="outline" className="capitalize">
-                          {subscriptionPlanId}
-                        </Badge>
-                      )}
+                      {subscriptionPlanId && <Badge variant="default">{subscriptionPlanId}</Badge>}
                     </div>
                   </SelectValue_Shadcn_>
                 </SelectTrigger_Shadcn_>
@@ -78,7 +75,7 @@ export function OrganizationSelector({ form, orgSlug }: OrganizationSelectorProp
                   </SelectGroup_Shadcn_>
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )
       }}

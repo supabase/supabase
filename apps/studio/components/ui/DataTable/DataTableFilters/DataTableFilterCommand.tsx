@@ -2,8 +2,6 @@ import { formatDistanceToNow } from 'date-fns'
 import { LoaderCircle, Search, X } from 'lucide-react'
 import { ParserBuilder } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
-
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import {
   cn,
   Command_Shadcn_ as Command,
@@ -15,6 +13,7 @@ import {
   CommandSeparator_Shadcn_ as CommandSeparator,
   Separator,
 } from 'ui'
+
 import type { DataTableFilterField } from '../DataTable.types'
 import { formatCompactNumber } from '../DataTable.utils'
 import { Kbd } from '../primitives/Kbd'
@@ -26,6 +25,7 @@ import {
   getWordByCaretPosition,
   replaceInputByFieldType,
 } from './DataTableFilters.utils'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 
 // FIXME: there is an issue on cmdk if I wanna only set a single slider value...
 
@@ -65,9 +65,6 @@ export function DataTableFilterCommand({
   const queryFields = filterFields.filter(
     (x) => typeof x.value === 'string' && currentWord.includes(`${x.value}:`)
   )
-
-  // [Joshen] Temporarily disabling as this conflicts with our current CMD K behaviour
-  // useHotKey(() => setOpen((open) => !open), 'k')
 
   useEffect(() => {
     // TODO: we could check for ARRAY_DELIMITER or SLIDER_DELIMITER to auto-set filter when typing
@@ -382,11 +379,13 @@ function CommandItemSuggestions<TData>({ field }: { field: DataTableFilterField<
     case 'checkbox': {
       return (
         <span className={cn(className)}>
-          {getFacetedUniqueValues
-            ? Array.from(getFacetedUniqueValues(table, value)?.keys() || [])
-                .map((value) => `[${value}]`)
-                .join(' ')
-            : field.options?.map(({ value }) => `[${value}]`).join(' ')}
+          {field.options && field.options.length > 0
+            ? field.options.map(({ value }) => `[${value}]`).join(' ')
+            : getFacetedUniqueValues
+              ? Array.from(getFacetedUniqueValues(table, value)?.keys() || [])
+                  .map((value) => `[${value}]`)
+                  .join(' ')
+              : null}
         </span>
       )
     }

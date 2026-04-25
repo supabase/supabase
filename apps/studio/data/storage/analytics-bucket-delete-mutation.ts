@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { storageKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type AnalyticsBucketDeleteVariables = {
   projectRef: string
@@ -12,7 +12,7 @@ type AnalyticsBucketDeleteVariables = {
 
 async function deleteAnalyticsBucket({ projectRef, id }: AnalyticsBucketDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!id) throw new Error('Bucket name is requried')
+  if (!id) throw new Error('Bucket name is required')
 
   const { data, error } = await del('/platform/storage/{ref}/analytics-buckets/{id}', {
     params: { path: { ref: projectRef, id } },
@@ -42,7 +42,7 @@ export const useAnalyticsBucketDeleteMutation = ({
     mutationFn: (vars) => deleteAnalyticsBucket(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(storageKeys.analyticsBuckets(projectRef))
+      await queryClient.invalidateQueries({ queryKey: storageKeys.analyticsBuckets(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -1,11 +1,12 @@
-import { get } from 'data/fetchers'
-import { generateRegexpWhere } from '../Reports.constants'
-import { ReportFilterItem } from '../Reports.types'
-import { useQueries, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/nextjs'
-import { useState } from 'react'
+import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
+import { useState } from 'react'
+
+import { generateRegexpWhere } from '../Reports.constants'
+import { ReportFilterItem } from '../Reports.types'
+import { get } from '@/data/fetchers'
 
 export const SHARED_API_REPORT_SQL = {
   totalRequests: {
@@ -303,7 +304,7 @@ export const useSharedAPIReport = ({
 
   const error = keys.reduce(
     (acc, key, i) => {
-      acc[key] = queries[i].error as string
+      acc[key] = queries[i].error as unknown as string
       return acc
     },
     {} as { [K in keyof typeof SHARED_API_REPORT_SQL]: string }

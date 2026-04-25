@@ -1,12 +1,20 @@
-import dayjs from 'dayjs'
-import { AlertTriangle, ChevronRight, Gauge, Inbox, Shield } from 'lucide-react'
-
-import { Notification } from 'data/notifications/notifications-v2-query'
-import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
-import { Button, cn } from 'ui'
+import { AlertTriangle, ChevronRight, Inbox } from 'lucide-react'
+import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { AdvisorItem } from './AdvisorPanelHeader'
+
+import type { AdvisorItem } from './AdvisorPanel.types'
+import {
+  formatItemDate,
+  getAdvisorItemSecondaryText,
+  getAdvisorPanelItemDisplayTitle,
+  severityBadgeVariants,
+  severityColorClasses,
+  severityLabels,
+  tabIconMap,
+} from './AdvisorPanel.utils'
 import { EmptyAdvisor } from './EmptyAdvisor'
+import type { Notification } from '@/data/notifications/notifications-v2-query'
+import type { AdvisorSeverity, AdvisorTab } from '@/state/advisor-state'
 
 const NoProjectNotice = () => {
   return (
@@ -20,18 +28,6 @@ const NoProjectNotice = () => {
       </div>
     </div>
   )
-}
-
-const tabIconMap: Record<Exclude<AdvisorTab, 'all'>, React.ElementType> = {
-  security: Shield,
-  performance: Gauge,
-  messages: Inbox,
-}
-
-const severityColorClasses: Record<AdvisorSeverity, string> = {
-  critical: 'text-destructive',
-  warning: 'text-warning',
-  info: 'text-foreground-light',
 }
 
 interface AdvisorPanelBodyProps {
@@ -60,7 +56,7 @@ export const AdvisorPanelBody = ({
   hasProjectRef = true,
 }: AdvisorPanelBodyProps) => {
   // Show notice if no project ref and trying to view project-specific tabs
-  if (!hasProjectRef && activeTab !== 'messages') {
+  if (!hasProjectRef && activeTab !== 'messages' && activeTab !== 'all') {
     return <NoProjectNotice />
   }
 
@@ -74,10 +70,12 @@ export const AdvisorPanelBody = ({
 
   if (isError) {
     return (
-      <div className="my-8 mx-4 flex flex-col items-center gap-2">
+      <div className="h-full mx-4 flex flex-col items-center justify-center gap-y-2">
         <AlertTriangle className="text-destructive" />
-        <h2 className="text-base text-foreground-light">Error loading advisories</h2>
-        <p className="text-sm text-foreground-lighter">Please try again later.</p>
+        <div className="flex flex-col items-center justify-center">
+          <h4 className="text-base font-normal text-foreground-light">Error loading advisories</h4>
+          <p className="text-sm text-foreground-lighter">Please try again later.</p>
+        </div>
       </div>
     )
   }
@@ -96,11 +94,19 @@ export const AdvisorPanelBody = ({
     <>
       <div className="flex flex-col">
         {filteredItems.map((item) => {
-          const SeverityIcon = tabIconMap[item.tab]
+          const SeverityIcon = tabIconMap[item.tab as Exclude<AdvisorTab, 'all'>]
           const severityClass = severityColorClasses[item.severity]
           const isNotification = item.source === 'notification'
           const notification = isNotification ? (item.original as Notification) : null
           const isUnread = notification?.status === 'new'
+
+          const primaryText = getAdvisorPanelItemDisplayTitle(item)
+          const secondaryText = getAdvisorItemSecondaryText(item)
+          const metadataText =
+            secondaryText ?? (item.createdAt ? formatItemDate(item.createdAt) : undefined)
+          // Date strings (e.g. "a few seconds ago") come from formatItemDate and
+          // need sentence-case capitalisation; entity strings (lint / signal) don't.
+          const metadataCapitalize = secondaryText === undefined && item.createdAt !== undefined
 
           return (
             <div key={`${item.source}-${item.id}`} className="border-b">
@@ -113,32 +119,37 @@ export const AdvisorPanelBody = ({
                 onClick={() => onItemClick(item)}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 overflow-hidden">
+                  <div className="flex items-center gap-3 overflow-hidden">
                     <SeverityIcon
                       size={16}
                       strokeWidth={1.5}
                       className={cn('flex-shrink-0', severityClass)}
                     />
                     <div className="text-left flex flex-col gap-0.5 truncate flex-1 min-w-0">
-                      <div className="truncate">{item.title.replace(/[`\\]/g, '')}</div>
-                      {item.createdAt && (
-                        <span className="text-xs text-foreground-light capitalize-sentence">
-                          {(() => {
-                            const insertedAt = item.createdAt
-                            const daysFromNow = dayjs().diff(dayjs(insertedAt), 'day')
-                            const formattedTimeFromNow = dayjs(insertedAt).fromNow()
-                            const formattedInsertedAt = dayjs(insertedAt).format('MMM DD, YYYY')
-                            return daysFromNow > 1 ? formattedInsertedAt : formattedTimeFromNow
-                          })()}
-                        </span>
+                      <div className="truncate">{primaryText}</div>
+                      {metadataText && (
+                        <div className="flex items-center gap-1 text-xs text-foreground-light">
+                          <span
+                            className={cn('truncate', metadataCapitalize && 'capitalize-sentence')}
+                          >
+                            {metadataText}
+                          </span>
+                        </div>
                       )}
                     </div>
                   </div>
-                  <ChevronRight
-                    size={16}
-                    strokeWidth={1.5}
-                    className="flex-shrink-0 text-foreground-lighter"
-                  />
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {item.severity === 'critical' && (
+                      <Badge variant={severityBadgeVariants[item.severity]}>
+                        {severityLabels[item.severity]}
+                      </Badge>
+                    )}
+                    <ChevronRight
+                      size={16}
+                      strokeWidth={1.5}
+                      className="flex-shrink-0 text-foreground-lighter"
+                    />
+                  </div>
                 </div>
               </Button>
             </div>

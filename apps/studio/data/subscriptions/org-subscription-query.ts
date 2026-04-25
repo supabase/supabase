@@ -1,10 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { subscriptionKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrgSubscriptionVariables = {
   orgSlug?: string
@@ -12,13 +13,15 @@ export type OrgSubscriptionVariables = {
 
 export async function getOrgSubscription(
   { orgSlug }: OrgSubscriptionVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: Record<string, string>
 ) {
   if (!orgSlug) throw new Error('orgSlug is required')
 
   const { error, data } = await get('/platform/organizations/{slug}/billing/subscription', {
     params: { path: { slug: orgSlug } },
     signal,
+    headers,
   })
 
   if (error) handleError(error)
@@ -52,6 +55,6 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
 }
 
 export const useHasAccessToProjectLevelPermissions = (slug: string) => {
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
-  return subscription?.plan.id === 'enterprise' || subscription?.plan.id === 'team'
+  const { hasAccess } = useCheckEntitlements('project_scoped_roles', slug)
+  return hasAccess
 }

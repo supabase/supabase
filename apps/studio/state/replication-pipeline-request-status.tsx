@@ -1,11 +1,11 @@
 import {
   createContext,
-  useContext,
-  useState,
   ReactNode,
   useCallback,
-  useRef,
+  useContext,
   useEffect,
+  useRef,
+  useState,
 } from 'react'
 
 export enum PipelineStatusRequestStatus {
@@ -35,6 +35,9 @@ const PipelineRequestStatusContext = createContext<PipelineRequestStatusContextT
   undefined
 )
 
+// [Joshen] Leaving a comment for future investigation
+// Do we need this? Afaict the status is getting returned from the API so we might not need
+// to track the pipeline status on the client side
 export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatusProviderProps) => {
   const [requestStatus, setRequestStatusState] = useState<
     Record<number, PipelineStatusRequestStatus>

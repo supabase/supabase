@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import type { ComponentProps, PropsWithChildren } from 'react'
 
-import { takeBreadcrumbSnapshot } from 'lib/breadcrumbs'
 import { createSupportFormUrl, type SupportFormUrlKeys } from './SupportForm.utils'
+import { takeBreadcrumbSnapshot } from '@/lib/breadcrumbs'
 
 export const SupportLink = ({
   children,
@@ -14,7 +14,14 @@ export const SupportLink = ({
   const href = createSupportFormUrl(queryParams ?? {})
 
   return (
-    <Link {...props} href={href} onClick={takeBreadcrumbSnapshot}>
+    <Link
+      {...props}
+      href={href}
+      onClick={(event) => {
+        takeBreadcrumbSnapshot()
+        props.onClick?.(event)
+      }}
+    >
       {children}
     </Link>
   )

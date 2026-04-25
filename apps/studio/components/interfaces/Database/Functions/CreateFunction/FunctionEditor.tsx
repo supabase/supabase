@@ -1,7 +1,7 @@
 import { Maximize2, Minimize2 } from 'lucide-react'
+import { Button, cn, FormControl, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { Button, FormControl_Shadcn_, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
 
 export const FunctionEditor = ({
   field,
@@ -16,7 +16,7 @@ export const FunctionEditor = ({
 }) => {
   return (
     <div className={cn('rounded-md relative group flex-grow')}>
-      <FormControl_Shadcn_>
+      <FormControl>
         {language !== undefined && (
           <CodeEditor
             id="database-functions-editor"
@@ -26,7 +26,7 @@ export const FunctionEditor = ({
             onInputChange={field.onChange}
           />
         )}
-      </FormControl_Shadcn_>
+      </FormControl>
       <div
         className={cn(
           'absolute top-0 right-2 bg-surface-300 border border-strong rounded h-[28px]',

@@ -1,6 +1,8 @@
-import { InlineLink } from 'components/ui/InlineLink'
-import Panel from 'components/ui/Panel'
 import { Admonition } from 'ui-patterns'
+
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { DOCS_URL } from '@/lib/constants'
 
 export const UpgradeExistingOrganizationCallout = () => {
   return (
@@ -12,7 +14,7 @@ export const UpgradeExistingOrganizationCallout = () => {
           <div>
             <p className="text-sm text-foreground-light">
               Supabase{' '}
-              <InlineLink href="https://supabase.com/docs/guides/platform/billing-on-supabase">
+              <InlineLink href={`${DOCS_URL}/guides/platform/billing-on-supabase`}>
                 bills per organization
               </InlineLink>
               . If you want to upgrade your existing projects,{' '}

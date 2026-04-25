@@ -47,7 +47,7 @@ Optimizing:
 2. [Increasing the compute size](/docs/guides/platform/compute-add-ons)
 3. [Distribute load by using read-replicas](/dashboard/project/_/settings/infrastructure)
 4. [Partitions](/docs/guides/database/partitions): Generally should be used on _very_ large tables to minimize data pulled from disk into memory
-5. [Remove bloat](/docs/guides/database/bloat): Bloat can fragment data across pages, causing redundant data to be pulled from disk.
+5. [Remove bloat](/docs/reference/cli/supabase-inspect-db): Bloat can fragment data across pages, causing redundant data to be pulled from disk.
 6. Table refactoring: Split tables to isolate columns that are less frequently accessed, so they are not redundantly pulled into memory while accessing hotter data
 
 ### Other useful Supabase Grafana guides:

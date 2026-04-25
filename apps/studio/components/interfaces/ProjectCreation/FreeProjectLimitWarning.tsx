@@ -1,7 +1,8 @@
-import Panel from 'components/ui/Panel'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
-import type { MemberWithFreeProjectLimit } from 'data/organizations/free-project-limit-check-query'
 import { Admonition } from 'ui-patterns/admonition'
+
+import Panel from '@/components/ui/Panel'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import type { MemberWithFreeProjectLimit } from '@/data/organizations/free-project-limit-check-query'
 
 interface FreeProjectLimitWarningProps {
   membersExceededLimit: MemberWithFreeProjectLimit[]
@@ -32,7 +33,10 @@ export const FreeProjectLimitWarning = ({ membersExceededLimit }: FreeProjectLim
               projects before you're able to create a free project within this organization.
             </p>
 
-            <UpgradePlanButton source="freeProjectLimitWarning">Upgrade plan</UpgradePlanButton>
+            <UpgradePlanButton
+              source="freeProjectLimitWarning"
+              featureProposition="create more projects"
+            />
           </div>
         }
       />

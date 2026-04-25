@@ -14,8 +14,7 @@
     "components": "@/registry/default/components",
     "utils": "@/lib/utils",
     "ui": "@/registry/default/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
+    "lib": "@/lib"
   },
   "iconLibrary": "lucide"
 }

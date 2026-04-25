@@ -121,6 +121,35 @@ export const analyticsKeys = {
       'infra-monitoring',
       { attribute, startDate, endDate, interval, databaseIdentifier },
     ] as const,
+  infraMonitoringGroup: (
+    projectRef: string | undefined,
+    {
+      attributes,
+      startDate,
+      endDate,
+      interval,
+      databaseIdentifier,
+    }: {
+      attributes?: string[]
+      startDate?: string
+      endDate?: string
+      interval?: string
+      databaseIdentifier?: string
+    }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'infra-monitoring',
+      'group',
+      {
+        attributes: attributes ? [...attributes].sort() : undefined,
+        startDate,
+        endDate,
+        interval,
+        databaseIdentifier,
+      },
+    ] as const,
   usageApiCounts: (projectRef: string | undefined, interval: string | undefined) =>
     ['projects', projectRef, 'usage.api-counts', interval] as const,
 

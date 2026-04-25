@@ -1,11 +1,11 @@
-import React from 'react'
+import dayjs from 'dayjs'
 // import authors from 'lib/authors.json'
 import Image from 'next/image'
 import Link from 'next/link'
+import React from 'react'
+
 // import type Author from '~/types/author'
 import type PostTypes from '../../types/post'
-
-import dayjs from 'dayjs'
 
 interface Props {
   event: PostTypes
@@ -40,7 +40,13 @@ const EventGridItem = ({ event }: Props) => {
                 fill
                 sizes="100%"
                 quality={100}
-                src={event.type === 'casestudy' ? event.thumb : `/images/blog/${event.thumb}`}
+                src={
+                  event.type === 'casestudy' ||
+                  event.thumb.startsWith('/') ||
+                  event.thumb.startsWith('http')
+                    ? event.thumb
+                    : `/images/blog/${event.thumb}`
+                }
                 className="scale-100 object-cover overflow-hidden"
                 alt={`${event.title} thumbnail`}
               />
@@ -52,7 +58,7 @@ const EventGridItem = ({ event }: Props) => {
               <p>{dayjs(event.date).format('D MMM YYYY')}</p>
               {event.readingTime && (
                 <>
-                  <p>•</p>
+                  <p>·</p>
                   <p>{event.readingTime}</p>
                 </>
               )}

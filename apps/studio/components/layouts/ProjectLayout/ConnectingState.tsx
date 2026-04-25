@@ -1,17 +1,17 @@
+import { useParams } from 'common'
 import { ExternalLink, Loader, Monitor, Server } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
+import { Badge, Button } from 'ui'
 
-import { useParams } from 'common'
-import ShimmerLine from 'components/ui/ShimmerLine'
+import ShimmerLine from '@/components/ui/ShimmerLine'
 import {
   useInvalidateProjectDetailsQuery,
   useSetProjectPostgrestStatus,
   type Project,
-} from 'data/projects/project-detail-query'
-import { DOCS_URL } from 'lib/constants'
-import pingPostgrest from 'lib/pingPostgrest'
-import { Badge, Button } from 'ui'
+} from '@/data/projects/project-detail-query'
+import { DOCS_URL } from '@/lib/constants'
+import pingPostgrest from '@/lib/pingPostgrest'
 
 export interface ConnectingStateProps {
   project: Project
@@ -51,7 +51,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
           <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:space-y-0 lg:space-x-6">
             <h1 className="text-3xl">{project.name}</h1>
             <div>
-              <Badge variant="brand">
+              <Badge variant="success">
                 <div className="flex items-center gap-2">
                   <Loader className="animate-spin" size={12} />
                   <span>Connecting to project</span>

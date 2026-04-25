@@ -1,31 +1,37 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { object, string } from 'yup'
-
-import { useParams } from 'common'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import * as z from 'zod'
 
-const schema = object({
-  SITE_URL: string().required('Must have a Site URL'),
+import AlertError from '@/components/ui/AlertError'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+
+const schema = z.object({
+  SITE_URL: z.string().min(1, 'Must have a Site URL'),
 })
 
 const SiteUrl = () => {
@@ -34,7 +40,7 @@ const SiteUrl = () => {
     data: authConfig,
     error: authConfigError,
     isError,
-    isLoading,
+    isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
   const [isUpdatingSiteUrl, setIsUpdatingSiteUrl] = useState(false)
@@ -45,11 +51,12 @@ const SiteUrl = () => {
   )
 
   const siteUrlForm = useForm({
-    resolver: yupResolver(schema),
+    resolver: zodResolver(schema),
     defaultValues: {
       SITE_URL: '',
     },
   })
+  const { isDirty } = siteUrlForm.formState
 
   useEffect(() => {
     if (authConfig && !isUpdatingSiteUrl) {
@@ -79,64 +86,73 @@ const SiteUrl = () => {
 
   if (isError) {
     return (
-      <ScaffoldSection isFullWidth>
-        <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   if (isLoading) {
     return (
-      <ScaffoldSection isFullWidth>
-        <GenericSkeletonLoader />
-      </ScaffoldSection>
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
     )
   }
 
   return (
-    <ScaffoldSection isFullWidth>
-      <ScaffoldSectionTitle className="mb-4">Site URL</ScaffoldSectionTitle>
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Site URL</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        <Form {...siteUrlForm}>
+          <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)}>
+            <Card>
+              <CardContent>
+                <FormField
+                  control={siteUrlForm.control}
+                  name="SITE_URL"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Site URL"
+                      description="Configure the default redirect URL used when a redirect URL is not specified or doesn't match one from the allow list. This value is also exposed as a template variable in the email templates section. Wildcards cannot be used here."
+                    >
+                      <FormControl>
+                        <Input_Shadcn_ {...field} disabled={!canUpdateConfig} />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </CardContent>
 
-      <Form_Shadcn_ {...siteUrlForm}>
-        <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)} className="space-y-4">
-          <Card>
-            <CardContent className="pt-6">
-              <FormField_Shadcn_
-                control={siteUrlForm.control}
-                name="SITE_URL"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="flex-row-reverse"
-                    label="Site URL"
-                    description="Configure the default redirect URL used when a redirect URL is not specified or doesn't match one from the allow list. This value is also exposed as a template variable in the email templates section. Wildcards cannot be used here."
-                  >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} disabled={!canUpdateConfig} />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
+              <CardFooter className="justify-end space-x-2">
+                {isDirty && (
+                  <Button type="default" onClick={() => siteUrlForm.reset()}>
+                    Cancel
+                  </Button>
                 )}
-              />
-            </CardContent>
-
-            <CardFooter className="justify-end space-x-2">
-              {siteUrlForm.formState.isDirty && (
-                <Button type="default" onClick={() => siteUrlForm.reset()}>
-                  Cancel
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={!canUpdateConfig || isUpdatingSiteUrl || !isDirty}
+                  loading={isUpdatingSiteUrl}
+                >
+                  Save changes
                 </Button>
-              )}
-              <Button
-                type="primary"
-                htmlType="submit"
-                disabled={!canUpdateConfig || isUpdatingSiteUrl || !siteUrlForm.formState.isDirty}
-                loading={isUpdatingSiteUrl}
-              >
-                Save changes
-              </Button>
-            </CardFooter>
-          </Card>
-        </form>
-      </Form_Shadcn_>
-    </ScaffoldSection>
+              </CardFooter>
+            </Card>
+          </form>
+        </Form>
+      </PageSectionContent>
+    </PageSection>
   )
 }
 
