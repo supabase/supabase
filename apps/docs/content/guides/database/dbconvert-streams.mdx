@@ -1,0 +1,82 @@
+---
+id: 'dbconvert-streams'
+title: 'Connecting with DBConvert Streams'
+breadcrumb: 'GUI Quickstarts'
+hideToc: true
+---
+
+If you do not have DBConvert Streams, you can install it from its [website](https://streams.dbconvert.com/install).
+
+## What is DBConvert Streams?
+
+DBConvert Streams is a GUI tool for working with PostgreSQL databases. You can use it to connect to your Supabase database via SSL.
+
+## Connecting DBConvert Streams with your Postgres database
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Create connection">
+
+    Create a new PostgreSQL connection.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    <Image
+      alt="Create PostgreSQL connection."
+      src={{
+        dark: '/docs/img/guides/database/connecting-to-postgres/dbconvert/new-connection-dark.png',
+        light: '/docs/img/guides/database/connecting-to-postgres/dbconvert/new-connection-light.png',
+      }}
+      width={1800}
+      height={1100}
+    />
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Copy connection string">
+
+    On your Supabase dashboard, open **Database → Connect** and copy the connection string.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ![Supabase connection string.](/docs/img/guides/database/connecting-to-postgres/dbconvert/supabase-connect.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Paste and connect">
+
+    Paste the connection string, then test and create the connection.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    <Image
+      alt="Paste connection string and connect."
+      src={{
+        dark: '/docs/img/guides/database/connecting-to-postgres/dbconvert/paste-connect-dark.png',
+        light: '/docs/img/guides/database/connecting-to-postgres/dbconvert/paste-connect-light.png',
+      }}
+      width={1800}
+      height={1100}
+    />
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
