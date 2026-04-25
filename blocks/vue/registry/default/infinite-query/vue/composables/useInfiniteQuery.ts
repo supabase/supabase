@@ -67,6 +67,7 @@ interface State<TData> {
   isFetching: boolean
   error: Error | null
   hasInitialFetch: boolean
+  requestCounter: number
 }
 
 // --------------------
@@ -85,16 +86,25 @@ export function useInfiniteQuery<
     isFetching: false,
     error: null,
     hasInitialFetch: false,
+    requestCounter: 0,
   })
 
   const pageSize = computed(() => props.pageSize ?? 20)
   const columns = computed(() => props.columns ?? '*')
 
   const fetchPage = async (skip: number) => {
+    // Capture the current request token to validate this request later
+    const requestToken = state.requestCounter
+
     if (
       state.hasInitialFetch &&
       (state.isFetching || state.data.length >= state.count)
     ) {
+      return
+    }
+
+    // Early return if request has been invalidated
+    if (requestToken !== state.requestCounter) {
       return
     }
 
@@ -112,6 +122,12 @@ export function useInfiniteQuery<
       skip,
       skip + pageSize.value - 1
     )
+
+    // Verify that this request is still valid before mutating state
+    if (requestToken !== state.requestCounter) {
+      state.isFetching = false
+      return
+    }
 
     if (error) {
       console.error(error)
@@ -137,6 +153,8 @@ export function useInfiniteQuery<
     state.isSuccess = false
     state.error = null
     state.hasInitialFetch = false
+    state.isFetching = false
+    state.requestCounter++
   }
 
   const initialize = async () => {

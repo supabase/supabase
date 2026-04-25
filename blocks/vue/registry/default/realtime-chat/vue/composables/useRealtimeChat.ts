@@ -18,7 +18,7 @@ export interface ChatMessage {
 
 const EVENT_MESSAGE_TYPE = 'message'
 
-export function useRealtimeChat({ roomName, username }: UseRealtimeChatProps) {
+export function useRealtimeChat(props: UseRealtimeChatProps) {
   const supabase = createClient()
 
   const messages = ref<ChatMessage[]>([])
@@ -33,9 +33,9 @@ export function useRealtimeChat({ roomName, username }: UseRealtimeChatProps) {
   }
 
   function setupChannel() {
-    if (!roomName) return
+    if (!props.roomName) return
 
-    const newChannel = supabase.channel(roomName)
+    const newChannel = supabase.channel(props.roomName)
 
     newChannel
       .on('broadcast', { event: EVENT_MESSAGE_TYPE }, (payload: { payload: ChatMessage }) => {
@@ -49,7 +49,7 @@ export function useRealtimeChat({ roomName, username }: UseRealtimeChatProps) {
   }
 
   watch(
-    () => roomName,
+    () => props.roomName,
     () => {
       cleanup()
       setupChannel()
@@ -68,7 +68,7 @@ export function useRealtimeChat({ roomName, username }: UseRealtimeChatProps) {
       id: crypto.randomUUID(),
       content,
       user: {
-        name: username,
+        name: props.username,
       },
       createdAt: new Date().toISOString(),
     }

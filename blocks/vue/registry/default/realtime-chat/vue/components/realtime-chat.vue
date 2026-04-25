@@ -59,7 +59,7 @@ watch(allMessages, (messages) => {
   }
 
   scrollToBottom()
-})
+}, { flush: 'post' })
 
 function handleSendMessage() {
   if (!newMessage.value.trim() || !isConnected.value) return

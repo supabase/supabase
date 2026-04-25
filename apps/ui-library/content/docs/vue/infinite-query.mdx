@@ -61,7 +61,7 @@ The hook also supports an custom defined result type by using `useInfiniteQuery<
 
 ```vue
 <script setup lang="ts">
-import { useInfiniteQuery } from '@/hooks/use-infinite-query'
+import { useInfiniteQuery } from '@/composables/useInfiniteQuery.ts'
 
 const { data, fetchNextPage } = useInfiniteQuery({
   tableName: 'products',
