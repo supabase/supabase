@@ -14,13 +14,13 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   Input_Shadcn_,
 } from 'ui'
 import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
@@ -47,9 +47,9 @@ export interface TextConfirmModalProps {
     description?: string | ReactNode
   }
   input?: React.ComponentProps<typeof Input_Shadcn_>
-  label?: React.ComponentProps<typeof FormLabel_Shadcn_>
-  formMessage?: React.ComponentProps<typeof FormMessage_Shadcn_>
-  description?: React.ComponentProps<typeof FormDescription_Shadcn_>
+  label?: React.ComponentProps<typeof FormLabel>
+  formMessage?: React.ComponentProps<typeof FormMessage>
+  description?: React.ComponentProps<typeof FormDescription>
   blockDeleteButton?: boolean
   errorMessage?: string
   enableCopy?: boolean
@@ -163,18 +163,18 @@ export const TextConfirmModal = forwardRef<
               <DialogSectionSeparator />
             </>
           )}
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               autoComplete="off"
               onSubmit={form.handleSubmit(onSubmit)}
               className="px-5 flex flex-col gap-y-3 pt-3"
             >
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="confirmValue"
                 render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                    <FormLabel_Shadcn_ {...label} enableSelection={!enableCopy}>
+                  <FormItem className="flex flex-col gap-y-2">
+                    <FormLabel {...label} enableSelection={!enableCopy}>
                       Type{' '}
                       {enableCopy ? (
                         <Button
@@ -196,18 +196,18 @@ export const TextConfirmModal = forwardRef<
                         </span>
                       )}{' '}
                       to confirm.
-                    </FormLabel_Shadcn_>
-                    <FormControl_Shadcn_>
+                    </FormLabel>
+                    <FormControl>
                       <Input_Shadcn_
                         autoComplete="off"
                         placeholder={confirmPlaceholder}
                         {...input}
                         {...field}
                       />
-                    </FormControl_Shadcn_>
-                    {!!description && <FormDescription_Shadcn_ {...description} />}
-                    <FormMessage_Shadcn_ {...formMessage} />
-                  </FormItem_Shadcn_>
+                    </FormControl>
+                    {!!description && <FormDescription {...description} />}
+                    <FormMessage {...formMessage} />
+                  </FormItem>
                 )}
               />
               <div className="flex gap-2">
@@ -235,7 +235,7 @@ export const TextConfirmModal = forwardRef<
                 </Button>
               </div>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogContent>
       </Dialog>
     )

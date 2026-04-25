@@ -11,17 +11,17 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
-  FormItem_Shadcn_,
+  FormItem,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
   Skeleton,
   Switch,
-  useWatch_Shadcn_,
+  useWatch,
 } from 'ui'
 import { GenericSkeletonLoader, PageSection, PageSectionContent } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
@@ -245,17 +245,17 @@ export const PostgrestConfig = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady])
 
-  const watchedDbSchema = useWatch_Shadcn_({ control: form.control, name: 'dbSchema' })
-  const watchedTableIdsToAdd = useWatch_Shadcn_({ control: form.control, name: 'tableIdsToAdd' })
-  const watchedTableIdsToRemove = useWatch_Shadcn_({
+  const watchedDbSchema = useWatch({ control: form.control, name: 'dbSchema' })
+  const watchedTableIdsToAdd = useWatch({ control: form.control, name: 'tableIdsToAdd' })
+  const watchedTableIdsToRemove = useWatch({
     control: form.control,
     name: 'tableIdsToRemove',
   })
-  const watchedFunctionNamesToAdd = useWatch_Shadcn_({
+  const watchedFunctionNamesToAdd = useWatch({
     control: form.control,
     name: 'functionNamesToAdd',
   })
-  const watchedFunctionNamesToRemove = useWatch_Shadcn_({
+  const watchedFunctionNamesToRemove = useWatch({
     control: form.control,
     name: 'functionNamesToRemove',
   })
@@ -264,7 +264,7 @@ export const PostgrestConfig = () => {
     <PageSection id="postgrest-config" className="first:pt-0">
       <PageSectionContent>
         <Card className="mb-4">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
               {isLoading ? (
                 <CardContent>
@@ -386,17 +386,17 @@ export const PostgrestConfig = () => {
                     </FormItemLayout>
 
                     {watchedDbSchema.includes('public') && (
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="defaultPrivilegesGranted"
                         render={({ field }) => (
-                          <FormItem_Shadcn_>
+                          <FormItem>
                             <FormItemLayout
                               layout="flex-row-reverse"
                               label="Automatically expose new tables and functions"
                               description="Grants privileges to Data API roles by default, exposing new tables and functions. We recommend disabling this to control access manually."
                             >
-                              <FormControl_Shadcn_>
+                              <FormControl>
                                 <div>
                                   <Switch
                                     size="large"
@@ -405,9 +405,9 @@ export const PostgrestConfig = () => {
                                     onCheckedChange={field.onChange}
                                   />
                                 </div>
-                              </FormControl_Shadcn_>
+                              </FormControl>
                             </FormItemLayout>
-                          </FormItem_Shadcn_>
+                          </FormItem>
                         )}
                       />
                     )}
@@ -421,11 +421,11 @@ export const PostgrestConfig = () => {
                     )}
                   </CardContent>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="dbExtraSearchPath"
                       render={({ field }) => (
-                        <FormItem_Shadcn_>
+                        <FormItem>
                           <FormItemLayout
                             layout="flex-row-reverse"
                             label="Extra search path"
@@ -467,22 +467,22 @@ export const PostgrestConfig = () => {
                               </MultiSelector>
                             )}
                           </FormItemLayout>
-                        </FormItem_Shadcn_>
+                        </FormItem>
                       )}
                     />
                   </CardContent>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="maxRows"
                       render={({ field }) => (
-                        <FormItem_Shadcn_>
+                        <FormItem>
                           <FormItemLayout
                             layout="flex-row-reverse"
                             label="Max rows"
                             description="The maximum number of rows returned from a view, table, or function. Limits payload size for accidental or malicious requests."
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <InputGroup>
                                 <FormInputGroupInput
                                   size="small"
@@ -495,24 +495,24 @@ export const PostgrestConfig = () => {
                                   <InputGroupText>rows</InputGroupText>
                                 </InputGroupAddon>
                               </InputGroup>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
-                        </FormItem_Shadcn_>
+                        </FormItem>
                       )}
                     />
                   </CardContent>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="dbPool"
                       render={({ field }) => (
-                        <FormItem_Shadcn_>
+                        <FormItem>
                           <FormItemLayout
                             layout="flex-row-reverse"
                             label="Pool size"
                             description="Number of maximum connections to keep open in the Data API server's database pool. Unset to let it be configured automatically based on compute size."
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <InputGroup>
                                 <FormInputGroupInput
                                   size="small"
@@ -531,16 +531,16 @@ export const PostgrestConfig = () => {
                                   <InputGroupText>connections</InputGroupText>
                                 </InputGroupAddon>
                               </InputGroup>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
-                        </FormItem_Shadcn_>
+                        </FormItem>
                       )}
                     />
                   </CardContent>
                 </>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
           {IS_PLATFORM && (
             <CardFooter className="border-t">
               <FormActions

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
+    "predev": "node scripts/clean-turbopack-cache.mjs",
     "dev": "next dev -p ${STUDIO_PORT:-8082}",
     "build": "next build && if [ \"$SKIP_ASSET_UPLOAD\" != \"1\" ]; then ./../../scripts/upload-static-assets.sh; fi",
     "start": "next start -p 8082",

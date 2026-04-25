@@ -16,10 +16,10 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
   Input_Shadcn_,
   Label_Shadcn_,
   Popover_Shadcn_,
@@ -375,20 +375,20 @@ const NewFunctionPage = () => {
         setSelectedFileId={setSelectedFileId}
       />
 
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 gap-3"
         >
           <div className="flex items-center gap-3">
             <Label_Shadcn_ htmlFor="functionName">Function name</Label_Shadcn_>
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="functionName"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex flex-col gap-0 m-0">
+                <FormItem className="flex flex-col gap-0 m-0">
                   <div className="flex items-center">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         id="functionName"
                         type="text"
@@ -397,7 +397,7 @@ const NewFunctionPage = () => {
                         className="w-[250px]"
                         {...field}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                     {form.formState.errors.functionName && (
                       <Tooltip>
                         <TooltipTrigger>
@@ -409,7 +409,7 @@ const NewFunctionPage = () => {
                       </Tooltip>
                     )}
                   </div>
-                </FormItem_Shadcn_>
+                </FormItem>
               )}
             />
           </div>
@@ -422,7 +422,7 @@ const NewFunctionPage = () => {
             Deploy function
           </Button>
         </form>
-      </Form_Shadcn_>
+      </Form>
       <PreventNavigationOnUnsavedChanges hasChanges={hasUnsavedChanges && !hasDeployed} />
     </PageLayout>
   )

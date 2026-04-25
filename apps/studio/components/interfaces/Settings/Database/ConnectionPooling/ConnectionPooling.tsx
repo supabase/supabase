@@ -12,9 +12,9 @@ import {
   AlertTitle_Shadcn_,
   Badge,
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
@@ -242,13 +242,13 @@ export const ConnectionPooling = () => {
                   </div>
                 </div>
                 <Separator className="bg-border -mx-6 w-[calc(100%+3rem)] my-4" />
-                <Form_Shadcn_ {...form}>
+                <Form {...form}>
                   <form
                     id={formId}
                     className="flex flex-col gap-y-4 w-full"
                     onSubmit={form.handleSubmit(onSubmit)}
                   >
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="default_pool_size"
                       render={({ field }) => (
@@ -264,7 +264,7 @@ export const ConnectionPooling = () => {
                           }
                           className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div>div>div]:min-w-100"
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <InputGroup>
                               <FormInputGroupInput
                                 {...field}
@@ -284,7 +284,7 @@ export const ConnectionPooling = () => {
                                 <InputGroupText>connections</InputGroupText>
                               </InputGroupAddon>
                             </InputGroup>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                           {!!maxConnData &&
                             (default_pool_size ?? 15) > maxConnData.maxConnections * 0.8 && (
                               <Alert_Shadcn_ variant="warning" className="mt-2">
@@ -304,7 +304,7 @@ export const ConnectionPooling = () => {
 
                     <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
 
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       disabled
                       name="max_client_conn"
@@ -328,7 +328,7 @@ export const ConnectionPooling = () => {
                             </>
                           }
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <InputGroup>
                               <FormInputGroupInput
                                 {...field}
@@ -348,12 +348,12 @@ export const ConnectionPooling = () => {
                                 <InputGroupText>clients</InputGroupText>
                               </InputGroupAddon>
                             </InputGroup>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
                   </form>
-                </Form_Shadcn_>
+                </Form>
               </>
             )}
           </Panel.Content>

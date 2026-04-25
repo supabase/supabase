@@ -2,9 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -36,9 +36,9 @@ export default function FormItemLayoutDemo() {
     // action('form form.handleSubmit(onSubmit)')(values)
   }
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form className="w-96 flex flex-col gap-3" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField_Shadcn_
+        <FormField
           name="email"
           control={form.control}
           render={({ field }) => (
@@ -48,11 +48,11 @@ export default function FormItemLayoutDemo() {
               labelOptional="Optional"
             >
               <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl_Shadcn_>
+                <FormControl>
                   <SelectTrigger_Shadcn_>
                     <SelectValue_Shadcn_ placeholder="Select a verified email to display" />
                   </SelectTrigger_Shadcn_>
-                </FormControl_Shadcn_>
+                </FormControl>
                 <SelectContent_Shadcn_>
                   <SelectItem_Shadcn_ value="m@example.com">m@example.com</SelectItem_Shadcn_>
                   <SelectItem_Shadcn_ value="m@google.com">m@google.com</SelectItem_Shadcn_>
@@ -66,6 +66,6 @@ export default function FormItemLayoutDemo() {
           Submit
         </Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

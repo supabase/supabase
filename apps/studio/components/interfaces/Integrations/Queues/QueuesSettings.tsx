@@ -4,14 +4,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  Switch,
-} from 'ui'
+import { Button, Form, FormControl, FormField, FormItem, Switch } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -193,15 +186,15 @@ export const QueuesSettings = () => {
           title="Settings"
           description="Manage your queues via any client library or Data APIs endpoints"
         />
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id="pgmq-postgrest" onSubmit={form.handleSubmit(onSubmit)}>
             <FormPanelContainer>
               <FormPanelContent className="px-8 py-8">
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="enable"
                   render={({ field }) => (
-                    <FormItem_Shadcn_ className="w-full">
+                    <FormItem className="w-full">
                       <FormItemLayout
                         className="w-full"
                         layout="flex"
@@ -239,7 +232,7 @@ export const QueuesSettings = () => {
                           </>
                         }
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             name="enable"
                             size="large"
@@ -249,7 +242,7 @@ export const QueuesSettings = () => {
                             checked={field.value}
                             onCheckedChange={(value) => field.onChange(value)}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                       {tablesWithoutRLS.length > 0 && (
                         <Admonition
@@ -313,7 +306,7 @@ export const QueuesSettings = () => {
                           </p>
                         </Admonition>
                       )}
-                    </FormItem_Shadcn_>
+                    </FormItem>
                   )}
                 />
               </FormPanelContent>
@@ -342,7 +335,7 @@ export const QueuesSettings = () => {
               </FormPanelFooter>
             </FormPanelContainer>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </div>
 
       <ConfirmationModal
