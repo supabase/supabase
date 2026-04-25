@@ -99,6 +99,17 @@ The `supabase start` command downloads Docker images, which can take a few minut
 
 </Admonition>
 
+<Admonition type="note">
+
+**Using Linux with SELinux?**
+
+If you're on Fedora, RHEL, or another distro with SELinux enabled, Docker may not have permission to access your project files. Allow Docker to access your project files by updating their SELinux labels:
+
+```bash
+sudo chcon -Rt container_file_t $(pwd)
+```
+</Admonition>
+
 Your function is now running at [`http://localhost:54321/functions/v1/hello-world`](http://localhost:54321/functions/v1/hello-world). Hot reloading is enabled, which means that the server will automatically reload when you save changes to your function code.
 
 <Admonition type="note">
