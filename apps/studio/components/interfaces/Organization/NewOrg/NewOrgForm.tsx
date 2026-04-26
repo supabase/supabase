@@ -15,9 +15,9 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -260,7 +260,6 @@ export const NewOrgForm = ({
     },
     onError: (data) => {
       toast.error(data.message, { duration: 10_000 })
-      resetPaymentMethod()
       setNewOrgLoading(false)
     },
   })
@@ -355,23 +354,21 @@ export const NewOrgForm = ({
 
     if (formValues.plan === 'FREE') {
       await createOrg(formValues)
-    } else if (!paymentMethod) {
-      const result = await paymentRef.current?.createPaymentMethod()
-      if (result) {
-        setPaymentMethod(result.paymentMethod)
-        const customerData = {
-          address: result.address,
-          billing_name: result.customerName,
-          tax_id: result.taxId,
-        }
-
-        createOrg(formValues, result.paymentMethod.id, customerData)
-      } else {
-        setNewOrgLoading(false)
-      }
-    } else {
-      createOrg(formValues, paymentMethod.id)
+      return
     }
+
+    const result = await paymentRef.current?.createPaymentMethod()
+    if (!result) {
+      setNewOrgLoading(false)
+      return
+    }
+
+    setPaymentMethod(result.paymentMethod)
+    createOrg(formValues, result.paymentMethod.id, {
+      address: result.address,
+      billing_name: result.customerName,
+      tax_id: result.taxId,
+    })
   }
 
   const resetPaymentMethod = () => {
@@ -380,7 +377,7 @@ export const NewOrgForm = ({
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} id={FORM_ID}>
         <Panel
           title={
@@ -424,7 +421,7 @@ export const NewOrgForm = ({
         >
           <div className="divide-y divide-border-muted">
             <Panel.Content>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
@@ -433,7 +430,7 @@ export const NewOrgForm = ({
                     layout="horizontal"
                     description="What's the name of your company or team? You can change this later."
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         autoFocus
                         type="text"
@@ -444,13 +441,13 @@ export const NewOrgForm = ({
                         data-bwignore
                         {...field}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </Panel.Content>
             <Panel.Content>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="kind"
                 render={({ field }) => (
@@ -459,7 +456,7 @@ export const NewOrgForm = ({
                     layout="horizontal"
                     description="What best describes your organization?"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger_Shadcn_ className="w-full">
                           <SelectValue_Shadcn_ />
@@ -473,7 +470,7 @@ export const NewOrgForm = ({
                           ))}
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -481,7 +478,7 @@ export const NewOrgForm = ({
 
             {form.watch('kind') == 'COMPANY' && (
               <Panel.Content>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="size"
                   render={({ field }) => (
@@ -490,7 +487,7 @@ export const NewOrgForm = ({
                       layout="horizontal"
                       description="How many people are in your company?"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger_Shadcn_ className="w-full">
                             <SelectValue_Shadcn_ />
@@ -504,7 +501,7 @@ export const NewOrgForm = ({
                             ))}
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -513,7 +510,7 @@ export const NewOrgForm = ({
 
             {isBillingEnabled && (
               <Panel.Content>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="plan"
                   render={({ field }) => (
@@ -527,7 +524,7 @@ export const NewOrgForm = ({
                         </>
                       }
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Select_Shadcn_
                           value={field.value}
                           onValueChange={(value) => {
@@ -547,7 +544,7 @@ export const NewOrgForm = ({
                             ))}
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -557,7 +554,7 @@ export const NewOrgForm = ({
             {form.watch('plan') === 'PRO' && (
               <>
                 <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="spend_cap"
                     render={({ field }) => (
@@ -580,9 +577,9 @@ export const NewOrgForm = ({
                             : `You pay for overages beyond the plan's quota.`
                         }
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -679,6 +676,6 @@ export const NewOrgForm = ({
           </Elements>
         )}
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

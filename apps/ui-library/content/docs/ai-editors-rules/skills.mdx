@@ -1,0 +1,42 @@
+---
+title: Skills
+description: Agent Skills for Supabase — procedural knowledge and context that AI agents can load on demand
+---
+
+Agent Skills are folders of instructions, scripts, and resources that agents can discover and use to do things more accurately and efficiently. Skills give agents access to procedural knowledge and Supabase-specific context they can load on demand, so they can do real work reliably.
+
+Skills work with 18+ AI agents including Claude Code, GitHub Copilot, Cursor, Cline, and many others.
+
+## Installation
+
+Run these commands in the root of your project — skills are installed per-project, similar to how you'd add a config file or dev dependency. Once installed, your AI agent will automatically pick them up the next time it runs.
+
+Install all Supabase skills using the skills CLI:
+
+```bash
+npx skills add supabase/agent-skills
+```
+
+This installs the full set of Supabase skills — the right choice for most projects. If you're doing a lot of database work, also add the Postgres-specific skill:
+
+```bash
+npx skills add supabase/agent-skills --skill supabase-postgres-best-practices
+```
+
+The `supabase-postgres-best-practices` skill covers Postgres performance optimization, query design, and schema best practices. It's used automatically when writing, reviewing, or optimizing queries and database configurations.
+
+### Claude Code
+
+You can also install the skills as Claude Code plugins:
+
+```bash
+/plugin marketplace add supabase/agent-skills
+/plugin install supabase@supabase-agent-skills
+```
+
+## Learn more
+
+For the full list of available skills, installation options, and usage guidance, see the [Agent Skills documentation](https://supabase.com/docs/guides/getting-started/ai-skills).
+
+- [Agent Skills Repository](https://github.com/supabase/agent-skills)
+- [Agent Skills Documentation](https://agentskills.io/home)

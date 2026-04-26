@@ -187,7 +187,7 @@ export const JWTSecretKeysTable = () => {
       <div className="-space-y-px">
         {!canReadAPIKeys ? null : legacyKey ? (
           <>
-            {standbyKey && (
+            {standbyKey ? (
               <ActionPanel
                 title="Rotate Signing Key"
                 description="Switch the standby key to in use. All new JSON Web Tokens issued by Supabase Auth will be signed with this key."
@@ -197,9 +197,7 @@ export const JWTSecretKeysTable = () => {
                 icon={<RotateCw className="size-4" />}
                 type="primary"
               />
-            )}
-
-            {!standbyKey && (
+            ) : (
               <ActionPanel
                 title="Create standby key"
                 description="Set up a new key which you can switch to once it has been picked up by all components of your application."
@@ -396,48 +394,6 @@ export const JWTSecretKeysTable = () => {
           </Card>
         </div>
       )}
-
-      {/* TODO(hf): For launch <div>
-        <h2 className="text-xl mb-4">Resources</h2>
-
-        <div className="flex flex-col lg:flex-row gap-6">
-          <Card className="bg-surface-75 overflow-hidden">
-            <div className="flex">
-              <div className="bg-surface-200 px-0 flex items-center justify-center w-[180px]">
-                <WhyRotateKeysIllustration />
-              </div>
-              <div className="flex-1 pl-8 border-l h-full py-6 px-5">
-                <h4 className="text-sm">Why Rotate keys?</h4>
-                <p className="text-xs text-foreground-light mb-4 max-w-xs">
-                  Create Standby keys ahead of time which can then be promoted to 'In use' at any
-                  time.
-                </p>
-                <Button type="outline" icon={<Book />}>
-                  View guide
-                </Button>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="bg-surface-75 overflow-hidden">
-            <div className="flex">
-              <div className="bg-surface-200 px-0 flex items-center justify-center w-[180px]">
-                <WhyUseStandbyKeysIllustration />
-              </div>
-              <div className="flex-1 pl-8 border-l h-full py-6 px-5">
-                <h4 className="text-sm">Why use a Standby key?</h4>
-                <p className="text-xs text-foreground-light mb-4 max-w-xs">
-                  Create Standby keys ahead of time which can then be promoted to 'In use' at any
-                  time.
-                </p>
-                <Button type="outline" icon={<Book />}>
-                  View guide
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div> */}
 
       <Dialog open={shownDialog === 'legacy'} onOpenChange={resetDialog}>
         <DialogContent className="sm:max-w-[425px]">

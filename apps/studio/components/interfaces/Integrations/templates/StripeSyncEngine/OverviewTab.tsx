@@ -8,9 +8,9 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -302,7 +302,7 @@ export const StripeSyncEngineOverviewTab = () => {
         >
           <Sheet open={!!shouldShowInstallSheet} onOpenChange={handleCloseInstallSheet}>
             <SheetContent size="lg" tabIndex={undefined} className="flex flex-col gap-0">
-              <Form_Shadcn_ {...form}>
+              <Form {...form}>
                 <form
                   id={formId}
                   onSubmit={form.handleSubmit(({ stripeSecretKey }) => {
@@ -329,7 +329,7 @@ export const StripeSyncEngineOverviewTab = () => {
                     <h3 className="heading-default">Configuration</h3>
 
                     <div className="flex flex-col gap-y-2">
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="stripeSecretKey"
                         render={({ field }) => (
@@ -338,7 +338,7 @@ export const StripeSyncEngineOverviewTab = () => {
                             label="Stripe API secret key"
                             description="Your Stripe secret key. Requires write access to Webhook Endpoints and read-only access to all other categories."
                           >
-                            <FormControl_Shadcn_ className="col-span-8">
+                            <FormControl className="col-span-8">
                               <Input
                                 id="stripe_api_key"
                                 name="stripe_api_key"
@@ -350,7 +350,7 @@ export const StripeSyncEngineOverviewTab = () => {
                                 value={field.value}
                                 onChange={(e) => field.onChange(e.target.value)}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -411,7 +411,7 @@ export const StripeSyncEngineOverviewTab = () => {
                     </Button>
                   </SheetFooter>
                 </form>
-              </Form_Shadcn_>
+              </Form>
             </SheetContent>
           </Sheet>
         </IntegrationOverviewTab>

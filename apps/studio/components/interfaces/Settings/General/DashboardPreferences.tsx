@@ -17,9 +17,9 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -106,11 +106,11 @@ export const DashboardPreferences = () => {
             </CardContent>
           </Card>
         ) : (
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="defaultDatabase"
                     render={({ field }) => (
@@ -129,7 +129,7 @@ export const DashboardPreferences = () => {
                         {isPending ? (
                           <ShimmeringLoader />
                         ) : (
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             {/* [Joshen] Need to disable unhealthy replicas */}
                             <DatabaseSelector
                               isForm
@@ -139,7 +139,7 @@ export const DashboardPreferences = () => {
                                 field.onChange(id === projectRef ? undefined : id)
                               }
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         )}
                       </FormItemLayout>
                     )}
@@ -161,7 +161,7 @@ export const DashboardPreferences = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         )}
       </PageSectionContent>
     </PageSection>

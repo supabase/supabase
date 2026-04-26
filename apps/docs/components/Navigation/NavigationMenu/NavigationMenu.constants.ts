@@ -2885,6 +2885,7 @@ export const self_hosting: NavMenuConstant = {
           name: 'Add Reverse Proxy with HTTPS',
           url: '/guides/self-hosting/self-hosted-proxy-https',
         },
+        { name: 'Envoy API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
         { name: 'Upgrade to Postgres 17', url: '/guides/self-hosting/postgres-upgrade-17' },
         {
           name: 'Restore Project from Platform',
@@ -2897,6 +2898,7 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
+        { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
       ],
     },
     {

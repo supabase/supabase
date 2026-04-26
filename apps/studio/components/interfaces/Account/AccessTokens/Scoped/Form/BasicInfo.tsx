@@ -2,8 +2,8 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { Control, ControllerRenderProps } from 'react-hook-form'
 import {
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -65,31 +65,31 @@ export const BasicInfo = ({
 
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">
-      <FormField_Shadcn_
+      <FormField
         key="tokenName"
         name="tokenName"
         control={control}
         render={({ field }) => (
           <FormItemLayout name="tokenName" label="Name">
-            <FormControl_Shadcn_>
+            <FormControl>
               <Input_Shadcn_
                 id="tokenName"
                 {...field}
                 placeholder="Provide a name for your token"
               />
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )}
       />
 
-      <FormField_Shadcn_
+      <FormField
         key="expiresAt"
         name="expiresAt"
         control={control}
         render={({ field }) => (
           <FormItemLayout name="expiresAt" label="Expires in">
             <div className="flex gap-2">
-              <FormControl_Shadcn_ className="flex-grow">
+              <FormControl className="flex-grow">
                 <Select_Shadcn_
                   value={field.value}
                   onValueChange={(value) => handleExpiryChange(value, field)}
@@ -107,7 +107,7 @@ export const BasicInfo = ({
                     )}
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
-              </FormControl_Shadcn_>
+              </FormControl>
               {isCustomSelected && (
                 <DatePicker
                   selectsRange={false}

@@ -15,6 +15,8 @@ import { getInitialGridColumns } from '@/components/grid/utils/column'
 import { getGridColumns } from '@/components/grid/utils/gridColumns'
 import { Entity } from '@/data/table-editor/table-editor-types'
 
+const FALLBACK_TABLE_STATE = proxy({}) as TableEditorTableState
+
 export const createTableEditorTableState = ({
   projectRef,
   table: originalTable,
@@ -286,6 +288,17 @@ export const useTableEditorTableStateSnapshot = (options?: Parameters<typeof use
   // as TableEditorTableState so this doesn't get marked as readonly,
   // making adopting this state easier since we're migrating from react-tracked
   return useSnapshot(state, options) as TableEditorTableState
+}
+
+/**
+ * Same as useTableEditorTableStateSnapshot but returns undefined when called
+ * outside a TableEditorTableStateContextProvider instead of crashing.
+ * Use this for components that may render outside the provider (e.g. sidebar).
+ */
+export const useOptionalTableEditorTableStateSnapshot = (): TableEditorTableState | undefined => {
+  const state = useContext(TableEditorTableStateContext)
+  const snap = useSnapshot(state ?? FALLBACK_TABLE_STATE)
+  return state != undefined ? (snap as TableEditorTableState) : undefined
 }
 
 export type TableEditorTableStateSnapshot = ReturnType<typeof useTableEditorTableStateSnapshot>
