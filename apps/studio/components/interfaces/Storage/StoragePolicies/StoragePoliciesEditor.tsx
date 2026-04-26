@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { Button, Checkbox, cn, Modal } from 'ui'
+import { Button, Checkbox_Shadcn_ as Checkbox, cn, Modal } from 'ui'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
@@ -52,26 +52,58 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
       </div>
       <div className="md:w-2/3 flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-          <Checkbox
-            label="SELECT"
-            onChange={() => onToggleOperation('SELECT')}
-            checked={allowedOperations.includes('SELECT')}
-          />
-          <Checkbox
-            label="INSERT"
-            onChange={() => onToggleOperation('INSERT')}
-            checked={allowedOperations.includes('INSERT')}
-          />
-          <Checkbox
-            label="UPDATE"
-            onChange={() => onToggleOperation('UPDATE')}
-            checked={allowedOperations.includes('UPDATE')}
-          />
-          <Checkbox
-            label="DELETE"
-            onChange={() => onToggleOperation('DELETE')}
-            checked={allowedOperations.includes('DELETE')}
-          />
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="checkbox-select"
+              onCheckedChange={() => onToggleOperation('SELECT')}
+              checked={allowedOperations.includes('SELECT')}
+            />
+            <label
+              htmlFor="checkbox-select"
+              className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              SELECT
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="checkbox-insert"
+              onCheckedChange={() => onToggleOperation('INSERT')}
+              checked={allowedOperations.includes('INSERT')}
+            />
+            <label
+              htmlFor="checkbox-insert"
+              className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              INSERT
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="checkbox-update"
+              onCheckedChange={() => onToggleOperation('UPDATE')}
+              checked={allowedOperations.includes('UPDATE')}
+            />
+            <label
+              htmlFor="checkbox-update"
+              className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              UPDATE
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="checkbox-delete"
+              onCheckedChange={() => onToggleOperation('DELETE')}
+              checked={allowedOperations.includes('DELETE')}
+            />
+            <label
+              htmlFor="checkbox-delete"
+              className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              DELETE
+            </label>
+          </div>
         </div>
         {hasUpdateOrDelete && (
           <p className="text-sm text-foreground-light mt-3 prose [&>code]:text-xs">

@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
-import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
+import { Alert, Button, Checkbox_Shadcn_, Input, Listbox } from 'ui'
 
 import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
@@ -306,22 +306,48 @@ const CreateProject = () => {
         </div>
       </div>
       <div className="py-2 pb-4">
-        <Checkbox
-          name="shouldRunMigrations"
-          label="Create sample tables with seed data"
-          description="To get you started quickly, we can create new tables for you with seed (sample) data. You can delete these tables later."
-          checked={shouldRunMigrations}
-          onChange={(e) => setShouldRunMigrations(e.target.checked)}
-        />
+        <div className="items-top flex space-x-2">
+          <Checkbox_Shadcn_
+            id="shouldRunMigrations"
+            name="shouldRunMigrations"
+            checked={shouldRunMigrations}
+            onCheckedChange={(checked) => setShouldRunMigrations(!!checked)}
+          />
+          <div className="grid gap-1.5 leading-none">
+            <label
+              htmlFor="enable-realtime"
+              className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Create sample tables with seed data
+            </label>
+            <p className="text-sm text-foreground-muted">
+              To get you started quickly, we can create new tables for you with seed (sample) data.
+              You can delete these tables later.
+            </p>
+          </div>
+        </div>
       </div>
       <div className="py-2 pb-4">
-        <Checkbox
-          name="dataApiDefaultPrivileges"
-          label="Automatically expose new tables and functions"
-          description="Grants privileges to Data API roles by default, exposing new tables and functions. We recommend disabling this to control access manually."
-          checked={dataApiDefaultPrivileges}
-          onChange={(e) => setDataApiDefaultPrivileges(e.target.checked)}
-        />
+        <div className="items-top flex space-x-2">
+          <Checkbox_Shadcn_
+            id="dataApiDefaultPrivileges"
+            name="dataApiDefaultPrivileges"
+            checked={dataApiDefaultPrivileges}
+            onCheckedChange={(checked) => setDataApiDefaultPrivileges(!!checked)}
+          />
+          <div className="grid gap-1.5 leading-none">
+            <label
+              htmlFor="dataApiDefaultPrivileges"
+              className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Automatically expose new tables and functions
+            </label>
+            <p className="text-sm text-foreground-muted">
+              Grants privileges to Data API roles by default, exposing new tables and functions. We
+              recommend disabling this to control access manually.
+            </p>
+          </div>
+        </div>
       </div>
       <div className="flex flex-row w-full justify-end">
         <Button

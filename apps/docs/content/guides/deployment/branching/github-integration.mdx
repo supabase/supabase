@@ -13,13 +13,19 @@ In the Supabase Dashboard:
 2. Under **GitHub Integration**, click **Authorize GitHub**.
 3. You are redirected to a GitHub authorization page. Click **Authorize Supabase**.
 4. You are redirected back to the Integrations page. Choose a GitHub repository to connect your project to.
-5. Fill in the relative path to the Supabase directory from your repository root.
+5. Set the **Working directory** field.
 6. Configure the other options as needed to automate your GitHub connection.
 7. Click **Enable integration**.
 
+### Set the working directory
+
+The working directory is the path from your repository root to the directory that contains the `supabase/` folder. Enter `.` when `supabase/` is at the repository root.
+
+If `supabase/` is nested deeper in your repository, enter its parent directory instead. For example, if your layout is `apps/web/supabase/`, enter `apps/web`.
+
 ## Preparing your Git repository
 
-You will be using the [Supabase CLI](/docs/guides/cli) to initialise your local `./supabase` directory:
+You will be using the [Supabase CLI](/docs/guides/cli) to initialize your local `./supabase` directory:
 
 <StepHikeCompact>
     <StepHikeCompact.Step step={1}>

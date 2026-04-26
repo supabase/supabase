@@ -53,6 +53,7 @@ import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidat
 import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { useRootQueryClient } from '@/data/query-client'
 import { customFont, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
@@ -197,6 +198,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                 <MainScrollContainerProvider>
                                   {getLayout(<Component {...pageProps} />)}
                                 </MainScrollContainerProvider>
+                                <GlobalShortcuts />
                                 <StudioCommandMenu />
                                 <FeaturePreviewModal />
                                 <UpdateBillingAddressModal />

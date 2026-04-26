@@ -9,9 +9,9 @@ import { useForm } from 'react-hook-form'
 import {
   Button,
   cn,
-  Form_Shadcn_,
-  FormField_Shadcn_,
-  FormMessage_Shadcn_,
+  Form,
+  FormField,
+  FormMessage,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -145,11 +145,11 @@ export default function OptOutPage() {
           </Admonition>
         )}
 
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="gap-2 max-w-xs flex flex-col">
             <input hidden value={form.getValues('ref')} readOnly {...register('ref')} />
             <input hidden {...register('captchaToken')} />
-            <FormField_Shadcn_
+            <FormField
               name="reason"
               control={form.control}
               render={({ field }) => (
@@ -230,7 +230,7 @@ export default function OptOutPage() {
             <Button htmlType="submit" size="small" disabled={submissionType === 'success'}>
               Report spam
             </Button>
-            <FormMessage_Shadcn_
+            <FormMessage
               className={cn(
                 'border-l pl-3',
                 submissionType === 'error'
@@ -239,9 +239,9 @@ export default function OptOutPage() {
               )}
             >
               {formMessage}
-            </FormMessage_Shadcn_>
+            </FormMessage>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </OptOutLayout>
     </>
   )

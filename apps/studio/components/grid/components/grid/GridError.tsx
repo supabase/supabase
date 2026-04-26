@@ -6,9 +6,7 @@ import { Admonition } from 'ui-patterns'
 
 import { isFilterRelatedError } from './GridError.utils'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
-import { useTableFilterNew } from '@/components/grid/hooks/useTableFilterNew'
 import { useTableSort } from '@/components/grid/hooks/useTableSort'
-import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from '@/components/ui/AlertError'
 import { HighCostError } from '@/components/ui/HighQueryCost'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -26,21 +24,15 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
 
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
-  const newFilterBarEnabled = useIsTableFilterBarEnabled()
-  const { filters: oldFilters, clearFilters: clearOldFilters } = useTableFilter()
-  const { filters: newFilters, clearFilters: clearNewFilters } = useTableFilterNew()
+  const { filters, clearFilters } = useTableFilter()
   const { sorts } = useTableSort()
 
   const snap = useTableEditorTableStateSnapshot()
   const tableEditorSnap = useTableEditorStateSnapshot()
 
   const removeAllFilters = useCallback(() => {
-    if (newFilterBarEnabled) {
-      clearNewFilters()
-    } else {
-      clearOldFilters()
-    }
-  }, [clearOldFilters, clearNewFilters, newFilterBarEnabled])
+    clearFilters()
+  }, [clearFilters])
 
   const handleLoadData = useCallback(() => {
     if (!!tableId) {
@@ -61,7 +53,7 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
   const isForeignTableMissingVaultKeyError =
     isForeignTable && error?.message?.includes('query vault failed')
 
-  const hasActiveFilters = oldFilters.length > 0 || newFilters.length > 0
+  const hasActiveFilters = filters.length > 0
 
   const hasFilterRelatedError = hasActiveFilters && isFilterRelatedError(error?.message)
 
