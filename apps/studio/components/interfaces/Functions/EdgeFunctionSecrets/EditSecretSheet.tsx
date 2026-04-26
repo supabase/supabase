@@ -7,9 +7,9 @@ import { useLatest } from 'react-use'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input,
   Input_Shadcn_,
   Sheet,
@@ -86,28 +86,28 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
         </SheetHeader>
 
         <SheetSection className="h-full">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={FORM_ID}
               className="flex flex-col gap-y-4"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItemLayout label="Name" layout="horizontal">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         {...field}
                         readOnly
                         className="!text-foreground-light cursor-not-allowed"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="value"
                 render={({ field }) => (
@@ -116,7 +116,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
                     layout="horizontal"
                     description="Secrets can’t be retrieved once saved. Enter a new value to overwrite the existing value."
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input
                         {...field}
                         type={showSecretValue ? 'text' : 'password'}
@@ -136,12 +136,12 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
                           </div>
                         }
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </SheetSection>
 
         <SheetFooter>

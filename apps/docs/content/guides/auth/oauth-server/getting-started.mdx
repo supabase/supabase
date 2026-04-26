@@ -694,7 +694,7 @@ curl 'http://localhost:54321/auth/v1/admin/oauth/clients' \
 
 ## Customizing tokens (optional)
 
-By default, OAuth access tokens include standard claims like `user_id`, `role`, and `client_id`. If you need to customize tokens—for example, to set a specific `audience` claim for third-party validation or add client-specific metadata—use [Custom Access Token Hooks](/docs/guides/auth/auth-hooks/access-token-hook).
+By default, OAuth access tokens include standard claims like `user_id`, `role`, and `client_id`. If you need to customize tokens—for example, to set a specific `audience` claim for third-party validation or add client-specific metadata—use [Custom Access Token Hooks](/docs/guides/auth/auth-hooks/custom-access-token-hook).
 
 Custom Access Token Hooks are triggered for all token issuance, including OAuth flows. You can use the `client_id` parameter to customize tokens based on which OAuth client is requesting them.
 

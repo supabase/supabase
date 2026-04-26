@@ -14,7 +14,7 @@ export const UnifiedLogsPreview = () => {
         unified view across all your services. Built for better performance and easier debugging.
       </p>
       <p className="text-foreground-light text-sm mb-4">
-        This interface will only be available for organizations on the Team plan or above.
+        This interface is only available for organizations on the Enterprise plan.
       </p>
 
       <Image

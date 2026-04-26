@@ -18,9 +18,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Label_Shadcn_,
   Popover_Shadcn_,
@@ -188,13 +188,13 @@ export default WrapperTableEditor
 const Option = ({ option, control }: { option: TableOption; control: Control<FieldValues> }) => {
   if (option.type === 'select') {
     return (
-      <FormField_Shadcn_
+      <FormField
         control={control}
         name={option.name}
         defaultValue={option.defaultValue}
         render={({ field }) => (
           <FormItemLayout layout="vertical" label={option.label} name={option.name}>
-            <FormControl_Shadcn_>
+            <FormControl>
               <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger_Shadcn_>
                   <SelectValue_Shadcn_ placeholder="Select an option" />
@@ -208,7 +208,7 @@ const Option = ({ option, control }: { option: TableOption; control: Control<Fie
                   ))}
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )}
       />
@@ -216,15 +216,15 @@ const Option = ({ option, control }: { option: TableOption; control: Control<Fie
   }
 
   return (
-    <FormField_Shadcn_
+    <FormField
       control={control}
       name={option.name}
       defaultValue={option.defaultValue ?? ''}
       render={({ field }) => (
         <FormItemLayout layout="vertical" label={option.label} name={option.name}>
-          <FormControl_Shadcn_>
+          <FormControl>
             <Input_Shadcn_ {...field} id={option.name} placeholder={option.placeholder ?? ''} />
-          </FormControl_Shadcn_>
+          </FormControl>
         </FormItemLayout>
       )}
     />
@@ -334,7 +334,7 @@ const TableForm = ({
   const schema = useWatch({ name: 'schema', control: form.control })
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form
         id="wrapper-table-editor-form"
         onSubmit={form.handleSubmit(handleSubmit)}
@@ -342,12 +342,12 @@ const TableForm = ({
       >
         {isLoading && <ShimmeringLoader className="py-4" />}
 
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="schema"
           render={({ field }) => (
             <FormItemLayout layout="vertical" label="Select a schema for the foreign table">
-              <FormControl_Shadcn_>
+              <FormControl>
                 <Select_Shadcn_
                   name="schema"
                   value={field.value}
@@ -371,25 +371,25 @@ const TableForm = ({
                     })}
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />
         {schema === 'custom' && (
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="schema_name"
             render={({ field }) => (
               <FormItemLayout name="schema_name" layout="vertical" label="Schema name">
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Input_Shadcn_ {...field} id="schema_name" />
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
             )}
           />
         )}
 
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="table_name"
           render={({ field }) => (
@@ -399,9 +399,9 @@ const TableForm = ({
               label="Table name"
               description="You can query from this table after the wrapper is enabled."
             >
-              <FormControl_Shadcn_>
+              <FormControl>
                 <Input_Shadcn_ {...field} id="table_name" />
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />
@@ -412,7 +412,7 @@ const TableForm = ({
           <input key={option.name} type="hidden" {...form.register(option.name)} />
         ))}
         {table.availableColumns != null ? (
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="selected_columns"
             render={() => (
@@ -468,7 +468,7 @@ const TableForm = ({
           <div className="flex flex-col gap-y-2">
             {columnFields.map((column, columnIndex) => (
               <div key={column.id} className="flex items-center gap-x-2">
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name={`columns.${columnIndex}.name`}
                   render={({ field }) => (
@@ -477,9 +477,9 @@ const TableForm = ({
                       name={`columns.${columnIndex}.name`}
                       label="Name"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_ {...field} id={`columns.${columnIndex}.name`} />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -516,6 +516,6 @@ const TableForm = ({
           <Option key={option.name} option={option} control={form.control} />
         ))}
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

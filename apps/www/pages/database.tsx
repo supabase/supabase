@@ -281,7 +281,7 @@ function Database() {
 
               <div className="mt-4 flex gap-2">
                 <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
-                  <Link href="/docs/guides/database/etl">Read the docs</Link>
+                  <Link href="/docs/guides/database/replication">Read the docs</Link>
                 </Button>
                 <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
                   <Link href="/blog/supabase-etl">Read the blog post</Link>

@@ -102,7 +102,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
               <SheetDescription>
                 {editMode
                   ? 'Update the configuration for this destination'
-                  : 'A destination is an external platform that automatically receives your database changes in real time.'}
+                  : 'A destination can be a read replica or an external platform that receives your database changes in real time.'}
               </SheetDescription>
             </SheetHeader>
 

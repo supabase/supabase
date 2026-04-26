@@ -8,9 +8,9 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   Input,
   Input_Shadcn_,
@@ -28,7 +28,7 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
-  useWatch_Shadcn_,
+  useWatch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -233,7 +233,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
   }
 
   const isManualConfiguration =
-    useWatch_Shadcn_({ control: form.control, name: 'provider_type' }) === 'oauth2'
+    useWatch({ control: form.control, name: 'provider_type' }) === 'oauth2'
 
   const {
     confirmOnClose,
@@ -247,7 +247,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
     },
   })
 
-  const issuerUrlValue = useWatch_Shadcn_({ control: form.control, name: 'issuer' })
+  const issuerUrlValue = useWatch({ control: form.control, name: 'issuer' })
 
   return (
     <Sheet open={visible} onOpenChange={handleOpenChange}>
@@ -275,14 +275,14 @@ export const CreateOrUpdateCustomProviderSheet = ({
             </SheetTitle>
           </div>
         </SheetHeader>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             className="flex-grow overflow-auto"
             onSubmit={form.handleSubmit(onSubmit)}
             id={FORM_ID}
           >
             <SheetSection className="flex-grow px-5 space-y-4">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="identifier"
                 render={({ field }) => (
@@ -291,7 +291,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
                     label="Provider Identifier"
                     description="Lowercase letters, numbers, and hyphens only. Used in SDK: signInWithOAuth({ provider: 'custom:my-company' })"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <InputGroup>
                         <InputGroupAddon align="inline-start">
                           <InputGroupText>custom:</InputGroupText>
@@ -307,24 +307,24 @@ export const CreateOrUpdateCustomProviderSheet = ({
                           }}
                         />
                       </InputGroup>
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
 
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItemLayout layout="horizontal" label="Display Name">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_ {...field} placeholder="Provider name" />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
 
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="provider_type"
                 render={({ field }) => (
@@ -350,7 +350,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
             <Separator />
             <SheetSection className="flex-grow px-5 space-y-4">
               <FormSectionLabel>OAuth Endpoints</FormSectionLabel>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="issuer"
                 render={({ field }) => (
@@ -359,58 +359,58 @@ export const CreateOrUpdateCustomProviderSheet = ({
                     label="Issuer URL"
                     description="Base URL of your OAuth provider. Discovery runs when you save."
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_ {...field} placeholder="https://auth.company.com" />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </SheetSection>
             {isManualConfiguration ? (
               <SheetSection className="flex-grow px-5 pt-0 space-y-4" key="manual-config">
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="authorization_url"
                   render={({ field }) => (
                     <FormItemLayout layout="horizontal" label="Authorization URL">
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_
                           {...field}
                           placeholder="https://auth.company.com/oauth/authorize"
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="token_url"
                   render={({ field }) => (
                     <FormItemLayout layout="horizontal" label="Token URL">
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_
                           {...field}
                           placeholder="https://auth.company.com/oauth/token"
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="userinfo_url"
                   render={({ field }) => (
                     <FormItemLayout layout="horizontal" label="Userinfo URL">
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_
                           {...field}
                           placeholder="https://auth.company.com/oauth/userinfo"
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="jwks_uri"
                   render={({ field }) => (
@@ -419,19 +419,19 @@ export const CreateOrUpdateCustomProviderSheet = ({
                       label="JWKS URI"
                       description="Required for ID token verification"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_
                           {...field}
                           placeholder="https://auth.company.com/.well-known/jwks.json"
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </SheetSection>
             ) : (
               <SheetSection className="flex-grow px-5 pt-0 space-y-4" key="discovery-config">
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="discovery_url"
                   render={({ field }) => (
@@ -440,7 +440,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
                       label="Discovery URL"
                       description="Leave empty to use standard path: {issuer}/.well-known/openid-configuration. Only needed if your provider uses a non-standard discovery path. Discovery runs when you save."
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_
                           {...field}
                           placeholder={
@@ -449,7 +449,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
                               : 'https://github.company.com/.well-known/openid-configuration'
                           }
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -457,32 +457,32 @@ export const CreateOrUpdateCustomProviderSheet = ({
             )}
             <Separator />
             <SheetSection className="flex-grow px-5 space-y-4">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="client_id"
                 render={({ field }) => (
                   <FormItemLayout layout="horizontal" label="Client ID">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_ {...field} placeholder="Client ID" />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="client_secret"
                 render={({ field }) => (
                   <FormItemLayout layout="horizontal" label="Client Secret">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_ {...field} type="password" placeholder="Client secret" />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </SheetSection>
             <Separator />
             <SheetSection className="flex-grow px-5 space-y-4">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="scopes"
                 render={({ field }) => (
@@ -491,13 +491,13 @@ export const CreateOrUpdateCustomProviderSheet = ({
                     label="Scopes"
                     description="Comma-separated list. Common: openid, email, profile"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_ {...field} placeholder="openid, email, profile" />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="email_optional"
                 render={({ field }) => (
@@ -506,9 +506,9 @@ export const CreateOrUpdateCustomProviderSheet = ({
                     label="Allow users without email"
                     description="Allows the user to successfully authenticate when the provider does not return an email address."
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -530,7 +530,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
               </FormItemLayout>
             </SheetSection>
           </form>
-        </Form_Shadcn_>
+        </Form>
         <SheetFooter>
           <Button type="default" onClick={confirmOnClose}>
             Cancel
