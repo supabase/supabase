@@ -37,6 +37,10 @@ services:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+      # See: https://supabase.com/docs/guides/self-hosting/remove-superuser-access
+      #POSTGRES_USER_READ_WRITE: postgres
+
       PG_META_CRYPTO_KEY: ${PG_META_CRYPTO_KEY}
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
       PGRST_DB_MAX_ROWS: ${PGRST_DB_MAX_ROWS:-1000}

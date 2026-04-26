@@ -14,9 +14,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
   WarningIcon,
 } from 'ui'
@@ -160,11 +160,11 @@ export const BasicAuthSettingsForm = () => {
         )}
 
         {isSuccess && (
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="DISABLE_SIGNUP"
                     render={({ field }) => (
@@ -173,20 +173,20 @@ export const BasicAuthSettingsForm = () => {
                         label="Allow new users to sign up"
                         description="If this is disabled, new users will not be able to sign up to your application"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
                 {showManualLinking && (
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="SECURITY_MANUAL_LINKING_ENABLED"
                       render={({ field }) => (
@@ -206,20 +206,20 @@ export const BasicAuthSettingsForm = () => {
                             </>
                           }
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Switch
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               disabled={!canUpdateConfig}
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
                   </CardContent>
                 )}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="EXTERNAL_ANONYMOUS_USERS_ENABLED"
                     render={({ field }) => (
@@ -239,13 +239,13 @@ export const BasicAuthSettingsForm = () => {
                           </>
                         }
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -305,7 +305,7 @@ export const BasicAuthSettingsForm = () => {
                     )}
                 </CardContent>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="MAILER_AUTOCONFIRM"
                     render={({ field }) => (
@@ -314,13 +314,13 @@ export const BasicAuthSettingsForm = () => {
                         label="Confirm email"
                         description="Users will need to confirm their email address before signing in for the first time"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -342,7 +342,7 @@ export const BasicAuthSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         )}
       </PageSectionContent>
     </PageSection>

@@ -26,10 +26,10 @@ import {
   CommandInput_Shadcn_ as CommandInput,
   CommandItem_Shadcn_ as CommandItem,
   CommandList_Shadcn_ as CommandList,
-  FormControl_Shadcn_ as FormControl,
-  FormField_Shadcn_ as FormField,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_ as FormMessage,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
   Input_Shadcn_ as Input,
   Popover_Shadcn_ as Popover,
   PopoverContent_Shadcn_ as PopoverContent,
@@ -446,12 +446,12 @@ export const NewPaymentMethodElement = forwardRef(
                   name="tax_id_value"
                   control={form.control}
                   render={({ field }) => (
-                    <FormItem_Shadcn_>
+                    <FormItem>
                       <FormControl>
                         <Input {...field} placeholder={selectedTaxId?.placeholder} />
                       </FormControl>
                       <FormMessage />
-                    </FormItem_Shadcn_>
+                    </FormItem>
                   )}
                 />
               )}

@@ -6,7 +6,7 @@ import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   cn,
-  FormField_Shadcn_,
+  FormField,
   RadioGroupCard,
   RadioGroupCardItem,
   Skeleton,
@@ -121,7 +121,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const hasHiddenOptions = availableOptions.length > INITIALLY_VISIBLE_COUNT
 
   return (
-    <FormField_Shadcn_
+    <FormField
       name="computeSize"
       control={control}
       render={({ field }) => (

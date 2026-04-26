@@ -444,7 +444,7 @@ export const ReplicationPipelineStatus = () => {
                       tooltip={{
                         content: {
                           side: 'left',
-                          text: hasErroredTables ? 'No tables require manual retry' : undefined,
+                          text: !hasErroredTables ? 'No tables require manual retry' : undefined,
                         },
                       }}
                     >

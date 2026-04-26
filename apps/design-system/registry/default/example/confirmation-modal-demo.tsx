@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -46,13 +46,13 @@ export default function ConfirmationModalDemo() {
           </p>
           {/* Dropdown for Postgres version */}
           <div className="pt-4">
-            <Form_Shadcn_ {...form}>
-              <FormField_Shadcn_
+            <Form {...form}>
+              <FormField
                 control={form.control}
                 name="postgresVersion"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Postgres version">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger_Shadcn_>
                           <SelectValue_Shadcn_ />
@@ -62,11 +62,11 @@ export default function ConfirmationModalDemo() {
                           <SelectItem_Shadcn_ value="17.6.1.055">17.6.1.055</SelectItem_Shadcn_>
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-            </Form_Shadcn_>
+            </Form>
           </div>
         </div>
       </ConfirmationModal>

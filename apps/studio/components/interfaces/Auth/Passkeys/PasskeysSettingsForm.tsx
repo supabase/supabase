@@ -8,12 +8,12 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Switch,
-  useWatch_Shadcn_,
+  useWatch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -279,7 +279,7 @@ export const PasskeysSettingsForm = () => {
     updateAuthConfig({ projectRef, config: payload })
   }
 
-  const passKeysEnabled = useWatch_Shadcn_({ control: form.control, name: 'PASSKEY_ENABLED' })
+  const passKeysEnabled = useWatch({ control: form.control, name: 'PASSKEY_ENABLED' })
 
   if (isPermissionsLoaded && !canReadConfig) {
     return <NoPermission resourceText="view passkey settings" />
@@ -290,11 +290,11 @@ export const PasskeysSettingsForm = () => {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <Card>
           <CardContent>
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="PASSKEY_ENABLED"
               render={({ field }) => (
@@ -309,13 +309,13 @@ export const PasskeysSettingsForm = () => {
                     </>
                   }
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       disabled={!canUpdateConfig}
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -324,7 +324,7 @@ export const PasskeysSettingsForm = () => {
           {passKeysEnabled && (
             <>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="WEBAUTHN_RP_DISPLAY_NAME"
                   render={({ field }) => (
@@ -333,15 +333,15 @@ export const PasskeysSettingsForm = () => {
                       label="Relying Party Display Name"
                       description="A human-readable name for your application shown during passkey registration."
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_ {...field} placeholder="My project" />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="WEBAUTHN_RP_ID"
                   render={({ field }) => (
@@ -350,15 +350,15 @@ export const PasskeysSettingsForm = () => {
                       label="Relying Party ID"
                       description='The domain name for your application (e.g. "example.com"). This determines which passkeys can be used.'
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_ {...field} placeholder="example.com" />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="WEBAUTHN_RP_ORIGINS"
                   render={({ field }) => (
@@ -367,9 +367,9 @@ export const PasskeysSettingsForm = () => {
                       label="Relying Party Origins"
                       description='Comma-separated list of allowed origins (e.g. "https://example.com"). HTTPS is required except for localhost.'
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_ {...field} placeholder="https://example.com" />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -396,6 +396,6 @@ export const PasskeysSettingsForm = () => {
           </CardFooter>
         </Card>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

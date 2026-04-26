@@ -13,8 +13,8 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -94,7 +94,7 @@ export const UpdateForeignSchemaDialog = ({
         <Button type="default">Update schema tables</Button>
       </DialogTrigger>
       <DialogContent size="medium" aria-describedby={undefined}>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
               <DialogTitle>Update schema to expose foreign tables</DialogTitle>
@@ -123,7 +123,7 @@ export const UpdateForeignSchemaDialog = ({
               </p>
 
               {schemasAssociatedWithNamespace.length > 1 ? (
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="schema"
                   render={({ field }) => (
@@ -167,7 +167,7 @@ export const UpdateForeignSchemaDialog = ({
               </div>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

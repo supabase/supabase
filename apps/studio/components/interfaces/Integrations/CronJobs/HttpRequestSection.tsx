@@ -1,10 +1,10 @@
 import { UseFormReturn } from 'react-hook-form'
 import {
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -24,41 +24,41 @@ interface HttpRequestSectionProps {
 export const HttpRequestSection = ({ form }: HttpRequestSectionProps) => {
   return (
     <SheetSection className="flex flex-col gap-3">
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="values.method"
         render={({ field }) => (
-          <FormItem_Shadcn_>
-            <FormLabel_Shadcn_>Method</FormLabel_Shadcn_>
+          <FormItem>
+            <FormLabel>Method</FormLabel>
             <Select_Shadcn_ onValueChange={field.onChange} value={field.value}>
-              <FormControl_Shadcn_>
+              <FormControl>
                 <SelectTrigger_Shadcn_>
                   <SelectValue_Shadcn_ placeholder="Select a method for the HTTP request" />
                 </SelectTrigger_Shadcn_>
-              </FormControl_Shadcn_>
+              </FormControl>
               <SelectContent_Shadcn_>
                 <SelectItem_Shadcn_ value="GET">GET</SelectItem_Shadcn_>
                 <SelectItem_Shadcn_ value="POST">POST</SelectItem_Shadcn_>
               </SelectContent_Shadcn_>
             </Select_Shadcn_>
-            <FormMessage_Shadcn_ />
-          </FormItem_Shadcn_>
+            <FormMessage />
+          </FormItem>
         )}
       />
 
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="values.endpoint"
         render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Endpoint URL" className="gap-1">
-            <FormControl_Shadcn_>
+            <FormControl>
               <Input {...rest} placeholder="https://api.example.com/endpoint" />
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )}
       />
 
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="values.timeoutMs"
         render={({ field: { ref, ...rest } }) => (
