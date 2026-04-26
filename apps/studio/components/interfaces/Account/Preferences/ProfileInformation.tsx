@@ -7,9 +7,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -96,37 +96,37 @@ export const ProfileInformation = () => {
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} className="space-y-6 w-full" onSubmit={form.handleSubmit(onSubmit)}>
             <Card>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="first_name"
                   render={({ field }) => (
                     <FormItemLayout label="First name" layout="flex-row-reverse">
-                      <FormControl_Shadcn_ className="col-span-8">
+                      <FormControl className="col-span-8">
                         <Input_Shadcn_ {...field} placeholder="First name" className="w-full" />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="last_name"
                   render={({ field }) => (
                     <FormItemLayout label="Last name" layout="flex-row-reverse">
-                      <FormControl_Shadcn_ className="col-span-8">
+                      <FormControl className="col-span-8">
                         <Input_Shadcn_ {...field} placeholder="Last name" className="w-full" />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="primary_email"
                   render={({ field }) => (
@@ -139,7 +139,7 @@ export const ProfileInformation = () => {
                       }
                       layout="flex-row-reverse"
                     >
-                      <FormControl_Shadcn_ className="col-span-8">
+                      <FormControl className="col-span-8">
                         <div className="flex flex-col gap-1">
                           <Select_Shadcn_
                             value={field.value}
@@ -159,13 +159,13 @@ export const ProfileInformation = () => {
                             </SelectContent_Shadcn_>
                           </Select_Shadcn_>
                         </div>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="username"
                   render={({ field }) => (
@@ -178,7 +178,7 @@ export const ProfileInformation = () => {
                       }
                       layout="flex-row-reverse"
                     >
-                      <FormControl_Shadcn_ className="col-span-8">
+                      <FormControl className="col-span-8">
                         <div className="flex flex-col gap-1">
                           <Input_Shadcn_
                             {...field}
@@ -187,7 +187,7 @@ export const ProfileInformation = () => {
                             disabled={profile?.is_sso_user}
                           />
                         </div>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -209,7 +209,7 @@ export const ProfileInformation = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </PageSectionContent>
     </PageSection>
   )

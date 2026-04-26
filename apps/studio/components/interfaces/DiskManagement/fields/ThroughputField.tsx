@@ -4,8 +4,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
@@ -79,7 +79,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
           transition={{ duration: 0.1 }}
           style={{ overflow: 'hidden' }}
         >
-          <FormField_Shadcn_
+          <FormField
             name="throughput"
             control={control}
             render={({ field }) => (
@@ -118,7 +118,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                   </>
                 }
               >
-                <FormControl_Shadcn_ className="max-w-32">
+                <FormControl className="max-w-32">
                   <InputGroup>
                     <FormInputGroupInput
                       type="number"
@@ -136,7 +136,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                       <InputGroupText>MB/s</InputGroupText>
                     </InputGroupAddon>
                   </InputGroup>
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
             )}
           />

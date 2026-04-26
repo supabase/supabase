@@ -7,12 +7,12 @@ import { toast } from 'sonner'
 import {
   Button,
   Checkbox_Shadcn_,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
 } from 'ui'
 import { z } from 'zod'
 
@@ -39,28 +39,28 @@ export default function CheckboxReactHookFormSingle() {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="mobile"
           render={({ field }) => (
-            <FormItem_Shadcn_ className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl_Shadcn_>
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+              <FormControl>
                 <Checkbox_Shadcn_ checked={field.value} onCheckedChange={field.onChange} />
-              </FormControl_Shadcn_>
+              </FormControl>
               <div className="space-y-1 leading-none">
-                <FormLabel_Shadcn_>Use different settings for my mobile devices</FormLabel_Shadcn_>
-                <FormDescription_Shadcn_>
+                <FormLabel>Use different settings for my mobile devices</FormLabel>
+                <FormDescription>
                   You can manage your mobile notifications in the{' '}
                   <Link href="/examples/forms">mobile settings</Link> page.
-                </FormDescription_Shadcn_>
+                </FormDescription>
               </div>
-            </FormItem_Shadcn_>
+            </FormItem>
           )}
         />
         <Button htmlType="submit">Submit</Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

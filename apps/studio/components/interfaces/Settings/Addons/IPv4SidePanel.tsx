@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { cn, RadioGroup_Shadcn_, RadioGroupLargeItem_Shadcn_, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
@@ -198,6 +199,7 @@ const IPv4SidePanel = () => {
                   </RadioGroupLargeItem_Shadcn_>
                 ))}
               </RadioGroup_Shadcn_>
+              <TaxDisclaimer className="mt-3" />
             </div>
           )}
 

@@ -15,7 +15,7 @@ Use Supabase client libraries, REST, or GraphQL with a publishable key. Protect 
 
 ### Edge Functions
 
-Put custom server-side logic between your client and database with [Edge Functions](/docs/guides/functions). You can use secrets, service role keys, or database connection strings inside the function, and you can [disable the Data API](/docs/guides/database/data-api#disable-the-data-api-completely) if your app only accesses data this way.
+Put custom server-side logic between your client and database with [Edge Functions](/docs/guides/functions). You can use secrets, API keys, or database connection strings inside the function, and you can [disable the Data API](/docs/guides/database/data-api#disable-the-data-api-completely) if your app only accesses data this way.
 
 ### Direct database connections
 
@@ -32,9 +32,9 @@ Your publishable key is safe to expose with RLS enabled, because row access perm
 
 Older projects may also show an `anon` key. Treat it like a publishable key: it can identify your project, but it is not a secret and must be paired with RLS and least-privilege grants.
 
-<Admonition type="danger" label="Never expose your service role key on the frontend">
+<Admonition type="danger" label="Never expose your service role or secret keys on the frontend">
 
-Unlike your publishable key, your **service role key** is **never** safe to expose because it bypasses RLS. Only use your service role key on the backend. Treat it as a secret (for example, import it as a sensitive environment variable instead of hardcoding it).
+Unlike your publishable key, your secret and service role keys are **never** safe to expose because they bypass RLS. Only use your secret and service role keys on the backend. Treat them as secrets (for example, import them as sensitive environment variables instead of hardcoding them).
 
 </Admonition>
 

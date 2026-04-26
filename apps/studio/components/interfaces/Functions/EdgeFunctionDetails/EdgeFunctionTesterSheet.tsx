@@ -7,9 +7,9 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import {
   Badge,
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_ as Input,
   Label_Shadcn_ as Label,
   ResizableHandle,
@@ -240,11 +240,11 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
       <div className="border rounded-md bg-surface-200">
         {(type === 'headers' ? headerFields : queryParamFields).map((field, index) => (
           <div key={field.id} className="grid grid-cols-[1fr,1fr,32px] border-b last:border-b-0">
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name={`${type}.${index}.key`}
               render={({ field }) => (
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Input
                     {...field}
                     size="tiny"
@@ -252,14 +252,14 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                     disabled={isPending}
                     className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-l-0 border-r-1 border-t-0 border-b-0 border-border"
                   />
-                </FormControl_Shadcn_>
+                </FormControl>
               )}
             />
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name={`${type}.${index}.value`}
               render={({ field }) => (
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Input
                     {...field}
                     size="tiny"
@@ -267,7 +267,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                     disabled={isPending}
                     className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-none"
                   />
-                </FormControl_Shadcn_>
+                </FormControl>
               )}
             />
             <div className="flex items-center justify-center">
@@ -316,7 +316,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
           <SheetTitle>Test {functionSlug}</SheetTitle>
         </SheetHeader>
 
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex-1 overflow-y-auto flex flex-col"
@@ -324,12 +324,12 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
             <ResizablePanelGroup orientation="vertical">
               <ResizablePanel>
                 <div className="flex flex-col gap-y-4 p-5 h-full overflow-y-auto">
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="method"
                     render={({ field }) => (
                       <FormItemLayout layout="vertical" label="HTTP Method">
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Select
                             value={field.value}
                             onValueChange={field.onChange}
@@ -346,17 +346,17 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                               ))}
                             </SelectContent>
                           </Select>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                   {method !== 'GET' && (
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="body"
                       render={({ field }) => (
                         <FormItemLayout layout="vertical" label="Request Body">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Textarea
                               {...field}
                               placeholder="Request body (JSON)"
@@ -364,7 +364,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                               disabled={isPending}
                               className="font-mono text-xs"
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -475,7 +475,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
               </div>
             </SheetFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </SheetContent>
     </Sheet>
   )

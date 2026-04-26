@@ -22,12 +22,12 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   Input_Shadcn_,
   Label_Shadcn_,
   Popover_Shadcn_,
@@ -213,7 +213,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
   return (
     <Dialog open={visible} onOpenChange={() => onClose()}>
       <DialogContent>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id="move-snippet" onSubmit={form.handleSubmit(onConfirmMove)}>
             <DialogHeader>
               <DialogTitle>
@@ -334,22 +334,22 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
               {selectedId === 'new-folder' && (
                 <div className="flex flex-col gap-y-2">
-                  <FormField_Shadcn_
+                  <FormField
                     name="name"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                        <FormLabel_Shadcn_>Provide a name for your new folder</FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
+                      <FormItem className="flex flex-col gap-y-2">
+                        <FormLabel>Provide a name for your new folder</FormLabel>
+                        <FormControl>
                           <Input_Shadcn_
                             autoFocus
                             {...field}
                             autoComplete="off"
                             disabled={isMovingSnippet || isCreatingFolder}
                           />
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
                 </div>
@@ -374,7 +374,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
               </Button>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

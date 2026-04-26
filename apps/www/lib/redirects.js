@@ -1,6 +1,11 @@
 module.exports = [
   {
     permanent: true,
+    source: '/ui/docs/ai-editors-rules/prompts',
+    destination: '/ui/docs/ai-editors-rules/skills',
+  },
+  {
+    permanent: true,
     source: '/auth/Auth',
     destination: '/auth',
   },

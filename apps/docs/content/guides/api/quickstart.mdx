@@ -200,6 +200,14 @@ You can query the route in your browser, by appending the `publishable` key as a
 
 `https://<PROJECT_REF>.supabase.co/rest/v1/todos?apikey=<PUBLISHABLE_KEY>`
 
+### Curl
+
+```
+curl 'https://<PROJECT_REF>.supabase.co/rest/v1/todos?select=*' \
+  -H "apikey: <PUBLISHABLE_KEY>" \
+  -H "Authorization: Bearer <PUBLISHABLE_KEY>"
+```
+
 ### Client libraries
 
 We provide a number of [Client Libraries](https://github.com/supabase/supabase#client-libraries).

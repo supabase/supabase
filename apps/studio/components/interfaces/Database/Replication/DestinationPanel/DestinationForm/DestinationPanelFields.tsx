@@ -5,8 +5,8 @@ import { useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -35,7 +35,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
     <div className="flex flex-col gap-y-6 p-5">
       <p className="text-sm font-medium text-foreground">BigQuery settings</p>
       <div className="flex flex-col gap-y-4">
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="projectId"
           render={({ field }) => (
@@ -44,14 +44,14 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               label="Project ID"
               description="The Google Cloud project ID where data will be sent"
             >
-              <FormControl_Shadcn_>
+              <FormControl>
                 <Input_Shadcn_ {...field} placeholder="my-gcp-project" />
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />
 
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="datasetId"
           render={({ field }) => (
@@ -60,14 +60,14 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               layout="horizontal"
               description="The BigQuery dataset where replicated tables will be created"
             >
-              <FormControl_Shadcn_>
+              <FormControl>
                 <Input_Shadcn_ {...field} placeholder="my_dataset" />
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />
 
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="serviceAccountKey"
           render={({ field }) => (
@@ -76,7 +76,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               label="Service Account Key"
               description="Service account credentials JSON for authenticating with BigQuery"
             >
-              <FormControl_Shadcn_>
+              <FormControl>
                 <TextArea_Shadcn_
                   {...field}
                   rows={5}
@@ -84,7 +84,7 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
                   placeholder='{"type": "service_account", "project_id": "...", ...}'
                   className="font-mono text-xs"
                 />
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />
@@ -159,7 +159,7 @@ export const AnalyticsBucketFields = ({
       <p className="text-sm font-medium text-foreground">Analytics Bucket settings</p>
 
       <div className="flex flex-col gap-y-4">
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="warehouseName"
           render={({ field }) => (
@@ -189,7 +189,7 @@ export const AnalyticsBucketFields = ({
                   Failed to retrieve buckets
                 </Button>
               ) : (
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Select_Shadcn_
                     value={field.value}
                     onValueChange={(value) => {
@@ -226,13 +226,13 @@ export const AnalyticsBucketFields = ({
                       </SelectGroup_Shadcn_>
                     </SelectContent_Shadcn_>
                   </Select_Shadcn_>
-                </FormControl_Shadcn_>
+                </FormControl>
               )}
             </FormItemLayout>
           )}
         />
 
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="namespace"
           render={({ field }) => (
@@ -262,7 +262,7 @@ export const AnalyticsBucketFields = ({
                   Failed to retrieve namespaces
                 </Button>
               ) : (
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Select_Shadcn_
                     value={field.value}
                     onValueChange={(value) => {
@@ -298,14 +298,14 @@ export const AnalyticsBucketFields = ({
                       </SelectGroup_Shadcn_>
                     </SelectContent_Shadcn_>
                   </Select_Shadcn_>
-                </FormControl_Shadcn_>
+                </FormControl>
               )}
             </FormItemLayout>
           )}
         />
 
         {namespace === CREATE_NEW_NAMESPACE && (
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="newNamespaceName"
             render={({ field }) => (
@@ -314,15 +314,15 @@ export const AnalyticsBucketFields = ({
                 layout="horizontal"
                 description="A unique name for the new namespace"
               >
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Input_Shadcn_ {...field} placeholder="new_namespace" value={field.value || ''} />
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
             )}
           />
         )}
 
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="catalogToken"
           render={({ field }) => (
@@ -360,7 +360,7 @@ export const AnalyticsBucketFields = ({
           )}
         />
 
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="s3AccessKeyId"
           render={({ field }) => (
@@ -416,7 +416,7 @@ export const AnalyticsBucketFields = ({
                   Failed to retrieve keys
                 </Button>
               ) : (
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger_Shadcn_>
                       {field.value === CREATE_NEW_KEY
@@ -440,14 +440,14 @@ export const AnalyticsBucketFields = ({
                       </SelectGroup_Shadcn_>
                     </SelectContent_Shadcn_>
                   </Select_Shadcn_>
-                </FormControl_Shadcn_>
+                </FormControl>
               )}
             </FormItemLayout>
           )}
         />
 
         {s3AccessKeyId !== CREATE_NEW_KEY && (
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="s3SecretAccessKey"
             render={({ field }) => (
@@ -457,14 +457,14 @@ export const AnalyticsBucketFields = ({
                 className="relative"
                 description="The secret key corresponding to your selected access key ID"
               >
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Input_Shadcn_
                     {...field}
                     type={showSecretAccessKey ? 'text' : 'password'}
                     value={field.value ?? ''}
                     placeholder="Provide the secret access key"
                   />
-                </FormControl_Shadcn_>
+                </FormControl>
                 <Button
                   type="default"
                   icon={showSecretAccessKey ? <Eye /> : <EyeOff />}

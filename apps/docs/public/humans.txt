@@ -52,6 +52,7 @@ Chris Martin
 Chris Stockton
 Chris Ward
 Clayton Kast
+Colin Goodheart-Smithe
 Colin Murray
 Colum Ferry
 Craig Cannon
@@ -90,11 +91,13 @@ Felipe Stival
 Ferhat Elmas
 Firas El Rachidi
 Francesco Sansalvadore
+Gabriel Claudino
 Garrett Crowell
 Gerardo Estaba
 Gildas Garcia
 Giuseppe Mandato
 Greg Kress
+Greg Marzouka
 Greg P
 Greg Richardson
 Gregor Vand
@@ -180,6 +183,7 @@ Natalie Roberge
 Nick B
 Nick Littman
 Nick Nowlan
+Nicolas Nosenzo
 Nyannyacha
 Oli R
 Pamela Chia
@@ -206,6 +210,7 @@ Ronan Lehane
 Rory Wilding
 Ryan Goulet
 Ruan Maia
+Saba Pochkhua
 Sam Meech-Ward
 Sam Rome
 Sam Rose
