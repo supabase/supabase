@@ -369,7 +369,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             ```
             <Admonition type="note" label="conflict management">
 
-              If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma-troubleshooting) for more details
+              If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma/prisma-troubleshooting) for more details
 
             </Admonition>
 
@@ -427,35 +427,78 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
-    <StepHikeCompact.Step step={6}>
+  <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Test your API">
-      Create a index.ts file and run it to test your connection
+      Create an <code>index.ts</code> file and run it to test your connection using the <code>Post</code> model created earlier.
     </StepHikeCompact.Details>
+
     <StepHikeCompact.Code>
-      ```ts index.ts
-      const { PrismaClient } = require('@prisma/client');
+    ```ts index.ts
+    import { PrismaClient } from '@prisma/client'
 
-      const prisma = new PrismaClient();
+    const prisma = new PrismaClient()
 
-      async function main() {
-        //change to reference a table in your schema
-        const val = await prisma.<SOME_TABLE_NAME>.findMany({
-          take: 10,
-        });
-        console.log(val);
-      }
+    async function main() {
+      const posts = await prisma.post.findMany({
+        take: 10,
+      })
 
-      main()
-        .then(async () => {
-          await prisma.$disconnect();
-        })
-        .catch(async (e) => {
-          console.error(e);
-          await prisma.$disconnect();
-        process.exit(1);
-      });
+      console.log(posts)
+    }
 
-      ```
+    main()
+      .catch((error) => {
+        console.error(error)
+        process.exit(1)
+      })
+      .finally(async () => {
+        await prisma.$disconnect()
+      })
+    ```
+
+    Run the script:
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="npm_run"
+      queryGroup="run"
+    >
+    <TabPanel id="npm_run" label="npm">
+
+    ```bash
+    npx ts-node index.ts
+    ```
+
+    </TabPanel>
+
+    <TabPanel id="pnpm_run" label="pnpm">
+
+    ```bash
+    pnpx ts-node index.ts
+    ```
+
+    </TabPanel>
+
+    <TabPanel id="yarn_run" label="yarn">
+
+    ```bash
+    npx ts-node index.ts
+    ```
+
+    </TabPanel>
+
+    <TabPanel id="bun_run" label="bun">
+
+    ```bash
+    bun run index.ts
+    ```
+
+    </TabPanel>
+
+    </Tabs>
+
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
