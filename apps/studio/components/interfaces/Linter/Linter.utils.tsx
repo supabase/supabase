@@ -332,6 +332,16 @@ export const lintInfoMap: LintInfo[] = [
     docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0025_public_bucket_allows_listing`,
     category: 'security',
   },
+  {
+    name: 'pg_graphql_anon_table_exposed',
+    title: 'pg_graphql Anon Role Exposes Objects in Introspection',
+    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/editor?schema=${metadata?.schema}&table=${metadata?.name}`,
+    linkText: 'View object',
+    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0026_pg_graphql_anon_table_exposed`,
+    category: 'security',
+  },
 ]
 
 export const LintCTA = ({
