@@ -19,6 +19,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
+  DialogDescription,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
@@ -399,6 +400,9 @@ export const JWTSecretKeysTable = () => {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Start using new JWT signing keys</DialogTitle>
+            <DialogDescription className="sr-only">
+              Migrate your project from the legacy JWT secret to the new JWT signing key workflow.
+            </DialogDescription>
           </DialogHeader>
           <DialogSectionSeparator />
           <DialogSection className="flex flex-col gap-2 text-sm text-foreground-light">

@@ -5,6 +5,7 @@ import {
   Badge,
   Button,
   Checkbox_Shadcn_,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -150,6 +151,10 @@ export const CreateKeyDialog = ({
     <>
       <DialogHeader>
         <DialogTitle>Create a new Standby Key</DialogTitle>
+        <DialogDescription className="sr-only">
+          Create a standby JWT signing key that you can rotate into use after your application has
+          picked it up.
+        </DialogDescription>
       </DialogHeader>
       <DialogSectionSeparator />
       <DialogSection className="space-y-4">
