@@ -1,11 +1,9 @@
-import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
 import { LabelBadges } from '~/components/Changelog/ChangelogTimelineList'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import {
   CHANGELOG_CATEGORY_ID,
   createChangelogOctokit,
-  fetchAllChangelogDiscussionMetadata,
   fetchChangelogDiscussionByNumber,
   type ChangelogLabel,
 } from '~/lib/changelog-github'
@@ -26,20 +24,9 @@ type PageProps = {
   number: number
   source: MDXRemoteSerializeResult
   labels: ChangelogLabel[]
-  prevNumber: number | null
-  nextNumber: number | null
 }
 
-const ChangelogDetailPage = ({
-  title,
-  url,
-  created_at,
-  number,
-  source,
-  labels,
-  prevNumber,
-  nextNumber,
-}: PageProps) => (
+const ChangelogDetailPage = ({ title, url, created_at, number, source, labels }: PageProps) => (
   <>
     <NextSeo
       title={`${title} · Changelog`}
@@ -82,32 +69,9 @@ const ChangelogDetailPage = ({
 
         <LabelBadges labels={labels} onBadgeClick={(e) => e.stopPropagation()} className="" />
 
-        <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
+        <article className="prose prose-docs max-w-none [overflow-wrap:break-word] mb-12 lg:mb-20">
           <MDXRemote {...source} components={mdxComponents('blog')} />
         </article>
-        <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-6">
-          {nextNumber != null ? (
-            <Link
-              href={`/changelog/${nextNumber}`}
-              className="text-foreground-lighter flex items-center gap-2 text-sm hover:text-foreground"
-            >
-              <ArrowLeftIcon className="h-4 w-4" /> Newer
-            </Link>
-          ) : (
-            <span />
-          )}
-          {prevNumber != null ? (
-            <Link
-              href={`/changelog/${prevNumber}`}
-              className="text-foreground-lighter flex items-center gap-2 text-sm hover:text-foreground"
-            >
-              Older
-              <ArrowRightIcon className="h-4 w-4" />
-            </Link>
-          ) : (
-            <span />
-          )}
-        </div>
       </div>
       <CTABanner />
     </DefaultLayout>
@@ -115,19 +79,8 @@ const ChangelogDetailPage = ({
 )
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const octokit = createChangelogOctokit()
-  const metadata = await fetchAllChangelogDiscussionMetadata(
-    octokit,
-    'supabase',
-    'supabase',
-    CHANGELOG_CATEGORY_ID
-  )
-  const visible = metadata.filter((item) => !item.title.includes('[d]'))
-
   return {
-    paths: visible.map((item) => ({
-      params: { number: String(item.number) },
-    })),
+    paths: [],
     fallback: 'blocking',
   }
 }
@@ -147,29 +100,6 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
     return { notFound: true }
   }
 
-  const metadata = await fetchAllChangelogDiscussionMetadata(
-    octokit,
-    'supabase',
-    'supabase',
-    CHANGELOG_CATEGORY_ID
-  )
-
-  const visible = metadata
-    .filter((item) => !item.title.includes('[d]'))
-    .map((item) => ({
-      number: item.number,
-      sortDate: discussionDisplayDate(item),
-    }))
-    .sort((a, b) => dayjs(b.sortDate).diff(dayjs(a.sortDate)))
-
-  const pos = visible.findIndex((item) => item.number === number)
-  let prevNumber: number | null = null
-  let nextNumber: number | null = null
-  if (pos >= 0) {
-    prevNumber = pos > 0 ? visible[pos - 1]!.number : null
-    nextNumber = pos < visible.length - 1 ? visible[pos + 1]!.number : null
-  }
-
   try {
     const source = await mdxSerialize(discussion.body)
     const created_at =
@@ -186,8 +116,6 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
         number,
         source,
         labels: discussion.labels?.nodes ?? [],
-        prevNumber,
-        nextNumber,
       },
       revalidate: 900,
     }
