@@ -64,7 +64,7 @@ export default function RealtimeLimitsEstimater({}) {
       <div className="grid mb-8 gap-y-8 gap-x-8 grid-cols-2 xl:grid-cols-4">
         <div>
           <Label_Shadcn_ htmlFor="computeAddOn">Compute:</Label_Shadcn_>
-          <Select_Shadcn_ onValueChange={handleComputeAddOnSelection} defaultValue={computeAddOn}>
+          <Select_Shadcn_ onValueChange={handleComputeAddOnSelection} value={computeAddOn}>
             <SelectTrigger_Shadcn_ id="computeAddOn">
               <SelectValue_Shadcn_ className="font-mono" />
             </SelectTrigger_Shadcn_>
@@ -77,7 +77,11 @@ export default function RealtimeLimitsEstimater({}) {
         </div>
         <div>
           <Label_Shadcn_ htmlFor="filters">Filters:</Label_Shadcn_>
-          <Select_Shadcn_ onValueChange={handleFiltersSelection} defaultValue={filters.toString()}>
+          <Select_Shadcn_
+            onValueChange={handleFiltersSelection}
+            value={filters.toString()}
+            disabled
+          >
             <SelectTrigger_Shadcn_ id="filters">
               <SelectValue_Shadcn_ className="font-mono" />
             </SelectTrigger_Shadcn_>
@@ -89,7 +93,7 @@ export default function RealtimeLimitsEstimater({}) {
         </div>
         <div>
           <Label_Shadcn_ htmlFor="rls">RLS:</Label_Shadcn_>
-          <Select_Shadcn_ onValueChange={handleRLSSelection} defaultValue={rls.toString()}>
+          <Select_Shadcn_ onValueChange={handleRLSSelection} value={rls.toString()}>
             <SelectTrigger_Shadcn_ id="rls">
               <SelectValue_Shadcn_ className="font-mono" />
             </SelectTrigger_Shadcn_>
