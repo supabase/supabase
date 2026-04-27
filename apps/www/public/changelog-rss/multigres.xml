@@ -1,0 +1,22 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · Multigres</title>
+      <link>https://supabase.com/changelog</link>
+      <description>Multigres updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Thu, 09 Apr 2026 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/multigres.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/44713</guid>
+  <title>Developer Update - April 2026</title>
+  <link>https://supabase.com/changelog/44713</link>
+  <pubDate>Thu, 09 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/43465</guid>
+  <title>Developer Update - March 2026</title>
+  <link>https://supabase.com/changelog/43465</link>
+  <pubDate>Thu, 05 Mar 2026 00:00:00 -0700</pubDate>
+</item>
+    </channel>
+  </rss>

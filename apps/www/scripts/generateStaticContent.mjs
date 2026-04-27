@@ -480,7 +480,7 @@ try {
     const visibleCount = entries.filter((e) => !e.title.includes('[d]')).length
     console.log(`✅ Generated changelog RSS with ${visibleCount} entries`)
 
-    // LLM-friendly changelog indexes (keep RSS as canonical syndication format).
+    // LLM-friendly changelog markdown index (RSS remains canonical syndication format).
     const visibleEntries = entries.filter((entry) => !entry.title.includes('[d]'))
     const escapeMd = (value) => String(value ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ')
     const mdRows = visibleEntries.map((entry) => {
@@ -488,31 +488,13 @@ try {
       const labels = (entry.labels ?? []).join(',')
       return `- ${date} | #${entry.number} | ${escapeMd(labels)} | ${escapeMd(entry.title)} | /changelog/${entry.number}`
     })
-    const changelogIndexMd = `# Changelog index
-
-Token-light index for LLMs and agents.
-Format: date | #number | labels(comma-separated slugs) | title | path
+    const changelogMd = `<!-- date | #number | labels(comma-separated slugs) | title | path -->
 
 ${mdRows.join('\n')}
 `
-    const changelogIndexMdPath = path.join(__dirname, '../public/changelog-index.md')
-    await fs.writeFile(changelogIndexMdPath, changelogIndexMd.trim() + '\n', 'utf8')
-
-    const changelogIndexJsonl = visibleEntries
-      .map((entry) =>
-        JSON.stringify({
-          date: dayjs(entry.sortDate).isValid() ? dayjs(entry.sortDate).format('YYYY-MM-DD') : null,
-          number: entry.number,
-          labels: entry.labels ?? [],
-          title: entry.title,
-          path: `/changelog/${entry.number}`,
-          url: `https://supabase.com/changelog/${entry.number}`,
-        })
-      )
-      .join('\n')
-    const changelogIndexJsonlPath = path.join(__dirname, '../public/changelog-index.jsonl')
-    await fs.writeFile(changelogIndexJsonlPath, changelogIndexJsonl + '\n', 'utf8')
-    console.log(`✅ Generated LLM changelog indexes (${visibleEntries.length} entries)`)
+    const changelogMdPath = path.join(__dirname, '../public/changelog.md')
+    await fs.writeFile(changelogMdPath, changelogMd.trim() + '\n', 'utf8')
+    console.log(`✅ Generated changelog.md (${visibleEntries.length} entries)`)
 
     // Per-tag RSS feeds → public/changelog-rss/<label-slug>.xml
     const tagFeedsDir = path.join(__dirname, '../public/changelog-rss')

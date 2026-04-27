@@ -1,7 +1,4 @@
-# Changelog index
-
-Token-light index for LLMs and agents.
-Format: date | #number | labels(comma-separated slugs) | title | path
+<!-- date | #number | labels(comma-separated slugs) | title | path -->
 
 - 2026-04-24 | #45233 | frontend | Feature Preview: RLS Tester | /changelog/45233
 - 2026-04-20 | #45071 | python,javascript,flutter,swift | Automatic PostgREST retries for transient errors | /changelog/45071
