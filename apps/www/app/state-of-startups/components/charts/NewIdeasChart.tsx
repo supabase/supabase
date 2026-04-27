@@ -41,7 +41,7 @@ export function NewIdeasChart() {
       title="Where do you usually discover new dev tools or startup ideas?"
       targetColumn="new_ideas"
       filterColumns={['person_age', 'location', 'money_raised']}
-      functionName="get_new_ideas_stats_2026"
+      functionName="get_new_ideas_stats"
       generateSQLQuery={generateNewIdeasSQL}
     />
   )

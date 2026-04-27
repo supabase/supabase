@@ -17,7 +17,7 @@ export function WorldOutlookChart() {
       title="Given the state of the world, are you…"
       targetColumn="world_outlook"
       filterColumns={['person_age', 'location', 'money_raised']}
-      functionName="get_world_outlook_stats_2026"
+      functionName="get_world_outlook_stats"
       generateSQLQuery={generateWorldOutlookSQL}
     />
   )

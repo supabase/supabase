@@ -42,7 +42,7 @@ export function RegularSocialMediaUseChart() {
       title="Which social media platforms do you use at least 3× per week?"
       targetColumn="regular_social_media_use"
       filterColumns={['person_age', 'location', 'money_raised']}
-      functionName="get_regular_social_media_use_stats_2026"
+      functionName="get_regular_social_media_use_stats"
       generateSQLQuery={generateRegularSocialMediaUseSQL}
     />
   )

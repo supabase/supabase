@@ -40,7 +40,8 @@ export function AuthProviderChart() {
       title="What authentication provider do you use?"
       targetColumn="auth_provider"
       filterColumns={['person_age', 'team_size', 'money_raised']}
-      functionName="get_auth_provider_stats_2026"
+      functionName="get_auth_provider_stats"
+      newInYear={2026}
       generateSQLQuery={generateAuthProviderSQL}
     />
   )

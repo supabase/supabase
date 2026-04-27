@@ -27,7 +27,7 @@ export function BiggestChallengeChart() {
       title="What’s the biggest business challenge your startup is facing today?"
       targetColumn="biggest_challenge"
       filterColumns={['person_age', 'location', 'money_raised']}
-      functionName="get_biggest_challenge_stats_2026"
+      functionName="get_biggest_challenge_stats"
       generateSQLQuery={generateBiggestChallengeSQL}
     />
   )

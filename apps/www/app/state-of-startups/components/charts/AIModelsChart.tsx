@@ -41,7 +41,7 @@ export function AIModelsChart() {
       title="Which AI models are you using or planning to use?"
       targetColumn="ai_models_used"
       filterColumns={['person_age', 'team_size', 'money_raised']}
-      functionName="get_ai_models_stats_2026"
+      functionName="get_ai_models_stats"
       generateSQLQuery={generateAIModelsSQL}
     />
   )

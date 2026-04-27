@@ -18,7 +18,8 @@ export function BuildingAgentsChart() {
       title="Are you building or planning to build AI agents?"
       targetColumn="building_ai_agents"
       filterColumns={['person_age', 'team_size', 'money_raised']}
-      functionName="get_building_ai_agents_stats_2026"
+      functionName="get_building_ai_agents_stats"
+      newInYear={2026}
       generateSQLQuery={generateBuildingAgentsSQL}
     />
   )

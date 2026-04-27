@@ -38,7 +38,7 @@ export function DatabasesChart() {
       title="Which database(s) is your startup using?"
       targetColumn="databases"
       filterColumns={['person_age', 'team_size', 'money_raised']}
-      functionName="get_databases_stats_2026"
+      functionName="get_databases_stats"
       generateSQLQuery={generateDatabasesSQL}
     />
   )

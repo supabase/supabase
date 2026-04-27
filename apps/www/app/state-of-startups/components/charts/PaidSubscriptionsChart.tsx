@@ -40,7 +40,8 @@ export function PaidSubscriptionsChart() {
       title="Which subscriptions does your startup pay for?"
       targetColumn="subscriptions"
       filterColumns={['person_age', 'team_size', 'money_raised']}
-      functionName="get_subscriptions_stats_2026"
+      functionName="get_subscriptions_stats"
+      newInYear={2026}
       generateSQLQuery={generatePaidSubscriptionsSQL}
     />
   )

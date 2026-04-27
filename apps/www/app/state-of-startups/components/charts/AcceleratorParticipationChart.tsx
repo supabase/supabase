@@ -29,7 +29,7 @@ export function AcceleratorParticipationChart() {
       title="If your startup has participated in an accelerator, which one?"
       targetColumn="accelerator_participation"
       filterColumns={['person_age', 'location', 'money_raised']}
-      functionName="get_accelerator_stats_2026"
+      functionName="get_accelerator_stats"
       generateSQLQuery={generateAcceleratorParticipationSQL}
     />
   )

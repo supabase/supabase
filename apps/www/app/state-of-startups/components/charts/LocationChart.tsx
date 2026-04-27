@@ -17,7 +17,7 @@ export function LocationChart() {
       title="Where is your startup headquartered?"
       targetColumn="location"
       filterColumns={['person_age', 'team_size', 'money_raised']}
-      functionName="get_location_stats_2026"
+      functionName="get_location_stats"
       generateSQLQuery={generateLocationSQL}
     />
   )

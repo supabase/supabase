@@ -29,7 +29,7 @@ export function IndustryChart() {
       title="What is your startup’s primary industry or target customer segment?"
       targetColumn="industry"
       filterColumns={['person_age', 'location', 'money_raised']}
-      functionName="get_industry_stats_2026"
+      functionName="get_industry_stats"
       generateSQLQuery={generateIndustrySQL}
     />
   )

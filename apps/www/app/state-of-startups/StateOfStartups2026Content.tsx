@@ -12,6 +12,8 @@ import { StateOfStartupsAuroraHeader } from './components/StateOfStartupsAuroraH
 import { SurveyChapter } from './components/SurveyChapter'
 import { SurveyChapterSection } from './components/SurveyChapterSection'
 import { SurveySectionBreak } from './components/SurveySectionBreak'
+import { YearProvider } from './components/year-context'
+import { YearToggle } from './components/YearToggle'
 
 interface FloatingTocProps {
   tocRef: RefObject<HTMLDivElement>
@@ -31,7 +33,7 @@ function FloatingTableOfContents({
   return (
     <motion.div
       ref={tocRef}
-      className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50"
+      className="fixed top-32 left-1/2 transform -translate-x-1/2 z-50"
       initial={{ opacity: 0, y: -8, x: '-50%' }}
       animate={{ opacity: 1, y: 0, x: '-50%' }}
       exit={{ opacity: 0, y: -8, x: '-50%' }}
@@ -192,75 +194,80 @@ export default function StateOfStartups2026Content() {
   }, [isTocOpen])
 
   return (
-    <DefaultLayout className="bg-alternative overflow-hidden">
-      <AnimatePresence>
-        {showFloatingToc && (
-          <FloatingTableOfContents
-            tocRef={tocRef}
-            isTocOpen={isTocOpen}
-            setIsTocOpen={setIsTocOpen}
-            activeChapter={activeChapter}
-          />
-        )}
-      </AnimatePresence>
-      {/* Intro section */}
-      <section ref={heroRef} className="w-full">
-        <StateOfStartupsAuroraHeader />
-        <SurveySectionBreak className="hidden md:block" />
-        <div className="grid grid-cols-1 md:grid-cols-3 max-w-240 mx-auto md:border-x border-muted">
-          {/* Intro text */}
-          <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl text-balance">
-            <p>{pageData.heroSection.subheader}</p>
-            <p>{pageData.heroSection.cta}</p>
+    <YearProvider>
+      <DefaultLayout className="bg-alternative overflow-hidden">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50">
+          <YearToggle />
+        </div>
+        <AnimatePresence>
+          {showFloatingToc && (
+            <FloatingTableOfContents
+              tocRef={tocRef}
+              isTocOpen={isTocOpen}
+              setIsTocOpen={setIsTocOpen}
+              activeChapter={activeChapter}
+            />
+          )}
+        </AnimatePresence>
+        {/* Intro section */}
+        <section ref={heroRef} className="w-full">
+          <StateOfStartupsAuroraHeader />
+          <SurveySectionBreak className="hidden md:block" />
+          <div className="grid grid-cols-1 md:grid-cols-3 max-w-240 mx-auto md:border-x border-muted">
+            {/* Intro text */}
+            <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl text-balance">
+              <p>{pageData.heroSection.subheader}</p>
+              <p>{pageData.heroSection.cta}</p>
+            </div>
+
+            {/* Table of contents */}
+            <ol className="flex flex-col py-5">
+              {pageData.pageChapters.map((chapter, chapterIndex) => (
+                <li key={chapterIndex + 1}>
+                  <Link
+                    href={`#chapter-${chapterIndex + 1}`}
+                    className="group flex flex-row gap-5 py-3 pl-7 pr-8 font-mono uppercase tracking-wide text-sm transition-all text-foreground-light hover:text-brand-link hover:bg-brand-300/25"
+                  >
+                    <span className="text-xs rounded-full bg-surface-75 border border-surface-200 group-hover:border-brand-500/40 w-5 h-5 flex items-center justify-center group-hover:bg-brand-600/5">
+                      {chapterIndex + 1}
+                    </span>{' '}
+                    {chapter.shortTitle}
+                  </Link>
+                </li>
+              ))}
+            </ol>
           </div>
 
-          {/* Table of contents */}
-          <ol className="flex flex-col py-5">
-            {pageData.pageChapters.map((chapter, chapterIndex) => (
-              <li key={chapterIndex + 1}>
-                <Link
-                  href={`#chapter-${chapterIndex + 1}`}
-                  className="group flex flex-row gap-5 py-3 pl-7 pr-8 font-mono uppercase tracking-wide text-sm transition-all text-foreground-light hover:text-brand-link hover:bg-brand-300/25"
-                >
-                  <span className="text-xs rounded-full bg-surface-75 border border-surface-200 group-hover:border-brand-500/40 w-5 h-5 flex items-center justify-center group-hover:bg-brand-600/5">
-                    {chapterIndex + 1}
-                  </span>{' '}
-                  {chapter.shortTitle}
-                </Link>
-              </li>
+          <SurveySectionBreak />
+        </section>
+
+        {pageData.pageChapters.map((chapter, chapterIndex) => (
+          <SurveyChapter
+            key={chapterIndex + 1}
+            number={chapterIndex + 1}
+            shortTitle={chapter.shortTitle}
+            title={chapter.title}
+            description={chapter.description}
+            pullQuote={chapter.pullQuote}
+          >
+            {chapter.sections.map((section, sectionIndex) => (
+              <SurveyChapterSection
+                key={sectionIndex + 1}
+                title={section.title}
+                description={section.description}
+                stats={section.stats}
+                charts={section.charts}
+                wordCloud={section.wordCloud}
+                summarizedAnswer={section.summarizedAnswer}
+                rankedAnswersPair={section.rankedAnswersPair}
+              />
             ))}
-          </ol>
-        </div>
-
-        <SurveySectionBreak />
-      </section>
-
-      {pageData.pageChapters.map((chapter, chapterIndex) => (
-        <SurveyChapter
-          key={chapterIndex + 1}
-          number={chapterIndex + 1}
-          shortTitle={chapter.shortTitle}
-          title={chapter.title}
-          description={chapter.description}
-          pullQuote={chapter.pullQuote}
-        >
-          {chapter.sections.map((section, sectionIndex) => (
-            <SurveyChapterSection
-              key={sectionIndex + 1}
-              title={section.title}
-              description={section.description}
-              stats={section.stats}
-              charts={section.charts}
-              wordCloud={section.wordCloud}
-              summarizedAnswer={section.summarizedAnswer}
-              rankedAnswersPair={section.rankedAnswersPair}
-            />
-          ))}
-        </SurveyChapter>
-      ))}
-      <CTABanner ref={ctaBannerRef} />
-      <ParticipantsList />
-    </DefaultLayout>
+          </SurveyChapter>
+        ))}
+        <CTABanner ref={ctaBannerRef} />
+        <ParticipantsList />
+      </DefaultLayout>
+    </YearProvider>
   )
 }
 

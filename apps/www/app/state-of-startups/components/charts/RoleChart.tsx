@@ -25,7 +25,7 @@ export function RoleChart() {
       title="What is your functional role at your startup?"
       targetColumn="role"
       filterColumns={['person_age', 'location', 'money_raised']}
-      functionName="get_role_stats_2026"
+      functionName="get_role_stats"
       generateSQLQuery={generateRoleSQL}
     />
   )

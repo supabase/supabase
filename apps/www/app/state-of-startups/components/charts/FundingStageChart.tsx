@@ -26,7 +26,7 @@ export function FundingStageChart() {
       title="What stage of funding is your startup in?"
       targetColumn="funding_stage"
       filterColumns={['person_age', 'location', 'team_size']}
-      functionName="get_funding_stage_stats_2026"
+      functionName="get_funding_stage_stats"
       generateSQLQuery={generateFundingStageSQL}
     />
   )

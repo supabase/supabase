@@ -1,7 +1,10 @@
 'use client'
-import { useEffect, useState, useRef, useCallback } from 'react'
+
 import { createClient } from '@supabase/supabase-js'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import { motion } from 'framer-motion'
+import { ChevronsUpDown } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -9,10 +12,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { ChevronsUpDown } from 'lucide-react'
-import TwoOptionToggle from './TwoOptionToggle'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
+
 import { useAccent } from './accent-context'
+import TwoOptionToggle from './TwoOptionToggle'
+import { rpcNameForYear, useYear, type SurveyYear } from './year-context'
 
 // Separate Supabase client for survey project
 const externalSupabase = createClient(
@@ -172,7 +175,17 @@ interface SurveyChartProps {
   targetColumn: string
   filterColumns: string[]
   generateSQLQuery?: (activeFilters: Record<string, string>) => string
+  /**
+   * Base RPC name without a year suffix (e.g. `get_role_stats`). The chart
+   * appends `_<year>` based on the active year context.
+   */
   functionName: string
+  /**
+   * Year in which this question was first asked. When the user views an
+   * earlier year, the chart shows a "new question" empty state instead of
+   * fetching.
+   */
+  newInYear?: SurveyYear
 }
 
 export function SurveyChart({
@@ -181,7 +194,11 @@ export function SurveyChart({
   filterColumns,
   generateSQLQuery,
   functionName,
+  newInYear,
 }: SurveyChartProps) {
+  const { year } = useYear()
+  const isAvailableForYear = !newInYear || year >= newInYear
+  const resolvedFunctionName = rpcNameForYear(functionName, year)
   const accent = useAccent()
   const accentBg = 'hsl(var(--brand-300))'
   const accentBarFg = 'bg-brand'
@@ -260,7 +277,12 @@ export function SurveyChart({
     chartData,
     isLoading: dataLoading,
     error: dataError,
-  } = useSurveyData(isInView, functionName, buildFunctionParams, activeFilters)
+  } = useSurveyData(
+    isInView && isAvailableForYear,
+    resolvedFunctionName,
+    buildFunctionParams,
+    activeFilters
+  )
 
   // Reset animation state when filters change
   useEffect(() => {
@@ -363,7 +385,16 @@ export function SurveyChart({
             ease: 'easeInOut',
           }}
         >
-          {dataError ? (
+          {!isAvailableForYear ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-16 px-8 text-center">
+              <p className="text-foreground-light text-balance">
+                This question was added to the {newInYear} survey.
+              </p>
+              <p className="text-foreground-lighter text-sm text-balance">
+                Switch the year to {newInYear} to view results.
+              </p>
+            </div>
+          ) : dataError ? (
             <div className="flex items-center justify-center h-full">
               <p className="text-danger">Error: {dataError}</p>
             </div>
@@ -466,7 +497,7 @@ export function SurveyChart({
                 <CodeBlock lang="sql">{generateSQLQuery(activeFilters)}</CodeBlock>
               ) : (
                 <CodeBlock lang="ts">
-                  {`// Function call: ${functionName}(${JSON.stringify(buildFunctionParams(activeFilters), null, 2)})`}
+                  {`// Function call: ${resolvedFunctionName}(${JSON.stringify(buildFunctionParams(activeFilters), null, 2)})`}
                 </CodeBlock>
               )}
             </div>

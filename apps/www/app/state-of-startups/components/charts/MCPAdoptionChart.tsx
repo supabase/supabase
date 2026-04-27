@@ -18,7 +18,8 @@ export function MCPAdoptionChart() {
       title="Have you adopted any MCP servers or tools?"
       targetColumn="mcp_adoption"
       filterColumns={['person_age', 'team_size', 'money_raised']}
-      functionName="get_mcp_adoption_stats_2026"
+      functionName="get_mcp_adoption_stats"
+      newInYear={2026}
       generateSQLQuery={generateMCPAdoptionSQL}
     />
   )

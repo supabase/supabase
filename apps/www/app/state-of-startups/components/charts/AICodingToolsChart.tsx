@@ -42,7 +42,7 @@ export function AICodingToolsChart() {
       title="Which AI coding tools do you use?"
       targetColumn="ai_coding_tools"
       filterColumns={['person_age', 'team_size', 'money_raised']}
-      functionName="get_ai_coding_tools_stats_2026"
+      functionName="get_ai_coding_tools_stats"
       generateSQLQuery={generateAICodingToolsSQL}
     />
   )

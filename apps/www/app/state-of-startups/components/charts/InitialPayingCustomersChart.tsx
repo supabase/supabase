@@ -39,7 +39,7 @@ export function InitialPayingCustomersChart() {
       title="Where did your startup’s initial paying customers come from?"
       targetColumn="initial_paying_customers"
       filterColumns={['person_age', 'location', 'team_size']}
-      functionName="get_initial_paying_customers_stats_2026"
+      functionName="get_initial_paying_customers_stats"
       generateSQLQuery={generateInitialPayingCustomersSQL}
     />
   )

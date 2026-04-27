@@ -38,7 +38,7 @@ export function SalesToolsChart() {
       title="What tools are you using to manage your sales process?"
       targetColumn="sales_tools"
       filterColumns={['person_age', 'location', 'team_size']}
-      functionName="get_sales_tools_stats_2026"
+      functionName="get_sales_tools_stats"
       generateSQLQuery={generateSalesToolsSQL}
     />
   )
