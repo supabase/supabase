@@ -1,4 +1,4 @@
-import { Badge, DialogSectionSeparator, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
 

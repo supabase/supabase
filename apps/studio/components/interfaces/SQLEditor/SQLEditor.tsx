@@ -131,7 +131,6 @@ export const SQLEditor = () => {
   const scrollTopRef = useRef<number>(0)
   const shouldRefocusAfterRunRef = useRef(false)
 
-  const [ranQuery, setRanQuery] = useState('')
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
@@ -384,7 +383,6 @@ export const SQLEditor = () => {
         return toast.error('Unable to run query: Connection string is missing')
       }
 
-      setRanQuery(sql)
       const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
       const formattedSql = suffixWithLimit(sql, limit)
 
@@ -994,7 +992,6 @@ export const SQLEditor = () => {
                 buildDebugPrompt={buildDebugPrompt}
                 activeTab={activeUtilityTab}
                 onActiveTabChange={setActiveUtilityTab}
-                ranQuery={ranQuery}
               />
             )}
           </ResizablePanel>

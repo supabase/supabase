@@ -1,4 +1,4 @@
-import { ident, joinSqlFragments, literal, safeSql, SafeSqlFragment } from '../../../pg-format'
+import { joinSqlFragments, literal, safeSql, SafeSqlFragment } from '../../../pg-format'
 
 export const getTablesRlsEnabledStatusSQL = ({
   tables,

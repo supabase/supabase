@@ -20,7 +20,6 @@ import {
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import AlertError from '@/components/ui/AlertError'
 import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'

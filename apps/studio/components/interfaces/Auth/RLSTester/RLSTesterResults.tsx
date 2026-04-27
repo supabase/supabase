@@ -1,4 +1,3 @@
-import { table } from 'console'
 import { type PostgresPolicy } from '@supabase/postgres-meta'
 import {
   Badge,

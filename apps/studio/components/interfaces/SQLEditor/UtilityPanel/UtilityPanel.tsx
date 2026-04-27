@@ -27,8 +27,6 @@ export type UtilityPanelProps = {
   buildDebugPrompt: () => string
   activeTab?: string
   onActiveTabChange?: (tab: string) => void
-
-  ranQuery?: string
 }
 
 const DEFAULT_CHART_CONFIG: ChartConfig = {
@@ -54,8 +52,6 @@ export const UtilityPanel = ({
   buildDebugPrompt,
   activeTab = 'results',
   onActiveTabChange,
-
-  ranQuery,
 }: UtilityPanelProps) => {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
