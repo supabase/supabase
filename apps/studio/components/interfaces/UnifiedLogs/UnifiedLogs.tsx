@@ -390,7 +390,7 @@ export const UnifiedLogs = () => {
                 <div className="block sm:hidden">
                   <DataTableFilterControlsDrawer />
                 </div>
-                <div className="min-w-0 flex-1 [&_button>span]:!h-[26px] [&_button>span]:!py-0 [&_input]:!h-[26px] [&_input]:!py-0">
+                <div className="min-w-0 flex-1 [&_[cmdk-input-wrapper]]:!px-3 [&_button]:!px-3 [&_button>span]:!h-[26px] [&_button>span]:!py-0 [&_input]:!h-[26px] [&_input]:!py-0">
                   <DataTableFilterCommand
                     placeholder="Search logs..."
                     searchParamsParser={SEARCH_PARAMS_PARSER}
