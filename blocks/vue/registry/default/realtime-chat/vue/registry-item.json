@@ -26,5 +26,5 @@
       "target": "composables/useRealtimeChat.ts"
     }
   ],
-  "dependencies": ["@supabase/supabase-js@latest"]
+  "dependencies": ["@supabase/supabase-js@latest", "lucide-vue-next@latest"]
 }
