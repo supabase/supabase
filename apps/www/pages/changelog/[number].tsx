@@ -128,7 +128,6 @@ function ChangelogDetailPage({
                 Changelog
               </Link>
             </nav>
-            <ChangelogRssButton />
           </div>
           <header className="border-default flex flex-col gap-2 border-b pb-6">
             <h1 className="h1 text-2xl sm:text-3xl">{title}</h1>

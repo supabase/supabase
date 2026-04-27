@@ -509,7 +509,7 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
             </section>
           ) : (
             <div
-              className="border-muted relative lg:ml-2 lg:border-l lg:pl-8"
+              className="border-muted relative lg:ml-2 lg:border-l lg:pl-8 mb-12 lg:mb-20"
               aria-label="Changelog timeline"
             >
               <div className="grid">
@@ -563,7 +563,7 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
               </div>
 
               {restIndex.length > 0 && (
-                <section aria-label="Earlier changelog entries" className="lg:pb-28">
+                <section aria-label="Earlier changelog entries" className="lg:pb-20">
                   <ChangelogTimelineList
                     items={restIndex}
                     mode="link"
@@ -573,7 +573,7 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
                 </section>
               )}
               <div className="hidden lg:grid">
-                <div className="col-span-12 -ml-8 mb-8 lg:mb-0 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32">
+                <div className="col-span-12 -ml-8 mb-8 lg:mb-0 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-20 lg:pt-20">
                   <div className="flex w-full items-baseline border-b pb-4 lg:gap-4 lg:border-none lg:pb-0">
                     <Link
                       href="https://www.ycombinator.com/companies/supabase"

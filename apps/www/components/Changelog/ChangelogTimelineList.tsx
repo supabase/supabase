@@ -31,7 +31,7 @@ export function LabelBadges({
 }) {
   if (labels.length === 0) return null
   return (
-    <div className={cn('flex flex-wrap items-center gap-0.5', className)}>
+    <div className={cn('flex flex-wrap items-center', tiny ? 'gap-0.5' : 'gap-1', className)}>
       {labels.map((label) => (
         <a
           key={label.name}
