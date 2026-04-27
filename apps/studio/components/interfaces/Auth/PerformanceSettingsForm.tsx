@@ -8,9 +8,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
@@ -219,11 +219,11 @@ export const PerformanceSettingsForm = () => {
       <ScaffoldSection isFullWidth>
         <ScaffoldSectionTitle className="mb-4">Request duration</ScaffoldSectionTitle>
 
-        <Form_Shadcn_ {...requestDurationForm}>
+        <Form {...requestDurationForm}>
           <form onSubmit={requestDurationForm.handleSubmit(onSubmitRequestDurationForm)}>
             <Card>
               <CardContent className="pt-6">
-                <FormField_Shadcn_
+                <FormField
                   control={requestDurationForm.control}
                   name="API_MAX_REQUEST_DURATION"
                   render={({ field }) => (
@@ -239,7 +239,7 @@ export const PerformanceSettingsForm = () => {
                     >
                       <div className="flex flex-col gap-2">
                         <div className="relative">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <InputGroup>
                               <FormInputGroupInput
                                 type="number"
@@ -252,7 +252,7 @@ export const PerformanceSettingsForm = () => {
                                 <InputGroupText>seconds</InputGroupText>
                               </InputGroupAddon>
                             </InputGroup>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </div>
 
                         <p className="text-xs text-right text-foreground-muted">
@@ -286,17 +286,17 @@ export const PerformanceSettingsForm = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </ScaffoldSection>
 
       <ScaffoldSection isFullWidth>
         <ScaffoldSectionTitle className="mb-4">Connection management</ScaffoldSectionTitle>
 
-        <Form_Shadcn_ {...databaseForm}>
+        <Form {...databaseForm}>
           <form onSubmit={databaseForm.handleSubmit(onSubmitDatabaseForm)} className="space-y-4">
             <Card>
               <CardContent className="pt-6 flex flex-col gap-4">
-                <FormField_Shadcn_
+                <FormField
                   control={databaseForm.control}
                   name="DB_MAX_POOL_SIZE_UNIT"
                   render={({ field }) => (
@@ -311,7 +311,7 @@ export const PerformanceSettingsForm = () => {
                         </p>
                       }
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Select_Shadcn_
                           value={field.value}
                           onValueChange={(value) => {
@@ -357,13 +357,13 @@ export const PerformanceSettingsForm = () => {
                             </SelectItem_Shadcn_>
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={databaseForm.control}
                   name="DB_MAX_POOL_SIZE"
                   render={({ field }) => (
@@ -382,7 +382,7 @@ export const PerformanceSettingsForm = () => {
                     >
                       <div className="flex flex-col gap-2">
                         <div className="relative">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <InputGroup>
                               <FormInputGroupInput
                                 type="number"
@@ -395,7 +395,7 @@ export const PerformanceSettingsForm = () => {
                                 </InputGroupText>
                               </InputGroupAddon>
                             </InputGroup>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </div>
                         {isLoadingMaxConns ? (
                           <ShimmeringLoader className="py-2 w-16 ml-auto" />
@@ -436,7 +436,7 @@ export const PerformanceSettingsForm = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </ScaffoldSection>
     </>
   )

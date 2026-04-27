@@ -12,11 +12,15 @@ import { sanitizeRoute } from './ProjectDropdown.utils'
 import { ProjectRowLink } from './ProjectRowLink'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
+import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import type { ManagedBy } from '@/lib/constants/infrastructure'
 
 // --- Sub-components ---
 
@@ -79,6 +83,7 @@ function ProjectDropdownNonPlatformView({ projectName }: { projectName: string }
 interface ProjectDropdownPlatformViewProps {
   projectRef: string | undefined
   projectName: string
+  projectManagedBy?: ManagedBy
   selectorProps: Omit<
     ComponentProps<typeof OrganizationProjectSelector>,
     'renderTrigger' | 'embedded'
@@ -88,6 +93,7 @@ interface ProjectDropdownPlatformViewProps {
 function ProjectDropdownPlatformView({
   projectRef,
   projectName,
+  projectManagedBy,
   selectorProps,
 }: ProjectDropdownPlatformViewProps) {
   return (
@@ -100,6 +106,7 @@ function ProjectDropdownPlatformView({
         <span title={projectName} className="text-foreground max-w-32 lg:max-w-64 truncate">
           {projectName}
         </span>
+        {projectManagedBy && <PartnerIcon organization={{ managed_by: projectManagedBy }} />}
       </Link>
 
       <OrganizationProjectSelector
@@ -139,6 +146,11 @@ export const ProjectDropdown = ({
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
+  const selectedProjectManagedBy = selectedProject?.integration_source
+    ? getManagedByFromOrganizationPartner(undefined, selectedProject.integration_source)
+    : selectedOrganization?.billing_partner
+      ? selectedOrganization.managed_by
+      : undefined
 
   if (isLoadingProject || (isBranch && isLoadingParentProject) || !selectedProject) {
     if (!embedded) return <ShimmeringLoader className="p-2 md:mr-2 md:w-[90px]" />
@@ -156,7 +168,7 @@ export const ProjectDropdown = ({
       close()
       router.push(href)
     },
-    renderRow: (project: { ref: string; name: string; status?: string }) => (
+    renderRow: (project: Pick<OrgProject, 'ref' | 'name' | 'status' | 'integration_source'>) => (
       <ProjectRowLink
         project={project}
         selectedRef={ref}
@@ -184,6 +196,7 @@ export const ProjectDropdown = ({
     <ProjectDropdownPlatformView
       projectRef={project?.ref}
       projectName={selectedProject?.name ?? ''}
+      projectManagedBy={selectedProjectManagedBy}
       selectorProps={selectorProps}
     />
   ) : (

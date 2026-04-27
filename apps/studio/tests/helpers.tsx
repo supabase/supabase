@@ -55,6 +55,7 @@ export const createMockOrganization = (details: Partial<Organization>): Organiza
     is_owner: true,
     billing_email: 'billing@example.com',
     billing_partner: null,
+    integration_source: null,
     usage_billing_enabled: false,
     stripe_customer_id: 'stripe-1',
     subscription_id: 'subscription-1',

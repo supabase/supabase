@@ -10,9 +10,9 @@ import {
   CardContent,
   CardFooter,
   Checkbox_Shadcn_,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   FormInputGroupTextArea,
   Input_Shadcn_,
@@ -133,12 +133,12 @@ export default function FormPatternsPageLayout() {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <Card>
                 {/* Text Input */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
@@ -147,9 +147,9 @@ export default function FormPatternsPageLayout() {
                         label="Text Input"
                         description="Single-line text entry for short values"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Input_Shadcn_ {...field} placeholder="Enter text" />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -157,7 +157,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* Password Input */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="password"
                     render={({ field }) => (
@@ -166,9 +166,9 @@ export default function FormPatternsPageLayout() {
                         label="Password Input"
                         description="Masked input for secure text entry"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Input_Shadcn_ {...field} type="password" placeholder="Enter password" />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -176,7 +176,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* Copyable Input */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="apiKey"
                     render={() => (
@@ -185,7 +185,7 @@ export default function FormPatternsPageLayout() {
                         label="Copyable Input"
                         description="Read-only input with copy-to-clipboard functionality"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Input
                             copy
                             readOnly
@@ -193,7 +193,7 @@ export default function FormPatternsPageLayout() {
                             onChange={() => {}}
                             onCopy={() => console.log('Copied to clipboard')}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -201,7 +201,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* Number Input */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="maxConnections"
                     render={({ field }) => (
@@ -210,7 +210,7 @@ export default function FormPatternsPageLayout() {
                         label="Number Input"
                         description="Numeric input with min/max validation"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Input_Shadcn_
                             {...field}
                             type="number"
@@ -218,7 +218,7 @@ export default function FormPatternsPageLayout() {
                             max={1000}
                             onChange={(e) => field.onChange(Number(e.target.value))}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -226,7 +226,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* Input with Units */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="duration"
                     render={({ field }) => (
@@ -235,7 +235,7 @@ export default function FormPatternsPageLayout() {
                         label="Input with Units"
                         description="Input with additional unit label"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <InputGroup>
                             <FormInputGroupInput
                               {...field}
@@ -248,7 +248,7 @@ export default function FormPatternsPageLayout() {
                               <InputGroupText className="font-mono">MB</InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -256,7 +256,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* Textarea */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="description"
                     render={({ field }) => (
@@ -265,14 +265,14 @@ export default function FormPatternsPageLayout() {
                         label="Textarea"
                         description="Multi-line text input for longer content"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Textarea
                             {...field}
                             rows={4}
                             placeholder="Enter multi-line text"
                             className="resize-none"
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -280,7 +280,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* Textarea with addon */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="description"
                     render={({ field }) => (
@@ -289,7 +289,7 @@ export default function FormPatternsPageLayout() {
                         label="Textarea"
                         description="Multi-line text input for longer content with addon"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <InputGroup>
                             <FormInputGroupTextArea
                               {...field}
@@ -301,7 +301,7 @@ export default function FormPatternsPageLayout() {
                               <InputGroupText>120 characters left</InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -309,7 +309,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* Icon Upload */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="description"
                     render={() => (
@@ -318,7 +318,7 @@ export default function FormPatternsPageLayout() {
                         label="Icon upload"
                         description="For icons, avatars, or small images with preview"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <div className="flex gap-4 items-center">
                             <button
                               type="button"
@@ -367,7 +367,7 @@ export default function FormPatternsPageLayout() {
                               }}
                             />
                           </div>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -375,7 +375,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* File Upload */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="description"
                     render={() => (
@@ -384,7 +384,7 @@ export default function FormPatternsPageLayout() {
                         label="File Upload"
                         description="Drag-and-drop or select files for upload"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <div
                             className={`border-2 rounded-lg p-6 text-center bg-muted transition-colors duration-300 ${
                               isDragging
@@ -460,7 +460,7 @@ export default function FormPatternsPageLayout() {
                               )}
                             </div>
                           </div>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -468,7 +468,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* Switch */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="enableFeature"
                     render={({ field }) => (
@@ -477,9 +477,9 @@ export default function FormPatternsPageLayout() {
                         label="Switch"
                         description="Toggle for boolean on/off states"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -493,18 +493,18 @@ export default function FormPatternsPageLayout() {
                     description="Boolean values or multiple selections"
                   >
                     <div className="w-full flex flex-col gap-4">
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="enableRls"
                         render={({ field }) => (
                           <div className="flex items-center w-full justify-start space-x-2">
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Checkbox_Shadcn_
                                 id="enable-rls"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                             <label
                               htmlFor="enable-rls"
                               className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
@@ -514,18 +514,18 @@ export default function FormPatternsPageLayout() {
                           </div>
                         )}
                       />
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="enableNotifications"
                         render={({ field }) => (
                           <div className="flex items-center w-full justify-start space-x-2">
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Checkbox_Shadcn_
                                 id="enable-notifications"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                             <label
                               htmlFor="enable-notifications"
                               className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
@@ -535,18 +535,18 @@ export default function FormPatternsPageLayout() {
                           </div>
                         )}
                       />
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="enableAnalytics"
                         render={({ field }) => (
                           <div className="flex items-center w-full justify-start space-x-2">
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Checkbox_Shadcn_
                                 id="enable-analytics"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                             <label
                               htmlFor="enable-analytics"
                               className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
@@ -562,7 +562,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* Select */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="region"
                     render={({ field }) => (
@@ -571,7 +571,7 @@ export default function FormPatternsPageLayout() {
                         label="Select (Dropdown)"
                         description="Single selection from a list of options"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                             <SelectTrigger_Shadcn_>
                               <SelectValue_Shadcn_ placeholder="Select an option" />
@@ -588,7 +588,7 @@ export default function FormPatternsPageLayout() {
                               </SelectItem_Shadcn_>
                             </SelectContent_Shadcn_>
                           </Select_Shadcn_>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -596,7 +596,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* Multi-Select */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="schemas"
                     render={({ field }) => (
@@ -633,7 +633,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* Radio Group */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="queueType"
                     render={({ field }) => (
@@ -642,7 +642,7 @@ export default function FormPatternsPageLayout() {
                         label="Radio Group"
                         description="Single selection from multiple options"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
                             <RadioGroupStackedItem
                               value="basic"
@@ -655,7 +655,7 @@ export default function FormPatternsPageLayout() {
                               description="Second option description"
                             />
                           </RadioGroupStacked>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -663,7 +663,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* Date Picker */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="expiryDate"
                     render={({ field }) => (
@@ -672,7 +672,7 @@ export default function FormPatternsPageLayout() {
                         label="Date Picker"
                         description="Date selection with calendar popover"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Popover_Shadcn_>
                             <PopoverTrigger_Shadcn_ asChild>
                               <Button
@@ -692,7 +692,7 @@ export default function FormPatternsPageLayout() {
                               />
                             </PopoverContent_Shadcn_>
                           </Popover_Shadcn_>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -700,7 +700,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* Field Array */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="redirectUris"
                     render={() => (
@@ -725,7 +725,7 @@ export default function FormPatternsPageLayout() {
 
                 {/* Key/Value Field Array */}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="httpHeaders"
                     render={() => (
@@ -783,7 +783,7 @@ export default function FormPatternsPageLayout() {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
     </div>

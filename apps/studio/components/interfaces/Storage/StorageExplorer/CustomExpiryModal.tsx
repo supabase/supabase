@@ -3,9 +3,9 @@ import dayjs from 'dayjs'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Modal,
   Select_Shadcn_,
@@ -81,7 +81,7 @@ export const CustomExpiryModal = () => {
       confirmText="Get URL"
       onCancel={handleClose}
     >
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <Modal.Content>
           <p className="text-sm text-foreground-light mb-4">
             Enter the duration for which the URL will be valid for:
@@ -93,12 +93,12 @@ export const CustomExpiryModal = () => {
             className="flex items-start space-x-2"
           >
             <div className="flex-grow">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="expiresIn"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Duration">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         {...field}
                         type="number"
@@ -108,18 +108,18 @@ export const CustomExpiryModal = () => {
                           )
                         }}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </div>
             <div>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="units"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Units">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger_Shadcn_>
                           <SelectValue_Shadcn_ aria-label="Units" placeholder="Select an option" />
@@ -131,7 +131,7 @@ export const CustomExpiryModal = () => {
                           <SelectItem_Shadcn_ value="years">years</SelectItem_Shadcn_>
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -158,7 +158,7 @@ export const CustomExpiryModal = () => {
             Get signed URL
           </Button>
         </Modal.Content>
-      </Form_Shadcn_>
+      </Form>
     </Modal>
   )
 }

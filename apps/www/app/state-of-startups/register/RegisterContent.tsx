@@ -134,6 +134,12 @@ export function RegisterContent() {
         <SurveySectionBreak />
       </section>
 
+      <section className="px-4 py-16 md:px-8 md:py-32">
+        <div className="max-w-[60rem] mx-auto">
+          <PreviousResultsCta />
+        </div>
+      </section>
+
       <Footer />
     </main>
   )
@@ -171,5 +177,40 @@ function ShirtImage() {
         </motion.div>
       </motion.div>
     </div>
+  )
+}
+
+function PreviousResultsCta() {
+  return (
+    <Link
+      href="/state-of-startups-2025"
+      className="group grid gap-8 transition-colors md:grid-cols-[auto_1fr_auto] md:items-end md:gap-12"
+    >
+      <div className="flex w-fit flex-col gap-2" aria-hidden="true">
+        <div className="w-fit bg-brand-300 px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-brand md:text-[2.25rem] md:leading-10">
+          State
+        </div>
+        <div className="w-fit bg-brand-300 px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-brand md:text-[2.25rem] md:leading-10">
+          of
+        </div>
+        <div className="w-fit bg-brand px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-background dark:text-brand-200 md:text-[2.25rem] md:leading-10">
+          Startups
+        </div>
+        <div className="w-fit bg-brand-500 px-5 py-3 text-[1.75rem] leading-8 tracking-tight text-brand-300 md:text-[2.25rem] md:leading-10">
+          2025
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2 self-end">
+        <p className="font-mono text-xs uppercase tracking-[0.18em] text-foreground-light">
+          Previous Report
+        </p>
+        <p className="text-2xl tracking-tight text-foreground">See last year&apos;s report.</p>
+      </div>
+
+      <div className="flex items-center self-end text-foreground-light transition-transform duration-200 group-hover:translate-x-1 group-hover:text-foreground md:justify-self-end">
+        <ArrowRight size={18} />
+      </div>
+    </Link>
   )
 }

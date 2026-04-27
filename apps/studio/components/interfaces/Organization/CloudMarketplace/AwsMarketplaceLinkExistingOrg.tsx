@@ -12,8 +12,8 @@ import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Form_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormField,
   Skeleton,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -171,9 +171,9 @@ export const AwsMarketplaceLinkExistingOrg = ({
           </ScaffoldSectionDetail>
 
           <ScaffoldSectionContent className="lg:ml-10">
-            <Form_Shadcn_ {...form}>
+            <Form {...form}>
               <form className="flex flex-col">
-                <FormField_Shadcn_
+                <FormField
                   name="orgSlug"
                   control={form.control}
                   render={({ field }) => (
@@ -233,7 +233,7 @@ export const AwsMarketplaceLinkExistingOrg = ({
                   )}
                 />
               </form>
-            </Form_Shadcn_>
+            </Form>
 
             {orgsNotLinkable.length > 0 && !isLoadingOnboardingInfo && (
               <Collapsible_Shadcn_

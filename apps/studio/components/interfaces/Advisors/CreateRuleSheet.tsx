@@ -7,9 +7,9 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -127,13 +127,13 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
           <SheetTitle>Create a rule for "{lint?.title}"</SheetTitle>
         </SheetHeader>
         <SheetSection className="overflow-auto flex-grow px-0">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={formId}
               className="flex flex-col gap-y-4"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              <FormField
                 name="is_disabled"
                 control={form.control}
                 render={({ field }) => (
@@ -145,13 +145,13 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
                   >
                     <Tooltip>
                       <TooltipTrigger type="button">
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={field.disabled || assigned_to === 'all'}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </TooltipTrigger>
                       {assigned_to === 'all' && (
                         <TooltipContent side="bottom" className="w-72">
@@ -168,7 +168,7 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
 
               <Separator />
 
-              <FormField_Shadcn_
+              <FormField
                 name="assigned_to"
                 control={form.control}
                 render={({ field }) => (
@@ -210,7 +210,7 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
 
               <Separator />
 
-              <FormField_Shadcn_
+              <FormField
                 name="note"
                 control={form.control}
                 render={({ field }) => (
@@ -220,18 +220,18 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
                     label="Description"
                     labelOptional="Optional"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input.TextArea
                         {...field}
                         className="[&>div>div>div>textarea]:text-sm"
                         placeholder="e.g Describe why this rule is being set"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </SheetSection>
         <SheetFooter>
           <Button disabled={isCreating} type="default" onClick={() => onOpenChange(false)}>

@@ -9,7 +9,7 @@ import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  FormField_Shadcn_,
+  FormField,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -29,7 +29,7 @@ interface SupportAccessToggleProps {
 
 export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
   return (
-    <FormField_Shadcn_
+    <FormField
       name="allowSupportAccess"
       control={form.control}
       render={({ field }) => {
