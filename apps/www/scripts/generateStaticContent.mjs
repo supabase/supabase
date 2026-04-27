@@ -286,9 +286,7 @@ try {
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const folderPath = path.join(__dirname, '../.generated/staticContent')
 const changelogProductTagsPath = path.join(__dirname, '../data/changelog-product-tags.json')
-const CHANGELOG_PRODUCT_TAGS = JSON.parse(
-  await fs.readFile(changelogProductTagsPath, 'utf8')
-)
+const CHANGELOG_PRODUCT_TAGS = JSON.parse(await fs.readFile(changelogProductTagsPath, 'utf8'))
 try {
   await fs.mkdir(folderPath, { recursive: true })
 } catch (error) {
@@ -484,7 +482,10 @@ try {
 
     // LLM-friendly changelog markdown index (RSS remains canonical syndication format).
     const visibleEntries = entries.filter((entry) => !entry.title.includes('[d]'))
-    const escapeMd = (value) => String(value ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ')
+    const escapeMd = (value) =>
+      String(value ?? '')
+        .replace(/\|/g, '\\|')
+        .replace(/\n/g, ' ')
     const mdRows = visibleEntries.map((entry) => {
       const date = dayjs(entry.sortDate).isValid() ? dayjs(entry.sortDate).format('YYYY-MM-DD') : ''
       const labels = (entry.labels ?? []).join(',')
@@ -513,11 +514,11 @@ ${mdRows.join('\n')}
       const pageUrl = `https://supabase.com/changelog/${entry.number}`
       const entryMd = `# ${titleLine}
 
-- **number:** ${entry.number}
-- **published:** ${published}
-- **discussion:** ${entry.url}
-- **labels:** ${labelsLine || '—'}
-- **page:** ${pageUrl}
+- number: ${entry.number}
+- published: ${published}
+- discussion: ${entry.url}
+- labels: ${labelsLine || '—'}
+- page: ${pageUrl}
 
 ---
 
