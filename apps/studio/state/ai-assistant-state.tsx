@@ -241,6 +241,10 @@ function createChatInstance(
         if (spanId) {
           state.pendingSpanIds[options.id] = spanId
         }
+        const spanExport = response.headers.get('x-braintrust-parent-span-export')
+        if (spanExport) {
+          state.lastSpanExports[options.id] = spanExport
+        }
         return response
       },
       async prepareSendMessagesRequest({ messages, ...opts }) {
@@ -250,6 +254,13 @@ function createChatInstance(
 
         // Get the chat specific to this request to ensure we have the correct name
         const chat = state.chats[options.id]
+
+        // When the last message is an assistant message (not a fresh user prompt), this
+        // is an automatic continuation triggered by completed tool results (e.g. execute_sql).
+        // Attach to the previous span so the follow-up turn stays in the same trace.
+        const lastMsg = messages[messages.length - 1]
+        const isContinuation = lastMsg?.role === 'assistant'
+        const parentSpanExport = isContinuation ? state.lastSpanExports[options.id] : undefined
 
         return {
           ...opts,
@@ -264,7 +275,10 @@ function createChatInstance(
             model: state.model,
             ...opts.body,
           },
-          ...(IS_PLATFORM ? { headers: { Authorization: authorizationHeader ?? '' } } : {}),
+          headers: {
+            ...(IS_PLATFORM ? { Authorization: authorizationHeader ?? '' } : {}),
+            ...(parentSpanExport ? { 'x-braintrust-parent-span-export': parentSpanExport } : {}),
+          },
         }
       },
     }),
@@ -315,6 +329,7 @@ export const createAiAssistantState = (): AiAssistantState => {
     chatInstances: {},
     pendingSpanIds: {},
     messageSpanIds: {},
+    lastSpanExports: {},
 
     setContext: (context: Partial<AiAssistantContext>) => {
       state.context = { ...state.context, ...context }
@@ -538,6 +553,7 @@ export type AiAssistantState = AiAssistantData & {
   chatInstances: Record<string, Chat<MessageType>>
   pendingSpanIds: Record<string, string>
   messageSpanIds: Record<string, string>
+  lastSpanExports: Record<string, string>
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
   newChat: (

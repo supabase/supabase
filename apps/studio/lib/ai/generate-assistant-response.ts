@@ -37,7 +37,9 @@ export async function generateAssistantResponse({
   providerOptions,
   requestedModel,
   abortSignal,
+  parentSpanExport,
   onSpanCreated,
+  onSpanExported,
 }: {
   messages: UIMessage[]
   model: LanguageModel
@@ -55,7 +57,9 @@ export async function generateAssistantResponse({
   promptProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
+  parentSpanExport?: string
   onSpanCreated?: (spanId: string) => void
+  onSpanExported?: (exportedSpan: string) => void
 }) {
   const shouldTrace = allowTracing ?? IS_TRACING_ENABLED
 
@@ -169,8 +173,17 @@ export async function generateAssistantResponse({
   if (shouldTrace) {
     // startSpan instead of traced() so we control when the span closes — onFinish logs
     // output to the span before we call span.end(), ensuring online scoring sees the output.
-    const span = startSpan({ name: 'generateAssistantResponse', type: 'function' })
+    const span = startSpan({
+      name: 'generateAssistantResponse',
+      type: 'function',
+      ...(parentSpanExport && { parent: parentSpanExport }),
+    })
     onSpanCreated?.(span.id)
+
+    // Export span for cross-process continuation so follow-up turns (e.g. after
+    // the user runs an execute_sql result) can attach as child spans in the same trace.
+    const exportedSpan = await span.export()
+    onSpanExported?.(exportedSpan)
 
     const lastUserMessage = rawMessages.findLast((m) => m.role === 'user')
     const lastUserText = lastUserMessage?.parts

@@ -201,6 +201,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
         : "You don't have access to any schemas."
     }
 
+    const parentSpanExport = req.headers['x-braintrust-parent-span-export'] as string | undefined
+
     const result = await generateAssistantResponse({
       messages,
       ...modelParams,
@@ -222,8 +224,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       requestedModel,
       promptProviderOptions,
       abortSignal: abortController.signal,
+      parentSpanExport,
       onSpanCreated: (spanId) => {
         res.setHeader('x-braintrust-span-id', spanId)
+      },
+      onSpanExported: (exportedSpan) => {
+        res.setHeader('x-braintrust-parent-span-export', exportedSpan)
       },
     })
 
