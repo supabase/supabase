@@ -51,8 +51,6 @@ type PageProps = {
 }
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res }) => {
-  res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
-
   try {
     const changelogIndex = await getChangelogTimelineSortedIndex()
     const visible = changelogIndex.filter((item) => !item.title.includes('[d]'))
@@ -94,9 +92,11 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
       )
     ).filter((e): e is FeaturedEntry => e != null)
 
+    res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
     return { props: { featured, restIndex, allIndex } }
   } catch (e) {
     console.error(e)
+    res.setHeader('Cache-Control', 'private, no-store, max-age=0, must-revalidate')
     return { props: { featured: [], restIndex: [], allIndex: [] } }
   }
 }
