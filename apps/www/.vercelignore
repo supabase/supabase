@@ -30,11 +30,10 @@ public/fonts/**/*
 **/coverage
 
 # Documentation
+# Note: the previous `*.md` rule also stripped content/md/*.md, which the build
+# script reads to bundle marketing-page markdown. Match READMEs explicitly.
 README.md
-*.md
-# ...except the marketing-page markdown content bundled at build time by
-# scripts/generateMdContent.mjs into app/api-v2/md/content.generated.ts.
-!content/md/**/*.md
+**/README.md
 docs/**/*
 
 # IDE files
