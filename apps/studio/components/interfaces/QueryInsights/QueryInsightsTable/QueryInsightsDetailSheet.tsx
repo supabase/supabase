@@ -118,7 +118,7 @@ export const QueryInsightsDetailSheet = ({
               </div>
             ) : activeSheetRow && explainResults[activeSheetRow.query]?.length > 0 ? (
               <>
-                <div className="flex items-center justify-between px-5 py-2 border-b flex-shrink-0">
+                <div className="flex items-center justify-between px-5 py-2 border-b shrink-0">
                   <p className="text-xs text-foreground-lighter">EXPLAIN ANALYZE output</p>
                   <Button
                     type="default"

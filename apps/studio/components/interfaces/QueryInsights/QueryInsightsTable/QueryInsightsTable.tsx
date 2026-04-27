@@ -333,7 +333,7 @@ export const QueryInsightsTable = ({
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <div className="overflow-x-auto flex-shrink-0 bg-surface-100 border-b">
+      <div className="overflow-x-auto shrink-0 bg-surface-100 border-b">
         <div className="flex items-center justify-between px-6 h-10 min-w-max">
           <div className="flex items-center gap-x-1.5">
             <TwoOptionToggle

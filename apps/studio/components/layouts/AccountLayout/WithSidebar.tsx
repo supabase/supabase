@@ -71,7 +71,7 @@ export const SidebarContent = ({
       >
         <div className="flex-1 flex flex-col">
           {backToDashboardURL && (
-            <div className="flex-shrink-0 hidden md:block">
+            <div className="shrink-0 hidden md:block">
               <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
                 <Link
                   href={backToDashboardURL}

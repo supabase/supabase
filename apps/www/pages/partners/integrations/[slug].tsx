@@ -1,4 +1,4 @@
-import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
+import { remarkCodeHike, type CodeHikeConfig } from '@code-hike/mdx'
 import { CH } from '@code-hike/mdx/components'
 import { ChevronLeft, ExternalLink } from 'lucide-react'
 import { type GetStaticPaths, type GetStaticProps } from 'next'
@@ -7,22 +7,23 @@ import { serialize } from 'next-mdx-remote/serialize'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { type Dispatch, type SetStateAction, useState } from 'react'
+import { useState, type Dispatch, type SetStateAction } from 'react'
 import remarkGfm from 'remark-gfm'
-import 'swiper/css'
-import { Swiper, SwiperSlide } from 'swiper/react'
 
-import { useBreakpoint } from 'common'
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
-import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
-import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+import 'swiper/css'
 
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
 import type { Partner } from '~/types/partners'
+import { useBreakpoint } from 'common'
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+
 import Error404 from '../../404'
 
 /**
@@ -108,7 +109,7 @@ function Partner({
                 layout="fixed"
                 width={56}
                 height={56}
-                className="bg-surface-200 flex-shrink-f0 h-14 w-14 rounded-full"
+                className="bg-surface-200 shrink-f0 h-14 w-14 rounded-full"
                 src={partner.logo}
                 alt={partner.title}
               />

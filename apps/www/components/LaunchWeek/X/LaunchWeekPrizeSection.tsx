@@ -22,7 +22,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
             contentClassName="flex flex-col justify-between"
             content={
               <>
-                <div className="p-4 md:p-6 flex flex-col flex-shrink gap-2 text-sm items-start">
+                <div className="p-4 md:p-6 flex flex-col shrink gap-2 text-sm items-start">
                   <LabelBadge text="10 keyboards" />
                   <p className="text-lg text-[#8B9092] max-w-lg">
                     Limited-edition{' '}

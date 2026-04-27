@@ -538,7 +538,7 @@ export default {
   toggle: {
     base: `
       p-0 relative
-      inline-flex flex-shrink-0
+      inline-flex shrink-0
       border-2 border-transparent
       rounded-full
       cursor-pointer
@@ -1014,7 +1014,7 @@ export default {
   // Icon
 
   icon: {
-    container: `flex-shrink-0 flex items-center justify-center rounded-full p-3`,
+    container: `shrink-0 flex items-center justify-center rounded-full p-3`,
   },
 
   loading: {

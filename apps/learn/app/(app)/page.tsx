@@ -92,7 +92,7 @@ export default function Home() {
                         <Card key={course.id} className="hover:border-primary/30 transition-colors">
                           <CardHeader>
                             <div className="flex items-start gap-4">
-                              <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center flex-shrink-0">
+                              <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center shrink-0">
                                 <Icon className="w-5 h-5 text-brand-500" />
                               </div>
                               <div className="flex-1 min-w-0">
@@ -100,7 +100,7 @@ export default function Home() {
                                   <h3 className="text-lg text-foreground font-bold">
                                     {course.title}
                                   </h3>
-                                  <Badge variant="secondary" className="flex-shrink-0">
+                                  <Badge variant="secondary" className="shrink-0">
                                     {course.level}
                                   </Badge>
                                 </div>

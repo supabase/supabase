@@ -97,7 +97,7 @@ export const BranchDropdown = ({
           <BranchBadge branch={selectedBranch} isBranchingEnabled={isBranchingEnabled} />
         </>
       }
-      linkClassName="flex items-center gap-2 flex-shrink-0"
+      linkClassName="flex items-center gap-2 shrink-0"
       commandContent={commandContent}
       open={open}
       onOpenChange={setOpen}
