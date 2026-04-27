@@ -1,16 +1,13 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import DefaultLayout from 'components/Layouts/Default'
+import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
+import BlogFilters from 'components/Blog/BlogFilters'
 import BlogGridItem from 'components/Blog/BlogGridItem'
 import BlogListItem from 'components/Blog/BlogListItem'
-import BlogFilters from 'components/Blog/BlogFilters'
-import FeaturedThumb from 'components/Blog/FeaturedThumb'
-import { cn } from 'ui'
-import { LOCAL_STORAGE_KEYS, isBrowser } from 'common'
 import { useInfiniteScrollWithFetch } from 'hooks/useInfiniteScroll'
-
+import { useCallback, useState } from 'react'
 import type PostTypes from 'types/post'
+import { cn } from 'ui'
 
 export type BlogView = 'list' | 'grid'
 
@@ -74,7 +71,6 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
   const [filteredTotal, setFilteredTotal] = useState<number | null>(null)
   const isList = view === 'list'
 
-  // Determine which posts and total to use based on filter state
   const currentPosts = filteredPosts ?? initialBlogs
   const currentTotal = filteredTotal ?? totalPosts
 
@@ -118,9 +114,7 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
     rootMargin: '1000px',
   })
 
-  // Handle filter changes - fetch filtered results from API
   const handleFilterChange = useCallback(async (category?: string, search?: string) => {
-    // If no filters, reset to initial state
     if ((!category || category === 'all') && !search) {
       setFilterParams({})
       setFilteredPosts(null)
@@ -159,78 +153,64 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
     }
   }, [])
 
-  const featuredPost = initialBlogs[0]
-
   return (
     <>
-      <DefaultLayout>
-        <h1 className="sr-only">Supabase blog</h1>
-        <div className="container relative mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
-          {featuredPost && <FeaturedThumb key={featuredPost.slug} {...featuredPost} />}
-        </div>
+      <BlogFilters onFilterChange={handleFilterChange} view={view} setView={setView} />
 
-        <div className="border-default border-t">
-          <div className="container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
-            <BlogFilters onFilterChange={handleFilterChange} view={view} setView={setView} />
-
-            <ol
-              className={cn(
-                'grid -mx-2 sm:-mx-4 py-6 lg:py-6 lg:pb-20',
-                isList ? 'grid-cols-1' : 'grid-cols-12 lg:gap-4'
-              )}
-            >
-              {isFiltering ? (
-                // Show skeletons while filtering
-                isList ? (
-                  Array.from({ length: SKELETON_COUNT }).map((_, idx) => (
-                    <div
-                      className="col-span-12 px-2 sm:px-4 [&_a]:last:border-none"
-                      key={`skeleton-list-${idx}`}
-                    >
-                      <BlogListItemSkeleton />
-                    </div>
-                  ))
-                ) : (
-                  Array.from({ length: SKELETON_COUNT }).map((_, idx) => (
-                    <div
-                      className="col-span-12 mb-4 md:col-span-12 lg:col-span-6 xl:col-span-4 h-full"
-                      key={`skeleton-grid-${idx}`}
-                    >
-                      <BlogGridItemSkeleton />
-                    </div>
-                  ))
-                )
-              ) : blogs?.length ? (
-                blogs?.map((blog: PostTypes, idx: number) =>
-                  isList ? (
-                    <div
-                      className="col-span-12 px-2 sm:px-4 [&_a]:last:border-none"
-                      key={`list-${idx}-${blog.slug}`}
-                    >
-                      <BlogListItem post={blog} />
-                    </div>
-                  ) : (
-                    <div
-                      className="col-span-12 mb-4 md:col-span-12 lg:col-span-6 xl:col-span-4 h-full"
-                      key={`grid-${idx}-${blog.slug}`}
-                    >
-                      <BlogGridItem post={blog} />
-                    </div>
-                  )
-                )
-              ) : (
-                <p className="text-sm text-light col-span-full">No results</p>
-              )}
-            </ol>
-
-            {hasMore && !isFiltering && (
-              <div ref={loadMoreRef} className="flex justify-center py-8" aria-hidden="true">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-foreground-muted border-t-foreground" />
+      <ol
+        className={cn(
+          'grid -mx-2 sm:-mx-4 py-6 lg:py-6 lg:pb-20',
+          isList ? 'grid-cols-1' : 'grid-cols-12 lg:gap-4'
+        )}
+      >
+        {isFiltering ? (
+          isList ? (
+            Array.from({ length: SKELETON_COUNT }).map((_, idx) => (
+              <div
+                className="col-span-12 px-2 sm:px-4 [&_a]:last:border-none"
+                key={`skeleton-list-${idx}`}
+              >
+                <BlogListItemSkeleton />
               </div>
-            )}
-          </div>
+            ))
+          ) : (
+            Array.from({ length: SKELETON_COUNT }).map((_, idx) => (
+              <div
+                className="col-span-12 mb-4 md:col-span-12 lg:col-span-6 xl:col-span-4 h-full"
+                key={`skeleton-grid-${idx}`}
+              >
+                <BlogGridItemSkeleton />
+              </div>
+            ))
+          )
+        ) : blogs?.length ? (
+          blogs?.map((blog: PostTypes, idx: number) =>
+            isList ? (
+              <div
+                className="col-span-12 px-2 sm:px-4 [&_a]:last:border-none"
+                key={`list-${idx}-${blog.slug}`}
+              >
+                <BlogListItem post={blog} />
+              </div>
+            ) : (
+              <div
+                className="col-span-12 mb-4 md:col-span-12 lg:col-span-6 xl:col-span-4 h-full"
+                key={`grid-${idx}-${blog.slug}`}
+              >
+                <BlogGridItem post={blog} />
+              </div>
+            )
+          )
+        ) : (
+          <p className="text-sm text-light col-span-full">No results</p>
+        )}
+      </ol>
+
+      {hasMore && !isFiltering && (
+        <div ref={loadMoreRef} className="flex justify-center py-8" aria-hidden="true">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-foreground-muted border-t-foreground" />
         </div>
-      </DefaultLayout>
+      )}
     </>
   )
 }
