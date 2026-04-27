@@ -179,7 +179,7 @@ select
   p.proname as function_name
 from pg_proc p
 join pg_namespace n on n.oid = p.pronamespace
-where pg_get_functiondef(p.oid) ~* '\m(sign|verify)\s*\(';
+where pg_get_functiondef(p.oid) ~* '\m(sign|verify)[[:space:]]*\(';
 ```
 
 To check whether your database has objects that depend on `pgjwt` before disabling the extension, query `pg_depend`:
