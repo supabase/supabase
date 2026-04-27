@@ -19,6 +19,11 @@ Check updates for each service to learn more.
 
 ## [2026-04-27]
 
+### Configuration
+- ⚠️ Added `docker-compose.envoy.yml` and `volumes/api/envoy` - PR [#43838](https://github.com/supabase/supabase/pull/43838). See also the API gateway updates below
+- ⚠️ Changed Studio healthcheck and some other configuration for better compatibility with Podman (requires `docker-compose.yml` update) - PR [#44754](https://github.com/supabase/supabase/pull/44754)
+- ⚠️ Changed Studio configuration to bind to all IPv4 interfaces only (requires `docker-compose.yml` update) - PR [#44772](https://github.com/supabase/supabase/pull/44772)
+
 ### Documentation
 - Added a new [how-to](https://supabase.com/docs/guides/self-hosting/remove-superuser-access) describing how to switch from `supabase_admin` to `postgres` role for Studio - PR [#42975](https://github.com/supabase/supabase/pull/42975) (via [@singh-inder](https://github.com/singh-inder/))
 - Added a new [how-to](https://github.com/supabase/supabase/pull/45152) for configuring Envoy as the new API gateway - PR [#45152](https://github.com/supabase/supabase/pull/45152)
@@ -27,10 +32,6 @@ Check updates for each service to learn more.
 ### Utils
 - ⚠️ Added `reassign-owner.sh` to update database objects - PR [#42975](https://github.com/supabase/supabase/pull/42975). Read more in "[Remove superuser access](https://supabase.com/docs/guides/self-hosting/remove-superuser-access)" how-to guide
 - ⚠️ Changed `add-new-auth-keys.sh` to also update `docker-compose.yml` - PR [#45056](https://github.com/supabase/supabase/pull/45056)
-
-### Configuration
-- ⚠️ Changed Studio healthcheck and some other configuration for better compatibility with Podman (requires `docker-compose.yml` update) - PR [#44754](https://github.com/supabase/supabase/pull/44754)
-- ⚠️ Changed Studio configuration to bind to all IPv4 interfaces only (requires `docker-compose.yml` update) - PR [#44772](https://github.com/supabase/supabase/pull/44772)
 
 ### Studio
 - Updated to `2026.04.27-sha-5f60601`
