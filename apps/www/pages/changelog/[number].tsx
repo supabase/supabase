@@ -1,5 +1,4 @@
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
-import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
 import { LabelBadges } from '~/components/Changelog/ChangelogTimelineList'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -30,6 +29,90 @@ type PageProps = {
   prevNumber: number | null
   nextNumber: number | null
 }
+
+const ChangelogDetailPage = ({
+  title,
+  url,
+  created_at,
+  number,
+  source,
+  labels,
+  prevNumber,
+  nextNumber,
+}: PageProps) => (
+  <>
+    <NextSeo
+      title={`${title} · Changelog`}
+      description={title}
+      openGraph={{
+        title,
+        url: `https://supabase.com/changelog/${number}`,
+        type: 'article',
+      }}
+    />
+    <DefaultLayout>
+      <div className="container mx-auto max-w-3xl flex flex-col gap-4 px-4 py-10 sm:px-16 xl:px-20">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <nav
+            aria-label="Breadcrumb"
+            className="text-foreground-lighter flex flex-wrap items-center gap-x-2 gap-y-1 text-sm"
+          >
+            <Link href="/changelog" className="text-foreground-lighter hover:underline">
+              Changelog
+            </Link>
+          </nav>
+        </div>
+        <header className="border-default flex flex-col gap-2 border-b pb-6">
+          <h1 className="h1 text-2xl sm:text-3xl">{title}</h1>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-foreground-lighter font-mono text-xs">
+              {dayjs(created_at).format('MMM D, YYYY')}
+            </p>
+            <Link
+              target="_blank"
+              href={url}
+              className="flex items-center gap-2 text-sm text-foreground-lighter hover:text-foreground-light"
+              rel="noreferrer"
+            >
+              View discussion on GitHub
+              <ArrowUpRightIcon size={14} />
+            </Link>
+          </div>
+        </header>
+
+        <LabelBadges labels={labels} onBadgeClick={(e) => e.stopPropagation()} className="" />
+
+        <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
+          <MDXRemote {...source} components={mdxComponents('blog')} />
+        </article>
+        <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-6">
+          {nextNumber != null ? (
+            <Link
+              href={`/changelog/${nextNumber}`}
+              className="text-foreground-lighter flex items-center gap-2 text-sm hover:text-foreground"
+            >
+              <ArrowLeftIcon className="h-4 w-4" /> Newer
+            </Link>
+          ) : (
+            <span />
+          )}
+          {prevNumber != null ? (
+            <Link
+              href={`/changelog/${prevNumber}`}
+              className="text-foreground-lighter flex items-center gap-2 text-sm hover:text-foreground"
+            >
+              Older
+              <ArrowRightIcon className="h-4 w-4" />
+            </Link>
+          ) : (
+            <span />
+          )}
+        </div>
+      </div>
+      <CTABanner />
+    </DefaultLayout>
+  </>
+)
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const octokit = createChangelogOctokit()
@@ -112,92 +195,6 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
     console.error(e)
     return { notFound: true }
   }
-}
-
-function ChangelogDetailPage({
-  title,
-  url,
-  created_at,
-  number,
-  source,
-  labels,
-  prevNumber,
-  nextNumber,
-}: PageProps) {
-  return (
-    <>
-      <NextSeo
-        title={`${title} · Changelog`}
-        description={title}
-        openGraph={{
-          title,
-          url: `https://supabase.com/changelog/${number}`,
-          type: 'article',
-        }}
-      />
-      <DefaultLayout>
-        <div className="container mx-auto max-w-3xl flex flex-col gap-4 px-4 py-10 sm:px-16 xl:px-20">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <nav
-              aria-label="Breadcrumb"
-              className="text-foreground-lighter flex flex-wrap items-center gap-x-2 gap-y-1 text-sm"
-            >
-              <Link href="/changelog" className="text-foreground-lighter hover:underline">
-                Changelog
-              </Link>
-            </nav>
-          </div>
-          <header className="border-default flex flex-col gap-2 border-b pb-6">
-            <h1 className="h1 text-2xl sm:text-3xl">{title}</h1>
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-foreground-lighter font-mono text-xs">
-                {dayjs(created_at).format('MMM D, YYYY')}
-              </p>
-              <Link
-                target="_blank"
-                href={url}
-                className="flex items-center gap-2 text-sm text-foreground-lighter hover:text-foreground-light"
-                rel="noreferrer"
-              >
-                View discussion on GitHub
-                <ArrowUpRightIcon size={14} />
-              </Link>
-            </div>
-          </header>
-
-          <LabelBadges labels={labels} onBadgeClick={(e) => e.stopPropagation()} className="" />
-
-          <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
-            <MDXRemote {...source} components={mdxComponents('blog')} />
-          </article>
-          <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-6">
-            {nextNumber != null ? (
-              <Link
-                href={`/changelog/${nextNumber}`}
-                className="text-foreground-lighter flex items-center gap-2 text-sm hover:text-foreground"
-              >
-                <ArrowLeftIcon className="h-4 w-4" /> Newer
-              </Link>
-            ) : (
-              <span />
-            )}
-            {prevNumber != null ? (
-              <Link
-                href={`/changelog/${prevNumber}`}
-                className="text-foreground-lighter flex items-center gap-2 text-sm hover:text-foreground"
-              >
-                Older
-                <ArrowRightIcon className="h-4 w-4" />
-              </Link>
-            ) : (
-              <span />
-            )}
-          </div>
-        </div>
-        <CTABanner />
-      </DefaultLayout>
-    </>
-  )
 }
 
 export default ChangelogDetailPage

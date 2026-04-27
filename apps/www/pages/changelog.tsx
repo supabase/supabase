@@ -1,6 +1,5 @@
 import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
 import { ChangelogTimelineList } from '~/components/Changelog/ChangelogTimelineList'
-import changelogProductTags from '~/data/changelog-product-tags.json'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import {
@@ -11,9 +10,13 @@ import {
   type ChangelogTimelineIndexItem,
 } from '~/lib/changelog-github'
 import {
+  CHANGELOG_PRODUCT_TAGS,
   changelogLabelDisplayName,
   discussionDisplayDate,
   githubChangelogLabelFilterUrl,
+  isChangelogProductSlug,
+  itemMatchesChangelogSearch,
+  itemMatchesChangelogSelectedTags,
 } from '~/lib/changelog.utils'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
@@ -30,14 +33,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { Badge, Button, cn, IconYCombinator, Input, Input_Shadcn_ } from 'ui'
 
 const FEATURED_COUNT = 1
-
-const CHANGELOG_PRODUCT_TAGS = changelogProductTags as Array<{ slug: string; label: string }>
-
-const CHANGELOG_PRODUCT_SLUG_SET = new Set<string>(CHANGELOG_PRODUCT_TAGS.map((t) => t.slug))
-
-function isChangelogProductSlug(value: string) {
-  return CHANGELOG_PRODUCT_SLUG_SET.has(value)
-}
 
 type FeaturedEntry = {
   number: number
@@ -105,36 +100,17 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
   }
 }
 
-export default function ChangelogProgressivePage(props: PageProps) {
+export default function ChangelogPage(props: PageProps) {
   return (
     <NuqsAdapter>
-      <ChangelogProgressiveContent {...props} />
+      <ChangelogIndex {...props} />
     </NuqsAdapter>
   )
 }
 
-function itemMatchesSearch(item: ChangelogTimelineIndexItem, q: string) {
-  const n = q.trim().toLowerCase()
-  if (!n) return true
-  if (item.title.toLowerCase().includes(n)) return true
-  return item.labels.some((l) => l.name.toLowerCase().includes(n))
-}
-
-function itemMatchesSelectedTags(
-  item: ChangelogTimelineIndexItem,
-  selected: Set<string>
-) {
-  if (selected.size === 0) return true
-  const labelNames = new Set(item.labels.map((l) => l.name.toLowerCase()))
-  for (const slug of selected) {
-    if (labelNames.has(slug.toLowerCase())) return true
-  }
-  return false
-}
-
 const nuqsUrlOptions = { shallow: true, history: 'push' as const }
 
-function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProps) {
+function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
   const [querySearch, setQuerySearch] = useQueryState(
     'q',
     parseAsString.withOptions(nuqsUrlOptions)
@@ -170,7 +146,11 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
     const hasTags = selectedTags.size > 0
     if (!hasSearch && !hasTags) return null
     return allIndex
-      .filter((item) => itemMatchesSearch(item, q) && itemMatchesSelectedTags(item, selectedTags))
+      .filter(
+        (item) =>
+          itemMatchesChangelogSearch(item, q) &&
+          itemMatchesChangelogSelectedTags(item, selectedTags)
+      )
       .sort((a, b) => dayjs(b.sortDate).diff(dayjs(a.sortDate)))
   }, [allIndex, filterSearch, selectedTags])
 

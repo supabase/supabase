@@ -1,3 +1,6 @@
+import changelogProductTags from '~/data/changelog-product-tags.json'
+import type { ChangelogTimelineIndexItem } from './changelog-github'
+
 // hackery to fix Terry accidentally deleting
 // a bunch of releases and their associted discussions in Dec 2023
 // checks if titles match and grabs this original createdAt timestamp
@@ -170,4 +173,34 @@ const GITHUB_CHANGELOG_DISCUSSIONS_BASE =
 export function githubChangelogLabelFilterUrl(labelName: string) {
   const discussions_q = `label%3A${encodeURIComponent(labelName)}+category%3AChangelog`
   return `${GITHUB_CHANGELOG_DISCUSSIONS_BASE}?discussions_q=${discussions_q}`
+}
+
+export const CHANGELOG_PRODUCT_TAGS = changelogProductTags as Array<{
+  slug: string
+  label: string
+}>
+
+const CHANGELOG_PRODUCT_SLUG_SET = new Set<string>(CHANGELOG_PRODUCT_TAGS.map((tag) => tag.slug))
+
+export function isChangelogProductSlug(value: string) {
+  return CHANGELOG_PRODUCT_SLUG_SET.has(value)
+}
+
+export function itemMatchesChangelogSearch(item: ChangelogTimelineIndexItem, query: string) {
+  const normalizedQuery = query.trim().toLowerCase()
+  if (!normalizedQuery) return true
+  if (item.title.toLowerCase().includes(normalizedQuery)) return true
+  return item.labels.some((label) => label.name.toLowerCase().includes(normalizedQuery))
+}
+
+export function itemMatchesChangelogSelectedTags(
+  item: ChangelogTimelineIndexItem,
+  selectedTags: Set<string>
+) {
+  if (selectedTags.size === 0) return true
+  const labelNames = new Set(item.labels.map((label) => label.name.toLowerCase()))
+  for (const slug of selectedTags) {
+    if (labelNames.has(slug.toLowerCase())) return true
+  }
+  return false
 }
