@@ -86,21 +86,21 @@ export const RLSTesterResults = ({
         <TabsContent_Shadcn_ value="policies" className="mt-0">
           {!isServiceRole && !!tableWithRLSEnabledButNoPolicies && (
             <Admonition showIcon={false} type="default" className="rounded mt-2">
-              <p className="!mb-0.5">Anonymous users do not have access to data from this query</p>
+              <p className="!mb-0.5">This user has no access to any rows from this query</p>
               <p className="text-foreground-light">
                 The table{' '}
                 <code className="text-code-inline">
                   {tableWithRLSEnabledButNoPolicies.schema}.{tableWithRLSEnabledButNoPolicies.table}
                 </code>{' '}
                 has RLS enabled but no policies set up for the{' '}
-                <code className="text-code-inline !break-keep">anon</code> role.
+                <code className="text-code-inline !break-keep">{parseQueryResults.role}</code> role.
               </p>
             </Admonition>
           )}
 
           {tableWithRLSEnabledWithPolicyFalse && (
             <Admonition showIcon={false} type="default" className="rounded mt-2">
-              <p className="!mb-0.5">User does not have access to data from this query</p>
+              <p className="!mb-0.5">This user has no access to any rows from this query</p>
               <p className="text-foreground-light">
                 The table{' '}
                 <code className="text-code-inline">
@@ -117,8 +117,8 @@ export const RLSTesterResults = ({
           {isServiceRole && (
             <Admonition showIcon={false} type="default" className="rounded mt-2">
               <p className="!mb-0.5">
-                Query returns all rows for the <code className="text-code-inline">postgres</code>{' '}
-                role
+                The <code className="text-code-inline">postgres</code> role has access to all rows
+                for this query
               </p>
               <p className="text-foreground-light">
                 The <code className="text-code-inline">postgres</code> role has admin privileges and
