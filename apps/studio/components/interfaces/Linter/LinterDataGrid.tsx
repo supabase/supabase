@@ -196,7 +196,11 @@ const LinterDataGrid = ({
               <Button type="text" icon={<X />} onClick={handleSidepanelClose} />
             </div>
             <div className="p-6 flex-grow min-h-0 overflow-y-auto">
-              <LintDetail lint={selectedLint} projectRef={ref!} />
+              <LintDetail
+                lint={selectedLint}
+                projectRef={ref!}
+                onAfterAction={handleSidepanelClose}
+              />
             </div>
           </ResizablePanel>
         </>

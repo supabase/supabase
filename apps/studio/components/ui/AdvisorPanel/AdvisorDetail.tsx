@@ -11,18 +11,20 @@ interface AdvisorDetailProps {
   item: AdvisorItem
   projectRef: string
   onUpdateNotificationStatus?: (id: string, status: 'archived' | 'seen') => void
+  onAfterLintAction?: () => void
 }
 
 export const AdvisorDetail = ({
   item,
   projectRef,
   onUpdateNotificationStatus = noop,
+  onAfterLintAction,
 }: AdvisorDetailProps) => {
   if (item.source === 'lint') {
     const lint = item.original as Lint
     return (
       <div className="px-6 py-6">
-        <LintDetail lint={lint} projectRef={projectRef} />
+        <LintDetail lint={lint} projectRef={projectRef} onAfterAction={onAfterLintAction} />
       </div>
     )
   }

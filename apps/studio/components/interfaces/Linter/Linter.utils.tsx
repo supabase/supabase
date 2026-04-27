@@ -14,6 +14,8 @@ import {
 import Link from 'next/link'
 import { Badge, Button } from 'ui'
 
+import { GraphqlExposureLintCTA } from './GraphqlExposureLintCTA'
+import { asDismissibleGraphqlLint } from './useDismissedGraphqlLints'
 import { LINTER_LEVELS, LintInfo } from '@/components/interfaces/Linter/Linter.constants'
 import { Lint, LINT_TYPES } from '@/data/lint/lint-query'
 import { DOCS_URL } from '@/lib/constants'
@@ -378,15 +380,29 @@ export const LintCTA = ({
   title,
   projectRef,
   metadata,
+  onAfterAction,
 }: {
   title: LINT_TYPES
   projectRef: string
   metadata: Lint['metadata']
+  onAfterAction?: () => void
 }) => {
   const lintInfo = lintInfoMap.find((item) => item.name === title)
 
   if (!lintInfo) {
     return null
+  }
+
+  const dismissibleLintName = asDismissibleGraphqlLint(title)
+  if (dismissibleLintName) {
+    return (
+      <GraphqlExposureLintCTA
+        lintName={dismissibleLintName}
+        projectRef={projectRef}
+        metadata={metadata}
+        onAfterAction={onAfterAction}
+      />
+    )
   }
 
   const link = lintInfo.link({ projectRef, metadata })

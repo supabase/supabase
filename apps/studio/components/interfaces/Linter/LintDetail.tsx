@@ -17,9 +17,10 @@ interface LintDetailProps {
   lint: Lint
   projectRef: string
   onAskAssistant?: () => void
+  onAfterAction?: () => void
 }
 
-const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
+const LintDetail = ({ lint, projectRef, onAskAssistant, onAfterAction }: LintDetailProps) => {
   const track = useTrack()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
@@ -69,7 +70,12 @@ const LintDetail = ({ lint, projectRef, onAskAssistant }: LintDetailProps) => {
           onOpenAssistant={handleAskAssistant}
           telemetrySource="lint_detail"
         />
-        <LintCTA title={lint.name} projectRef={projectRef} metadata={lint.metadata} />
+        <LintCTA
+          title={lint.name}
+          projectRef={projectRef}
+          metadata={lint.metadata}
+          onAfterAction={onAfterAction}
+        />
         <Button asChild type="text">
           <Link
             href={
