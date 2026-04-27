@@ -1,9 +1,17 @@
-import { NextRequest } from 'next/server'
-import { describe, expect, it } from 'vitest'
-
 import { FIRST_REFERRER_COOKIE_NAME } from 'common/first-referrer-cookie'
+import { NextRequest } from 'next/server'
+import { describe, expect, it, vi } from 'vitest'
 
 import { middleware } from './middleware'
+
+// content.generated.ts is produced by scripts/generateMdContent.mjs at
+// content:build time and gitignored, so it isn't on disk in CI before tests
+// run. These tests only exercise referrer-cookie stamping, not .md routing,
+// so a stub is enough.
+vi.mock('./app/api-v2/md/content.generated', () => ({
+  MD_CONTENT: new Map<string, string>(),
+  MD_PAGES: new Set<string>(),
+}))
 
 function makeRequest(
   url: string,
