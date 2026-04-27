@@ -89,10 +89,7 @@ You can write the zip file to ephemeral storage first, then use a background tas
 import { BlobWriter, ZipReader } from 'https://deno.land/x/zipjs/index.js'
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL'),
-  Deno.env.get('SUPABASE_SECRET_KEY')
-)
+const supabase = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_SECRET_KEY'))
 
 async function processZipFile(uploadId: string, filepath: string) {
   const file = await Deno.open(filepath, { read: true })
