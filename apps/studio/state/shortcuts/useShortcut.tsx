@@ -60,7 +60,16 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
   const timeout = options?.timeout ?? def.options?.timeout ?? undefined
   const ignoreInputs = options?.ignoreInputs ?? def.options?.ignoreInputs
 
-  useHotkeySequence(def.sequence, callback, { enabled, timeout, ignoreInputs })
+  // Only include `ignoreInputs` when set. The library resolves it to a concrete
+  // boolean at register time (false for Meta/Ctrl/Escape, true otherwise), but
+  // its setOptions does an object spread on every re-render — passing
+  // `ignoreInputs: undefined` would overwrite the resolved value and re-enable
+  // the input-focus guard for shortcuts that should always fire.
+  useHotkeySequence(def.sequence, callback, {
+    enabled,
+    timeout,
+    ...(ignoreInputs !== undefined && { ignoreInputs }),
+  })
 
   // Handle overrides for command menu
   const enabledInCommandMenu = enabled && (options?.registerInCommandMenu ?? false)
