@@ -101,7 +101,7 @@ export function ServiceFlowPanel({
             'xl:relative xl:border-l-0'
           )}
         >
-          <div className="h-full overflow-auto">
+          <div className="mt-8 h-[calc(100%-2rem)] overflow-auto">
             {/* Service Flow Header with navigation */}
             <ServiceFlowHeader
               selectedRow={selectedRow}
