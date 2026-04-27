@@ -1548,13 +1548,13 @@ exposed_objects as (
 )
 select
     'pg_graphql_anon_table_exposed' as name,
-    'pg_graphql Anon Role Exposes Objects in Introspection' as title,
+    'Public Can See Object in GraphQL Schema' as title,
     'WARN' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
-    'Detects tables, views, materialized views, and foreign tables whose schema is visible via the public \`/graphql/v1\` introspection endpoint. When \`pg_graphql\` is installed, any object the \`anon\` role has \`SELECT\` on is visible in introspection — names, columns, types, and relationships — even when RLS is enabled. See lint 0027 for the equivalent check against the \`authenticated\` role; in default Supabase projects revoking from \`anon\` alone is not sufficient.' as description,
+    'Detects tables, views, materialized views, and foreign tables that are visible in the GraphQL schema to anyone using your public anon key. Revoke \`SELECT\` from \`anon\` for objects that should not be discoverable before sign-in, and check lint 0027 for the matching signed-in-user exposure.' as description,
     format(
-        'Extension \`pg_graphql\` is installed and the \`anon\` role has \`SELECT\` on %s \`%s.%s\`. Its name, columns, and relationships are visible via the public \`/graphql/v1\` introspection endpoint.',
+        '%s \`%s.%s\` is visible in the GraphQL schema because the \`anon\` role can \`SELECT\` it. Revoke \`SELECT\` from \`anon\` if it should not be discoverable without signing in.',
         object_type,
         schema_name,
         object_name
@@ -1615,13 +1615,13 @@ exposed_objects as (
 )
 select
     'pg_graphql_authenticated_table_exposed' as name,
-    'pg_graphql Authenticated Role Exposes Objects in Introspection' as title,
+    'Signed-In Users Can See Object in GraphQL Schema' as title,
     'WARN' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
-    'Detects tables, views, materialized views, and foreign tables whose schema is visible via the \`/graphql/v1\` introspection endpoint to any signed-up user. When \`pg_graphql\` is installed, any object the \`authenticated\` role has \`SELECT\` on is visible in introspection — names, columns, types, and relationships — even when RLS is enabled. In default Supabase projects \`authenticated\` is anyone with a valid JWT, which under open or auto-confirm signup is anyone with a throwaway email. See lint 0026 for the equivalent check against \`anon\`.' as description,
+    'Detects tables, views, materialized views, and foreign tables that are visible in the GraphQL schema to signed-in users. Revoke \`SELECT\` from \`authenticated\` for objects that signed-in users should not discover, and check lint 0026 for the matching public exposure.' as description,
     format(
-        'Extension \`pg_graphql\` is installed and the \`authenticated\` role has \`SELECT\` on %s \`%s.%s\`. Its name, columns, and relationships are visible via the \`/graphql/v1\` introspection endpoint to any signed-up user.',
+        '%s \`%s.%s\` is visible in the GraphQL schema to signed-in users because the \`authenticated\` role can \`SELECT\` it. Revoke \`SELECT\` from \`authenticated\` if it should not be discoverable to every account.',
         object_type,
         schema_name,
         object_name
@@ -1646,13 +1646,13 @@ union all
 (
 select
     'anon_security_definer_function_executable' as name,
-    'SECURITY DEFINER Function Executable by Anon' as title,
+    'Public Can Execute SECURITY DEFINER Function' as title,
     'WARN' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
-    'Detects SECURITY DEFINER functions that the \`anon\` role has EXECUTE on. A SECURITY DEFINER function runs with the privileges of its owner and bypasses RLS, so granting EXECUTE to \`anon\` lets any holder of the public anon key invoke a privileged operation via PostgREST \`/rest/v1/rpc/<name>\` (and via \`/graphql/v1\` when pg_graphql is installed and the function''s return type is supported). See lint 0029 for the equivalent check against the \`authenticated\` role.' as description,
+    'Detects \`SECURITY DEFINER\` functions that are callable without signing in. Revoke \`EXECUTE\`, switch the function to \`SECURITY INVOKER\`, or move it out of your exposed API schema if it is not meant to be public.' as description,
     format(
-        'SECURITY DEFINER function \`%s.%s(%s)\` is executable by the \`anon\` role. It runs with the privileges of its owner and bypasses RLS, so any unauthenticated caller can invoke it via \`/rest/v1/rpc/%s\`.',
+        'Function \`%s.%s(%s)\` can be executed by the \`anon\` role as a \`SECURITY DEFINER\` function via \`/rest/v1/rpc/%s\`. Revoke \`EXECUTE\` or switch it to \`SECURITY INVOKER\` if that is not intentional.',
         schema_name,
         function_name,
         function_args,
@@ -1701,13 +1701,13 @@ union all
 (
 select
     'authenticated_security_definer_function_executable' as name,
-    'SECURITY DEFINER Function Executable by Authenticated' as title,
+    'Signed-In Users Can Execute SECURITY DEFINER Function' as title,
     'WARN' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
-    'Detects SECURITY DEFINER functions that the \`authenticated\` role has EXECUTE on. A SECURITY DEFINER function runs with the privileges of its owner and bypasses RLS, so granting EXECUTE to \`authenticated\` lets any signed-up user invoke a privileged operation via PostgREST \`/rest/v1/rpc/<name>\` (and via \`/graphql/v1\` when pg_graphql is installed and the function''s return type is supported). Under open or auto-confirm signup \`authenticated\` is anyone with a throwaway email. See lint 0028 for the equivalent check against the \`anon\` role.' as description,
+    'Detects \`SECURITY DEFINER\` functions that are callable by signed-in users. Revoke \`EXECUTE\`, switch the function to \`SECURITY INVOKER\`, or move it out of your exposed API schema if signed-in users should not call it.' as description,
     format(
-        'SECURITY DEFINER function \`%s.%s(%s)\` is executable by the \`authenticated\` role. It runs with the privileges of its owner and bypasses RLS, so any signed-up user can invoke it via \`/rest/v1/rpc/%s\`.',
+        'Function \`%s.%s(%s)\` can be executed by the \`authenticated\` role as a \`SECURITY DEFINER\` function via \`/rest/v1/rpc/%s\`. Revoke \`EXECUTE\` or switch it to \`SECURITY INVOKER\` if that is not intentional.',
         schema_name,
         function_name,
         function_args,
