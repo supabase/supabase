@@ -316,7 +316,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
               }}
             >
               <SelectTrigger_Shadcn_ id="payment-method">
-                <SelectValue_Shadcn_ placeholder="Select Organization" className="flex gap-2" />
+                <SelectValue_Shadcn_ className="flex gap-2" />
               </SelectTrigger_Shadcn_>
               <SelectContent_Shadcn_>
                 {paymentMethods?.data.map((method) => {
