@@ -14,7 +14,6 @@ interface PageSection {
   rag_ignore?: boolean
 }
 
-
 export async function clippy(
   openai: OpenAI,
   supabaseClient: SupabaseClient<any, 'public', any>,

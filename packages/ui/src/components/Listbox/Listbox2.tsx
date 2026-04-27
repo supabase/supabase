@@ -233,7 +233,6 @@ interface OptionProps {
   addOnBefore?: ({ active, selected }: any) => React.ReactNode
 }
 
-
 /**
  * @deprecated Use ./Select_shadcn_ or follow ComboBox convention or use ./ui-patterns/multi-select
  */

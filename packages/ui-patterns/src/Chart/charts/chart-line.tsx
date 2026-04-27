@@ -62,10 +62,7 @@ export interface ChartLineProps {
   isFullHeight?: boolean
   className?: string
   color?: string
-  hoverColor?: string
   chartHighlight?: ChartHighlight
-  updateDateRange?: (from: string, to: string) => void
-  highlightActions?: ChartHighlightAction[]
   syncId?: string
   showHighlightArea?: boolean
   cursor?: string
