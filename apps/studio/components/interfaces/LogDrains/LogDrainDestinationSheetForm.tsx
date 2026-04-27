@@ -263,8 +263,8 @@ const submitSchema = z
   })
   .and(submitUnion)
 
-type LogDrainDestinationFormValues = z.infer
-type LogDrainDestinationSubmitValues = z.infer
+type LogDrainDestinationFormValues = z.infer<typeof formSchema>
+type LogDrainDestinationSubmitValues = z.infer<typeof submitSchema>
 
 const HEADER_ENABLED_TYPES = ['webhook', 'loki', 'otlp'] as const
 
@@ -317,7 +317,7 @@ function LogDrainFormItem({
   )
 }
 
-type DefaultValues = { type: LogDrainType } & Partial
+type DefaultValues = { type: LogDrainType } & Partial<LogDrainData>
 
 export function LogDrainDestinationSheetForm({
   open,

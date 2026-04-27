@@ -129,5 +129,5 @@ export type LogDrainOtlpConfig = {
   endpoint: string
   protocol?: string
   gzip?: boolean
-  headers?: Record
+  headers?: Record<string, string>
 }
