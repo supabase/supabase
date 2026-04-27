@@ -34,10 +34,11 @@ function FloatingTableOfContents({
   return (
     <motion.div
       ref={tocRef}
-      className="fixed top-32 left-1/2 transform -translate-x-1/2 z-50"
-      initial={{ opacity: 0, y: -8, x: '-50%' }}
-      animate={{ opacity: 1, y: 0, x: '-50%' }}
-      exit={{ opacity: 0, y: -8, x: '-50%' }}
+      layout
+      className="relative"
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
     >
       <div className="relative">
@@ -202,19 +203,21 @@ export default function StateOfStartups2026Content({
     <YearProvider>
       <SurveyDataProvider preloadedData={preloadedData}>
         <DefaultLayout className="bg-alternative overflow-hidden">
-          <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50">
-            <YearToggle />
+          <div className="fixed top-20 inset-x-0 z-50 pointer-events-none flex justify-center">
+            <motion.div layout className="flex items-start gap-2 pointer-events-auto">
+              <YearToggle />
+              <AnimatePresence>
+                {showFloatingToc && (
+                  <FloatingTableOfContents
+                    tocRef={tocRef}
+                    isTocOpen={isTocOpen}
+                    setIsTocOpen={setIsTocOpen}
+                    activeChapter={activeChapter}
+                  />
+                )}
+              </AnimatePresence>
+            </motion.div>
           </div>
-          <AnimatePresence>
-            {showFloatingToc && (
-              <FloatingTableOfContents
-                tocRef={tocRef}
-                isTocOpen={isTocOpen}
-                setIsTocOpen={setIsTocOpen}
-                activeChapter={activeChapter}
-              />
-            )}
-          </AnimatePresence>
           {/* Intro section */}
           <section ref={heroRef} className="w-full">
             <StateOfStartupsAuroraHeader />
