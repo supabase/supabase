@@ -365,6 +365,7 @@ const ReportFilterBar = ({
                       ? 'Provide a regex expression'
                       : 'Provide a string'
                   }
+                  value={addFilterValues.value}
                   onChange={(e) => {
                     setAddFilterValues((prev) => ({ ...prev, value: e.target.value }))
                   }}
