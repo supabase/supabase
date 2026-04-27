@@ -1,5 +1,4 @@
 import { ChangelogLlmMarkdownButton } from '~/components/Changelog/ChangelogLlmMarkdownButton'
-import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
 import { ChangelogTimelineList } from '~/components/Changelog/ChangelogTimelineList'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -23,7 +22,7 @@ import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { useBreakpoint } from 'common'
 import dayjs from 'dayjs'
-import { GitCommit, ListFilter, X } from 'lucide-react'
+import { GitCommit, ListFilter, Rss, X } from 'lucide-react'
 import type { GetServerSideProps } from 'next'
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { MDXRemote } from 'next-mdx-remote'
@@ -216,8 +215,15 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                     {filterPanelOpen ? 'Hide filters' : isMobile && 'Filter changelog'}
                   </Button>
                 </div>
+                <Button
+                  asChild
+                  type="default"
+                  className="shrink-0"
+                  icon={<Rss className="h-4 w-4" strokeWidth={2} aria-hidden />}
+                >
+                  <Link href="/changelog-rss.xml">Changelog RSS</Link>
+                </Button>
                 <ChangelogLlmMarkdownButton />
-                <ChangelogRssButton />
               </div>
             </div>
           </div>

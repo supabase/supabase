@@ -38,18 +38,6 @@ function buildItemsXml(sorted) {
     .join('\n')
 }
 
-/**
- * Converts a display label into a lowercase, URL-safe filename slug.
- * e.g. "Edge Functions" → "edge-functions", "AI & Vector" → "ai-vector"
- * @param {string} label
- */
-export function labelToFileSlug(label) {
-  return label
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-}
-
 /** @param {ChangelogRssItemInput[]} entries */
 export function generateChangelogRssXml(entries) {
   const visible = entries.filter((e) => !e.title.includes('[d]'))
@@ -70,47 +58,6 @@ export function generateChangelogRssXml(entries) {
       <language>en</language>
       <lastBuildDate>${lastBuildDate}</lastBuildDate>
       <atom:link href="https://supabase.com/changelog-rss.xml" rel="self" type="application/rss+xml"/>
-      ${buildItemsXml(sorted)}
-    </channel>
-  </rss>
-`
-}
-
-/**
- * Generates a tag-filtered RSS feed.
- * @param {ChangelogRssItemInput[]} allEntries - all entries (labels as lowercase strings)
- * @param {{ githubLabelSlug: string; displayLabel: string }} tag
- */
-export function generateChangelogTagRssXml(allEntries, tag) {
-  const { githubLabelSlug, displayLabel } = tag
-  const fileSlug = labelToFileSlug(displayLabel)
-
-  const filtered = allEntries.filter(
-    (e) => !e.title.includes('[d]') && (e.labels ?? []).includes(githubLabelSlug.toLowerCase())
-  )
-  const sorted = [...filtered].sort(
-    (a, b) => dayjs(b.sortDate).valueOf() - dayjs(a.sortDate).valueOf()
-  )
-
-  const lastBuildDate = sorted[0]?.sortDate
-    ? formatRssPubDate(sorted[0].sortDate)
-    : formatRssPubDate(dayjs().toISOString())
-
-  const feedUrl = `https://supabase.com/changelog-rss/${fileSlug}.xml`
-  const channelTitle = xmlEncodeRss(`Supabase Changelog · ${displayLabel}`)
-  const channelDescription = xmlEncodeRss(
-    `${displayLabel} updates and improvements from Supabase`
-  )
-
-  return `
-  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-    <channel>
-      <title>${channelTitle}</title>
-      <link>https://supabase.com/changelog</link>
-      <description>${channelDescription}</description>
-      <language>en</language>
-      <lastBuildDate>${lastBuildDate}</lastBuildDate>
-      <atom:link href="${xmlEncodeRss(feedUrl)}" rel="self" type="application/rss+xml"/>
       ${buildItemsXml(sorted)}
     </channel>
   </rss>

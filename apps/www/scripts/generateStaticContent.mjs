@@ -285,8 +285,6 @@ try {
 // Create folder for static content
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const folderPath = path.join(__dirname, '../.generated/staticContent')
-const changelogProductTagsPath = path.join(__dirname, '../data/changelog-product-tags.json')
-const CHANGELOG_PRODUCT_TAGS = JSON.parse(await fs.readFile(changelogProductTagsPath, 'utf8'))
 try {
   await fs.mkdir(folderPath, { recursive: true })
 } catch (error) {
@@ -393,8 +391,7 @@ try {
     const { Octokit } = await import('@octokit/core')
     const { paginateGraphql } = await import('@octokit/plugin-paginate-graphql')
 
-    const { generateChangelogRssXml, generateChangelogTagRssXml, labelToFileSlug } =
-      await import('../lib/changelog-rss.mjs')
+    const { generateChangelogRssXml } = await import('../lib/changelog-rss.mjs')
     const rewritesPath = path.join(__dirname, 'data/changelog-deleted-discussions.json')
     const rewrites = JSON.parse(await fs.readFile(rewritesPath, 'utf8'))
     const discussionDisplayDate = (item) => {
@@ -531,28 +528,6 @@ ${entry.body ?? ''}
       )
     }
     console.log(`✅ Generated public/changelog/*.md (${visibleEntries.length} files)`)
-
-    // Per-tag RSS feeds → public/changelog-rss/<label-slug>.xml
-    const tagFeedsDir = path.join(__dirname, '../public/changelog-rss')
-    await fs.mkdir(tagFeedsDir, { recursive: true })
-    const tagResults = await Promise.allSettled(
-      CHANGELOG_PRODUCT_TAGS.map(async ({ slug, label }) => {
-        const fileSlug = labelToFileSlug(label)
-        const tagXml = generateChangelogTagRssXml(entries, {
-          githubLabelSlug: slug,
-          displayLabel: label,
-        })
-        await fs.writeFile(path.join(tagFeedsDir, `${fileSlug}.xml`), tagXml.trim(), 'utf8')
-        const count = entries.filter(
-          (e) => !e.title.includes('[d]') && e.labels.includes(slug.toLowerCase())
-        ).length
-        return { label, fileSlug, count }
-      })
-    )
-    const succeeded = tagResults.filter((r) => r.status === 'fulfilled').length
-    console.log(
-      `✅ Generated ${succeeded}/${CHANGELOG_PRODUCT_TAGS.length} per-tag changelog RSS feeds`
-    )
   }
 } catch (error) {
   console.warn('Error generating changelog RSS:', error)
