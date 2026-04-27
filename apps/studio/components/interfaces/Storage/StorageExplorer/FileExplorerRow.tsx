@@ -18,7 +18,7 @@ import {
 } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import {
-  Checkbox_Shadcn_ as Checkbox,
+  Checkbox,
   cn,
   DropdownMenu,
   DropdownMenuContent,

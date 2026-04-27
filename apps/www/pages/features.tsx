@@ -9,7 +9,7 @@ import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/compat/router'
 import Link from 'next/link'
 import React, { useCallback, useEffect, useState } from 'react'
-import { Button, Checkbox_Shadcn_ as Checkbox, cn, Input } from 'ui'
+import { Button, Checkbox, cn, Input } from 'ui'
 
 function FeaturesPage() {
   const router = useRouter()

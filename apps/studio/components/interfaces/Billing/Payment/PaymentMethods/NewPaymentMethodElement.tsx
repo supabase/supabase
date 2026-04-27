@@ -18,7 +18,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   Command_Shadcn_ as Command,
   CommandEmpty_Shadcn_ as CommandEmpty,
@@ -337,7 +337,7 @@ export const NewPaymentMethodElement = forwardRef(
 
         {fullyLoaded && (
           <div className="flex items-center space-x-2 py-4">
-            <Checkbox_Shadcn_
+            <Checkbox
               id="business"
               checked={purchasingAsBusiness}
               onCheckedChange={() => setPurchasingAsBusiness(!purchasingAsBusiness)}

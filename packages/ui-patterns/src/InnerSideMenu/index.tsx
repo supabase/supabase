@@ -1,5 +1,9 @@
 import { ChevronRight, ChevronsDown, Loader2, Search } from 'lucide-react'
 import Link from 'next/link'
+// Required to avoid issues:
+// The inferred type of InnerSideMenuCollapsible cannot be named without a reference to CollapsibleProps
+// The inferred type of InnerSideBarFilterSortDropdown cannot be named without a reference to DropdownMenuProps
+import { Collapsible as _RadixCollapsible, DropdownMenu as _RadixDropdownMenu } from 'radix-ui'
 import { ElementRef, forwardRef } from 'react'
 import {
   cn,

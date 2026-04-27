@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { Button, Checkbox_Shadcn_ as Checkbox, cn, Modal } from 'ui'
+import { Button, Checkbox, cn, Modal } from 'ui'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'

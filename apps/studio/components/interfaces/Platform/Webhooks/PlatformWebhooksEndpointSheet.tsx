@@ -8,7 +8,7 @@ import {
   AccordionItem_Shadcn_ as AccordionItem,
   AccordionTrigger_Shadcn_ as AccordionTrigger,
   Button,
-  Checkbox_Shadcn_ as Checkbox,
+  Checkbox,
   cn,
   Form,
   FormControl,

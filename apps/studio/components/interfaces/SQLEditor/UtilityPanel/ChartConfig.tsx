@@ -6,7 +6,7 @@ import { useMemo } from 'react'
 import {
   Badge,
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   Label_Shadcn_,
   ResizableHandle,
   ResizablePanel,
@@ -269,7 +269,7 @@ export const ChartConfig = ({
         </div>
         <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
           <Label_Shadcn_ className="" htmlFor="cumulative">
-            <Checkbox_Shadcn_
+            <Checkbox
               id="cumulative"
               name="cumulative"
               checked={config.cumulative}
@@ -279,7 +279,7 @@ export const ChartConfig = ({
           </Label_Shadcn_>
 
           <Label_Shadcn_ htmlFor="showLabels">
-            <Checkbox_Shadcn_
+            <Checkbox
               id="showLabels"
               name="showLabels"
               checked={config.showLabels}
@@ -289,7 +289,7 @@ export const ChartConfig = ({
           </Label_Shadcn_>
 
           <Label_Shadcn_ htmlFor="showGrid">
-            <Checkbox_Shadcn_
+            <Checkbox
               id="showGrid"
               name="showGrid"
               checked={config.showGrid}

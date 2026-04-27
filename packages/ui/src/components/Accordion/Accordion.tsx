@@ -1,7 +1,7 @@
 'use client'
 
-import * as RadixAccordion from '@radix-ui/react-accordion'
 import { ChevronDown } from 'lucide-react'
+import { Accordion as RadixAccordion } from 'radix-ui'
 import React, { createContext, useContext, useState } from 'react'
 
 import styleHandler from '../../lib/theme/styleHandler'
