@@ -94,7 +94,7 @@ export const useUnifiedLogsPreview = () => {
 
   const isLoading = !flagsHaveLoaded || isOrgLoading
   const isEligible = unifiedLogsEnabled && isEnterpriseOrSupabaseOrg
-  const isEnabled = isEligible && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
@@ -124,9 +124,6 @@ export const useIsJitDbAccessEnabled = () => {
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
-
-// [Joshen] Temporarily leaving this in, will eventually clean up this flag + old Header component completely
-export const useIsTableFilterBarEnabled = () => true
 
 export const useIsFloatingMobileToolbarEnabled = () => {
   const { flags } = useFeaturePreviewContext()

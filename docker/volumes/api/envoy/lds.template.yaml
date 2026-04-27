@@ -867,8 +867,11 @@ resources:
                     inline_code: |
                       local ANON_KEY = "${ANON_KEY}"
                       local SERVICE_ROLE_KEY = "${SERVICE_ROLE_KEY}"
+                      local SUPABASE_PUBLISHABLE_KEY = "${SUPABASE_PUBLISHABLE_KEY}"
+                      local SUPABASE_SECRET_KEY = "${SUPABASE_SECRET_KEY}"
                       local ANON_KEY_ASYMMETRIC = "${ANON_KEY_ASYMMETRIC}"
                       local SERVICE_ROLE_KEY_ASYMMETRIC = "${SERVICE_ROLE_KEY_ASYMMETRIC}"
+                      local TRANSLATION_ENABLED = SUPABASE_SECRET_KEY ~= "" and SUPABASE_PUBLISHABLE_KEY ~= "" and SERVICE_ROLE_KEY_ASYMMETRIC ~= "" and ANON_KEY_ASYMMETRIC ~= ""
 
                       local PROTECTED_ROUTES = {
                         ["auth-v1-protected"] = true,
@@ -900,11 +903,11 @@ resources:
                           return true
                         end
 
-                        if SERVICE_ROLE_KEY_ASYMMETRIC ~= "" and apikey == SERVICE_ROLE_KEY_ASYMMETRIC then
+                        if TRANSLATION_ENABLED and apikey == SERVICE_ROLE_KEY_ASYMMETRIC then
                           return true
                         end
 
-                        if ANON_KEY_ASYMMETRIC ~= "" and apikey == ANON_KEY_ASYMMETRIC then
+                        if TRANSLATION_ENABLED and apikey == ANON_KEY_ASYMMETRIC then
                           return true
                         end
 

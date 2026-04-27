@@ -1,14 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import {
-  Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Modal,
-  Textarea,
-} from 'ui'
+import { Button, Form, FormControl, FormField, Input_Shadcn_, Modal, Textarea } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -53,29 +45,29 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
       onCancel={handleCancel}
       onEscapeKeyDown={handleCancel}
     >
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)}>
           <Modal.Content className="pt-4 pb-2 flex flex-col gap-2">
             <input type="hidden" id="page" {...form.register('page')} />
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItemLayout layout="vertical" label="Title">
-                  <FormControl_Shadcn_ className="col-span-6">
+                  <FormControl className="col-span-6">
                     <Input_Shadcn_ {...field} />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="comment"
               render={({ field }) => (
                 <FormItemLayout layout="vertical" label="Comment" afterLabel="(not anonymous)">
-                  <FormControl_Shadcn_ className="col-span-6">
+                  <FormControl className="col-span-6">
                     <Textarea {...field} rows={4} className="resize-none" />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -113,7 +105,7 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
             </div>
           </Modal.Content>
         </form>
-      </Form_Shadcn_>
+      </Form>
     </Modal>
   )
 }

@@ -16,7 +16,7 @@ RadioGroupCard.displayName = RadioGroupPrimitive.Root.displayName
 
 interface RadioGroupCardItemProps {
   image?: React.ReactNode
-  label: string | React.ReactNode
+  label: React.ReactNode
   showIndicator?: boolean
 }
 

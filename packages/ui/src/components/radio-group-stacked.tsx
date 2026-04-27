@@ -24,9 +24,9 @@ RadioGroupStacked.displayName = 'RadioGroupStacked'
 
 interface RadioGroupStackedItemProps {
   image?: React.ReactNode
-  label: string
+  label: React.ReactNode
   showIndicator?: boolean
-  description?: string
+  description?: React.ReactNode
 }
 
 const RadioGroupStackedItem = React.forwardRef<

@@ -1,9 +1,9 @@
 import { QueryClient, useQuery } from '@tanstack/react-query'
-import { components } from 'api-types'
+import { platformComponents as components } from 'api-types'
 
 import { organizationKeys } from './keys'
+import { getManagedByFromOrganizationPartner } from './managed-by-utils'
 import { get, handleError } from '@/data/fetchers'
-import { MANAGED_BY, ManagedBy } from '@/lib/constants/infrastructure'
 import { useProfile } from '@/lib/profile'
 import type { Organization, ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -13,19 +13,8 @@ export function castOrganizationResponseToOrganization(org: OrganizationBase): O
   return {
     ...org,
     billing_email: org.billing_email ?? 'Unknown',
-    managed_by: getManagedBy(org),
+    managed_by: getManagedByFromOrganizationPartner(org.billing_partner, org.integration_source),
     partner_id: org.slug.startsWith('vercel_') ? org.slug.replace('vercel_', '') : undefined,
-  }
-}
-
-function getManagedBy(org: OrganizationBase): ManagedBy {
-  switch (org.billing_partner) {
-    case 'vercel_marketplace':
-      return MANAGED_BY.VERCEL_MARKETPLACE
-    case 'aws_marketplace':
-      return MANAGED_BY.AWS_MARKETPLACE
-    default:
-      return MANAGED_BY.SUPABASE
   }
 }
 

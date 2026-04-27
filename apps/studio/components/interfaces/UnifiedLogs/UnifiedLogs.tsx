@@ -45,7 +45,6 @@ import { DataTableSideBarLayout } from '@/components/ui/DataTable/DataTableSideB
 import { DataTableToolbar } from '@/components/ui/DataTable/DataTableToolbar'
 import { FilterSideBar } from '@/components/ui/DataTable/FilterSideBar'
 import { LiveButton } from '@/components/ui/DataTable/LiveButton'
-import { LiveRow } from '@/components/ui/DataTable/LiveRow'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { TimelineChart } from '@/components/ui/DataTable/TimelineChart'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
@@ -410,11 +409,6 @@ export const UnifiedLogs = () => {
                         totalRowsFetched={totalFetched}
                         fetchNextPage={fetchNextPage}
                         hasNextPage={hasNextPage}
-                        renderLiveRow={(props) => {
-                          if (!liveMode.timestamp) return null
-                          if (props?.row?.original.id !== liveMode?.row?.id) return null
-                          return <LiveRow colSpan={UNIFIED_LOGS_COLUMNS.length - 1} />
-                        }}
                         setColumnOrder={setColumnOrder}
                         setColumnVisibility={setColumnVisibility}
                         searchParamsParser={SEARCH_PARAMS_PARSER}
