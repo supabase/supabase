@@ -1,10 +1,13 @@
-import { RefObject } from 'react'
+import { RefObject, useContext } from 'react'
 import type { DataGridHandle } from 'react-data-grid'
 
 import { SupaRow } from '@/components/grid/types'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
-import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
+import {
+  TableEditorTableStateContext,
+  useTableEditorTableStateSnapshot,
+} from '@/state/table-editor-table'
 
 type ShortcutsProps = {
   gridRef: RefObject<DataGridHandle>
@@ -13,6 +16,7 @@ type ShortcutsProps = {
 
 export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
   const snap = useTableEditorTableStateSnapshot()
+  const state = useContext(TableEditorTableStateContext)
   const canStartNavigation = !snap.selectedCellPosition && rows.length > 0
 
   const startGridNavigation = () => {
@@ -63,17 +67,17 @@ export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
   useShortcut(
     SHORTCUT_IDS.TABLE_EDITOR_TOGGLE_ROW_SELECTION,
     () => {
-      const rowIdx = snap.selectedCellPosition?.rowIdx
+      const rowIdx = state.selectedCellPosition?.rowIdx
       if (rowIdx === undefined) return
 
       const row = rows[rowIdx]
       if (!row) return
 
-      const next = new Set(snap.selectedRows)
+      const next = new Set(state.selectedRows)
       if (next.has(row.idx)) next.delete(row.idx)
       else next.add(row.idx)
 
-      snap.setSelectedRows(next)
+      state.setSelectedRows(next)
     },
     {
       enabled: !!snap.selectedCellPosition,
