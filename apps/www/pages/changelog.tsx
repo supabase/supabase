@@ -554,7 +554,7 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
                       </div>
                     </div>
                     <div className="col-span-8 lg:max-w-[calc(100vw-80px)]">
-                      <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
+                      <article className="prose prose-docs max-w-none [overflow-wrap:break-word] [&>*:first-child]:mt-0">
                         <MDXRemote {...entry.source} components={mdxComponents('blog')} />
                       </article>
                     </div>
