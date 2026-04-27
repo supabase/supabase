@@ -1,4 +1,4 @@
-import { mkdirSync, readdirSync, writeFileSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'fs'
 import { join, dirname, relative } from 'path'
 import { fileURLToPath } from 'url'
 import { processSpec, type SpecCategory, type SpecConfig } from './process-tsdoc.js'
@@ -135,7 +135,7 @@ function generateExamplesBlock(examples: any[]): string[] {
   return lines
 }
 
-function generateMdx(categories: SpecCategory[], config: SpecConfig): string {
+function generateMdx(categories: SpecCategory[], config: SpecConfig, specDir: string): string {
   const fmVal = (v: string) => `"${v.replace(/"/g, '\\"')}"`
   const frontmatter = [
     '---',
@@ -151,6 +151,12 @@ function generateMdx(categories: SpecCategory[], config: SpecConfig): string {
   ]
   const lines: string[] = frontmatter
 
+  // Insert optional introduction partial immediately after frontmatter
+  const introParthialPath = join(specDir, 'introduction.partial.mdx')
+  if (existsSync(introParthialPath)) {
+    lines.push(readFileSync(introParthialPath, 'utf-8').trimEnd(), '')
+  }
+
   for (let i = 0; i < categories.length; i++) {
     const { category, definitions } = categories[i]
 
@@ -159,6 +165,12 @@ function generateMdx(categories: SpecCategory[], config: SpecConfig): string {
     }
 
     lines.push(`## ${category}`, '')
+
+    // Insert optional partial: <specDir>/<category-slug>.partial.mdx
+    const partialPath = join(specDir, `${toSlug(category)}.partial.mdx`)
+    if (existsSync(partialPath)) {
+      lines.push(readFileSync(partialPath, 'utf-8').trimEnd(), '')
+    }
 
     for (let j = 0; j < definitions.length; j++) {
       const def = definitions[j]
@@ -221,7 +233,7 @@ for (const specDir of specFolders) {
   mkdirSync(outDir, { recursive: true })
 
   // Write MDX
-  const mdx = generateMdx(categories, config)
+  const mdx = generateMdx(categories, config, specDir)
   const mdxPath = join(outDir, 'index.mdx')
   writeFileSync(mdxPath, mdx)
 

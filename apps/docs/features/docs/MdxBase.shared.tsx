@@ -117,7 +117,6 @@ const components = {
    */
   RefDefinitionParams,
   RefDefinitionReturnType,
-  CodeBlock,
   CollapsibleDetails,
 }
 
