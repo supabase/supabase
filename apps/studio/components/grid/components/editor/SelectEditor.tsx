@@ -25,7 +25,6 @@ export function SelectEditor<TRow, TSummaryRow = unknown>({
   isNullable,
 }: SelectEditorProps<TRow, TSummaryRow>) {
   const value = row[column.key as keyof TRow] as unknown as string
-  console.log({ options })
 
   function onChange(value: string) {
     if (!value || value == '') {
