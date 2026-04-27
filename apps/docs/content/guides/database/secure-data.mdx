@@ -15,11 +15,11 @@ Use Supabase client libraries, REST, or GraphQL with a publishable key. Protect 
 
 ### Edge Functions
 
-Put custom server-side logic between your client and database with [Edge Functions](/docs/guides/functions). You can use secrets, service role keys, or database connection strings inside the function, and you can [disable the Data API](/docs/guides/database/data-api#disable-the-data-api-completely) if your app only accesses data this way.
+Put custom server-side logic between your client and database with [Edge Functions](/docs/guides/functions). You can use secrets, service role keys, or database connection strings inside the function, and you can [disable the Data API](/docs/guides/api/securing-your-api#disable-the-data-api) if your app only accesses data this way.
 
 ### Direct database connections
 
-Connect to Postgres with a connection string from trusted servers, workers, or tools. Keep database credentials secret and use the right [connection method](/docs/guides/database/connecting-to-postgres) for your environment. You can [disable the Data API](/docs/guides/database/data-api#disable-the-data-api-completely) if your app only uses direct connections.
+Connect to Postgres with a connection string from trusted servers, workers, or tools. Keep database credentials secret and use the right [connection method](/docs/guides/database/connecting-to-postgres) for your environment. You can [disable the Data API](/docs/guides/api/securing-your-api#disable-the-data-api) if your app only uses direct connections.
 
 ## Frontend access
 
@@ -44,6 +44,6 @@ Supabase and Postgres provide you with multiple ways to manage security, includi
 
 - [Row Level Security](/docs/guides/database/postgres/row-level-security)
 - [Column Level Security](/docs/guides/database/postgres/column-level-security)
-- [Data API](/docs/guides/database/data-api)
+- [Securing your API](/docs/guides/api/securing-your-api)
 - [Managing Postgres roles](/docs/guides/database/postgres/roles)
 - [Managing secrets with Vault](/docs/guides/database/vault)

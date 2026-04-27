@@ -16,6 +16,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
     destination: '/docs/guides/api/custom-claims-and-role-based-access-control-rbac',
   },
