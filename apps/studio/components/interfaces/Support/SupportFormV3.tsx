@@ -4,7 +4,7 @@ import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { type Dispatch, type MouseEventHandler } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
-import { Form_Shadcn_, Separator } from 'ui'
+import { Form, Separator } from 'ui'
 
 import {
   AffectedServicesSelector,
@@ -210,7 +210,7 @@ export const SupportFormV3 = ({
   const showDirectEmailInfo = state.type !== 'success' && selectedProjectRef !== undefined
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form id="support-form" className="flex min-h-full flex-col">
         <div className="flex flex-col gap-y-6">
           <OrganizationSelector form={form} orgSlug={organizationSlug} />
@@ -277,7 +277,7 @@ export const SupportFormV3 = ({
           />
         </div>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }
 
