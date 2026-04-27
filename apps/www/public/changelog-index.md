@@ -1,0 +1,192 @@
+# Changelog index
+
+Token-light index for LLMs and agents.
+Format: date | #number | labels(comma-separated slugs) | title | path
+
+- 2026-04-24 | #45233 | frontend | Feature Preview: RLS Tester | /changelog/45233
+- 2026-04-20 | #45071 | python,javascript,flutter,swift | Automatic PostgREST retries for transient errors | /changelog/45071
+- 2026-04-17 | #44968 | billing | Upcoming: Tax Collection on Supabase Invoices | /changelog/44968
+- 2026-04-16 | #44938 | cli | [Public Alpha] Declarative Schema Management with pg-delta | /changelog/44938
+- 2026-04-09 | #44713 | documentation,frontend,branching,multigres | Developer Update - April 2026 | /changelog/44713
+- 2026-03-11 | #43644 | edge functions | Edge Functions rate limits on recursive/nested Edge Functions calls | /changelog/43644
+- 2026-03-05 | #43465 | documentation,edge functions,storage,analytics,multigres | Developer Update - March 2026 | /changelog/43465
+- 2026-02-17 | #42949 | postgrest,breaking-change | Breaking Change: Removing access to OpenAPI spec via the anon key | /changelog/42949
+- 2026-02-05 | #42531 | security,edge functions,ai | Developer Update - February 2026 | /changelog/42531
+- 2026-02-04 | #42460 | frontend | Queue table Inserts, edits and deletes on the table editor | /changelog/42460
+- 2026-01-26 | #42180 | breaking-change | Breaking Change: pg_graphql no longer enabled automatically (within approx 3 weeks from today) | /changelog/42180
+- 2026-01-21 | #42031 | cli,self-hosted | SQL snippets can now be saved in local Studio | /changelog/42031
+- 2026-01-08 | #41796 | documentation,security,frontend,python,ai | Developer Update - January 2026 | /changelog/41796
+- 2025-12-12 | #41288 | postgrest | Data API upgrade to PostgREST v14 | /changelog/41288
+- 2025-12-10 | #41231 | edge functions,auth,ai,analytics,infra,etl | Developer Update - December 2025 | /changelog/41231
+- 2025-11-26 | #40815 | ai | [Public Alpha] Manage Vector Buckets from the dashboard | /changelog/40815
+- 2025-11-24 | #40734 | frontend | Dashboard Updates (101125 - 251125) | /changelog/40734
+- 2025-11-11 | #40349 | security,auth | Notify users about security-sensitive actions on their accounts | /changelog/40349
+- 2025-11-04 | #40116 | frontend,storage,analytics | [Public Alpha] Manage Analytics Buckets from the dashboard | /changelog/40116
+- 2025-11-03 | #40083 | frontend | Dashboard Updates (201025 - 031125) | /changelog/40083
+- 2025-10-22 | #39773 | javascript | Enhanced Type Inference for Embedded Functions (Computed Relationships) | /changelog/39773
+- 2025-10-21 | #39709 | frontend | Dashboard Updates (061025 - 201025) | /changelog/39709
+- 2025-10-10 | #39434 | mcp | Supabase Remote MCP server | /changelog/39434
+- 2025-10-08 | #39378 | postgres | Potential breaking change in pgmq from 1.4.4 to 1.5.1 and temporary halt on upgrade for existing projects | /changelog/39378
+- 2025-10-06 | #39292 | frontend | Dashboard Updates (220925 - 061025) | /changelog/39292
+- 2025-10-02 | #39197 | javascript | Supabase JS Client Libs: Migration to Monorepo | /changelog/39197
+- 2025-09-24 | #38974 | frontend | Dashboard Updates (080925 - 220925) | /changelog/38974
+- 2025-09-17 | #38771 | postgrest | Changes to Custom JWT and Signing Keys issue resolution | /changelog/38771
+- 2025-09-01 | #38356 | frontend | Dashboard Updates (180825 - 010925) | /changelog/38356
+- 2025-08-27 | #38248 | security | Personal Access Tokens: Expiration & Usage Tracking | /changelog/38248
+- 2025-08-22 | #38119 | storage,billing | 3x cheaper egress for cache hits | /changelog/38119
+- 2025-08-19 | #38022 | auth | OAuth 2.1 Server Capabilities for Supabase Auth | /changelog/38022
+- 2025-08-15 | #37941 | edge functions | All regions now run Deno 2.1 compatible release | /changelog/37941
+- 2025-08-12 | #37869 | realtime,persist-in-search | Change in `realtime-js` affecting Node.js < 22 | /changelog/37869
+- 2025-08-08 | #37798 | python | Deprecation Notice: Dropping support for python's gotrue and supafunc | /changelog/37798
+- 2025-08-04 | #37655 | frontend | Dashboard Navigation Updates: Project Settings | /changelog/37655
+- 2025-07-23 | #37415 | javascript | supabase v17.4.1.062 was withdrawn | /changelog/37415
+- 2025-07-17 | #37234 | frontend | Coming Soon: Combined View for Logs | /changelog/37234
+- 2025-07-16 | #37217 | javascript | Deprecation Notice: Dropping Support for Node.js 18 | /changelog/37217
+- 2025-07-11 | #37041 | realtime | Realtime Settings | /changelog/37041
+- 2025-07-03 | #36850 | edge functions | Update to Edge Functions Regional Invocations | /changelog/36850
+- 2025-07-02 | #36814 | edge functions | Deno 2.1 Preview - Hosted Environment | /changelog/36814
+- 2025-05-22 | #35851 | infra | Forthcoming Postgres 17 Release Notes | /changelog/35851
+- 2025-05-13 | #35636 | frontend | Feature Preview: Tabs for Table and SQL Editor | /changelog/35636
+- 2025-05-07 | #35523 | security,frontend,mcp | Developer Update - April 2025 | /changelog/35523
+- 2025-05-06 | #35495 | frontend | Dashboard Updates [210425 - 050525] | /changelog/35495
+- 2025-04-21 | #35172 | security | Project scoped roles now available in Team plans | /changelog/35172
+- 2025-04-21 | #35169 | frontend | Dashboard Updates [070425 - 210425] | /changelog/35169
+- 2025-04-08 | #34839 | frontend,mcp,postgres | Developer Update - March 2025 | /changelog/34839
+- 2025-04-07 | #34794 | frontend | Dashboard Updates [240225 - 070425] | /changelog/34794
+- 2025-04-01 | #34634 | infra | Supabase Management API `GET` Logs Restrictions | /changelog/34634
+- 2025-03-27 | #34494 | infra | Upcoming Change: Improved Experimental Routing for Read Replica Load Balancers | /changelog/34494
+- 2025-03-25 | #34404 | infra | Dedicated Pooler with PgBouncer | /changelog/34404
+- 2025-03-18 | #34270 | auth,storage,realtime | Restricting Access on Auth, Storage, and Realtime Schemas on April 21, 2025 | /changelog/34270
+- 2025-03-07 | #34067 | frontend,edge functions,ai,billing,postgres | Developer Update - February 2025 | /changelog/34067
+- 2025-03-07 | #34054 | edge functions | Deno 2.1 Preview **local only** | /changelog/34054
+- 2025-03-03 | #33959 | billing | Greatly increased Third-Party Auth MAU quota for Free and Paid Plans | /changelog/33959
+- 2025-02-25 | #33835 | frontend | Dashboard Updates [10/02/25 - 24/02/25] | /changelog/33835
+- 2025-02-20 | #33720 | edge functions | Deploy and update Edge Functions using the Management API | /changelog/33720
+- 2025-02-19 | #33690 | frontend | Feature Preview: Inline Editor | /changelog/33690
+- 2025-02-18 | #33670 | frontend,breaking-change | Upcoming breaking change to Dashboard Navigation | /changelog/33670
+- 2025-02-14 | #33613 | cli,edge functions | Deploy Edge Functions from CLI without needing Docker + import files outside of supabase directory | /changelog/33613
+- 2025-02-11 | #33511 | frontend | Dashboard Updates [27/01/25 - 10/02/25] | /changelog/33511
+- 2025-02-07 | #33416 | frontend,auth,ai,analytics | Developer Update - January 2025 | /changelog/33416
+- 2025-02-07 | #33413 | infra | Deprecation of Fly.io Postgres Managed by Supabase on April 11, 2025 | /changelog/33413
+- 2025-01-28 | #33144 | frontend | Dashboard Updates [13/01/25 - 27/01/25] | /changelog/33144
+- 2025-01-27 | #33121 | billing | Relaxing Database Size limit on Free Plan - 0.5 GB Database Size per project | /changelog/33121
+- 2025-01-23 | #33035 | security,frontend,ai | Developer Update - December 2024 | /changelog/33035
+- 2025-01-20 | #32925 | javascript | Enhanced Type Inference for JSON Fields in supabase-js | /changelog/32925
+- 2025-01-16 | #32815 | edge functions | Add static files to Edge Functions | /changelog/32815
+- 2025-01-13 | #32755 | infra | Supabase Connection Pooler Deprecating Session Mode on Port 6543 on February 28, 2025 | /changelog/32755
+- 2025-01-13 | #32741 | frontend | Dashboard Updates [30/12/24 - 13/01/25] | /changelog/32741
+- 2025-01-13 | #32735 | billing | Credit Balance Top Up | /changelog/32735
+- 2025-01-09 | #32677 | javascript | Type validation for query filter values in supabase-js | /changelog/32677
+- 2025-01-07 | #32635 | edge functions | Use a custom NPM registry for Edge Function dependencies | /changelog/32635
+- 2024-12-24 | #31318 | frontend | Dashboard Updates [09/12/24 - 23/12/24] | /changelog/31318
+- 2024-12-10 | #31041 | frontend | Dashboard Updates [18/11/24 - 09/12/24] | /changelog/31041
+- 2024-12-02 | #30772 | auth | Slack V1 OAuth Provider Deprecated in favour of Slack (OIDC) | /changelog/30772
+- 2024-11-22 | #30606 | security | Removal of app.settings.jwt_secret from the database | /changelog/30606
+- 2024-11-18 | #30526 | frontend | Dashboard Updates [04/11/24 - 18/11/24] | /changelog/30526
+- 2024-11-06 | #30324 | postgrest,javascript | `supabase-js` release candidate `2.46.2-rc.3` incoming types inferences for PostgREST fixes and feedbacks | /changelog/30324
+- 2024-11-05 | #30307 | edge functions | Write Edge Functions in pure JavaScript instead of using TypeScript | /changelog/30307
+- 2024-11-05 | #30291 | edge functions | Use `deno.json` configuration file in Edge Functions | /changelog/30291
+- 2024-11-04 | #30264 | frontend,auth | Dashboard Updates [21/10/24 - 04/11/24] | /changelog/30264
+- 2024-10-30 | #30179 | edge functions | Import NPM packages from private registries in Edge Functions | /changelog/30179
+- 2024-10-21 | #30005 | frontend | Dashboard Updates [07/10/24 - 21/10/24] | /changelog/30005
+- 2024-10-10 | #29828 | frontend,edge functions | Developer Update - September 2024 | /changelog/29828
+- 2024-10-09 | #29798 | documentation | Improved docs information architecture | /changelog/29798
+- 2024-10-07 | #29710 | frontend | Dashboard Updates [23/09/24 - 07/10/24] | /changelog/29710
+- 2024-10-02 | #29633 | infra | XHTML responses are only allowed with a Custom Domain enabled | /changelog/29633
+- 2024-09-24 | #29494 | security,breaking-change | Supabase Platform Access Control: Project Permissions Breaking Changes on October 15, 2024 | /changelog/29494
+- 2024-09-23 | #29447 | frontend | Dashboard Weekly Updates [16/09/24 - 23/09/24] | /changelog/29447
+- 2024-09-22 | #29434 | infra | Projects on XL and larger compute add-ons can now create up to 5 Read Replicas. | /changelog/29434
+- 2024-09-18 | #29370 | auth | Supabase Auth: Changes to default email provider | /changelog/29370
+- 2024-09-16 | #29331 | postgrest,auth,realtime,python,ai,wrappers,analytics | Developer Update - August 2024 | /changelog/29331
+- 2024-09-13 | #29289 | auth | Supabase Auth: Asymmetric Keys support in 2025 | /changelog/29289
+- 2024-09-12 | #29260 | breaking-change,persist-in-search | Upcoming changes to Supabase API Keys | /changelog/29260
+- 2024-09-12 | #29239 | frontend | Dashboard Weekly Updates [02/09/24 - 09/09/24] | /changelog/29239
+- 2024-09-10 | #29189 | edge functions | Edge Functions are now Deno 1.45 compatible | /changelog/29189
+- 2024-09-02 | #29030 | frontend | Dashboard Weekly Updates [26/08/24 - 02/09/24] | /changelog/29030
+- 2024-08-30 | #29004 | frontend | Dashboard Weekly Updates [26/08/24 - 30/08/24] | /changelog/29004
+- 2024-08-23 | #28849 | billing | Moving to hourly usage-based billing for databases, based on disk consumption | /changelog/28849
+- 2024-08-19 | #28738 | infra | Threshold for transitioning projects to physical backups lowered to 15GB | /changelog/28738
+- 2024-08-09 | #28519 | billing,infra,postgres | Developer Updates - July 2024 | /changelog/28519
+- 2024-08-09 | #28493 | breaking-change,infra | Let's Encrypt cross-signed chain will no longer be used for Custom Domains after September 9, 2024 | /changelog/28493
+- 2024-08-08 | #28480 | billing | Improved invoices and more timely usage data | /changelog/28480
+- 2024-08-07 | #28438 | billing | Moving to hourly usage-based billing for IPv4, Custom Domain and Point-in-time recovery | /changelog/28438
+- 2024-08-02 | #28339 | billing | Moving to hourly billing for Storage Size | /changelog/28339
+- 2024-07-30 | #28267 | wrappers | Wrappers Wasm FDW is on Public Alpha | /changelog/28267
+- 2024-07-24 | #28154 | documentation,frontend,edge functions,billing,analytics | Developer Updates - June 2024 | /changelog/28154
+- 2024-07-22 | #28118 | security,breaking-change | DigiCert no longer being used as the CA for Supabase HTTP APIs | /changelog/28118
+- 2024-07-18 | #28062 | billing | Edge Functions: Deploy More Functions at No Extra Cost | /changelog/28062
+- 2024-07-15 | #27993 | breaking-change | Supabase Platform Access Control: Organization Permissions Breaking Changes on July 26, 2024 | /changelog/27993
+- 2024-07-15 | #27988 | frontend | Dashboard Weekly Updates [08/07/24 - 15/07/24] | /changelog/27988
+- 2024-07-12 | #27946 | postgres | Postgres 13 Deprecation Notice | /changelog/27946
+- 2024-07-09 | #27876 | frontend | Dashboard Weekly Updates [01/07/24 - 08/07/24] | /changelog/27876
+- 2024-06-24 | #27498 | frontend | Dashboard Weekly Updates [17/06/24 - 24/06/24] | /changelog/27498
+- 2024-06-24 | #27497 | infra | Paused Free Plan projects are restorable for 90 days | /changelog/27497
+- 2024-06-18 | #27349 | edge functions | Edge Functions are now Deno 1.43 compatible | /changelog/27349
+- 2024-06-18 | #27338 | frontend,edge functions,auth,realtime,ai | Developer Updates - May 2024 | /changelog/27338
+- 2024-06-11 | #27166 | frontend | Dashboard Weekly Updates [03/06/24 - 10/06/24] | /changelog/27166
+- 2024-06-05 | #27037 | auth | @supabase/ssr updates and roadmap towards v1.0.0 | /changelog/27037
+- 2024-05-22 | #26650 | analytics | Log Drains Private Alpha | /changelog/26650
+- 2024-05-17 | #26421 | analytics | Updated deployment instructions for supabase-grafana monitoring application | /changelog/26421
+- 2024-05-15 | #26327 | frontend | Dashboard Weekly Updates [06/05/24 - 13/05/24] | /changelog/26327
+- 2024-05-08 | #25860 | security,auth,storage,ai,infra | Developer Updates - April 2024 | /changelog/25860
+- 2024-05-07 | #25842 | edge functions | JSR modules are supported in Edge Functions & Edge Runtime | /changelog/25842
+- 2024-04-30 | #23433 | frontend | Dashboard Weekly Updates [22/04/24 - 29/04/24] | /changelog/23433
+- 2024-04-22 | #23139 | security,frontend,auth,storage,wrappers | Dashboard Weekly Updates [15/04/24 - 22/04/24] | /changelog/23139
+- 2024-04-06 | #22525 | infra | Platform Updates: March 2024 | /changelog/22525
+- 2024-04-04 | #22484 | realtime | Realtime Broadcast and Presence Authorization | /changelog/22484
+- 2024-04-04 | #22457 | infra | Increased Supavisor Client Connection Limits Across Paid Plans | /changelog/22457
+- 2024-03-26 | #22222 | frontend | Dashboard Weekly Updates [18/03/24 - 25/03/24] | /changelog/22222
+- 2024-03-20 | #22135 | infra | Migration to v2 platform architecture | /changelog/22135
+- 2024-03-12 | #21974 | frontend | Dashboard Weekly Updates [04/03/24 - 11/03/24] | /changelog/21974
+- 2024-03-06 | #21823 | postgrest,ai,infra | Platform Updates: February 2024 | /changelog/21823
+- 2024-03-04 | #21732 | frontend | Dashboard Weekly Updates [26/02/24 - 04/03/24] | /changelog/21732
+- 2024-02-26 | #21563 | frontend | Dashboard Weekly Updates [19/02/24 - 26/02/24] | /changelog/21563
+- 2024-02-20 | #21386 | billing,infra | Paid organizations can now launch projects on bigger compute immediately | /changelog/21386
+- 2024-02-19 | #21366 | frontend | Dashboard Weekly Updates [12/02/24 - 19/02/24] | /changelog/21366
+- 2024-02-13 | #21219 | frontend | Dashboard Weekly Updates [05/02/24 - 12/02/24] | /changelog/21219
+- 2024-02-06 | #21042 | frontend,edge functions,storage,infra | Platform Updates: January 2024 | /changelog/21042
+- 2024-01-30 | #20863 | frontend | Dashboard Weekly Updates [22/01/24 - 29/01/24] | /changelog/20863
+- 2024-01-22 | #20622 | frontend | Dashboard Weekly Updates [15/01/24 - 22/01/24] | /changelog/20622
+- 2024-01-17 | #20522 | infra | Supavisor starts enforcing Network Restrictions | /changelog/20522
+- 2024-01-17 | #20512 | infra | IPv4 addon for projects available | /changelog/20512
+- 2024-01-15 | #20430 | frontend | Dashboard Weekly Updates [08/01/24 - 15/01/24] | /changelog/20430
+- 2024-01-11 | #20358 | infra | Supavisor 1.1.6 | /changelog/20358
+- 2024-01-11 | #20346 | infra | Platform Updates December 2023 | /changelog/20346
+- 2024-01-10 | #20313 | infra | Supavisor 1.1.5 | /changelog/20313
+- 2024-01-08 | #20231 | frontend | Dashboard Weekly Updates [01/01/24 - 01/08/24] | /changelog/20231
+- 2024-01-05 | #20195 | infra | Supavisor v1.1.2 - allow_list and client_heartbeat_interval | /changelog/20195
+- 2024-01-03 | #20122 | infra | Threshold for transitioning projects to physical backups lowered to 40GB | /changelog/20122
+- 2023-12-18 | #19827 | frontend | Dashboard Weekly Updates [11th Dec - 18th Dec] | /changelog/19827
+- 2023-10-06 | #19706 | edge functions,auth,realtime,ai,wrappers,infra | Platform update September 2023 | /changelog/19706
+- 2023-11-06 | #19705 | security,frontend,auth,storage,ai | Platform updates: October 2023 | /changelog/19705
+- 2023-09-08 | #19704 | security,frontend,ai,billing,infra | Platform updates: August 2023 | /changelog/19704
+- 2023-07-07 | #19703 | cli,auth,storage,realtime,billing,postgres | Platform updates June 2023 | /changelog/19703
+- 2023-06-09 | #19702 | security,frontend,edge functions,auth,storage,ai,postgres | Platform updates: May 2023 | /changelog/19702
+- 2023-05-10 | #19701 | frontend,edge functions,auth,storage,graphql,analytics,postgres | Platform updates: April 2023 | /changelog/19701
+- 2023-03-09 | #19700 | frontend,cli,edge functions,database,javascript,postgres | Platform Update February 2023 | /changelog/19700
+- 2023-02-08 | #19699 | documentation,auth,storage,python,ai,postgres | Platform update January 2023 | /changelog/19699
+- 2022-12-08 | #19698 | auth,auth-helpers | Platform Updates November 2022 | /changelog/19698
+- 2022-11-02 | #19697 | edge functions,auth,storage,database,javascript,flutter,postgres | Platform updates: October 2022 | /changelog/19697
+- 2022-10-07 | #19696 | security,edge functions,auth,postgres | Platform Update September 2022 | /changelog/19696
+- 2021-11-30 | #19695 | postgrest,auth,storage,realtime,postgres | Platform updates: 30 Nov 2021 | /changelog/19695
+- 2021-11-08 | #19694 | frontend,postgrest,auth,self-hosted,javascript | October Beta 2021 | /changelog/19694
+- 2021-10-04 | #19693 | auth,database,javascript,postgres | September Beta 2021 | /changelog/19693
+- 2021-09-13 | #19692 | frontend,auth,realtime,flutter,infra | August Beta 2021 | /changelog/19692
+- 2021-08-12 | #19691 | frontend,postgrest,auth,storage,flutter,postgres | July Beta 2021 | /changelog/19691
+- 2021-07-04 | #19690 | auth,storage,database,postgres | June Beta 2021 | /changelog/19690
+- 2021-05-05 | #19688 | frontend,storage,wrappers | April Beta 2021 | /changelog/19688
+- 2023-12-13 | #19669 | infra | Supavisor 1.0 | /changelog/19669
+- 2023-12-05 | #19438 | billing | Improved usage insights and transparency | /changelog/19438
+- 2023-12-05 | #19425 | frontend | Dashboard Weekly Updates [27th - 4th Dec] | /changelog/19425
+- 2023-11-29 | #19298 | database,breaking-change | Directly updating rows in the `cron.job` table is no longer allowed | /changelog/19298
+- 2023-11-27 | #19254 | enhancement,frontend | Dashboard Weekly Updates [20th Nov - 27th Nov] | /changelog/19254
+- 2023-11-24 | #19204 | auth,breaking-change | LinkedIn OAuth Provider deprecated in favour of LinkedIn (OIDC) Provider | /changelog/19204
+- 2023-11-15 | #18972 | edge functions | Edge Functions secrets should now get updated upon resetting DB password or JWT secret | /changelog/18972
+- 2023-11-10 | #18861 | realtime | Improved Realtime reliability when migrations fail for a project | /changelog/18861
+- 2023-11-09 | #18849 | frontend | Column Encryption is SQL-only now | /changelog/18849
+- 2023-11-09 | #18845 | enhancement,edge functions | Connections to Postgres directly from an edge function are secured with SSL | /changelog/18845
+- 2023-11-02 | #18654 | infra | Large databases now use daily physical backups | /changelog/18654
+- 2023-10-14 | #18198 | postgres | Postgres 12 Deprecation Notice | /changelog/18198
+- 2023-09-29 | #17817 | infra | PGBouncer and IPv4 Deprecation | /changelog/17817
+- 2023-08-31 | #17061 | billing | Moving to Org-based billing | /changelog/17061
+- 2022-10-04 | #9314 | security | Security Patch Notice | /changelog/9314
