@@ -333,9 +333,12 @@ const ReportFilterBar = ({
                 size="tiny"
               >
                 <Select_Shadcn_
-                  value={addFilterValues.key}
+                  value={addFilterValues.compare}
                   onValueChange={(value: string) =>
-                    setAddFilterValues((prev) => ({ ...prev, key: value }))
+                    setAddFilterValues((prev) => ({
+                      ...prev,
+                      compare: value as ReportFilterItem['compare'],
+                    }))
                   }
                 >
                   <SelectTrigger_Shadcn_>
