@@ -13,6 +13,7 @@ import { MetricsStackCards } from '~/components/MetricsStackCards'
 import { NavData } from '~/components/NavData'
 import { Price } from '~/components/Price'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
+import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
 import { RegionsList, SmartRegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
@@ -71,6 +72,7 @@ const components = {
   NamedCodeBlock,
   NavData,
   ProjectConfigVariables,
+  RealtimeLimitsEstimator,
   RegionsList,
   SmartRegionsList,
   SharedData,
