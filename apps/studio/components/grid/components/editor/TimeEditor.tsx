@@ -17,7 +17,6 @@ interface TimeEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellPro
   format: string
 }
 
-
 function BaseEditor<TRow, TSummaryRow = unknown>({
   row,
   column,

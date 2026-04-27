@@ -45,10 +45,10 @@ export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization, isSuccess: isSuccessOrganization } = useSelectedOrganizationQuery()
-  const {
-    can: canUpdateConfig,
-    isSuccess: isPermissionsLoaded,
-  } = useAsyncCheckPermissions(PermissionAction.REALTIME_ADMIN_READ, '*')
+  const { can: canUpdateConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.REALTIME_ADMIN_READ,
+    '*'
+  )
 
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
 
@@ -56,11 +56,7 @@ export const RealtimeSettings = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const {
-    data,
-    error,
-    isError,
-  } = useRealtimeConfigurationQuery({
+  const { data, error, isError } = useRealtimeConfigurationQuery({
     projectRef,
   })
 

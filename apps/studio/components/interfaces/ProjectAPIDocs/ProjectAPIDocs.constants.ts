@@ -1207,7 +1207,15 @@ RLS policy permissions required:
 - \`buckets\` table permissions: none
 - \`objects\` table permissions: none
 `,
-    code: ({ name, apikey: _apikey, endpoint }: { name: string; apikey: string; endpoint: string }) => [
+    code: ({
+      name,
+      apikey: _apikey,
+      endpoint,
+    }: {
+      name: string
+      apikey: string
+      endpoint: string
+    }) => [
       {
         key: 'storage-retrieve-public-url',
         title: undefined,

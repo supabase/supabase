@@ -1,6 +1,5 @@
 import { PermissionResource, PermissionRow } from './Permissions.types'
 
-
 export const sortActions = (actions: string[]): string[] => {
   const sorted: string[] = []
   const remaining = [...actions]

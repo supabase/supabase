@@ -6,6 +6,7 @@ import { Plus, RefreshCw, Save } from 'lucide-react'
 import { DragEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, LogoLoader } from 'ui'
+
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { GridResize } from './GridResize'
