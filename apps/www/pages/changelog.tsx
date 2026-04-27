@@ -180,7 +180,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: 'https://supabase.com/changelog-progressive',
+          url: 'https://supabase.com/changelog',
           type: 'article',
         }}
       />

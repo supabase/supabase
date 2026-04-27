@@ -50,7 +50,7 @@ export function ChangelogLlmMarkdownButton({ className, markdownPath = '/changel
             aria-label="Open LLM options for this changelog page"
           />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-52">
+        <DropdownMenuContent align="end" className="w-40">
           <DropdownMenuItem asChild className="gap-2">
             <a
               href={`https://chatgpt.com/?hint=search&q=${encodeURIComponent(aiPrompt)}`}

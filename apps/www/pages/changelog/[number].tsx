@@ -87,14 +87,14 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
     return { notFound: true }
   }
 
-  const octokit = createChangelogOctokit()
-  const discussion = await fetchChangelogDiscussionByNumber(octokit, 'supabase', 'supabase', number)
-
-  if (!discussion || discussion.category?.id !== CHANGELOG_CATEGORY_ID) {
-    return { notFound: true }
-  }
-
   try {
+    const octokit = createChangelogOctokit()
+    const discussion = await fetchChangelogDiscussionByNumber(octokit, 'supabase', 'supabase', number)
+
+    if (!discussion || discussion.category?.id !== CHANGELOG_CATEGORY_ID) {
+      return { notFound: true }
+    }
+
     const source = await mdxSerialize(discussion.body)
     const created_at =
       discussionDisplayDate({

@@ -102,16 +102,20 @@ export function generateChangelogTagRssXml(allEntries, tag) {
     : formatRssPubDate(dayjs().toISOString())
 
   const feedUrl = `https://supabase.com/changelog-rss/${fileSlug}.xml`
+  const channelTitle = xmlEncodeRss(`Supabase Changelog · ${displayLabel}`)
+  const channelDescription = xmlEncodeRss(
+    `${displayLabel} updates and improvements from Supabase`
+  )
 
   return `
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-      <title>Supabase Changelog · ${displayLabel}</title>
+      <title>${channelTitle}</title>
       <link>https://supabase.com/changelog</link>
-      <description>${displayLabel} updates and improvements from Supabase</description>
+      <description>${channelDescription}</description>
       <language>en</language>
       <lastBuildDate>${lastBuildDate}</lastBuildDate>
-      <atom:link href="${feedUrl}" rel="self" type="application/rss+xml"/>
+      <atom:link href="${xmlEncodeRss(feedUrl)}" rel="self" type="application/rss+xml"/>
       ${buildItemsXml(sorted)}
     </channel>
   </rss>

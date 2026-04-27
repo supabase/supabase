@@ -1,8 +1,8 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-      <title>Supabase Changelog · Analytics & Monitoring</title>
+      <title>Supabase Changelog · Analytics &amp; Monitoring</title>
       <link>https://supabase.com/changelog</link>
-      <description>Analytics & Monitoring updates and improvements from Supabase</description>
+      <description>Analytics &amp; Monitoring updates and improvements from Supabase</description>
       <language>en</language>
       <lastBuildDate>Thu, 05 Mar 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/changelog-rss/analytics-monitoring.xml" rel="self" type="application/rss+xml"/>
