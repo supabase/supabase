@@ -342,6 +342,36 @@ export const lintInfoMap: LintInfo[] = [
     docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0026_pg_graphql_anon_table_exposed`,
     category: 'security',
   },
+  {
+    name: 'pg_graphql_authenticated_table_exposed',
+    title: 'pg_graphql Authenticated Role Exposes Objects in Introspection',
+    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/editor?schema=${metadata?.schema}&table=${metadata?.name}`,
+    linkText: 'View object',
+    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0027_pg_graphql_authenticated_table_exposed`,
+    category: 'security',
+  },
+  {
+    name: 'anon_security_definer_function_executable',
+    title: 'SECURITY DEFINER Function Executable by Anon',
+    icon: <Unlock className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/database/functions?schema=${metadata?.schema}&search=${metadata?.name}`,
+    linkText: 'View function',
+    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0028_anon_security_definer_function_executable`,
+    category: 'security',
+  },
+  {
+    name: 'authenticated_security_definer_function_executable',
+    title: 'SECURITY DEFINER Function Executable by Authenticated',
+    icon: <Unlock className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/database/functions?schema=${metadata?.schema}&search=${metadata?.name}`,
+    linkText: 'View function',
+    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable`,
+    category: 'security',
+  },
 ]
 
 export const LintCTA = ({
