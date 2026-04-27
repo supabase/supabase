@@ -175,11 +175,14 @@ To check whether your database has objects that depend on `pgjwt` before disabli
 
 ```sql
 select
-  classid::regclass as object_type,
-  objid::regclass as object_name,
-  objsubid
-from pg_depend
-where refobjid = 'pgjwt'::regextension;
+  pg_describe_object(d.classid, d.objid, d.objsubid) as dependent_object
+from pg_depend d
+where d.refclassid = 'pg_extension'::regclass
+  and d.refobjid = (
+    select oid
+    from pg_extension
+    where extname = 'pgjwt'
+  );
 ```
 
 Existing projects on lower versions of Postgres are not impacted, and the extensions will continue to be supported on projects using Postgres 15, until the end of life of Postgres 15 on the Supabase platform.
