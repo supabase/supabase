@@ -89,7 +89,12 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
 
   try {
     const octokit = createChangelogOctokit()
-    const discussion = await fetchChangelogDiscussionByNumber(octokit, 'supabase', 'supabase', number)
+    const discussion = await fetchChangelogDiscussionByNumber(
+      octokit,
+      'supabase',
+      'supabase',
+      number
+    )
 
     if (!discussion || discussion.category?.id !== CHANGELOG_CATEGORY_ID) {
       return { notFound: true }

@@ -3,11 +3,9 @@
  * @typedef {{ number?: number; title: string; url: string; sortDate: string; labels?: string[] }} ChangelogRssItemInput
  */
 import dayjs from 'dayjs'
-import advancedFormat from 'dayjs/plugin/advancedFormat.js'
 import utc from 'dayjs/plugin/utc.js'
 
 dayjs.extend(utc)
-dayjs.extend(advancedFormat)
 
 function xmlEncodeRss(str) {
   if (str === undefined || str === null) return ''
@@ -20,10 +18,7 @@ function xmlEncodeRss(str) {
 }
 
 function formatRssPubDate(isoOrDate) {
-  return dayjs(isoOrDate)
-    .utcOffset(0, true)
-    .startOf('day')
-    .format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
+  return `${dayjs(isoOrDate).utc().startOf('day').format('ddd, DD MMM YYYY HH:mm:ss')} +0000`
 }
 
 function buildItemsXml(sorted) {
