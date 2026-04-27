@@ -10,6 +10,7 @@ import apiWrapper from '@/lib/api/apiWrapper'
 const codeSchema = z.object({
   sql: z
     .string()
+    .optional()
     .describe(
       'The converted SQL query from the provided client library code. Return undefined if the code is invalid'
     ),

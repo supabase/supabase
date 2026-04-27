@@ -188,8 +188,11 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
               tablePolicies,
             }
           })
-
-          .sort((a, b) => (a.isRLSEnabled && a.tablePolicies.length === 0 ? -1 : 1))
+          .sort((a, b) => {
+            const aFirst = a.isRLSEnabled && a.tablePolicies.length === 0
+            const bFirst = b.isRLSEnabled && b.tablePolicies.length === 0
+            return Number(bFirst) - Number(aFirst)
+          })
 
         await executeSql({
           projectRef: project.ref,

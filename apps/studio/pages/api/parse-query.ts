@@ -48,12 +48,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const { sql } = req.body
+
+    if (typeof sql !== 'string' || sql.trim().length === 0) {
+      return res.status(400).json({ error: 'Missing or invalid "sql" in request body' })
+    }
+
     const tables = await getTablesInQuery(sql)
     const operation = await getOperation(sql)
     return res.status(200).json({ tables, operation })
   } catch (error) {
-    return res
-      .status(400)
-      .json({ error: (error as unknown as { sqlDetails: { message: string } }).sqlDetails.message })
+    const message =
+      (error as { sqlDetails?: { message?: string } })?.sqlDetails?.message ??
+      (error instanceof Error ? error.message : 'Failed to parse SQL')
+    return res.status(400).json({ error: message })
   }
 }

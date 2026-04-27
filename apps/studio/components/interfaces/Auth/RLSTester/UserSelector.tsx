@@ -7,6 +7,7 @@ import {
   Button,
   cn,
   Command_Shadcn_,
+  CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
@@ -16,9 +17,10 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import AlertError from '@/components/ui/AlertError'
 import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
@@ -33,17 +35,14 @@ export const UserSelector = () => {
 
   const debouncedSearchText = useDebounce(searchText, 300)
 
-  const { data, isSuccess, isPending, isError, error, isFetching, isPlaceholderData } =
-    useUsersInfiniteQuery(
-      {
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        keywords: debouncedSearchText.trim().toLocaleLowerCase(),
-      },
-      {
-        placeholderData: keepPreviousData,
-      }
-    )
+  const { data, error, isSuccess, isPending, isError } = useUsersInfiniteQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      keywords: debouncedSearchText.trim().toLocaleLowerCase(),
+    },
+    { placeholderData: keepPreviousData }
+  )
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
 
   const impersonatingUser =
@@ -89,7 +88,17 @@ export const UserSelector = () => {
               showResetIcon
               placeholder="Search for a user"
               className="text-xs"
+              value={searchText}
+              onValueChange={setSearchText}
             />
+
+            <CommandEmpty_Shadcn_>No user found</CommandEmpty_Shadcn_>
+
+            {isError && (
+              <Admonition showIcon={false} type="warning" className="border-0 rounded-none text-xs">
+                Failed to fetch users: {error.message}
+              </Admonition>
+            )}
 
             <CommandList_Shadcn_>
               {isPending && (
