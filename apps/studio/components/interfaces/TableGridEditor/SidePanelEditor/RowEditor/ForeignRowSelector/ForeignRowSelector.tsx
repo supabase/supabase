@@ -27,8 +27,6 @@ import {
 } from '@/state/role-impersonation-state'
 import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
 
-const FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX = '__frselector'
-
 export interface ForeignRowSelectorProps {
   visible: boolean
   foreignKey?: ForeignKey

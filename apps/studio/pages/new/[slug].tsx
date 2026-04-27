@@ -9,7 +9,7 @@ import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
-import { Button, Form_Shadcn_, FormField_Shadcn_, useWatch_Shadcn_ } from 'ui'
+import { Button, Form, FormField, useWatch } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
@@ -59,7 +59,7 @@ import {
 } from '@/data/projects/project-create-mutation'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
+import { useDataApiRevokeOnCreateDefaultEnabled } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -101,11 +101,11 @@ const Wizard: NextPageWithLayout = () => {
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
 
-  const isDataApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
-  // Read the raw flag for telemetry — useDataApiGrantTogglesEnabled coerces undefined→false,
-  // which would record false for users whose flags haven't loaded yet. The raw value preserves
-  // undefined (omitted from PostHog) so we only record true/false when the flag is resolved.
-  const tableEditorApiAccessToggleFlag = usePHFlag<boolean>('tableEditorApiAccessToggle')
+  // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
+  // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
+  // PostHog) so we only record true/false when the flag is resolved.
+  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
+  const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
@@ -138,6 +138,7 @@ const Wizard: NextPageWithLayout = () => {
       dbRegion: undefined,
       instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
       dataApi: true,
+      dataApiDefaultPrivileges: !isDataApiRevokeOnCreateDefault,
       enableRlsEventTrigger: false,
       postgresVersionSelection: '',
       useOrioleDb: false,
@@ -150,7 +151,7 @@ const Wizard: NextPageWithLayout = () => {
     dbRegion,
     organization,
     highAvailability,
-  } = useWatch_Shadcn_({ control: form.control })
+  } = useWatch({ control: form.control })
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
@@ -266,12 +267,14 @@ const Wizard: NextPageWithLayout = () => {
       track(
         'project_creation_simple_version_submitted',
         {
+          surface: 'main',
           instanceSize: form.getValues('instanceSize'),
           enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
           dataApiEnabled: form.getValues('dataApi'),
+          dataApiDefaultPrivilegesGranted: form.getValues('dataApiDefaultPrivileges'),
           useOrioleDb: form.getValues('useOrioleDb'),
-          ...(tableEditorApiAccessToggleFlag !== undefined && {
-            tableEditorApiAccessToggleEnabled: tableEditorApiAccessToggleFlag,
+          ...(dataApiRevokeOnCreateDefaultFlag !== undefined && {
+            dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
           }),
         },
         {
@@ -310,6 +313,7 @@ const Wizard: NextPageWithLayout = () => {
       postgresVersion,
       instanceSize,
       dataApi,
+      dataApiDefaultPrivileges,
       enableRlsEventTrigger,
       postgresVersionSelection,
       useOrioleDb,
@@ -345,9 +349,7 @@ const Wizard: NextPageWithLayout = () => {
       dbSql:
         [
           enableRlsEventTrigger && AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL,
-          // [Alaister]: temporarily disable the default secure sql
-          // To re-enable, remove the false &&
-          false && isDataApiGrantTogglesEnabled && buildDefaultPrivilegesSql('revoke'),
+          dataApi && !dataApiDefaultPrivileges && buildDefaultPrivilegesSql('revoke'),
         ]
           .filter(Boolean)
           .join('\n') || undefined,
@@ -433,7 +435,7 @@ const Wizard: NextPageWithLayout = () => {
         <title>{pageTitle}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation)}>
           <Panel
             loading={!isOrganizationsSuccess}
@@ -484,7 +486,7 @@ const Wizard: NextPageWithLayout = () => {
 
                       {showPostgresVersionSelector && (
                         <Panel.Content>
-                          <FormField_Shadcn_
+                          <FormField
                             control={form.control}
                             name="postgresVersionSelection"
                             render={({ field }) => (
@@ -589,7 +591,7 @@ const Wizard: NextPageWithLayout = () => {
             </div>
           </ConfirmationModal>
         </form>
-      </Form_Shadcn_>
+      </Form>
     </>
   )
 }

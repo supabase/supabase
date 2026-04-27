@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Globe, Trash } from 'lucide-react'
-import { Button, Checkbox_Shadcn_ } from 'ui'
+import { Button, Checkbox } from 'ui'
 
 import { ValueContainer } from './ValueContainer'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -111,7 +111,7 @@ export const RedirectUrlList = ({
               <ValueContainer key={url} isSelected={isSelected} onClick={(e) => onClickUrl(e, url)}>
                 <div className={`flex items-center gap-4 font-mono group w-full`}>
                   <div className="w-5 h-5 flex items-center justify-center">
-                    <Checkbox_Shadcn_ checked={isSelected} onChange={(e) => onClickUrl(e, url)} />
+                    <Checkbox checked={isSelected} onChange={(e) => onClickUrl(e, url)} />
                   </div>
                   <Globe strokeWidth={2} size={14} className="text-foreground-lighter" />
                   <span className="text-sm flex-grow">{url}</span>

@@ -13,7 +13,7 @@ import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Form_Shadcn_,
+  Form,
   Separator,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -155,6 +155,7 @@ export function DiskManagementForm() {
       CreateDiskStorageSchema({
         defaultTotalSize: defaultValues.totalSize,
         cloudProvider: project?.cloud_provider as CloudProvider,
+        isSpendCapEnabled,
       })
     ),
     defaultValues,
@@ -223,13 +224,14 @@ export function DiskManagementForm() {
 
   const isBranch = project?.parent_project_ref !== undefined
 
-  const disableDiskInputs =
+  const disableDiskSizeInput =
     isRequestingChanges ||
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
-    isSpendCapEnabled ||
     !canUpdateDiskConfiguration ||
     !isAws
+
+  const disableDiskInputs = disableDiskSizeInput || isSpendCapEnabled
 
   const disableComputeInputs = isPlanUpgradeRequired
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
@@ -372,7 +374,7 @@ export function DiskManagementForm() {
         <Separator />
       </ScaffoldContainer>
 
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form
           id="disk-compute-form"
           onSubmit={form.handleSubmit(onSubmit)}
@@ -383,7 +385,7 @@ export function DiskManagementForm() {
 
             {isDiskNoticeVisible && <Separator />}
 
-            <SpendCapDisabledSection />
+            <SpendCapDisabledSection currentDiskSizeGb={defaultValues.totalSize} />
 
             <div className="flex flex-col gap-y-4">
               <NoticeBar
@@ -433,7 +435,7 @@ export function DiskManagementForm() {
 
                   <DiskSizeField
                     form={form}
-                    disableInput={disableDiskInputs}
+                    disableInput={disableDiskSizeInput}
                     setAdvancedSettingsOpenState={setAdvancedSettingsOpenState}
                   />
                 </>
@@ -559,7 +561,7 @@ export function DiskManagementForm() {
             ) : null}
           </AnimatePresence>
         </form>
-      </Form_Shadcn_>
+      </Form>
     </>
   )
 }

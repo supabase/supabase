@@ -172,6 +172,10 @@ export const handleError = (error: unknown, options: HandleErrorOptions = {}): n
       'metadata' in error && typeof error.metadata === 'object' && !!error.metadata
         ? (error.metadata as ErrorMetadata)
         : undefined
+    const formattedError =
+      'formattedError' in error && typeof error.formattedError === 'string'
+        ? error.formattedError
+        : undefined
 
     if (errorMessage) {
       const matched = ERROR_PATTERNS.find(({ pattern }) => pattern.test(errorMessage))
@@ -182,7 +186,8 @@ export const handleError = (error: unknown, options: HandleErrorOptions = {}): n
             requestId,
             retryAfter,
             requestPathname,
-            metadata
+            metadata,
+            formattedError
           )
         : new UnknownAPIResponseError(
             errorMessage,
@@ -190,7 +195,8 @@ export const handleError = (error: unknown, options: HandleErrorOptions = {}): n
             requestId,
             retryAfter,
             requestPathname,
-            metadata
+            metadata,
+            formattedError
           )
     }
   }

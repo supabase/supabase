@@ -10,9 +10,9 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
-  Form_Shadcn_,
+  Form,
   Label_Shadcn_,
   ScrollArea,
   Sheet,
@@ -290,7 +290,7 @@ export const PolicyEditorPanel = memo(function ({
 
   return (
     <>
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
           <Sheet open={visible} onOpenChange={handleOpenChange}>
             <SheetContent
@@ -461,7 +461,7 @@ export const PolicyEditorPanel = memo(function ({
 
                     {supportWithCheck && (
                       <div className="px-5 py-3 flex items-center gap-x-2">
-                        <Checkbox_Shadcn_
+                        <Checkbox
                           id="use-check"
                           name="use-check"
                           checked={showCheckBlock}
@@ -571,7 +571,7 @@ export const PolicyEditorPanel = memo(function ({
             </SheetContent>
           </Sheet>
         </form>
-      </Form_Shadcn_>
+      </Form>
 
       <DiscardChangesConfirmationDialog
         {...modalProps}

@@ -227,7 +227,7 @@ function StoragePage() {
               </p>
               <div className="mt-4 flex gap-2">
                 <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
-                  <Link href="/docs/guides/storage/analytics-buckets">Read the docs</Link>
+                  <Link href="/docs/guides/storage/analytics/introduction">Read the docs</Link>
                 </Button>
                 <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
                   <Link href="/blog/analytics-buckets">Read the blog post</Link>
@@ -244,7 +244,7 @@ function StoragePage() {
               </p>
               <div className="mt-4 flex gap-2">
                 <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
-                  <Link href="/docs/guides/storage/vector-buckets">Read the docs</Link>
+                  <Link href="/docs/guides/storage/vector/introduction">Read the docs</Link>
                 </Button>
                 <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
                   <Link href="/blog/vector-buckets">Read the blog post</Link>

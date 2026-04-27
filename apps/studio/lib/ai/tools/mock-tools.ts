@@ -1,5 +1,5 @@
 import assert from 'node:assert'
-import { tool, type ToolSet } from 'ai'
+import { tool } from 'ai'
 import { z } from 'zod'
 
 import { getStudioTools } from '../tools/studio-tools'

@@ -99,6 +99,10 @@ export const LOCAL_STORAGE_KEYS = {
 
   // Observability banner dismissed
   OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
+  ORGANIZATION_MARKETPLACE_BANNER_DISMISSED: (orgSlug: string, managedBy: string) =>
+    `organization-marketplace-banner-dismissed-${orgSlug}-${managedBy}`,
+  PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
+    `project-integration-banner-dismissed-${ref}-${integrationSource}`,
 
   // Tax ID banner dismissed
   TAX_ID_BANNER_DISMISSED: (slug: string) => `tax-id-banner-dismissed-${slug}`,

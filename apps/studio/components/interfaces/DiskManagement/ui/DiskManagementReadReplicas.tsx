@@ -24,7 +24,7 @@ interface DiskManagementDiskSizeReadReplicasProps {
 export const DiskManagementDiskSizeReadReplicas = ({
   isDirty,
   totalSize,
-  usedSize,
+  usedSize: _usedSize,
   newTotalSize,
   oldStorageType,
   newStorageType,

@@ -9,9 +9,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -112,11 +112,11 @@ const SiteUrl = () => {
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        <Form_Shadcn_ {...siteUrlForm}>
+        <Form {...siteUrlForm}>
           <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)}>
             <Card>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={siteUrlForm.control}
                   name="SITE_URL"
                   render={({ field }) => (
@@ -125,9 +125,9 @@ const SiteUrl = () => {
                       label="Site URL"
                       description="Configure the default redirect URL used when a redirect URL is not specified or doesn't match one from the allow list. This value is also exposed as a template variable in the email templates section. Wildcards cannot be used here."
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_ {...field} disabled={!canUpdateConfig} />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -150,7 +150,7 @@ const SiteUrl = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </PageSectionContent>
     </PageSection>
   )

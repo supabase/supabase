@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
 import { ReactNode, useState } from 'react'
@@ -15,11 +15,11 @@ import {
   Separator,
 } from 'ui'
 
+import { useInitializeFiltersFromUrl, useSyncFiltersToUrl } from '../../hooks/useFilterLifeCycle'
 import { ExportDialog } from './ExportDialog'
-import { FilterPopover } from './filter/FilterPopover'
+import { FilterPopoverNew } from './filter/FilterPopoverNew'
 import { formatRowsForCSV } from './Header.utils'
 import { SortPopover } from './sort/SortPopover'
-import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
 import { useTableSort } from '@/components/grid/hooks/useTableSort'
 import { GridHeaderActions } from '@/components/interfaces/TableGridEditor/GridHeaderActions'
@@ -51,27 +51,40 @@ export type HeaderProps = {
 }
 
 export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true }: HeaderProps) => {
+  useInitializeFiltersFromUrl()
+
+  useSyncFiltersToUrl()
+
   const snap = useTableEditorTableStateSnapshot()
+  const showInsertButton = snap.selectedRows.size === 0
 
   return (
     <div>
-      <div className="flex h-10 items-center justify-between bg-dash-sidebar dark:bg-surface-100 px-1.5 py-1.5 gap-2 overflow-x-auto ">
+      <div className="flex flex-wrap min-h-10 items-center bg-dash-sidebar dark:bg-surface-100 py-1.5 gap-2">
         {customHeader ? (
-          customHeader
+          <div className="flex-1 px-1.5">{customHeader}</div>
         ) : snap.selectedRows.size > 0 ? (
-          <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
+          <div className="flex-1 px-1.5">
+            <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
+          </div>
         ) : (
-          <DefaultHeader tableQueriesEnabled={tableQueriesEnabled} />
+          <div className="w-full flex items-center gap-2 px-1.5 pb-1.5 border-b border-border">
+            <FilterPopoverNew isRefetching={isRefetching} />
+          </div>
         )}
-        <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
+        <div className="flex items-center gap-2 overflow-x-auto px-1.5">
+          {!customHeader && snap.selectedRows.size === 0 && (
+            <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
+          )}
+          <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
+          {showInsertButton && <InsertButton />}
+        </div>
       </div>
     </div>
   )
 }
 
-const DefaultHeader = ({
-  tableQueriesEnabled = true,
-}: Pick<HeaderProps, 'tableQueriesEnabled'>) => {
+const InsertButton = () => {
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
 
@@ -90,129 +103,106 @@ const DefaultHeader = ({
 
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
+  if (!canAddNew || !canCreateColumns) return null
+
   return (
-    <div className="flex items-center gap-4">
-      <div className="flex items-center gap-2">
-        <FilterPopover />
-        <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
-      </div>
-      {canAddNew && (
-        <>
-          <div className="h-[20px] w-px border-r border-control" />
-          <div className="flex items-center gap-2">
-            {canCreateColumns && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    data-testid="table-editor-insert-new-row"
-                    type="primary"
-                    size="tiny"
-                    icon={<ChevronDown strokeWidth={1.5} />}
-                  >
-                    Insert
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="start">
-                  {[
-                    ...(onAddRow !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="add-row"
-                            className="group space-x-2"
-                            onClick={onAddRow}
-                          >
-                            <div className="-mt-2 pr-1.5">
-                              <div className="border border-foreground-lighter w-[15px] h-[4px]" />
-                              <div className="border border-foreground-lighter w-[15px] h-[4px] my-[2px]" />
-                              <div
-                                className={cn([
-                                  'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
-                                ])}
-                              />
-                            </div>
-                            <div>
-                              <p>Insert row</p>
-                              <p className="text-foreground-light">
-                                Insert a new row into {snap.table.name}
-                              </p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                    ...(onAddColumn !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="add-column"
-                            className="group space-x-2"
-                            onClick={onAddColumn}
-                          >
-                            <div className="flex -mt-2 pr-1.5">
-                              <div className="border border-foreground-lighter w-[4px] h-[15px]" />
-                              <div className="border border-foreground-lighter w-[4px] h-[15px] mx-[2px]" />
-                              <div
-                                className={cn([
-                                  'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
-                                ])}
-                              />
-                            </div>
-                            <div>
-                              <p>Insert column</p>
-                              <p className="text-foreground-light">
-                                Insert a new column into {snap.table.name}
-                              </p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                    ...(onImportData !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="import-data"
-                            className="group space-x-2"
-                            onClick={() => {
-                              onImportData()
-                              sendEvent({
-                                action: 'import_data_button_clicked',
-                                properties: { tableType: 'Existing Table' },
-                                groups: {
-                                  project: projectRef ?? 'Unknown',
-                                  organization: org?.slug ?? 'Unknown',
-                                },
-                              })
-                            }}
-                          >
-                            <div className="relative -mt-2">
-                              <FileText
-                                size={18}
-                                strokeWidth={1.5}
-                                className="-translate-x-[2px]"
-                              />
-                              <ArrowUp
-                                className={cn(
-                                  'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
-                                  'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
-                                )}
-                                strokeWidth={3}
-                                size={12}
-                              />
-                            </div>
-                            <div>
-                              <p>Import data from CSV</p>
-                              <p className="text-foreground-light">Insert new rows from a CSV</p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                  ]}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-        </>
-      )}
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          data-testid="table-editor-insert-new-row"
+          type="primary"
+          size="tiny"
+          icon={<ChevronDown strokeWidth={1.5} />}
+        >
+          Insert
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="bottom" align="end">
+        {[
+          ...(onAddRow !== undefined
+            ? [
+                <DropdownMenuItem key="add-row" className="group space-x-2" onClick={onAddRow}>
+                  <div className="-mt-2 pr-1.5">
+                    <div className="border border-foreground-lighter w-[15px] h-[4px]" />
+                    <div className="border border-foreground-lighter w-[15px] h-[4px] my-[2px]" />
+                    <div
+                      className={cn([
+                        'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
+                        'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
+                      ])}
+                    />
+                  </div>
+                  <div>
+                    <p>Insert row</p>
+                    <p className="text-foreground-light">Insert a new row into {snap.table.name}</p>
+                  </div>
+                </DropdownMenuItem>,
+              ]
+            : []),
+          ...(onAddColumn !== undefined
+            ? [
+                <DropdownMenuItem
+                  key="add-column"
+                  className="group space-x-2"
+                  onClick={onAddColumn}
+                >
+                  <div className="flex -mt-2 pr-1.5">
+                    <div className="border border-foreground-lighter w-[4px] h-[15px]" />
+                    <div className="border border-foreground-lighter w-[4px] h-[15px] mx-[2px]" />
+                    <div
+                      className={cn([
+                        'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
+                        'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
+                      ])}
+                    />
+                  </div>
+                  <div>
+                    <p>Insert column</p>
+                    <p className="text-foreground-light">
+                      Insert a new column into {snap.table.name}
+                    </p>
+                  </div>
+                </DropdownMenuItem>,
+              ]
+            : []),
+          ...(onImportData !== undefined
+            ? [
+                <DropdownMenuItem
+                  key="import-data"
+                  className="group space-x-2"
+                  onClick={() => {
+                    onImportData()
+                    sendEvent({
+                      action: 'import_data_button_clicked',
+                      properties: { tableType: 'Existing Table' },
+                      groups: {
+                        project: projectRef ?? 'Unknown',
+                        organization: org?.slug ?? 'Unknown',
+                      },
+                    })
+                  }}
+                >
+                  <div className="relative -mt-2">
+                    <FileText size={18} strokeWidth={1.5} className="-translate-x-[2px]" />
+                    <ArrowUp
+                      className={cn(
+                        'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
+                        'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
+                      )}
+                      strokeWidth={3}
+                      size={12}
+                    />
+                  </div>
+                  <div>
+                    <p>Import data from CSV</p>
+                    <p className="text-foreground-light">Insert new rows from a CSV</p>
+                  </div>
+                </DropdownMenuItem>,
+              ]
+            : []),
+        ]}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 
@@ -232,7 +222,7 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const isImpersonatingRole = roleImpersonationState.role !== undefined
 
-  const { filters } = useTableFilter()
+  const filters = snap.filters
   const { sorts } = useTableSort()
 
   const [isExporting, setIsExporting] = useState(false)

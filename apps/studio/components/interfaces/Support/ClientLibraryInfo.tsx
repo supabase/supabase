@@ -7,8 +7,8 @@ import type { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   cn,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -36,12 +36,12 @@ export function ClientLibraryInfo({ form, category, library }: ClientLibraryInfo
 
   return (
     <div className="flex flex-col gap-y-1">
-      <FormField_Shadcn_
+      <FormField
         name="library"
         control={form.control}
         render={({ field }) => (
           <FormItemLayout layout="vertical" label="Which library are you having issues with">
-            <FormControl_Shadcn_>
+            <FormControl>
               <Select_Shadcn_ {...field} defaultValue={field.value} onValueChange={field.onChange}>
                 <SelectTrigger_Shadcn_ className="w-full" aria-label="Select a library">
                   <SelectValue_Shadcn_ placeholder="Select a library" />
@@ -56,7 +56,7 @@ export function ClientLibraryInfo({ form, category, library }: ClientLibraryInfo
                   </SelectGroup_Shadcn_>
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )}
       />
