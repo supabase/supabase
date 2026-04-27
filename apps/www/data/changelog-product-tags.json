@@ -7,7 +7,7 @@
   { "slug": "postgres", "label": "postgres" },
   { "slug": "postgrest", "label": "PostgREST" },
   { "slug": "ai", "label": "AI & Vector" },
-  { "slug": "analytics", "label": "Analytics & Monitoring" },
+  { "slug": "analytics", "label": "Analytics" },
   { "slug": "billing", "label": "Billing" },
   { "slug": "breaking-change", "label": "Breaking Change" },
   { "slug": "cli", "label": "CLI" },

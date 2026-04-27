@@ -1,3 +1,4 @@
+import { ChangelogLlmMarkdownButton } from '~/components/Changelog/ChangelogLlmMarkdownButton'
 import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
 import { ChangelogTimelineList } from '~/components/Changelog/ChangelogTimelineList'
 import CTABanner from '~/components/CTABanner'
@@ -20,6 +21,7 @@ import {
 } from '~/lib/changelog.utils'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
+import { useBreakpoint } from 'common'
 import dayjs from 'dayjs'
 import { GitCommit, ListFilter, X } from 'lucide-react'
 import type { GetServerSideProps } from 'next'
@@ -120,6 +122,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
     parseAsArrayOf(parseAsString).withOptions(nuqsUrlOptions)
   )
 
+  const isMobile = useBreakpoint('lg')
   const [filterPanelOpen, setFilterPanelOpen] = useState(false)
 
   const filterSearch = querySearch ?? ''
@@ -189,34 +192,38 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
               <p className="text-foreground-lighter text-lg">
                 New updates and product improvements
               </p>
-              <div className="flex flex-wrap items-center gap-1">
-                <Button
-                  type={filterPanelOpen ? 'default' : 'text'}
-                  size="tiny"
-                  className="shrink-0"
-                  aria-expanded={filterPanelOpen}
-                  aria-controls="changelog-progressive-filters"
-                  icon={
-                    filterPanelOpen ? (
-                      <X className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                    ) : (
-                      <ListFilter className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                    )
-                  }
-                  onClick={() => {
-                    if (filterPanelOpen) setFilterPanelOpen(false)
-                    else setFilterPanelOpen(true)
-                  }}
-                >
-                  {filterPanelOpen ? 'Hide filters' : 'Filter changelog'}
-                </Button>
+              <div className="w-full lg:w-auto flex flex-wrap items-center gap-1">
+                <div className="flex-1">
+                  <Button
+                    type="default"
+                    size="tiny"
+                    className={cn('shrink-0', !filterPanelOpen && 'px-1.5')}
+                    aria-expanded={filterPanelOpen}
+                    aria-controls="changelog-filters"
+                    title="Filter changelog"
+                    icon={
+                      filterPanelOpen ? (
+                        <X className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                      ) : (
+                        <ListFilter className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                      )
+                    }
+                    onClick={() => {
+                      if (filterPanelOpen) setFilterPanelOpen(false)
+                      else setFilterPanelOpen(true)
+                    }}
+                  >
+                    {filterPanelOpen ? 'Hide filters' : isMobile && 'Filter changelog'}
+                  </Button>
+                </div>
+                <ChangelogLlmMarkdownButton />
                 <ChangelogRssButton />
               </div>
             </div>
           </div>
 
           {filterPanelOpen && (
-            <div id="changelog-progressive-filters" className="flex flex-col gap-2 -mt-4 sm:mx-0">
+            <div id="changelog-filters" className="flex flex-col gap-2 -mt-4 sm:mx-0">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div className="relative min-w-0 flex-1">
                   <label htmlFor="changelog-filter-search" className="sr-only">

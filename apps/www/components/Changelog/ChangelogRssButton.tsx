@@ -1,14 +1,15 @@
 'use client'
 
+import changelogProductTags from '~/data/changelog-product-tags.json'
 import { ChevronDown, Rss } from 'lucide-react'
 import Link from 'next/link'
-import changelogProductTags from '~/data/changelog-product-tags.json'
 import {
   Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from 'ui'
 
@@ -50,7 +51,10 @@ export function ChangelogRssButton({ className }: Props) {
             aria-label="Open product-specific changelog RSS feeds"
           />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="max-h-100 w-52 overflow-y-auto">
+        <DropdownMenuContent align="end" className="max-h-96 w-56 overflow-y-auto">
+          <DropdownMenuLabel className="font-normal">
+            Tag-based Changelog RSS feeds
+          </DropdownMenuLabel>
           {PRODUCT_RSS_FEEDS.map(({ label }) => (
             <DropdownMenuItem key={label} asChild className="gap-2">
               <Link href={productFeedHref(label)}>

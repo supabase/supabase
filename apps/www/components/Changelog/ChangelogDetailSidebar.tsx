@@ -64,7 +64,7 @@ export function ChangelogDetailSidebar({ number, url, labels, className }: Props
             ) : (
               <Copy size={14} strokeWidth={1.5} />
             )}
-            {copied ? 'Copied!' : 'Copy page as markdown'}
+            {copied ? 'Copied as markdown' : 'Copy page as markdown'}
           </button>
           <a
             href={`https://chatgpt.com/?hint=search&q=${encodeURIComponent(`Read from ${mdAbs} so I can ask questions about its contents`)}`}
