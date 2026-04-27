@@ -29,6 +29,7 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
+  Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
@@ -180,6 +181,16 @@ const otlpSubmitSchema = z.object({
 
 const syslogSchema = z.object({
   type: z.literal('syslog'),
+  host: z.string().min(1, { message: 'Host is required' }),
+  port: z.coerce
+    .number()
+    .int({ message: 'Port must be an integer' })
+    .min(1, { message: 'Port must be between 1 and 65535' })
+    .max(65535, { message: 'Port must be between 1 and 65535' }),
+  tls: z.boolean().default(false),
+  ca_cert: z.string().optional(),
+  client_cert: z.string().optional(),
+  client_key: z.string().optional(),
 })
 
 const formUnion = z.discriminatedUnion('type', [
@@ -351,6 +362,12 @@ export function LogDrainDestinationSheetForm({
       api_token: defaultConfig?.api_token || '',
       endpoint: defaultConfig?.endpoint || '',
       protocol: defaultConfig?.protocol || 'http/protobuf',
+      host: defaultConfig?.host || '',
+      port: defaultConfig?.port ?? 514,
+      tls: defaultConfig?.tls ?? false,
+      ca_cert: defaultConfig?.ca_cert || '',
+      client_cert: defaultConfig?.client_cert || '',
+      client_key: defaultConfig?.client_key || '',
     },
   })
 
@@ -802,6 +819,103 @@ export function LogDrainDestinationSheetForm({
                       formControl={form.control}
                       description="Password for authentication from Last9 OTEL integration."
                     />
+                  </div>
+                )}
+                {type === 'syslog' && (
+                  <div className="grid gap-4 px-content">
+                    <LogDrainFormItem
+                      value="host"
+                      label="Host"
+                      placeholder="logs.example.com"
+                      formControl={form.control}
+                      description="The hostname or IP address of the syslog server."
+                    />
+                    <LogDrainFormItem
+                      type="number"
+                      value="port"
+                      label="Port"
+                      placeholder="514"
+                      formControl={form.control}
+                      description="The port number the syslog server listens on (1–65535)."
+                    />
+                    <FormField
+                      control={form.control}
+                      name="tls"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2 px-0">
+                          <div className="flex gap-2 items-center">
+                            <FormControl>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                            <FormLabel className="text-base">TLS Encryption</FormLabel>
+                            <InfoTooltip align="start">
+                              Enable TLS to encrypt the connection to the syslog server.
+                            </InfoTooltip>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    {form.watch('tls') && (
+                      <>
+                        <FormField
+                          control={form.control}
+                          name="ca_cert"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="horizontal"
+                              label="CA Certificate"
+                              description="PEM-encoded CA certificate to verify the server's TLS certificate."
+                            >
+                              <FormControl>
+                                <Textarea
+                                  className="font-mono min-h-[100px]"
+                                  placeholder={'-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----'}
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="client_cert"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="horizontal"
+                              label="Client Certificate"
+                              description="PEM-encoded client certificate for mutual TLS authentication."
+                            >
+                              <FormControl>
+                                <Textarea
+                                  className="font-mono min-h-[100px]"
+                                  placeholder={'-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----'}
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="client_key"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="horizontal"
+                              label="Client Key"
+                              description="PEM-encoded private key for the client certificate."
+                            >
+                              <FormControl>
+                                <Textarea
+                                  className="font-mono min-h-[100px]"
+                                  placeholder={'-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----'}
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </>
+                    )}
                   </div>
                 )}
                 {HEADER_ENABLED_TYPES.includes(type as (typeof HEADER_ENABLED_TYPES)[number]) && (
