@@ -27,6 +27,30 @@ function addSelfClosingTags(htmlString: string): string {
   return modifiedHTML
 }
 
+// GitHub discussion editors often emit raw HTML <img>. Convert them to markdown images
+// so they follow the same mdxComponents img rendering pipeline.
+function normalizeHtmlImagesToMarkdown(source: string): string {
+  if (!source || typeof source !== 'string') return ''
+
+  const getAttr = (attrs: string, name: string) => {
+    const match = attrs.match(new RegExp(`${name}\\s*=\\s*("([^"]*)"|'([^']*)')`, 'i'))
+    return (match?.[2] ?? match?.[3] ?? '').trim()
+  }
+
+  return source.replace(/<img\b([^>]*)\/?>/gi, (_match, attrs: string) => {
+    const src = getAttr(attrs, 'src')
+    if (!src) return _match
+
+    const alt = getAttr(attrs, 'alt')
+      .replace(/\]/g, '\\]')
+      .replace(/\[/g, '\\[')
+      .replace(/\(/g, '\\(')
+      .replace(/\)/g, '\\)')
+
+    return `![${alt}](${src})`
+  })
+}
+
 type TocItem = { content: string; slug: string; lvl: number }
 
 function createRemarkCollectToc(maxDepth: number) {
@@ -74,7 +98,8 @@ function createRemarkCollectToc(maxDepth: number) {
 }
 
 export async function mdxSerialize(source: string, options?: { tocDepth?: number }) {
-  const formattedSource = addSelfClosingTags(source)
+  const normalizedSource = normalizeHtmlImagesToMarkdown(source)
+  const formattedSource = addSelfClosingTags(normalizedSource)
   // Preprocess MDX to handle CodeTabs transformation
   const preprocessedSource = await preprocessMdxWithCodeTabs(formattedSource)
   const codeHikeOptions: CodeHikeConfig = {
