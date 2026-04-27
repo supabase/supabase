@@ -294,7 +294,7 @@ export const ForeignKeySelector = ({
               size="tiny"
             >
               <Select_Shadcn_
-                value={(selectedTable?.id ?? 1).toString()}
+                value={selectedTable?.id !== undefined ? String(selectedTable.id) : undefined}
                 onValueChange={(value) => updateSelectedTable(Number(value))}
                 disabled={isLoadingSelectedTable}
               >
