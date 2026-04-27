@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronDown, Trash2 } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -8,7 +8,7 @@ import {
   AccordionItem_Shadcn_ as AccordionItem,
   AccordionTrigger_Shadcn_ as AccordionTrigger,
   Button,
-  Checkbox_Shadcn_ as Checkbox,
+  Checkbox,
   cn,
   Form,
   FormControl,

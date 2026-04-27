@@ -14,8 +14,6 @@ interface PageSection {
   rag_ignore?: boolean
 }
 
-type MatchPageSectionsFunction = 'match_page_sections_v2' | 'match_page_sections_v2_nimbus'
-
 export async function clippy(
   openai: OpenAI,
   supabaseClient: SupabaseClient<any, 'public', any>,

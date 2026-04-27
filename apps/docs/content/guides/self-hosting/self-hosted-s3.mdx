@@ -195,7 +195,7 @@ const client = new S3Client({
 
 S3 clients sign requests using the access key ID and secret. If you see `SignatureDoesNotMatch`, verify that the `REGION`, `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` in your `.env` file match what your S3 client is using.
 
-**If you use a custom reverse proxy**: with the [new API keys and auth](/docs/guides/self-hosting/self-hosted-auth-keys) configuration, requests to Storage should be forwarded to the API gateway (Kong) for proper handling. If you are still using legacy API keys and proxy directly to Storage, make sure your proxy sets the `X-Forwarded-Prefix` header to `/storage/v1` so that signed URLs are generated correctly. In both cases, `STORAGE_PUBLIC_URL` must be [set properly](https://github.com/supabase/supabase/blob/a5f4a59e0e262394b345600e8d8a2241d6ac3b64/docker/docker-compose.yml#L369) in `docker-compose.yml`.
+**If you use a custom reverse proxy**: with the [new API keys and auth](/docs/guides/self-hosting/self-hosted-auth-keys) configuration, requests to Storage should be forwarded to the API gateway for proper handling. If you are still using legacy API keys and proxy directly to Storage, make sure your proxy sets the `X-Forwarded-Prefix` header to `/storage/v1` so that signed URLs are generated correctly. In both cases, `STORAGE_PUBLIC_URL` must be [set properly](https://github.com/supabase/supabase/blob/a5f4a59e0e262394b345600e8d8a2241d6ac3b64/docker/docker-compose.yml#L369) in `docker-compose.yml`.
 
 ### TUS upload errors on Cloudflare R2
 

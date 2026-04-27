@@ -14,7 +14,6 @@ import {
 } from 'ui'
 
 import { OrgCommandItem } from './OrgCommandItem'
-import PartnerIcon from '@/components/ui/PartnerIcon'
 import type { Organization } from '@/types'
 
 export interface OrganizationDropdownCommandContentProps {

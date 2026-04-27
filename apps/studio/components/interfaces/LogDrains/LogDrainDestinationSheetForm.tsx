@@ -50,6 +50,7 @@ import {
   logDrainHeaderEntriesSchema,
   type LogDrainHeaderRow,
 } from './LogDrains.utils'
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
@@ -859,16 +860,19 @@ export function LogDrainDestinationSheetForm({
           </SheetSection>
 
           <SheetFooter className="p-content !mt-0 !justify-between !flex-row w-full items-center">
-            <span className="text-sm text-foreground-light">
-              <span>See full pricing breakdown</span>{' '}
-              <Link
-                href={`${DOCS_URL}/guides/platform/manage-your-usage/log-drains`}
-                target="_blank"
-                className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all"
-              >
-                here
-              </Link>
-            </span>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm text-foreground-light">
+                <span>See full pricing breakdown</span>{' '}
+                <Link
+                  href={`${DOCS_URL}/guides/platform/manage-your-usage/log-drains`}
+                  target="_blank"
+                  className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all"
+                >
+                  here
+                </Link>
+              </span>
+              <TaxDisclaimer />
+            </div>
             <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
               Save destination
             </Button>

@@ -29,10 +29,7 @@ import {
 
 import { Shortcut } from '../ui/Shortcut'
 import { Route } from '../ui/ui.types'
-import {
-  useIsPlatformWebhooksEnabled,
-  useUnifiedLogsPreview,
-} from './App/FeaturePreview/FeaturePreviewContext'
+import { useUnifiedLogsPreview } from './App/FeaturePreview/FeaturePreviewContext'
 import {
   generateOtherRoutes,
   generateProductRoutes,
@@ -40,14 +37,12 @@ import {
   generateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLints } from '@/hooks/misc/useLints'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useAppStateSnapshot } from '@/state/app-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const ICON_SIZE = 32

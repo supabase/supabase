@@ -133,7 +133,7 @@ export const CreateWrapperSheet = ({
   }
 
   const { mutateAsync: createFDW, isPending: isCreatingWrapper } = useFDWCreateMutation({
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success(`Successfully created ${wrapperMeta?.label} foreign data wrapper`)
 
       const { tables } = getValues()

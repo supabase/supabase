@@ -246,7 +246,7 @@ test('disabled helpers are disabled', async () => {
     },
   ]
 
-  const el = render(
+  render(
     <LogsDatePicker
       helpers={helpers}
       onSubmit={mockFn}
