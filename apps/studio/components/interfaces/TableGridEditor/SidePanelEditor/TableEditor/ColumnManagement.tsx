@@ -286,7 +286,7 @@ export const ColumnManagement = ({
                     isNewRecord ? '' : '-mx-3'
                   }`}
                 >
-                  {primaryKeyColumns.map((column: ColumnField, index: number) => (
+                  {primaryKeyColumns.map((column: ColumnField) => (
                     <Column
                       key={column.id}
                       column={column}
@@ -317,7 +317,7 @@ export const ColumnManagement = ({
           >
             <SortableContext items={otherColumns} strategy={verticalListSortingStrategy}>
               <div className={`space-y-2 py-2 ${isNewRecord ? 'px-3 ' : ''}`}>
-                {otherColumns.map((column: ColumnField, index: number) => (
+                {otherColumns.map((column: ColumnField) => (
                   <Column
                     key={column.id}
                     column={column}

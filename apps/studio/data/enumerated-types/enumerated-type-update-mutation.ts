@@ -1,5 +1,4 @@
 import { getUpdateEnumeratedTypeSQL } from '@supabase/pg-meta'
-import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 

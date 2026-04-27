@@ -30,7 +30,7 @@ function getFilePaths(folderPath: string, baseFolder = ''): string[] {
   return filepaths
 }
 
-export default async function getFileNames(req: NextApiRequest, res: NextApiResponse) {
+export default async function getFileNames(_req: NextApiRequest, res: NextApiResponse) {
   const folderPath = path.join(process.cwd(), 'components/interfaces/Home/Connect/content')
   const filepaths = getFilePaths(folderPath)
   res.statusCode = 200

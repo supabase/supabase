@@ -6,7 +6,7 @@ import { Filter, Plus } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   Label_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
@@ -242,7 +242,7 @@ export const TableEditorMenu = () => {
                     {Object.entries(ENTITY_TYPE).map(([key, value]) => (
                       <div key={key} className="group flex items-center justify-between py-0.5">
                         <div className="flex items-center gap-x-2">
-                          <Checkbox_Shadcn_
+                          <Checkbox
                             id={key}
                             name={key}
                             checked={visibleTypes.includes(value)}

@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import {
   Alert,
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -323,7 +323,7 @@ const CreateProject = () => {
       </div>
       <div className="py-2 pb-4">
         <div className="items-top flex space-x-2">
-          <Checkbox_Shadcn_
+          <Checkbox
             id="shouldRunMigrations"
             name="shouldRunMigrations"
             checked={shouldRunMigrations}
@@ -345,7 +345,7 @@ const CreateProject = () => {
       </div>
       <div className="py-2 pb-4">
         <div className="items-top flex space-x-2">
-          <Checkbox_Shadcn_
+          <Checkbox
             id="dataApiDefaultPrivileges"
             name="dataApiDefaultPrivileges"
             checked={dataApiDefaultPrivileges}

@@ -15,7 +15,7 @@ import {
 } from 'react'
 import { toast } from 'sonner'
 import {
-  Checkbox_Shadcn_,
+  Checkbox,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -367,7 +367,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
             {/* If the customer already has a billing address, optionally allow overwriting it - if they have no address, we use that as a default */}
             {customerProfile?.address != null && (
               <div className="flex items-center space-x-2 mt-4">
-                <Checkbox_Shadcn_
+                <Checkbox
                   id="defaultBillingAddress"
                   checked={useAsDefaultBillingAddress}
                   onCheckedChange={() => {

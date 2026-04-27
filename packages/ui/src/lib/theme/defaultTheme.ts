@@ -58,13 +58,6 @@ const defaults = {
   },
 }
 
-const utils = {
-  border: {
-    hover: 'border-opacity-50 hover:border-opacity-100',
-    fix: 'border-opacity-100',
-  },
-}
-
 const default__padding_and_text = {
   tiny: `${defaults.size.text.tiny} ${defaults.size.padding.tiny}`,
   small: `${defaults.size.text.small} ${defaults.size.padding.small}`,

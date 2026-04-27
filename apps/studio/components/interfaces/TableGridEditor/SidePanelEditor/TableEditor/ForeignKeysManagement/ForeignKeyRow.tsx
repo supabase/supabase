@@ -23,7 +23,7 @@ export const ForeignKeyRow = ({
   disabled = false,
   status,
   layout = 'horizontal',
-  closePanel,
+  closePanel: _closePanel,
   onSelectEdit,
   onSelectRemove,
   onSelectUndoRemove,

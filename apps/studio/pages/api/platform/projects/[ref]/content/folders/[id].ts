@@ -45,7 +45,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetRespons
 type PatchResponseData =
   paths['/platform/projects/{ref}/content/folders/{id}']['patch']['responses']['200']['content']
 
-const handlePatch = async (req: NextApiRequest, res: NextApiResponse<PatchResponseData>) => {
+const handlePatch = async (_req: NextApiRequest, res: NextApiResponse<PatchResponseData>) => {
   // Platform specific endpoint
   return res.status(200).json({} as never)
 }

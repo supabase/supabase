@@ -29,7 +29,6 @@ import {
   type ForeignKeyDirtyState,
 } from './ForeignKeySelector.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { DocsButton } from '@/components/ui/DocsButton'
 import InformationBox from '@/components/ui/InformationBox'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useTableQuery } from '@/data/tables/table-retrieve-query'
@@ -37,7 +36,6 @@ import { useTablesQuery } from '@/data/tables/tables-query'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { DOCS_URL } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 
 const EMPTY_STATE: ForeignKey = {

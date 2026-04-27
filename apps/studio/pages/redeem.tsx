@@ -2,7 +2,7 @@ import { FeatureFlagContext } from 'common'
 import Link from 'next/link'
 import { useContext, useState } from 'react'
 import { Button } from 'ui'
-import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns'
 
 import { CreditCodeRedemption } from '@/components/interfaces/Organization/BillingSettings/CreditCodeRedemption'
 import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'

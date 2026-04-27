@@ -187,7 +187,7 @@ export function MessageMarkdown({
 export const MarkdownPre = ({
   children,
   id,
-  isLoading,
+  isLoading: _isLoading,
   readOnly,
 }: {
   children: any

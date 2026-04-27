@@ -67,7 +67,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
   const [validationResult, setValidationResult] = useState<ValidateSpamResponse>()
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
   const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
 

@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Checkbox_Shadcn_, Label_Shadcn_, Modal } from 'ui'
+import { Button, Checkbox, Label_Shadcn_, Modal } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -205,7 +205,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
         />
 
         <div className="flex items-center gap-x-2 mt-4 mb-2">
-          <Checkbox_Shadcn_
+          <Checkbox
             id="save-as-default"
             checked={isDefaultPaymentMethod}
             onCheckedChange={(checked) => {
@@ -220,7 +220,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
         </div>
 
         <div className="flex items-center gap-x-2 mt-4 mb-2">
-          <Checkbox_Shadcn_
+          <Checkbox
             id="is-primary-billing-address"
             checked={isPrimaryBillingAddress}
             onCheckedChange={(checked) => {

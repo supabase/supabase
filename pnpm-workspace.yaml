@@ -17,6 +17,7 @@ catalog:
   lodash: ^4.18.1
   lodash-es: ^4.18.1
   next: 16.2.3
+  radix-ui: ^1.4.3
   react: ^18.3.0
   react-dom: ^18.3.0
   recharts: ^2.15.4
@@ -50,7 +51,7 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
-  - braintrust  # Included for bugfix in v3.9.0
+  - braintrust # Included for bugfix in v3.9.0
   # The following packages are excluded from the minimum release age check because they had a vulneralibity
   # Delete them the next time you update this list
   - follow-redirects

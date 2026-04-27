@@ -3,7 +3,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
-import { AuthUserHoverCard } from './AuthUserHoverCard'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
 import { TextWithTooltip } from './TextWithTooltip'
@@ -51,7 +50,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       enableHiding: false,
       enableResizing: false,
       enableSorting: false,
-      filterFn: (row, columnId, filterValue) => true,
+      filterFn: (_row, _columnId, _filterValue) => true,
       size: 48,
       minSize: 48,
       maxSize: 48,
@@ -68,7 +67,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
         const date = new Date(row.getValue<ColumnSchema['date']>('date'))
         return <HoverCardTimestamp date={date} />
       },
-      filterFn: (row, columnId, filterValue) => true,
+      filterFn: (_row, _columnId, _filterValue) => true,
       enableResizing: false,
       enableSorting: false,
       size: 130,
@@ -92,7 +91,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
         )
       },
       enableHiding: false,
-      filterFn: (row, columnId, filterValue) => true,
+      filterFn: (_row, _columnId, _filterValue) => true,
       enableResizing: false,
       enableSorting: false,
       size: 40,
@@ -143,7 +142,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
           </div>
         )
       },
-      filterFn: (row, columnId, filterValue) => true,
+      filterFn: (_row, _columnId, _filterValue) => true,
       enableResizing: false,
       enableSorting: false,
       size: 70,

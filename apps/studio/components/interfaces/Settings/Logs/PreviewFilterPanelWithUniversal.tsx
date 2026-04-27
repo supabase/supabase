@@ -96,14 +96,14 @@ export const PreviewFilterPanelWithUniversal = ({
   condensedLayout,
   isShowingEventChart,
   onToggleEventChart,
-  csvData,
+  csvData: _csvData,
   onFiltersChange,
   filters,
   table,
   onSelectedDatabaseChange,
   className,
-  selectedDatePickerValue,
-  setSelectedDatePickerValue,
+  selectedDatePickerValue: _selectedDatePickerValue,
+  setSelectedDatePickerValue: _setSelectedDatePickerValue,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -154,7 +154,7 @@ export const PreviewFilterPanelWithUniversal = ({
     })
 
     // Add table-specific filters
-    Object.entries(tableFilters).forEach(([key, filterSet]) => {
+    Object.entries(tableFilters).forEach(([_key, filterSet]) => {
       properties.push({
         label: filterSet.label,
         name: filterSet.key,

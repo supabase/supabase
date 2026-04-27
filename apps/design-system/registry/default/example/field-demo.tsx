@@ -1,4 +1,4 @@
-import { Button, Checkbox_Shadcn_ as Checkbox, Input, Textarea } from 'ui'
+import { Button, Checkbox, Input, Textarea } from 'ui'
 import {
   Field,
   FieldDescription,

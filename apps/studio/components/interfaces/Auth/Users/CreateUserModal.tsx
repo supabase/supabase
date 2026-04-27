@@ -6,7 +6,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -139,7 +139,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
               render={({ field }) => (
                 <FormItem className="flex items-center gap-x-2">
                   <FormControl>
-                    <Checkbox_Shadcn_
+                    <Checkbox
                       checked={field.value}
                       onCheckedChange={(value) => field.onChange(value)}
                     />

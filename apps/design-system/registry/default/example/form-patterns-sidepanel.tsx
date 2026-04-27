@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import {
   Button,
   Calendar,
-  Checkbox_Shadcn_,
+  Checkbox,
   Form,
   FormControl,
   FormField,
@@ -484,7 +484,7 @@ export default function FormPatternsSidePanel() {
                       render={({ field }) => (
                         <div className="flex items-center w-full justify-start space-x-2">
                           <FormControl>
-                            <Checkbox_Shadcn_
+                            <Checkbox
                               id="enable-rls"
                               checked={field.value}
                               onCheckedChange={field.onChange}
@@ -505,7 +505,7 @@ export default function FormPatternsSidePanel() {
                       render={({ field }) => (
                         <div className="flex items-center w-full justify-start space-x-2">
                           <FormControl>
-                            <Checkbox_Shadcn_
+                            <Checkbox
                               id="enable-notifications"
                               checked={field.value}
                               onCheckedChange={field.onChange}
@@ -526,7 +526,7 @@ export default function FormPatternsSidePanel() {
                       render={({ field }) => (
                         <div className="flex items-center w-full justify-start space-x-2">
                           <FormControl>
-                            <Checkbox_Shadcn_
+                            <Checkbox
                               id="enable-analytics"
                               checked={field.value}
                               onCheckedChange={field.onChange}
