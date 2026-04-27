@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { ExternalLink, Search, X } from 'lucide-react'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import React, { useMemo } from 'react'
@@ -36,13 +36,12 @@ import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFu
 import AlertError from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
-import { usePHFlag } from '@/hooks/ui/useFlag'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const showEdgeFunctionsRequestMetrics = usePHFlag<boolean>('edgeFunctionsRequestMetrics') === true
+  const showEdgeFunctionsRequestMetrics = useFlag('edgeFunctionsRequestMetrics') === true
   const showLastHourStats = IS_PLATFORM && showEdgeFunctionsRequestMetrics
 
   const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
