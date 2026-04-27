@@ -16,7 +16,7 @@ import {
 import { useDebounce, useParams } from 'common'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   ChartConfig,
@@ -44,7 +44,6 @@ import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.util
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
 import { DataTableFilterCommand } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterCommand'
 import { DataTableFilterControlsDrawer } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterControlsDrawer'
-import { DataTableHeaderLayout } from '@/components/ui/DataTable/DataTableHeaderLayout'
 import { DataTableInfinite } from '@/components/ui/DataTable/DataTableInfinite'
 import { DataTableSideBarLayout } from '@/components/ui/DataTable/DataTableSideBarLayout'
 import { DataTableViewOptions } from '@/components/ui/DataTable/DataTableViewOptions'
@@ -92,6 +91,18 @@ export const UnifiedLogs = () => {
     .filter(({ value }) => value ?? undefined)
 
   const [topBarHeight, setTopBarHeight] = useState(0)
+  const topBarRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new ResizeObserver(() => {
+      const rect = topBarRef.current?.getBoundingClientRect()
+      if (rect) setTopBarHeight(rect.height)
+    })
+    const topBar = topBarRef.current
+    if (!topBar) return
+    observer.observe(topBar)
+    return () => observer.unobserve(topBar)
+  }, [])
 
   const [sorting, setSorting] = useState<SortingState>(defaultColumnSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
@@ -365,8 +376,8 @@ export const UnifiedLogs = () => {
             id="panel-right"
             className="flex max-w-full flex-1 flex-col overflow-hidden"
           >
-            <DataTableHeaderLayout setTopBarHeight={setTopBarHeight}>
-              <div className="flex items-center gap-2">
+            <div ref={topBarRef} className="top-0 z-10 flex flex-col gap-2 bg-background pb-3">
+              <div className="flex items-center gap-2 px-2 pt-2.5 pb-0.5">
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -415,7 +426,7 @@ export const UnifiedLogs = () => {
                 columnId="timestamp"
                 chartConfig={filteredChartConfig}
               />
-            </DataTableHeaderLayout>
+            </div>
             <ResizablePanelGroup orientation="horizontal" className="w-full h-full">
               <ResizablePanel minSize="30" className="h-full">
                 <ResizablePanelGroup key="main-logs" orientation="vertical" className="h-full">
