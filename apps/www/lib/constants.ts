@@ -56,3 +56,23 @@ export const LW15_URL = `${SITE_ORIGIN}/launch-week`
 export const SITE_NAME = 'Supabase'
 
 export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
+// Pages that have a .md equivalent served via /api-v2/md/[...slug].
+// Used by middleware (rewrite) and the API route handler (whitelist).
+// Update this set when adding new .md files.
+//
+// Most slugs are sourced from content/md/<slug>.md, bundled at build time
+// into MD_CONTENT. 'pricing' is the exception: served dynamically via
+// generatePricingContent() so it always reflects current shared-data.
+export const MD_PAGES = new Set([
+  'homepage',
+  'pricing',
+  'auth',
+  'database',
+  'edge-functions',
+  'realtime',
+  'storage',
+  'vector',
+  'modules/cron',
+  'modules/queues',
+])

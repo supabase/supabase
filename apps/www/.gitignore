@@ -28,6 +28,9 @@ yarn-error.log*
 # Sitemap
 public/sitemap.xml
 
+# Generated .md content bundle (built by scripts/generateMdContent.mjs)
+app/api-v2/md/content.generated.ts
+
 # contentlayer
 .contentlayer
 .vercel

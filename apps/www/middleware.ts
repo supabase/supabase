@@ -1,7 +1,32 @@
 import { stampFirstReferrerCookie } from 'common/first-referrer-cookie'
 import { NextResponse, type NextRequest } from 'next/server'
 
+import { MD_PAGES } from './lib/constants'
+
 export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // Handle /<page>.md suffix: /pricing.md -> /api-v2/md/pricing
+  if (pathname.endsWith('.md')) {
+    const slug = pathname.slice(1, -3) // strip leading / and trailing .md
+    if (MD_PAGES.has(slug)) {
+      const url = request.nextUrl.clone()
+      url.pathname = `/api-v2/md/${slug}`
+      return NextResponse.rewrite(url)
+    }
+  }
+
+  // Content negotiation: Accept: text/markdown on known pages
+  const accept = (request.headers.get('accept') ?? '').toLowerCase()
+  if (accept.includes('text/markdown')) {
+    const slug = pathname === '/' ? 'homepage' : pathname.slice(1)
+    if (MD_PAGES.has(slug)) {
+      const url = request.nextUrl.clone()
+      url.pathname = `/api-v2/md/${slug}`
+      return NextResponse.rewrite(url)
+    }
+  }
+
   const response = NextResponse.next()
   stampFirstReferrerCookie(request, response)
   return response

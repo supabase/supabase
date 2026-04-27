@@ -1,7 +1,6 @@
-import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
 import { isFeatureEnabled } from 'common/enabled-features'
 
+import { MD_CONTENT } from '@/app/api-v2/md/content.generated'
 import { generatePricingContent } from '@/lib/llms'
 
 export const dynamic = 'force-dynamic'
@@ -33,25 +32,28 @@ function getSources(): Source[] {
   ]
 }
 
-// Order matters: homepage first, products alphabetical in between.
-// pricing.txt is generated dynamically via generatePricingContent().
-const PRODUCT_LLM_FILES = [
-  'homepage.txt',
-  'auth.txt',
-  'database.txt',
-  'edge-functions.txt',
-  'realtime.txt',
-  'storage.txt',
-  'vector.txt',
+// Order matters: homepage first, products alphabetical, then modules.
+// pricing is generated dynamically via generatePricingContent().
+const PRODUCT_MD_SLUGS = [
+  'homepage',
+  'auth',
+  'database',
+  'edge-functions',
+  'realtime',
+  'storage',
+  'vector',
+  'modules/cron',
+  'modules/queues',
 ]
 
-async function readProductOverviews(): Promise<string> {
-  const staticContents = await Promise.all(
-    PRODUCT_LLM_FILES.map((file) => {
-      const filePath = join(process.cwd(), 'data/llms', file)
-      return readFile(filePath, 'utf-8')
-    })
-  )
+function readProductOverviews(): string {
+  const staticContents = PRODUCT_MD_SLUGS.map((slug) => {
+    const content = MD_CONTENT.get(slug)
+    if (!content) {
+      throw new Error(`Missing .md content for "${slug}". Run \`pnpm content:build\`.`)
+    }
+    return content
+  })
   const pricingContent = generatePricingContent()
 
   return [...staticContents, pricingContent].join('\n\n---\n\n')
@@ -71,13 +73,13 @@ export async function GET() {
   const sources = getSources()
   const enabledSources = sources.filter((source) => source.enabled)
 
-  const [productContent, ...sourceContents] = await Promise.all([
-    readProductOverviews(),
-    ...enabledSources.map(async (source) => {
+  const productContent = readProductOverviews()
+  const sourceContents = await Promise.all(
+    enabledSources.map(async (source) => {
       const text = await fetchSourceContent(source.slug)
       return { title: source.title, text }
-    }),
-  ])
+    })
+  )
 
   const docsSection = sourceContents
     .filter((s): s is { title: string; text: string } => s.text !== null)
