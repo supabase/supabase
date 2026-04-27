@@ -356,7 +356,7 @@ select ${
     !table.columns
       ? '*'
       : `
-${table.columns.map((column, index, array) => `\t${column.name}`).join(',\n')}`
+${table.columns.map((column) => `\t${column.name}`).join(',\n')}`
   }
 from ${formatTableIdentifier(table)}
 -- where

@@ -47,10 +47,7 @@ export function Item({
   children,
   icon,
   active,
-  rounded,
   onClick,
-  doNotCloseOverlay = false,
-  showActiveBar = false,
   style,
 }: ItemProps) {
   const __styles = styleHandler('menu')

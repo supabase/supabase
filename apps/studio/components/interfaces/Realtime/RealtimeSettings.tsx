@@ -47,7 +47,6 @@ export const RealtimeSettings = () => {
   const { data: organization, isSuccess: isSuccessOrganization } = useSelectedOrganizationQuery()
   const {
     can: canUpdateConfig,
-    isLoading: isLoadingPermissions,
     isSuccess: isPermissionsLoaded,
   } = useAsyncCheckPermissions(PermissionAction.REALTIME_ADMIN_READ, '*')
 
@@ -60,7 +59,6 @@ export const RealtimeSettings = () => {
   const {
     data,
     error,
-    isPending: isLoading,
     isError,
   } = useRealtimeConfigurationQuery({
     projectRef,
@@ -126,7 +124,7 @@ export const RealtimeSettings = () => {
   const isDisablingRealtime = !isRealtimeDisabled && suspend
   const isEnablingRealtime = isRealtimeDisabled && !suspend
 
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (data) => {
+  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (_data) => {
     if (!projectRef) return console.error('Project ref is required')
     setIsConfirmNextModalOpen(true)
   }

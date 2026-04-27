@@ -3,7 +3,6 @@ import UsageSection from './UsageSection/UsageSection'
 import { DataPoint } from '@/data/analytics/constants'
 import {
   PricingMetric,
-  useOrgDailyStatsQuery,
   type OrgDailyUsageResponse,
 } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'

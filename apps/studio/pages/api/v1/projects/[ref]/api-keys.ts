@@ -24,7 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
   const response = [
     {
       name: 'anon',

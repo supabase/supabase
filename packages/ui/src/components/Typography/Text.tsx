@@ -19,18 +19,12 @@ export interface Props {
 }
 
 function Text({
-  className,
   children,
   style,
-  type,
-  disabled,
   mark,
   code,
   keyboard,
-  underline,
-  strikethrough,
   strong,
-  small,
 }: Props) {
   // let classes = [TextStyles['sbui-typography-text']]
   // if (className) {

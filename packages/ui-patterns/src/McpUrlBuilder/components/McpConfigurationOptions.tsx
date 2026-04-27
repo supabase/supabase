@@ -24,7 +24,6 @@ interface McpConfigurationOptionsProps {
 }
 
 export function McpConfigurationOptions({
-  isPlatform,
   readonly,
   onReadonlyChange,
   selectedFeatures,

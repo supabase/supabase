@@ -80,8 +80,6 @@ export const ChartBar = ({
   color = CHART_COLORS.BRAND,
   hoverColor = CHART_COLORS.BRAND_HOVER,
   chartHighlight,
-  updateDateRange,
-  highlightActions,
   syncId,
   showHighlightArea = true,
   cursor,

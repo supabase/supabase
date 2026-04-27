@@ -29,7 +29,7 @@ export function useApiKeysCommands() {
   const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
-  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.SECRETS_READ,
     '*'
   )

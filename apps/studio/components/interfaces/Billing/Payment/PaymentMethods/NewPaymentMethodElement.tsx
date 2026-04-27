@@ -372,7 +372,7 @@ export const NewPaymentMethodElement = forwardRef(
               <FormField
                 name="tax_id_name"
                 control={form.control}
-                render={({ field }) => (
+                render={() => (
                   <FormItemLayout hideMessage layout="vertical">
                     <Popover open={showTaxIDsPopover} onOpenChange={setShowTaxIDsPopover}>
                       <PopoverTrigger asChild>

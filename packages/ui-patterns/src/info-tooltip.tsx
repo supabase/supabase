@@ -20,7 +20,7 @@ const SVG = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>((props, ref
 const InfoTooltip = forwardRef<
   ElementRef<typeof TooltipContent>,
   React.ComponentPropsWithoutRef<typeof TooltipContent>
->(({ ...props }, ref) => {
+>(({ ...props }, _ref) => {
   return (
     <Tooltip>
       <TooltipTrigger

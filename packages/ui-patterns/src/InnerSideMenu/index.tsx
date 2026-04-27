@@ -222,7 +222,7 @@ const InnerSideBarFilterSortDropdown = forwardRef<
     contentClassName?: string
     triggerClassName?: string
   }
->(({ value, onValueChange, contentClassName, triggerClassName, ...props }, ref) => {
+>(({ value, onValueChange, contentClassName, triggerClassName, ...props }, _ref) => {
   return (
     <DropdownMenu modal={false}>
       <Tooltip delayDuration={0}>

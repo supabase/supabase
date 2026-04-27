@@ -109,7 +109,7 @@ export const TextConfirmModal = forwardRef<
     const isFormValid = form.formState.isValid
 
     // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    function onSubmit(_values: z.infer<typeof formSchema>) {
       // Do something with the form values.
       // ✅ This will be type-safe and validated.
       onConfirm()

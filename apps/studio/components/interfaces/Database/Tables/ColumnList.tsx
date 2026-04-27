@@ -18,7 +18,7 @@ import {
   Trash,
   Type,
 } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import {
   Button,
   Card,

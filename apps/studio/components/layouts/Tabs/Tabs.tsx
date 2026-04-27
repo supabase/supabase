@@ -11,7 +11,6 @@ import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import {
   cn,
   ContextMenu_Shadcn_,

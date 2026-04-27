@@ -1,6 +1,5 @@
 import dayjs from 'dayjs'
 import { TextSearch } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { UIEvent, useMemo, useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -138,7 +137,6 @@ export const QueueMessagesDataGrid = ({
   fetchNextPage,
 }: QueueDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
-  const router = useRouter()
 
   const [selectedMessageId, setSelectedMessageId] = useQueryState('messageId', parseAsInteger)
 
