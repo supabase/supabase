@@ -15,7 +15,7 @@ import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import dayjs from 'dayjs'
 import { ArrowUpRightIcon } from 'lucide-react'
-import { GetServerSideProps } from 'next'
+import { GetStaticPaths, GetStaticProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
@@ -31,9 +31,25 @@ type PageProps = {
   nextNumber: number | null
 }
 
-export const getServerSideProps: GetServerSideProps<PageProps> = async ({ params, res }) => {
-  res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
+export const getStaticPaths: GetStaticPaths = async () => {
+  const octokit = createChangelogOctokit()
+  const metadata = await fetchAllChangelogDiscussionMetadata(
+    octokit,
+    'supabase',
+    'supabase',
+    CHANGELOG_CATEGORY_ID
+  )
+  const visible = metadata.filter((item) => !item.title.includes('[d]'))
 
+  return {
+    paths: visible.map((item) => ({
+      params: { number: String(item.number) },
+    })),
+    fallback: 'blocking',
+  }
+}
+
+export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
   const raw = params?.number
   const numStr = Array.isArray(raw) ? raw[0] : raw
   const number = Number(numStr)
@@ -73,10 +89,11 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ params
 
   try {
     const source = await mdxSerialize(discussion.body)
-    const created_at = discussionDisplayDate({
-      title: discussion.title,
-      createdAt: discussion.createdAt,
-    })
+    const created_at =
+      discussionDisplayDate({
+        title: discussion.title,
+        createdAt: discussion.createdAt,
+      }) ?? discussion.createdAt
 
     return {
       props: {
@@ -89,6 +106,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ params
         prevNumber,
         nextNumber,
       },
+      revalidate: 900,
     }
   } catch (e) {
     console.error(e)

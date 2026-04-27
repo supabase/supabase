@@ -64,105 +64,41 @@ export function LabelBadges({
 
 function TimelineRow({
   item,
-  mode,
   href,
-  onSelect,
-  dateFormat = 'month-day',
 }: {
   item: ChangelogTimelineIndexItem
-  mode: 'link' | 'action'
-  href?: string
-  onSelect?: (item: ChangelogTimelineIndexItem) => void
-  dateFormat?: 'month-day' | 'full'
+  href: string
 }) {
-  const dateLabel =
-    dateFormat === 'full'
-      ? dayjs(item.sortDate).format('MMM D, YYYY')
-      : dayjs(item.sortDate).format('MMM D')
+  const dateLabel = dayjs(item.sortDate).format('MMM D')
   const labels = item.labels ?? []
 
-  const titleBlock =
-    mode === 'link' && href ? (
-      <Link href={href} prefetch={false} className="min-w-0 text-left">
-        <h3 className="text-foreground text-lg leading-snug hover:underline">{item.title}</h3>
-      </Link>
-    ) : (
-      <h3 className="text-foreground text-lg leading-snug hover:underline">{item.title}</h3>
-    )
-
-  const meta = (
-    <div className="flex min-w-0 gap-2 pt-0.5">
-      <time dateTime={item.sortDate} className="text-foreground-lighter text-xs tracking-normal">
-        {dateLabel}
-      </time>
-      <LabelBadges labels={labels} onBadgeClick={(e) => e.stopPropagation()} />
-    </div>
-  )
-
-  const rowClass =
-    'group border-default flex w-full flex-col gap-0.5 border-b py-3 text-left scroll-mt-16'
-
-  if (mode === 'link' && href) {
-    return (
-      <div className={rowClass} id={item.number.toString()}>
-        <div className="min-w-0">{titleBlock}</div>
-        {meta}
-      </div>
-    )
-  }
-
   return (
-    <button
-      type="button"
+    <div
+      className="group border-default flex w-full flex-col gap-0.5 border-b py-3 text-left scroll-mt-16"
       id={item.number.toString()}
-      onClick={() => onSelect?.(item)}
-      className={`${rowClass} cursor-pointer bg-transparent`}
     >
-      <div className="min-w-0">{titleBlock}</div>
-      {meta}
-    </button>
-  )
-}
-
-export function ChangelogTimelineFlatList(props: {
-  items: ChangelogTimelineIndexItem[]
-  mode: 'action'
-  onSelect: (item: ChangelogTimelineIndexItem) => void
-  showFullDate?: boolean
-}) {
-  const { items, onSelect, showFullDate } = props
-  const dateFormat = showFullDate ? 'full' : 'month-day'
-  return (
-    <div className="min-w-0 [&>*:last-child]:border-b-0" role="list">
-      {items.map((item) => (
-        <TimelineRow
-          key={item.number}
-          item={item}
-          mode="action"
-          onSelect={onSelect}
-          dateFormat={dateFormat}
-        />
-      ))}
+      <div className="min-w-0">
+        <Link href={href} prefetch={false} className="min-w-0 text-left">
+          <h3 className="text-foreground text-lg leading-snug hover:underline">{item.title}</h3>
+        </Link>
+      </div>
+      <div className="flex min-w-0 gap-2 pt-0.5">
+        <time dateTime={item.sortDate} className="text-foreground-lighter text-xs tracking-normal">
+          {dateLabel}
+        </time>
+        <LabelBadges labels={labels} onBadgeClick={(e) => e.stopPropagation()} />
+      </div>
     </div>
   )
 }
 
-type Props =
-  | {
-      items: ChangelogTimelineIndexItem[]
-      mode: 'link'
-      hrefFor: (item: ChangelogTimelineIndexItem) => string
-      omitOuterTimelineBorder?: boolean
-    }
-  | {
-      items: ChangelogTimelineIndexItem[]
-      mode: 'action'
-      onSelect: (item: ChangelogTimelineIndexItem) => void
-      omitOuterTimelineBorder?: boolean
-    }
+type Props = {
+  items: ChangelogTimelineIndexItem[]
+  omitOuterTimelineBorder?: boolean
+}
 
 export function ChangelogTimelineList(props: Props) {
-  const { items, mode, omitOuterTimelineBorder } = props
+  const { items, omitOuterTimelineBorder } = props
   const yearGroups = groupChangelogIndexByYear(items)
 
   return (
@@ -213,13 +149,7 @@ export function ChangelogTimelineList(props: Props) {
 
             <div className="min-w-0 lg:col-span-10 [&>*:last-child]:border-b-0">
               {yearItems.map((item) => (
-                <TimelineRow
-                  key={item.number}
-                  item={item}
-                  mode={mode}
-                  href={props.mode === 'link' ? props.hrefFor(item) : undefined}
-                  onSelect={props.mode === 'action' ? props.onSelect : undefined}
-                />
+                <TimelineRow key={item.number} item={item} href={`/changelog/${item.number}`} />
               ))}
             </div>
           </div>

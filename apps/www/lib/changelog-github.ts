@@ -170,7 +170,7 @@ export async function getChangelogTimelineSortedIndex(): Promise<ChangelogTimeli
       number: item.number,
       title: item.title,
       url: item.url,
-      sortDate: discussionDisplayDate(item),
+      sortDate: discussionDisplayDate(item) ?? item.createdAt,
       labels:
         item.labels?.nodes?.map((l) => ({
           name: l.name,

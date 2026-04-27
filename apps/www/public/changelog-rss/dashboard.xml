@@ -4,9 +4,15 @@
       <link>https://supabase.com/changelog</link>
       <description>Dashboard updates and improvements from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 09 Apr 2026 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Fri, 24 Apr 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/changelog-rss/dashboard.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/45233</guid>
+  <title>Feature Preview: RLS Tester</title>
+  <link>https://supabase.com/changelog/45233</link>
+  <pubDate>Fri, 24 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid isPermaLink="true">https://supabase.com/changelog/44713</guid>
   <title>Developer Update - April 2026</title>
   <link>https://supabase.com/changelog/44713</link>

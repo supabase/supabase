@@ -1,8 +1,5 @@
 import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
-import {
-  ChangelogTimelineFlatList,
-  ChangelogTimelineList,
-} from '~/components/Changelog/ChangelogTimelineList'
+import { ChangelogTimelineList } from '~/components/Changelog/ChangelogTimelineList'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import {
@@ -19,7 +16,6 @@ import {
 } from '~/lib/changelog.utils'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
-import { useBreakpoint } from 'common'
 import dayjs from 'dayjs'
 import { GitCommit, ListFilter, X } from 'lucide-react'
 import type { GetServerSideProps } from 'next'
@@ -27,29 +23,10 @@ import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
-import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState } from 'nuqs'
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
-import {
-  Badge,
-  Button,
-  cn,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  IconYCombinator,
-  Input,
-  Input_Shadcn_,
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetTitle,
-} from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-
-import 'ui-patterns/ShimmeringLoader/index.css'
+import { useEffect, useMemo, useState } from 'react'
+import { Badge, Button, cn, IconYCombinator, Input, Input_Shadcn_ } from 'ui'
 
 const FEATURED_COUNT = 1
 
@@ -91,13 +68,6 @@ type FeaturedEntry = {
   created_at: string
   source: MDXRemoteSerializeResult
   labels: ChangelogLabel[]
-}
-
-type ModalPayload = {
-  title: string
-  url: string
-  created_at: string
-  source: MDXRemoteSerializeResult
 }
 
 type PageProps = {
@@ -184,35 +154,9 @@ function itemMatchesSelectedTags(
   return false
 }
 
-function ChangelogDiscussionArticle({
-  loading,
-  payload,
-}: {
-  loading: boolean
-  payload: ModalPayload | null
-}) {
-  return (
-    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 md:px-5">
-      {loading && <GenericSkeletonLoader className="py-2" />}
-      {!loading && payload?.source && (
-        <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
-          <MDXRemote {...payload.source} components={mdxComponents('blog')} />
-        </article>
-      )}
-    </div>
-  )
-}
-
 const nuqsUrlOptions = { shallow: true, history: 'push' as const }
 
 function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProps) {
-  const isMobile = useBreakpoint('lg')
-
-  const [discussion, setDiscussion] = useQueryState(
-    'discussion',
-    parseAsInteger.withOptions(nuqsUrlOptions)
-  )
-
   const [querySearch, setQuerySearch] = useQueryState(
     'q',
     parseAsString.withOptions(nuqsUrlOptions)
@@ -221,10 +165,6 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
     'tags',
     parseAsArrayOf(parseAsString).withOptions(nuqsUrlOptions)
   )
-
-  const [payload, setPayload] = useState<ModalPayload | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
 
   const [filterPanelOpen, setFilterPanelOpen] = useState(false)
 
@@ -246,14 +186,6 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
     if (hasNuqsFilters) setFilterPanelOpen(true)
   }, [hasNuqsFilters])
 
-  /** Hash anchors (e.g. year deep-links) scroll the page behind the dialog/sheet; drop hash when opening a discussion. */
-  useLayoutEffect(() => {
-    if (discussion == null) return
-    const { pathname, search, hash } = window.location
-    if (!hash) return
-    window.history.replaceState(window.history.state, '', `${pathname}${search}`)
-  }, [discussion])
-
   const filteredIndex = useMemo(() => {
     const q = filterSearch
     const hasSearch = q.trim().length > 0
@@ -274,93 +206,6 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
   const clearFilters = () => {
     void setQuerySearch(null)
     void setQueryTags(null)
-  }
-
-  const preview = useMemo(() => {
-    if (discussion == null) return null
-    const fromFeatured = featured.find((e) => e.number === discussion)
-    if (fromFeatured) {
-      return {
-        title: fromFeatured.title,
-        url: fromFeatured.url,
-        dateIso: fromFeatured.created_at,
-      }
-    }
-    const fromIndex = allIndex.find((e) => e.number === discussion)
-    if (fromIndex) {
-      return {
-        title: fromIndex.title,
-        url: fromIndex.url,
-        dateIso: fromIndex.sortDate,
-      }
-    }
-    return null
-  }, [discussion, featured, allIndex])
-
-  useEffect(() => {
-    if (discussion == null) {
-      setPayload(null)
-      setError(null)
-      setLoading(false)
-      return
-    }
-
-    const entry = featured.find((e) => e.number === discussion)
-    if (entry) {
-      setPayload({
-        title: entry.title,
-        url: entry.url,
-        created_at: entry.created_at,
-        source: entry.source,
-      })
-      setError(null)
-      setLoading(false)
-      return
-    }
-
-    let cancelled = false
-    setLoading(true)
-    setError(null)
-    setPayload(null)
-
-    void (async () => {
-      try {
-        const res = await fetch(`/api/changelog-discussion/${discussion}`)
-        if (cancelled) return
-        if (!res.ok) {
-          setError(res.status === 404 ? 'Discussion not found.' : 'Could not load this entry.')
-          return
-        }
-        const data = (await res.json()) as ModalPayload
-        if (!cancelled) setPayload(data)
-      } catch {
-        if (!cancelled) setError('Network error.')
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    })()
-
-    return () => {
-      cancelled = true
-    }
-  }, [discussion, featured])
-
-  const open = discussion != null
-
-  const handleOpenChange = (next: boolean) => {
-    if (!next) void setDiscussion(null)
-  }
-
-  const displayTitle =
-    preview?.title ?? payload?.title ?? (discussion != null ? `Discussion #${discussion}` : '')
-  const displayDateIso = preview?.dateIso ?? payload?.created_at
-
-  const handleSelectFromList = (item: ChangelogTimelineIndexItem) => {
-    const { pathname, search, hash } = window.location
-    if (hash) {
-      window.history.replaceState(window.history.state, '', `${pathname}${search}`)
-    }
-    void setDiscussion(item.number)
   }
 
   const TITLE = 'Changelog'
@@ -498,12 +343,7 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
                       </Button>
                     )}
                   </div>
-                  <ChangelogTimelineFlatList
-                    items={filteredIndex}
-                    mode="action"
-                    onSelect={handleSelectFromList}
-                    showFullDate
-                  />
+                  <ChangelogTimelineList items={filteredIndex} omitOuterTimelineBorder />
                 </>
               )}
             </section>
@@ -564,12 +404,7 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
 
               {restIndex.length > 0 && (
                 <section aria-label="Earlier changelog entries" className="lg:pb-20">
-                  <ChangelogTimelineList
-                    items={restIndex}
-                    mode="link"
-                    hrefFor={(item) => `/changelog/${item.number}`}
-                    omitOuterTimelineBorder
-                  />
+                  <ChangelogTimelineList items={restIndex} omitOuterTimelineBorder />
                 </section>
               )}
               <div className="hidden lg:grid">
@@ -592,88 +427,6 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
         </div>
         <CTABanner />
       </DefaultLayout>
-
-      {open && isMobile && (
-        <Sheet open={open} onOpenChange={handleOpenChange}>
-          <SheetContent
-            side="bottom"
-            size="content"
-            showClose={false}
-            className="flex h-[85dvh] max-h-[85dvh] flex-col gap-0 overflow-hidden rounded-t-lg border-0 p-0"
-          >
-            <SheetTitle className="sr-only">{displayTitle}</SheetTitle>
-            <div className="bg-dash-sidebar sticky top-0 z-10 shrink-0 border-b border-default">
-              <SheetClose
-                className={cn(
-                  'text-foreground ring-offset-background hover:opacity-100',
-                  'absolute right-3 top-3 z-20 rounded-sm p-1 opacity-70 transition-opacity',
-                  'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
-                )}
-              >
-                <X className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                <span className="sr-only">Close</span>
-              </SheetClose>
-              <div className="px-4 pb-3 pt-4 pr-12 md:px-5 md:pr-14">
-                <h2 className="text-foreground text-left text-xl">{displayTitle}</h2>
-                <div className="text-foreground-lighter flex flex-col gap-2 text-left">
-                  <div className="flex items-center flex-wrap gap-1.5">
-                    {displayDateIso && (
-                      <p className="font-mono text-xs">
-                        {dayjs(displayDateIso).format('MMM D, YYYY')}{' '}
-                        <span className="text-foreground-lighter text-xs">—</span>
-                      </p>
-                    )}
-                    <Link
-                      href={preview?.url ?? ''}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-foreground-lighter hover:text-foreground-light hover:underline text-sm"
-                    >
-                      View on GitHub
-                    </Link>
-                  </div>
-                  {error && <span className="text-destructive-600 text-sm">{error}</span>}
-                </div>
-              </div>
-            </div>
-            <ChangelogDiscussionArticle loading={loading} payload={payload} />
-          </SheetContent>
-        </Sheet>
-      )}
-
-      {open && !isMobile && (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-          <DialogContent className="flex max-h-[min(90vh,900px)] max-w-3xl flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl">
-            <div className="bg-dash-sidebar sticky top-0 shrink-0 border-b border-default">
-              <DialogHeader className="border-0">
-                <DialogTitle className="pr-8 text-left text-xl">{displayTitle}</DialogTitle>
-                <DialogDescription asChild>
-                  <div className="text-foreground-lighter flex flex-col gap-2 text-left">
-                    <div className="flex items-center flex-wrap gap-1.5">
-                      {displayDateIso && (
-                        <p className="font-mono text-xs">
-                          {dayjs(displayDateIso).format('MMM D, YYYY')}{' '}
-                          <span className="text-foreground-lighter text-xs">—</span>
-                        </p>
-                      )}
-                      <Link
-                        href={preview?.url ?? ''}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-foreground-lighter hover:text-foreground-light hover:underline text-sm"
-                      >
-                        View on GitHub
-                      </Link>
-                    </div>
-                    {error && <span className="text-destructive-600 text-sm">{error}</span>}
-                  </div>
-                </DialogDescription>
-              </DialogHeader>
-            </div>
-            <ChangelogDiscussionArticle loading={loading} payload={payload} />
-          </DialogContent>
-        </Dialog>
-      )}
     </>
   )
 }
