@@ -40,9 +40,9 @@ import { withSupabase } from "jsr:@supabase/server";
 
 // This endpoint uses 'user' access, credentials is required.
 export default {
-  fetch: withSupabase({ allow: "user" }, async (_req, ctx) => {
+  fetch: withSupabase({ allow: "user" }, async (_req, { supabase }) => {
     // TODO: Change the table_name to your table
-    const { data, error } = await ctx.supabase.from("table_name").select("*");
+    const { data, error } = await supabase.from("table_name").select("*");
 
     if (error) {
       return Response.json(
@@ -65,12 +65,12 @@ import { withSupabase } from "jsr:@supabase/server";
 import { randomUUID } from "node:crypto"
 
 export default {
-  fetch: withSupabase({ allow: "public" }, async (req, ctx) => {
+  fetch: withSupabase({ allow: "public" }, async (req, { supabase }) => {
     const formData = await req.formData()
     const file = formData.get('file')
 
     // TODO: update your-bucket to the bucket you want to write files
-    const { data, error } = await ctx.supabase
+    const { data, error } = await supabase
       .storage
       .from('your-bucket')
       .upload(
@@ -311,7 +311,7 @@ import Stripe from "npm:stripe";
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!);
 
 export default {
-  fetch: withSupabase({ allow: "always" }, async (req, ctx) => {
+  fetch: withSupabase({ allow: "always" }, async (req, { supabaseAdmin }) => {
     const body = await req.text();
     const sig = req.headers.get("stripe-signature")!;
 
@@ -330,7 +330,7 @@ export default {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
-        await ctx.supabaseAdmin
+        await supabaseAdmin
           .from("orders")
           .update({ status: "paid" })
           .eq("stripe_session_id", session.id);
@@ -356,7 +356,7 @@ import { withSupabase } from "jsr:@supabase/server";
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
 
 export default {
-  fetch: withSupabase({ allow: "public" }, async (req, ctx) => {
+  fetch: withSupabase({ allow: "public" }, async (req, _ctx) => {
     const { to, subject, html } = await req.json();
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
