@@ -121,6 +121,10 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
       type text,
       source text
     );
+
+    -- Grant the privileges the roles need
+    GRANT SELECT ON public.nods_page TO anon;
+
     alter table "public"."nods_page"
       enable row level security;
 
@@ -134,6 +138,10 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
       slug text,
       heading text
     );
+
+    -- Grant the privileges the roles need
+    GRANT SELECT ON public.nods_page_section TO anon;
+
     alter table "public"."nods_page_section"
       enable row level security;
     ```

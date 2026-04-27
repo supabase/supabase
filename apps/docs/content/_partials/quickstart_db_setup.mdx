@@ -36,16 +36,13 @@ When your project is up and running, go to the [**Table Editor**](/dashboard/pro
 
 Alternatively, you can run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new).
 
-This sets a secure baseline by setting only the privileges each Postgres role needs, creates an `instruments` table with some sample data, and adds [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default.
+This creates an `instruments` table with some sample data, sets a secure baseline by setting only the privileges each Postgres role needs, and adds [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default.
 
 </StepHikeCompact.Details>
 
 <StepHikeCompact.Code>
 
     ```sql SQL_EDITOR
-    -- Grant the privileges the role needs, which is read access
-    grant select on public.instruments to anon;
-
     -- Create the table
     create table instruments (
       id bigint primary key generated always as identity,
@@ -58,6 +55,9 @@ This sets a secure baseline by setting only the privileges each Postgres role ne
       ('violin'),
       ('viola'),
       ('cello');
+
+    -- Grant the privileges the role needs, which is read access
+    grant select on public.instruments to anon;
 
     -- Enable row level security for the table
     alter table instruments enable row level security;
