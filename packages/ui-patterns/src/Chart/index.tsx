@@ -1,9 +1,9 @@
 'use client'
 
-import { Slot } from '@radix-ui/react-slot'
 import dayjs from 'dayjs'
 import { HelpCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { Slot } from 'radix-ui'
 import * as React from 'react'
 import { useContext, useMemo, useRef, useState } from 'react'
 import {
@@ -86,7 +86,7 @@ interface ChartCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
   ({ children, className, asChild, ...props }, ref) => {
-    const Comp = asChild ? Slot : Card
+    const Comp = asChild ? Slot.Slot : Card
     return (
       <Comp ref={ref} className={cn('relative w-full', className)} {...props}>
         {children}

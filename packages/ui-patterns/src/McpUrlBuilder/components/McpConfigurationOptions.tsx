@@ -14,7 +14,6 @@ import {
 import type { McpFeatureGroup } from '../types'
 
 interface McpConfigurationOptionsProps {
-  isPlatform: boolean
   readonly: boolean
   onReadonlyChange: (readonly: boolean) => void
   selectedFeatures: string[]
@@ -24,7 +23,6 @@ interface McpConfigurationOptionsProps {
 }
 
 export function McpConfigurationOptions({
-  isPlatform,
   readonly,
   onReadonlyChange,
   selectedFeatures,

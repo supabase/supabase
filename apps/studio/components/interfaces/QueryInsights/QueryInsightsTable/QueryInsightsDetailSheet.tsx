@@ -1,5 +1,4 @@
 import { Loader2 } from 'lucide-react'
-import { useRef } from 'react'
 import {
   AiIconAnimation,
   Button,

@@ -15,7 +15,8 @@ import {
   FormLabel,
   FormMessage,
   Input_Shadcn_,
-  Radio,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   ScrollArea,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -341,20 +342,16 @@ export const CreateFunction = ({
                           render={({ field }) => (
                             <FormItem>
                               <FormControl className="col-span-8">
-                                {/* TODO: This RadioGroup imports Formik state, replace it with a clean component */}
-                                <Radio.Group
-                                  type="cards"
-                                  layout="vertical"
-                                  onChange={(event) =>
-                                    field.onChange(event.target.value == 'SECURITY_DEFINER')
+                                <RadioGroupStacked
+                                  onValueChange={(value) =>
+                                    field.onChange(value == 'SECURITY_DEFINER')
                                   }
                                   value={field.value ? 'SECURITY_DEFINER' : 'SECURITY_INVOKER'}
                                 >
-                                  <Radio
+                                  <RadioGroupStackedItem
+                                    value="SECURITY_INVOKER"
                                     id="SECURITY_INVOKER"
                                     label="SECURITY INVOKER"
-                                    value="SECURITY_INVOKER"
-                                    checked={!field.value}
                                     description={
                                       <>
                                         Function is to be executed with the privileges of the user
@@ -362,11 +359,10 @@ export const CreateFunction = ({
                                       </>
                                     }
                                   />
-                                  <Radio
+                                  <RadioGroupStackedItem
+                                    value="SECURITY_DEFINER"
                                     id="SECURITY_DEFINER"
                                     label="SECURITY DEFINER"
-                                    value="SECURITY_DEFINER"
-                                    checked={field.value}
                                     description={
                                       <>
                                         Function is to be executed with the privileges of the user
@@ -374,7 +370,7 @@ export const CreateFunction = ({
                                       </>
                                     }
                                   />
-                                </Radio.Group>
+                                </RadioGroupStacked>
                               </FormControl>
                               <FormMessage />
                             </FormItem>

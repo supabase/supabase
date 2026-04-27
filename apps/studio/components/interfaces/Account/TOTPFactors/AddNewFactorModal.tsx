@@ -59,7 +59,7 @@ interface FirstStepProps {
   onClose: () => void
 }
 
-const FirstStep = ({ visible, isEnrolling, reset, enroll, onClose }: FirstStepProps) => {
+const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) => {
   const FormSchema = z.object({
     name: z.string().min(1, 'Please provide a name to identify this app'),
   })

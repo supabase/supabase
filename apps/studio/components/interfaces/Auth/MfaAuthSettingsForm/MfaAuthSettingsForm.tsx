@@ -39,6 +39,7 @@ import {
 } from 'ui-patterns/PageSection'
 import * as z from 'zod'
 
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import AlertError from '@/components/ui/AlertError'
 import NoPermission from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
@@ -610,6 +611,7 @@ export const MfaAuthSettingsForm = () => {
           Billing will start immediately upon enabling this add-on, regardless of whether your
           customers are using SMS MFA.
         </p>
+        <TaxDisclaimer className="mt-2" />
       </ConfirmationModal>
 
       <PageSection>

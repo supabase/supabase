@@ -80,7 +80,6 @@ const SuccessState = ({ data }: { data: ErrorCodeQueryQuery | undefined }) => {
 }
 
 const ErrorExplanation = ({
-  code,
   service,
   message,
 }: {

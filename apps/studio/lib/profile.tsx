@@ -131,7 +131,6 @@ export function useProfileNameAndPicture(): {
   const { profile, isLoading: isLoadingProfile } = useProfile()
   const { data: identitiesData, isPending: isLoadingIdentities } = useProfileIdentitiesQuery()
 
-  const username = profile?.username
   const isGitHubProfile = profile?.auth0_id?.startsWith('github')
 
   const gitHubUsername = isGitHubProfile

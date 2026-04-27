@@ -11,8 +11,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  RadioGroup_Shadcn_,
-  RadioGroupItem_Shadcn_,
+  RadioGroup,
+  RadioGroupItem,
 } from 'ui'
 import { z } from 'zod'
 
@@ -47,30 +47,30 @@ export default function RadioGroupForm() {
             <FormItem className="space-y-3">
               <FormLabel>Notify me about...</FormLabel>
               <FormControl>
-                <RadioGroup_Shadcn_
+                <RadioGroup
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                   className="flex flex-col space-y-1"
                 >
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem_Shadcn_ value="all" />
+                      <RadioGroupItem value="all" />
                     </FormControl>
                     <FormLabel className="font-normal">All new messages</FormLabel>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem_Shadcn_ value="mentions" />
+                      <RadioGroupItem value="mentions" />
                     </FormControl>
                     <FormLabel className="font-normal">Direct messages and mentions</FormLabel>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem_Shadcn_ value="none" />
+                      <RadioGroupItem value="none" />
                     </FormControl>
                     <FormLabel className="font-normal">Nothing</FormLabel>
                   </FormItem>
-                </RadioGroup_Shadcn_>
+                </RadioGroup>
               </FormControl>
               <FormMessage />
             </FormItem>

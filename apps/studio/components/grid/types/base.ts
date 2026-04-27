@@ -1,4 +1,3 @@
-import { Filter, Sort } from '@supabase/pg-meta/src/query'
 import { CalculatedColumn, RenderHeaderCellProps } from 'react-data-grid'
 
 export interface SavedState {

@@ -2,7 +2,6 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { cn } from 'ui'
 import {
   MetricCard,
   MetricCardContent,
@@ -31,8 +30,8 @@ type DatabaseInfrastructureSectionProps = {
 export const DatabaseInfrastructureSection = ({
   interval,
   refreshKey,
-  dbErrorRate,
-  isLoading: dbLoading,
+  dbErrorRate: _dbErrorRate,
+  isLoading: _dbLoading,
   slowQueriesCount = 0,
   slowQueriesLoading = false,
 }: DatabaseInfrastructureSectionProps) => {

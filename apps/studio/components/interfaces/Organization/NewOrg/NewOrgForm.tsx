@@ -260,7 +260,6 @@ export const NewOrgForm = ({
     },
     onError: (data) => {
       toast.error(data.message, { duration: 10_000 })
-      resetPaymentMethod()
       setNewOrgLoading(false)
     },
   })
@@ -355,23 +354,21 @@ export const NewOrgForm = ({
 
     if (formValues.plan === 'FREE') {
       await createOrg(formValues)
-    } else if (!paymentMethod) {
-      const result = await paymentRef.current?.createPaymentMethod()
-      if (result) {
-        setPaymentMethod(result.paymentMethod)
-        const customerData = {
-          address: result.address,
-          billing_name: result.customerName,
-          tax_id: result.taxId,
-        }
-
-        createOrg(formValues, result.paymentMethod.id, customerData)
-      } else {
-        setNewOrgLoading(false)
-      }
-    } else {
-      createOrg(formValues, paymentMethod.id)
+      return
     }
+
+    const result = await paymentRef.current?.createPaymentMethod()
+    if (!result) {
+      setNewOrgLoading(false)
+      return
+    }
+
+    setPaymentMethod(result.paymentMethod)
+    createOrg(formValues, result.paymentMethod.id, {
+      address: result.address,
+      billing_name: result.customerName,
+      tax_id: result.taxId,
+    })
   }
 
   const resetPaymentMethod = () => {

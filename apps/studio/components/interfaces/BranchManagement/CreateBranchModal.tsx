@@ -40,6 +40,7 @@ import {
   estimateDiskCost,
   estimateRestoreTime,
 } from './BranchManagement.utils'
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { BranchingPITRNotice } from '@/components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -605,6 +606,7 @@ export const CreateBranchModal = () => {
               </div>
 
               {!hasPitrEnabled && <BranchingPITRNotice />}
+              <TaxDisclaimer />
             </DialogSection>
 
             <DialogFooter className="justify-end gap-2" padding="medium">

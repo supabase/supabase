@@ -21,7 +21,7 @@ interface ShadowScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {
 const ShadowScrollArea = React.forwardRef<HTMLDivElement, ShadowScrollAreaProps>(
   (
     { className, containerClassName, children, stickyLastColumn, outerContainerRef, ...props },
-    ref
+    _ref
   ) => {
     const containerRef = React.useRef<HTMLDivElement>(null)
     const { hasHorizontalScroll, canScrollLeft, canScrollRight } = useHorizontalScroll(containerRef)
