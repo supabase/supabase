@@ -133,7 +133,7 @@ export const ChartConfig = ({
   }
 
   return (
-    <ResizablePanelGroup orientation="horizontal" className="flex-grow h-full">
+    <ResizablePanelGroup orientation="horizontal" className="grow h-full">
       <ResizablePanel className="p-4 h-full" defaultSize="75">
         {!hasConfig ? (
           <ResizablePanel className="p-4 h-full" defaultSize="75">

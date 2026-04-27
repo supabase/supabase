@@ -452,7 +452,7 @@ export const QueryInsightsTable = ({
             <DataGrid
               ref={triageGridRef}
               style={{ height: '100%' }}
-              className="flex-1 flex-grow h-full"
+              className="flex-1 grow h-full"
               rowHeight={60}
               headerRowHeight={36}
               columns={triageColumns}
@@ -508,7 +508,7 @@ export const QueryInsightsTable = ({
             <DataGrid
               ref={gridRef}
               style={{ height: '100%' }}
-              className={cn('flex-1 flex-grow h-full')}
+              className={cn('flex-1 grow h-full')}
               rowHeight={44}
               headerRowHeight={36}
               columns={columns}

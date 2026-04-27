@@ -29,7 +29,7 @@ export const ActionCard = (card: {
         >
           {card.icon}
         </div>
-        <div className="flex-grow flex flex-col gap-0 min-w-0">
+        <div className="grow flex flex-col gap-0 min-w-0">
           <h3 title={card.title} className="text-sm text-foreground mb-0 truncate max-w-full">
             {card.title}
           </h3>

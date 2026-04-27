@@ -384,7 +384,7 @@
 }
 
 .sb-grid-foreign-key-formatter__text {
-  @apply m-0 flex-grow overflow-hidden overflow-ellipsis;
+  @apply m-0 grow overflow-hidden overflow-ellipsis;
 }
 
 /*

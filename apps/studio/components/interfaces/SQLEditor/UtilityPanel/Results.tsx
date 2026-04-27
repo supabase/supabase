@@ -134,7 +134,7 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
           <DataGrid
             columns={columns}
             rows={rows}
-            className="flex-grow min-h-0 border-t-0"
+            className="grow min-h-0 border-t-0"
             rowClass={() => '[&>.rdg-cell]:items-center'}
             onSelectedCellChange={setCellPosition}
             onCellKeyDown={handleCopyCell}

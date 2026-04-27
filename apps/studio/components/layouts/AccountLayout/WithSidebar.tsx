@@ -44,7 +44,7 @@ export const WithSidebar = ({
         />
       )}
       <div className="flex flex-1 flex-col">
-        <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
+        <div className="flex-1 grow overflow-y-auto">{children}</div>
       </div>
     </div>
   )

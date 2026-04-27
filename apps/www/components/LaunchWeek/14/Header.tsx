@@ -1,6 +1,6 @@
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import { ReactNode, useEffect, useState } from 'react'
 import { cn } from 'ui'
-import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 
 export const TicketHeader = ({ children, hidden }: { children: ReactNode; hidden?: boolean }) => {
   if (hidden) return null
@@ -34,7 +34,7 @@ export const TicketHeaderClaim = () => {
           <SingleTick key={i} />
         ))}
       </div>
-      <div className="text-start md:text-center justify-center text-neutral-500 text-sm font-normal uppercase [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)] lg:text-nowrap flex-grow max-w-[220px] md:max-w-none">
+      <div className="text-start md:text-center justify-center text-neutral-500 text-sm font-normal uppercase [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)] lg:text-nowrap grow max-w-[220px] md:max-w-none">
         Launch Week is coming. Stay tuned!
       </div>
       <div className="hidden gap-4 flex-wrap w-full h-2.5 overflow-hidden flex-shrink flex-1 md:flex">

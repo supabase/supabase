@@ -479,7 +479,7 @@ export const QueryPerformanceGrid = ({
 
   if (error) {
     return (
-      <div className="relative flex flex-grow bg-alternative min-h-0">
+      <div className="relative flex grow bg-alternative min-h-0">
         <div className="flex-1 min-w-0 p-6">
           <Admonition
             type="destructive"
@@ -504,12 +504,12 @@ export const QueryPerformanceGrid = ({
   const canShowIndexesTab = isSelectQuery(selectedQuery) && !isProtectedSchemaQuery
 
   return (
-    <div className="relative flex flex-grow bg-alternative min-h-0">
+    <div className="relative flex grow bg-alternative min-h-0">
       <div ref={dataGridContainerRef} className="flex-1 min-w-0 overflow-x-auto">
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
-          className={cn('flex-1 flex-grow h-full')}
+          className={cn('flex-1 grow h-full')}
           rowHeight={44}
           headerRowHeight={36}
           columns={columns}
@@ -628,7 +628,7 @@ export const QueryPerformanceGrid = ({
               </TabsList_Shadcn_>
             </div>
 
-            <TabsContent_Shadcn_ value="details" className="mt-0 flex-grow min-h-0 overflow-y-auto">
+            <TabsContent_Shadcn_ value="details" className="mt-0 grow min-h-0 overflow-y-auto">
               {selectedRow !== undefined && (
                 <QueryDetail
                   selectedRow={reportData[selectedRow]}
@@ -638,10 +638,7 @@ export const QueryPerformanceGrid = ({
               )}
             </TabsContent_Shadcn_>
             {selectedRow !== undefined && canShowIndexesTab && (
-              <TabsContent_Shadcn_
-                value="suggestion"
-                className="mt-0 flex-grow min-h-0 overflow-y-auto"
-              >
+              <TabsContent_Shadcn_ value="suggestion" className="mt-0 grow min-h-0 overflow-y-auto">
                 <QueryIndexes selectedRow={reportData[selectedRow]} />
               </TabsContent_Shadcn_>
             )}

@@ -372,7 +372,7 @@ export const LogsDatePicker = ({
 
         <div>
           <div className="flex p-2 gap-2 items-center">
-            <div className="flex flex-grow *:flex-grow gap-2 font-mono">
+            <div className="flex grow *:grow gap-2 font-mono">
               <TimeSplitInput
                 type="start"
                 startTime={startTime}

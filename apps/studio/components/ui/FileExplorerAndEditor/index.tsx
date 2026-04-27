@@ -412,7 +412,7 @@ export const FileExplorerAndEditor = ({
         </div>
       </div>
 
-      <div className="flex-grow min-w-0">
+      <div className="grow min-w-0">
         {selectedFile && isBinaryFile(selectedFile.name) ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">

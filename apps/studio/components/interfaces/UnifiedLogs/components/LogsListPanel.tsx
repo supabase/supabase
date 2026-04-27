@@ -38,7 +38,7 @@ export const LogsListPanel = ({ selectedRow }: { selectedRow?: Row<any> }) => {
               </Button>
             </div>
             {open && (
-              <div className="flex-grow overflow-auto border-t">
+              <div className="grow overflow-auto border-t">
                 <LogsList logs={selectedRow?.original?.logs} />
               </div>
             )}

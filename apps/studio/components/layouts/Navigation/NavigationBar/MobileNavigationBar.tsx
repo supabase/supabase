@@ -79,7 +79,7 @@ const MobileNavigationBar = ({
                 type="button"
                 className={cn(
                   'group',
-                  'flex-grow h-[30px] rounded-md',
+                  'grow h-[30px] rounded-md',
                   'p-2',
                   'flex items-center justify-between',
                   'bg-transparent border-none text-foreground-lighter',
