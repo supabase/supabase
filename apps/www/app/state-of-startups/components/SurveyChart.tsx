@@ -1,10 +1,9 @@
 'use client'
 
-import { createClient } from '@supabase/supabase-js'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import { motion } from 'framer-motion'
 import { ChevronsUpDown } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -14,14 +13,9 @@ import {
 } from 'ui'
 
 import { useAccent } from './accent-context'
+import { useSurveyDataCache, type ChartDataItem } from './survey-data-context'
 import TwoOptionToggle from './TwoOptionToggle'
 import { rpcNameForYear, useYear, type SurveyYear } from './year-context'
-
-// Separate Supabase client for survey project
-const externalSupabase = createClient(
-  process.env.NEXT_PUBLIC_SURVEY_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SURVEY_SUPABASE_ANON_KEY!
-)
 
 // Sentinel for “no filter”
 const NO_FILTER = 'unset'
@@ -38,12 +32,6 @@ interface FilterConfig {
 
 interface Filters {
   [key: string]: FilterConfig
-}
-
-interface ChartDataItem {
-  label: string
-  value: number
-  rawValue: number
 }
 
 interface FilterColumnConfig {
@@ -101,75 +89,6 @@ function useFilterOptions(filterColumns: string[]) {
   return { filters }
 }
 
-// Fetch survey data using secure database functions
-function useSurveyData(
-  shouldFetch: boolean,
-  functionName: string,
-  functionParams: (activeFilters: Record<string, string>) => Record<string, any>,
-  activeFilters: Record<string, string>
-) {
-  const [chartData, setChartData] = useState<ChartDataItem[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!shouldFetch) return
-
-    async function fetchData() {
-      try {
-        setIsLoading(true)
-        setError(null)
-
-        let data, fetchError
-
-        const functionParamsData = functionParams(activeFilters)
-        const { data: functionData, error: functionError } = await externalSupabase.rpc(
-          functionName,
-          functionParamsData
-        )
-        data = functionData
-        fetchError = functionError
-
-        if (fetchError) {
-          console.error('Error executing SQL query:', fetchError)
-          setError(fetchError.message)
-          return
-        }
-
-        // Calculate total for percentage calculation
-        const total = data.reduce(
-          (sum: number, row: any) => sum + parseInt(row.count || row.total),
-          0
-        )
-
-        // Transform the data to match chart format
-        const processedData = data.map((row: any) => {
-          const count = parseInt(row.count || row.total)
-          const rawPercentage = total > 0 ? (count / total) * 100 : 0
-          const roundedPercentage = Math.round(rawPercentage)
-
-          return {
-            label: row.label || row.value || row[Object.keys(row)[0]], // Get the first column as label
-            value: roundedPercentage,
-            rawValue: rawPercentage, // Keep the raw value for bar scaling
-          }
-        })
-
-        setChartData(processedData)
-      } catch (err: any) {
-        console.error('Error in fetchData:', err)
-        setError(err.message)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [shouldFetch, functionName, functionParams, activeFilters])
-
-  return { chartData, isLoading, error }
-}
-
 interface SurveyChartProps {
   title: string
   targetColumn: string
@@ -199,46 +118,11 @@ export function SurveyChart({
   const { year } = useYear()
   const isAvailableForYear = !newInYear || year >= newInYear
   const resolvedFunctionName = rpcNameForYear(functionName, year)
+  const { get, fetchAndCache } = useSurveyDataCache()
   const accent = useAccent()
   const accentBg = 'hsl(var(--brand-300))'
   const accentBarFg = 'bg-brand'
   const accentBarText = 'text-brand-link dark:text-brand'
-
-  const [isInView, setIsInView] = useState(false)
-  const chartRef = useRef<HTMLDivElement>(null)
-  const [shouldAnimateBars, setShouldAnimateBars] = useState(false)
-  const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
-
-  // Intersection observer to trigger chart data loading via database function
-  useEffect(() => {
-    const chartRefCurrent = chartRef.current
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !hasLoadedOnce) {
-            setIsInView(true)
-            setHasLoadedOnce(true)
-            observer.disconnect() // Only trigger once
-          }
-        })
-      },
-      {
-        threshold: 0.1,
-        rootMargin: '128px', // Start loading before the component comes into view
-      }
-    )
-
-    if (chartRefCurrent) {
-      observer.observe(chartRefCurrent)
-    }
-
-    return () => {
-      if (chartRefCurrent) {
-        observer.unobserve(chartRefCurrent)
-      }
-    }
-  }, [hasLoadedOnce])
 
   // Each chart uses a subset of available filters, defined below
   const { filters } = useFilterOptions(filterColumns)
@@ -252,54 +136,69 @@ export function SurveyChart({
   )
 
   // Build function parameters based on filterColumns
-  const buildFunctionParams = useCallback((activeFilters: Record<string, string>) => {
+  const buildFunctionParams = useCallback((filterValues: Record<string, string>) => {
     const params: Record<string, any> = {}
-
-    // Convert single values to arrays for the function parameters
-    if (activeFilters.person_age && activeFilters.person_age !== 'unset') {
-      params.person_age_filter = [activeFilters.person_age]
+    if (filterValues.person_age && filterValues.person_age !== NO_FILTER) {
+      params.person_age_filter = [filterValues.person_age]
     }
-    if (activeFilters.location && activeFilters.location !== 'unset') {
-      params.location_filter = [activeFilters.location]
+    if (filterValues.location && filterValues.location !== NO_FILTER) {
+      params.location_filter = [filterValues.location]
     }
-    if (activeFilters.money_raised && activeFilters.money_raised !== 'unset') {
-      params.money_raised_filter = [activeFilters.money_raised]
+    if (filterValues.money_raised && filterValues.money_raised !== NO_FILTER) {
+      params.money_raised_filter = [filterValues.money_raised]
     }
-    if (activeFilters.team_size && activeFilters.team_size !== 'unset') {
-      params.team_size_filter = [activeFilters.team_size]
+    if (filterValues.team_size && filterValues.team_size !== NO_FILTER) {
+      params.team_size_filter = [filterValues.team_size]
     }
-
     return params
   }, [])
 
-  // Use the custom hook to fetch data
-  const {
-    chartData,
-    isLoading: dataLoading,
-    error: dataError,
-  } = useSurveyData(
-    isInView && isAvailableForYear,
-    resolvedFunctionName,
-    buildFunctionParams,
-    activeFilters
+  const params = useMemo(
+    () => buildFunctionParams(activeFilters),
+    [activeFilters, buildFunctionParams]
   )
 
-  // Reset animation state when filters change
-  useEffect(() => {
-    setShouldAnimateBars(false)
-  }, [activeFilters])
+  const cached = isAvailableForYear ? get(resolvedFunctionName, params) : undefined
+  const [chartData, setChartData] = useState<ChartDataItem[]>(cached ?? [])
+  const [isLoading, setIsLoading] = useState<boolean>(!cached && isAvailableForYear)
+  const [dataError, setDataError] = useState<string | null>(null)
 
-  // Trigger bar animation when data loads
+  // Sync data with cache + on-demand fetch when year/filters change
   useEffect(() => {
-    if (!dataLoading && chartData.length > 0 && !shouldAnimateBars) {
-      // Small delay to ensure DOM is ready
-      const timer = setTimeout(() => {
-        setShouldAnimateBars(true)
-      }, 100)
-
-      return () => clearTimeout(timer)
+    if (!isAvailableForYear) {
+      setChartData([])
+      setIsLoading(false)
+      setDataError(null)
+      return
     }
-  }, [dataLoading, chartData.length, shouldAnimateBars])
+
+    const next = get(resolvedFunctionName, params)
+    if (next) {
+      setChartData(next)
+      setIsLoading(false)
+      setDataError(null)
+      return
+    }
+
+    let cancelled = false
+    setIsLoading(true)
+    setDataError(null)
+    fetchAndCache(resolvedFunctionName, params)
+      .then((data) => {
+        if (cancelled) return
+        setChartData(data)
+        setIsLoading(false)
+      })
+      .catch((err: any) => {
+        if (cancelled) return
+        setDataError(err?.message ?? 'Error fetching data')
+        setIsLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [resolvedFunctionName, params, isAvailableForYear, get, fetchAndCache])
 
   const [view, setView] = useState<'chart' | 'sql'>('chart')
 
@@ -327,17 +226,8 @@ export function SurveyChart({
   const BUTTON_AREA_HEIGHT = 40 // px
   const CHART_HEIGHT = FIXED_HEIGHT - BUTTON_AREA_HEIGHT // px
 
-  const skeletonData = [
-    { label: 'Loading', value: 0, rawValue: 0 },
-    { label: 'Loading', value: 0, rawValue: 0 },
-    { label: 'Loading', value: 0, rawValue: 0 },
-  ]
-
-  const displayData = dataLoading ? skeletonData : chartData || []
-
   return (
     <div
-      ref={chartRef}
       className="w-full bg-200 border-t border-muted"
       style={{
         background: `radial-gradient(circle at center -150%, ${accentBg}, transparent 80%), radial-gradient(ellipse at center 230%, hsl(var(--background-surface-200)), transparent 75%)`,
@@ -399,22 +289,25 @@ export function SurveyChart({
               <p className="text-danger">Error: {dataError}</p>
             </div>
           ) : view === 'chart' ? (
-            <div className="flex flex-col h-full w-full justify-between px-8 pt-4 pb-12 min-h-[300px]">
+            <div
+              className={`flex flex-col h-full w-full justify-between px-8 pt-4 pb-12 min-h-[300px] transition-opacity ${
+                isLoading && chartData.length === 0 ? 'opacity-0' : 'opacity-100'
+              }`}
+            >
               {chartData.length > 0 ? (
                 <div
                   className="flex flex-col gap-10"
                   style={{ height: isExpanded ? 'auto' : `${CHART_HEIGHT}px` }}
                 >
-                  {displayData.map((item, index) => (
-                    <div key={index} className="flex flex-col">
+                  {chartData.map((item, index) => (
+                    <div
+                      key={`${resolvedFunctionName}-${index}-${item.label}`}
+                      className="flex flex-col"
+                    >
                       {/* Text above the bar */}
                       <div
                         className={`mb-2 flex flex-row justify-between text-sm font-mono uppercase tracking-widest tabular-nums transition-colors duration-300 ${
-                          shouldAnimateBars
-                            ? item.value === maxValue
-                              ? accentBarText
-                              : 'text-foreground'
-                            : 'text-foreground-muted'
+                          item.value === maxValue ? accentBarText : 'text-foreground'
                         }`}
                       >
                         <span>{item.label}</span>
@@ -444,11 +337,9 @@ export function SurveyChart({
 
                         {/* Filled portion of the bar */}
                         <div
-                          className={`h-full relative bg-surface-100`}
+                          className="h-full relative bg-surface-100"
                           style={{
                             width: `calc(max(0.5%, (var(--bar-value) / 100) * 100%))`,
-                            clipPath: shouldAnimateBars ? 'inset(0 0 0 0)' : 'inset(0 100% 0 0)',
-                            transition: `clip-path 0.5s steps(${Math.max(2, Math.floor((item.value / 100) * 12))}, end) ${index * 0.05}s`,
                           }}
                         >
                           {/* Foreground pattern for the filled portion */}
@@ -504,22 +395,18 @@ export function SurveyChart({
           )}
 
           {/* Expand button overlay - only show for chart view */}
-          {view === 'chart' &&
-            !isExpanded &&
-            !dataLoading &&
-            !dataError &&
-            chartData.length > 3 && (
-              <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-linear-to-b from-transparent to-background">
-                <Button
-                  type="default"
-                  size="tiny"
-                  onClick={() => setIsExpanded(true)}
-                  className="shadow-xs"
-                >
-                  Show more
-                </Button>
-              </div>
-            )}
+          {view === 'chart' && !isExpanded && !dataError && chartData.length > 3 && (
+            <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center py-4 bg-linear-to-b from-transparent to-background">
+              <Button
+                type="default"
+                size="tiny"
+                onClick={() => setIsExpanded(true)}
+                className="shadow-xs"
+              >
+                Show more
+              </Button>
+            </div>
+          )}
         </motion.div>
       </div>
     </div>
