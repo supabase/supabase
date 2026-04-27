@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 import { globby } from 'globby'
 import prettier from 'prettier'
 
@@ -115,10 +115,31 @@ async function generate() {
     })
     .filter(Boolean)
 
+  // Changelog detail pages are dynamic routes; include them from generated changelog RSS links.
+  const changelogDetailUrls = (() => {
+    try {
+      const rss = readFileSync('public/changelog-rss.xml', 'utf-8')
+      const matches = [...rss.matchAll(/<link>(https:\/\/supabase\.com\/changelog\/\d+)<\/link>/g)]
+      const uniqueUrls = [...new Set(matches.map((match) => match[1]))]
+
+      return uniqueUrls.map(
+        (url) => `
+        <url>
+            <loc>${url}</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.5</priority>
+        </url>
+      `
+      )
+    } catch {
+      return []
+    }
+  })()
+
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-        ${[...staticUrls].join('')}
+        ${[...staticUrls, ...changelogDetailUrls].join('')}
     </urlset>
     `
 
