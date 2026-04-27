@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -49,8 +49,6 @@ const S3TableSchema = z.object({
   region_name: z.string().min(1, 'Required'),
   vault_aws_s3table_bucket_arn: z.string().min(1, 'Required'),
 })
-type S3TableSchemaType = z.infer<typeof S3TableSchema>
-
 const R2CatalogSchema = z.object({
   target: z.literal('R2Catalog'),
   source_schema: z.string().min(1, 'Please provide a namespace name'),
@@ -63,8 +61,6 @@ const R2CatalogSchema = z.object({
   s3: z.object({ endpoint: z.string().min(1, 'Required') }),
   catalog_uri: z.string().min(1, 'Required'),
 })
-type R2CatalogSchemaType = z.infer<typeof R2CatalogSchema>
-
 const IcebergRestCatalogSchema = z.object({
   target: z.literal('IcebergRestCatalog'),
   source_schema: z.string().min(1, 'Please provide a namespace name'),
@@ -79,8 +75,6 @@ const IcebergRestCatalogSchema = z.object({
   s3: z.object({ endpoint: z.string().min(1, 'Required') }),
   catalog_uri: z.string().optional(),
 })
-type IcebergRestCatalogSchemaType = z.infer<typeof IcebergRestCatalogSchema>
-
 const formSchema = z.discriminatedUnion('target', [
   S3TableSchema,
   R2CatalogSchema,

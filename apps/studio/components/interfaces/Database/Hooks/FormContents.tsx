@@ -5,7 +5,7 @@ import Image from 'next/legacy/image'
 import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
-  Checkbox_Shadcn_,
+  Checkbox,
   FormControl,
   FormField,
   Input_Shadcn_,
@@ -181,7 +181,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                 <div className="space-y-3">
                   {HOOK_EVENTS.map((event) => (
                     <div key={event.value} className="flex items-start space-x-3">
-                      <Checkbox_Shadcn_
+                      <Checkbox
                         id={`event-${event.value}`}
                         checked={field.value.includes(event.value)}
                         onCheckedChange={(checked) => {

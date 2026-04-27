@@ -236,7 +236,7 @@ export const getDecryptedParameters = async ({
 
   const paramsToBeDecrypted = Object.fromEntries(
     new Map(
-      Object.entries(serverOptions).filter(([key, value]) => {
+      Object.entries(serverOptions).filter(([key, _value]) => {
         return wrapperServerOptions.find((option) => option.name === key)?.encrypted
       })
     )

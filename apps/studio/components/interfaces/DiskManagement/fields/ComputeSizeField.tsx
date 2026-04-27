@@ -58,7 +58,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
 
   const showComputePrice = useIsFeatureEnabled('project_addons:show_compute_price')
 
-  const { computeSize, storageType } = form.watch()
+  const { computeSize } = form.watch()
 
   const {
     data: addons,

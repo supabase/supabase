@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { Control } from 'react-hook-form'
-import { FormField, RadioGroup_Shadcn_, RadioGroupItem_Shadcn_ } from 'ui'
+import { FormField, RadioGroup, RadioGroupItem } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { OptInToOpenAIToggle } from './OptInToOpenAIToggle'
@@ -100,7 +100,7 @@ export const AIOptInLevelSelector = ({
           control={control}
           name="aiOptInLevel"
           render={({ field }) => (
-            <RadioGroup_Shadcn_
+            <RadioGroup
               value={field.value}
               onValueChange={field.onChange}
               disabled={disabled}
@@ -108,7 +108,7 @@ export const AIOptInLevelSelector = ({
             >
               {AI_OPT_IN_LEVELS.map((item) => (
                 <div key={item.value} className="flex items-start space-x-3">
-                  <RadioGroupItem_Shadcn_
+                  <RadioGroupItem
                     value={item.value}
                     id={`ai-opt-in-${item.value}`}
                     className="mt-0.5"
@@ -122,7 +122,7 @@ export const AIOptInLevelSelector = ({
                   </label>
                 </div>
               ))}
-            </RadioGroup_Shadcn_>
+            </RadioGroup>
           )}
         />
       </div>

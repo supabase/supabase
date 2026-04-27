@@ -22,7 +22,7 @@ export function buildSlowQueriesCountSql(): string {
   `
 }
 
-export const useSlowQueriesCount = (projectRef?: string, refreshKey: number = 0) => {
+export const useSlowQueriesCount = (_projectRef?: string, refreshKey: number = 0) => {
   // refreshKey is used in useMemo to force recomputation when refresh is triggered
   const sql = useMemo(
     () => buildSlowQueriesCountSql(),

@@ -2,6 +2,9 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Copy } from 'lucide-react'
+// Required to avoid issue:
+// The inferred type of ConfirmationModal cannot be named without a reference to DialogProps
+import { Dialog as _RadixDialog } from 'radix-ui'
 import { forwardRef, ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -109,7 +112,7 @@ export const TextConfirmModal = forwardRef<
     const isFormValid = form.formState.isValid
 
     // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    function onSubmit(_values: z.infer<typeof formSchema>) {
       // Do something with the form values.
       // ✅ This will be type-safe and validated.
       onConfirm()

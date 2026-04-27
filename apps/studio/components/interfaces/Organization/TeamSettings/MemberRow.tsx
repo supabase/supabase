@@ -47,8 +47,6 @@ export const MemberRow = ({ member }: MemberRowProps) => {
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   const isInvitedUser = Boolean(member.invited_id)
-  const isEmailUser = member.username === member.primary_email
-  const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
 
   // Use generic avatar for all team members instead of attempting to fetch from GitHub
   const profileImageUrl = undefined
