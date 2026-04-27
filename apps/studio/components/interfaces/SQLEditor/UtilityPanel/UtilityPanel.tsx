@@ -94,7 +94,7 @@ export const UtilityPanel = ({
 
       snapV2.updateSnippet({ id, snippet: newSnippet as unknown as Snippet })
     },
-    onError: async (err, newContent, context) => {
+    onError: async (_err, _newContent, _context) => {
       toast.error(`Failed to update chart. Please try again.`)
     },
   })

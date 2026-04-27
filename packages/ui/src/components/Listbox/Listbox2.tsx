@@ -1,8 +1,8 @@
 'use client'
 
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { flatten } from 'lodash'
 import { Check } from 'lucide-react'
+import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
@@ -58,7 +58,6 @@ function Listbox({
   style,
   size = 'medium',
   defaultValue,
-  validation,
   disabled,
   optionsWidth,
 }: Props) {
@@ -234,18 +233,12 @@ interface OptionProps {
   addOnBefore?: ({ active, selected }: any) => React.ReactNode
 }
 
-type addOnBefore = {
-  selected: boolean
-  active: boolean
-}
-
 /**
  * @deprecated Use ./Select_shadcn_ or follow ComboBox convention or use ./ui-patterns/multi-select
  */
 function SelectOption({
   id,
   value,
-  label,
   disabled = false,
   children,
   className = '',

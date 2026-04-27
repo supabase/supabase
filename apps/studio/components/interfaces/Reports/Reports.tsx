@@ -1,14 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import dayjs from 'dayjs'
 import { groupBy, isEqual, isNull } from 'lodash'
 import { Plus, RefreshCw, Save } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { DragEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, LogoLoader } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
@@ -32,7 +29,6 @@ import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { BASE_PATH } from '@/lib/constants'
 import { Metric, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
 import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
@@ -43,7 +39,6 @@ const DEFAULT_CHART_COLUMN_COUNT = 1
 const DEFAULT_CHART_ROW_COUNT = 1
 
 const Reports = () => {
-  const router = useRouter()
   const { id: reportId, ref } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()

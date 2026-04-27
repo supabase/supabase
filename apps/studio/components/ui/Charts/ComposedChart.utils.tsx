@@ -144,7 +144,7 @@ export const calculateTotalChartAggregate = (
 export const CustomTooltip = ({
   active,
   payload,
-  label,
+  label: _label,
   attributes,
   data,
   xAxisKey = 'period_start',
@@ -311,7 +311,7 @@ export const CustomLabel = ({
 }: CustomLabelProps) => {
   const items = payload ?? []
   const maxValueAttribute = isMaxAttribute(attributes)
-  const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
+  const [, setHoveredLabel] = useState<string | null>(null)
 
   const handleMouseEnter = (label: string) => {
     setHoveredLabel(label)
