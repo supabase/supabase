@@ -31,8 +31,12 @@ export default async function BlogPage() {
   })
 
   const initialPosts = allPosts.slice(0, INITIAL_POSTS_LIMIT)
-  const totalPosts = allPosts.length
   const featuredPost = initialPosts[0]
+  // Featured post is rendered as the hero above the list, so exclude it from
+  // the list to avoid showing it twice. BlogClient compensates the API offset
+  // when scrolling for more posts.
+  const listPosts = initialPosts.slice(1)
+  const totalListPosts = Math.max(0, allPosts.length - 1)
 
   return (
     <DefaultLayout>
@@ -43,7 +47,7 @@ export default async function BlogPage() {
 
       <div className="border-default border-t">
         <div className="container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
-          <BlogClient initialBlogs={initialPosts} totalPosts={totalPosts} />
+          <BlogClient initialBlogs={listPosts} totalPosts={totalListPosts} />
         </div>
       </div>
     </DefaultLayout>

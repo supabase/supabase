@@ -76,8 +76,15 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
 
   const fetchMorePosts = useCallback(
     async (offset: number, limit: number) => {
+      const isFiltered =
+        (filterParams.category && filterParams.category !== 'all') || Boolean(filterParams.search)
+      // The featured post is rendered above the list (not in `items`), so the
+      // API offset has to skip past it for unfiltered fetches. Filtered
+      // results come from a separate query and don't share that hero slot.
+      const apiOffset = isFiltered ? offset : offset + 1
+
       const params = new URLSearchParams({
-        offset: offset.toString(),
+        offset: apiOffset.toString(),
         limit: limit.toString(),
       })
 
