@@ -32,15 +32,7 @@ function FloatingTableOfContents({
   const currentChapter = pageData.pageChapters[activeChapter - 1]
 
   return (
-    <motion.div
-      ref={tocRef}
-      layout
-      className="relative"
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
-    >
+    <motion.div ref={tocRef} layout className="relative">
       <div className="relative">
         <AnimatePresence mode="wait">
           {!isTocOpen ? (
@@ -203,22 +195,28 @@ export default function StateOfStartups2026Content({
     <YearProvider>
       <SurveyDataProvider preloadedData={preloadedData}>
         <DefaultLayout className="bg-alternative overflow-hidden">
-          <div className="fixed top-20 inset-x-0 z-50 pointer-events-none flex justify-center">
-            <motion.div layout className="flex items-start gap-2 pointer-events-auto">
-              <AnimatePresence mode="popLayout">
-                {showFloatingToc && (
+          <AnimatePresence>
+            {showFloatingToc && (
+              <motion.div
+                key="floating-controls"
+                className="fixed top-20 inset-x-0 z-50 pointer-events-none flex justify-center"
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+              >
+                <div className="flex items-start gap-2 pointer-events-auto">
                   <FloatingTableOfContents
-                    key="floating-toc"
                     tocRef={tocRef}
                     isTocOpen={isTocOpen}
                     setIsTocOpen={setIsTocOpen}
                     activeChapter={activeChapter}
                   />
-                )}
-              </AnimatePresence>
-              <YearToggle />
-            </motion.div>
-          </div>
+                  <YearToggle />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           {/* Intro section */}
           <section ref={heroRef} className="w-full">
             <StateOfStartupsAuroraHeader />
