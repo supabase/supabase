@@ -3,10 +3,12 @@ import { NextResponse } from 'next/server'
 import { MD_CONTENT } from '../content.generated'
 import { generatePricingContent } from '@/lib/llms'
 
-// Static .md files are bundled at build time, so they're safe to cache for a day.
+// Static .md files are bundled at build time, so they're safe to cache at the
+// edge for a day. Without s-maxage Vercel's CDN won't cache the response and
+// every request would hit the lambda.
 const STATIC_HEADERS = {
   'Content-Type': 'text/markdown; charset=utf-8',
-  'Cache-Control': 'public, max-age=86400, stale-while-revalidate=3600',
+  'Cache-Control': 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600',
   Vary: 'Accept',
 }
 
