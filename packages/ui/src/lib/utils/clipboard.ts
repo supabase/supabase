@@ -14,6 +14,12 @@ export const copyToClipboard = async (str: string | Promise<string>, callback = 
   const focused = window.document.hasFocus()
   if (focused) {
     if (typeof ClipboardItem && navigator.clipboard?.write) {
+      if (window.location.protocol === 'http:') {
+        throw new Error(
+          'Safari only allows copying to the clipboard in secure contexts (HTTPS), not HTTP.'
+        )
+      }
+
       // NOTE: Safari locks down the clipboard API to only work when triggered
       // by a direct user interaction. You can't use it async in a promise.
       // But! You can wrap the promise in a ClipboardItem, and give that to
