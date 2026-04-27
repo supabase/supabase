@@ -165,13 +165,13 @@ describe('parseCronJobCommand', () => {
   })
 
   it('should return an HTTP request config with POST method, some headers and empty body', () => {
-    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('fst', '1', 'snd', '2'), body:='', timeout_milliseconds:=1000 );`
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('fst', '1', 'snd', 'O''Reilly'), body:='', timeout_milliseconds:=1000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
       method: 'POST',
       httpHeaders: [
         { name: 'fst', value: '1' },
-        { name: 'snd', value: '2' },
+        { name: 'snd', value: "O'Reilly" },
       ],
       httpBody: '',
       timeoutMs: 1000,
@@ -222,16 +222,13 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return an HTTP request config with POST method, plain JSON headers and plain JSON body with ::jsonb typecasting', () => {
-    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:='{"fst": "1", "snd": "2"}'::jsonb,body:='{"key": "value"}'::jsonb,timeout_milliseconds:=5000);`
+  it('should return an HTTP request config with POST method, plain JSON headers and plain JSON body with escaped SQL strings and ::jsonb typecasting', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:='{"X-Name":"O''Reilly"}'::jsonb,body:='{"message":"hello  there","name":"O''Reilly"}'::jsonb,timeout_milliseconds:=5000);`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
       method: 'POST',
-      httpHeaders: [
-        { name: 'fst', value: '1' },
-        { name: 'snd', value: '2' },
-      ],
-      httpBody: '{"key": "value"}',
+      httpHeaders: [{ name: 'X-Name', value: "O'Reilly" }],
+      httpBody: `{"message":"hello  there","name":"O'Reilly"}`,
       timeoutMs: 5000,
       type: 'http_request',
       snippet: command,

@@ -7,9 +7,9 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Modal,
   Select_Shadcn_,
@@ -87,7 +87,7 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
       header="Confirm to ban user"
       onCancel={() => onClose()}
     >
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Modal.Content className="flex flex-col gap-y-3">
             <p className="text-sm">
@@ -95,23 +95,23 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
               for a specified duration.
             </p>
             <div className="flex items-start gap-x-2 [&>div:first-child]:flex-grow">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="value"
                 render={({ field }) => (
                   <FormItemLayout className="[&>div>div]:mt-0" label="Set a ban duration">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_ {...field} />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="unit"
                 render={({ field }) => (
                   <FormItemLayout className="[&>div>div]:mt-0 mt-[33px]">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Select_Shadcn_
                         {...field}
                         value={field.value}
@@ -125,7 +125,7 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
                           <SelectItem_Shadcn_ value="days">Days</SelectItem_Shadcn_>
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -150,7 +150,7 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
             </Button>
           </Modal.Content>
         </form>
-      </Form_Shadcn_>
+      </Form>
     </Modal>
   )
 }

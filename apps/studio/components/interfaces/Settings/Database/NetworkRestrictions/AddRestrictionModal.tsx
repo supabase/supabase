@@ -6,9 +6,9 @@ import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Modal,
   Tooltip,
@@ -147,7 +147,7 @@ const AddRestrictionModal = ({
       onCancel={onClose}
       header={`Add a new ${type} restriction`}
     >
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <Modal.Content className="space-y-4">
           <p className="text-sm text-foreground-light">
             This will add an IP address range to a list of allowed ranges that can access your
@@ -166,20 +166,20 @@ const AddRestrictionModal = ({
             className="flex space-x-4"
           >
             <div className="w-[55%]">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="ipAddress"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label={`${type} address`}>
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_ {...field} placeholder={type === 'IPv4' ? '0.0.0.0' : '::0'} />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </div>
             <div className="flex-grow">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="cidrBlockSize"
                 render={({ field }) => (
@@ -203,7 +203,7 @@ const AddRestrictionModal = ({
                       </div>
                     }
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         {...field}
                         type="number"
@@ -216,7 +216,7 @@ const AddRestrictionModal = ({
                             : IPV6_MAX_CIDR_BLOCK_SIZE.toString()
                         }
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -257,7 +257,7 @@ const AddRestrictionModal = ({
             Save restriction
           </Button>
         </Modal.Content>
-      </Form_Shadcn_>
+      </Form>
     </Modal>
   )
 }

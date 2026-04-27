@@ -9,7 +9,7 @@ const color = require('./../../build/css/tw-extend/color')
  * @param {string} file
  * Name of file to be created
  */
-function writeJsFile(file) {
+function writeJsFile(file: string) {
   const backgrounds = Object.keys(color).filter((x) => x.includes('background-'))
   const borders = Object.keys(color).filter((x) => x.includes('border-'))
   const texts = Object.keys(color).filter((x) => x.includes('foreground-'))
@@ -25,7 +25,7 @@ function writeJsFile(file) {
 
   // console.log('Example tailwind classes: ')
 
-  function santizieDefaults(x) {
+  function santizieDefaults(x: string) {
     // console.log(x)
     let value = x
     value = value.replace('-DEFAULT', '')

@@ -11,9 +11,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -177,7 +177,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         )}
       </div>
       <Collapsible.Content>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             id={formId}
             onSubmit={form.handleSubmit(onSaveChanges)}
@@ -186,7 +186,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             <div className="py-4 space-y-[9px]">
               {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[]).map(
                 (permission) => (
-                  <FormField_Shadcn_
+                  <FormField
                     key={permission}
                     control={form.control}
                     name={permission}
@@ -197,14 +197,14 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
                         layout="flex"
                         label={ROLE_PERMISSIONS[permission].description}
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             id={`${role.id}-${permission}`}
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -227,7 +227,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               </div>
             )}
           </form>
-        </Form_Shadcn_>
+        </Form>
       </Collapsible.Content>
     </Collapsible>
   )

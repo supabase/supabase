@@ -1,15 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import {
-  Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Modal,
-  Textarea,
-} from 'ui'
+import { Button, Form, FormControl, FormField, Input_Shadcn_, Modal, Textarea } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -54,30 +46,30 @@ export const UpdateSavedQueryModal = ({
 
   return (
     <Modal visible={visible} onCancel={handleCancel} hideFooter header={header} size="medium">
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
           <Modal.Content>
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItemLayout layout="vertical" label="Name">
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Input_Shadcn_ {...field} placeholder="Enter text" />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
           </Modal.Content>
           <Modal.Content>
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItemLayout layout="vertical" label="Description">
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Textarea {...field} placeholder="Describe query" className="resize-none" />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -92,7 +84,7 @@ export const UpdateSavedQueryModal = ({
             </Button>
           </Modal.Content>
         </form>
-      </Form_Shadcn_>
+      </Form>
     </Modal>
   )
 }

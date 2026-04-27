@@ -14,11 +14,11 @@ import {
   DialogSection,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
   Input_Shadcn_,
   Separator,
 } from 'ui'
@@ -150,23 +150,23 @@ export const DeleteAccountButton = () => {
                 </DialogFooter>
               </>
             ) : (
-              <Form_Shadcn_ {...form}>
+              <Form {...form}>
                 <form
                   id="account-deletion-request"
                   onSubmit={form.handleSubmit(() => onConfirmDelete())}
                 >
                   <DialogSection>
-                    <FormField_Shadcn_
+                    <FormField
                       name="account"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItem_Shadcn_>
-                          <FormLabel_Shadcn_>
+                        <FormItem>
+                          <FormLabel>
                             Please type{' '}
                             <span className="font-bold">{profile?.primary_email ?? ''}</span> to
                             confirm
-                          </FormLabel_Shadcn_>
-                          <FormControl_Shadcn_>
+                          </FormLabel>
+                          <FormControl>
                             <Input_Shadcn_
                               autoFocus
                               {...field}
@@ -174,8 +174,8 @@ export const DeleteAccountButton = () => {
                               disabled={isPending}
                               placeholder="Enter the account above"
                             />
-                          </FormControl_Shadcn_>
-                        </FormItem_Shadcn_>
+                          </FormControl>
+                        </FormItem>
                       )}
                     />
                   </DialogSection>
@@ -193,7 +193,7 @@ export const DeleteAccountButton = () => {
                     </Button>
                   </DialogFooter>
                 </form>
-              </Form_Shadcn_>
+              </Form>
             )}
           </>
         )}

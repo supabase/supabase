@@ -2,7 +2,7 @@ import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Badge, Checkbox, Input, SidePanel } from 'ui'
+import { Badge, Checkbox_Shadcn_, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -371,26 +371,31 @@ export const TableEditor = ({
       <SidePanel.Separator />
 
       <SidePanel.Content className="space-y-10 py-6">
-        <Checkbox
-          id="enable-rls"
-          // @ts-ignore
-          label={
-            <div className="flex items-center space-x-2">
+        <div className="items-top flex space-x-2">
+          <Checkbox_Shadcn_
+            id="enable-rls"
+            checked={tableFields.isRLSEnabled}
+            onCheckedChange={() => {
+              // if isEnabled, show confirm modal to turn off
+              // if not enabled, allow turning on without modal confirmation
+              tableFields.isRLSEnabled
+                ? setRlsConfirmVisible(true)
+                : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+            }}
+          />
+          <div className="grid gap-1.5 leading-none">
+            <label
+              htmlFor="enable-rls"
+              className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
               <span>Enable Row Level Security (RLS)</span>
               <Badge>Recommended</Badge>
-            </div>
-          }
-          description="Restrict access to your table by enabling RLS and writing Postgres policies."
-          checked={tableFields.isRLSEnabled}
-          onChange={() => {
-            // if isEnabled, show confirm modal to turn off
-            // if not enabled, allow turning on without modal confirmation
-            tableFields.isRLSEnabled
-              ? setRlsConfirmVisible(true)
-              : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
-          }}
-          size="medium"
-        />
+            </label>
+            <p className="text-sm text-foreground-muted">
+              Restrict access to your table by enabling RLS and writing Postgres policies.
+            </p>
+          </div>
+        </div>
 
         {tableFields.isRLSEnabled ? (
           <Admonition
@@ -433,22 +438,32 @@ export const TableEditor = ({
         )}
 
         {realtimeEnabled && (
-          <Checkbox
-            id="enable-realtime"
-            label="Enable Realtime"
-            description="Broadcast changes on this table to authorized subscribers"
-            checked={tableFields.isRealtimeEnabled}
-            onChange={() => {
-              track('realtime_toggle_table_clicked', {
-                newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
-                origin: 'tableSidePanel',
-              })
-              onUpdateField({
-                isRealtimeEnabled: !tableFields.isRealtimeEnabled,
-              })
-            }}
-            size="medium"
-          />
+          <div className="items-top flex space-x-2">
+            <Checkbox_Shadcn_
+              id="enable-realtime"
+              checked={tableFields.isRealtimeEnabled}
+              onCheckedChange={() => {
+                track('realtime_toggle_table_clicked', {
+                  newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
+                  origin: 'tableSidePanel',
+                })
+                onUpdateField({
+                  isRealtimeEnabled: !tableFields.isRealtimeEnabled,
+                })
+              }}
+            />
+            <div className="grid gap-1.5 leading-none">
+              <label
+                htmlFor="enable-realtime"
+                className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Enable Realtime
+              </label>
+              <p className="text-sm text-foreground-muted">
+                Broadcast changes on this table to authorized subscribers.
+              </p>
+            </div>
+          </div>
         )}
       </SidePanel.Content>
 
@@ -474,14 +489,24 @@ export const TableEditor = ({
         )}
         {isDuplicating && (
           <>
-            <Checkbox
-              id="duplicate-rows"
-              label="Duplicate table entries"
-              description="This will copy all the data in the table into the new table"
-              checked={isDuplicateRows}
-              onChange={() => setIsDuplicateRows(!isDuplicateRows)}
-              size="medium"
-            />
+            <div className="items-top flex space-x-2">
+              <Checkbox_Shadcn_
+                id="duplicate-rows"
+                checked={isDuplicateRows}
+                onCheckedChange={() => setIsDuplicateRows(!isDuplicateRows)}
+              />
+              <div className="grid gap-1.5 leading-none">
+                <label
+                  htmlFor="duplicate-rows"
+                  className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Duplicate table entries
+                </label>
+                <p className="text-sm text-foreground-muted">
+                  This will copy all the data in the table into the new table
+                </p>
+              </div>
+            </div>
           </>
         )}
 

@@ -12,9 +12,9 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   InfoIcon,
   InputGroup,
@@ -183,9 +183,9 @@ const DiskSizeConfigurationModal = ({
                     </Button>
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
-                <Form_Shadcn_ {...form}>
+                <Form {...form}>
                   <form id={formId} onSubmit={form.handleSubmit(handleSubmit)} noValidate>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="new-disk-size"
                       disabled={!isAbleToResizeDatabase}
@@ -195,7 +195,7 @@ const DiskSizeConfigurationModal = ({
                           layout="vertical"
                           label="New disk size"
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <InputGroup>
                               <FormInputGroupInput
                                 {...field}
@@ -207,12 +207,12 @@ const DiskSizeConfigurationModal = ({
                                 <InputGroupText>GB</InputGroupText>
                               </InputGroupAddon>
                             </InputGroup>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
                   </form>
-                </Form_Shadcn_>
+                </Form>
               </Modal.Content>
               <Modal.Separator />
               <Modal.Content className="flex space-x-2 justify-end">

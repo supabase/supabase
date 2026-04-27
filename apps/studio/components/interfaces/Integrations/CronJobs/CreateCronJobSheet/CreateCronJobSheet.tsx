@@ -8,9 +8,9 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -297,21 +297,21 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
             </SheetHeader>
 
             <div className="overflow-auto flex-grow">
-              <Form_Shadcn_ {...form}>
+              <Form {...form}>
                 <form
                   id={FORM_ID}
                   className="flex-grow overflow-auto"
                   onSubmit={form.handleSubmit(onSubmit)}
                 >
                   <SheetSection>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="name"
                       render={({ field }) => (
                         <FormItemLayout label="Name" layout="vertical" className="gap-1 relative">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Input_Shadcn_ {...field} disabled={isEditing} />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                           <span className="text-foreground-lighter text-xs absolute top-0 right-0">
                             Cron jobs cannot be renamed once created
                           </span>
@@ -323,12 +323,12 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                   <CronJobScheduleSection form={form} supportsSeconds={supportsSeconds} />
                   <Separator />
                   <SheetSection>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="values.type"
                       render={({ field }) => (
                         <FormItemLayout label="Type" layout="vertical" className="gap-1">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <RadioGroupStacked
                               id="function_type"
                               name="function_type"
@@ -373,7 +373,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                                 </RadioGroupStackedItem>
                               ))}
                             </RadioGroupStacked>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -436,7 +436,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                   {cronType === 'sql_function' && <SqlFunctionSection form={form} />}
                   {cronType === 'sql_snippet' && <SqlSnippetSection form={form} />}
                 </form>
-              </Form_Shadcn_>
+              </Form>
             </div>
             <SheetFooter>
               <Button
