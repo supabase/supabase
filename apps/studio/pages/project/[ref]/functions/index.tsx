@@ -164,7 +164,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                               ))
                             ) : (
                               <TableRow>
-                                <TableCell colSpan={showLastHourStats ? 7 : 5}>
+                                <TableCell colSpan={showLastHourStats ? 8 : 6}>
                                   <p className="text-sm text-foreground">No results found</p>
                                   <p className="text-sm text-foreground-light">
                                     Your search for "{search}" did not return any results
