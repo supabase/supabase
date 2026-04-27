@@ -420,6 +420,7 @@ try {
           nodes {
             number
             title
+            body
             createdAt
             url
             labels(first: 25) {
@@ -472,6 +473,7 @@ try {
       url: item.url,
       sortDate: discussionDisplayDate({ title: item.title, createdAt: item.createdAt }),
       labels: (item.labels?.nodes ?? []).map((l) => l.name.toLowerCase()),
+      body: item.body ?? '',
     }))
 
     const changelogXml = generateChangelogRssXml(entries)
@@ -486,15 +488,48 @@ try {
     const mdRows = visibleEntries.map((entry) => {
       const date = dayjs(entry.sortDate).isValid() ? dayjs(entry.sortDate).format('YYYY-MM-DD') : ''
       const labels = (entry.labels ?? []).join(',')
-      return `- ${date} | #${entry.number} | ${escapeMd(labels)} | ${escapeMd(entry.title)} | /changelog/${entry.number}`
+      return `- ${date} | #${entry.number} | ${escapeMd(labels)} | ${escapeMd(entry.title)} | /changelog/${entry.number}.md`
     })
-    const changelogMd = `<!-- date | #number | labels(comma-separated slugs) | title | path -->
+    const changelogMd = `<!-- All paths in the last column are relative to https://supabase.com -->
+<!-- Each row: date | #number | labels (comma-separated slugs) | title | path -->
 
 ${mdRows.join('\n')}
 `
     const changelogMdPath = path.join(__dirname, '../public/changelog.md')
     await fs.writeFile(changelogMdPath, changelogMd.trim() + '\n', 'utf8')
     console.log(`✅ Generated changelog.md (${visibleEntries.length} entries)`)
+
+    // One markdown file per entry → /changelog/<number>.md (same content shape as the web page body).
+    const changelogEntryMdDir = path.join(__dirname, '../public/changelog')
+    await fs.mkdir(changelogEntryMdDir, { recursive: true })
+    for (const entry of visibleEntries) {
+      const published = dayjs(entry.sortDate).isValid()
+        ? dayjs(entry.sortDate).format('YYYY-MM-DD')
+        : ''
+      const titleLine = String(entry.title ?? '')
+        .replace(/\n/g, ' ')
+        .trim()
+      const labelsLine = (entry.labels ?? []).join(', ')
+      const pageUrl = `https://supabase.com/changelog/${entry.number}`
+      const entryMd = `# ${titleLine}
+
+- **number:** ${entry.number}
+- **published:** ${published}
+- **discussion:** ${entry.url}
+- **labels:** ${labelsLine || '—'}
+- **page:** ${pageUrl}
+
+---
+
+${entry.body ?? ''}
+`
+      await fs.writeFile(
+        path.join(changelogEntryMdDir, `${entry.number}.md`),
+        entryMd.trim() + '\n',
+        'utf8'
+      )
+    }
+    console.log(`✅ Generated public/changelog/*.md (${visibleEntries.length} files)`)
 
     // Per-tag RSS feeds → public/changelog-rss/<label-slug>.xml
     const tagFeedsDir = path.join(__dirname, '../public/changelog-rss')
