@@ -145,11 +145,11 @@ Please refer to the [Vector configuration file](https://github.com/supabase/supa
 
 You **must** ensure that each payload matches the event shape produced by the example Vector transforms. Studio Logs expects the fields below when querying Analytics sources:
 
-| Field | Description |
-| --- | --- |
-| `event_message` | The log message displayed in Studio. |
-| `timestamp` | The event timestamp. If omitted, Logflare assigns an ingestion timestamp. |
-| `metadata` | A JSON object with service-specific fields used by the Logs UI. For example, API logs include request and response metadata, while database logs include parsed Postgres severity metadata. |
+| Field           | Description                                                                                                                                                                                 |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `event_message` | The log message displayed in Studio.                                                                                                                                                        |
+| `timestamp`     | The event timestamp. If omitted, Logflare assigns an ingestion timestamp.                                                                                                                   |
+| `metadata`      | A JSON object with service-specific fields used by the Logs UI. For example, API logs include request and response metadata, while database logs include parsed Postgres severity metadata. |
 
 When adding a custom Vector source, map your service logs to this shape before sending them to `http://analytics:4000/api/logs?source_name=<source-name>`. Reuse the existing source names in `vector.yml` if you want the logs to appear in the built-in Studio Logs panels.
 
