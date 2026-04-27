@@ -147,7 +147,7 @@ export const EditorTabs = () => {
           ref={tabsListRef}
           className={cn(
             'rounded-b-none gap-0 min-h-[var(--header-height)] flex items-center w-full z-[1]',
-            'bg-surface-200 dark:bg-alternative border-none overflow-clip overflow-x-auto'
+            'bg-surface-200 dark:bg-alternative border-none text-clip overflow-x-auto'
           )}
         >
           <SortableContext
