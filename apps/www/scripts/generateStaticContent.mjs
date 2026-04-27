@@ -391,7 +391,8 @@ try {
     const { Octokit } = await import('@octokit/core')
     const { paginateGraphql } = await import('@octokit/plugin-paginate-graphql')
 
-    const { generateChangelogRssXml, generateChangelogTagRssXml, labelToFileSlug } = await import('../lib/changelog-rss.mjs')
+    const { generateChangelogRssXml, generateChangelogTagRssXml, labelToFileSlug } =
+      await import('../lib/changelog-rss.mjs')
     const rewritesPath = path.join(__dirname, 'data/changelog-deleted-discussions.json')
     const rewrites = JSON.parse(await fs.readFile(rewritesPath, 'utf8'))
     const discussionDisplayDate = (item) => {
@@ -516,7 +517,9 @@ try {
       })
     )
     const succeeded = tagResults.filter((r) => r.status === 'fulfilled').length
-    console.log(`✅ Generated ${succeeded}/${CHANGELOG_PRODUCT_TAGS.length} per-tag changelog RSS feeds`)
+    console.log(
+      `✅ Generated ${succeeded}/${CHANGELOG_PRODUCT_TAGS.length} per-tag changelog RSS feeds`
+    )
   }
 } catch (error) {
   console.warn('Error generating changelog RSS:', error)

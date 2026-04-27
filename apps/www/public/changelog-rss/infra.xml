@@ -1,0 +1,208 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · Infra</title>
+      <link>https://supabase.com/changelog</link>
+      <description>Infra updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Wed, 10 Dec 2025 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/infra.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/41231</guid>
+  <title>Developer Update - December 2025</title>
+  <link>https://supabase.com/changelog/41231</link>
+  <pubDate>Wed, 10 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/35851</guid>
+  <title>Forthcoming Postgres 17 Release Notes</title>
+  <link>https://supabase.com/changelog/35851</link>
+  <pubDate>Thu, 22 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/34634</guid>
+  <title>Supabase Management API `GET` Logs Restrictions</title>
+  <link>https://supabase.com/changelog/34634</link>
+  <pubDate>Tue, 01 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/34494</guid>
+  <title>Upcoming Change: Improved Experimental Routing for Read Replica Load Balancers</title>
+  <link>https://supabase.com/changelog/34494</link>
+  <pubDate>Thu, 27 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/34404</guid>
+  <title>Dedicated Pooler with PgBouncer</title>
+  <link>https://supabase.com/changelog/34404</link>
+  <pubDate>Tue, 25 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/33413</guid>
+  <title>Deprecation of Fly.io Postgres Managed by Supabase on April 11, 2025</title>
+  <link>https://supabase.com/changelog/33413</link>
+  <pubDate>Fri, 07 Feb 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/32755</guid>
+  <title>Supabase Connection Pooler Deprecating Session Mode on Port 6543 on February 28, 2025</title>
+  <link>https://supabase.com/changelog/32755</link>
+  <pubDate>Mon, 13 Jan 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/29633</guid>
+  <title>XHTML responses are only allowed with a Custom Domain enabled</title>
+  <link>https://supabase.com/changelog/29633</link>
+  <pubDate>Wed, 02 Oct 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/29434</guid>
+  <title>Projects on XL and larger compute add-ons can now create up to 5 Read Replicas.</title>
+  <link>https://supabase.com/changelog/29434</link>
+  <pubDate>Sun, 22 Sep 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/28738</guid>
+  <title>Threshold for transitioning projects to physical backups lowered to 15GB</title>
+  <link>https://supabase.com/changelog/28738</link>
+  <pubDate>Mon, 19 Aug 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/28519</guid>
+  <title>Developer Updates - July 2024</title>
+  <link>https://supabase.com/changelog/28519</link>
+  <pubDate>Fri, 09 Aug 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/28493</guid>
+  <title>Let&apos;s Encrypt cross-signed chain will no longer be used for Custom Domains after September 9, 2024</title>
+  <link>https://supabase.com/changelog/28493</link>
+  <pubDate>Fri, 09 Aug 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/27497</guid>
+  <title>Paused Free Plan projects are restorable for 90 days</title>
+  <link>https://supabase.com/changelog/27497</link>
+  <pubDate>Mon, 24 Jun 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/25860</guid>
+  <title>Developer Updates - April 2024</title>
+  <link>https://supabase.com/changelog/25860</link>
+  <pubDate>Wed, 08 May 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/22525</guid>
+  <title>Platform Updates: March 2024</title>
+  <link>https://supabase.com/changelog/22525</link>
+  <pubDate>Sat, 06 Apr 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/22457</guid>
+  <title>Increased Supavisor Client Connection Limits Across Paid Plans</title>
+  <link>https://supabase.com/changelog/22457</link>
+  <pubDate>Thu, 04 Apr 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/22135</guid>
+  <title>Migration to v2 platform architecture</title>
+  <link>https://supabase.com/changelog/22135</link>
+  <pubDate>Wed, 20 Mar 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/21823</guid>
+  <title>Platform Updates: February 2024</title>
+  <link>https://supabase.com/changelog/21823</link>
+  <pubDate>Wed, 06 Mar 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/21386</guid>
+  <title>Paid organizations can now launch projects on bigger compute immediately</title>
+  <link>https://supabase.com/changelog/21386</link>
+  <pubDate>Tue, 20 Feb 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/21042</guid>
+  <title>Platform Updates: January 2024</title>
+  <link>https://supabase.com/changelog/21042</link>
+  <pubDate>Tue, 06 Feb 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/20522</guid>
+  <title>Supavisor starts enforcing Network Restrictions</title>
+  <link>https://supabase.com/changelog/20522</link>
+  <pubDate>Wed, 17 Jan 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/20512</guid>
+  <title>IPv4 addon for projects available</title>
+  <link>https://supabase.com/changelog/20512</link>
+  <pubDate>Wed, 17 Jan 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/20358</guid>
+  <title>Supavisor 1.1.6</title>
+  <link>https://supabase.com/changelog/20358</link>
+  <pubDate>Thu, 11 Jan 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/20346</guid>
+  <title>Platform Updates December 2023</title>
+  <link>https://supabase.com/changelog/20346</link>
+  <pubDate>Thu, 11 Jan 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/20313</guid>
+  <title>Supavisor 1.1.5</title>
+  <link>https://supabase.com/changelog/20313</link>
+  <pubDate>Wed, 10 Jan 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/20195</guid>
+  <title>Supavisor v1.1.2 - allow_list and client_heartbeat_interval</title>
+  <link>https://supabase.com/changelog/20195</link>
+  <pubDate>Fri, 05 Jan 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/20122</guid>
+  <title>Threshold for transitioning projects to physical backups lowered to 40GB</title>
+  <link>https://supabase.com/changelog/20122</link>
+  <pubDate>Wed, 03 Jan 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19669</guid>
+  <title>Supavisor 1.0</title>
+  <link>https://supabase.com/changelog/19669</link>
+  <pubDate>Wed, 13 Dec 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/18654</guid>
+  <title>Large databases now use daily physical backups</title>
+  <link>https://supabase.com/changelog/18654</link>
+  <pubDate>Thu, 02 Nov 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19706</guid>
+  <title>Platform update September 2023</title>
+  <link>https://supabase.com/changelog/19706</link>
+  <pubDate>Fri, 06 Oct 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/17817</guid>
+  <title>PGBouncer and IPv4 Deprecation</title>
+  <link>https://supabase.com/changelog/17817</link>
+  <pubDate>Fri, 29 Sep 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19704</guid>
+  <title>Platform updates: August 2023</title>
+  <link>https://supabase.com/changelog/19704</link>
+  <pubDate>Fri, 08 Sep 2023 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19692</guid>
+  <title>August Beta 2021</title>
+  <link>https://supabase.com/changelog/19692</link>
+  <pubDate>Mon, 13 Sep 2021 00:00:00 -0700</pubDate>
+</item>
+    </channel>
+  </rss>

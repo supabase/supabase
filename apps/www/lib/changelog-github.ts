@@ -47,6 +47,15 @@ export async function fetchAllChangelogDiscussionMetadata(
   repo: string,
   categoryId: string
 ): Promise<ChangelogDiscussionMetadata[]> {
+  type DiscussionMetadataResponse = {
+    repository: {
+      discussions: {
+        nodes: ChangelogDiscussionMetadata[]
+        pageInfo: { hasNextPage: boolean; endCursor: string | null }
+      }
+    }
+  }
+
   const query = `
     query changelogDiscussionMetadata($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
       repository(owner: $owner, name: $repo) {
@@ -84,23 +93,13 @@ export async function fetchAllChangelogDiscussionMetadata(
   let hasNextPage = true
 
   while (hasNextPage) {
-    const {
-      repository: {
-        discussions: { nodes, pageInfo },
-      },
-    } = await octokit.graphql<{
-      repository: {
-        discussions: {
-          nodes: ChangelogDiscussionMetadata[]
-          pageInfo: { hasNextPage: boolean; endCursor: string | null }
-        }
-      }
-    }>(query, {
+    const response: DiscussionMetadataResponse = await octokit.graphql(query, {
       owner,
       repo,
       categoryId,
       cursor,
     })
+    const { nodes, pageInfo } = response.repository.discussions
 
     collected.push(...nodes)
     hasNextPage = pageInfo.hasNextPage

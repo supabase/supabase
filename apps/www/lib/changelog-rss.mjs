@@ -3,8 +3,8 @@
  * @typedef {{ number?: number; title: string; url: string; sortDate: string; labels?: string[] }} ChangelogRssItemInput
  */
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc.js'
 import advancedFormat from 'dayjs/plugin/advancedFormat.js'
+import utc from 'dayjs/plugin/utc.js'
 
 dayjs.extend(utc)
 dayjs.extend(advancedFormat)
@@ -30,9 +30,7 @@ function buildItemsXml(sorted) {
   return sorted
     .map((e) => {
       const encodedTitle = xmlEncodeRss(e.title)
-      const canonicalUrl = e.number
-        ? `https://supabase.com/changelog/${e.number}`
-        : e.url
+      const canonicalUrl = e.number ? `https://supabase.com/changelog/${e.number}` : e.url
       const encodedCanonical = xmlEncodeRss(canonicalUrl)
       const pubDate = formatRssPubDate(e.sortDate)
       return `<item>
@@ -93,9 +91,7 @@ export function generateChangelogTagRssXml(allEntries, tag) {
   const fileSlug = labelToFileSlug(displayLabel)
 
   const filtered = allEntries.filter(
-    (e) =>
-      !e.title.includes('[d]') &&
-      (e.labels ?? []).includes(githubLabelSlug.toLowerCase())
+    (e) => !e.title.includes('[d]') && (e.labels ?? []).includes(githubLabelSlug.toLowerCase())
   )
   const sorted = [...filtered].sort(
     (a, b) => dayjs(b.sortDate).valueOf() - dayjs(a.sortDate).valueOf()

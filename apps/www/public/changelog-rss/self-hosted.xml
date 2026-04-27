@@ -1,0 +1,22 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · Self-hosted</title>
+      <link>https://supabase.com/changelog</link>
+      <description>Self-hosted updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Wed, 21 Jan 2026 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/self-hosted.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/42031</guid>
+  <title>SQL snippets can now be saved in local Studio</title>
+  <link>https://supabase.com/changelog/42031</link>
+  <pubDate>Wed, 21 Jan 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19694</guid>
+  <title>October Beta 2021</title>
+  <link>https://supabase.com/changelog/19694</link>
+  <pubDate>Mon, 08 Nov 2021 00:00:00 -0700</pubDate>
+</item>
+    </channel>
+  </rss>

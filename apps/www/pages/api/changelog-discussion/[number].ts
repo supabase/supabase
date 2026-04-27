@@ -1,4 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
 import {
   CHANGELOG_CATEGORY_ID,
   createChangelogOctokit,
@@ -6,6 +5,7 @@ import {
 } from '~/lib/changelog-github'
 import { discussionDisplayDate } from '~/lib/changelog.utils'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -22,7 +22,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const octokit = createChangelogOctokit()
-    const discussion = await fetchChangelogDiscussionByNumber(octokit, 'supabase', 'supabase', number)
+    const discussion = await fetchChangelogDiscussionByNumber(
+      octokit,
+      'supabase',
+      'supabase',
+      number
+    )
 
     if (!discussion || discussion.category?.id !== CHANGELOG_CATEGORY_ID) {
       return res.status(404).json({ error: 'Not found' })
