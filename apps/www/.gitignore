@@ -25,8 +25,9 @@ yarn-error.log*
 !**/*/generated/**/.gitkeep
 .generated
 
-# Sitemap
+# Sitemap (regenerated on every Vercel deploy by `pnpm postbuild` -> internals/generate-sitemap.mjs)
 public/sitemap.xml
+public/sitemap_www.xml
 
 # contentlayer
 .contentlayer
