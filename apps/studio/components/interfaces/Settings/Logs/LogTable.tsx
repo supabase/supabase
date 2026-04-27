@@ -8,7 +8,7 @@ import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   ContextMenu_Shadcn_,
   ContextMenuItem_Shadcn_,
@@ -207,7 +207,7 @@ export const LogTable = ({
             toggle()
           }}
         >
-          <Checkbox_Shadcn_
+          <Checkbox
             className="group-hover:border-foreground-muted"
             checked={selectedRows.has(key)}
             onClick={(e: React.MouseEvent) => e.stopPropagation()}

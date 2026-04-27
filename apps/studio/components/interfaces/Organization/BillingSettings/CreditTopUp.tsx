@@ -177,7 +177,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const [paymentIntentSecret, setPaymentIntentSecret] = useState('')
   const [paymentIntentConfirmation, setPaymentIntentConfirmation] = useState<PaymentIntentResult>()
 
-  const onSubmit: SubmitHandler<CreditTopUpForm> = async ({ amount, paymentMethod }) => {
+  const onSubmit: SubmitHandler<CreditTopUpForm> = async ({ amount }) => {
     setPaymentIntentConfirmation(undefined)
 
     const token = await initHcaptcha()

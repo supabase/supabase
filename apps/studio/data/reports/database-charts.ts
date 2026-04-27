@@ -15,7 +15,7 @@ export const getReportAttributesV2: (
   isSpendCapEnabled?: boolean
 ) => ReportAttributes[] = (
   entitledFeatures,
-  project,
+  _project,
   diskConfig,
   maxConnections,
   pgBouncerMaxConnections,

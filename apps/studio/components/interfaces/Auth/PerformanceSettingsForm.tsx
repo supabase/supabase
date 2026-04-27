@@ -94,7 +94,7 @@ export const PerformanceSettingsForm = () => {
 
   const promptUpgrade = IS_PLATFORM && !isLoadingEntitlement && !hasAccessToPerformance
 
-  const { mutate: updateAuthConfig, isPending: isSaving } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   const requestDurationForm = useForm({
     resolver: zodResolver(
@@ -147,7 +147,7 @@ export const PerformanceSettingsForm = () => {
     updateAuthConfig(
       { projectRef: project?.ref, config },
       {
-        onError: (error) => {
+        onError: () => {
           setIsUpdatingDatabaseForm(false)
         },
         onSuccess: () => {

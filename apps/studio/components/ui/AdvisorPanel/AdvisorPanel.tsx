@@ -51,7 +51,7 @@ export const AdvisorPanel = () => {
     isError: isLintsError,
   } = useProjectLintsQuery({ projectRef: project?.ref }, { enabled: shouldLoadProjectAdvisorData })
 
-  const { data: signalItems, isPending: isSignalsPending } = useAdvisorSignals({
+  const { data: signalItems } = useAdvisorSignals({
     projectRef: project?.ref,
     enabled: shouldLoadProjectAdvisorData,
   })
@@ -157,11 +157,9 @@ export const AdvisorPanel = () => {
   // Only show loading state if the query is actually enabled
   const isLintsActuallyLoading = shouldLoadProjectAdvisorData && isLintsLoading
   const isNotificationsActuallyLoading = shouldLoadNotifications && isNotificationsLoading
-  const isSignalsActuallyLoading = shouldLoadProjectAdvisorData && isSignalsPending
-  const isLoading =
-    isLintsActuallyLoading || isNotificationsActuallyLoading || isSignalsActuallyLoading
 
-  // [Joshen] Opting to ignore error state of advisor signals for now - render lints irregardless of banned ips
+  // [Joshen] Opting to ignore loading and error state of advisor signals - render lints irregardless of banned ips
+  const isLoading = isLintsActuallyLoading || isNotificationsActuallyLoading
   const isError = isLintsError || isNotificationsError
 
   const handleTabChange = (tab: string) => {

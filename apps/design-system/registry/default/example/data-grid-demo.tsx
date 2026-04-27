@@ -3,7 +3,7 @@ import DataGrid, { Column, useRowSelection } from 'react-data-grid'
 
 import 'react-data-grid/lib/styles.css'
 
-import { Checkbox_Shadcn_, cn } from 'ui'
+import { Checkbox, cn } from 'ui'
 
 type User = {
   id: string
@@ -37,7 +37,7 @@ export default function DataGridDemo() {
 
         return (
           <div className="flex items-center justify-center h-full">
-            <Checkbox_Shadcn_
+            <Checkbox
               checked={isRowSelected}
               onClick={(e) => {
                 e.stopPropagation()

@@ -5,7 +5,7 @@ import { useState } from 'react'
 import {
   Badge,
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   Command_Shadcn_,
   CommandGroup_Shadcn_,
@@ -283,7 +283,7 @@ export const Column = ({
         </div>
       </div>
       <div className="w-[10%]">
-        <Checkbox_Shadcn_
+        <Checkbox
           aria-label="Check to make this column a primary key"
           checked={column.isPrimaryKey}
           onCheckedChange={() => {
@@ -326,7 +326,7 @@ export const Column = ({
                     label="Is Nullable"
                     description="Specify if the column can assume a NULL value if no value is provided"
                   >
-                    <Checkbox_Shadcn_
+                    <Checkbox
                       id="isNullable"
                       checked={column.isNullable}
                       onCheckedChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
@@ -341,7 +341,7 @@ export const Column = ({
                     label="Is Unique"
                     description="Enforce if values in the column should be unique across rows"
                   >
-                    <Checkbox_Shadcn_
+                    <Checkbox
                       id="isUnique"
                       checked={column.isUnique}
                       onCheckedChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
@@ -356,7 +356,7 @@ export const Column = ({
                     label="Is Identity"
                     description="Automatically assign a sequential unique number to the column"
                   >
-                    <Checkbox_Shadcn_
+                    <Checkbox
                       id="isIdentity"
                       checked={column.isIdentity}
                       onCheckedChange={() => {
@@ -375,7 +375,7 @@ export const Column = ({
                     label="Define as Array"
                     description="Define your column as a variable-length multidimensional array"
                   >
-                    <Checkbox_Shadcn_
+                    <Checkbox
                       id="defineAsArray"
                       checked={column.isArray}
                       onCheckedChange={() => {
