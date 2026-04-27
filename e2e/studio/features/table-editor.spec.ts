@@ -244,7 +244,8 @@ testRunner('table editor', () => {
     // insert row with enum value
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByText('Insert a new row into').click()
-    await page.getByRole('combobox').selectOption('value1')
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'value1' }).click()
     await page.getByTestId('action-bar-save-row').click()
     await expect(page.getByTestId('side-panel-row-editor')).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value1' })).toBeVisible()
@@ -252,7 +253,8 @@ testRunner('table editor', () => {
     // insert row with another enum value
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByText('Insert a new row into').click()
-    await page.getByRole('combobox').selectOption('value2')
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'value2' }).click()
     await page.getByTestId('action-bar-save-row').click()
     await expect(page.getByRole('gridcell', { name: 'value2' })).toBeVisible({ timeout: 10_000 })
 
@@ -903,7 +905,8 @@ testRunner('table editor', () => {
     const updateTrueResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
-    await booleanEditor.selectOption('true')
+    await booleanEditor.click()
+    await page.getByRole('option', { name: 'true' }).click()
     await page.getByRole('columnheader', { name: 'id' }).click()
     await updateTrueResponse
 
@@ -922,7 +925,8 @@ testRunner('table editor', () => {
     const updateFalseResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
-    await booleanEditor.selectOption('false')
+    await booleanEditor.click()
+    await page.getByRole('option', { name: 'false' }).click()
     await page.getByRole('columnheader', { name: 'id' }).click()
     await updateFalseResponse
 
@@ -1019,7 +1023,8 @@ testRunner('table editor', () => {
     const updateNullResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
-    await booleanEditor.selectOption('null')
+    await booleanEditor.click()
+    await page.getByRole('option', { name: 'null' }).click()
     await page.getByRole('columnheader', { name: 'id' }).click()
     await updateNullResponse
 
@@ -1034,7 +1039,8 @@ testRunner('table editor', () => {
     const updateFalseResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
-    await booleanEditor.selectOption('false')
+    await booleanEditor.click()
+    await page.getByRole('option', { name: 'false' }).click()
     await page.getByRole('columnheader', { name: 'id' }).click()
     await updateFalseResponse
 
