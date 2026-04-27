@@ -33,8 +33,8 @@ function FloatingTableOfContents({
 
   return (
     <motion.div ref={tocRef} layout className="relative">
-      <div className="relative">
-        <AnimatePresence mode="popLayout">
+      <motion.div layout className="relative">
+        <AnimatePresence mode="wait">
           {!isTocOpen ? (
             <motion.button
               key="pill"
@@ -111,7 +111,7 @@ function FloatingTableOfContents({
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
     </motion.div>
   )
 }
