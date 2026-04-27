@@ -12,9 +12,9 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Separator,
 } from 'ui'
@@ -102,10 +102,10 @@ export const CreateWorkOSIntegrationDialog = ({
 
         <Separator />
         <DialogSection>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {/* Enabled flag can't be changed for now because there's no update API call for integrations */}
-              {/* <FormField_Shadcn_
+              {/* <FormField
               key="enabled"
               control={form.control}
               name="enabled"
@@ -115,13 +115,13 @@ export const CreateWorkOSIntegrationDialog = ({
                   label={`Enable Firebase Auth Connection`}
                   layout="flex"
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       disabled={field.disabled}
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -130,7 +130,7 @@ export const CreateWorkOSIntegrationDialog = ({
               <p className="text-sm text-foreground-light">
                 Enables a JWT from WorkOS to access data from this Supabase project.
               </p>
-              <FormField_Shadcn_
+              <FormField
                 key="issuerURL"
                 control={form.control}
                 name="issuerURL"
@@ -139,17 +139,17 @@ export const CreateWorkOSIntegrationDialog = ({
                     label="WorkOS Issuer URL"
                     description="Obtain your issuer URL from the WorkOS dashboard."
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         {...field}
                         placeholder="https://api.workos.com/user_management/client_ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
         <DialogFooter>
           {!isCreating && (

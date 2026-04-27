@@ -1,7 +1,7 @@
 import { UseFormReturn } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
 import {
-  FormField_Shadcn_,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -27,7 +27,7 @@ interface ComputeSizeSelectorProps {
 export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
   return (
     <Panel.Content>
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="instanceSize"
         render={({ field }) => (

@@ -1,19 +1,19 @@
 import 'react-data-grid/lib/styles.css'
-import '@/styles/code.scss'
-import '@/styles/editor.scss'
-import '@/styles/focus.scss'
-import '@/styles/graphiql-base.scss'
-import '@/styles/grid.scss'
-import '@/styles/main.scss'
-import '@/styles/markdown-preview.scss'
-import '@/styles/monaco.scss'
-import '@/styles/react-data-grid-logs.scss'
-import '@/styles/reactflow.scss'
-import '@/styles/storage.scss'
-import '@/styles/stripe.scss'
-import '@/styles/toast.scss'
-import '@/styles/typography.scss'
-import '@/styles/ui.scss'
+import '@/styles/code.css'
+import '@/styles/editor.css'
+import '@/styles/focus.css'
+import '@/styles/graphiql-base.css'
+import '@/styles/grid.css'
+import '@/styles/main.css'
+import '@/styles/markdown-preview.css'
+import '@/styles/monaco.css'
+import '@/styles/react-data-grid-logs.css'
+import '@/styles/reactflow.css'
+import '@/styles/storage.css'
+import '@/styles/stripe.css'
+import '@/styles/toast.css'
+import '@/styles/typography.css'
+import '@/styles/ui.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
@@ -53,6 +53,7 @@ import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidat
 import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { useRootQueryClient } from '@/data/query-client'
 import { customFont, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
@@ -197,6 +198,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                 <MainScrollContainerProvider>
                                   {getLayout(<Component {...pageProps} />)}
                                 </MainScrollContainerProvider>
+                                <GlobalShortcuts />
                                 <StudioCommandMenu />
                                 <FeaturePreviewModal />
                                 <UpdateBillingAddressModal />

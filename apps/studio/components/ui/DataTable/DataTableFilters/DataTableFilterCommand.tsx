@@ -66,9 +66,6 @@ export function DataTableFilterCommand({
     (x) => typeof x.value === 'string' && currentWord.includes(`${x.value}:`)
   )
 
-  // [Joshen] Temporarily disabling as this conflicts with our current CMD K behaviour
-  // useHotKey(() => setOpen((open) => !open), 'k')
-
   useEffect(() => {
     // TODO: we could check for ARRAY_DELIMITER or SLIDER_DELIMITER to auto-set filter when typing
     if (currentWord !== '' && open) return

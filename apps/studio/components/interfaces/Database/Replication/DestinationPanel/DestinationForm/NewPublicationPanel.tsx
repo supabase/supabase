@@ -4,9 +4,9 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Sheet,
   SheetContent,
@@ -84,24 +84,24 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
               <SheetDescription>Replicate table changes to destinations</SheetDescription>
             </SheetHeader>
             <SheetSection className="flex-grow overflow-auto">
-              <Form_Shadcn_ {...form}>
+              <Form {...form}>
                 <form
                   id={formId}
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="flex flex-col gap-y-4"
                 >
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
                       <FormItemLayout label="Name" layout="vertical">
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Input_Shadcn_ {...field} placeholder="Name" />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="tables"
                     render={({ field }) => (
@@ -109,7 +109,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                         label="Tables"
                         description="Which tables to replicate to destinations"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <MultiSelector
                             values={field.value}
                             onValuesChange={field.onChange}
@@ -133,12 +133,12 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                               </MultiSelector.List>
                             </MultiSelector.Content>
                           </MultiSelector>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </form>
-              </Form_Shadcn_>
+              </Form>
             </SheetSection>
             <SheetFooter>
               <Button type="default" disabled={creatingPublication} onClick={onClose}>

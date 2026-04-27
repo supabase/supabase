@@ -12,7 +12,7 @@ import {
   Button,
   Checkbox_Shadcn_,
   cn,
-  Form_Shadcn_,
+  Form,
   Label_Shadcn_,
   ScrollArea,
   Sheet,
@@ -290,7 +290,7 @@ export const PolicyEditorPanel = memo(function ({
 
   return (
     <>
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
           <Sheet open={visible} onOpenChange={handleOpenChange}>
             <SheetContent
@@ -571,7 +571,7 @@ export const PolicyEditorPanel = memo(function ({
             </SheetContent>
           </Sheet>
         </form>
-      </Form_Shadcn_>
+      </Form>
 
       <DiscardChangesConfirmationDialog
         {...modalProps}

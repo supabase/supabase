@@ -1,8 +1,8 @@
 import type { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -28,14 +28,14 @@ export function OrganizationSelector({ form, orgSlug }: OrganizationSelectorProp
   const subscriptionPlanId = getOrgSubscriptionPlan(organizations, orgSlug)
 
   return (
-    <FormField_Shadcn_
+    <FormField
       name="organizationSlug"
       control={form.control}
       render={({ field }) => {
         const { ref: _ref, ...fieldWithoutRef } = field
         return (
           <FormItemLayout hideMessage layout="vertical" label="Which organization is affected?">
-            <FormControl_Shadcn_>
+            <FormControl>
               <Select_Shadcn_
                 {...fieldWithoutRef}
                 disabled={!isSuccessOrganizations}
@@ -75,7 +75,7 @@ export function OrganizationSelector({ form, orgSlug }: OrganizationSelectorProp
                   </SelectGroup_Shadcn_>
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )
       }}

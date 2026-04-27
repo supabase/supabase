@@ -10,11 +10,11 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
-  FormMessage_Shadcn_,
+  FormMessage,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -151,14 +151,14 @@ export const RealtimeSettings = () => {
 
   return (
     <>
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
           {isError ? (
             <AlertError error={error} subject="Failed to retrieve realtime settings" />
           ) : (
             <Card>
               <CardContent className="space-y-4">
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="suspend"
                   render={({ field }) => (
@@ -168,15 +168,15 @@ export const RealtimeSettings = () => {
                         label="Enable Realtime service"
                         description="If disabled, no clients will be able to connect and new connections will be rejected"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={!field.value}
                             onCheckedChange={(checked) => field.onChange(!checked)}
                             disabled={!canUpdateConfig}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
-                      <FormMessage_Shadcn_ />
+                      <FormMessage />
                     </>
                   )}
                 />
@@ -214,7 +214,7 @@ export const RealtimeSettings = () => {
               {!suspend && (
                 <>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="allow_public"
                       render={({ field }) => (
@@ -224,13 +224,13 @@ export const RealtimeSettings = () => {
                             label="Allow public access to channels"
                             description="If disabled, only private channels will be allowed"
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                                 disabled={!canUpdateConfig}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
 
                           {isSuccessPolicies &&
@@ -266,7 +266,7 @@ export const RealtimeSettings = () => {
                     />
                   </CardContent>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="connection_pool"
                       render={({ field }) => (
@@ -276,7 +276,7 @@ export const RealtimeSettings = () => {
                             label="Database connection pool size"
                             description="Realtime Authorization uses this database pool to check client access"
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <InputGroup>
                                 <FormInputGroupInput
                                   {...field}
@@ -288,7 +288,7 @@ export const RealtimeSettings = () => {
                                   <InputGroupText>connections</InputGroupText>
                                 </InputGroupAddon>
                               </InputGroup>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                           {!!maxConn && field.value > maxConn.maxConnections * 0.5 && (
                             <Admonition
@@ -303,7 +303,7 @@ export const RealtimeSettings = () => {
                     />
                   </CardContent>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="max_concurrent_users"
                       render={({ field }) => (
@@ -312,7 +312,7 @@ export const RealtimeSettings = () => {
                           label="Max concurrent clients"
                           description="Sets maximum number of concurrent clients that can connect to your Realtime service"
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <InputGroup>
                               <FormInputGroupInput
                                 {...field}
@@ -324,13 +324,13 @@ export const RealtimeSettings = () => {
                                 <InputGroupText>clients</InputGroupText>
                               </InputGroupAddon>
                             </InputGroup>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
                   </CardContent>
                   <CardContent className="space-y-2">
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="max_events_per_second"
                       render={({ field }) => (
@@ -339,7 +339,7 @@ export const RealtimeSettings = () => {
                           label="Max events per second"
                           description="Sets maximum number of events per second that can be sent to your Realtime service"
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <InputGroup>
                               <FormInputGroupInput
                                 {...field}
@@ -351,7 +351,7 @@ export const RealtimeSettings = () => {
                                 <InputGroupText>events/s</InputGroupText>
                               </InputGroupAddon>
                             </InputGroup>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -384,7 +384,7 @@ export const RealtimeSettings = () => {
                     )}
                   </CardContent>
                   <CardContent className="space-y-2">
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="max_presence_events_per_second"
                       render={({ field }) => (
@@ -393,7 +393,7 @@ export const RealtimeSettings = () => {
                           label="Max presence events per second"
                           description="Sets maximum number of presence events per second that can be sent to your Realtime service"
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <InputGroup>
                               <FormInputGroupInput
                                 {...field}
@@ -405,7 +405,7 @@ export const RealtimeSettings = () => {
                                 <InputGroupText>events/s</InputGroupText>
                               </InputGroupAddon>
                             </InputGroup>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -438,7 +438,7 @@ export const RealtimeSettings = () => {
                     )}
                   </CardContent>
                   <CardContent className="space-y-2">
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="max_payload_size_in_kb"
                       render={({ field }) => (
@@ -447,7 +447,7 @@ export const RealtimeSettings = () => {
                           label="Max payload size in KB"
                           description="Sets maximum number of payload size in KB that can be sent to your Realtime service"
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <InputGroup>
                               <FormInputGroupInput
                                 {...field}
@@ -459,7 +459,7 @@ export const RealtimeSettings = () => {
                                 <InputGroupText>KB</InputGroupText>
                               </InputGroupAddon>
                             </InputGroup>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -522,7 +522,7 @@ export const RealtimeSettings = () => {
             </Card>
           )}
         </form>
-      </Form_Shadcn_>
+      </Form>
 
       <ConfirmationModal
         visible={isConfirmNextModalOpen}

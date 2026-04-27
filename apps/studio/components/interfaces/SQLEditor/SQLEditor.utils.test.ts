@@ -420,6 +420,108 @@ describe('SQLEditor.utils:getCreateTablesMissingRLS', () => {
     expect(result[0].tableName).toBe('foo')
   })
 
+  it('does not flag `select ... into var` inside a plpgsql function body', () => {
+    // Regression: the SELECT..INTO detector used to match variable assignments
+    // inside $$...$$ function bodies and surface them as \"new tables\".
+    const sql = stripIndent`
+      create or replace function schema_checks()
+      returns jsonb
+      language plpgsql
+      as $$
+      declare
+        ret jsonb;
+      begin
+        select jsonb_build_object('value', 'ok')
+        into ret;
+        return ret;
+      end;
+      $$;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('does not flag `select ... into var` inside a DO block', () => {
+    const sql = stripIndent`
+      do $$
+      declare
+        result int;
+      begin
+        select count(*) into result from information_schema.tables;
+      end
+      $$;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('does not flag CREATE TABLE text that appears inside a function body', () => {
+    const sql = stripIndent`
+      create or replace function noop()
+      returns void
+      language plpgsql
+      as $$
+      begin
+        -- create table foo (id int);
+        perform 1;
+      end;
+      $$;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('flags top-level CREATE TABLE alongside a function with INTO assignments', () => {
+    const sql = stripIndent`
+      create table public.foo (id int8 primary key);
+      create or replace function bar()
+      returns int
+      language plpgsql
+      as $$
+      declare
+        v int;
+      begin
+        select 1 into v;
+        return v;
+      end;
+      $$;
+    `
+    const result = getCreateTablesMissingRLS(sql)
+    expect(result).toEqual([{ schema: 'public', tableName: 'foo' }])
+  })
+
+  it('does not flag CREATE TABLE inside nested dollar-quoted dynamic SQL', () => {
+    // Regression: the `$sql$...$sql$` block inside the outer `$fn$...$fn$`
+    // body was previously pairing with the outer tag, letting the inner
+    // semicolon split the statement and exposing `create table fake` to the
+    // RLS warning.
+    const sql = stripIndent`
+      create function f()
+      returns void
+      language plpgsql
+      as $fn$
+      begin
+        execute $sql$create table fake(id int);$sql$;
+      end;
+      $fn$;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('handles custom dollar-quote tags (e.g. $body$...$body$)', () => {
+    const sql = stripIndent`
+      create or replace function f()
+      returns int
+      language plpgsql
+      as $body$
+      declare
+        v int;
+      begin
+        select 1 into v;
+        return v;
+      end;
+      $body$;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
   it('does not collide quoted identifiers that differ only by case', () => {
     // "MyTable" and "mytable" are distinct tables in Postgres, so the ALTER
     // here targets a different table than the CREATE — the warning must fire.

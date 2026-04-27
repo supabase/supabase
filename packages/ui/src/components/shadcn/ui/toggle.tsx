@@ -35,6 +35,7 @@ const Toggle = React.forwardRef<
   <TogglePrimitive.Root
     ref={ref}
     className={cn(toggleVariants({ variant, size, className }))}
+    tabIndex={0}
     {...props}
   />
 ))

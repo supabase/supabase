@@ -7,10 +7,10 @@ packages:
 catalog:
   '@sentry/nextjs': ^10.26.0
   '@supabase/ssr': 0.10.2
-  '@supabase/auth-js': 2.103.2
-  '@supabase/postgrest-js': 2.103.2
-  '@supabase/realtime-js': 2.103.2
-  '@supabase/supabase-js': 2.103.2
+  '@supabase/auth-js': 2.104.1
+  '@supabase/postgrest-js': 2.104.1
+  '@supabase/realtime-js': 2.104.1
+  '@supabase/supabase-js': 2.104.1
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
@@ -50,6 +50,7 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
+  - braintrust  # Included for bugfix in v3.9.0
   # The following packages are excluded from the minimum release age check because they had a vulneralibity
   # Delete them the next time you update this list
   - follow-redirects

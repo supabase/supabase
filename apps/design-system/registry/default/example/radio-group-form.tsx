@@ -5,12 +5,12 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   RadioGroup_Shadcn_,
   RadioGroupItem_Shadcn_,
 } from 'ui'
@@ -38,48 +38,46 @@ export default function RadioGroupForm() {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="type"
           render={({ field }) => (
-            <FormItem_Shadcn_ className="space-y-3">
-              <FormLabel_Shadcn_>Notify me about...</FormLabel_Shadcn_>
-              <FormControl_Shadcn_>
+            <FormItem className="space-y-3">
+              <FormLabel>Notify me about...</FormLabel>
+              <FormControl>
                 <RadioGroup_Shadcn_
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                   className="flex flex-col space-y-1"
                 >
-                  <FormItem_Shadcn_ className="flex items-center space-x-3 space-y-0">
-                    <FormControl_Shadcn_>
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
                       <RadioGroupItem_Shadcn_ value="all" />
-                    </FormControl_Shadcn_>
-                    <FormLabel_Shadcn_ className="font-normal">All new messages</FormLabel_Shadcn_>
-                  </FormItem_Shadcn_>
-                  <FormItem_Shadcn_ className="flex items-center space-x-3 space-y-0">
-                    <FormControl_Shadcn_>
+                    </FormControl>
+                    <FormLabel className="font-normal">All new messages</FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
                       <RadioGroupItem_Shadcn_ value="mentions" />
-                    </FormControl_Shadcn_>
-                    <FormLabel_Shadcn_ className="font-normal">
-                      Direct messages and mentions
-                    </FormLabel_Shadcn_>
-                  </FormItem_Shadcn_>
-                  <FormItem_Shadcn_ className="flex items-center space-x-3 space-y-0">
-                    <FormControl_Shadcn_>
+                    </FormControl>
+                    <FormLabel className="font-normal">Direct messages and mentions</FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
                       <RadioGroupItem_Shadcn_ value="none" />
-                    </FormControl_Shadcn_>
-                    <FormLabel_Shadcn_ className="font-normal">Nothing</FormLabel_Shadcn_>
-                  </FormItem_Shadcn_>
+                    </FormControl>
+                    <FormLabel className="font-normal">Nothing</FormLabel>
+                  </FormItem>
                 </RadioGroup_Shadcn_>
-              </FormControl_Shadcn_>
-              <FormMessage_Shadcn_ />
-            </FormItem_Shadcn_>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
         <Button htmlType="submit">Submit</Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

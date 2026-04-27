@@ -11,11 +11,11 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -225,12 +225,12 @@ function OrganizationSelector({
   disabled = false,
 }: OrganizationSelectorProps): ReactNode {
   return (
-    <Form_Shadcn_ {...form}>
-      <FormField_Shadcn_
+    <Form {...form}>
+      <FormField
         control={form.control}
         name="selectedOrgSlug"
         render={({ field }) => (
-          <FormItem_Shadcn_>
+          <FormItem>
             <FormLayout
               label="Organization to grant API access to"
               description={
@@ -240,7 +240,7 @@ function OrganizationSelector({
               }
               isReactForm
             >
-              <FormControl_Shadcn_>
+              <FormControl>
                 <Select_Shadcn_
                   value={field.value || undefined}
                   disabled={disabled}
@@ -261,12 +261,12 @@ function OrganizationSelector({
                     ))}
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormLayout>
-          </FormItem_Shadcn_>
+          </FormItem>
         )}
       />
-    </Form_Shadcn_>
+    </Form>
   )
 }
 
