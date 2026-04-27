@@ -4,7 +4,18 @@ const radixUiColors = require('@radix-ui/colors')
 const brandColors = require('./default-colors')
 const svgToDataUri = require('mini-svg-data-uri')
 
-const { default: flattenColorPalette } = require('tailwindcss/lib/util/flattenColorPalette')
+function flattenColorPalette(colors) {
+  return Object.assign(
+    {},
+    ...Object.entries(colors ?? {}).flatMap(([key, value]) =>
+      typeof value === 'object'
+        ? Object.entries(flattenColorPalette(value)).map(([k, v]) => ({
+            [key + (k === 'DEFAULT' ? '' : '-' + k)]: v,
+          }))
+        : [{ [key]: value }]
+    )
+  )
+}
 
 // exclude these colors from the included set from Radix
 const excludedRadixColors = [
