@@ -12,8 +12,8 @@ import {
 import {
   CHANGELOG_PRODUCT_TAGS,
   changelogLabelDisplayName,
+  changelogTagFilterUrl,
   discussionDisplayDate,
-  githubChangelogLabelFilterUrl,
   isChangelogProductSlug,
   itemMatchesChangelogSearch,
   itemMatchesChangelogSelectedTags,
@@ -301,7 +301,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                       </Button>
                     )}
                   </div>
-                  <ChangelogTimelineList items={filteredIndex} omitOuterTimelineBorder />
+                  <ChangelogTimelineList items={filteredIndex} />
                 </>
               )}
             </section>
@@ -336,9 +336,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                               {entry.labels.map((label) => (
                                 <a
                                   key={`${entry.number}-${label.name}`}
-                                  href={githubChangelogLabelFilterUrl(label.name)}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
+                                  href={changelogTagFilterUrl(label.name)}
                                   className="group inline-flex no-underline focus-visible:ring-brand-default rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                                 >
                                   <Badge className="group-hover:text-foreground-light text-foreground-lighter group-hover:border-foreground-muted px-1.5 py-px text-[11px] lowercase">

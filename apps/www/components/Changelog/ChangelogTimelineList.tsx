@@ -1,5 +1,5 @@
 import type { ChangelogLabel, ChangelogTimelineIndexItem } from '~/lib/changelog-github'
-import { changelogLabelDisplayName, githubChangelogLabelFilterUrl } from '~/lib/changelog.utils'
+import { changelogLabelDisplayName, changelogTagFilterUrl } from '~/lib/changelog.utils'
 import dayjs from 'dayjs'
 import { GitCommit } from 'lucide-react'
 import Link from 'next/link'
@@ -35,9 +35,7 @@ export function LabelBadges({
       {labels.map((label) => (
         <a
           key={label.name}
-          href={githubChangelogLabelFilterUrl(label.name)}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={changelogTagFilterUrl(label.name)}
           className={
             tiny
               ? 'inline-flex shrink-0 no-underline focus-visible:ring-brand-default rounded focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:outline-none'

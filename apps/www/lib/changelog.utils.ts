@@ -175,6 +175,11 @@ export function githubChangelogLabelFilterUrl(labelName: string) {
   return `${GITHUB_CHANGELOG_DISCUSSIONS_BASE}?discussions_q=${discussions_q}`
 }
 
+/** Internal changelog index URL with preselected tag filter (nuqs `tags` param). */
+export function changelogTagFilterUrl(labelName: string) {
+  return `/changelog?tags=${encodeURIComponent(labelName.toLowerCase())}`
+}
+
 export const CHANGELOG_PRODUCT_TAGS = changelogProductTags as Array<{
   slug: string
   label: string
