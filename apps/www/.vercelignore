@@ -32,6 +32,9 @@ public/fonts/**/*
 # Documentation
 README.md
 *.md
+# ...except the marketing-page markdown content bundled at build time by
+# scripts/generateMdContent.mjs into app/api-v2/md/content.generated.ts.
+!content/md/**/*.md
 docs/**/*
 
 # IDE files
