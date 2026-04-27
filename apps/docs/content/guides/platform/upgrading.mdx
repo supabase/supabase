@@ -171,6 +171,17 @@ Projects planning to upgrade from Postgres 15 to Postgres 17 need to first disab
 
 `pgjwt` was enabled by default on every Supabase project up until Postgres 17. If you weren’t explicitly using `pgjwt` in your project, it’s most likely safe to disable.
 
+The most common way to use `pgjwt` is through the `sign()` and `verify()` functions. Search your application code and database functions for calls to these functions before disabling the extension. To check database functions, run:
+
+```sql
+select
+  n.nspname as schema_name,
+  p.proname as function_name
+from pg_proc p
+join pg_namespace n on n.oid = p.pronamespace
+where pg_get_functiondef(p.oid) ~* '\m(sign|verify)\s*\(';
+```
+
 To check whether your database has objects that depend on `pgjwt` before disabling the extension, query `pg_depend`:
 
 ```sql
