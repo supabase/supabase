@@ -29,6 +29,10 @@ function getSources(): Source[] {
   ]
 }
 
+// Editorial ordering for the product overview list (mirrors the homepage
+// products section); not derived from MD_PAGES because the order is
+// intentional. When dropping a new content/md/<slug>.md file, add a matching
+// entry here too — otherwise the page ships but won't be linked from /llms.txt.
 const PRODUCT_OVERVIEW_LINKS = [
   '- [Supabase Overview](https://supabase.com/homepage.md)',
   '- [Supabase Database](https://supabase.com/database.md)',

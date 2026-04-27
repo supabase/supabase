@@ -8,6 +8,7 @@ import { generatePricingContent } from '@/lib/llms'
 // every request would hit the lambda.
 const STATIC_HEADERS = {
   'Content-Type': 'text/markdown; charset=utf-8',
+  'X-Content-Type-Options': 'nosniff',
   'Cache-Control': 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600',
   Vary: 'Accept',
 }
@@ -16,6 +17,7 @@ const STATIC_HEADERS = {
 // so use a shorter edge cache to match /llms.txt and /llms-full.txt.
 const DYNAMIC_HEADERS = {
   'Content-Type': 'text/markdown; charset=utf-8',
+  'X-Content-Type-Options': 'nosniff',
   'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
   Vary: 'Accept',
 }

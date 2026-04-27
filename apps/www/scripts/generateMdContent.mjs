@@ -51,6 +51,18 @@ if (slugs.length === 0) {
   process.exit(1)
 }
 
+// A static file with the same slug as a dynamic generator would land in both
+// MD_CONTENT and the dynamic append path, so /llms-full.txt would emit it
+// twice. Fail the build instead of shipping a duplicate.
+const collisions = slugs.filter((s) => DYNAMIC_SLUGS.includes(s))
+if (collisions.length > 0) {
+  console.error(
+    `❌ Slug collision: [${collisions.join(', ')}] is reserved for a dynamic generator. ` +
+      `Remove the corresponding file from content/md/ or update DYNAMIC_SLUGS.`
+  )
+  process.exit(1)
+}
+
 const entries = []
 const errors = []
 for (const slug of slugs) {
