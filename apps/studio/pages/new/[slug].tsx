@@ -9,7 +9,7 @@ import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
-import { Button, Form_Shadcn_, FormField_Shadcn_, useWatch_Shadcn_ } from 'ui'
+import { Button, Form, FormField, useWatch } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
@@ -151,7 +151,7 @@ const Wizard: NextPageWithLayout = () => {
     dbRegion,
     organization,
     highAvailability,
-  } = useWatch_Shadcn_({ control: form.control })
+  } = useWatch({ control: form.control })
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
@@ -435,7 +435,7 @@ const Wizard: NextPageWithLayout = () => {
         <title>{pageTitle}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation)}>
           <Panel
             loading={!isOrganizationsSuccess}
@@ -486,7 +486,7 @@ const Wizard: NextPageWithLayout = () => {
 
                       {showPostgresVersionSelector && (
                         <Panel.Content>
-                          <FormField_Shadcn_
+                          <FormField
                             control={form.control}
                             name="postgresVersionSelection"
                             render={({ field }) => (
@@ -591,7 +591,7 @@ const Wizard: NextPageWithLayout = () => {
             </div>
           </ConfirmationModal>
         </form>
-      </Form_Shadcn_>
+      </Form>
     </>
   )
 }

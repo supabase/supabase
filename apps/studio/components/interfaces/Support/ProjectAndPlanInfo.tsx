@@ -6,14 +6,7 @@ import { Check, ChevronsUpDown, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  cn,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-} from 'ui'
+import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_, FormControl, FormField } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
@@ -62,12 +55,12 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
   const { projectRef: urlProjectRef } = useParams()
 
   return (
-    <FormField_Shadcn_
+    <FormField
       name="projectRef"
       control={form.control}
       render={({ field }) => (
         <FormItemLayout hideMessage layout="vertical" label="Which project is affected?">
-          <FormControl_Shadcn_>
+          <FormControl>
             <OrganizationProjectSelector
               key={orgSlug}
               sameWidthAsTrigger
@@ -120,7 +113,7 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                 </CommandGroup_Shadcn_>
               )}
             />
-          </FormControl_Shadcn_>
+          </FormControl>
         </FormItemLayout>
       )}
     />

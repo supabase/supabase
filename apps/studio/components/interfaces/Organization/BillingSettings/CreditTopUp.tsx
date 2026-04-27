@@ -24,8 +24,8 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -318,10 +318,10 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
         <DialogSectionSeparator />
 
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
             <DialogSection className="flex flex-col gap-2">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="amount"
                 render={({ field }) => (
@@ -331,7 +331,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                 )}
               />
 
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="paymentMethod"
                 render={() => (
@@ -414,7 +414,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
               </DialogFooter>
             )}
           </form>
-        </Form_Shadcn_>
+        </Form>
         {stripePromise && paymentIntentSecret && (
           <Elements stripe={stripePromise} options={options}>
             <PaymentConfirmation

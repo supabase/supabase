@@ -9,9 +9,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
@@ -203,14 +203,14 @@ export const SessionsAuthSettingsForm = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form_Shadcn_ {...refreshTokenForm}>
+          <Form {...refreshTokenForm}>
             <form
               onSubmit={refreshTokenForm.handleSubmit(onSubmitRefreshTokens)}
               className="space-y-4"
             >
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={refreshTokenForm.control}
                     name="REFRESH_TOKEN_ROTATION_ENABLED"
                     render={({ field }) => (
@@ -219,19 +219,19 @@ export const SessionsAuthSettingsForm = () => {
                         label="Detect and revoke potentially compromised refresh tokens"
                         description="Prevent replay attacks from potentially compromised refresh tokens."
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={refreshTokenForm.control}
                     name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
                     render={({ field }) => (
@@ -240,7 +240,7 @@ export const SessionsAuthSettingsForm = () => {
                         label="Refresh token reuse interval"
                         description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
                       >
-                        <FormControl_Shadcn_ className="w-full">
+                        <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
                               type="number"
@@ -252,7 +252,7 @@ export const SessionsAuthSettingsForm = () => {
                               <InputGroupText>seconds</InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -278,7 +278,7 @@ export const SessionsAuthSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
 
@@ -289,14 +289,14 @@ export const SessionsAuthSettingsForm = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form_Shadcn_ {...userSessionsForm}>
+          <Form {...userSessionsForm}>
             <form
               onSubmit={userSessionsForm.handleSubmit(onSubmitUserSessions)}
               className="space-y-4"
             >
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={userSessionsForm.control}
                     name="SESSIONS_SINGLE_PER_USER"
                     render={({ field }) => (
@@ -305,20 +305,20 @@ export const SessionsAuthSettingsForm = () => {
                         label="Enforce single session per user"
                         description="If enabled, all but a user's most recently active session will be terminated."
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
 
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={userSessionsForm.control}
                     name="SESSIONS_TIMEBOX"
                     render={({ field }) => (
@@ -327,7 +327,7 @@ export const SessionsAuthSettingsForm = () => {
                         label="Time-box user sessions"
                         description="The amount of time before a user is forced to sign in again. Use 0 for never."
                       >
-                        <FormControl_Shadcn_ className="w-full">
+                        <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
                               type="number"
@@ -341,14 +341,14 @@ export const SessionsAuthSettingsForm = () => {
                               </InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
 
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={userSessionsForm.control}
                     name="SESSIONS_INACTIVITY_TIMEOUT"
                     render={({ field }) => (
@@ -357,7 +357,7 @@ export const SessionsAuthSettingsForm = () => {
                         label="Inactivity timeout"
                         description="The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never."
                       >
-                        <FormControl_Shadcn_ className="w-full">
+                        <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
                               type="number"
@@ -371,7 +371,7 @@ export const SessionsAuthSettingsForm = () => {
                               </InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -408,7 +408,7 @@ export const SessionsAuthSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
     </>

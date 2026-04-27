@@ -17,8 +17,8 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormField,
   Input_Shadcn_,
   Separator,
 } from 'ui'
@@ -258,7 +258,7 @@ export const CreditCodeRedemption = ({
 
             <DialogSectionSeparator />
 
-            <Form_Shadcn_ {...form}>
+            <Form {...form}>
               {isOrgLoading || isCustomerProfileLoading || !isPermissionsLoaded ? (
                 <div className="p-6 space-y-4">
                   <ShimmeringLoader />
@@ -270,7 +270,7 @@ export const CreditCodeRedemption = ({
               ) : (
                 <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
                   <DialogSection className="flex flex-col gap-2">
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="code"
                       render={({ field }) => (
@@ -343,7 +343,7 @@ export const CreditCodeRedemption = ({
                   </DialogFooter>
                 </form>
               )}
-            </Form_Shadcn_>
+            </Form>
           </>
         )}
       </DialogContent>

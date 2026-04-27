@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
-import { Button, Form_Shadcn_ } from 'ui'
+import { Button, Form } from 'ui'
 
 import { SingleValueFieldArray } from './SingleValueFieldArray'
 
@@ -42,7 +42,7 @@ const ValueForm = ({
   })
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <SingleValueFieldArray
           control={form.control}
@@ -56,7 +56,7 @@ const ValueForm = ({
         />
         <Button htmlType="submit">Submit</Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }
 
@@ -69,7 +69,7 @@ const NameForm = ({ onSubmit = vi.fn() }: { onSubmit?: (values: NameFormValues) 
   })
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <SingleValueFieldArray
           control={form.control}
@@ -83,7 +83,7 @@ const NameForm = ({ onSubmit = vi.fn() }: { onSubmit?: (values: NameFormValues) 
         />
         <Button htmlType="submit">Submit</Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }
 

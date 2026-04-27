@@ -7,9 +7,9 @@ import {
   Button,
   Calendar,
   Checkbox_Shadcn_,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
@@ -135,7 +135,7 @@ export default function FormPatternsSidePanel() {
           <SheetHeader>
             <SheetTitle>Create Configuration</SheetTitle>
           </SheetHeader>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={formId}
               onSubmit={form.handleSubmit(onSubmit)}
@@ -143,7 +143,7 @@ export default function FormPatternsSidePanel() {
             >
               {/* Text Input */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
@@ -152,9 +152,9 @@ export default function FormPatternsSidePanel() {
                       label="Text Input"
                       description="Single-line text entry for short values"
                     >
-                      <FormControl_Shadcn_ className="col-span-6">
+                      <FormControl className="col-span-6">
                         <Input_Shadcn_ {...field} placeholder="Enter text" />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -164,7 +164,7 @@ export default function FormPatternsSidePanel() {
 
               {/* Password Input */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="password"
                   render={({ field }) => (
@@ -173,9 +173,9 @@ export default function FormPatternsSidePanel() {
                       label="Password Input"
                       description="Masked input for secure text entry"
                     >
-                      <FormControl_Shadcn_ className="col-span-6">
+                      <FormControl className="col-span-6">
                         <Input_Shadcn_ {...field} type="password" placeholder="Enter password" />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -185,7 +185,7 @@ export default function FormPatternsSidePanel() {
 
               {/* Copyable Input */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="apiKey"
                   render={() => (
@@ -194,7 +194,7 @@ export default function FormPatternsSidePanel() {
                       label="Copyable Input"
                       description="Read-only input with copy-to-clipboard functionality"
                     >
-                      <FormControl_Shadcn_ className="col-span-6">
+                      <FormControl className="col-span-6">
                         <Input
                           copy
                           readOnly
@@ -203,7 +203,7 @@ export default function FormPatternsSidePanel() {
                           onChange={() => {}}
                           onCopy={() => console.log('Copied to clipboard')}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -213,7 +213,7 @@ export default function FormPatternsSidePanel() {
 
               {/* Number Input */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="maxConnections"
                   render={({ field }) => (
@@ -222,7 +222,7 @@ export default function FormPatternsSidePanel() {
                       label="Number Input"
                       description="Numeric input with min/max validation"
                     >
-                      <FormControl_Shadcn_ className="col-span-6">
+                      <FormControl className="col-span-6">
                         <Input_Shadcn_
                           {...field}
                           type="number"
@@ -230,7 +230,7 @@ export default function FormPatternsSidePanel() {
                           max={1000}
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -240,7 +240,7 @@ export default function FormPatternsSidePanel() {
 
               {/* Input with Units */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="duration"
                   render={({ field }) => (
@@ -249,14 +249,14 @@ export default function FormPatternsSidePanel() {
                       label="Input with Units"
                       description="Input with additional unit label"
                     >
-                      <FormControl_Shadcn_ className="col-span-6">
+                      <FormControl className="col-span-6">
                         <InputGroup>
                           <FormInputGroupInput {...field} type="number" min={5} max={30} />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>MB</InputGroupText>
                           </InputGroupAddon>
                         </InputGroup>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -266,7 +266,7 @@ export default function FormPatternsSidePanel() {
 
               {/* Textarea */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="description"
                   render={({ field }) => (
@@ -275,14 +275,14 @@ export default function FormPatternsSidePanel() {
                       label="Textarea"
                       description="Multi-line text input for longer content"
                     >
-                      <FormControl_Shadcn_ className="col-span-6">
+                      <FormControl className="col-span-6">
                         <Textarea
                           {...field}
                           rows={3}
                           placeholder="Enter multi-line text"
                           className="resize-none"
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -292,7 +292,7 @@ export default function FormPatternsSidePanel() {
 
               {/* Icon Upload */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="description"
                   render={() => (
@@ -301,7 +301,7 @@ export default function FormPatternsSidePanel() {
                       label="Icon upload"
                       description="For icons, avatars, or small images with preview"
                     >
-                      <FormControl_Shadcn_ className="col-span-6">
+                      <FormControl className="col-span-6">
                         <div className="flex gap-4 items-center">
                           <button
                             type="button"
@@ -350,7 +350,7 @@ export default function FormPatternsSidePanel() {
                             }}
                           />
                         </div>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -360,7 +360,7 @@ export default function FormPatternsSidePanel() {
 
               {/* File Upload */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="description"
                   render={() => (
@@ -369,7 +369,7 @@ export default function FormPatternsSidePanel() {
                       label="File Upload"
                       description="Drag-and-drop or select files for upload"
                     >
-                      <FormControl_Shadcn_ className="col-span-6">
+                      <FormControl className="col-span-6">
                         <div
                           className={`border-2 rounded-lg p-6 text-center bg-muted transition-colors duration-300 ${
                             isDragging
@@ -443,7 +443,7 @@ export default function FormPatternsSidePanel() {
                             )}
                           </div>
                         </div>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -453,7 +453,7 @@ export default function FormPatternsSidePanel() {
 
               {/* Switch */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="enableFeature"
                   render={({ field }) => (
@@ -462,9 +462,9 @@ export default function FormPatternsSidePanel() {
                       label="Switch"
                       description="Toggle for boolean on/off states"
                     >
-                      <FormControl_Shadcn_ className="col-span-6">
+                      <FormControl className="col-span-6">
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -478,18 +478,18 @@ export default function FormPatternsSidePanel() {
                   description="Boolean values or multiple selections"
                 >
                   <div className="col-span-6 w-full flex flex-col gap-4">
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="enableRls"
                       render={({ field }) => (
                         <div className="flex items-center w-full justify-start space-x-2">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Checkbox_Shadcn_
                               id="enable-rls"
                               checked={field.value}
                               onCheckedChange={field.onChange}
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                           <label
                             htmlFor="enable-rls"
                             className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
@@ -499,18 +499,18 @@ export default function FormPatternsSidePanel() {
                         </div>
                       )}
                     />
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="enableNotifications"
                       render={({ field }) => (
                         <div className="flex items-center w-full justify-start space-x-2">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Checkbox_Shadcn_
                               id="enable-notifications"
                               checked={field.value}
                               onCheckedChange={field.onChange}
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                           <label
                             htmlFor="enable-notifications"
                             className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
@@ -520,18 +520,18 @@ export default function FormPatternsSidePanel() {
                         </div>
                       )}
                     />
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="enableAnalytics"
                       render={({ field }) => (
                         <div className="flex items-center w-full justify-start space-x-2">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Checkbox_Shadcn_
                               id="enable-analytics"
                               checked={field.value}
                               onCheckedChange={field.onChange}
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                           <label
                             htmlFor="enable-analytics"
                             className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
@@ -549,7 +549,7 @@ export default function FormPatternsSidePanel() {
 
               {/* Select */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="region"
                   render={({ field }) => (
@@ -558,7 +558,7 @@ export default function FormPatternsSidePanel() {
                       label="Select (Dropdown)"
                       description="Single selection from a list of options"
                     >
-                      <FormControl_Shadcn_ className="col-span-6">
+                      <FormControl className="col-span-6">
                         <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger_Shadcn_>
                             <SelectValue_Shadcn_ placeholder="Select an option" />
@@ -575,7 +575,7 @@ export default function FormPatternsSidePanel() {
                             </SelectItem_Shadcn_>
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -585,7 +585,7 @@ export default function FormPatternsSidePanel() {
 
               {/* Multi-Select */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="schemas"
                   render={({ field }) => (
@@ -627,7 +627,7 @@ export default function FormPatternsSidePanel() {
 
               {/* Radio Group */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="queueType"
                   render={({ field }) => (
@@ -659,7 +659,7 @@ export default function FormPatternsSidePanel() {
 
               {/* Date Picker */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="expiryDate"
                   render={({ field }) => (
@@ -668,7 +668,7 @@ export default function FormPatternsSidePanel() {
                       label="Date Picker"
                       description="Date selection with calendar popover"
                     >
-                      <FormControl_Shadcn_ className="col-span-6">
+                      <FormControl className="col-span-6">
                         <Popover_Shadcn_>
                           <PopoverTrigger_Shadcn_ asChild>
                             <Button
@@ -688,7 +688,7 @@ export default function FormPatternsSidePanel() {
                             />
                           </PopoverContent_Shadcn_>
                         </Popover_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -698,7 +698,7 @@ export default function FormPatternsSidePanel() {
 
               {/* Field Array */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="redirectUris"
                   render={() => (
@@ -727,7 +727,7 @@ export default function FormPatternsSidePanel() {
 
               {/* Key/Value Field Array */}
               <SheetSection>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="httpHeaders"
                   render={() => (
@@ -778,7 +778,7 @@ export default function FormPatternsSidePanel() {
                 </FormItemLayout>
               </SheetSection>
             </form>
-          </Form_Shadcn_>
+          </Form>
           <SheetFooter>
             <Button
               type="default"

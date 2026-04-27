@@ -4,8 +4,8 @@ import { RotateCcw } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
@@ -93,12 +93,12 @@ export function DiskSizeField({
   return (
     <div id="disk-size" className="grid @xl:grid-cols-12 gap-5">
       <div className="col-span-4">
-        <FormField_Shadcn_
+        <FormField
           name="totalSize"
           control={control}
           render={({ field, fieldState: { isDirty } }) => (
             <FormItemLayout label="Disk Size" layout="vertical" id={field.name}>
-              <FormControl_Shadcn_ className="max-w-32">
+              <FormControl className="max-w-32">
                 <InputGroup>
                   <FormInputGroupInput
                     type="number"
@@ -135,7 +135,7 @@ export function DiskSizeField({
                     ) : null}
                   </InputGroupAddon>
                 </InputGroup>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />

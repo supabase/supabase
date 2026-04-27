@@ -11,11 +11,11 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   Input_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
@@ -110,36 +110,36 @@ export const PolicyDetailsV2 = ({
     <>
       <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
         <div className="items-start justify-between gap-4 grid grid-cols-12">
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem_Shadcn_ className="col-span-6 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_>Policy Name</FormLabel_Shadcn_>
-                <FormControl_Shadcn_>
+              <FormItem className="col-span-6 flex flex-col gap-y-1">
+                <FormLabel>Policy Name</FormLabel>
+                <FormControl>
                   <Input_Shadcn_
                     {...field}
                     disabled={!canUpdatePolicies}
                     className="bg-control border-control"
                     placeholder="Provide a name for your policy"
                   />
-                </FormControl_Shadcn_>
-                <FormMessage_Shadcn_ />
-              </FormItem_Shadcn_>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
 
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="table"
             render={({ field }) => (
-              <FormItem_Shadcn_ className="col-span-6 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_>
+              <FormItem className="col-span-6 flex flex-col gap-y-1">
+                <FormLabel>
                   Table
                   <code className="text-code-inline">on</code> clause
-                </FormLabel_Shadcn_>
+                </FormLabel>
                 {authContext === 'database' && (
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
                       <PopoverTrigger_Shadcn_ asChild>
                         <Button
@@ -199,32 +199,32 @@ export const PolicyDetailsV2 = ({
                         </Command_Shadcn_>
                       </PopoverContent_Shadcn_>
                     </Popover_Shadcn_>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 )}
                 {authContext === 'realtime' && (
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Input_Shadcn_
                       disabled
                       value="messages.realtime"
                       className="bg-control border-control"
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 )}
 
-                <FormMessage_Shadcn_ />
-              </FormItem_Shadcn_>
+                <FormMessage />
+              </FormItem>
             )}
           />
 
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="behavior"
             render={({ field }) => (
-              <FormItem_Shadcn_ className="col-span-6 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_>
+              <FormItem className="col-span-6 flex flex-col gap-y-1">
+                <FormLabel>
                   Policy Behavior <code className="text-code-inline">as</code> clause
-                </FormLabel_Shadcn_>
-                <FormControl_Shadcn_>
+                </FormLabel>
+                <FormControl>
                   <Select_Shadcn_
                     disabled={isEditing}
                     value={field.value}
@@ -250,20 +250,20 @@ export const PolicyDetailsV2 = ({
                       </SelectGroup_Shadcn_>
                     </SelectContent_Shadcn_>
                   </Select_Shadcn_>
-                </FormControl_Shadcn_>
-                <FormMessage_Shadcn_ />
-              </FormItem_Shadcn_>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="command"
             render={({ field }) => (
-              <FormItem_Shadcn_ className="col-span-12 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_>
+              <FormItem className="col-span-12 flex flex-col gap-y-1">
+                <FormLabel>
                   Policy Command <code className="text-code-inline">for</code> clause
-                </FormLabel_Shadcn_>
-                <FormControl_Shadcn_>
+                </FormLabel>
+                <FormControl>
                   <RadioGroup_Shadcn_
                     disabled={isEditing}
                     value={field.value}
@@ -288,20 +288,20 @@ export const PolicyDetailsV2 = ({
                       />
                     ))}
                   </RadioGroup_Shadcn_>
-                </FormControl_Shadcn_>
-                <FormMessage_Shadcn_ />
-              </FormItem_Shadcn_>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="roles"
             render={({ field }) => (
-              <FormItem_Shadcn_ className="col-span-12 flex flex-col gap-y-1">
-                <FormLabel_Shadcn_>
+              <FormItem className="col-span-12 flex flex-col gap-y-1">
+                <FormLabel>
                   Target Roles <code className="text-code-inline">to</code> clause
-                </FormLabel_Shadcn_>
-                <FormControl_Shadcn_>
+                </FormLabel>
+                <FormControl>
                   <MultiSelectV2
                     disabled={!canUpdatePolicies}
                     options={formattedRoles}
@@ -310,9 +310,9 @@ export const PolicyDetailsV2 = ({
                     searchPlaceholder="Search for a role"
                     onChange={(roles) => form.setValue('roles', roles.join(', '))}
                   />
-                </FormControl_Shadcn_>
-                <FormMessage_Shadcn_ />
-              </FormItem_Shadcn_>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
         </div>
