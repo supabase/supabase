@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.90.0
+  version: 2.95.4
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -27,11 +27,11 @@ flags:
       - id: auto
         name: auto
         type: '[ auto | yes | no ]'
-      - id: 'yes'
-        name: 'yes'
+      - id: "yes"
+        name: "yes"
         type: '[ auto | yes | no ]'
-      - id: 'no'
-        name: 'no'
+      - id: "no"
+        name: "no"
         type: '[ auto | yes | no ]'
   - id: create-ticket
     name: --create-ticket
@@ -92,7 +92,7 @@ flags:
     name: --workdir <string>
     description: path to a Supabase project directory
     default_value: ''
-  - id: 'yes'
+  - id: "yes"
     name: --yes
     description: answer yes to all prompts
     default_value: 'false'
@@ -2391,7 +2391,7 @@ commands:
 
       Automatically generates type definitions based on your Postgres database schema.
 
-      This command connects to your database (local or remote) and generates typed definitions that match your database tables, views, and functions. By default, it generates TypeScript definitions, but also supports Go and Swift.
+      This command connects to your database (local or remote) and generates typed definitions that match your database tables, views, and stored procedures. By default, it generates TypeScript definitions, but also supports Go and Swift.
 
       Generated types give you type safety and autocompletion when working with your database in code, helping prevent runtime errors and improving developer experience.
 
@@ -3197,6 +3197,8 @@ commands:
       Optionally, a new row can be inserted into the migration history table to reflect the current state of the remote database.
 
       If no entries exist in the migration history table, `pg_dump` will be used to capture all contents of the remote schemas you have created. Otherwise, this command will only diff schema changes against the remote database, similar to running `db diff --linked`.
+
+      Pass `--diff-engine pg-delta` to keep the migration-file `db pull` workflow while using pg-delta for the shadow diff step. Pass `--use-pg-delta` to switch to the declarative pg-delta export workflow instead.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -3240,6 +3242,17 @@ commands:
         description: |
           Pulls from the database specified by the connection string (must be percent-encoded).
         default_value: ''
+      - id: diff-engine
+        name: --diff-engine <[ migra | pg-delta ]>
+        description: Diff engine to use for migration-style db pull.
+        default_value: migra
+        accepted_values:
+          - id: migra
+            name: migra
+            type: '[ migra | pg-delta ]'
+          - id: pg-delta
+            name: pg-delta
+            type: '[ migra | pg-delta ]'
       - id: linked
         name: --linked
         description: Pulls from the linked project.
