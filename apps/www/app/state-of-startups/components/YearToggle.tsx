@@ -1,5 +1,6 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import { cn } from 'ui'
 
 import { SURVEY_YEARS, useYear, type SurveyYear } from './year-context'
@@ -8,7 +9,8 @@ export function YearToggle({ className }: { className?: string }) {
   const { year, setYear } = useYear()
 
   return (
-    <div
+    <motion.div
+      layout
       role="radiogroup"
       aria-label="Survey year"
       className={cn(
@@ -36,6 +38,6 @@ export function YearToggle({ className }: { className?: string }) {
           </button>
         )
       })}
-    </div>
+    </motion.div>
   )
 }

@@ -205,7 +205,7 @@ export default function StateOfStartups2026Content({
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.2, ease: 'easeOut' }}
               >
-                <div className="flex items-start gap-2 pointer-events-auto">
+                <motion.div layout className="flex items-start gap-2 pointer-events-auto">
                   <FloatingTableOfContents
                     tocRef={tocRef}
                     isTocOpen={isTocOpen}
@@ -213,7 +213,7 @@ export default function StateOfStartups2026Content({
                     activeChapter={activeChapter}
                   />
                   <YearToggle />
-                </div>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
