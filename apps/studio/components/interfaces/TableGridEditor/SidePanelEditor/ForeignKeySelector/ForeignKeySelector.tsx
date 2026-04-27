@@ -279,11 +279,7 @@ export const ForeignKeySelector = ({
                 <SelectContent_Shadcn_>
                   {sortedSchemas.map((schema) => (
                     <SelectItem_Shadcn_ key={schema.id} value={schema.name} className="min-w-96">
-                      <div className="flex items-center gap-2">
-                        {/* For aria searching to target the schema name instead of schema */}
-                        <span className="hidden">{schema.name}</span>
-                        <span className="text-foreground">{schema.name}</span>
-                      </div>
+                      {schema.name}
                     </SelectItem_Shadcn_>
                   ))}
                 </SelectContent_Shadcn_>
@@ -361,7 +357,9 @@ export const ForeignKeySelector = ({
                               value={fk.columns[idx].source}
                               onValueChange={(value) => updateSelectedColumn(idx, 'source', value)}
                             >
-                              <SelectTrigger_Shadcn_>
+                              <SelectTrigger_Shadcn_
+                                aria-label={`Column from ${selectedSchema}.${table.name.length > 0 ? table.name : '[unnamed table]'}`}
+                              >
                                 <SelectValue_Shadcn_ />
                               </SelectTrigger_Shadcn_>
                               <SelectContent_Shadcn_>
@@ -388,7 +386,9 @@ export const ForeignKeySelector = ({
                               value={fk.columns[idx].target}
                               onValueChange={(value) => updateSelectedColumn(idx, 'target', value)}
                             >
-                              <SelectTrigger_Shadcn_>
+                              <SelectTrigger_Shadcn_
+                                aria-label={`Column from ${fk.schema}.${fk.table}`}
+                              >
                                 <SelectValue_Shadcn_ />
                               </SelectTrigger_Shadcn_>
                               <SelectContent_Shadcn_>
