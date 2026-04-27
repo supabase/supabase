@@ -1,0 +1,21 @@
+[
+  { "slug": "database", "label": "Database" },
+  { "slug": "auth", "label": "Auth" },
+  { "slug": "storage", "label": "Storage" },
+  { "slug": "realtime", "label": "Realtime" },
+  { "slug": "edge functions", "label": "Edge Functions" },
+  { "slug": "postgres", "label": "postgres" },
+  { "slug": "postgrest", "label": "PostgREST" },
+  { "slug": "ai", "label": "AI & Vector" },
+  { "slug": "billing", "label": "Billing" },
+  { "slug": "breaking-change", "label": "Breaking Change" },
+  { "slug": "cli", "label": "CLI" },
+  { "slug": "frontend", "label": "Dashboard" },
+  { "slug": "documentation", "label": "Docs" },
+  { "slug": "infra", "label": "Infra" },
+  { "slug": "self-hosted", "label": "Self-hosted" },
+  { "slug": "javascript", "label": "supabase-js" },
+  { "slug": "swift", "label": "supabase-swift" },
+  { "slug": "flutter", "label": "supabase-flutter" },
+  { "slug": "python", "label": "supabase-py" }
+]

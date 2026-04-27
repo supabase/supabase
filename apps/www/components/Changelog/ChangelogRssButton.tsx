@@ -2,6 +2,7 @@
 
 import { ChevronDown, Rss } from 'lucide-react'
 import Link from 'next/link'
+import changelogProductTags from '~/data/changelog-product-tags.json'
 import {
   Button,
   cn,
@@ -15,28 +16,7 @@ type Props = {
   className?: string
 }
 
-/** Must stay in sync with CHANGELOG_PRODUCT_TAGS in apps/www/pages/changelog.tsx */
-const PRODUCT_RSS_FEEDS = [
-  { label: 'Database' },
-  { label: 'Auth' },
-  { label: 'Storage' },
-  { label: 'Realtime' },
-  { label: 'Edge Functions' },
-  { label: 'postgres' },
-  { label: 'PostgREST' },
-  { label: 'AI & Vector' },
-  { label: 'Billing' },
-  { label: 'Breaking Change' },
-  { label: 'CLI' },
-  { label: 'Dashboard' },
-  { label: 'Docs' },
-  { label: 'Infra' },
-  { label: 'Self-hosted' },
-  { label: 'supabase-js' },
-  { label: 'supabase-swift' },
-  { label: 'supabase-flutter' },
-  { label: 'supabase-py' },
-] as const
+const PRODUCT_RSS_FEEDS = changelogProductTags.map(({ label }) => ({ label }))
 
 function labelToFileSlug(label: string): string {
   return label

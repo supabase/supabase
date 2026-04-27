@@ -1,5 +1,6 @@
 import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
 import { ChangelogTimelineList } from '~/components/Changelog/ChangelogTimelineList'
+import changelogProductTags from '~/data/changelog-product-tags.json'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import {
@@ -30,34 +31,11 @@ import { Badge, Button, cn, IconYCombinator, Input, Input_Shadcn_ } from 'ui'
 
 const FEATURED_COUNT = 1
 
-/** GitHub changelog label slugs used for product filters. */
-const CHANGELOG_PRODUCT_TAGS = [
-  { slug: 'database', label: 'Database' },
-  { slug: 'auth', label: 'Auth' },
-  { slug: 'storage', label: 'Storage' },
-  { slug: 'realtime', label: 'Realtime' },
-  { slug: 'edge functions', label: 'Edge Functions' },
-  { slug: 'postgres', label: 'postgres' },
-  { slug: 'postgrest', label: 'PostgREST' },
-  { slug: 'ai', label: 'AI & Vector' },
-  { slug: 'billing', label: 'Billing' },
-  { slug: 'breaking-change', label: 'Breaking Change' },
-  { slug: 'cli', label: 'CLI' },
-  { slug: 'frontend', label: 'Dashboard' },
-  { slug: 'documentation', label: 'Docs' },
-  { slug: 'infra', label: 'Infra' },
-  { slug: 'self-hosted', label: 'Self-hosted' },
-  { slug: 'javascript', label: 'supabase-js' },
-  { slug: 'swift', label: 'supabase-swift' },
-  { slug: 'flutter', label: 'supabase-flutter' },
-  { slug: 'python', label: 'supabase-py' },
-] as const
-
-type ChangelogProductSlug = (typeof CHANGELOG_PRODUCT_TAGS)[number]['slug']
+const CHANGELOG_PRODUCT_TAGS = changelogProductTags as Array<{ slug: string; label: string }>
 
 const CHANGELOG_PRODUCT_SLUG_SET = new Set<string>(CHANGELOG_PRODUCT_TAGS.map((t) => t.slug))
 
-function isChangelogProductSlug(value: string): value is ChangelogProductSlug {
+function isChangelogProductSlug(value: string) {
   return CHANGELOG_PRODUCT_SLUG_SET.has(value)
 }
 
@@ -144,7 +122,7 @@ function itemMatchesSearch(item: ChangelogTimelineIndexItem, q: string) {
 
 function itemMatchesSelectedTags(
   item: ChangelogTimelineIndexItem,
-  selected: Set<ChangelogProductSlug>
+  selected: Set<string>
 ) {
   if (selected.size === 0) return true
   const labelNames = new Set(item.labels.map((l) => l.name.toLowerCase()))
@@ -170,7 +148,7 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
 
   const filterSearch = querySearch ?? ''
   const selectedTags = useMemo(() => {
-    const next = new Set<ChangelogProductSlug>()
+    const next = new Set<string>()
     for (const raw of queryTags ?? []) {
       if (isChangelogProductSlug(raw)) next.add(raw)
     }
@@ -196,7 +174,7 @@ function ChangelogProgressiveContent({ featured, restIndex, allIndex }: PageProp
       .sort((a, b) => dayjs(b.sortDate).diff(dayjs(a.sortDate)))
   }, [allIndex, filterSearch, selectedTags])
 
-  const toggleProductTag = (slug: ChangelogProductSlug) => {
+  const toggleProductTag = (slug: string) => {
     const current = (queryTags ?? []).filter(isChangelogProductSlug)
     const has = current.includes(slug)
     const next = has ? current.filter((t) => t !== slug) : [...current, slug]

@@ -285,6 +285,10 @@ try {
 // Create folder for static content
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const folderPath = path.join(__dirname, '../.generated/staticContent')
+const changelogProductTagsPath = path.join(__dirname, '../data/changelog-product-tags.json')
+const CHANGELOG_PRODUCT_TAGS = JSON.parse(
+  await fs.readFile(changelogProductTagsPath, 'utf8')
+)
 try {
   await fs.mkdir(folderPath, { recursive: true })
 } catch (error) {
@@ -403,29 +407,6 @@ try {
     }
 
     const CHANGELOG_CATEGORY_ID = 'DIC_kwDODMpXOc4CAFUr'
-
-    /** Must stay in sync with CHANGELOG_PRODUCT_TAGS in apps/www/pages/changelog.tsx */
-    const CHANGELOG_PRODUCT_TAGS = [
-      { slug: 'database', label: 'Database' },
-      { slug: 'auth', label: 'Auth' },
-      { slug: 'storage', label: 'Storage' },
-      { slug: 'realtime', label: 'Realtime' },
-      { slug: 'edge functions', label: 'Edge Functions' },
-      { slug: 'postgres', label: 'postgres' },
-      { slug: 'postgrest', label: 'PostgREST' },
-      { slug: 'ai', label: 'AI & Vector' },
-      { slug: 'billing', label: 'Billing' },
-      { slug: 'breaking-change', label: 'Breaking Change' },
-      { slug: 'cli', label: 'CLI' },
-      { slug: 'frontend', label: 'Dashboard' },
-      { slug: 'documentation', label: 'Docs' },
-      { slug: 'infra', label: 'Infra' },
-      { slug: 'self-hosted', label: 'Self-hosted' },
-      { slug: 'javascript', label: 'supabase-js' },
-      { slug: 'swift', label: 'supabase-swift' },
-      { slug: 'flutter', label: 'supabase-flutter' },
-      { slug: 'python', label: 'supabase-py' },
-    ]
 
     const changelogQuery = `
     query changelogDiscussionMetadata($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
