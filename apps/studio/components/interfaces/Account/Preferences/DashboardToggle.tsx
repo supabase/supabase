@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { FieldValues, Path, UseFormReturn } from 'react-hook-form'
-import { CardContent, FormControl_Shadcn_, FormField_Shadcn_, Switch } from 'ui'
+import { CardContent, FormControl, FormField, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 interface DashboardToggleProps<T extends FieldValues> {
@@ -22,12 +22,12 @@ export function DashboardToggle<T extends FieldValues>({
 }: DashboardToggleProps<T>) {
   return (
     <CardContent className={isLast ? undefined : 'border-b'}>
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name={name}
         render={({ field }) => (
           <FormItemLayout layout="flex-row-reverse" label={label} description={description}>
-            <FormControl_Shadcn_>
+            <FormControl>
               <Switch
                 checked={field.value}
                 onCheckedChange={(value) => {
@@ -35,7 +35,7 @@ export function DashboardToggle<T extends FieldValues>({
                   onToggle(value)
                 }}
               />
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )}
       />

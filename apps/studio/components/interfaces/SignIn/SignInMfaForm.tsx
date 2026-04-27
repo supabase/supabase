@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { Button, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
@@ -119,9 +119,9 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
       {isErrorFactors && <AlertError error={factorsError} subject="Failed to retrieve factors" />}
 
       {isSuccessFactors && (
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField_Shadcn_
+            <FormField
               key="code"
               name="code"
               control={form.control}
@@ -134,7 +134,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                       : null
                   }
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-foreground-light [&_svg]:stroke-[1.5] [&_svg]:h-[20px] [&_svg]:w-[20px]">
                         <Lock />
@@ -152,7 +152,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                         disabled={isVerifying}
                       />
                     </div>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -180,7 +180,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
               </Button>
             </div>
           </form>
-        </Form_Shadcn_>
+        </Form>
       )}
 
       <div className="my-8">

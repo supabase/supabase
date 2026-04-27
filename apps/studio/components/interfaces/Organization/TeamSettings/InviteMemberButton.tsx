@@ -16,9 +16,9 @@ import {
   DialogTitle,
   DialogTrigger,
   ExpandingTextArea,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -286,19 +286,19 @@ export const InviteMemberButton = () => {
             </>
           }
         />
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             id="organization-invitation"
             className="flex flex-col gap-y-4"
             onSubmit={form.handleSubmit(onInviteMember)}
           >
             <DialogSection className="flex flex-col gap-y-4 pb-2">
-              <FormField_Shadcn_
+              <FormField
                 name="role"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout label="Role">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger_Shadcn_ className="text-sm capitalize">
                           {orgScopedRoles.find((role) => role.id === Number(field.value))?.name ??
@@ -326,12 +326,12 @@ export const InviteMemberButton = () => {
                           </SelectGroup_Shadcn_>
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
               {hasSsoProvider && (
-                <FormField_Shadcn_
+                <FormField
                   name="requireSso"
                   control={form.control}
                   render={({ field }) => (
@@ -339,7 +339,7 @@ export const InviteMemberButton = () => {
                       label="Invitation type"
                       description="Choose how the invitee should authenticate"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger_Shadcn_>
                             <SelectValue_Shadcn_ placeholder="Automatic (based on your account)" />
@@ -358,26 +358,26 @@ export const InviteMemberButton = () => {
                             </SelectGroup_Shadcn_>
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               )}
               {hasAccessToProjectLevelPermissions && (
-                <FormField_Shadcn_
+                <FormField
                   name="applyToOrg"
                   control={form.control}
                   render={({ field }) => (
                     <FormItemLayout layout="flex" label="Grant this role on all projects">
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               )}
               {!applyToOrg && (
-                <FormField_Shadcn_
+                <FormField
                   name="projectRef"
                   control={form.control}
                   render={({ field }) => (
@@ -385,7 +385,7 @@ export const InviteMemberButton = () => {
                       label="Select a project"
                       description="Project access can be adjusted after the user joins"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <OrganizationProjectSelector
                           fetchOnMount
                           sameWidthAsTrigger
@@ -397,17 +397,17 @@ export const InviteMemberButton = () => {
                           onSelect={(project) => field.onChange(project.ref)}
                           onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? '')}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               )}
-              <FormField_Shadcn_
+              <FormField
                 name="email"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout label="Email addresses">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <ExpandingTextArea
                         autoFocus
                         {...field}
@@ -420,7 +420,7 @@ export const InviteMemberButton = () => {
                         data-form-type="other"
                         data-bwignore
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -434,7 +434,7 @@ export const InviteMemberButton = () => {
               </Button>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
       <DiscardChangesConfirmationDialog
         {...discardChangesModalProps}
