@@ -1,9 +1,8 @@
 'use client'
 
-import { Check, Copy, ExternalLink } from 'lucide-react'
+import { Check, Copy } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
-import { isFeatureEnabled } from 'common'
+import { isFeatureEnabled, useCopyMarkdownFromUrl } from 'common'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns/Toc'
@@ -21,34 +20,20 @@ interface TOCHeader {
 }
 
 function AiTools({ className }: { className?: string }) {
-  const [copied, setCopied] = useState(false)
+  const { copied, copyMarkdown } = useCopyMarkdownFromUrl()
   const path = usePathname()
   const sendTelemetryEvent = useSendTelemetryEvent()
 
-  async function copyMarkdown() {
-    const mdUrl = `/docs/${path}.md`
-
-    try {
-      const res = await fetch(mdUrl)
-      let text: string
-
-      if (res.ok) {
-        text = await res.text()
-      } else {
-        // Default to HTML content within the article when no .md file is available.
-        text = document.getElementById('sb-docs-guide-main-article')?.innerHTML ?? ''
-      }
-
-      await navigator.clipboard.writeText(text)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (error) {
-      console.error('Failed to copy markdown', error)
-    }
-
-    sendTelemetryEvent({
-      action: 'copy_as_markdown_clicked',
+  async function handleCopyMarkdown() {
+    const ok = await copyMarkdown(`/docs/${path}.md`, {
+      fallbackHtml: () =>
+        document.getElementById('sb-docs-guide-main-article')?.innerHTML ?? '',
     })
+    if (ok) {
+      sendTelemetryEvent({
+        action: 'copy_as_markdown_clicked',
+      })
+    }
   }
 
   return (
@@ -61,7 +46,8 @@ function AiTools({ className }: { className?: string }) {
       </h3>
       <div className="flex flex-col gap-2">
         <button
-          onClick={copyMarkdown}
+          type="button"
+          onClick={() => void handleCopyMarkdown()}
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground text-left transition-colors"
         >
           {copied ? (

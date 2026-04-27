@@ -1,4 +1,4 @@
-import { LabelBadges } from '~/components/Changelog/ChangelogTimelineList'
+import { ChangelogDetailSidebar } from '~/components/Changelog/ChangelogDetailSidebar'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import {
@@ -11,7 +11,6 @@ import { discussionDisplayDate } from '~/lib/changelog.utils'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import dayjs from 'dayjs'
-import { ArrowUpRightIcon } from 'lucide-react'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
@@ -38,40 +37,35 @@ const ChangelogDetailPage = ({ title, url, created_at, number, source, labels }:
       }}
     />
     <DefaultLayout>
-      <div className="container mx-auto max-w-3xl flex flex-col gap-4 px-4 py-10 sm:px-16 xl:px-20">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <nav
-            aria-label="Breadcrumb"
-            className="text-foreground-lighter flex flex-wrap items-center gap-x-2 gap-y-1 text-sm"
-          >
-            <Link href="/changelog" className="text-foreground-lighter hover:underline">
-              Changelog
-            </Link>
-          </nav>
-        </div>
-        <header className="border-default flex flex-col gap-2 border-b pb-6">
+      <div className="container mx-auto max-w-5xl px-4 py-10 sm:px-16 xl:px-20">
+        <nav
+          aria-label="Breadcrumb"
+          className="text-foreground-lighter mb-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm"
+        >
+          <Link href="/changelog" className="text-foreground-lighter hover:underline">
+            Changelog
+          </Link>
+        </nav>
+        <header className="border-default mb-8 flex flex-col gap-2 border-b pb-6">
           <h1 className="h1 text-2xl sm:text-3xl">{title}</h1>
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-foreground-lighter font-mono text-xs">
-              {dayjs(created_at).format('MMM D, YYYY')}
-            </p>
-            <Link
-              target="_blank"
-              href={url}
-              className="flex items-center gap-2 text-sm text-foreground-lighter hover:text-foreground-light"
-              rel="noreferrer"
-            >
-              View discussion on GitHub
-              <ArrowUpRightIcon size={14} />
-            </Link>
-          </div>
+          <p className="text-foreground-lighter font-mono text-xs">
+            {dayjs(created_at).format('MMM D, YYYY')}
+          </p>
         </header>
 
-        <LabelBadges labels={labels} onBadgeClick={(e) => e.stopPropagation()} className="" />
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
+          <div className="min-w-0 lg:col-span-8">
+            <article className="prose prose-docs mb-8 max-w-none [overflow-wrap:break-word] lg:mb-20 [&>*:first-child:not(style):not(script)]:mt-0 [&>style:first-child+*]:mt-0 [&>script:first-child+*]:mt-0">
+              <MDXRemote {...source} components={mdxComponents('blog')} />
+            </article>
+          </div>
 
-        <article className="prose prose-docs max-w-none [overflow-wrap:break-word] mb-12 lg:mb-20">
-          <MDXRemote {...source} components={mdxComponents('blog')} />
-        </article>
+          <aside className="border-default border-t pt-6 lg:col-span-4 lg:border-t-0 lg:pl-4 lg:pt-0">
+            <div className="thin-scrollbar lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
+              <ChangelogDetailSidebar number={number} url={url} labels={labels} />
+            </div>
+          </aside>
+        </div>
       </div>
       <CTABanner />
     </DefaultLayout>

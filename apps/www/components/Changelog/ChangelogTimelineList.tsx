@@ -60,13 +60,7 @@ export function LabelBadges({
   )
 }
 
-function TimelineRow({
-  item,
-  href,
-}: {
-  item: ChangelogTimelineIndexItem
-  href: string
-}) {
+function TimelineRow({ item, href }: { item: ChangelogTimelineIndexItem; href: string }) {
   const dateLabel = dayjs(item.sortDate).format('MMM D')
   const labels = item.labels ?? []
 

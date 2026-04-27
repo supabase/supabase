@@ -350,7 +350,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                       </div>
                     </div>
                     <div className="col-span-8 lg:max-w-[calc(100vw-80px)]">
-                      <article className="prose prose-docs max-w-none [overflow-wrap:break-word] [&>*:first-child]:mt-0">
+                      <article className="prose prose-docs max-w-none [overflow-wrap:break-word] [&>*:first-child:not(style):not(script)]:mt-0 [&>style:first-child+*]:mt-0 [&>script:first-child+*]:mt-0">
                         <MDXRemote {...entry.source} components={mdxComponents('blog')} />
                       </article>
                     </div>
