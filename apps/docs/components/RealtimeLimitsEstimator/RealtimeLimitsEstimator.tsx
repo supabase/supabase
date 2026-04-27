@@ -105,10 +105,7 @@ export default function RealtimeLimitsEstimater({}) {
         </div>
         <div>
           <Label_Shadcn_ htmlFor="concurrency">Connected clients:</Label_Shadcn_>
-          <Select_Shadcn_
-            onValueChange={handleConcurrencySelection}
-            defaultValue={concurrency.toString()}
-          >
+          <Select_Shadcn_ onValueChange={handleConcurrencySelection} value={concurrency.toString()}>
             <SelectTrigger_Shadcn_ id="concurrency">
               <SelectValue_Shadcn_ className="font-mono" />
             </SelectTrigger_Shadcn_>
