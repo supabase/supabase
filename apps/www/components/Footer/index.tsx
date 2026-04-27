@@ -2,6 +2,8 @@
 
 import { CheckIcon } from '@heroicons/react/outline'
 import { REALTIME_CHANNEL_STATES } from '@supabase/supabase-js'
+import SupabaseWordmark from '~/components/Nav/SupabaseWordmark'
+import supabase from '~/lib/supabase'
 import footerData from 'data/Footer'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -19,8 +21,7 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
-import SupabaseWordmark from '~/components/Nav/SupabaseWordmark'
-import supabase from '~/lib/supabase'
+
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
 import SectionContainer from '../Layouts/SectionContainer'
 
@@ -100,6 +101,10 @@ const Footer = (props: Props) => {
             <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
               <CheckIcon className="w-4 h-4" /> HIPAA{' '}
               <span className="text-foreground-lighter hidden sm:inline">Compliant</span>
+            </li>
+            <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
+              <CheckIcon className="w-4 h-4" /> ISO 27001{' '}
+              <span className="text-foreground-lighter hidden sm:inline">Certified</span>
             </li>
           </ul>
         </SectionContainer>

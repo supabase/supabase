@@ -21,6 +21,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
+import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { useOrganizationBillingSubscriptionPreview } from '@/data/organizations/organization-billing-subscription-preview'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
@@ -55,6 +56,9 @@ export const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const { slug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const isPartnerBilledOrganization = isPartnerBillingOrganization(
+    selectedOrganization?.billing_partner
+  )
   const { mutate: sendEvent } = useSendEventMutation()
 
   const originalPlanRef = useRef<string>()
@@ -204,7 +208,7 @@ export const PlanUpdateSidePanel = () => {
           </div>
         }
       >
-        {selectedOrganization && selectedOrganization.managed_by !== MANAGED_BY.SUPABASE && (
+        {selectedOrganization && isPartnerBilledOrganization && (
           <PartnerManagedResource
             managedBy={selectedOrganization.managed_by}
             resource="Organization plans"
@@ -282,8 +286,7 @@ export const PlanUpdateSidePanel = () => {
                           subscription?.plan?.id === 'enterprise' ||
                           subscription?.plan?.id === 'platform' ||
                           // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
-                          (selectedOrganization?.managed_by !== MANAGED_BY.SUPABASE &&
-                            plan.id !== 'tier_free') ||
+                          (isPartnerBilledOrganization && plan.id !== 'tier_free') ||
                           // Orgs managed by AWS marketplace are not allowed to change the plan
                           selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE ||
                           hasOrioleProjects

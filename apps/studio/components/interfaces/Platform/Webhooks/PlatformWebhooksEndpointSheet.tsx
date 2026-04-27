@@ -10,9 +10,9 @@ import {
   Button,
   Checkbox_Shadcn_ as Checkbox,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_ as InputField,
   Label_Shadcn_ as Label,
   Separator,
@@ -264,14 +264,14 @@ export const PlatformWebhooksEndpointSheet = ({
         </SheetHeader>
         <Separator />
         <SheetSection className="overflow-auto flex-grow px-0 py-0">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id="platform-webhook-endpoint-form"
               className="space-y-5 py-5"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <div className="px-5 space-y-5">
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
@@ -285,29 +285,29 @@ export const PlatformWebhooksEndpointSheet = ({
                       layout="vertical"
                       className="gap-1"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <InputField {...field} placeholder="winged-envelope" maxLength={64} />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
 
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="url"
                   render={({ field }) => (
                     <FormItemLayout label="Endpoint URL" layout="vertical" className="gap-1">
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <InputField
                           {...field}
                           placeholder="https://api.example.com/webhooks/supabase"
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
 
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="description"
                   render={({ field }) => (
@@ -320,20 +320,20 @@ export const PlatformWebhooksEndpointSheet = ({
                       layout="vertical"
                       className="gap-1"
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Textarea
                           {...field}
                           rows={4}
                           placeholder="Optional description for this endpoint"
                           className="resize-none"
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
 
                 {mode === 'edit' && (
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="enabled"
                     render={({ field }) => {
@@ -350,13 +350,13 @@ export const PlatformWebhooksEndpointSheet = ({
                                 Disabled endpoints won’t receive deliveries
                               </p>
                             </div>
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch
                                 id={enabledId}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </Label>
                         </div>
                       )
@@ -368,7 +368,7 @@ export const PlatformWebhooksEndpointSheet = ({
               <Separator />
 
               <div className="px-5 space-y-3">
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="eventTypes"
                   render={({ field, fieldState }) => {
@@ -401,7 +401,7 @@ export const PlatformWebhooksEndpointSheet = ({
                         layout="vertical"
                         className="gap-2"
                       >
-                        <FormField_Shadcn_
+                        <FormField
                           control={form.control}
                           name="subscribeAll"
                           render={({ field }) => {
@@ -415,7 +415,7 @@ export const PlatformWebhooksEndpointSheet = ({
                                     field.value ? 'bg-surface-100' : 'bg-surface-200'
                                   )}
                                 >
-                                  <FormControl_Shadcn_>
+                                  <FormControl>
                                     <Checkbox
                                       id={subscribeAllId}
                                       checked={field.value}
@@ -437,7 +437,7 @@ export const PlatformWebhooksEndpointSheet = ({
                                         })
                                       }}
                                     />
-                                  </FormControl_Shadcn_>
+                                  </FormControl>
                                   <span className="text-sm text-foreground">
                                     Subscribe to all events{' '}
                                     <code className="text-code-inline">(*)</code>
@@ -448,7 +448,7 @@ export const PlatformWebhooksEndpointSheet = ({
                           }}
                         />
 
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Accordion
                             type="multiple"
                             value={openEventGroups}
@@ -547,7 +547,7 @@ export const PlatformWebhooksEndpointSheet = ({
                               )
                             })}
                           </Accordion>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )
                   }}
@@ -580,7 +580,7 @@ export const PlatformWebhooksEndpointSheet = ({
                 </FormItemLayout>
               </div>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </SheetSection>
         <SheetFooter>
           <Button type="default" onClick={confirmOnClose}>

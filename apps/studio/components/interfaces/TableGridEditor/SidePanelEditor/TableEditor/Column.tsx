@@ -5,7 +5,6 @@ import { useState } from 'react'
 import {
   Badge,
   Button,
-  Checkbox,
   Checkbox_Shadcn_,
   cn,
   Command_Shadcn_,
@@ -284,10 +283,10 @@ export const Column = ({
         </div>
       </div>
       <div className="w-[10%]">
-        <Checkbox
-          label=""
+        <Checkbox_Shadcn_
+          aria-label="Check to make this column a primary key"
           checked={column.isPrimaryKey}
-          onChange={() => {
+          onCheckedChange={() => {
             const updatedValue = !column.isPrimaryKey
             onUpdateColumn({
               isPrimaryKey: updatedValue,

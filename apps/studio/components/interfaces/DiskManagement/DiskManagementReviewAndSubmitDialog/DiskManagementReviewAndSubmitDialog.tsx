@@ -27,6 +27,7 @@ import {
   ValueChange,
 } from './DiskManagementReviewAndSubmitDialog.components'
 import { useDiskManagementReviewChanges } from './DiskManagementReviewAndSubmitDialog.hooks'
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -154,6 +155,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 </span>
               </div>
             </div>
+            <TaxDisclaimer className="px-5 py-2 text-center border-b" />
           </>
         )}
 

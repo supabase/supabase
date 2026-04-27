@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, cn, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Separator } from 'ui'
+import { Button, cn, Form, FormControl, FormField, Separator } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
@@ -75,15 +75,15 @@ export const ResetPasswordForm = () => {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onResetPassword)} className="space-y-4 pt-4">
         {requireCurrentPassword && (
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="currentPassword"
             render={({ field }) => (
               <FormItemLayout label="Current password">
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Input
                     id="currentPassword"
                     type={currentPasswordHidden ? 'password' : 'text'}
@@ -103,17 +103,17 @@ export const ResetPasswordForm = () => {
                       setCurrentPasswordHidden(true)
                     }}
                   />
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
             )}
           />
         )}
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="password"
           render={({ field }) => (
             <FormItemLayout label="Password">
-              <FormControl_Shadcn_>
+              <FormControl>
                 <Input
                   id="password"
                   type={passwordHidden ? 'password' : 'text'}
@@ -135,7 +135,7 @@ export const ResetPasswordForm = () => {
                     setPasswordHidden(true)
                   }}
                 />
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />
@@ -161,6 +161,6 @@ export const ResetPasswordForm = () => {
           Save new password
         </Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

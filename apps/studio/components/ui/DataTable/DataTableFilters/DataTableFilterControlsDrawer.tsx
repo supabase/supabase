@@ -19,15 +19,16 @@ import {
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import { Kbd } from '../primitives/Kbd'
 import { DataTableFilterControls } from './DataTableFilterControls'
-import { useHotKey } from '@/hooks/ui/useHotKey'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export function DataTableFilterControlsDrawer() {
   const triggerButtonRef = useRef<HTMLButtonElement>(null)
   const isMobile = useMediaQuery('(max-width: 640px)')
 
-  useHotKey(() => {
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => {
     triggerButtonRef.current?.click()
-  }, 'b')
+  })
 
   return (
     <Drawer>
