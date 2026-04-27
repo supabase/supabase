@@ -205,10 +205,10 @@ export default function StateOfStartups2026Content({
         <DefaultLayout className="bg-alternative overflow-hidden">
           <div className="fixed top-20 inset-x-0 z-50 pointer-events-none flex justify-center">
             <motion.div layout className="flex items-start gap-2 pointer-events-auto">
-              <YearToggle />
-              <AnimatePresence>
+              <AnimatePresence mode="popLayout">
                 {showFloatingToc && (
                   <FloatingTableOfContents
+                    key="floating-toc"
                     tocRef={tocRef}
                     isTocOpen={isTocOpen}
                     setIsTocOpen={setIsTocOpen}
@@ -216,6 +216,7 @@ export default function StateOfStartups2026Content({
                   />
                 )}
               </AnimatePresence>
+              <YearToggle />
             </motion.div>
           </div>
           {/* Intro section */}
