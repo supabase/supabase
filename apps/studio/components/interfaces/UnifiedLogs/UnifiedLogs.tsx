@@ -14,15 +14,19 @@ import {
   VisibilityState,
 } from '@tanstack/react-table'
 import { useDebounce, useParams } from 'common'
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import {
+  Button,
   ChartConfig,
   cn,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Separator,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   useIsMobile,
 } from 'ui'
 
@@ -39,12 +43,14 @@ import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.utils'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
 import { DataTableFilterCommand } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterCommand'
+import { DataTableFilterControlsDrawer } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterControlsDrawer'
 import { DataTableHeaderLayout } from '@/components/ui/DataTable/DataTableHeaderLayout'
 import { DataTableInfinite } from '@/components/ui/DataTable/DataTableInfinite'
 import { DataTableSideBarLayout } from '@/components/ui/DataTable/DataTableSideBarLayout'
-import { DataTableToolbar } from '@/components/ui/DataTable/DataTableToolbar'
+import { DataTableViewOptions } from '@/components/ui/DataTable/DataTableViewOptions'
 import { FilterSideBar } from '@/components/ui/DataTable/FilterSideBar'
 import { LiveButton } from '@/components/ui/DataTable/LiveButton'
+import { Kbd } from '@/components/ui/DataTable/primitives/Kbd'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { TimelineChart } from '@/components/ui/DataTable/TimelineChart'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
@@ -52,6 +58,8 @@ import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const CHART_CONFIG = {
   success: {
@@ -318,6 +326,8 @@ export const UnifiedLogs = () => {
   const isMobile = useIsMobile()
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
 
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev))
+
   useEffect(() => {
     if (isMobile) {
       setIsFilterBarOpen(false)
@@ -356,29 +366,46 @@ export const UnifiedLogs = () => {
             className="flex max-w-full flex-1 flex-col overflow-hidden"
           >
             <DataTableHeaderLayout setTopBarHeight={setTopBarHeight}>
-              <DataTableFilterCommand
-                placeholder="Search logs..."
-                searchParamsParser={SEARCH_PARAMS_PARSER}
-              />
-              <DataTableToolbar
-                renderActions={() => [
-                  <DownloadLogsButton key="download" searchParameters={searchParameters} />,
-                  <RefreshButton
-                    key="refresh"
-                    isLoading={isRefetchingData}
-                    onRefresh={refetchAllData}
-                  />,
-                  fetchPreviousPage ? (
-                    <LiveButton
-                      key="live"
-                      fetchPreviousPage={fetchPreviousPage}
-                      searchParamsParser={SEARCH_PARAMS_PARSER}
+              <div className="flex items-center gap-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="tiny"
+                      type="text"
+                      icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
+                      onClick={() => setIsFilterBarOpen((prev) => !prev)}
+                      className="hidden w-[26px] sm:flex"
                     />
-                  ) : null,
-                ]}
-                isFilterBarOpen={isFilterBarOpen}
-                setIsFilterBarOpen={setIsFilterBarOpen}
-              />
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <p>
+                      Toggle controls with{' '}
+                      <Kbd className="ml-1 text-muted-foreground group-hover:text-accent-foreground">
+                        <span className="mr-1">⌘</span>
+                        <span>B</span>
+                      </Kbd>
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+                <div className="block sm:hidden">
+                  <DataTableFilterControlsDrawer />
+                </div>
+                <div className="min-w-0 flex-1 [&_button>span]:!h-[26px] [&_button>span]:!py-0 [&_input]:!h-[26px] [&_input]:!py-0">
+                  <DataTableFilterCommand
+                    placeholder="Search logs..."
+                    searchParamsParser={SEARCH_PARAMS_PARSER}
+                  />
+                </div>
+                <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />
+                <DataTableViewOptions />
+                <DownloadLogsButton searchParameters={searchParameters} />
+                {fetchPreviousPage ? (
+                  <LiveButton
+                    fetchPreviousPage={fetchPreviousPage}
+                    searchParamsParser={SEARCH_PARAMS_PARSER}
+                  />
+                ) : null}
+              </div>
               <TimelineChart
                 data={unifiedLogsChart}
                 className={cn(
@@ -389,7 +416,6 @@ export const UnifiedLogs = () => {
                 chartConfig={filteredChartConfig}
               />
             </DataTableHeaderLayout>
-            <Separator />
             <ResizablePanelGroup orientation="horizontal" className="w-full h-full">
               <ResizablePanel minSize="30" className="h-full">
                 <ResizablePanelGroup key="main-logs" orientation="vertical" className="h-full">
@@ -401,7 +427,7 @@ export const UnifiedLogs = () => {
                       isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
                     )}
                   >
-                    <div className="h-full overflow-auto">
+                    <div className="h-full [&>div]:h-full [&_thead_tr]:!bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))] [&_thead_th]:![border-top:none] [&_thead_th]:![border-bottom:none] [&_thead_th]:![box-shadow:inset_0_-1px_0_hsl(var(--border-default))] [&_tbody_tr]:!border-b-0 [&_thead_tr:hover]:!bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))] [&_thead_th]:!text-foreground-lighter">
                       <DataTableInfinite
                         columns={UNIFIED_LOGS_COLUMNS}
                         totalRows={totalDBRowCount}
