@@ -13,8 +13,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
-  Select,
+  Input_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
@@ -291,52 +298,82 @@ const ReportFilterBar = ({
           </PopoverTrigger>
           <PopoverContent align={filters.length > 0 ? 'end' : 'start'} className="p-0 w-60">
             <div className="flex flex-col gap-3 p-3">
-              <Select
-                size="tiny"
-                value={addFilterValues.key}
-                onChange={(e) => {
-                  setAddFilterValues((prev) => ({ ...prev, key: e.target.value }))
-                }}
+              <FormItemLayout
+                isReactForm={false}
+                layout="vertical"
                 label="Attribute Filter"
                 className="gap-[2px]"
-              >
-                {filterKeys.map((key) => (
-                  <Select.Option key={key} value={key}>
-                    {key}
-                  </Select.Option>
-                ))}
-              </Select>
-              <Select
                 size="tiny"
-                value={addFilterValues.compare}
-                onChange={(e) => {
-                  setAddFilterValues((prev) => ({
-                    ...prev,
-                    compare: e.target.value as ReportFilterItem['compare'],
-                  }))
-                }}
+              >
+                <Select_Shadcn_
+                  value={addFilterValues.key}
+                  onValueChange={(value: string) =>
+                    setAddFilterValues((prev) => ({ ...prev, key: value }))
+                  }
+                >
+                  <SelectTrigger_Shadcn_>
+                    <SelectValue_Shadcn_ placeholder="---" />
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectGroup_Shadcn_>
+                      {filterKeys.map((key) => (
+                        <SelectItem_Shadcn_ key={key} value={key}>
+                          {key}
+                        </SelectItem_Shadcn_>
+                      ))}
+                    </SelectGroup_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </FormItemLayout>
+              <FormItemLayout
+                isReactForm={false}
+                layout="vertical"
                 label="Comparison"
                 className="gap-[2px]"
-              >
-                {['is', 'matches'].map((value) => (
-                  <Select.Option key={value} value={value}>
-                    {value}
-                  </Select.Option>
-                ))}
-              </Select>
-              <Input
                 size="tiny"
+              >
+                <Select_Shadcn_
+                  value={addFilterValues.compare}
+                  onValueChange={(value: string) =>
+                    setAddFilterValues((prev) => ({
+                      ...prev,
+                      compare: value as ReportFilterItem['compare'],
+                    }))
+                  }
+                >
+                  <SelectTrigger_Shadcn_>
+                    <SelectValue_Shadcn_ placeholder="---" />
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectGroup_Shadcn_>
+                      {['is', 'matches'].map((value) => (
+                        <SelectItem_Shadcn_ key={value} value={value}>
+                          {value}
+                        </SelectItem_Shadcn_>
+                      ))}
+                    </SelectGroup_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </FormItemLayout>
+              <FormItemLayout
+                isReactForm={false}
+                layout="vertical"
                 label="Value"
                 className="gap-[2px]"
-                placeholder={
-                  addFilterValues.compare === 'matches'
-                    ? 'Provide a regex expression'
-                    : 'Provide a string'
-                }
-                onChange={(e) => {
-                  setAddFilterValues((prev) => ({ ...prev, value: e.target.value }))
-                }}
-              />
+                size="tiny"
+              >
+                <Input_Shadcn_
+                  placeholder={
+                    addFilterValues.compare === 'matches'
+                      ? 'Provide a regex expression'
+                      : 'Provide a string'
+                  }
+                  value={addFilterValues.value}
+                  onChange={(e) => {
+                    setAddFilterValues((prev) => ({ ...prev, value: e.target.value }))
+                  }}
+                />
+              </FormItemLayout>
             </div>
 
             <div className="flex items-center justify-end gap-2 border-t border-default p-2">
