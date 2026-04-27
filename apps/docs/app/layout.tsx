@@ -29,11 +29,6 @@ const metadata: Metadata = {
     index: IS_PRODUCTION,
     follow: IS_PRODUCTION,
   },
-  alternates: {
-    types: {
-      'text/markdown': '/llms-full.txt',
-    },
-  },
   openGraph: {
     type: 'article',
     authors: 'Supabase',

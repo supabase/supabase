@@ -32,28 +32,10 @@ function getSources(): Source[] {
   ]
 }
 
-// Order matters: homepage first, products alphabetical, then modules.
-// pricing is generated dynamically via generatePricingContent().
-const PRODUCT_MD_SLUGS = [
-  'homepage',
-  'auth',
-  'database',
-  'edge-functions',
-  'realtime',
-  'storage',
-  'vector',
-  'modules/cron',
-  'modules/queues',
-]
-
-function readProductOverviews(): string {
-  const staticContents = PRODUCT_MD_SLUGS.map((slug) => {
-    const content = MD_CONTENT.get(slug)
-    if (!content) {
-      throw new Error(`Missing .md content for "${slug}". Run \`pnpm content:build\`.`)
-    }
-    return content
-  })
+// Order is set by scripts/generateMdContent.mjs (homepage first, rest
+// alphabetical). pricing is appended here since it's dynamic.
+async function readProductOverviews(): Promise<string> {
+  const staticContents = [...MD_CONTENT.values()]
   const pricingContent = generatePricingContent()
 
   return [...staticContents, pricingContent].join('\n\n---\n\n')
@@ -73,13 +55,13 @@ export async function GET() {
   const sources = getSources()
   const enabledSources = sources.filter((source) => source.enabled)
 
-  const productContent = readProductOverviews()
-  const sourceContents = await Promise.all(
-    enabledSources.map(async (source) => {
+  const [productContent, ...sourceContents] = await Promise.all([
+    readProductOverviews(),
+    ...enabledSources.map(async (source) => {
       const text = await fetchSourceContent(source.slug)
       return { title: source.title, text }
-    })
-  )
+    }),
+  ])
 
   const docsSection = sourceContents
     .filter((s): s is { title: string; text: string } => s.text !== null)

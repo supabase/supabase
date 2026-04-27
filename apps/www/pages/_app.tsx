@@ -26,9 +26,10 @@ import { useConsentToast } from 'ui-patterns/consent'
 
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 import { useWwwCommandMenuTelemetry } from '../hooks/useWwwCommandMenuTelemetry'
+import { MD_PAGES } from '@/app/api-v2/md/content.generated'
 import { Toaster } from '@/app/toaster'
 import { WwwCommandMenu } from '@/components/CommandMenu'
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION, MD_PAGES } from '@/lib/constants'
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '@/lib/constants'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()

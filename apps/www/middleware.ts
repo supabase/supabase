@@ -1,7 +1,7 @@
 import { stampFirstReferrerCookie } from 'common/first-referrer-cookie'
 import { NextResponse, type NextRequest } from 'next/server'
 
-import { MD_PAGES } from './lib/constants'
+import { MD_PAGES } from './app/api-v2/md/content.generated'
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl

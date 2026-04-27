@@ -3127,7 +3127,7 @@ module.exports = [
     source: '/docs/llms-full.txt',
     destination: '/llms-full.txt',
   },
-  // Legacy product .txt URLs → new .md routes (GROWTH-760)
+  // Legacy product .txt URLs → new .md routes
   { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },
   { permanent: true, source: '/llms/auth.txt', destination: '/auth.md' },
   { permanent: true, source: '/llms/database.txt', destination: '/database.md' },
