@@ -429,35 +429,30 @@ export const UnifiedLogs = () => {
                 chartConfig={filteredChartConfig}
               />
             </div>
-            <ResizablePanelGroup orientation="horizontal" className="w-full h-full">
-              <ResizablePanel minSize="30" className="h-full">
-                <ResizablePanelGroup key="main-logs" orientation="vertical" className="h-full">
-                  <ResizablePanel
-                    defaultSize="100"
-                    minSize="30"
-                    className={cn(
-                      'bg',
-                      isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
-                    )}
-                  >
-                    <div className="h-full [&>div]:h-full [&_thead_tr]:!bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))] [&_thead_th]:![border-top:none] [&_thead_th]:![border-bottom:none] [&_thead_th]:![box-shadow:inset_0_-1px_0_hsl(var(--border-default))] [&_thead_tr]:!border-b-0 [&_tbody_tr]:!border-b-0 [&_thead_tr:hover]:!bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))] [&_thead_th]:!text-foreground-lighter">
-                      <DataTableInfinite
-                        columns={UNIFIED_LOGS_COLUMNS}
-                        totalRows={totalDBRowCount}
-                        filterRows={filterDBRowCount}
-                        totalRowsFetched={totalFetched}
-                        fetchNextPage={fetchNextPage}
-                        hasNextPage={hasNextPage}
-                        setColumnOrder={setColumnOrder}
-                        setColumnVisibility={setColumnVisibility}
-                        searchParamsParser={SEARCH_PARAMS_PARSER}
-                      />
-                    </div>
-                  </ResizablePanel>
-                  <LogsListPanel selectedRow={selectedRow} />
-                </ResizablePanelGroup>
+            <ResizablePanelGroup key="main-logs" orientation="vertical" className="flex-1">
+              <ResizablePanel
+                defaultSize="100"
+                minSize="30"
+                className={cn(
+                  'bg',
+                  isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
+                )}
+              >
+                <div className="h-full [&>div]:h-full [&_thead_tr]:!bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))] [&_thead_th]:![border-top:none] [&_thead_th]:![border-bottom:none] [&_thead_th]:![box-shadow:inset_0_-1px_0_hsl(var(--border-default))] [&_thead_tr]:!border-b-0 [&_tbody_tr]:!border-b-0 [&_thead_tr:hover]:!bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))] [&_thead_th]:!text-foreground-lighter">
+                  <DataTableInfinite
+                    columns={UNIFIED_LOGS_COLUMNS}
+                    totalRows={totalDBRowCount}
+                    filterRows={filterDBRowCount}
+                    totalRowsFetched={totalFetched}
+                    fetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    setColumnOrder={setColumnOrder}
+                    setColumnVisibility={setColumnVisibility}
+                    searchParamsParser={SEARCH_PARAMS_PARSER}
+                  />
+                </div>
               </ResizablePanel>
-
+              <LogsListPanel selectedRow={selectedRow} />
               {selectedRowKey && (
                 <ServiceFlowPanel
                   selectedRow={selectedRow?.original}

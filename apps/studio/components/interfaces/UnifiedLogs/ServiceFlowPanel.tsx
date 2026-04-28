@@ -89,19 +89,12 @@ export function ServiceFlowPanel({
         <ResizableHandle withHandle className="z-10" />
         <ResizablePanel
           id="log-sidepanel"
-          minSize={448}
-          maxSize={720}
-          className={cn(
-            'bg-dash-sidebar',
-            'z-40',
-            'border-l fixed right-0 top-0 bottom-0',
-            'md:absolute md:h-auto',
-            // ' md:w-3/4',
-            'xl:z-[1]',
-            'xl:relative xl:border-l-0'
-          )}
+          defaultSize={45}
+          minSize={400}
+          maxSize={400}
+          className={cn('bg-dash-sidebar border-t')}
         >
-          <div className="mt-8 h-[calc(100%-2rem)] overflow-auto">
+          <div className="h-full overflow-auto">
             {/* Service Flow Header with navigation */}
             <ServiceFlowHeader
               selectedRow={selectedRow}
