@@ -1,9 +1,9 @@
 import { useParams } from 'common'
-import { ChevronLeft, Menu, Search } from 'lucide-react'
+import { ChevronLeft, Menu } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button, cn } from 'ui'
-import { CommandMenuTrigger, MobileSheetNav } from 'ui-patterns'
+import { MobileSheetNav } from 'ui-patterns'
 
 import { HeaderUpgradeButton } from '../LayoutHeader/HeaderUpgradeButton'
 import { HomeIcon } from '../LayoutHeader/HomeIcon'

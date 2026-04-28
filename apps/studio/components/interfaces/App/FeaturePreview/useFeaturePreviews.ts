@@ -88,6 +88,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isNew: false,
       isPlatformOnly: false,
       isDefaultOptIn: false,
-    }
+    },
   ].sort((a, b) => Number(b.isNew) - Number(a.isNew))
 }
