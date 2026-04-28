@@ -1,20 +1,21 @@
-import { ChangelogDetailSidebar } from '~/components/Changelog/ChangelogDetailSidebar'
-import CTABanner from '~/components/CTABanner'
-import DefaultLayout from '~/components/Layouts/Default'
+import dayjs from 'dayjs'
+import type { GetStaticPaths, GetStaticProps } from 'next'
+import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { NextSeo } from 'next-seo'
+import Link from 'next/link'
+
+import { ChangelogDetailSidebar } from '@/components/Changelog/ChangelogDetailSidebar'
+import CTABanner from '@/components/CTABanner'
+import DefaultLayout from '@/components/Layouts/Default'
 import {
   CHANGELOG_CATEGORY_ID,
   createChangelogOctokit,
   fetchChangelogDiscussionByNumber,
   type ChangelogLabel,
-} from '~/lib/changelog-github'
-import { discussionDisplayDate } from '~/lib/changelog.utils'
-import mdxComponents from '~/lib/mdx/mdxComponents'
-import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
-import dayjs from 'dayjs'
-import { GetStaticPaths, GetStaticProps } from 'next'
-import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { NextSeo } from 'next-seo'
-import Link from 'next/link'
+} from '@/lib/changelog-github'
+import { discussionDisplayDate } from '@/lib/changelog.utils'
+import mdxComponents from '@/lib/mdx/mdxComponents'
+import { mdxSerialize } from '@/lib/mdx/mdxSerialize'
 
 type PageProps = {
   title: string

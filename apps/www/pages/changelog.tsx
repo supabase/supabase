@@ -1,25 +1,3 @@
-import { ChangelogLlmMarkdownButton } from '~/components/Changelog/ChangelogLlmMarkdownButton'
-import { ChangelogTimelineList } from '~/components/Changelog/ChangelogTimelineList'
-import CTABanner from '~/components/CTABanner'
-import DefaultLayout from '~/components/Layouts/Default'
-import {
-  createChangelogOctokit,
-  fetchChangelogDiscussionByNumber,
-  getChangelogTimelineSortedIndex,
-  type ChangelogLabel,
-  type ChangelogTimelineIndexItem,
-} from '~/lib/changelog-github'
-import {
-  CHANGELOG_PRODUCT_TAGS,
-  changelogLabelDisplayName,
-  changelogTagFilterUrl,
-  discussionDisplayDate,
-  isChangelogProductSlug,
-  itemMatchesChangelogSearch,
-  itemMatchesChangelogSelectedTags,
-} from '~/lib/changelog.utils'
-import mdxComponents from '~/lib/mdx/mdxComponents'
-import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { useBreakpoint } from 'common'
 import dayjs from 'dayjs'
 import { GitCommit, ListFilter, Rss, X } from 'lucide-react'
@@ -31,9 +9,32 @@ import Link from 'next/link'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { useEffect, useMemo, useState } from 'react'
-import { Badge, Button, cn, IconYCombinator, Input, Input_Shadcn_ } from 'ui'
+import { Badge, Button, cn, IconYCombinator, Input_Shadcn_ } from 'ui'
 
-const FEATURED_COUNT = 1
+import { ChangelogLlmMarkdownButton } from '@/components/Changelog/ChangelogLlmMarkdownButton'
+import { ChangelogTimelineList } from '@/components/Changelog/ChangelogTimelineList'
+import CTABanner from '@/components/CTABanner'
+import DefaultLayout from '@/components/Layouts/Default'
+import {
+  createChangelogOctokit,
+  fetchChangelogDiscussionByNumber,
+  getChangelogTimelineSortedIndex,
+  type ChangelogLabel,
+  type ChangelogTimelineIndexItem,
+} from '@/lib/changelog-github'
+import {
+  CHANGELOG_PRODUCT_TAGS,
+  changelogLabelDisplayName,
+  changelogTagFilterUrl,
+  discussionDisplayDate,
+  isChangelogProductSlug,
+  itemMatchesChangelogSearch,
+  itemMatchesChangelogSelectedTags,
+} from '@/lib/changelog.utils'
+import mdxComponents from '@/lib/mdx/mdxComponents'
+import { mdxSerialize } from '@/lib/mdx/mdxSerialize'
+
+const FEATURED_COUNT = 3
 
 type FeaturedEntry = {
   number: number
@@ -221,7 +222,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                   className="shrink-0"
                   icon={<Rss className="h-4 w-4" strokeWidth={2} aria-hidden />}
                 >
-                  <Link href="/changelog-rss.xml">Changelog RSS</Link>
+                  <Link href="/changelog-rss.xml">RSS</Link>
                 </Button>
                 <ChangelogLlmMarkdownButton />
               </div>
@@ -319,7 +320,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
               )}
             </section>
           ) : (
-            <div
+            <section
               className="border-muted relative lg:ml-2 lg:border-l lg:pl-8 mb-12 lg:mb-20"
               aria-label="Changelog timeline"
             >
@@ -337,8 +338,10 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                         </div>
                         <div className="flex w-full flex-col gap-1">
                           {entry.title && (
-                            <Link href={entry.url}>
-                              <h3 className="text-foreground text-lg">{entry.title}</h3>
+                            <Link href={`/changelog/${entry.number}`}>
+                              <h3 className="text-foreground text-lg hover:underline">
+                                {entry.title}
+                              </h3>
                             </Link>
                           )}
                           <p className="text-foreground-lighter font-mono text-xs">
@@ -352,7 +355,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                                   href={changelogTagFilterUrl(label.name)}
                                   className="group inline-flex no-underline focus-visible:ring-brand-default rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                                 >
-                                  <Badge className="group-hover:text-foreground-light text-foreground-lighter group-hover:border-foreground-muted px-1.5 py-px text-[11px] lowercase">
+                                  <Badge className="group-hover:text-foreground-light text-foreground-lighter group-hover:border-foreground-muted px-1.5 py-px text-[11px] tracking-normal lowercase">
                                     {changelogLabelDisplayName(label.name)}
                                   </Badge>
                                 </a>
@@ -391,7 +394,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
           )}
         </div>
         <CTABanner />

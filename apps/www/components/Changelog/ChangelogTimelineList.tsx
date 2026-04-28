@@ -46,7 +46,7 @@ export function LabelBadges({
           <Badge
             variant="default"
             className={cn(
-              'tracking-normal lowercase border-default bg-surface-200',
+              'tracking-normal lowercase border-default',
               tiny
                 ? 'text-foreground-lighter hover:text-foreground-light rounded-full border px-0.5 py-px text-[8px] font-medium leading-none'
                 : 'text-foreground-light hover:text-foreground rounded-full border px-1.5 py-px text-[11px] font-medium leading-tight'

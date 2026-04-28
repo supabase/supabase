@@ -38,7 +38,7 @@ export function ChangelogLlmMarkdownButton({ className, markdownPath = '/changel
         }
         onClick={() => void copyMarkdown(markdownPath)}
       >
-        {copied ? 'Copied as markdown' : 'Copy as markdown'}
+        {copied ? 'Copied as Markdown' : 'Copy as Markdown'}
       </Button>
 
       <DropdownMenu>
