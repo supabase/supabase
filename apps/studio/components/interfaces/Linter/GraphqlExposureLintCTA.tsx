@@ -25,6 +25,8 @@ export const asGraphqlExposureLint = (
     ? (name as GraphqlExposureLintName)
     : null
 
+const quoteIdent = (ident: string) => `"${ident.replace(/"/g, '""')}"`
+
 interface GraphqlExposureLintCTAProps {
   lintName: GraphqlExposureLintName
   projectRef: string
@@ -65,7 +67,9 @@ export const GraphqlExposureLintCTA = ({
   const audience = AUDIENCE_LABEL[lintName]
   const canAct = !!schema && !!name
 
-  const revokeSql = canAct ? `revoke all on "${schema}"."${name}" from ${role};` : ''
+  const revokeSql = canAct
+    ? `revoke all on ${quoteIdent(schema)}.${quoteIdent(name)} from ${role};`
+    : ''
 
   const { mutate: executeSql, isPending: isRevoking } = useExecuteSqlMutation({
     onSuccess: async () => {
