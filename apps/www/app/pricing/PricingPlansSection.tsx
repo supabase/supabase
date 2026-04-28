@@ -25,15 +25,22 @@ export default function PricingPlansSection() {
   // Pricing value/flexibility A/B experiment.
   // Uses client-side PostHog directly — server-side evaluation lacks full person context for www pages.
   // DevToolbar overrides (x-ph-flag-overrides cookie) are respected in local dev via posthogClient.getFeatureFlag.
+  //
+  // Initialize as undefined so this section SSRs cleanly. Reading the flag from
+  // the useState initializer would touch posthogClient on the server and trip
+  // BAILOUT_TO_CLIENT_SIDE_RENDERING for the whole /pricing page, hiding plan
+  // tiers from crawlers and LLM bots (FE-3079).
   const [flagValue, setFlagValue] = useState<PricingPageExperimentVariant | false | undefined>(
-    () =>
+    undefined
+  )
+
+  useEffect(() => {
+    setFlagValue(
       posthogClient.getFeatureFlag(EXPERIMENT_ID) as
         | PricingPageExperimentVariant
         | false
         | undefined
-  )
-
-  useEffect(() => {
+    )
     return posthogClient.onFeatureFlags(() => {
       const value = posthogClient.getFeatureFlag(EXPERIMENT_ID)
       setFlagValue(value as PricingPageExperimentVariant | false | undefined)
