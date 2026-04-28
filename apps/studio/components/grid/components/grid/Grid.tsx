@@ -362,7 +362,13 @@ export const Grid = memo(
                       onRowDoubleClick(props.row, { name: props.column.name })
                     }
                   }}
-                  onCellKeyDown={handleCellKeyDown}
+                  onCellKeyDown={(args, event) =>
+                    handleCellKeyDown(args, event, {
+                      rows: rows ?? [],
+                      columns: snap.table.columns,
+                      onRowsChange,
+                    })
+                  }
                 />
               </RowContextMenuProvider>
               {/* The DragOverlay is necessary to avoid styling issues while dragging a column */}
