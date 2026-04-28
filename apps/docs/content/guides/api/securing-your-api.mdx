@@ -25,7 +25,7 @@ grant select, insert, update, delete on table public.your_table to authenticated
 grant select, insert, update, delete on table public.your_table to service_role;
 
 -- For functions, grant EXECUTE to the roles that should call them
-grant execute on function public.your_function to anon, authenticated;
+grant execute on function public.your_function() to anon, authenticated;
 ```
 
 If a required grant is missing, PostgREST returns a `42501` error with a hint that names the exact `GRANT` statement you need:
