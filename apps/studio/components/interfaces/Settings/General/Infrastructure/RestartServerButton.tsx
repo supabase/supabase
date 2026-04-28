@@ -26,6 +26,7 @@ import {
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { type ResponseError } from '@/types'
 
 const RestartServerButton = () => {
   const router = useRouter()
@@ -85,7 +86,7 @@ const RestartServerButton = () => {
     restartProjectServices({ ref: projectRef, region: projectRegion, services: ['postgresql'] })
   }
 
-  const onRestartFailed = (error: any, type: string) => {
+  const onRestartFailed = (error: ResponseError, type: string) => {
     toast.error(`Unable to restart ${type}: ${error.message}`)
     setServiceToRestart(undefined)
   }

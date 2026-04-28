@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useState, type ComponentPropsWithoutRef } from 'react'
+import { useMemo, useState, type ComponentPropsWithoutRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
@@ -114,8 +114,7 @@ export const ResumeProjectButton = ({
     }
 
     if (hasMembersExceedingFreeTierLimit) {
-      setShowFreeProjectLimitWarning(true)
-      return
+      return setShowFreeProjectLimitWarning(true)
     }
 
     setShowConfirmRestore(true)
@@ -127,8 +126,7 @@ export const ResumeProjectButton = ({
     }
 
     if (!showPostgresVersionSelector) {
-      restoreProject({ ref: project.ref })
-      return
+      return restoreProject({ ref: project.ref })
     }
 
     const postgresVersionDetails = extractPostgresVersionDetails(values.postgresVersionSelection)
@@ -148,7 +146,7 @@ export const ResumeProjectButton = ({
     isRestoreDisabled ||
     !canResumeProject
 
-  const getTooltipText = () => {
+  const tooltipText = useMemo(() => {
     if (isPauseStatusPending) return 'Checking whether this project can be resumed'
     if (project?.status !== PROJECT_STATUS.INACTIVE) {
       return 'Project must be paused before it can be resumed'
@@ -156,7 +154,7 @@ export const ResumeProjectButton = ({
     if (isRestoreDisabled) return 'This project can no longer be resumed from the dashboard'
     if (!canResumeProject) return 'You need additional permissions to resume this project'
     return undefined
-  }
+  }, [canResumeProject, isPauseStatusPending, isRestoreDisabled, project?.status])
 
   return (
     <>
@@ -170,7 +168,7 @@ export const ResumeProjectButton = ({
         tooltip={{
           content: {
             side: 'bottom',
-            text: getTooltipText(),
+            text: tooltipText,
           },
         }}
       >
