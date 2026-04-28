@@ -16,12 +16,12 @@ export const ActionCard = (card: {
     >
       <div className={`relative flex items-start gap-3`}>
         {card.isBeta && (
-          <Badge className="absolute -right-5 -top-5 bg-surface-300 bg-opacity-100 text-xs text-foreground">
+          <Badge className="absolute -right-5 -top-5 bg-surface-300/100 text-xs text-foreground">
             Coming soon
           </Badge>
         )}
         <div
-          className={`rounded-full ${card.bgColor} w-8 h-8 flex items-center justify-center flex-shrink-0`}
+          className={`rounded-full ${card.bgColor} w-8 h-8 flex items-center justify-center shrink-0`}
         >
           {card.icon}
         </div>

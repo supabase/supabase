@@ -3,7 +3,6 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
-  Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -37,7 +36,7 @@ export const LocalDropdown = ({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className={cn('border flex-shrink-0 px-3', triggerClassName)} asChild>
+      <DropdownMenuTrigger className={cn('border shrink-0 px-3', triggerClassName)} asChild>
         <ButtonTooltip
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"

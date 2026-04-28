@@ -219,7 +219,7 @@ export function ServiceFlowPanel({
                   </TabsContent>
                 )}
 
-                <TabsContent value="raw-json" className="flex-grow overflow-auto">
+                <TabsContent value="raw-json" className="grow overflow-auto">
                   {isLoading && shouldShowServiceFlow && (
                     <div className="flex items-center gap-3 text-foreground-light p-3 bg-surface-100 border-b border-border">
                       <Skeleton className="h-4 w-4 rounded-full animate-pulse" />

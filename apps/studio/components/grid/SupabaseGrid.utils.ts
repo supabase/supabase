@@ -10,10 +10,9 @@ import { FilterOperatorOptions } from './components/header/filter/Filter.constan
 import { STORAGE_KEY_PREFIX } from './constants'
 import type { Sort, SupaColumn, SupaTable } from './types'
 import { formatClipboardValue } from './utils/common'
-import type { Filter, SavedState, SupaRow } from '@/components/grid/types'
+import type { Filter, SavedState } from '@/components/grid/types'
 import { Entity, isTableLike } from '@/data/table-editor/table-editor-types'
 import { BASE_PATH } from '@/lib/constants'
-import { QueuedOperation, QueuedOperationType } from '@/state/table-editor-operation-queue.types'
 
 export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
   if (Array.isArray(sort)) {
@@ -231,7 +230,7 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
   table: Entity | undefined
 }) {
   // Warning: nuxt url state often fails to update to changes to URL
-  const [, updateUrlParams] = useQueryStates(
+  useQueryStates(
     {
       sort: parseAsNativeArrayOf(parseAsString),
       filter: parseAsNativeArrayOf(parseAsString),

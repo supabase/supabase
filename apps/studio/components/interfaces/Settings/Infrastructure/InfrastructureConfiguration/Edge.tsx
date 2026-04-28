@@ -8,7 +8,6 @@ import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 
 export const SmoothstepEdge = ({
-  id,
   sourceX,
   sourceY,
   targetX,

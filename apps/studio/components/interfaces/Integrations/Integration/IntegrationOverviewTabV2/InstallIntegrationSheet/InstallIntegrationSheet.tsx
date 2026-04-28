@@ -234,7 +234,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
               </div>
             </SheetHeader>
 
-            <div className="flex-grow overflow-y-auto">
+            <div className="grow overflow-y-auto">
               <div className="py-5 flex flex-col gap-y-7">
                 {Object.keys(inputs).length > 0 && (
                   <InstallationSettings form={form} integration={integration} />

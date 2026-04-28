@@ -1,5 +1,8 @@
 'use client'
 
+// Required to avoid issue:
+// The inferred type of AssistantCommandsPopover cannot be named without a reference to PopoverProps
+import { Popover as _RadixPopover } from 'radix-ui'
 import {
   ComponentPropsWithoutRef,
   createRef,

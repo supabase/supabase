@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { compact } from 'lodash'
 import { Edit, Trash } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -96,7 +96,7 @@ export const EditWrapperSheet = ({
     resolver: zodResolver(formSchema),
   })
 
-  const { getValues, reset, resetField, setError } = form
+  const { getValues, resetField, setError } = form
   const { errors, isDirty, isSubmitting } = form.formState
 
   const {
@@ -205,7 +205,7 @@ export const EditWrapperSheet = ({
                 Edit {wrapperMeta.label} wrapper: {wrapper.name}
               </SheetTitle>
             </SheetHeader>
-            <SheetSection className="flex-grow overflow-y-auto">
+            <SheetSection className="grow overflow-y-auto">
               <PageSection>
                 <PageSectionMeta>
                   <PageSectionSummary>

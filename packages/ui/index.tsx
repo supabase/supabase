@@ -36,7 +36,6 @@ export * from './src/lib/utils'
 
 // DATA ENTRY
 
-export * from './src/components/Select'
 export * from './src/components/Listbox'
 export * from './src/components/Input'
 export * from './src/components/Toggle'
@@ -158,11 +157,7 @@ export {
   SelectScrollDownButton as SelectScrollDownButton_Shadcn_,
 } from './src/components/shadcn/ui/select'
 
-export {
-  RadioGroup as RadioGroup_Shadcn_,
-  RadioGroupItem as RadioGroupItem_Shadcn_,
-  RadioGroupLargeItem as RadioGroupLargeItem_Shadcn_,
-} from './src/components/shadcn/ui/radio-group'
+export * from './src/components/shadcn/ui/radio-group'
 
 export { Slider as Slider_Shadcn_ } from './src/components/shadcn/ui/slider'
 
@@ -190,7 +185,7 @@ export * from './src/components/shadcn/ui/input-group'
 
 export * from './src/components/shadcn/ui/switch'
 
-export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbox'
+export * from './src/components/shadcn/ui/checkbox'
 
 export * from './src/components/shadcn/ui/scroll-area'
 

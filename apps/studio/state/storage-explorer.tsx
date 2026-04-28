@@ -418,7 +418,7 @@ function createStorageExplorerState({
       }
 
       const foldersItems = await Promise.all(
-        pathsWithEmptyPrefix.map(async (path, idx) => {
+        pathsWithEmptyPrefix.map(async (_path, idx) => {
           const prefix = paths.slice(0, idx).join('/')
           const options = {
             limit: LIMIT,

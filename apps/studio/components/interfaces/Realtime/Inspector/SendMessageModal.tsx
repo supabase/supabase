@@ -51,7 +51,7 @@ export const SendMessageModal = ({
         <Input
           label="Message name"
           size="small"
-          className="flex-grow"
+          className="grow"
           value={values.message}
           onChange={(v) => setValues({ ...values, message: v.target.value })}
         />

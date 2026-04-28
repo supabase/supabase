@@ -1,5 +1,8 @@
 'use client'
 
+// Required to avoid issue:
+// The inferred type of ConfirmationModal cannot be named without a reference to DialogProps
+import { Dialog as _RadixDialog } from 'radix-ui'
 import { forwardRef, MouseEventHandler, useEffect, useState } from 'react'
 import {
   Alert_Shadcn_,
