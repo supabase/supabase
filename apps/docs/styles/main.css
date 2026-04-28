@@ -6,6 +6,16 @@
 
 @config '../tailwind.config.cjs';
 
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: hsl(var(--border-default, currentColor));
+  }
+}
+
 @font-face {
   font-family: 'custom-font';
   src:

@@ -6,6 +6,16 @@
 
 @config '../tailwind.config.js';
 
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: hsl(var(--border-default, currentColor));
+  }
+}
+
 @layer utilities {
   .run {
     animation-play-state: running;
