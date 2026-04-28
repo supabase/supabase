@@ -1,7 +1,14 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import { Check } from 'lucide-react'
+import { Check, ChevronDown, ChevronUp, Eye, Info, Pencil } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Button, Card, CardContent, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { PERMISSIONS_DESCRIPTIONS } from './OAuthApps.constants'
+import { InterstitialExpandableContent, LogoBox } from '@/components/layouts/InterstitialLayout'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { DOCS_URL } from '@/lib/constants'
+
+const OAUTH_SCOPES_DOCS_URL = `${DOCS_URL}/guides/platform/oauth-apps/oauth-scopes`
 
 export interface AuthorizeRequesterDetailsProps {
   icon: string | null
@@ -20,141 +27,344 @@ export const ScopeSection = ({
   hasReadScope: boolean
   hasWriteScope: boolean
 }) => {
-  if (hasReadScope || hasWriteScope) {
-    const perms = [hasReadScope ? 'Read' : null, hasWriteScope ? 'Write' : null]
-      .filter(Boolean)
+  if (!hasReadScope && !hasWriteScope) return null
 
-      .map((str) => (
-        <span key={str} className="font-semibold text-foreground">
-          {str}
-        </span>
-      ))
-      .reduce((acc, v) => (
-        <>
-          {acc}
-          <span> and </span>
-          {v}
-        </>
-      ))
+  const permissions = [hasReadScope ? 'Read' : null, hasWriteScope ? 'Write' : null]
+    .filter(Boolean)
+    .join(' and ')
 
-    return (
-      <div className="first:border-t border-b flex flex-row space-x-1 text-sm text-foreground-light py-2 px-1">
-        <div className="pt-0.5">
-          <Check stroke="green" height={18} width={18} strokeWidth={1.5} />
-        </div>
-        <div>
-          {perms} {description}
-        </div>
-      </div>
-    )
-  }
-  return null
-}
-
-export const AuthorizeRequesterDetails = ({
-  icon,
-  name,
-  domain,
-  scopes,
-  showOnlyScopes = false,
-}: AuthorizeRequesterDetailsProps) => {
   return (
-    <div className="flex gap-y-4 flex-col">
-      {!showOnlyScopes && (
-        <div className="flex flex-row gap-x-4 items-center">
-          <div className="flex items-center">
-            <div
-              className="w-12 h-12 md:w-14 md:h-14 bg-center bg-no-repeat bg-cover flex items-center justify-center rounded-md border border-control"
-              style={{
-                backgroundImage: !!icon ? `url('${icon}')` : 'none',
-              }}
-            >
-              {!icon && <p className="text-foreground-light text-lg">{name[0]}</p>}
-            </div>
-          </div>
-          <p className="text-foreground">
-            {name} ({domain}) is requesting API access to an organization.
-          </p>
-        </div>
-      )}
+    <div className="first:border-t border-b flex flex-row space-x-1 text-sm text-foreground-light py-2 px-1">
+      <div className="pt-0.5">
+        <Check className="size-4 text-brand" strokeWidth={1.5} />
+      </div>
       <div>
-        {!showOnlyScopes && (
-          <>
-            <h3>Permissions</h3>
-            <p className="text-sm text-foreground-light">
-              The following scopes will apply for the{' '}
-              <span className="text-amber-900">selected organization and all of its projects.</span>
-            </p>
-          </>
-        )}
-        <div className="pt-2">
-          {scopes.length === 0 && (
-            <p className="text-foreground-lighter text-sm">
-              No permissions requested, {name} will not have access to your organization or projects
-            </p>
-          )}
-          <ScopeSection
-            description={PERMISSIONS_DESCRIPTIONS.ANALYTICS}
-            hasReadScope={scopes.includes(OAuthScope.ANALYTICS_READ)}
-            hasWriteScope={scopes.includes(OAuthScope.ANALYTICS_WRITE)}
-          />
-          <ScopeSection
-            description={PERMISSIONS_DESCRIPTIONS.ANALYTICS_CONFIG}
-            hasReadScope={scopes.includes(OAuthScope.ANALYTICS_CONFIG_READ)}
-            hasWriteScope={scopes.includes(OAuthScope.ANALYTICS_CONFIG_WRITE)}
-          />
-          <ScopeSection
-            description={PERMISSIONS_DESCRIPTIONS.AUTH}
-            hasReadScope={scopes.includes(OAuthScope.AUTH_READ)}
-            hasWriteScope={scopes.includes(OAuthScope.AUTH_WRITE)}
-          />
-          <ScopeSection
-            description={PERMISSIONS_DESCRIPTIONS.DATABASE}
-            hasReadScope={scopes.includes(OAuthScope.DATABASE_READ)}
-            hasWriteScope={scopes.includes(OAuthScope.DATABASE_WRITE)}
-          />
-          <ScopeSection
-            description={PERMISSIONS_DESCRIPTIONS.DOMAINS}
-            hasReadScope={scopes.includes(OAuthScope.DOMAINS_READ)}
-            hasWriteScope={scopes.includes(OAuthScope.DOMAINS_WRITE)}
-          />
-          <ScopeSection
-            description={PERMISSIONS_DESCRIPTIONS.EDGE_FUNCTIONS}
-            hasReadScope={scopes.includes(OAuthScope.EDGE_FUNCTIONS_READ)}
-            hasWriteScope={scopes.includes(OAuthScope.EDGE_FUNCTIONS_WRITE)}
-          />
-          <ScopeSection
-            description={PERMISSIONS_DESCRIPTIONS.ENVIRONMENT}
-            hasReadScope={scopes.includes(OAuthScope.ENVIRONMENT_READ)}
-            hasWriteScope={scopes.includes(OAuthScope.ENVIRONMENT_WRITE)}
-          />
-          <ScopeSection
-            description={PERMISSIONS_DESCRIPTIONS.ORGANIZATIONS}
-            hasReadScope={scopes.includes(OAuthScope.ORGANIZATIONS_READ)}
-            hasWriteScope={scopes.includes(OAuthScope.ORGANIZATIONS_WRITE)}
-          />
-          <ScopeSection
-            description={PERMISSIONS_DESCRIPTIONS.PROJECTS}
-            hasReadScope={scopes.includes(OAuthScope.PROJECTS_READ)}
-            hasWriteScope={scopes.includes(OAuthScope.PROJECTS_WRITE)}
-          />
-          <ScopeSection
-            description={PERMISSIONS_DESCRIPTIONS.REST}
-            hasReadScope={scopes.includes(OAuthScope.REST_READ)}
-            hasWriteScope={scopes.includes(OAuthScope.REST_WRITE)}
-          />
-          <ScopeSection
-            description={PERMISSIONS_DESCRIPTIONS.SECRETS}
-            hasReadScope={scopes.includes(OAuthScope.SECRETS_READ)}
-            hasWriteScope={scopes.includes(OAuthScope.SECRETS_WRITE)}
-          />
-          <ScopeSection
-            description={PERMISSIONS_DESCRIPTIONS.STORAGE}
-            hasReadScope={scopes.includes(OAuthScope.STORAGE_READ)}
-            hasWriteScope={scopes.includes(OAuthScope.STORAGE_WRITE)}
-          />
-        </div>
+        <span className="font-semibold text-foreground">{permissions}</span> {description}
       </div>
     </div>
   )
+}
+
+type PermissionLevel = 'read' | 'write' | 'read-write'
+
+type PermissionItem = {
+  label: string
+  description: string
+  read?: OAuthScope
+  write?: OAuthScope
+}
+
+type PermissionGroup = {
+  label: string
+  items: PermissionItem[]
+}
+
+const PERMISSION_GROUPS: PermissionGroup[] = [
+  {
+    label: 'Data & authentication',
+    items: [
+      {
+        label: 'Database',
+        description: PERMISSIONS_DESCRIPTIONS.DATABASE,
+        read: OAuthScope.DATABASE_READ,
+        write: OAuthScope.DATABASE_WRITE,
+      },
+      {
+        label: 'Secrets',
+        description: PERMISSIONS_DESCRIPTIONS.SECRETS,
+        read: OAuthScope.SECRETS_READ,
+        write: OAuthScope.SECRETS_WRITE,
+      },
+      {
+        label: 'Auth',
+        description: PERMISSIONS_DESCRIPTIONS.AUTH,
+        read: OAuthScope.AUTH_READ,
+        write: OAuthScope.AUTH_WRITE,
+      },
+    ],
+  },
+  {
+    label: 'Code execution',
+    items: [
+      {
+        label: 'Edge Functions',
+        description: PERMISSIONS_DESCRIPTIONS.EDGE_FUNCTIONS,
+        read: OAuthScope.EDGE_FUNCTIONS_READ,
+        write: OAuthScope.EDGE_FUNCTIONS_WRITE,
+      },
+    ],
+  },
+  {
+    label: 'Platform management',
+    items: [
+      {
+        label: 'Environment',
+        description: PERMISSIONS_DESCRIPTIONS.ENVIRONMENT,
+        read: OAuthScope.ENVIRONMENT_READ,
+        write: OAuthScope.ENVIRONMENT_WRITE,
+      },
+      {
+        label: 'Organizations',
+        description: PERMISSIONS_DESCRIPTIONS.ORGANIZATIONS,
+        read: OAuthScope.ORGANIZATIONS_READ,
+        write: OAuthScope.ORGANIZATIONS_WRITE,
+      },
+      {
+        label: 'Projects',
+        description: PERMISSIONS_DESCRIPTIONS.PROJECTS,
+        read: OAuthScope.PROJECTS_READ,
+        write: OAuthScope.PROJECTS_WRITE,
+      },
+      {
+        label: 'Domains',
+        description: PERMISSIONS_DESCRIPTIONS.DOMAINS,
+        read: OAuthScope.DOMAINS_READ,
+        write: OAuthScope.DOMAINS_WRITE,
+      },
+      {
+        label: 'PostgREST',
+        description: PERMISSIONS_DESCRIPTIONS.REST,
+        read: OAuthScope.REST_READ,
+        write: OAuthScope.REST_WRITE,
+      },
+    ],
+  },
+  {
+    label: 'Files & monitoring',
+    items: [
+      {
+        label: 'Analytics',
+        description: PERMISSIONS_DESCRIPTIONS.ANALYTICS,
+        read: OAuthScope.ANALYTICS_READ,
+        write: OAuthScope.ANALYTICS_WRITE,
+      },
+      {
+        label: 'Analytics configuration',
+        description: PERMISSIONS_DESCRIPTIONS.ANALYTICS_CONFIG,
+        read: OAuthScope.ANALYTICS_CONFIG_READ,
+        write: OAuthScope.ANALYTICS_CONFIG_WRITE,
+      },
+      {
+        label: 'Storage',
+        description: PERMISSIONS_DESCRIPTIONS.STORAGE,
+        read: OAuthScope.STORAGE_READ,
+        write: OAuthScope.STORAGE_WRITE,
+      },
+    ],
+  },
+]
+
+export const RequesterLogo = ({ icon, name }: { icon: string | null; name: string }) => (
+  <LogoBox>
+    {icon ? (
+      <img alt={name} src={icon} className="size-full object-cover" />
+    ) : (
+      <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>
+    )}
+  </LogoBox>
+)
+
+export const AuthorizeRequesterDetails = ({
+  name,
+  scopes,
+  showOnlyScopes = false,
+}: AuthorizeRequesterDetailsProps) => {
+  const [showDetails, setShowDetails] = useState(showOnlyScopes)
+  const requestedPermissions = useMemo(() => getRequestedPermissions(scopes), [scopes])
+  const writablePermissions = requestedPermissions.filter(({ level }) => level !== 'read')
+  const readOnlyPermissions = requestedPermissions.filter(({ level }) => level === 'read')
+
+  return (
+    <section className="flex flex-col gap-3">
+      {requestedPermissions.length === 0 ? (
+        <Card className="shadow-none">
+          <CardContent className="border-none px-4 py-3 text-sm text-foreground-lighter">
+            No permissions requested.
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          {!showOnlyScopes && (
+            <>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
+                  Permissions
+                </p>
+                <p className="mt-1 text-xs text-foreground-lighter">
+                  Authorizing {name} grants it the following{' '}
+                  <InlineLink href={OAUTH_SCOPES_DOCS_URL}>permissions</InlineLink> to the selected
+                  organization. Only continue if you trust this app.
+                </p>
+              </div>
+
+              <Card className="overflow-hidden shadow-none bg-surface-200/60 border-muted">
+                <CardContent className="border-none p-0">
+                  <div className="divide-y divide-muted px-4">
+                    {writablePermissions.length > 0 && (
+                      <PermissionSummaryRow permissions={writablePermissions} level="read-write" />
+                    )}
+                    {readOnlyPermissions.length > 0 && (
+                      <PermissionSummaryRow permissions={readOnlyPermissions} level="read" />
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+
+          <Button
+            type="text"
+            size="tiny"
+            block
+            iconRight={showDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            onClick={() => setShowDetails((value) => !value)}
+          >
+            {showDetails ? 'Hide detailed permissions' : 'Show detailed permissions'}
+          </Button>
+
+          <InterstitialExpandableContent show={showDetails}>
+            <PermissionDetails requestedPermissions={requestedPermissions} />
+          </InterstitialExpandableContent>
+        </>
+      )}
+    </section>
+  )
+}
+
+function PermissionSummaryRow({
+  permissions,
+  level,
+}: {
+  permissions: Array<RequestedPermission>
+  level: PermissionLevel
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-3 text-sm">
+      <p className="min-w-0 leading-tight">
+        <span className="font-medium text-foreground">
+          {permissions.map(({ label }) => label).join(', ')}
+        </span>
+      </p>
+      <span
+        className={cn(
+          'inline-flex shrink-0 items-center gap-1',
+          getPermissionLevelClassName(level)
+        )}
+      >
+        <PermissionLevelIcon level={level} />
+        {formatPermissionLevel(level)}
+      </span>
+    </div>
+  )
+}
+
+function PermissionDetails({
+  requestedPermissions,
+}: {
+  requestedPermissions: Array<RequestedPermission>
+}) {
+  const requestedByLabel = new Map(
+    requestedPermissions.map((permission) => [permission.label, permission])
+  )
+
+  return (
+    <Card className="overflow-hidden shadow-none bg-surface-200/60 border-muted">
+      <CardContent className="border-none p-0">
+        {PERMISSION_GROUPS.map((group) => {
+          const groupPermissions = group.items
+            .map((item) => requestedByLabel.get(item.label))
+            .filter(Boolean) as RequestedPermission[]
+
+          if (groupPermissions.length === 0) return null
+
+          return (
+            <div key={group.label} className="border-b border-muted last:border-b-0 px-4 py-3">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wider text-foreground-light">
+                {group.label}
+              </p>
+              <div className="divide-y divide-muted">
+                {groupPermissions.map((permission) => (
+                  <div
+                    key={permission.label}
+                    className="flex items-center justify-between gap-3 py-2"
+                  >
+                    <div className="flex min-w-0 items-center gap-1.5">
+                      <p className="truncate text-sm font-medium text-foreground">
+                        {permission.label}
+                      </p>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            aria-label={`${permission.label} permission details`}
+                            className="flex shrink-0 text-foreground-muted transition-colors hover:text-foreground"
+                          >
+                            <Info className="size-3.5" strokeWidth={1.75} />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="max-w-64 text-xs">
+                          {formatPermissionDescription(permission.description)}
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <span
+                      className={cn(
+                        'inline-flex items-center gap-1 text-sm',
+                        getPermissionLevelClassName(permission.level)
+                      )}
+                    >
+                      <PermissionLevelIcon level={permission.level} />
+                      {formatPermissionLevel(permission.level)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })}
+      </CardContent>
+    </Card>
+  )
+}
+
+type RequestedPermission = PermissionItem & {
+  level: PermissionLevel
+}
+
+function getRequestedPermissions(scopes: OAuthScope[]): RequestedPermission[] {
+  return PERMISSION_GROUPS.flatMap((group) =>
+    group.items.flatMap((item) => {
+      const hasReadScope = !!item.read && scopes.includes(item.read)
+      const hasWriteScope = !!item.write && scopes.includes(item.write)
+
+      if (!hasReadScope && !hasWriteScope) return []
+
+      return {
+        ...item,
+        level: hasReadScope && hasWriteScope ? 'read-write' : hasWriteScope ? 'write' : 'read',
+      }
+    })
+  )
+}
+
+function PermissionLevelIcon({ level, className }: { level: PermissionLevel; className?: string }) {
+  if (level === 'read') {
+    return <Eye className={cn('size-4', className)} strokeWidth={1.5} />
+  }
+
+  return <Pencil className={cn('size-4', className)} strokeWidth={1.5} />
+}
+
+function formatPermissionLevel(level: PermissionLevel) {
+  if (level === 'read') return 'Read'
+  if (level === 'write') return 'Write'
+  return 'Read + Write'
+}
+
+function formatPermissionDescription(description: string) {
+  return description.charAt(0).toUpperCase() + description.slice(1)
+}
+
+function getPermissionLevelClassName(level: PermissionLevel) {
+  return level === 'read' ? 'text-foreground-lighter' : 'text-warning'
 }
