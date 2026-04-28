@@ -15,6 +15,7 @@ import { ChangelogLlmMarkdownButton } from '@/components/Changelog/ChangelogLlmM
 import { ChangelogTimelineList } from '@/components/Changelog/ChangelogTimelineList'
 import CTABanner from '@/components/CTABanner'
 import DefaultLayout from '@/components/Layouts/Default'
+import changelogProductTags from '@/data/changelog-product-tags.json'
 import {
   createChangelogOctokit,
   fetchChangelogDiscussionByNumber,
@@ -169,6 +170,8 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
     void setQueryTags(null)
   }
 
+  const isSingleQueryTag = queryTags?.length === 1
+
   const TITLE = 'Changelog'
   const DESCRIPTION = 'New updates and improvements to Supabase'
 
@@ -222,7 +225,18 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                   className="shrink-0"
                   icon={<Rss className="h-4 w-4" strokeWidth={2} aria-hidden />}
                 >
-                  <Link href="/changelog-rss.xml">RSS</Link>
+                  <Link
+                    href={
+                      isSingleQueryTag
+                        ? `/changelog-rss/${queryTags?.[0]}.xml`
+                        : '/changelog-rss.xml'
+                    }
+                  >
+                    {isSingleQueryTag &&
+                      changelogProductTags.find((tag) => tag.slug === queryTags?.[0])?.label +
+                        ' '}{' '}
+                    RSS
+                  </Link>
                 </Button>
                 <ChangelogLlmMarkdownButton />
               </div>

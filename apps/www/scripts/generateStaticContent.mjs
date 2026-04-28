@@ -310,7 +310,7 @@ await fs.writeFile(
   'utf8'
 )
 
-console.log(`✅ Generated static content with ${latestBlogPosts.length} blog posts`)
+console.log(`✅ Generated static content with ${latestBlogPosts.length} latest blog posts`)
 
 // Generate blog and changelog RSS feed
 try {
@@ -391,7 +391,8 @@ try {
     const { Octokit } = await import('@octokit/core')
     const { paginateGraphql } = await import('@octokit/plugin-paginate-graphql')
 
-    const { generateChangelogRssXml } = await import('../lib/changelog-rss.mjs')
+    const { generateChangelogRssXml, generateChangelogTagRssXml, labelToFileSlug } =
+      await import('../lib/changelog-rss.mjs')
     const rewritesPath = path.join(__dirname, 'data/changelog-deleted-discussions.json')
     const rewrites = JSON.parse(await fs.readFile(rewritesPath, 'utf8'))
     const discussionDisplayDate = (item) => {
@@ -476,6 +477,24 @@ try {
     await fs.writeFile(changelogRssPath, changelogXml.trim(), 'utf8')
     const visibleCount = entries.filter((e) => !e.title.includes('[d]')).length
     console.log(`✅ Generated changelog RSS with ${visibleCount} entries`)
+
+    // Per-tag feeds → public/changelog-rss/<label-slug>.xml
+    const productTagsPath = path.join(__dirname, '../data/changelog-product-tags.json')
+    const productTags = JSON.parse(await fs.readFile(productTagsPath, 'utf8'))
+    const tagFeedsDir = path.join(__dirname, '../public/changelog-rss')
+    await fs.mkdir(tagFeedsDir, { recursive: true })
+    const tagResults = await Promise.allSettled(
+      productTags.map(async ({ slug, label }) => {
+        const fileSlug = labelToFileSlug(label)
+        const tagXml = generateChangelogTagRssXml(entries, {
+          githubLabelSlug: slug,
+          displayLabel: label,
+        })
+        await fs.writeFile(path.join(tagFeedsDir, `${fileSlug}.xml`), tagXml.trim(), 'utf8')
+      })
+    )
+    const succeeded = tagResults.filter((r) => r.status === 'fulfilled').length
+    console.log(`✅ Generated ${succeeded}/${productTags.length} per-tag changelog RSS feeds`)
 
     // LLM-friendly changelog markdown index (RSS remains canonical syndication format).
     const visibleEntries = entries.filter((entry) => !entry.title.includes('[d]'))

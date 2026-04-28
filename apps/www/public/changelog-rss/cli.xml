@@ -1,0 +1,40 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · CLI</title>
+      <link>https://supabase.com/changelog</link>
+      <description>CLI updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Thu, 16 Apr 2026 00:00:00 +0000</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/cli.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/44938</guid>
+  <title>[Public Alpha] Declarative Schema Management with pg-delta</title>
+  <link>https://supabase.com/changelog/44938</link>
+  <pubDate>Thu, 16 Apr 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/42031</guid>
+  <title>SQL snippets can now be saved in local Studio</title>
+  <link>https://supabase.com/changelog/42031</link>
+  <pubDate>Wed, 21 Jan 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/33613</guid>
+  <title>Deploy Edge Functions from CLI without needing Docker + import files outside of supabase directory</title>
+  <link>https://supabase.com/changelog/33613</link>
+  <pubDate>Fri, 14 Feb 2025 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19703</guid>
+  <title>Platform updates June 2023</title>
+  <link>https://supabase.com/changelog/19703</link>
+  <pubDate>Fri, 07 Jul 2023 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19700</guid>
+  <title>Platform Update February 2023</title>
+  <link>https://supabase.com/changelog/19700</link>
+  <pubDate>Thu, 09 Mar 2023 00:00:00 +0000</pubDate>
+</item>
+    </channel>
+  </rss>

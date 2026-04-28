@@ -1,0 +1,40 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · supabase-py</title>
+      <link>https://supabase.com/changelog</link>
+      <description>supabase-py updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Mon, 20 Apr 2026 00:00:00 +0000</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/supabase-py.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/45071</guid>
+  <title>Automatic PostgREST retries for transient errors</title>
+  <link>https://supabase.com/changelog/45071</link>
+  <pubDate>Mon, 20 Apr 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/41796</guid>
+  <title>Developer Update - January 2026</title>
+  <link>https://supabase.com/changelog/41796</link>
+  <pubDate>Thu, 08 Jan 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/37798</guid>
+  <title>Deprecation Notice: Dropping support for python&apos;s gotrue and supafunc</title>
+  <link>https://supabase.com/changelog/37798</link>
+  <pubDate>Fri, 08 Aug 2025 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/29331</guid>
+  <title>Developer Update - August 2024</title>
+  <link>https://supabase.com/changelog/29331</link>
+  <pubDate>Mon, 16 Sep 2024 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19699</guid>
+  <title>Platform update January 2023</title>
+  <link>https://supabase.com/changelog/19699</link>
+  <pubDate>Wed, 08 Feb 2023 00:00:00 +0000</pubDate>
+</item>
+    </channel>
+  </rss>

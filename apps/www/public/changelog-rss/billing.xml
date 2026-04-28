@@ -1,0 +1,118 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · Billing</title>
+      <link>https://supabase.com/changelog</link>
+      <description>Billing updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Fri, 17 Apr 2026 00:00:00 +0000</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/billing.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/44968</guid>
+  <title>Upcoming: Tax Collection on Supabase Invoices</title>
+  <link>https://supabase.com/changelog/44968</link>
+  <pubDate>Fri, 17 Apr 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/38119</guid>
+  <title>3x cheaper egress for cache hits</title>
+  <link>https://supabase.com/changelog/38119</link>
+  <pubDate>Fri, 22 Aug 2025 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/34067</guid>
+  <title>Developer Update - February 2025</title>
+  <link>https://supabase.com/changelog/34067</link>
+  <pubDate>Fri, 07 Mar 2025 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/33959</guid>
+  <title>Greatly increased Third-Party Auth MAU quota for Free and Paid Plans</title>
+  <link>https://supabase.com/changelog/33959</link>
+  <pubDate>Mon, 03 Mar 2025 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/33121</guid>
+  <title>Relaxing Database Size limit on Free Plan - 0.5 GB Database Size per project</title>
+  <link>https://supabase.com/changelog/33121</link>
+  <pubDate>Mon, 27 Jan 2025 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/32735</guid>
+  <title>Credit Balance Top Up</title>
+  <link>https://supabase.com/changelog/32735</link>
+  <pubDate>Mon, 13 Jan 2025 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/28849</guid>
+  <title>Moving to hourly usage-based billing for databases, based on disk consumption</title>
+  <link>https://supabase.com/changelog/28849</link>
+  <pubDate>Fri, 23 Aug 2024 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/28519</guid>
+  <title>Developer Updates - July 2024</title>
+  <link>https://supabase.com/changelog/28519</link>
+  <pubDate>Fri, 09 Aug 2024 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/28480</guid>
+  <title>Improved invoices and more timely usage data</title>
+  <link>https://supabase.com/changelog/28480</link>
+  <pubDate>Thu, 08 Aug 2024 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/28438</guid>
+  <title>Moving to hourly usage-based billing for IPv4, Custom Domain and Point-in-time recovery</title>
+  <link>https://supabase.com/changelog/28438</link>
+  <pubDate>Wed, 07 Aug 2024 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/28339</guid>
+  <title>Moving to hourly billing for Storage Size</title>
+  <link>https://supabase.com/changelog/28339</link>
+  <pubDate>Fri, 02 Aug 2024 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/28154</guid>
+  <title>Developer Updates - June 2024</title>
+  <link>https://supabase.com/changelog/28154</link>
+  <pubDate>Wed, 24 Jul 2024 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/28062</guid>
+  <title>Edge Functions: Deploy More Functions at No Extra Cost</title>
+  <link>https://supabase.com/changelog/28062</link>
+  <pubDate>Thu, 18 Jul 2024 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/21386</guid>
+  <title>Paid organizations can now launch projects on bigger compute immediately</title>
+  <link>https://supabase.com/changelog/21386</link>
+  <pubDate>Tue, 20 Feb 2024 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19438</guid>
+  <title>Improved usage insights and transparency</title>
+  <link>https://supabase.com/changelog/19438</link>
+  <pubDate>Tue, 05 Dec 2023 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19704</guid>
+  <title>Platform updates: August 2023</title>
+  <link>https://supabase.com/changelog/19704</link>
+  <pubDate>Fri, 08 Sep 2023 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/17061</guid>
+  <title>Moving to Org-based billing</title>
+  <link>https://supabase.com/changelog/17061</link>
+  <pubDate>Thu, 31 Aug 2023 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19703</guid>
+  <title>Platform updates June 2023</title>
+  <link>https://supabase.com/changelog/19703</link>
+  <pubDate>Fri, 07 Jul 2023 00:00:00 +0000</pubDate>
+</item>
+    </channel>
+  </rss>

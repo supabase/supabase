@@ -1,0 +1,64 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Supabase Changelog · PostgREST</title>
+      <link>https://supabase.com/changelog</link>
+      <description>PostgREST updates and improvements from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Tue, 17 Feb 2026 00:00:00 +0000</lastBuildDate>
+      <atom:link href="https://supabase.com/changelog-rss/postgrest.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid isPermaLink="true">https://supabase.com/changelog/42949</guid>
+  <title>Breaking Change: Removing access to OpenAPI spec via the anon key</title>
+  <link>https://supabase.com/changelog/42949</link>
+  <pubDate>Tue, 17 Feb 2026 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/41288</guid>
+  <title>Data API upgrade to PostgREST v14</title>
+  <link>https://supabase.com/changelog/41288</link>
+  <pubDate>Thu, 11 Dec 2025 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/38771</guid>
+  <title>Changes to Custom JWT and Signing Keys issue resolution</title>
+  <link>https://supabase.com/changelog/38771</link>
+  <pubDate>Wed, 17 Sep 2025 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/30324</guid>
+  <title>`supabase-js` release candidate `2.46.2-rc.3` incoming types inferences for PostgREST fixes and feedbacks</title>
+  <link>https://supabase.com/changelog/30324</link>
+  <pubDate>Wed, 06 Nov 2024 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/29331</guid>
+  <title>Developer Update - August 2024</title>
+  <link>https://supabase.com/changelog/29331</link>
+  <pubDate>Mon, 16 Sep 2024 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/21823</guid>
+  <title>Platform Updates: February 2024</title>
+  <link>https://supabase.com/changelog/21823</link>
+  <pubDate>Wed, 06 Mar 2024 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19695</guid>
+  <title>Platform updates: 30 Nov 2021</title>
+  <link>https://supabase.com/changelog/19695</link>
+  <pubDate>Tue, 30 Nov 2021 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19694</guid>
+  <title>October Beta 2021</title>
+  <link>https://supabase.com/changelog/19694</link>
+  <pubDate>Mon, 08 Nov 2021 00:00:00 +0000</pubDate>
+</item>
+<item>
+  <guid isPermaLink="true">https://supabase.com/changelog/19691</guid>
+  <title>July Beta 2021</title>
+  <link>https://supabase.com/changelog/19691</link>
+  <pubDate>Thu, 12 Aug 2021 00:00:00 +0000</pubDate>
+</item>
+    </channel>
+  </rss>
