@@ -91,7 +91,7 @@ export default function MultiSelect({
   }
 
   const handleRemove = (idx: number) => {
-    const updatedSelected = selected.filter((x, index) => index !== idx)
+    const updatedSelected = selected.filter((_x, index) => index !== idx)
     setSelected(updatedSelected)
     onChange(updatedSelected)
   }

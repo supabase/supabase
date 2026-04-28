@@ -16,7 +16,7 @@ This URL:
 - Must be reachable from `auth` service
 - Must return a valid Golang HTML template
 
-To provide templates to Supabase Auth, you need a service that serves static HTML files. This can be any server of your choice. You can even use `kong` service which is included with the default Supabase docker configuration. The only requirement is that the `auth` service must be able to reach it via a HTTP GET request.
+To provide templates to Supabase Auth, you need a service that serves static HTML files. This can be any server of your choice. The only requirement is that the `auth` service must be able to reach it via a HTTP GET request.
 
 This guide uses [Caddy](https://github.com/caddyserver/caddy) for serving templates.
 

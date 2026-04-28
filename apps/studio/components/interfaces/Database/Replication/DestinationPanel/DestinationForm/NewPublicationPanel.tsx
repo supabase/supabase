@@ -22,6 +22,7 @@ import { z } from 'zod'
 
 import { useCreatePublicationMutation } from '@/data/replication/publication-create-mutation'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface NewPublicationPanelProps {
   visible: boolean
@@ -31,6 +32,7 @@ interface NewPublicationPanelProps {
 
 export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const { mutateAsync: createPublication, isPending: creatingPublication } =
     useCreatePublicationMutation()
   const { data: tables } = useReplicationTablesQuery({
@@ -55,6 +57,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
+    if (!project) return console.error('Project is required')
     if (!sourceId) return console.error('Source id is required')
     try {
       await createPublication({
@@ -65,6 +68,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
           const [schema, name] = table.split('.')
           return { schema, name }
         }),
+        connectionString: project.connectionString,
       })
       toast.success('Successfully created publication')
       onClose()

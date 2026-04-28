@@ -20,8 +20,8 @@ import {
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  RadioGroup_Shadcn_,
-  RadioGroupLargeItem_Shadcn_,
+  RadioGroup,
+  RadioGroupLargeItem,
   ScrollArea,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -264,7 +264,7 @@ export const PolicyDetailsV2 = ({
                   Policy Command <code className="text-code-inline">for</code> clause
                 </FormLabel>
                 <FormControl>
-                  <RadioGroup_Shadcn_
+                  <RadioGroup
                     disabled={isEditing}
                     value={field.value}
                     defaultValue={field.value}
@@ -279,7 +279,7 @@ export const PolicyDetailsV2 = ({
                       'insert',
                       ...(authContext === 'database' ? ['update', 'delete', 'all'] : []),
                     ].map((x) => (
-                      <RadioGroupLargeItem_Shadcn_
+                      <RadioGroupLargeItem
                         key={x}
                         value={x}
                         disabled={isEditing}
@@ -287,7 +287,7 @@ export const PolicyDetailsV2 = ({
                         className={cn('w-auto', isEditing && 'cursor-not-allowed')}
                       />
                     ))}
-                  </RadioGroup_Shadcn_>
+                  </RadioGroup>
                 </FormControl>
                 <FormMessage />
               </FormItem>

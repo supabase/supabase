@@ -17,6 +17,13 @@ Check updates for each service to learn more.
 
 ---
 
+## [2026-04-27]
+
+### Studio
+
+- Updated to `2026.04.27-sha-4afbe9c`
+- Added 4 new lints to the Security Advisor - PR [#45253](https://github.com/supabase/supabase/pull/45253), PR [#45260](https://github.com/supabase/supabase/pull/45260). Read more in our [docs](https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0026_pg_graphql_anon_table_exposed) for lint rules 0026 - 0029.
+
 ## [2026-04-08]
 
 ### Documentation

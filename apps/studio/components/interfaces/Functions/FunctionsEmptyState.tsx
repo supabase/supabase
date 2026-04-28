@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Code, Github, Lock, Play, Server, Terminal } from 'lucide-react'
+import { Code, Github, Play, Server, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
