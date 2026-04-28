@@ -96,7 +96,15 @@ export const RLSTableCard = ({
         />
       </>
     )
-  }, [isRLSEnabled, noPolicies, trueOnlyPolicy, role, policies, handleSelectEditPolicy])
+  }, [
+    isRLSEnabled,
+    noPolicies,
+    trueOnlyPolicy,
+    falseOnlyPolicy,
+    policies,
+    role,
+    handleSelectEditPolicy,
+  ])
 
   return (
     <Collapsible_Shadcn_
