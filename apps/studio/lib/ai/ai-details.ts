@@ -1,7 +1,6 @@
 import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { getProjectSettings } from '@/data/config/project-settings-v2-query'
 import { checkEntitlement } from '@/data/entitlements/entitlements-query'
-import { get } from '@/data/fetchers'
 import { getOrganizations } from '@/data/organizations/organizations-query'
 import { getProjectDetail } from '@/data/projects/project-detail-query'
 import { getOrgSubscription } from '@/data/subscriptions/org-subscription-query'
@@ -19,14 +18,10 @@ export const getOrgAIDetails = async ({
     ...(authorization && { Authorization: authorization }),
   }
 
-  const [organizations, subscription, advanceModelAccess, dpaSignedStatus] = await Promise.all([
+  const [organizations, subscription, advanceModelAccess] = await Promise.all([
     getOrganizations({ headers }),
     getOrgSubscription({ orgSlug }, undefined, headers),
     checkEntitlement(orgSlug, 'assistant.advance_model', undefined, headers),
-    get('/platform/organizations/{slug}/documents/dpa-signed', {
-      params: { path: { slug: orgSlug } },
-      headers,
-    }),
   ])
 
   const selectedOrg = organizations.find((org) => org.slug === orgSlug)
@@ -35,7 +30,6 @@ export const getOrgAIDetails = async ({
     aiOptInLevel: getAiOptInLevel(selectedOrg?.opt_in_tags),
     hasAccessToAdvanceModel: advanceModelAccess.hasAccess,
     hasHipaaAddon: subscriptionHasHipaaAddon(subscription),
-    isDpaSigned: dpaSignedStatus.data?.signed,
     orgId: selectedOrg?.id,
     planId: selectedOrg?.plan.id,
   }

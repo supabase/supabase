@@ -1,11 +1,3 @@
-import { ArrowDown, Check, X } from 'lucide-react'
-import Link from 'next/link'
-import { Badge, Button } from 'ui'
-import { Admonition, type AdmonitionProps } from 'ui-patterns/admonition'
-import { GlassPanel } from 'ui-patterns/GlassPanel'
-import { IconPanel } from 'ui-patterns/IconPanel'
-import SqlToRest from 'ui-patterns/SqlToRest'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { AiPromptsIndex } from '~/app/guides/getting-started/ai-prompts/[slug]/AiPromptsIndex'
 import { AiSkillsIndex } from '~/app/guides/getting-started/ai-skills/AiSkillsIndex'
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
@@ -13,15 +5,15 @@ import AuthProviders from '~/components/AuthProviders'
 import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
 import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderConfig.Warnings'
 import ButtonCard from '~/components/ButtonCard'
+import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
 import { Extensions } from '~/components/Extensions'
 import Image, { type ImageProps } from '~/components/Image'
-import { JwtGenerator, JwtGeneratorSimple } from '~/components/JwtGenerator'
+import { JwtGeneratorSimple } from '~/components/JwtGenerator'
 import { MetricsStackCards } from '~/components/MetricsStackCards'
 import { NavData } from '~/components/NavData'
 import { Price } from '~/components/Price'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
-import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
 import { RegionsList, SmartRegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
@@ -32,6 +24,15 @@ import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import InfoTooltip from '~/features/ui/InfoTooltip'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import { ArrowDown, Check, X } from 'lucide-react'
+import Link from 'next/link'
+import { Badge, Button } from 'ui'
+import { Admonition, type AdmonitionProps } from 'ui-patterns/admonition'
+import { GlassPanel } from 'ui-patterns/GlassPanel'
+import { IconPanel } from 'ui-patterns/IconPanel'
+import SqlToRest from 'ui-patterns/SqlToRest'
+import { Heading } from 'ui/src/components/CustomHTMLElements'
+
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
@@ -64,7 +65,6 @@ const components = {
   IconPanel,
   IconX: X,
   Image: (props: ImageProps) => <Image className="rounded-md w-full" {...props} />,
-  JwtGenerator,
   JwtGeneratorSimple,
   Link,
   McpConfigPanel,
