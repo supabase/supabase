@@ -287,20 +287,22 @@ export const CreateFunction = ({
               ) : (
                 <>
                   <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                    <FormItem className="flex flex-row items-center justify-between">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Show advanced settings</FormLabel>
-                        <FormDescription>
-                          These are settings that might be familiar for Postgres developers
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={advancedSettingsShown}
-                          onCheckedChange={(checked) => setAdvancedSettingsShown(checked)}
-                        />
-                      </FormControl>
-                    </FormItem>
+                    <div className="space-y-8 rounded bg-studio py-4 px-6 border border-overlay">
+                      <FormItem className="flex flex-row items-center justify-between">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Show advanced settings</FormLabel>
+                          <FormDescription>
+                            These are settings that might be familiar for Postgres developers
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={advancedSettingsShown}
+                            onCheckedChange={(checked) => setAdvancedSettingsShown(checked)}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    </div>
                   </SheetSection>
                   {advancedSettingsShown && (
                     <>
