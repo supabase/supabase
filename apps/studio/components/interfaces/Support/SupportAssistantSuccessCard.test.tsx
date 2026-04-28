@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { SupportAssistantSuccessCard } from './SupportAssistantSuccessCard'
 import type { SubmittedSupportRequest } from './SupportForm.state'
+import { NO_PROJECT_MARKER } from './SupportForm.utils'
 
 const { chatInstances, mockNewChat, mockOpenSidebar, mockSelectChat, mockUseChat } = vi.hoisted(
   () => ({
@@ -105,9 +106,10 @@ describe('SupportAssistantSuccessCard', () => {
   })
 
   it('shows a loading preview before the assistant responds', async () => {
-    render(<SupportAssistantSuccessCard request={supportRequest} />)
+    const { container } = render(<SupportAssistantSuccessCard request={supportRequest} />)
 
-    expect(await screen.findByText('Assistant is reviewing your request...')).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /see reply/i })).toBeInTheDocument()
+    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0)
   })
 
   it('renders a truncated assistant response preview', async () => {
@@ -130,12 +132,12 @@ describe('SupportAssistantSuccessCard', () => {
     expect(preview).not.toHaveTextContent('A'.repeat(421))
   })
 
-  it('opens the generated assistant chat when clicked', async () => {
+  it('opens the generated assistant chat when the action is clicked', async () => {
     const user = userEvent.setup()
     render(<SupportAssistantSuccessCard request={supportRequest} />)
 
-    const card = await screen.findByRole('button', { name: /assistant is checking too/i })
-    await user.click(card)
+    const button = await screen.findByRole('button', { name: /see reply/i })
+    await user.click(button)
 
     expect(mockSelectChat).toHaveBeenCalledWith('chat-1')
     expect(mockOpenSidebar).toHaveBeenCalledWith('ai-assistant')
@@ -145,11 +147,22 @@ describe('SupportAssistantSuccessCard', () => {
     const user = userEvent.setup()
     render(<SupportAssistantSuccessCard request={supportRequest} />)
 
-    const card = await screen.findByRole('button', { name: /assistant is checking too/i })
-    card.focus()
+    const button = await screen.findByRole('button', { name: /see reply/i })
+    button.focus()
     await user.keyboard('{Enter}')
 
     expect(mockSelectChat).toHaveBeenCalledWith('chat-1')
     expect(mockOpenSidebar).toHaveBeenCalledWith('ai-assistant')
+  })
+
+  it('does not render or create a chat when no project is selected', () => {
+    render(
+      <SupportAssistantSuccessCard
+        request={{ ...supportRequest, projectRef: NO_PROJECT_MARKER, organizationSlug: 'org-1' }}
+      />
+    )
+
+    expect(screen.queryByText(/assistant response/i)).not.toBeInTheDocument()
+    expect(mockNewChat).not.toHaveBeenCalled()
   })
 })

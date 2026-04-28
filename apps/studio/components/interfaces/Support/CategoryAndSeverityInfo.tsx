@@ -75,7 +75,7 @@ function CategorySelector({ form }: CategorySelectorProps) {
       render={({ field }) => {
         const { ref: _ref, ...fieldWithoutRef } = field
         return (
-          <FormItemLayout hideMessage layout="vertical" label="What are you having issues with?">
+          <FormItemLayout hideMessage layout="vertical" label="What issue are you having?">
             <FormControl>
               <Select_Shadcn_
                 {...fieldWithoutRef}

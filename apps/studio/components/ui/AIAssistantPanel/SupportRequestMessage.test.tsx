@@ -22,6 +22,8 @@ describe('SupportRequestMessage', () => {
     render(
       <SupportRequestMessage
         request={{
+          assistant_context:
+            'A support request has already been submitted and a human member of the Supabase Support team is already looking at it.',
           subject: 'Database unavailable',
           message: 'Connections are timing out',
           organization_slug: 'org-1',
@@ -37,9 +39,10 @@ describe('SupportRequestMessage', () => {
     expect(screen.getByText('Support request submitted')).toBeInTheDocument()
     expect(screen.getByText('Database unavailable')).toBeInTheDocument()
     expect(screen.getByText('Connections are timing out')).toBeInTheDocument()
-    expect(screen.getByText('org-1')).toBeInTheDocument()
-    expect(screen.getByText('project-1')).toBeInTheDocument()
-    expect(screen.getByText('Granted')).toBeInTheDocument()
+    expect(screen.queryByText('org-1')).not.toBeInTheDocument()
+    expect(screen.queryByText('project-1')).not.toBeInTheDocument()
+    expect(screen.queryByText('Granted')).not.toBeInTheDocument()
     expect(screen.queryByText('Client library')).not.toBeInTheDocument()
+    expect(screen.queryByText(/human member of the supabase support team/i)).not.toBeInTheDocument()
   })
 })

@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 
 import { buildSupportAssistantPrompt, parseSupportAssistantPrompt } from './SupportAssistant.utils'
 import type { SubmittedSupportRequest } from './SupportForm.state'
-import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
 
 const supportRequest: SubmittedSupportRequest = {
   organizationSlug: 'org-1',
@@ -24,18 +23,16 @@ describe('SupportAssistant utils', () => {
 
     expect(prompt).toContain('<support>')
     expect(prompt).toContain('<assistant_context>')
-    expect(prompt).toContain(
-      'A support request has already been submitted to the Supabase Support team'
-    )
+    expect(prompt).toContain('a human member of the Supabase Support team is already looking at it')
     expect(prompt).toContain('<subject>API requests fail</subject>')
+    expect(prompt).not.toContain('<organization_slug>')
+    expect(prompt).not.toContain('<project_ref>')
   })
 
   it('parses and unescapes tagged assistant prompts', () => {
     const parsed = parseSupportAssistantPrompt(buildSupportAssistantPrompt(supportRequest))
 
     expect(parsed).toMatchObject({
-      organization_slug: 'org-1',
-      project_ref: 'project-1',
       category: 'Problem',
       severity: 'Normal',
       subject: 'API requests fail',
@@ -49,8 +46,8 @@ describe('SupportAssistant utils', () => {
     const parsed = parseSupportAssistantPrompt(
       buildSupportAssistantPrompt({
         ...supportRequest,
-        organizationSlug: NO_ORG_MARKER,
-        projectRef: NO_PROJECT_MARKER,
+        organizationSlug: undefined,
+        projectRef: undefined,
         library: undefined,
         dashboardLogs: undefined,
         allowSupportAccess: false,
@@ -58,8 +55,6 @@ describe('SupportAssistant utils', () => {
     )
 
     expect(parsed).toMatchObject({
-      organization_slug: 'No organization selected',
-      project_ref: 'No specific project selected',
       library: 'Not provided',
       support_access: 'Not granted',
       dashboard_logs: 'Not attached',

@@ -10,12 +10,14 @@ import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
 import { SupportAssistantSuccessCard } from './SupportAssistantSuccessCard'
 import { createInitialSupportFormState, supportFormReducer } from './SupportForm.state'
-import type { SupportFormUrlKeys } from './SupportForm.utils'
+import { NO_PROJECT_MARKER, type SupportFormUrlKeys } from './SupportForm.utils'
 import { SupportFormV3 } from './SupportFormV3'
 import { useSupportForm } from './useSupportForm'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useStateTransition } from '@/hooks/misc/useStateTransition'
+
+const SHOW_SUPPORT_INCIDENT_ADMONITION = false
 
 function useSupportFormTelemetry() {
   const { mutate: sendEvent } = useSendEventMutation()
@@ -79,24 +81,36 @@ export function SupportForm({ initialParams, onFinish }: SupportFormProps) {
   })
 
   const isSuccess = state.type === 'success'
+  const showAssistantSuccessCard =
+    isSuccess &&
+    state.submittedRequest.projectRef !== undefined &&
+    state.submittedRequest.projectRef !== NO_PROJECT_MARKER
 
   return (
     <div className="relative h-full overflow-y-auto overflow-x-hidden">
-      <IncidentAdmonition
-        isActive={hasActiveIncidents}
-        className="rounded-none border-x-0 shadow-none"
-      />
+      {SHOW_SUPPORT_INCIDENT_ADMONITION && (
+        <IncidentAdmonition
+          isActive={hasActiveIncidents}
+          className="rounded-none border-x-0 shadow-none"
+        />
+      )}
       <div className="min-h-full px-5 pt-5">
         <div className="flex flex-col gap-y-8">
           {isSuccess ? (
-            <div className="flex flex-col gap-y-6 pt-2">
+            <div className="flex flex-col gap-y-8 pt-2">
               <Success
-                selectedProject={projectRef ?? undefined}
+                selectedProject={
+                  state.sentProjectRef === undefined
+                    ? (projectRef ?? undefined)
+                    : state.sentProjectRef
+                }
                 sentCategory={state.sentCategory}
                 onFinish={onFinish}
-                finishLabel={onFinish ? 'Done' : undefined}
+                finishLabel={onFinish ? 'Back to support' : undefined}
               />
-              <SupportAssistantSuccessCard request={state.submittedRequest} />
+              {showAssistantSuccessCard && (
+                <SupportAssistantSuccessCard request={state.submittedRequest} />
+              )}
             </div>
           ) : (
             <SupportFormV3

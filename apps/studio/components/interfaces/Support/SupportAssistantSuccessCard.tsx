@@ -1,11 +1,13 @@
 import { useChat, type UIMessage as MessageType } from '@ai-sdk/react'
 import { lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
-import { ArrowRight, MessageSquare } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
-import { AiIconAnimation, Button, cn } from 'ui'
+import { ArrowUpRight } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { AiIconAnimation, Button, Card, CardContent, cn, Skeleton } from 'ui'
 
 import { buildSupportAssistantPrompt } from './SupportAssistant.utils'
 import type { SubmittedSupportRequest } from './SupportForm.state'
+import { NO_PROJECT_MARKER } from './SupportForm.utils'
+import { SupportSuccessSection } from './SupportSuccessSection'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { Message } from '@/components/ui/AIAssistantPanel/Message'
 import { useAiAssistantStateSnapshot, type AiAssistantState } from '@/state/ai-assistant-state'
@@ -19,10 +21,16 @@ interface SupportAssistantSuccessCardProps {
   className?: string
 }
 
+function hasProjectScopedAssistantContext(projectRef: string | undefined) {
+  return projectRef !== undefined && projectRef !== NO_PROJECT_MARKER
+}
+
 export function SupportAssistantSuccessCard({
   request,
   className,
 }: SupportAssistantSuccessCardProps) {
+  if (!hasProjectScopedAssistantContext(request.projectRef)) return null
+
   const aiAssistant = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const createdChatIdRef = useRef<string>()
@@ -50,56 +58,40 @@ export function SupportAssistantSuccessCard({
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
   }
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      handleOpenAssistant()
-    }
-  }
-
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={handleOpenAssistant}
-      onKeyDown={handleKeyDown}
-      className={cn(
-        'group w-full cursor-pointer rounded-md border bg-surface-75 p-4 text-left transition hover:border-strong hover:bg-surface-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
-        className
-      )}
+    <SupportSuccessSection
+      className={className}
+      headerClassName="sm:items-center"
+      title="Assistant response"
+      description={
+        <p className="text-balance">
+          Supabase Assistant is also reviewing your request in case it can help immediately.
+        </p>
+      }
+      action={
+        <Button
+          type="default"
+          size="tiny"
+          icon={<AiIconAnimation size={14} />}
+          onClick={handleOpenAssistant}
+        >
+          See reply
+        </Button>
+      }
     >
-      <div className="flex items-start gap-3">
-        <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border bg-background">
-          <AiIconAnimation size={16} />
-        </div>
-        <div className="min-w-0 flex-1 space-y-1">
-          <div className="flex items-center gap-2">
-            <h4 className="text-sm font-medium text-foreground">Assistant is checking too</h4>
-            <ArrowRight
-              size={14}
-              className="text-foreground-muted transition group-hover:translate-x-0.5 group-hover:text-foreground"
-            />
-          </div>
-          <p className="text-sm text-foreground-light">
-            Your request was also sent to Supabase Assistant to see if it can help while the support
-            team reviews your ticket.
-          </p>
-          {chatId && chat && (
-            <SupportAssistantResponsePreview
-              chatId={chatId}
-              chat={chat as SupportAssistantPreviewChat}
-              className="mt-3"
-              maxCharacters={SUPPORT_ASSISTANT_PREVIEW_MAX_CHARACTERS}
-            />
-          )}
-          <div className="pt-2">
-            <Button asChild type="default" size="tiny" icon={<MessageSquare size={14} />}>
-              <span>Open Assistant chat</span>
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
+      {chatId && chat ? (
+        <SupportAssistantResponsePreview
+          chatId={chatId}
+          chat={chat as SupportAssistantPreviewChat}
+          maxCharacters={SUPPORT_ASSISTANT_PREVIEW_MAX_CHARACTERS}
+          onOpen={handleOpenAssistant}
+        />
+      ) : (
+        <SupportAssistantResponseCard onOpen={handleOpenAssistant}>
+          <SupportAssistantResponseLoadingSkeleton />
+        </SupportAssistantResponseCard>
+      )}
+    </SupportSuccessSection>
   )
 }
 
@@ -136,11 +128,13 @@ function SupportAssistantResponsePreview({
   chat,
   className,
   maxCharacters,
+  onOpen,
 }: {
   chatId: string
   chat: SupportAssistantPreviewChat
   className?: string
   maxCharacters: number
+  onOpen: () => void
 }) {
   const { messages, status } = useChat({
     id: chatId,
@@ -155,14 +149,9 @@ function SupportAssistantResponsePreview({
 
   if (!latestAssistantMessage) {
     return (
-      <div
-        className={cn(
-          'rounded-md border bg-background px-3 py-2 text-xs text-foreground-muted',
-          className
-        )}
-      >
-        Assistant is reviewing your request...
-      </div>
+      <SupportAssistantResponseCard className={className} onOpen={onOpen}>
+        <SupportAssistantResponseLoadingSkeleton />
+      </SupportAssistantResponseCard>
     )
   }
 
@@ -172,26 +161,68 @@ function SupportAssistantResponsePreview({
   )
 
   return (
-    <div
+    <SupportAssistantResponseCard className={cn('max-h-48', className)} onOpen={onOpen}>
+      <CardContent className="p-3">
+        <Message
+          id={previewMessage.id}
+          message={previewMessage}
+          isLoading={isChatLoading}
+          readOnly
+          onDelete={() => {}}
+          onEdit={() => {}}
+          onCancelEdit={() => {}}
+          isAfterEditedMessage={false}
+          isBeingEdited={false}
+        />
+        {wasTruncated && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-muted to-transparent" />
+        )}
+      </CardContent>
+    </SupportAssistantResponseCard>
+  )
+}
+
+function SupportAssistantResponseLoadingSkeleton() {
+  return (
+    <CardContent className="space-y-2 p-3">
+      <Skeleton className="h-4 w-[82%]" />
+      <Skeleton className="h-4 w-[92%]" />
+      <Skeleton className="h-4 w-[68%]" />
+    </CardContent>
+  )
+}
+
+function SupportAssistantResponseCard({
+  children,
+  className,
+  onOpen,
+}: {
+  children: ReactNode
+  className?: string
+  onOpen: () => void
+}) {
+  return (
+    <Card
+      role="button"
+      tabIndex={0}
+      onClick={onOpen}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          onOpen()
+        }
+      }}
       className={cn(
-        'relative max-h-48 overflow-hidden rounded-md border bg-background p-3',
+        'group relative cursor-pointer bg-muted/50 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
         className
       )}
     >
-      <Message
-        id={previewMessage.id}
-        message={previewMessage}
-        isLoading={isChatLoading}
-        readOnly
-        onDelete={() => {}}
-        onEdit={() => {}}
-        onCancelEdit={() => {}}
-        isAfterEditedMessage={false}
-        isBeingEdited={false}
-      />
-      {wasTruncated && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-background to-transparent" />
-      )}
-    </div>
+      <div className="pointer-events-none absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+        <Button type="default" size="tiny" className="h-8 w-8 p-0" tabIndex={-1} aria-hidden>
+          <ArrowUpRight size={16} strokeWidth={1.5} className="text-foreground" />
+        </Button>
+      </div>
+      {children}
+    </Card>
   )
 }

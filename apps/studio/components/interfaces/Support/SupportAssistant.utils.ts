@@ -1,5 +1,4 @@
 import type { SubmittedSupportRequest } from './SupportForm.state'
-import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
 
 const SUPPORT_ASSISTANT_FIELD_LABELS = {
   assistant_context: 'Assistant context',
@@ -37,23 +36,12 @@ function supportField(
 }
 
 export function buildSupportAssistantPrompt(request: SubmittedSupportRequest) {
-  const projectRef =
-    request.projectRef && request.projectRef !== NO_PROJECT_MARKER
-      ? request.projectRef
-      : 'No specific project selected'
-  const organizationSlug =
-    request.organizationSlug && request.organizationSlug !== NO_ORG_MARKER
-      ? request.organizationSlug
-      : 'No organization selected'
-
   return [
     '<support>',
     supportField(
       'assistant_context',
-      'A support request has already been submitted to the Supabase Support team. Help the user troubleshoot while they wait for a support team member. Do not ask them to submit another support ticket for this same issue.'
+      'A support request has already been submitted and a human member of the Supabase Support team is already looking at it. Your role is to help the user troubleshoot in the interim while they wait for the human support response. Do not ask them to submit another support ticket for this same issue.'
     ),
-    supportField('organization_slug', organizationSlug),
-    supportField('project_ref', projectRef),
     supportField('category', request.category),
     supportField('severity', request.severity),
     supportField('subject', request.subject),
