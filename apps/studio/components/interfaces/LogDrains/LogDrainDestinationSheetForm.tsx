@@ -415,6 +415,7 @@ export function LogDrainDestinationSheetForm({
     if (!open || mode !== 'create') return
 
     form.setValue('headerEntries', headerRecordToRows(getDefaultHeadersByType(type)))
+    form.clearErrors('headerEntries')
   }, [form, mode, open, type])
 
   return (
