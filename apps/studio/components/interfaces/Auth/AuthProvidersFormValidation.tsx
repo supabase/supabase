@@ -261,18 +261,15 @@ const smsProviderDisabledSchema = z
 // as the SMS hook will be used in place of the configured SMS provider
 const makeProviderOptionalWhenSMSHookEnabled = (
   config: ProjectAuthConfigData,
-  schema: z.ZodObject<z.ZodRawShape>
+  getSchema: (optional?: boolean) => z.ZodObject<z.ZodRawShape>
 ) => {
-  return config.HOOK_SEND_SMS_ENABLED ? schema.partial() : schema
+  return config.HOOK_SEND_SMS_ENABLED ? getSchema(true).partial() : getSchema()
 }
 
 // getPhoneProviderValidationSchema generate the validation schema for the SMS providers
 // based on whether the SMS hook is enabled
 export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) => {
-  const twilioSchema = makeProviderOptionalWhenSMSHookEnabled(
-    config,
-    getTwilioPhoneProviderSchema()
-  )
+  const twilioSchema = makeProviderOptionalWhenSMSHookEnabled(config, getTwilioPhoneProviderSchema)
     .merge(
       z.object({
         SMS_PROVIDER: z.literal('twilio'),
@@ -287,7 +284,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
 
   const twilioVerifySchema = makeProviderOptionalWhenSMSHookEnabled(
     config,
-    getTwilioVerifyPhoneProviderSchema()
+    getTwilioVerifyPhoneProviderSchema
   )
     .merge(
       z.object({
@@ -302,7 +299,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
 
   const messagebirdSchema = makeProviderOptionalWhenSMSHookEnabled(
     config,
-    getMessagebirdPhoneProviderSchema()
+    getMessagebirdPhoneProviderSchema
   )
     .merge(
       z.object({
@@ -316,10 +313,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
     .merge(getVonagePhoneProviderSchema(true).partial())
     .merge(getTextlocalPhoneProviderSchema(true).partial())
 
-  const vonageSchema = makeProviderOptionalWhenSMSHookEnabled(
-    config,
-    getVonagePhoneProviderSchema()
-  )
+  const vonageSchema = makeProviderOptionalWhenSMSHookEnabled(config, getVonagePhoneProviderSchema)
     .merge(
       z.object({
         SMS_PROVIDER: z.literal('vonage'),
@@ -334,7 +328,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
 
   const textlocalSchema = makeProviderOptionalWhenSMSHookEnabled(
     config,
-    getTextlocalPhoneProviderSchema()
+    getTextlocalPhoneProviderSchema
   )
     .merge(
       z.object({
@@ -378,10 +372,12 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
           return enabledSchema.parse(values)
         }
       })
-      // Trick: use transform to ensure the correct shape when EXTERNAL_PHONE_ENABLED is true
+      // Trick: use transform to ensure the correct shape when EXTERNAL_PHONE_ENABLED is true.
+      // enabledSchema strips EXTERNAL_PHONE_ENABLED (not declared on its branches), so re-add it
+      // to keep the flag in the submitted payload.
       .transform((values) => {
         if (values.EXTERNAL_PHONE_ENABLED === true) {
-          return enabledSchema.parse(values)
+          return { ...enabledSchema.parse(values), EXTERNAL_PHONE_ENABLED: true as const }
         }
         return values
       })

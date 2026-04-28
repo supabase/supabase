@@ -254,14 +254,32 @@ export const SubscriptionPlanUpdateDialog = ({
   // Derives the itemized charge breakdown rows shown above "Charge today".
   // Example: Pro -> Team upgrade with proration, tax, and credits:
   //   Team Plan            $25.00
-  //   Unused Time on Pro   -$8.33
-  //   Subtotal             $16.67
   //   Tax (10%)             $1.67
+  //   Subtotal             $26.67
+  //   Unused Time on Pro   -$8.33
   //   Credits              -$5.00
   //   ─────────────────────────────
   //   Charge today         $13.34
   const breakdownItems = useMemo(() => {
     const items: BreakdownItem[] = []
+
+    if (hasTax && tax) {
+      items.push({
+        type: 'amount',
+        label: `Tax (${tax.tax_rate_percentage}%)`,
+        amount: tax.tax_amount,
+      })
+      if (taxableAmount !== newPlanCost) {
+        items.push({ type: 'amount', label: 'Subtotal', amount: taxableAmount! })
+      }
+    }
+
+    if (taxFailed) {
+      items.push({
+        type: 'notice',
+        label: 'Tax could not be estimated and may be applied separately',
+      })
+    }
 
     if (currentPlanId !== 'free' && proratedCredit > 0) {
       items.push({
@@ -269,25 +287,8 @@ export const SubscriptionPlanUpdateDialog = ({
         label: `Unused Time on ${currentPlanName} Plan`,
         amount: -proratedCredit,
         tooltip:
-          'Your previous plan was charged upfront, so a plan change will prorate any unused time in credits. If the prorated credits exceed the new plan charge, the excessive credits are added to your organization for future use.',
-      })
-    }
-
-    if (hasTax && tax) {
-      if (taxableAmount !== newPlanCost) {
-        items.push({ type: 'amount', label: 'Subtotal', amount: taxableAmount! })
-      }
-      items.push({
-        type: 'amount',
-        label: `Tax (${tax.tax_rate_percentage}%)`,
-        amount: tax.tax_amount,
-      })
-    }
-
-    if (taxFailed) {
-      items.push({
-        type: 'notice',
-        label: 'Tax could not be estimated and may be applied separately',
+          'Your previous plan was charged upfront, so a plan change will prorate any unused time in credits. If the prorated credits exceed the new plan charge, the excessive credits are added to your organization for future use.' +
+          (hasTax ? ' Includes proportional tax if applicable.' : ''),
       })
     }
 
@@ -522,21 +523,23 @@ export const SubscriptionPlanUpdateDialog = ({
 
                                       const content = (
                                         <>
+                                          {planItem && (
+                                            <TableRow className="text-foreground-light">
+                                              <TableCell className="!py-2 px-0">
+                                                {planItem.description}
+                                              </TableCell>
+                                              <TableCell
+                                                className="text-right py-2 px-0"
+                                                translate="no"
+                                              >
+                                                {formatCurrency(planItem.total_price)}
+                                              </TableCell>
+                                            </TableRow>
+                                          )}
+
                                           {/* Combined projects section */}
                                           {allProjects.length > 0 && (
                                             <>
-                                              <TableRow className="text-foreground-light">
-                                                <TableCell className="!py-2 px-0">
-                                                  {planItem?.description}
-                                                </TableCell>
-                                                <TableCell
-                                                  className="text-right py-2 px-0"
-                                                  translate="no"
-                                                >
-                                                  {formatCurrency(planItem?.total_price)}
-                                                </TableCell>
-                                              </TableRow>
-
                                               <TableRow className="text-foreground-light">
                                                 <TableCell className="!py-2 px-0 flex items-center gap-1">
                                                   <span>Compute</span>

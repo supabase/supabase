@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import type { Control } from 'react-hook-form'
 import {
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -59,7 +59,7 @@ export function JitDbAccessRoleGrantFields({
           grant.enabled ? 'hover:bg-surface-200/40' : 'hover:bg-surface-100/50'
         }`}
       >
-        <Checkbox_Shadcn_
+        <Checkbox
           id={checkboxId}
           checked={grant.enabled}
           onCheckedChange={(value) => {

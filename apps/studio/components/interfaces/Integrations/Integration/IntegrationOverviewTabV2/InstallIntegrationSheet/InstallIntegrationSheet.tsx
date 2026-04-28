@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import {
   Button,
   DialogSectionSeparator,
-  Form_Shadcn_,
+  Form,
   Sheet,
   SheetClose,
   SheetContent,
@@ -217,7 +217,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
         <Button type="primary">Install integration</Button>
       </SheetTrigger>
 
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
           <SheetContent
             size="default"
@@ -277,7 +277,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
             </SheetFooter>
           </SheetContent>
         </form>
-      </Form_Shadcn_>
+      </Form>
     </Sheet>
   )
 }

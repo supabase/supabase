@@ -1,6 +1,6 @@
 'use client'
 
-import * as SwitchPrimitives from '@radix-ui/react-switch'
+import { Switch as SwitchPrimitives } from 'radix-ui'
 import { cva, VariantProps } from 'class-variance-authority'
 import * as React from 'react'
 
@@ -50,6 +50,7 @@ const Switch = React.forwardRef<React.ElementRef<typeof SwitchPrimitives.Root>, 
   ({ className, size, ...props }, ref) => (
     <SwitchPrimitives.Root
       className={cn(switchRootVariants({ size }), className)}
+      tabIndex={0}
       {...props}
       ref={ref}
     >

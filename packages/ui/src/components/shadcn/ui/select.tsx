@@ -1,6 +1,6 @@
 'use client'
 
-import * as SelectPrimitive from '@radix-ui/react-select'
+import { Select as SelectPrimitive } from 'radix-ui'
 import { cva, VariantProps } from 'class-variance-authority'
 import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import * as React from 'react'
@@ -54,6 +54,7 @@ const SelectTrigger = React.forwardRef<
       SelectTriggerVariants({ size }),
       className
     )}
+    tabIndex={0}
     {...props}
   >
     {children}

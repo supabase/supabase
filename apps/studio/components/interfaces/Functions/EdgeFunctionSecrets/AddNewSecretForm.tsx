@@ -11,12 +11,12 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import z from 'zod'
@@ -198,7 +198,7 @@ const AddNewSecretForm = () => {
 
   return (
     <>
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
             <CardHeader>
@@ -207,13 +207,13 @@ const AddNewSecretForm = () => {
             <CardContent>
               {fields.map((fieldItem, index) => (
                 <div key={fieldItem.id} className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4">
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name={`secrets.${index}.name`}
                     render={({ field }) => (
-                      <FormItem_Shadcn_ className="w-full">
-                        <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
+                      <FormItem className="w-full">
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
                           <Input
                             {...field}
                             placeholder="e.g. CLIENT_KEY"
@@ -223,18 +223,18 @@ const AddNewSecretForm = () => {
                             data-bwignore
                             onPaste={(e) => handlePaste(e.nativeEvent)}
                           />
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name={`secrets.${index}.value`}
                     render={({ field }) => (
-                      <FormItem_Shadcn_ className="w-full relative">
-                        <FormLabel_Shadcn_>Value</FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
+                      <FormItem className="w-full relative">
+                        <FormLabel>Value</FormLabel>
+                        <FormControl>
                           <Input
                             {...field}
                             type={isSecretVisible(fieldItem.id) ? 'text' : 'password'}
@@ -253,9 +253,9 @@ const AddNewSecretForm = () => {
                               </div>
                             }
                           />
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
 
@@ -284,7 +284,7 @@ const AddNewSecretForm = () => {
             </CardFooter>
           </Card>
         </form>
-      </Form_Shadcn_>
+      </Form>
       <DuplicateSecretWarningModal
         visible={!!duplicateSecretName}
         onCancel={handleCancelDuplicate}

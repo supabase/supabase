@@ -20,8 +20,8 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
-  Form_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormField,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -141,7 +141,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   return (
     <>
-      <Card className="w-[40rem] mx-auto">
+      <Card className="w-full max-w-[40rem] mx-auto">
         <CardContent>
           <PauseCircle
             size={48}
@@ -235,7 +235,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
         )}
 
         {isPauseStatusSuccess && !isRestoreDisabled && (
-          <CardFooter className="flex justify-end items-center gap-x-2">
+          <CardFooter className="flex flex-wrap justify-end items-center gap-2">
             <ButtonTooltip
               size="tiny"
               type="default"
@@ -289,11 +289,11 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
               ? 'Your project’s data will be restored to when it was initially paused.'
               : 'Your project’s data will be restored and billing will resume based on compute size and hours active.'}
           </p>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form onSubmit={form.handleSubmit(onConfirmRestore)}>
               {showPostgresVersionSelector && (
                 <div className="space-y-2">
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="postgresVersionSelection"
                     render={({ field }) => (
@@ -312,7 +312,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                 </div>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
         </div>
       </ConfirmationModal>
 

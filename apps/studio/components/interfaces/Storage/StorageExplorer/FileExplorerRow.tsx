@@ -333,15 +333,15 @@ export const FileExplorerRow = ({
               </div>
             )}
             <Checkbox
-              label={''}
-              className={`w-full ${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
+              className={`${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
                 isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
               }`}
               checked={isSelected}
-              onChange={(event) => {
-                event.stopPropagation()
-                onCheckItem((event.nativeEvent as KeyboardEvent).shiftKey)
+              // use onClick instead of onCheckedChange to handle shift-key selection
+              onClick={(event) => {
+                onCheckItem(event.nativeEvent.shiftKey)
               }}
+              aria-label="Check to select this item"
             />
           </div>
           <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>

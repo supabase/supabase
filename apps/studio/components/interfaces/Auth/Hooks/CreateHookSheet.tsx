@@ -6,9 +6,9 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -296,13 +296,13 @@ export const CreateHookSheet = ({
         </SheetHeader>
         <Separator />
         <SheetSection className="overflow-auto flex-grow px-0">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={FORM_ID}
               className="space-y-6 w-full py-5 flex-1"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField_Shadcn_
+              <FormField
                 key="enabled"
                 name="enabled"
                 control={form.control}
@@ -317,23 +317,23 @@ export const CreateHookSheet = ({
                         : undefined
                     }
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Switch
                         checked={field.value}
                         onCheckedChange={field.onChange}
                         disabled={field.disabled}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
               <Separator />
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="selectedType"
                 render={({ field }) => (
                   <FormItemLayout label="Hook type" className="px-5">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <RadioGroupStacked
                         value={field.value}
                         onValueChange={(value) => field.onChange(value)}
@@ -353,14 +353,14 @@ export const CreateHookSheet = ({
                           description="Used to call any HTTPS endpoint."
                         />
                       </RadioGroupStacked>
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
               {values.selectedType === 'postgres' ? (
                 <>
                   <div className="grid grid-cols-2 gap-8 px-5">
-                    <FormField_Shadcn_
+                    <FormField
                       key="postgresValues.schema"
                       control={form.control}
                       name="postgresValues.schema"
@@ -369,7 +369,7 @@ export const CreateHookSheet = ({
                           label="Postgres Schema"
                           description="Postgres schema where the function is defined"
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <SchemaSelector
                               size="small"
                               showError={false}
@@ -378,11 +378,11 @@ export const CreateHookSheet = ({
                               onSelectSchema={(name) => field.onChange(name)}
                               disabled={field.disabled}
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
-                    <FormField_Shadcn_
+                    <FormField
                       key="postgresValues.functionName"
                       control={form.control}
                       name="postgresValues.functionName"
@@ -391,7 +391,7 @@ export const CreateHookSheet = ({
                           label="Postgres function"
                           description="This function will be called by Supabase Auth each time the hook is triggered"
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <FunctionSelector
                               size="small"
                               schema={values.postgresValues.schema}
@@ -419,7 +419,7 @@ export const CreateHookSheet = ({
                                 </span>
                               }
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -441,7 +441,7 @@ export const CreateHookSheet = ({
                 </>
               ) : (
                 <div className="flex flex-col gap-4 px-5">
-                  <FormField_Shadcn_
+                  <FormField
                     key="httpsValues.url"
                     control={form.control}
                     name="httpsValues.url"
@@ -450,13 +450,13 @@ export const CreateHookSheet = ({
                         label="URL"
                         description="Supabase Auth will send a HTTPS POST request to this URL each time the hook is triggered."
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Input_Shadcn_ {...field} />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
-                  <FormField_Shadcn_
+                  <FormField
                     key="httpsValues.secret"
                     control={form.control}
                     name="httpsValues.secret"
@@ -477,7 +477,7 @@ export const CreateHookSheet = ({
                           </div>
                         }
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <div className="flex flex-row">
                             <Input_Shadcn_ {...field} className="rounded-r-none border-r-0" />
                             <Button
@@ -494,14 +494,14 @@ export const CreateHookSheet = ({
                               Generate secret
                             </Button>
                           </div>
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </div>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
         </SheetSection>
         <SheetFooter>
           {!isCreating && (

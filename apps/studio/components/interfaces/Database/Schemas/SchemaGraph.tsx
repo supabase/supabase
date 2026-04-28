@@ -11,8 +11,7 @@ import {
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react'
-import { toPng, toSvg } from 'html-to-image'
-import { Check, Copy, Download, Loader2, Plus } from 'lucide-react'
+import { Check, ChevronDown, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -20,7 +19,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import '@xyflow/react/dist/style.css'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { toast } from 'sonner'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,8 +43,13 @@ import { DefaultEdge } from './DefaultEdge'
 import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGraphContext'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { EdgeData, TableNodeData } from './Schemas.constants'
-import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
+import {
+  getGraphDataFromTables,
+  getLayoutedElementsViaDagre,
+  getSchemaAsMarkdown,
+} from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
+import { useExportSchemaToImage } from './useExportSchemaToImage'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import SchemaSelector from '@/components/ui/SchemaSelector'
@@ -70,6 +73,7 @@ export const SchemaGraph = () => {
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [selectedTable, setSelectedTable] = useState<PostgresTable | null>(null)
   const snap = useTableEditorStateSnapshot()
+  const { isDownloading, exportSchemaToImage } = useExportSchemaToImage()
 
   const [copied, setCopied] = useState(false)
   useEffect(() => {
@@ -77,8 +81,6 @@ export const SchemaGraph = () => {
       setTimeout(() => setCopied(false), 2000)
     }
   }, [copied])
-
-  const [isDownloading, setIsDownloading] = useState(false)
 
   const miniMapNodeColor = '#111318'
   const miniMapMaskColor = resolvedTheme?.includes('dark')
@@ -175,72 +177,28 @@ export const SchemaGraph = () => {
     (params: OnSelectionChangeParams<Node<TableNodeData>, Edge<EdgeData>>) => {
       if (params.edges.length === 1) {
         setSelectedEdge(params.edges[0])
-        return
+      } else {
+        setSelectedEdge(undefined)
       }
-      setSelectedEdge(undefined)
+
+      const selectedNodeIds = new Set(params.nodes.map((n) => n.id))
+      reactFlowInstance.setEdges(
+        reactFlowInstance.getEdges().map((edge) => ({
+          ...edge,
+          animated:
+            selectedNodeIds.size > 0 &&
+            (selectedNodeIds.has(edge.source) || selectedNodeIds.has(edge.target)),
+        }))
+      )
     }
   )
 
-  const downloadImage = (format: 'png' | 'svg') => {
+  const downloadImage = async (format: 'png' | 'svg') => {
     const reactflowViewport = document.querySelector('.react-flow__viewport') as HTMLElement
     if (!reactflowViewport) return
-
-    setIsDownloading(true)
-    const width = reactflowViewport.clientWidth
-    const height = reactflowViewport.clientHeight
+    if (!ref) return
     const { x, y, zoom } = reactFlowInstance.getViewport()
-
-    if (format === 'svg') {
-      toSvg(reactflowViewport, {
-        backgroundColor: 'white',
-        width,
-        height,
-        style: {
-          width: width.toString(),
-          height: height.toString(),
-          transform: `translate(${x}px, ${y}px) scale(${zoom})`,
-        },
-      })
-        .then((data) => {
-          const a = document.createElement('a')
-          a.setAttribute('download', `supabase-schema-${ref}.svg`)
-          a.setAttribute('href', data)
-          a.click()
-          toast.success('Successfully downloaded as SVG')
-        })
-        .catch((error) => {
-          console.error('Failed to download:', error)
-          toast.error('Failed to download current view:', error.message)
-        })
-        .finally(() => {
-          setIsDownloading(false)
-        })
-    } else if (format === 'png') {
-      toPng(reactflowViewport, {
-        backgroundColor: 'white',
-        width,
-        height,
-        style: {
-          width: width.toString(),
-          height: height.toString(),
-          transform: `translate(${x}px, ${y}px) scale(${zoom})`,
-        },
-      })
-        .then((data) => {
-          const a = document.createElement('a')
-          a.setAttribute('download', `supabase-schema-${ref}.png`)
-          a.setAttribute('href', data)
-          a.click()
-          toast.success('Successfully downloaded as PNG')
-        })
-        .catch((error) => {
-          console.error('Failed to download:', error)
-          toast.error('Failed to download current view:', error.message)
-        })
-        .finally(() => {
-          setIsDownloading(false)
-        })
-    }
+    exportSchemaToImage({ element: reactflowViewport, format, x, y, zoom, projectRef: ref })
   }
 
   const isFirstLoad = useRef(true)
@@ -268,7 +226,7 @@ export const SchemaGraph = () => {
     selectedSchema,
   ])
 
-  const schemaGraphPanelEditorContext = useMemo<SchemaGraphContextType>(
+  const schemaGraphContext = useMemo<SchemaGraphContextType>(
     () => ({
       selectedEdge,
       isDownloading,
@@ -313,52 +271,85 @@ export const SchemaGraph = () => {
             />
             {!hasNoTables && (
               <div className="flex items-center gap-x-2">
-                <ButtonTooltip
-                  type="outline"
-                  icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
-                  onClick={() => {
-                    if (tables) {
-                      copyToClipboard(tablesToSQL(tables))
-                      setCopied(true)
-                    }
-                  }}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: (
-                        <div className="max-w-[180px] space-y-2 text-foreground-light">
-                          <p className="text-foreground">Note</p>
-                          <p>
-                            This schema is for context or debugging only. Table order and
-                            constraints may be invalid. Not meant to be run as-is.
-                          </p>
-                        </div>
-                      ),
-                    },
-                  }}
-                >
-                  Copy as SQL
-                </ButtonTooltip>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <ButtonTooltip
-                      aria-label="Download Schema"
-                      type="default"
-                      loading={isDownloading}
-                      className="px-1.5"
-                      icon={<Download />}
-                      tooltip={{ content: { side: 'bottom', text: 'Download current view' } }}
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-32">
-                    <DropdownMenuItem onClick={() => downloadImage('png')}>
-                      Download as PNG
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => downloadImage('svg')}>
-                      Download as SVG
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center gap-0">
+                  <ButtonTooltip
+                    type="default"
+                    className="rounded-r-none border-r-0"
+                    icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
+                    onClick={() => {
+                      if (tables) {
+                        copyToClipboard(tablesToSQL(tables))
+                        setCopied(true)
+                      }
+                    }}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: (
+                          <div className="max-w-[180px] space-y-2 text-foreground-light">
+                            <p className="text-foreground">Note</p>
+                            <p>
+                              This schema is for context or debugging only. Table order and
+                              constraints may be invalid. Not meant to be run as-is.
+                            </p>
+                          </div>
+                        ),
+                      },
+                    }}
+                  >
+                    Copy as SQL
+                  </ButtonTooltip>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="default"
+                        size="tiny"
+                        className="rounded-l-none pl-1 pr-0"
+                        icon={<ChevronDown size={12} />}
+                      >
+                        <span className="sr-only">Export options</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      <DropdownMenuItem
+                        className="flex items-center space-x-2 whitespace-nowrap"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          const tables = reactFlowInstance
+                            .getNodes()
+                            .filter((node) => node.type === 'table')
+                            .map((node) => node.data as TableNodeData)
+
+                          copyToClipboard(getSchemaAsMarkdown(selectedSchema, tables))
+                          setCopied(true)
+                        }}
+                      >
+                        <Copy size={12} />
+                        <span>Copy as Markdown</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="flex items-center space-x-2 whitespace-nowrap"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          downloadImage('png')
+                        }}
+                      >
+                        <Download size={12} />
+                        <span>Download as PNG</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="flex items-center space-x-2 whitespace-nowrap"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          downloadImage('svg')
+                        }}
+                      >
+                        <Download size={12} />
+                        <span>Download as SVG</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <ButtonTooltip
@@ -427,7 +418,7 @@ export const SchemaGraph = () => {
               </Admonition>
             </div>
           ) : (
-            <SchemaGraphContextProvider value={schemaGraphPanelEditorContext}>
+            <SchemaGraphContextProvider value={schemaGraphContext}>
               <div className="w-full h-full">
                 <ReactFlow<Node<TableNodeData>, Edge<EdgeData>>
                   // FIXME: https://github.com/xyflow/xyflow/issues/4876
@@ -436,7 +427,7 @@ export const SchemaGraph = () => {
                   defaultEdges={[]}
                   defaultEdgeOptions={{
                     type: 'default',
-                    animated: true,
+                    animated: false,
                     deletable: false,
                   }}
                   nodeTypes={nodeTypes}

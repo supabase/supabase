@@ -1,14 +1,14 @@
 import { UseFormReturn } from 'react-hook-form'
 import {
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  useWatch_Shadcn_,
+  useWatch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -25,11 +25,11 @@ interface CloudProviderSelectorProps {
 
 export const CloudProviderSelector = ({ form }: CloudProviderSelectorProps) => {
   const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
-  const highAvailability = useWatch_Shadcn_({ control: form.control, name: 'highAvailability' })
+  const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
 
   return (
     <Panel.Content>
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="cloudProvider"
         render={({ field }) => (
@@ -49,11 +49,11 @@ export const CloudProviderSelector = ({ form }: CloudProviderSelectorProps) => {
               defaultValue={field.value}
               value={field.value}
             >
-              <FormControl_Shadcn_>
+              <FormControl>
                 <SelectTrigger_Shadcn_>
                   <SelectValue_Shadcn_ placeholder="Select a cloud provider" />
                 </SelectTrigger_Shadcn_>
-              </FormControl_Shadcn_>
+              </FormControl>
               <SelectContent_Shadcn_>
                 <SelectGroup_Shadcn_>
                   {Object.values(PROVIDERS)

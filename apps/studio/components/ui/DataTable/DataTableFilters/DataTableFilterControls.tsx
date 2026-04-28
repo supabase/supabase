@@ -24,7 +24,9 @@ interface DataTableFilterControls {
   dateRangeDisabled?: DateRangeDisabled
 }
 
-export function DataTableFilterControls({ dateRangeDisabled }: DataTableFilterControls) {
+export function DataTableFilterControls({
+  dateRangeDisabled: _dateRangeDisabled,
+}: DataTableFilterControls) {
   const { filterFields, isLoadingCounts } = useDataTable()
   return (
     <Accordion

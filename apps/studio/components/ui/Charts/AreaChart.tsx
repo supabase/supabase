@@ -125,7 +125,7 @@ const AreaChart = ({
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
           <Tooltip
-            content={(props) =>
+            content={(_props) =>
               syncId && syncTooltip && hoveredIndex !== null ? (
                 <div className="bg-black/90 text-white p-2 rounded text-xs">
                   <div className="font-medium">

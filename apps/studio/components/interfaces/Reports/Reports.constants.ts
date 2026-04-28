@@ -380,7 +380,7 @@ limit 12
     queries: {
       mostFrequentlyInvoked: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
+        sql: (_params, where, orderBy, runIndexAdvisor = false, _filterIndexAdvisor = false) => `
         -- reports-query-performance-most-frequently-invoked
 set search_path to public, extensions;
 
@@ -437,7 +437,7 @@ select
       },
       mostTimeConsuming: {
         queryType: 'db',
-        sql: (_, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
+        sql: (_, where, orderBy, runIndexAdvisor = false, _filterIndexAdvisor = false) => `
         -- reports-query-performance-most-time-consuming
 set search_path to public, extensions;
 
@@ -486,7 +486,7 @@ select
       },
       slowestExecutionTime: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
+        sql: (_params, where, orderBy, runIndexAdvisor = false, _filterIndexAdvisor = false) => `
         -- reports-query-performance-slowest-execution-time
 set search_path to public, extensions;
 
@@ -654,7 +654,7 @@ select
       },
       queryMetrics: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
+        sql: (_params, where, orderBy, _runIndexAdvisor = false, _filterIndexAdvisor = false) => `
         -- reports-query-performance-metrics
         set search_path to public, extensions;
 
