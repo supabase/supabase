@@ -3,7 +3,14 @@
 import { cva, VariantProps } from 'class-variance-authority'
 import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 import React, { useEffect } from 'react'
-import { Badge, cn, Popover_Shadcn_ as Popover, PopoverAnchor_Shadcn_ as PopoverAnchor } from 'ui'
+import {
+  Badge,
+  cn,
+  Popover_Shadcn_ as Popover,
+  PopoverAnchor_Shadcn_ as PopoverAnchor,
+  PopoverContent_Shadcn_ as PopoverContent,
+  PopoverContentProps_Shadcn_ as PopoverContentProps,
+} from 'ui'
 import {
   Command,
   CommandEmpty,
@@ -11,7 +18,6 @@ import {
   CommandItem,
   CommandList,
 } from 'ui/src/components/shadcn/ui/command'
-import { PopoverContent } from 'ui/src/components/shadcn/ui/popover'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 
 interface MultiSelectContextProps {
@@ -462,11 +468,12 @@ const MultiSelectorInput = React.forwardRef<
 MultiSelectorInput.displayName = 'MultiSelectorInput'
 MultiSelector.Input = MultiSelectorInput
 
-const MultiSelectorContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, children }, ref) => {
+const MultiSelectorContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
+  ({ className, children, ...props }, ref) => {
     const { id } = useMultiSelect()
     return (
       <PopoverContent
+        align="start"
         ref={ref}
         className={cn(
           'bg-overlay shadow-md z-50 border border-overlay rounded-md p-0',
@@ -479,6 +486,7 @@ const MultiSelectorContent = React.forwardRef<HTMLDivElement, React.HTMLAttribut
             event.stopPropagation()
           }
         }}
+        {...props}
       >
         {children}
       </PopoverContent>
