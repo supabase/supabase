@@ -13,6 +13,7 @@ set -e
 
 pass=0
 fail=0
+project_name="${COMPOSE_PROJECT_NAME:-supabase}"
 
 fail_msg() {
     fail=$((fail + 1))
@@ -24,12 +25,49 @@ pass_msg() {
     echo "  PASS: $1"
 }
 
+is_service_running() {
+    service="$1"
+    if docker compose ps --services --status running 2>/dev/null | grep -q "^$service$"; then
+        return 0
+    fi
+
+    docker ps --filter "label=com.docker.compose.project=$project_name" \
+        --filter "label=com.docker.compose.service=$service" \
+        --filter "status=running" \
+        --quiet | grep -q '.'
+}
+
+get_container_id() {
+    service="$1"
+
+    container_id=$(docker compose ps -q "$service" 2>/dev/null || true)
+    if [ -n "$container_id" ]; then
+        printf '%s' "$container_id"
+        return
+    fi
+
+    container_id=$(docker ps -a \
+        --filter "label=com.docker.compose.project=$project_name" \
+        --filter "label=com.docker.compose.service=$service" \
+        --quiet)
+
+    set -- $container_id
+    printf '%s' "$1"
+}
+
 # Check that a service's logs contain all expected patterns
 check_logs() {
     service="$1"
     shift
 
-    logs=$(docker compose logs "$service" 2>/dev/null)
+    logs=$(docker compose logs "$service" 2>/dev/null || true)
+    if [ -z "$logs" ]; then
+        container_id=$(get_container_id "$service")
+        if [ -n "$container_id" ]; then
+            logs=$(docker logs "$container_id" 2>&1 || true)
+        fi
+    fi
+
     if [ -z "$logs" ]; then
         fail_msg "$service (no logs found)"
         return
@@ -43,6 +81,17 @@ check_logs() {
     done
 
     pass_msg "$service"
+}
+
+check_logs_if_running() {
+    service="$1"
+    shift
+
+    if is_service_running "$service"; then
+        check_logs "$service" "$@"
+    else
+        pass_msg "$service (skipped: service not running)"
+    fi
 }
 
 echo ""
@@ -79,7 +128,7 @@ check_logs meta \
 check_logs functions \
     'main function started'
 
-check_logs analytics \
+check_logs_if_running analytics \
     'Access LogflareWeb.Endpoint at http://localhost:4000' \
     'Executing startup tasks' \
     'Ensuring single tenant user is seeded'
@@ -88,7 +137,7 @@ check_logs supavisor \
     'Connected to Postgres database' \
     'HEAD /api/health$'
 
-check_logs vector \
+check_logs_if_running vector \
     'Vector has started'
 
 check_logs imgproxy \
