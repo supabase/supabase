@@ -8,12 +8,11 @@ The Data API is designed to work with Postgres' built-in access controls. Two la
 
 1. **Grants** determine which Postgres roles (`anon`, `authenticated`, `service_role`) can reach a given table, view, or function over the Data API.
 2. **Row Level Security (RLS) policies** then determine which rows those roles can read or modify from the tables exposed in step 1.
-
-Use both together: grants control _whether_ a role can touch an object; RLS controls _what_ rows they see.
+3. **Both together** grant control _whether_ a role can touch an object. RLS controls _what_ rows they see.
 
 ## Grant access explicitly
 
-A table isn't reachable through the Data API unless a role has been granted privileges on it. Grant the minimum privileges each role needs. For example:
+A table isn't reachable through the Data API unless you have granted a role privileges on it. Grant the minimum privileges each role needs. For example:
 
 ```sql
 -- Read-only access for anonymous clients
@@ -39,7 +38,7 @@ If a required grant is missing, PostgREST returns a `42501` error with a hint th
 }
 ```
 
-See [Database API 42501 errors](/docs/guides/troubleshooting/database-api-42501-errors) for the full troubleshooting flow.
+See [the Database API 42501 errors troubleshooting guide](/docs/guides/troubleshooting/database-api-42501-errors) for the full troubleshooting flow.
 
 <Admonition type="tip">
 

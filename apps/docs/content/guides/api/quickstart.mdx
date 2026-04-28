@@ -60,7 +60,7 @@ After your project is ready, create a table in your Supabase database. You can d
 
     Expose the `leaderboard` table through the Data API so it can be queried over HTTP. A leaderboard is meant to be public, so anonymous clients only need read access.
 
-    For more control over which tables and functions are exposed, see [Grant access explicitly](/docs/guides/api/securing-your-api#grant-access-explicitly).
+    For more control over which tables and functions are exposed, read the [Grant access explicitly guide](/docs/guides/api/securing-your-api#grant-access-explicitly).
 
     </StepHikeCompact.Details>
 
@@ -83,7 +83,7 @@ After your project is ready, create a table in your Supabase database. You can d
       </TabPanel>
       <TabPanel id="dashboard" label="Dashboard">
 
-      Go to [**Integrations > Data API > Settings**](/dashboard/project/_/integrations/data_api/settings). Under **Exposed schemas**, make sure `public` is included, then under **Exposed tables**, toggle on access for the `leaderboard` table.
+      In the [**Integrations > Data API > Settings**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard. Under **Exposed schemas**, make sure `public` is included, then under **Exposed tables**, toggle on access for the `leaderboard` table.
 
       </TabPanel>
       </Tabs>
@@ -96,7 +96,7 @@ After your project is ready, create a table in your Supabase database. You can d
 
     <StepHikeCompact.Details title="Configure RLS">
 
-    Turn on Row Level Security for this table and create the policies that control who can read and write rows. For a leaderboard, anyone should be able to read scores; only authenticated users should be able to submit or update them.
+    Enable Row Level Security (RLS) for this table and create the policies that control who can read and write rows. For a leaderboard, anyone should be able to read scores. Only authenticated users should be able to submit or update them.
 
     </StepHikeCompact.Details>
 
@@ -136,7 +136,7 @@ After your project is ready, create a table in your Supabase database. You can d
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Enable Data API access for authenticated and service roles">
 
-    Now that RLS is in place, grant write access to the `authenticated` and `service_role` roles.
+    With RLS setup, grant write access to the `authenticated` and `service_role` roles.
 
     </StepHikeCompact.Details>
 
@@ -155,7 +155,7 @@ After your project is ready, create a table in your Supabase database. You can d
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Insert some dummy data">
 
-    Now add some scores to the table so you have something to query through the API.
+    Now add some scores to the table so the API has something to query.
 
     </StepHikeCompact.Details>
 
@@ -177,7 +177,7 @@ After your project is ready, create a table in your Supabase database. You can d
   <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Fetch the data">
 
-    Find your API URL and Keys in the [**Settings > API Settings**](/dashboard/project/_/settings/api) section of the Dashboard. You can now query your `leaderboard` table by appending `/rest/v1/leaderboard` to the API URL.
+    You can find your API URL and Keys in the [**Settings > API Settings**](/dashboard/project/_/settings/api) section of the Dashboard. Query the `leaderboard` table by appending `/rest/v1/leaderboard` to the API URL.
 
     Copy this block of code, substitute `<PROJECT_REF>` and `<PUBLISHABLE_KEY>`, then run it from a terminal.
 
@@ -207,7 +207,7 @@ You can query the route in your browser, by appending the `publishable` key as a
 
 ### Curl
 
-```
+```sh
 curl 'https://<PROJECT_REF>.supabase.co/rest/v1/leaderboard?select=*&order=score.desc' \
   -H "apikey: <PUBLISHABLE_KEY>" \
   -H "Authorization: Bearer <PUBLISHABLE_KEY>"
