@@ -733,7 +733,7 @@ export const AnalyticsBucketFields = ({
                 layout="horizontal"
                 label="S3 Secret Access Key"
                 className="relative"
-                description="The secret key corresponding to your selected access key ID"
+                description="The secret key corresponding to your selected access key ID."
               >
                 <FormControl>
                   <Input_Shadcn_
