@@ -253,7 +253,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     return () => {
       dismissBanner('rls-tester-banner')
     }
-  }, [])
+  }, [addBanner, dismissBanner, isRlsTesterBannerDismissed, rlsTesterEnabled, rlsTesterVisible])
 
   useEffect(() => {
     if (!isTriggerPermissionsLoaded) return
