@@ -8,6 +8,7 @@ import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { IncidentAdmonition } from './IncidentAdmonition'
 import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
+import { SupportAssistantSuccessCard } from './SupportAssistantSuccessCard'
 import { createInitialSupportFormState, supportFormReducer } from './SupportForm.state'
 import type { SupportFormUrlKeys } from './SupportForm.utils'
 import { SupportFormV3 } from './SupportFormV3'
@@ -88,13 +89,14 @@ export function SupportForm({ initialParams, onFinish }: SupportFormProps) {
       <div className="min-h-full px-5 pt-5">
         <div className="flex flex-col gap-y-8">
           {isSuccess ? (
-            <div className="pt-2">
+            <div className="flex flex-col gap-y-6 pt-2">
               <Success
                 selectedProject={projectRef ?? undefined}
                 sentCategory={state.sentCategory}
                 onFinish={onFinish}
                 finishLabel={onFinish ? 'Done' : undefined}
               />
+              <SupportAssistantSuccessCard request={state.submittedRequest} />
             </div>
           ) : (
             <SupportFormV3
