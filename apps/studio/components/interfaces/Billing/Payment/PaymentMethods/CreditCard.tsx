@@ -57,7 +57,6 @@ const CreditCard = ({
   const tokenExpiry = spt?.expires_at
     ? `${new Date(spt.expires_at * 1000).getMonth() + 1}/${new Date(spt.expires_at * 1000).getFullYear()}`
     : undefined
-  const cardExpiryLabel = `${expiryMonth}/${expiryYear}`
 
   const stripeStatus = (() => {
     if (!isSpt) return null
