@@ -45,6 +45,53 @@ export const escapeSqlString = (value: string) => value.replace(/'/g, "''")
 
 export const formatSingleLineMessage = (message: string) => message.replace(/\s+/g, ' ').trim()
 
+/**
+ * Trims a runtime error message down to the meaningful summary, dropping the
+ * stack trace that follows the first ` at ` frame so we can show it inline in
+ * a table cell.
+ */
+export const summarizeErrorMessage = (message: string): string => {
+  const collapsed = formatSingleLineMessage(message)
+  if (!collapsed) return collapsed
+
+  const stackFrameMatch = collapsed.match(/\s+at\s+\S+\s+\(/)
+  if (stackFrameMatch && stackFrameMatch.index !== undefined) {
+    return collapsed.slice(0, stackFrameMatch.index).trim()
+  }
+  return collapsed
+}
+
+/**
+ * Picks the most useful error description for a group. The invocation
+ * `event_message` only contains the request URL, so when we have a related
+ * runtime error log we surface its summary instead.
+ */
+export const getDisplayErrorMessage = (group: RecentErrorGroup): string => {
+  const errorLog = group.logs.find((log) => log.level === 'error')
+  if (errorLog) {
+    const summary = summarizeErrorMessage(errorLog.message)
+    if (summary) return summary
+  }
+  return summarizeErrorMessage(group.message)
+}
+
+const TROUBLESHOOTING_DOCS_URL = 'https://supabase.com/docs/guides/troubleshooting'
+
+export const buildTroubleshootingDocsUrl = ({
+  statusCode,
+  errorMessage,
+}: {
+  statusCode?: string
+  errorMessage?: string
+}): string => {
+  const errorType = errorMessage?.match(/^([A-Z][A-Za-z0-9]*Error)\b/)?.[1]
+  const terms = ['edge function', errorType, statusCode].filter((term): term is string =>
+    Boolean(term)
+  )
+  const search = terms.length > 0 ? terms.join(' ') : 'edge function'
+  return `${TROUBLESHOOTING_DOCS_URL}?search=${encodeURIComponent(search)}`
+}
+
 export const toAlertError = (error: unknown): AlertErrorProps['error'] | undefined => {
   if (typeof error === 'string') return { message: error }
 
