@@ -17,7 +17,7 @@ type ParsedToolCall = {
 
 function parseToolCall(
   toolCall: TypedToolCall<ToolSet>,
-  toolResult: TypedToolResult<ToolSet>
+  toolResult: TypedToolResult<ToolSet> | undefined
 ): ParsedToolCall {
   switch (toolCall.toolName) {
     case 'execute_sql': {
@@ -26,7 +26,7 @@ function parseToolCall(
       return { sqlQuery }
     }
     case 'search_docs': {
-      const content = toolResult.output?.content
+      const content = toolResult?.output?.content
       if (!content || !Array.isArray(content)) return {}
       const docs = content
         .map((item) => item?.text)
@@ -64,9 +64,7 @@ export function buildAssistantEvalOutput(
   for (const step of steps) {
     for (const [i, toolCall] of step.toolCalls.entries()) {
       toolNames.push(toolCall.toolName)
-      const toolResult = step.toolResults.at(i)
-      if (!toolResult) continue
-      const parsed = parseToolCall(toolCall, toolResult)
+      const parsed = parseToolCall(toolCall, step.toolResults.at(i))
       if (parsed.sqlQuery) sqlQueries.push(parsed.sqlQuery)
       if (parsed.docs) docs.push(...parsed.docs)
     }
