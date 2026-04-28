@@ -194,13 +194,25 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
           ) : null}
         </div>
 
-        <SheetFooter>
-          <Button type="default" disabled={isLoading} onClick={() => setOpen(false)}>
-            Cancel
+        <SheetFooter className="sm:justify-between">
+          <Button asChild type="text">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground-light hover:text-foreground"
+              href="https://github.com/orgs/supabase/discussions/45233"
+            >
+              Give feedback
+            </a>
           </Button>
-          <Button type="primary" loading={isLoading} onClick={onRunQuery}>
-            Run query
-          </Button>
+          <div className="flex items-center gap-x-2">
+            <Button type="default" disabled={isLoading} onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="primary" loading={isLoading} onClick={onRunQuery}>
+              Run query
+            </Button>
+          </div>
         </SheetFooter>
       </SheetContent>
     </Sheet>

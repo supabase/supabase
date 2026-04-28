@@ -98,6 +98,8 @@ export const LOCAL_STORAGE_KEYS = {
   // RLS event trigger banner dismissed
   RLS_EVENT_TRIGGER_BANNER_DISMISSED: (ref: string) => `rls-event-trigger-banner-dismissed-${ref}`,
 
+  RLS_TESTER_BANNER_DISMISSED: (ref: string) => `rls-tester-banner-dismissed-${ref}`,
+
   // Observability banner dismissed
   OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
   ORGANIZATION_MARKETPLACE_BANNER_DISMISSED: (orgSlug: string, managedBy: string) =>

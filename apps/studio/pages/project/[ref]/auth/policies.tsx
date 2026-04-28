@@ -1,6 +1,6 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { Search, X } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
@@ -30,11 +30,12 @@ import { RLSTesterSheet } from '@/components/interfaces/Auth/RLSTester/RLSTester
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { BannerRlsEventTrigger } from '@/components/ui/BannerStack/Banners/BannerRlsEventTrigger'
+import { BannerRlsTester } from '@/components/ui/BannerStack/Banners/BannerRlsTester'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { DocsButton } from '@/components/ui/DocsButton'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
@@ -114,6 +115,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
   const rlsTesterEnabled = useIsRLSTesterEnabled()
+  const rlsTesterVisible = useFlag('rlsTester')
 
   const { openSidebar } = useSidebarManagerSnapshot()
   const {
@@ -133,6 +135,11 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const [isRlsBannerDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.RLS_EVENT_TRIGGER_BANNER_DISMISSED(projectRef ?? ''),
+    false
+  )
+
+  const [isRlsTesterBannerDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.RLS_TESTER_BANNER_DISMISSED(projectRef ?? ''),
     false
   )
 
@@ -228,6 +235,25 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   )
 
   const handleResetSearch = useCallback(() => setSearchString(''), [setSearchString])
+
+  useEffect(() => {
+    if (!rlsTesterVisible || rlsTesterEnabled) return
+
+    if (!isRlsTesterBannerDismissed) {
+      addBanner({
+        id: 'rls-tester-banner',
+        isDismissed: false,
+        content: <BannerRlsTester />,
+        priority: 3,
+      })
+    } else {
+      dismissBanner('rls-tester-banner')
+    }
+
+    return () => {
+      dismissBanner('rls-tester-banner')
+    }
+  }, [addBanner, dismissBanner, isRlsTesterBannerDismissed, rlsTesterEnabled, rlsTesterVisible])
 
   useEffect(() => {
     if (!isTriggerPermissionsLoaded) return
