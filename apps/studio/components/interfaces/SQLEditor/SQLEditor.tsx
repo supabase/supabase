@@ -50,7 +50,7 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import { useAddDefinitions } from './useAddDefinitions'
-import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { UtilityPanel } from './UtilityPanel/UtilityPanel'
 import {
   isExplainQuery,
   isExplainSql,

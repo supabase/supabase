@@ -1,11 +1,11 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { toast } from 'sonner'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
 import { ChartConfig } from './ChartConfig'
-import UtilityActions from './UtilityActions'
+import { UtilityActions } from './UtilityActions'
 import { UtilityTabExplain } from './UtilityTabExplain'
-import UtilityTabResults from './UtilityTabResults'
+import { UtilityTabResults } from './UtilityTabResults'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
@@ -38,7 +38,7 @@ const DEFAULT_CHART_CONFIG: ChartConfig = {
   showGrid: false,
 }
 
-const UtilityPanel = ({
+export const UtilityPanel = ({
   id,
   isExecuting,
   isExplainExecuting,
@@ -56,7 +56,6 @@ const UtilityPanel = ({
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const showPrettyExplain = useFlag('ShowPrettyExplain')
 
   const snippet = snapV2.snippets[id]?.snippet
   const result = snapV2.results[id]?.[0]
@@ -140,15 +139,13 @@ const UtilityPanel = ({
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
             <span className="translate-y-[1px]">Results</span>
           </TabsTrigger_Shadcn_>
-          {/* Only show Explain tab if ShowPrettyExplain flag is on */}
-          {showPrettyExplain && (
-            <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
-              <span className="translate-y-[1px]">Explain</span>
-            </TabsTrigger_Shadcn_>
-          )}
+          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
+            <span className="translate-y-[1px]">Explain</span>
+          </TabsTrigger_Shadcn_>
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
             <span className="translate-y-[1px]">Chart</span>
           </TabsTrigger_Shadcn_>
+
           {result?.rows && (
             <DownloadResultsButton
               type="text"
@@ -181,6 +178,7 @@ const UtilityPanel = ({
             />
           )}
         </div>
+
         <UtilityActions
           id={id}
           isExecuting={isExecuting}
@@ -190,6 +188,7 @@ const UtilityPanel = ({
           executeQuery={executeQuery}
         />
       </TabsList_Shadcn_>
+
       <TabsContent_Shadcn_ asChild value="results" className="mt-0 flex-grow">
         <UtilityTabResults
           id={id}
@@ -201,12 +200,9 @@ const UtilityPanel = ({
         />
       </TabsContent_Shadcn_>
 
-      {/* Only render Explain tab content if ShowPrettyExplain flag is on */}
-      {showPrettyExplain && (
-        <TabsContent_Shadcn_ asChild value="explain" className="mt-0 flex-grow">
-          <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
-        </TabsContent_Shadcn_>
-      )}
+      <TabsContent_Shadcn_ asChild value="explain" className="mt-0 flex-grow">
+        <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
+      </TabsContent_Shadcn_>
 
       <TabsContent_Shadcn_ asChild value="chart" className="mt-0 flex-grow">
         <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />
@@ -214,5 +210,3 @@ const UtilityPanel = ({
     </Tabs_Shadcn_>
   )
 }
-
-export default UtilityPanel

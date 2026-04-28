@@ -1,5 +1,6 @@
 export * from './check-tables-anon-authenticated-access'
 export * from './check-tables-without-rls'
+export * from './check-tables-rls-enabled'
 export * from './columns'
 export * from './cron-jobs'
 export * from './extensions'
