@@ -11,7 +11,7 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/guides/api/api-keys/',
+    source: '/docs/guides/api/api-keys',
     destination: '/docs/guides/getting-started/api-keys',
   },
   {
