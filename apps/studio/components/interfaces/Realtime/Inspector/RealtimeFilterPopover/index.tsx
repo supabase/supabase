@@ -13,7 +13,7 @@ import {
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Toggle,
+  Switch,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -102,12 +102,12 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                   Presence
                 </label>
               </div>
-              <Toggle
+              <Switch
                 id="toggle-presence"
-                size="tiny"
+                size="small"
                 checked={tempConfig.enablePresence}
-                onChange={() =>
-                  setTempConfig({ ...tempConfig, enablePresence: !tempConfig.enablePresence })
+                onCheckedChange={(checked) =>
+                  setTempConfig((current) => ({ ...current, enablePresence: checked }))
                 }
               />
             </div>
@@ -126,12 +126,12 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                   Broadcast
                 </label>
               </div>
-              <Toggle
+              <Switch
                 id="toggle-broadcast"
-                size="tiny"
+                size="small"
                 checked={tempConfig.enableBroadcast}
-                onChange={() =>
-                  setTempConfig({ ...tempConfig, enableBroadcast: !tempConfig.enableBroadcast })
+                onCheckedChange={(checked) =>
+                  setTempConfig((current) => ({ ...current, enableBroadcast: checked }))
                 }
               />
             </div>
@@ -156,13 +156,13 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                   Database changes
                 </label>
               </div>
-              <Toggle
+              <Switch
                 id="toggle-db-changes"
-                size="tiny"
+                size="small"
                 checked={tempConfig.enableDbChanges}
                 disabled={!config.enableDbChanges}
-                onChange={() =>
-                  setTempConfig({ ...tempConfig, enableDbChanges: !tempConfig.enableDbChanges })
+                onCheckedChange={(checked) =>
+                  setTempConfig((current) => ({ ...current, enableDbChanges: checked }))
                 }
               />
             </div>

@@ -7,12 +7,13 @@ import {
   Checkbox,
   Input,
   Label_Shadcn_ as Label,
+  Label_Shadcn_,
   Separator,
+  Switch,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
-  Toggle,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import {
@@ -151,8 +152,16 @@ export default function ProjectPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <Toggle checked={enableRls} onChange={() => setEnableRls(!enableRls)} />
-                <Label>Enable RLS by default on new tables</Label>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="enable-rls"
+                    checked={enableRls}
+                    onCheckedChange={(checked) => setEnableRls(checked)}
+                  />
+                  <Label_Shadcn_ htmlFor="enable-rls">
+                    Enable RLS by default on new tables
+                  </Label_Shadcn_>
+                </div>
               </div>
 
               <div className="flex items-center gap-3">
