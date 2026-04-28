@@ -220,7 +220,7 @@ export const PublishAppSidePanel = ({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="h-full flex flex-col">
-            <div className="flex-grow">
+            <div className="grow">
               <SidePanel.Content>
                 <div className="py-4 flex items-start justify-between gap-10">
                   <div className="space-y-4 w-full">

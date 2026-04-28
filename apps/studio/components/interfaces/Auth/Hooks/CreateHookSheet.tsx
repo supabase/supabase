@@ -295,7 +295,7 @@ export const CreateHookSheet = ({
           <DocsButton href={`${DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`} />
         </SheetHeader>
         <Separator />
-        <SheetSection className="overflow-auto flex-grow px-0">
+        <SheetSection className="overflow-auto grow px-0">
           <Form {...form}>
             <form
               id={FORM_ID}

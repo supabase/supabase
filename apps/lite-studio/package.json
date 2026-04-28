@@ -27,7 +27,7 @@
     "@types/react-dom": "catalog:",
     "autoprefixer": "^10.4.27",
     "config": "workspace:*",
-    "postcss": "^8.5.8",
+    "postcss": "catalog:",
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
     "vite": "^7.3.2",

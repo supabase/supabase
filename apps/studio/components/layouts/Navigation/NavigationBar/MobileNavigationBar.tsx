@@ -49,7 +49,7 @@ const MobileNavigationBar = ({
           'hide-scrollbar flex flex-row items-center justify-between overflow-x-auto'
         )}
       >
-        <div className={cn('flex min-w-0 flex-shrink items-center gap-2', !IS_PLATFORM && 'pl-2')}>
+        <div className={cn('flex min-w-0 shrink items-center gap-2', !IS_PLATFORM && 'pl-2')}>
           {showFloatingMobileToolbar && backToDashboardURL && (
             <div className="flex items-center justify-center ml-1 flex-0 md:hidden h-full aspect-square">
               <Link
@@ -72,18 +72,18 @@ const MobileNavigationBar = ({
             <HomeIcon className="ml-1" />
           )}
         </div>
-        <div className="flex flex-shrink-0 gap-2">
+        <div className="flex shrink-0 gap-2">
           {!showFloatingMobileToolbar && (
             <CommandMenuTrigger>
               <button
                 type="button"
                 className={cn(
                   'group',
-                  'flex-grow h-[30px] rounded-md',
+                  'grow h-[30px] rounded-md',
                   'p-2',
                   'flex items-center justify-between',
                   'bg-transparent border-none text-foreground-lighter',
-                  'hover:bg-opacity-100 hover:border-strong hover:text-foreground-light',
+                  'hover:bg-transparent/100 hover:border-strong hover:text-foreground-light',
                   'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
                   'transition'
                 )}

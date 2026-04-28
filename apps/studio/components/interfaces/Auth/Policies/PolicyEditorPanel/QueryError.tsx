@@ -80,7 +80,7 @@ export const QueryError = ({
 
                         return arr.concat([cur])
                       }, [] as string[])
-                      .map((str, index, arr) => {
+                      .map((str, index) => {
                         return (
                           <span
                             key={index}

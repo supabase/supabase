@@ -325,7 +325,7 @@
 */
 
 .sb-grid-json-editor__trigger {
-  @apply text-grid overflow-hidden overflow-ellipsis px-2;
+  @apply text-grid overflow-hidden text-ellipsis px-2;
 }
 
 /*
@@ -352,7 +352,7 @@
 */
 
 .sb-grid-text-editor__trigger {
-  @apply text-grid overflow-hidden overflow-ellipsis px-2;
+  @apply text-grid overflow-hidden text-ellipsis px-2;
 }
 
 /*
@@ -384,7 +384,7 @@
 }
 
 .sb-grid-foreign-key-formatter__text {
-  @apply m-0 flex-grow overflow-hidden overflow-ellipsis;
+  @apply m-0 grow overflow-hidden text-ellipsis;
 }
 
 /*
@@ -400,16 +400,16 @@
 }
 
 .sb-grid-column-header__inner {
-  @apply flex items-center gap-2 overflow-hidden overflow-ellipsis;
+  @apply flex items-center gap-2 overflow-hidden text-ellipsis;
 }
 
 .sb-grid-column-header__inner__name {
-  @apply text-foreground overflow-hidden overflow-ellipsis text-xs select-text;
+  @apply text-foreground overflow-hidden text-ellipsis text-xs select-text;
 }
 
 .sb-grid-column-header__inner__format {
   @apply text-xs;
-  @apply overflow-hidden overflow-ellipsis font-normal;
+  @apply overflow-hidden text-ellipsis font-normal;
   @apply text-foreground-light;
 }
 

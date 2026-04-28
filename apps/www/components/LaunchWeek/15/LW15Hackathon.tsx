@@ -1,11 +1,10 @@
-import React, { FC } from 'react'
+import SectionContainer from 'components/Layouts/SectionContainer'
+import { motion, useInView } from 'framer-motion'
+import { DEFAULT_EASE } from 'lib/animations'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion, useInView } from 'framer-motion'
+import React, { FC } from 'react'
 import { Button, cn } from 'ui'
-
-import SectionContainer from 'components/Layouts/SectionContainer'
-import { DEFAULT_EASE } from 'lib/animations'
 
 const MotionImage = motion(Image)
 
@@ -82,7 +81,7 @@ const LW15HackathonImage = ({ className }: { className?: string }) => {
         className
       )}
     >
-      <div className="relative flex-grow-[1] overflow-hidden">
+      <div className="relative grow-[1] overflow-hidden">
         <MotionImage
           variants={imageVariants}
           src="/images/launchweek/15/lw15-galaxy-hackathon.png"
@@ -93,7 +92,7 @@ const LW15HackathonImage = ({ className }: { className?: string }) => {
           className="absolute w-full inset-0 h-full object-cover object-top"
         />
       </div>
-      <div className="relative flex-grow-[2] overflow-hidden">
+      <div className="relative grow-[2] overflow-hidden">
         <MotionImage
           variants={imageVariants}
           src="/images/launchweek/15/lw15-galaxy-hackathon.png"
@@ -104,7 +103,7 @@ const LW15HackathonImage = ({ className }: { className?: string }) => {
           className="absolute w-full inset-0 h-full object-cover object-top"
         />
       </div>
-      <div className="relative flex-grow-[3] overflow-hidden">
+      <div className="relative grow-[3] overflow-hidden">
         <MotionImage
           variants={imageVariants}
           src="/images/launchweek/15/lw15-galaxy-hackathon.png"

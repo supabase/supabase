@@ -1,6 +1,4 @@
-import { useParams } from 'common'
 import { Pointer } from 'lucide-react'
-import { useRef } from 'react'
 import { cn, TreeViewItemVariant } from 'ui'
 import { InnerSideBarEmptyPanel } from 'ui-patterns/InnerSideMenu'
 

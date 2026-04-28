@@ -144,7 +144,7 @@ export const calculateTotalChartAggregate = (
 export const CustomTooltip = ({
   active,
   payload,
-  label,
+  label: _label,
   attributes,
   data,
   xAxisKey = 'period_start',
@@ -231,7 +231,7 @@ export const CustomTooltip = ({
       return (
         <div key={entry.name} className="flex items-center w-full">
           {getIcon(entry.color, isMax)}
-          <span className="text-foreground-lighter ml-1 flex-grow cursor-default select-none">
+          <span className="text-foreground-lighter ml-1 grow cursor-default select-none">
             {attribute?.label || entry.name}
           </span>
           <span className="ml-3.5 flex items-end gap-1">
@@ -263,7 +263,7 @@ export const CustomTooltip = ({
           ))}
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">
-              <span className="flex-grow text-foreground-lighter">Total</span>
+              <span className="grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
                   {isPercentage
@@ -311,7 +311,7 @@ export const CustomLabel = ({
 }: CustomLabelProps) => {
   const items = payload ?? []
   const maxValueAttribute = isMaxAttribute(attributes)
-  const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
+  const [, setHoveredLabel] = useState<string | null>(null)
 
   const handleMouseEnter = (label: string) => {
     setHoveredLabel(label)

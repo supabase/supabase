@@ -16,6 +16,7 @@ import { ExitSurveyModal } from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
+import { STRIPE_PROJECTS_DOCS_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
 import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
@@ -42,7 +43,7 @@ const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
     return {
       installationId: selectedOrganization?.partner_id,
       path: '/settings',
-      message: 'Change Plan on Vercel Marketplace',
+      message: 'Change plan on Vercel Marketplace',
     }
   }
   if (selectedOrganization.managed_by === MANAGED_BY.AWS_MARKETPLACE) {
@@ -52,6 +53,12 @@ const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
   }
 }
 
+const getStripeProjectsUpgradeCommand = (planId: string | null | undefined) => {
+  const currentTier = planId ?? 'free'
+  const action = currentTier === 'team' ? 'downgrade' : 'upgrade'
+  return `stripe projects ${action} supabase/${currentTier}`
+}
+
 export const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const { slug } = useParams()
@@ -59,6 +66,8 @@ export const PlanUpdateSidePanel = () => {
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
     selectedOrganization?.billing_partner
   )
+  const isStripeManagedOrganization =
+    selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
   const { mutate: sendEvent } = useSendEventMutation()
 
   const originalPlanRef = useRef<string>()
@@ -189,6 +198,9 @@ export const PlanUpdateSidePanel = () => {
   const planMeta = selectedTier
     ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
     : null
+  const stripeProjectsUpgradeCommand = getStripeProjectsUpgradeCommand(
+    selectedOrganization?.plan?.id ?? subscription?.plan?.id
+  )
 
   return (
     <>
@@ -208,13 +220,30 @@ export const PlanUpdateSidePanel = () => {
           </div>
         }
       >
-        {selectedOrganization && isPartnerBilledOrganization && (
-          <PartnerManagedResource
-            managedBy={selectedOrganization.managed_by}
-            resource="Organization plans"
-            cta={getPartnerManagedResourceCta(selectedOrganization)}
-          />
-        )}
+        {selectedOrganization &&
+          (isStripeManagedOrganization ? (
+            <PartnerManagedResource
+              managedBy={MANAGED_BY.STRIPE_PROJECTS}
+              resource="Organization plans"
+              title="Organization plans are managed through Stripe."
+              details={
+                <>
+                  Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code> in
+                  your project directory.
+                </>
+              }
+              cta={{
+                overrideUrl: `${STRIPE_PROJECTS_DOCS_URL}#upgrade-a-service-tier`,
+                message: 'Stripe Projects docs',
+              }}
+            />
+          ) : isPartnerBilledOrganization ? (
+            <PartnerManagedResource
+              managedBy={selectedOrganization.managed_by}
+              resource="Organization plans"
+              cta={getPartnerManagedResourceCta(selectedOrganization)}
+            />
+          ) : null)}
         <SidePanel.Content>
           <div className="py-6 grid grid-cols-12 gap-3">
             {subscriptionsPlans.map((plan) => {

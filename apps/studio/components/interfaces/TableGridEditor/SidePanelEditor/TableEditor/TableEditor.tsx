@@ -2,7 +2,7 @@ import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Badge, Checkbox_Shadcn_, Input, SidePanel } from 'ui'
+import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -372,7 +372,7 @@ export const TableEditor = ({
 
       <SidePanel.Content className="space-y-10 py-6">
         <div className="items-top flex space-x-2">
-          <Checkbox_Shadcn_
+          <Checkbox
             id="enable-rls"
             checked={tableFields.isRLSEnabled}
             onCheckedChange={() => {
@@ -439,7 +439,7 @@ export const TableEditor = ({
 
         {realtimeEnabled && (
           <div className="items-top flex space-x-2">
-            <Checkbox_Shadcn_
+            <Checkbox
               id="enable-realtime"
               checked={tableFields.isRealtimeEnabled}
               onCheckedChange={() => {
@@ -490,7 +490,7 @@ export const TableEditor = ({
         {isDuplicating && (
           <>
             <div className="items-top flex space-x-2">
-              <Checkbox_Shadcn_
+              <Checkbox
                 id="duplicate-rows"
                 checked={isDuplicateRows}
                 onCheckedChange={() => setIsDuplicateRows(!isDuplicateRows)}

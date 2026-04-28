@@ -29,7 +29,7 @@ export type VercelIntegrationFlow = 'deploy-button' | 'marketing'
 
 const VercelIntegration: NextPageWithLayout = () => {
   const router = useRouter()
-  const { code, configurationId, teamId, source, externalId } = useParams()
+  const { code, configurationId, teamId, source } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
 
   const snapshot = useIntegrationInstallationSnapshot()

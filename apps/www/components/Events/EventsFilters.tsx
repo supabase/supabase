@@ -1,23 +1,22 @@
 import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { startCase } from 'lib/helpers'
-import { useSearchParams } from 'next/navigation'
+import { ChevronDown, X as CloseIcon, Search } from 'lucide-react'
 import { useRouter } from 'next/compat/router'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { useKey } from 'react-use'
 import type PostTypes from 'types/post'
-
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Input,
-  cn,
 } from 'ui'
-import { ChevronDown, Search, X as CloseIcon } from 'lucide-react'
 
 interface Props {
   allEvents: PostTypes[]
@@ -187,7 +186,7 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
             </DropdownMenu>
           </motion.div>
         )}
-        <div className="hidden lg:flex flex-wrap items-center flex-grow gap-2">
+        <div className="hidden lg:flex flex-wrap items-center grow gap-2">
           {Object.entries(categories).map(([category, count]) => (
             <Button
               key={category}

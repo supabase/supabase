@@ -1,3 +1,5 @@
+'use client'
+
 import pricingFaq from '~/data/PricingFAQ.json'
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
