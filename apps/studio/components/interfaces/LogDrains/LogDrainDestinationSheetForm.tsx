@@ -340,13 +340,13 @@ export function LogDrainDestinationSheetForm({
   // out of it, therefore for an ease of use now, we bail to `any` until the better time come.
   const defaultConfig = (defaultValues?.config || {}) as any
   const defaultType = defaultValues?.type || 'webhook'
-  const defaultHeaderEntries = useMemo(
-    () =>
-      headerRecordToRows(
-        mode === 'create' ? getDefaultHeadersByType(defaultType) : defaultConfig?.headers || {}
-      ),
-    [mode, defaultType, defaultConfig]
-  )
+  const defaultHeaderEntries = useMemo(() => {
+    const config = (defaultValues?.config || {}) as any
+    const type = defaultValues?.type || 'webhook'
+    return headerRecordToRows(
+      mode === 'create' ? getDefaultHeadersByType(type) : config?.headers || {}
+    )
+  }, [defaultValues, mode])
 
   const sentryEnabled = useFlag('SentryLogDrain')
   const s3Enabled = useFlag('S3logdrain')
@@ -362,40 +362,41 @@ export function LogDrainDestinationSheetForm({
 
   const track = useTrack()
 
-  const formValues = useMemo(
-    () => ({
+  const formValues = useMemo(() => {
+    const config = (defaultValues?.config || {}) as any
+    const type = defaultValues?.type || 'webhook'
+    return {
       name: defaultValues?.name || '',
       description: defaultValues?.description || '',
-      type: defaultType,
-      http: defaultConfig?.http || 'http2',
-      gzip: mode === 'create' ? true : defaultConfig?.gzip || false,
+      type,
+      http: config?.http || 'http2',
+      gzip: mode === 'create' ? true : config?.gzip || false,
       headerEntries: defaultHeaderEntries,
-      url: defaultConfig?.url || '',
-      api_key: defaultConfig?.api_key || '',
-      region: defaultConfig?.region || '',
-      username: defaultConfig?.username || '',
-      password: defaultConfig?.password || '',
-      dsn: defaultConfig?.dsn || '',
-      s3_bucket: defaultConfig?.s3_bucket || '',
-      storage_region: defaultConfig?.storage_region || '',
-      access_key_id: defaultConfig?.access_key_id || '',
-      secret_access_key: defaultConfig?.secret_access_key || '',
-      batch_timeout: defaultConfig?.batch_timeout ?? 3000,
-      dataset_name: defaultConfig?.dataset_name || '',
-      api_token: defaultConfig?.api_token || '',
-      endpoint: defaultConfig?.endpoint || '',
-      protocol: defaultConfig?.protocol || 'http/protobuf',
-      host: defaultConfig?.host || '',
-      port: (defaultConfig?.port ?? '') as number,
-      tls: defaultConfig?.tls ?? false,
-      structured_data: defaultConfig?.structured_data || '',
-      cipher_key: defaultConfig?.cipher_key || '',
-      ca_cert: defaultConfig?.ca_cert || '',
-      client_cert: defaultConfig?.client_cert || '',
-      client_key: defaultConfig?.client_key || '',
-    }),
-    [defaultValues, defaultType, defaultConfig, defaultHeaderEntries, mode]
-  )
+      url: config?.url || '',
+      api_key: config?.api_key || '',
+      region: config?.region || '',
+      username: config?.username || '',
+      password: config?.password || '',
+      dsn: config?.dsn || '',
+      s3_bucket: config?.s3_bucket || '',
+      storage_region: config?.storage_region || '',
+      access_key_id: config?.access_key_id || '',
+      secret_access_key: config?.secret_access_key || '',
+      batch_timeout: config?.batch_timeout ?? 3000,
+      dataset_name: config?.dataset_name || '',
+      api_token: config?.api_token || '',
+      endpoint: config?.endpoint || '',
+      protocol: config?.protocol || 'http/protobuf',
+      host: config?.host || '',
+      port: (config?.port ?? '') as number,
+      tls: config?.tls ?? false,
+      structured_data: config?.structured_data || '',
+      cipher_key: config?.cipher_key || '',
+      ca_cert: config?.ca_cert || '',
+      client_cert: config?.client_cert || '',
+      client_key: config?.client_key || '',
+    }
+  }, [defaultValues, mode, defaultHeaderEntries])
 
   const form = useForm<LogDrainDestinationFormValues>({
     resolver: zodResolver(formSchema),
