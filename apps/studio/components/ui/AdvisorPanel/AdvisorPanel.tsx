@@ -11,7 +11,6 @@ import {
 import { AdvisorPanelBody } from './AdvisorPanelBody'
 import { AdvisorPanelHeader } from './AdvisorPanelHeader'
 import { useAdvisorSignals } from './useAdvisorSignals'
-import { useDismissedGraphqlLints } from '@/components/interfaces/Linter/useDismissedGraphqlLints'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { Notification, useNotificationsV2Query } from '@/data/notifications/notifications-v2-query'
@@ -102,11 +101,9 @@ export const AdvisorPanel = () => {
     }
   }
 
-  const { filterDismissed: filterDismissedGraphqlLints } = useDismissedGraphqlLints(project?.ref)
-
   const lintItems = useMemo<AdvisorItem[]>(() => {
-    return createAdvisorLintItems(filterDismissedGraphqlLints(lintData ?? []))
-  }, [lintData, filterDismissedGraphqlLints])
+    return createAdvisorLintItems(lintData ?? [])
+  }, [lintData])
 
   const notificationItems = useMemo<AdvisorItem[]>(() => {
     if (!IS_PLATFORM) return []

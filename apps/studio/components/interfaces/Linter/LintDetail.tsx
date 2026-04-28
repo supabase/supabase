@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Button } from 'ui'
 
 import { Markdown } from '../Markdown'
+import { asGraphqlExposureLint, GraphqlExposureCallout } from './GraphqlExposureLintCTA'
 import { EntityTypeIcon, LintCTA, LintEntity } from './Linter.utils'
 import { createLintSummaryPrompt, lintInfoMap } from '@/components/interfaces/Linter/Linter.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -24,6 +25,7 @@ const LintDetail = ({ lint, projectRef, onAskAssistant, onAfterAction }: LintDet
   const track = useTrack()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
+  const isGraphqlExposureLint = !!asGraphqlExposureLint(lint.name)
 
   const handleAskAssistant = () => {
     track('advisor_assistant_button_clicked', {
@@ -92,6 +94,11 @@ const LintDetail = ({ lint, projectRef, onAskAssistant, onAfterAction }: LintDet
           </Link>
         </Button>
       </div>
+      {isGraphqlExposureLint && (
+        <div className="mt-4">
+          <GraphqlExposureCallout projectRef={projectRef} />
+        </div>
+      )}
     </div>
   )
 }

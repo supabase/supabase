@@ -8,7 +8,6 @@ import LinterDataGrid from '@/components/interfaces/Linter/LinterDataGrid'
 import LinterFilters from '@/components/interfaces/Linter/LinterFilters'
 import { LinterPageFooter } from '@/components/interfaces/Linter/LinterPageFooter'
 import LintPageTabs from '@/components/interfaces/Linter/LintPageTabs'
-import { useDismissedGraphqlLints } from '@/components/interfaces/Linter/useDismissedGraphqlLints'
 import AdvisorsLayout from '@/components/layouts/AdvisorsLayout/AdvisorsLayout'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
@@ -18,7 +17,7 @@ import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const ProjectLints: NextPageWithLayout = () => {
-  const { ref: urlRef, preset, id } = useParams()
+  const { preset, id } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   // need to maintain a list of filters for each tab
@@ -39,11 +38,7 @@ const ProjectLints: NextPageWithLayout = () => {
     projectRef: project?.ref,
   })
 
-  const { filterDismissed } = useDismissedGraphqlLints(urlRef)
-
-  const activeLints = filterDismissed(
-    (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
-  )
+  const activeLints = (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
   // hide vulnerable_postgres_version lint temporarily
   // https://linear.app/supabase/project/pg-minor-version-upgrade-for-security-vulnerabilities-0124b2c2dcf5
   // https://github.com/supabase/supabase/pull/38280/files

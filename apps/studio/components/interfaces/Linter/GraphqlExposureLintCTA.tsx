@@ -2,32 +2,47 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { DismissibleGraphqlLintName, useDismissedGraphqlLints } from './useDismissedGraphqlLints'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { lintKeys } from '@/data/lint/keys'
 import { Lint } from '@/data/lint/lint-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
+const GRAPHQL_EXPOSURE_LINT_NAMES = [
+  'pg_graphql_anon_table_exposed',
+  'pg_graphql_authenticated_table_exposed',
+] as const
+
+export type GraphqlExposureLintName = (typeof GRAPHQL_EXPOSURE_LINT_NAMES)[number]
+
+export const asGraphqlExposureLint = (
+  name: string | undefined | null
+): GraphqlExposureLintName | null =>
+  !!name && (GRAPHQL_EXPOSURE_LINT_NAMES as readonly string[]).includes(name)
+    ? (name as GraphqlExposureLintName)
+    : null
+
 interface GraphqlExposureLintCTAProps {
-  lintName: DismissibleGraphqlLintName
+  lintName: GraphqlExposureLintName
   projectRef: string
   metadata: Lint['metadata']
   onAfterAction?: () => void
 }
 
-const ROLE_BY_LINT: Record<DismissibleGraphqlLintName, 'anon' | 'authenticated'> = {
+const ROLE_BY_LINT: Record<GraphqlExposureLintName, 'anon' | 'authenticated'> = {
   pg_graphql_anon_table_exposed: 'anon',
   pg_graphql_authenticated_table_exposed: 'authenticated',
 }
 
-const HIDE_LABEL: Record<DismissibleGraphqlLintName, string> = {
+const HIDE_LABEL: Record<GraphqlExposureLintName, string> = {
   pg_graphql_anon_table_exposed: 'Disable for anonymous users',
   pg_graphql_authenticated_table_exposed: 'Disable for signed-in users',
 }
 
-const AUDIENCE_LABEL: Record<DismissibleGraphqlLintName, string> = {
+const AUDIENCE_LABEL: Record<GraphqlExposureLintName, string> = {
   pg_graphql_anon_table_exposed: 'anonymous users',
   pg_graphql_authenticated_table_exposed: 'signed-in users',
 }
@@ -40,7 +55,6 @@ export const GraphqlExposureLintCTA = ({
 }: GraphqlExposureLintCTAProps) => {
   const { data: project } = useSelectedProjectQuery()
   const queryClient = useQueryClient()
-  const { dismiss } = useDismissedGraphqlLints(projectRef)
 
   const [showConfirmRevoke, setShowConfirmRevoke] = useState(false)
 
@@ -76,20 +90,10 @@ export const GraphqlExposureLintCTA = ({
     })
   }
 
-  const handleKeepExposed = () => {
-    if (!canAct) return
-    dismiss({ lintName, schema, name })
-    toast.success(`Acknowledged ${schema}.${name} as intentionally exposed`)
-    onAfterAction?.()
-  }
-
   return (
     <>
       <Button type="primary" disabled={!canAct} onClick={() => setShowConfirmRevoke(true)}>
         {HIDE_LABEL[lintName]}
-      </Button>
-      <Button type="default" disabled={!canAct} onClick={handleKeepExposed}>
-        Keep exposed
       </Button>
       <ConfirmationModal
         visible={showConfirmRevoke}
@@ -113,5 +117,24 @@ export const GraphqlExposureLintCTA = ({
         </pre>
       </ConfirmationModal>
     </>
+  )
+}
+
+export const GraphqlExposureCallout = ({ projectRef }: { projectRef: string }) => {
+  return (
+    <Admonition
+      type="default"
+      title="GraphQL is enabled on this project"
+      description={
+        <p>
+          This lint only applies because the <code className="text-code-inline">pg_graphql</code>{' '}
+          extension is enabled. If you don't use GraphQL, you can{' '}
+          <InlineLink href={`/project/${projectRef}/integrations/graphiql`}>
+            disable it from the GraphQL integration page
+          </InlineLink>
+          .
+        </p>
+      }
+    />
   )
 }
