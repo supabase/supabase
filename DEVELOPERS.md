@@ -147,7 +147,7 @@ First, make sure you have the Docker installed on your device. You can download 
 
 3. Run docker:
 
-    Make sure Docker is running and required ports are free.
+   Make sure Docker is running and required ports are free.
 
    ```sh
    docker compose up
