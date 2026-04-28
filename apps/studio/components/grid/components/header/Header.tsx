@@ -109,15 +109,15 @@ const InsertButton = () => {
 
   useShortcut(SHORTCUT_IDS.TABLE_EDITOR_INSERT_ROW, () => onAddRow?.(), {
     registerInCommandMenu: true,
-    enabled: onAddRow !== undefined,
+    enabled: onAddRow !== undefined && canAddNew && canCreateColumns,
   })
   useShortcut(SHORTCUT_IDS.TABLE_EDITOR_INSERT_COLUMN, () => onAddColumn?.(), {
     registerInCommandMenu: true,
-    enabled: onAddColumn !== undefined,
+    enabled: onAddColumn !== undefined && canAddNew && canCreateColumns,
   })
   useShortcut(SHORTCUT_IDS.TABLE_EDITOR_IMPORT_CSV, () => onImportData?.(), {
     registerInCommandMenu: true,
-    enabled: onImportData !== undefined,
+    enabled: onImportData !== undefined && canAddNew && canCreateColumns,
   })
 
   if (!canAddNew || !canCreateColumns) return null
