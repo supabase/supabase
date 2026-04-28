@@ -128,6 +128,12 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
     alter table "public"."nods_page"
       enable row level security;
 
+    create policy "Allow public read access to nods_page"
+      on public.nods_page
+      for select
+      to anon
+      using (true);
+
     -- Stores the actual embeddings with some metadata
     create table "public"."nods_page_section" (
       id bigserial primary key,
@@ -144,6 +150,12 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
 
     alter table "public"."nods_page_section"
       enable row level security;
+
+    create policy "Allow public read access to nods_page_section"
+      on public.nods_page_section
+      for select
+      to anon
+      using (true);
     ```
 
     </StepHikeCompact.Code>

@@ -13,7 +13,7 @@ create table profiles (
 
 -- Grant the privileges roles need
 GRANT SELECT ON public.profiles TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.profiles TO authenticated;
 
 -- Set up Row Level Security (RLS)
 -- See https://supabase.com/docs/guides/database/postgres/row-level-security for more details.

@@ -106,7 +106,15 @@ create table public.rooms_users (
   created_at timestamptz default current_timestamp
 );
 
+GRANT SELECT ON public.rooms_users TO authenticated;
+
 alter table public.rooms_users enable row level security;
+
+create policy "authenticated can read own room memberships"
+on public.rooms_users
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
 ```
 
 ### Broadcast
