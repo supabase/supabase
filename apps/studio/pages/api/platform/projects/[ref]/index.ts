@@ -17,7 +17,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleGet = async (_req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
   const response = {
     ...DEFAULT_PROJECT,

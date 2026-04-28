@@ -90,7 +90,7 @@ export function useQueryInsightsTableColumns({
                     <Button
                       type="text"
                       size="tiny"
-                      className="p-1 h-5 w-5 flex-shrink-0"
+                      className="p-1 h-5 w-5 shrink-0"
                       icon={<ChevronDown size={14} className="text-foreground-muted" />}
                       onClick={(e) => e.stopPropagation()}
                     />
@@ -130,7 +130,7 @@ export function useQueryInsightsTableColumns({
             const IssueIcon = row.issueType ? ISSUE_ICONS[row.issueType] : null
             return (
               <div className="w-full flex items-center gap-x-3 group">
-                <div className="flex-shrink-0 w-6">
+                <div className="shrink-0 w-6">
                   {row.issueType && IssueIcon && (
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -172,7 +172,7 @@ export function useQueryInsightsTableColumns({
                     setSheetView('details')
                     gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
                   }}
-                  className="p-1 flex-shrink-0 -translate-x-2 group-hover:flex hidden"
+                  className="p-1 shrink-0 -translate-x-2 group-hover:flex hidden"
                 />
               </div>
             )
@@ -330,7 +330,7 @@ export function useQueryInsightsTableColumns({
           const IssueIcon = row.issueType ? ISSUE_ICONS[row.issueType] : null
           return (
             <div className="w-full flex items-center gap-x-3 group">
-              <div className="flex-shrink-0 w-6">
+              <div className="shrink-0 w-6">
                 {row.issueType && IssueIcon && (
                   <div
                     className={cn(
@@ -379,7 +379,7 @@ export function useQueryInsightsTableColumns({
                   setSelectedTriageRow(props.rowIdx)
                   setSheetView('details')
                 }}
-                className="p-1 flex-shrink-0 group-hover:flex hidden"
+                className="p-1 shrink-0 group-hover:flex hidden"
               />
             </div>
           )

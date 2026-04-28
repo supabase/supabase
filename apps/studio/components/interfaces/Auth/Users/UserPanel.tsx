@@ -101,21 +101,18 @@ export const UserPanel = () => {
 
               <TabsContent_Shadcn_
                 value="overview"
-                className={cn('mt-0 flex-grow min-h-0 overflow-y-auto')}
+                className={cn('mt-0 grow min-h-0 overflow-y-auto')}
               >
                 {selectedUser && (
                   <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null)} />
                 )}
               </TabsContent_Shadcn_>
-              <TabsContent_Shadcn_
-                value="logs"
-                className={cn('mt-0 flex-grow min-h-0 overflow-y-auto')}
-              >
+              <TabsContent_Shadcn_ value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
                 {selectedUser && <UserLogs user={selectedUser} />}
               </TabsContent_Shadcn_>
               <TabsContent_Shadcn_
                 value="raw"
-                className={cn('mt-0 flex-grow min-h-0 overflow-y-auto', PANEL_PADDING)}
+                className={cn('mt-0 grow min-h-0 overflow-y-auto', PANEL_PADDING)}
               >
                 <div className="flex items-center mb-2">
                   <Input_Shadcn_

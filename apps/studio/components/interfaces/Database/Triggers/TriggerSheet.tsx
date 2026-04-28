@@ -6,7 +6,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   Form,
   FormControl,
@@ -323,7 +323,7 @@ export const TriggerSheet = ({
                                 description={event.description}
                               >
                                 <FormControl>
-                                  <Checkbox_Shadcn_
+                                  <Checkbox
                                     className="translate-y-[2px]"
                                     checked={field.value?.includes(event.value)}
                                     onCheckedChange={(checked) => {
@@ -438,7 +438,7 @@ export const TriggerSheet = ({
                                 )}
                               >
                                 <div className="flex items-center gap-2">
-                                  <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background focus-within:bg-opacity-10">
+                                  <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background focus-within:bg-foreground/10">
                                     <Terminal size="18" strokeWidth={2} width={14} />
                                   </div>
                                   <p>

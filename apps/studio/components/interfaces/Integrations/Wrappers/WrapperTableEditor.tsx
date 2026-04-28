@@ -449,7 +449,7 @@ const TableForm = ({
                     />
                     <MultiSelectorContent>
                       <MultiSelectorList>
-                        {table.availableColumns!.map((availableColumn, index) => (
+                        {table.availableColumns!.map((availableColumn) => (
                           <MultiSelectorItem
                             key={availableColumn.name}
                             value={availableColumn.name}

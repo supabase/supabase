@@ -2,7 +2,6 @@ import '@code-hike/mdx/styles.css'
 import 'config/code-hike.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
 import '../styles/main.css'
-import '../styles/new-docs.css'
 import '../styles/prism-okaidia.css'
 
 import { GlobalProviders } from '~/features/app.providers'

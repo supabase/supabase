@@ -1,9 +1,8 @@
 'use client'
 
-import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { DialogProps } from '@radix-ui/react-dialog'
 import { cva, VariantProps } from 'class-variance-authority'
 import { X } from 'lucide-react'
+import { Dialog as DialogPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
@@ -219,6 +218,7 @@ const DialogSectionSeparator = React.forwardRef<
 ))
 DialogSectionSeparator.displayName = 'DialogSectionSeparator'
 
+type DialogProps = DialogPrimitive.DialogProps
 export {
   Dialog,
   DialogClose,

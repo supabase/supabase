@@ -60,7 +60,7 @@
     "concurrently": "^8.2.2",
     "config": "workspace:^",
     "mdast-util-toc": "^6.1.1",
-    "postcss": "^8.5.3",
+    "postcss": "catalog:",
     "rimraf": "^4.1.3",
     "shiki": "^1.1.7",
     "tailwindcss": "catalog:",
