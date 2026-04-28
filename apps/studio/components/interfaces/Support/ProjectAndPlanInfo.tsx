@@ -43,7 +43,7 @@ export function ProjectAndPlanInfo({
       <ProjectRefHighlighted projectRef={projectRef} />
 
       {!hasProjectSelected && (
-        <Admonition type="default" description="No project has been selected" />
+        <Admonition type="default" description="No project has been selected." />
       )}
 
       {showPlanExpectationInfo &&

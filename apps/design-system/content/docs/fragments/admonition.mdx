@@ -15,7 +15,9 @@ Admonition provides focus for situations that require a callout.
 
 Use Admonition instead of [Alert](../components/alert) unless you specifically need the primitives. If in doubt, stick with Admonition.
 
-Use `title` for the heading slot and `description` for short body copy. Use `children` instead of `description` when the body needs rich React or MDX content such as links, lists, or paragraphs.
+Use `title` for the heading slot and `description` for short body copy. The `description` should always end in a period.
+
+Use `children` instead of `description` when the body needs rich React or MDX content such as links, lists, or multiple paragraphs, and this cannot be achieved via a React Fragment as a `description` value.
 
 Avoid `label` in new code. It is a legacy alias for `title` that still exists for older docs content.
 

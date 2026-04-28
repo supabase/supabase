@@ -303,7 +303,7 @@ export function JitDbAccessRuleSheet({
                       {grants.length === 0 ? (
                         <Admonition
                           type="note"
-                          description="No assignable roles found"
+                          description="No assignable roles found."
                           className="bg-background"
                         />
                       ) : (

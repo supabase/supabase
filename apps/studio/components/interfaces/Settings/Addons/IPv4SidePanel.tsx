@@ -161,7 +161,7 @@ const IPv4SidePanel = () => {
           {!isAws && (
             <Admonition
               type="default"
-              description="Dedicated IPv4 address is only available for AWS projects"
+              description="Dedicated IPv4 address is only available for AWS projects."
             />
           )}
 
