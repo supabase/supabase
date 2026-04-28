@@ -30,7 +30,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
     const iconClasses = [
       'absolute left-0 top-0 flex rounded h-10 w-10 items-center justify-center text-foreground-lighter', // Layout
       'group-hover/item:text-foreground-light',
-      isActive ? '!text-foreground [&_svg]:stroke-[1.5]' : '[&_svg]:stroke-[1]',
+      isActive ? 'text-foreground! [&_svg]:stroke-[1.5]' : '[&_svg]:stroke-1',
       'transition-all',
     ]
 
@@ -43,7 +43,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
       'group-data-[state=expanded]:-space-x-2',
       'hover:bg-surface-200',
       'group/item',
-      `${isActive && '!bg-selection shadow-sm'}`,
+      `${isActive && 'bg-selection! shadow-sm'}`,
     ]
 
     const LinkComponent = forwardRef<HTMLAnchorElement, ComponentPropsWithoutRef<typeof Link>>(

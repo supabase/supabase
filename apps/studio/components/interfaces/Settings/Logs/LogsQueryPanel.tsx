@@ -81,7 +81,7 @@ const LogsQueryPanel = ({
   }, [value.from, value.to, value.text, value.isHelper])
 
   return (
-    <div className="flex items-center border-b bg-surface-100 h-[var(--header-height)]">
+    <div className="flex items-center border-b bg-surface-100 h-(--header-height)">
       <div className="flex w-full items-center justify-between px-4 md:px-5 py-2 overflow-x-scroll no-scrollbar">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
@@ -212,7 +212,7 @@ const LogsQueryPanel = ({
                     unnesting joins
                     <ExternalLink
                       size="14"
-                      className="ml-1 inline -translate-y-[2px]"
+                      className="ml-1 inline translate-y-[-2px]"
                       strokeWidth={1.5}
                     />
                   </Link>
@@ -236,10 +236,10 @@ const LogsQueryPanel = ({
                 >
                   <Table
                     head={[
-                      <Table.th className="text-xs !p-2" key="path">
+                      <Table.th className="text-xs p-2!" key="path">
                         Path
                       </Table.th>,
-                      <Table.th key="type" className="text-xs !p-2">
+                      <Table.th key="type" className="text-xs p-2!">
                         Type
                       </Table.th>,
                     ]}
@@ -272,7 +272,7 @@ const Field = ({
   return (
     <Table.tr>
       <Table.td
-        className="font-mono text-xs !p-2 cursor-pointer hover:text-foreground transition flex items-center space-x-2"
+        className="font-mono text-xs p-2! cursor-pointer hover:text-foreground transition flex items-center space-x-2"
         onClick={() =>
           copyToClipboard(field.path, () => {
             setIsCopied(true)
@@ -297,7 +297,7 @@ const Field = ({
           </Tooltip>
         )}
       </Table.td>
-      <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>
+      <Table.td className="font-mono text-xs p-2!">{field.type}</Table.td>
     </Table.tr>
   )
 }

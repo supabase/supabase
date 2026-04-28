@@ -81,7 +81,7 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
             className="rounded-lg bg-alternative"
             size="content"
             overlay={
-              <pre className="whitespace-pre-line break-words rounded-lg bg-alternative p-4 text-sm">
+              <pre className="whitespace-pre-line wrap-break-word rounded-lg bg-alternative p-4 text-sm">
                 {template.searchString}
               </pre>
             }

@@ -137,13 +137,13 @@ export const UtilityPanel = ({
       <TabsList_Shadcn_ className="flex justify-between gap-2 px-4 overflow-x-auto min-h-[42px]">
         <div className="flex items-center gap-4">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
-            <span className="translate-y-[1px]">Results</span>
+            <span className="translate-y-px">Results</span>
           </TabsTrigger_Shadcn_>
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
-            <span className="translate-y-[1px]">Explain</span>
+            <span className="translate-y-px">Explain</span>
           </TabsTrigger_Shadcn_>
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
-            <span className="translate-y-[1px]">Chart</span>
+            <span className="translate-y-px">Chart</span>
           </TabsTrigger_Shadcn_>
 
           {result?.rows && (

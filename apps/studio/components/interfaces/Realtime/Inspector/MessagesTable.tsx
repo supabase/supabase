@@ -179,7 +179,7 @@ const MessagesTable = ({
                   isEqual(row, focusedLog)
                     ? 'bg-scale-800 rdg-row--focused'
                     : 'bg-200 hover:bg-scale-300 cursor-pointer',
-                  isErrorLog(row) && '!bg-warning-300',
+                  isErrorLog(row) && 'bg-warning-300!',
                 ])
               }}
               rows={data}

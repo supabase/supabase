@@ -49,7 +49,7 @@ const EnumeratedTypeValueRow = <TFieldValues extends FieldValues>({
                 {...attributes}
                 {...listeners}
                 className={`opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab ${
-                  isDisabled ? 'text-foreground-lighter !cursor-default' : 'text-foreground'
+                  isDisabled ? 'text-foreground-lighter cursor-default!' : 'text-foreground'
                 }`}
                 type="button"
                 disabled={isDisabled}

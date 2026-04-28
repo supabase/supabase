@@ -212,7 +212,7 @@ export const QueryIndexes = ({
                   language="sql"
                   className={cn(
                     'max-w-full max-h-[200px]',
-                    '!py-2 !px-2.5 prose dark:prose-dark',
+                    'py-2! px-2.5! prose dark:prose-dark',
                     '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
                   )}
                 />
@@ -339,7 +339,7 @@ export const QueryIndexes = ({
                         language="sql"
                         className={cn(
                           'max-w-full max-h-[310px]',
-                          '!py-3 !px-3.5 prose dark:prose-dark transition',
+                          'py-3! px-3.5! prose dark:prose-dark transition',
                           '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
                         )}
                       />
@@ -391,7 +391,7 @@ export const QueryIndexes = ({
               <h4 className="mb-2">FAQ</h4>
               <Accordion_Shadcn_ collapsible type="single" className="border rounded-md">
                 <AccordionItem_Shadcn_ value="1">
-                  <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition [&[data-state=open]]:text-foreground">
+                  <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition data-open:text-foreground">
                     What units are cost in?
                   </AccordionTrigger>
                   <AccordionContent_Shadcn_ className="px-4 text-foreground-light">
@@ -401,7 +401,7 @@ export const QueryIndexes = ({
                   </AccordionContent_Shadcn_>
                 </AccordionItem_Shadcn_>
                 <AccordionItem_Shadcn_ value="2" className="border-b-0">
-                  <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition [&[data-state=open]]:text-foreground">
+                  <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition data-open:text-foreground">
                     How should I prioritize start up and total cost?
                   </AccordionTrigger>
                   <AccordionContent_Shadcn_ className="px-4 text-foreground-light [&>div]:space-y-2">

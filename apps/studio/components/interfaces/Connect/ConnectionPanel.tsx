@@ -170,12 +170,12 @@ export const ConnectionPanel = ({
                 )}
                 language={lang}
                 value={connectionString}
-                className="[&_code]:text-[12px] [&_code]:text-foreground [&_code]:!whitespace-normal"
+                className="[&_code]:text-[12px] [&_code]:text-foreground [&_code]:whitespace-normal!"
                 hideLineNumbers
                 onCopyCallback={onCopyCallback}
               />
               {notice && (
-                <div className="border px-4 py-1 w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-light">
+                <div className="border px-4 py-1 w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none border-light">
                   {notice?.map((text: string) => (
                     <p key={text} className="text-xs text-foreground-lighter">
                       {text}
@@ -237,16 +237,16 @@ export const ConnectionPanel = ({
             <Collapsible_Shadcn_ className="group -space-y-px">
               <CollapsibleTrigger_Shadcn_
                 asChild
-                className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-muted"
+                className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none border-muted"
               >
                 <Button
                   type="default"
                   size="tiny"
-                  className="text-foreground-lighter !bg-dash-sidebar"
+                  className="text-foreground-lighter bg-dash-sidebar!"
                   icon={
                     <ChevronRight
                       className={cn(
-                        'group-data-[state=open]/collapse:rotate-90 text-foreground-muted transition-transform'
+                        'group-data-open/collapse:rotate-90 text-foreground-muted transition-transform'
                       )}
                     />
                   }

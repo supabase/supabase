@@ -240,7 +240,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                       </div>
                     ) : (
                       <>
-                        <div className="grid grid-cols-[1fr,1fr,32px]">
+                        <div className="grid grid-cols-[1fr_1fr_32px]">
                           <p className="text-xs text-foreground-lighter">Name</p>
                           <p className="text-xs text-foreground-lighter">Type</p>
                         </div>
@@ -251,7 +251,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
 
                           return (
                             <Fragment key={`column-${idx}`}>
-                              <div className="grid grid-cols-[1fr,1fr,32px] gap-x-1">
+                              <div className="grid grid-cols-[1fr_1fr_32px] gap-x-1">
                                 <FormField
                                   control={form.control}
                                   name={`columns.${idx}.name`}

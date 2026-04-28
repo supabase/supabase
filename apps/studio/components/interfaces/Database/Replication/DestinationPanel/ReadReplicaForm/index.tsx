@@ -112,7 +112,7 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
           </Select_Shadcn_>
         </FormItemLayout>
       </SheetSection>
-      <SheetFooter className="!justify-between">
+      <SheetFooter className="justify-between!">
         <div className="flex items-center gap-x-4">
           <InfoIcon className="h-5 w-5" />
           <p className="text-sm">

@@ -110,7 +110,7 @@ export const RLSTableCard = ({
     <Collapsible_Shadcn_
       className={cn('border rounded', !isRLSEnabled && 'bg-warning-300 border-warning-500')}
     >
-      <CollapsibleTrigger_Shadcn_ className="flex items-center justify-between px-3 py-2 w-full [&[data-state=open]>div>svg]:!-rotate-180">
+      <CollapsibleTrigger_Shadcn_ className="flex items-center justify-between px-3 py-2 w-full [&[data-state=open]>div>svg]:-rotate-180!">
         <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-x-2">
             {!isRLSEnabled ? (

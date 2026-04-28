@@ -87,7 +87,7 @@ export const RLSTesterResults = ({
           {!isServiceRole &&
             (!!tableWithRLSEnabledButNoPolicies ? (
               <Admonition showIcon={false} type="default" className="rounded mt-2">
-                <p className="!mb-0.5">This user has no access to any rows from this query</p>
+                <p className="mb-0.5!">This user has no access to any rows from this query</p>
                 <p className="text-foreground-light">
                   The table{' '}
                   <code className="text-code-inline">
@@ -95,13 +95,13 @@ export const RLSTesterResults = ({
                     {tableWithRLSEnabledButNoPolicies.table}
                   </code>{' '}
                   has RLS enabled but no policies set up for the{' '}
-                  <code className="text-code-inline !break-keep">{parseQueryResults.role}</code>{' '}
+                  <code className="text-code-inline break-keep!">{parseQueryResults.role}</code>{' '}
                   role.
                 </p>
               </Admonition>
             ) : tableWithRLSEnabledWithPolicyFalse ? (
               <Admonition showIcon={false} type="default" className="rounded mt-2">
-                <p className="!mb-0.5">This user has no access to any rows from this query</p>
+                <p className="mb-0.5!">This user has no access to any rows from this query</p>
                 <p className="text-foreground-light">
                   The table{' '}
                   <code className="text-code-inline">
@@ -109,8 +109,8 @@ export const RLSTesterResults = ({
                     {tableWithRLSEnabledWithPolicyFalse.table}
                   </code>{' '}
                   has a policy that evaluates to
-                  <code className="text-code-inline !break-keep">false</code> for the{' '}
-                  <code className="text-code-inline !break-keep">{parseQueryResults.role}</code>{' '}
+                  <code className="text-code-inline break-keep!">false</code> for the{' '}
+                  <code className="text-code-inline break-keep!">{parseQueryResults.role}</code>{' '}
                   role.
                 </p>
               </Admonition>
@@ -118,7 +118,7 @@ export const RLSTesterResults = ({
 
           {isServiceRole && (
             <Admonition showIcon={false} type="default" className="rounded mt-2">
-              <p className="!mb-0.5">
+              <p className="mb-0.5!">
                 The <code className="text-code-inline">postgres</code> role has access to all rows
                 for this query
               </p>
@@ -152,7 +152,7 @@ export const RLSTesterResults = ({
         <TabsContent_Shadcn_ value="data" className="mt-2">
           <div
             className={cn(
-              'flex-grow flex flex-col border overflow-hidden',
+              'grow flex flex-col border overflow-hidden',
               results.length === 0 ? 'rounded h-32' : 'rounded-t h-56'
             )}
           >

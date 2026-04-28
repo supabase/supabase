@@ -127,16 +127,16 @@ export function IPv4StatusPanel({ method, ipv4Status, projectRef }: IPv4StatusPa
             <Collapsible_Shadcn_ className="group -space-y-px">
               <CollapsibleTrigger_Shadcn_
                 asChild
-                className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-muted"
+                className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none border-muted"
               >
                 <Button
                   type="default"
                   size="tiny"
-                  className="text-foreground-lighter !bg-dash-sidebar"
+                  className="text-foreground-lighter bg-dash-sidebar!"
                   icon={
                     <ChevronRight
                       className={cn(
-                        'group-data-[state=open]/collapse:rotate-90 text-foreground-muted transition-transform'
+                        'group-data-open/collapse:rotate-90 text-foreground-muted transition-transform'
                       )}
                     />
                   }

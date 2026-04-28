@@ -246,7 +246,7 @@ export const RegionSelector = ({
                             value={value.name}
                             className={cn(
                               'w-full [&>:nth-child(2)]:w-full',
-                              value.status !== undefined && '!pointer-events-auto'
+                              value.status !== undefined && 'pointer-events-auto!'
                             )}
                             disabled={value.status !== undefined}
                           >

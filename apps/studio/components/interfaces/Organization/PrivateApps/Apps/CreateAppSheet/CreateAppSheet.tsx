@@ -142,7 +142,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
         <SheetContent
           showClose={false}
           size="default"
-          className="!min-w-[600px] flex flex-col h-full gap-0"
+          className="min-w-[600px]! flex flex-col h-full gap-0"
         >
           <SheetHeader>
             <SheetTitle>Create private app</SheetTitle>
@@ -366,7 +366,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
             </div>
           </ScrollArea>
 
-          <SheetFooter className="!justify-end w-full mt-auto py-4 border-t">
+          <SheetFooter className="justify-end! w-full mt-auto py-4 border-t">
             <div className="flex gap-2">
               <Button type="default" onClick={handleRequestClose} disabled={isLoading}>
                 Cancel

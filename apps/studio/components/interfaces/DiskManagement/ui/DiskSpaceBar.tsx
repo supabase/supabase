@@ -84,7 +84,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
         <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
           {usedSizeTotal.toFixed(2)}
           <span>GB used of </span>
-          <span className="text-foreground font-semibold -mt-[2px]">
+          <span className="text-foreground font-semibold mt-[-2px]">
             <MotionNumber value={newTotalSize} style={{ lineHeight: 0.8 }} className="font-mono" />
           </span>{' '}
           GB
@@ -175,10 +175,10 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.1 }}
-              className="absolute h-8 w-full -mx-[2px]"
+              className="absolute h-8 w-full mx-[-2px]"
             >
               <div
-                className="absolute top-0 -left-0 h-full flex items-center transition-all duration-500 ease-in-out"
+                className="absolute top-0 left-0 h-full flex items-center transition-all duration-500 ease-in-out"
                 style={{ left: `${showNewSize ? newResizePercentage : resizePercentage}%` }}
               >
                 <Tooltip>

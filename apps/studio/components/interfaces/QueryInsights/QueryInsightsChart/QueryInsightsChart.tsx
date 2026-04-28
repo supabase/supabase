@@ -85,12 +85,12 @@ export const QueryInsightsChart = ({
   return (
     <div className="bg-surface-100 border-b min-h-[320px]">
       <Tabs_Shadcn_ value={selectedMetric} onValueChange={setSelectedMetric} className="w-full">
-        <TabsList_Shadcn_ className="flex justify-start rounded-none gap-x-4 border-b !mt-0 pt-0 px-6">
+        <TabsList_Shadcn_ className="flex justify-start rounded-none gap-x-4 border-b mt-0! pt-0 px-6">
           {CHART_TABS.map((tab) => (
             <TabsTrigger_Shadcn_
               key={tab.id}
               value={tab.id}
-              className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
+              className="flex items-center gap-2 text-xs py-3 border-b font-mono uppercase"
             >
               {tab.label}
             </TabsTrigger_Shadcn_>

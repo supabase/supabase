@@ -136,7 +136,7 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
               })}
             </div>
             <div className="text-area-text-sm flex flex-col gap-y-2">
-              <label className="text-sm whitespace-pre-line break-words">{textareaLabel}</label>
+              <label className="text-sm whitespace-pre-line wrap-break-word">{textareaLabel}</label>
               <Input.TextArea
                 id="message"
                 name="message"

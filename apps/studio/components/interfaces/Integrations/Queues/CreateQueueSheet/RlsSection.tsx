@@ -47,7 +47,7 @@ export function RlsSection({
           title="Row Level Security for queues is only relevant if exposure through PostgREST has been enabled"
         >
           <Markdown
-            className="[&>p]:!leading-normal"
+            className="[&>p]:leading-normal!"
             content={`You may opt to manage your queues via any Supabase client libraries or PostgREST
                       endpoints by enabling this in the [queues settings](/project/${projectRef}/integrations/queues/settings).`}
           />

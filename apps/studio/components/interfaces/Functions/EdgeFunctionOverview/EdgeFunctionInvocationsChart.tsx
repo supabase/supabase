@@ -38,7 +38,7 @@ export const EdgeFunctionInvocationsChart = ({
   return (
     <div className="flex flex-col gap-1">
       <div className="relative h-40 w-full overflow-visible">
-        <ChartContainer config={INVOCATION_CHART_CONFIG} className="!aspect-auto !h-full !w-full">
+        <ChartContainer config={INVOCATION_CHART_CONFIG} className="aspect-auto! h-full! w-full!">
           <RechartBarChart
             data={chartData}
             margin={{ top: 0, right: 0, left: 0, bottom: 0 }}

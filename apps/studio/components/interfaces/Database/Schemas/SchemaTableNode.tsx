@@ -50,7 +50,7 @@ export const TableNode = ({
 }: NodeProps<Node<TableNodeData>> & { placeholder?: boolean }) => {
   // Important styles is a nasty hack to use Handles (required for edges calculations), but do not show them in the UI.
   // ref: https://github.com/wbkd/react-flow/discussions/2698
-  const hiddenNodeConnector = '!h-px !w-px !min-w-0 !min-h-0 !cursor-grab !border-0 !opacity-0'
+  const hiddenNodeConnector = 'h-px! w-px! min-w-0! min-h-0! cursor-grab! border-0! opacity-0!'
   const schemaGraphContext = useSchemaGraphContext()
   const { data: project } = useSelectedProjectQuery()
   const { can: canUpdateColumns } = useAsyncCheckPermissions(
@@ -309,7 +309,7 @@ export const TableNode = ({
                   <Button
                     type="text"
                     // Use opacity to hide the button so that it remains accessible (users can tab to it)
-                    className="opacity-0 focus:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100 absolute right-0 top-1/2 -translate-y-1/2 px-0 mr-1 w-[16px] h-[16px] rounded"
+                    className="opacity-0 focus:opacity-100 group-hover:opacity-100 data-open:opacity-100 absolute right-0 top-1/2 -translate-y-1/2 px-0 mr-1 w-[16px] h-[16px] rounded"
                   >
                     <MoreVertical size={10} />
                     <span className="sr-only">

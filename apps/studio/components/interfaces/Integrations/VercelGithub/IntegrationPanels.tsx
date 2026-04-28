@@ -188,7 +188,7 @@ export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnec
               <div className="flex-1 min-w-0 flex gap-2 items-center">
                 {!connection?.metadata?.framework ? (
                   <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
-                    <HandleIcon type={type} className={'!w-2.5'} />
+                    <HandleIcon type={type} className={'w-2.5!'} />
                   </div>
                 ) : (
                   <img

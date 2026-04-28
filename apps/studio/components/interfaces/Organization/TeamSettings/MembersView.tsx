@@ -111,7 +111,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                     ...(isSuccessRoles && isSuccessMembers && !isOrgScopedRole
                       ? [
                           <TableRow key="project-scope-notice">
-                            <TableCell colSpan={12} className="!p-0">
+                            <TableCell colSpan={12} className="p-0!">
                               <Admonition
                                 type="note"
                                 title="You have limited visibility in this organization"

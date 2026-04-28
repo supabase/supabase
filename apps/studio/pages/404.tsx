@@ -40,7 +40,7 @@ const Error404: NextPage = ({}) => {
         </nav>
       </div>
       <div
-        className={`absolute select-none opacity-[5%] filter transition duration-200 ${
+        className={`absolute select-none opacity-5 filter transition duration-200 ${
           show404 ? 'blur-sm' : 'blur-none'
         }`}
       >

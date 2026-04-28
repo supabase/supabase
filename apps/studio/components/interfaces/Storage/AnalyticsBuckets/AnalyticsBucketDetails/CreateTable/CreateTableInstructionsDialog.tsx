@@ -43,7 +43,7 @@ export const CreateTableInstructionsDialog = () => {
             <DropdownMenuTrigger asChild>
               <Button
                 type="primary"
-                className="w-7 rounded-l-none -ml-[1px]"
+                className="w-7 rounded-l-none -ml-px"
                 icon={<ChevronDown />}
               />
             </DropdownMenuTrigger>

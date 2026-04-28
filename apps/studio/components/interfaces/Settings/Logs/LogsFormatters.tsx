@@ -153,10 +153,10 @@ export const SeverityFormatter = ({
     case 'ERROR':
       return (
         <Layout className="gap-1">
-          <div className=" p-0.5 rounded !text-red-900">
+          <div className=" p-0.5 rounded text-red-900!">
             <AlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-red-900 !block titlecase">{text}</span>
+          <span className="text-red-900! block! titlecase">{text}</span>
         </Layout>
       )
       break
@@ -166,10 +166,10 @@ export const SeverityFormatter = ({
     case 'DEBUG':
       return (
         <Layout className="gap-1">
-          <div className=" p-0.5 rounded !text-blue-900">
+          <div className=" p-0.5 rounded text-blue-900!">
             <AlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-blue-900 !block titlecase">{text}</span>
+          <span className="text-blue-900! block! titlecase">{text}</span>
         </Layout>
       )
       break
@@ -177,10 +177,10 @@ export const SeverityFormatter = ({
     case 'LOG':
       return (
         <Layout className="gap-1">
-          <div className=" p-0.5 rounded !text-blue-900">
+          <div className=" p-0.5 rounded text-blue-900!">
             <Info size={14} strokeWidth={2} />
           </div>
-          <span className="!text-blue-900 !block titlecase">{text}</span>
+          <span className="text-blue-900! block! titlecase">{text}</span>
         </Layout>
       )
       break
@@ -188,10 +188,10 @@ export const SeverityFormatter = ({
     case 'WARNING':
       return (
         <Layout className="gap-1">
-          <div className=" p-0.5 rounded !text-amber-900">
+          <div className=" p-0.5 rounded text-amber-900!">
             <AlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-amber-900 !block titlecase">{text}</span>
+          <span className="text-amber-900! block! titlecase">{text}</span>
         </Layout>
       )
       break

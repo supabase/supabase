@@ -219,7 +219,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                       </span>
                       <ChevronDown
                         size={14}
-                        className="transition group-data-[state=open]:-rotate-180"
+                        className="transition group-data-open:-rotate-180"
                       />
                     </CollapsibleTrigger_Shadcn_>
                     <CollapsibleContent_Shadcn_ className="text-foreground-light text-sm px-4">
@@ -351,7 +351,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               )}
             </SheetSection>
 
-            <SheetFooter className="flex items-center !justify-end px-5 py-4 w-full border-t">
+            <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
               <Button type="default" disabled={false} onClick={() => onClose()}>
                 Cancel
               </Button>

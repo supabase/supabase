@@ -365,28 +365,28 @@ export const QueryInsightsTable = ({
           <div className="flex items-center">
             {mode === 'triage' ? (
               <Tabs_Shadcn_ value={filter} onValueChange={(v) => setFilter(v as IssueFilter)}>
-                <TabsList_Shadcn_ className="flex gap-x-4 rounded-none !mt-0 pt-0 !border-none">
+                <TabsList_Shadcn_ className="flex gap-x-4 rounded-none mt-0! pt-0 border-none!">
                   <TabsTrigger_Shadcn_
                     value="all"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                    className="text-xs py-3 border-b font-mono uppercase"
                   >
                     All{triageItems.length > 0 && ` (${triageItems.length})`}
                   </TabsTrigger_Shadcn_>
                   <TabsTrigger_Shadcn_
                     value="error"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                    className="text-xs py-3 border-b font-mono uppercase"
                   >
                     Errors{errorCount > 0 && ` (${errorCount})`}
                   </TabsTrigger_Shadcn_>
                   <TabsTrigger_Shadcn_
                     value="index"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                    className="text-xs py-3 border-b font-mono uppercase"
                   >
                     Index{indexCount > 0 && ` (${indexCount})`}
                   </TabsTrigger_Shadcn_>
                   <TabsTrigger_Shadcn_
                     value="slow"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                    className="text-xs py-3 border-b font-mono uppercase"
                   >
                     Slow{slowCount > 0 && ` (${slowCount})`}
                   </TabsTrigger_Shadcn_>

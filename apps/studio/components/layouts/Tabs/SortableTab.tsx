@@ -60,7 +60,7 @@ export const SortableTab = ({
       layoutId={tab.id}
       transition={{ duration: 0.045 }}
       animate={{ opacity: isDragging ? 0 : 1 }}
-      className={cn('flex items-center h-[var(--header-height)] first-of-type:border-l')}
+      className={cn('flex items-center h-(--header-height) first-of-type:border-l')}
     >
       <TabsTrigger_Shadcn_
         value={tab.id}

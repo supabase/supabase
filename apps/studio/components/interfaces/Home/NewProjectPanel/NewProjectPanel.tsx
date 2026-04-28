@@ -94,7 +94,7 @@ export const NewProjectPanel = () => {
                       </Button>
 
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -126,7 +126,7 @@ export const NewProjectPanel = () => {
                       </Button>
 
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -158,7 +158,7 @@ export const NewProjectPanel = () => {
                         <Link href={`/project/${ref}/functions`}>Explore Functions</Link>
                       </Button>
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild
@@ -192,7 +192,7 @@ export const NewProjectPanel = () => {
                         <Link href={`/project/${ref}/realtime/inspector`}>Explore Realtime</Link>
                       </Button>
                       <Button
-                        className="translate-y-[1px]"
+                        className="translate-y-px"
                         icon={<ExternalLink />}
                         type="default"
                         asChild

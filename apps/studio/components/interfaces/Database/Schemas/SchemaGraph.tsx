@@ -253,7 +253,7 @@ export const SchemaGraph = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between p-4 border-b border-muted h-[var(--header-height)]">
+      <div className="flex items-center justify-between p-4 border-b border-muted h-(--header-height)">
         {isLoadingSchemas && (
           <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
         )}
@@ -441,7 +441,7 @@ export const SchemaGraph = () => {
                 >
                   <Background
                     gap={16}
-                    className="[&>*]:stroke-foreground-muted opacity-[25%]"
+                    className="*:stroke-foreground-muted opacity-25"
                     variant={BackgroundVariant.Dots}
                     color={'inherit'}
                   />

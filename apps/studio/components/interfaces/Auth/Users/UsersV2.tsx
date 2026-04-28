@@ -485,7 +485,7 @@ export const UsersV2 = () => {
   return (
     <>
       <div className="h-full flex flex-col">
-        <FormHeader className="py-4 px-6 !mb-0 border-b" title="Users" />
+        <FormHeader className="py-4 px-6 mb-0! border-b" title="Users" />
 
         {showImprovedSearchOptIn && (
           <Alert_Shadcn_ className="rounded-none mb-0 border-0 relative">
@@ -592,7 +592,7 @@ export const UsersV2 = () => {
                       <SelectTrigger_Shadcn_
                         size="tiny"
                         className={cn(
-                          'w-[140px] !bg-transparent',
+                          'w-[140px] bg-transparent!',
                           filterUserType === 'all' && 'border-dashed'
                         )}
                       >

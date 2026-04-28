@@ -156,7 +156,7 @@ export const UpgradingState = () => {
                   )}
 
                   <div
-                    className="!mt-4 !mb-2 py-3 px-4 transition-all overflow-hidden border rounded relative"
+                    className="mt-4! mb-2! py-3 px-4 transition-all overflow-hidden border rounded relative"
                     style={{ maxHeight: isExpanded ? '500px' : '110px' }}
                   >
                     {isExpanded ? (

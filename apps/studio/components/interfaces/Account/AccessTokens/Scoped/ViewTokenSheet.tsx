@@ -102,7 +102,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
         <SheetContent
           showClose={false}
           size="default"
-          className="!min-w-[600px] flex flex-col h-full gap-0"
+          className="min-w-[600px]! flex flex-col h-full gap-0"
         >
           <SheetHeader
             className={cn('flex flex-row justify-between gap-x-4 items-center border-b')}

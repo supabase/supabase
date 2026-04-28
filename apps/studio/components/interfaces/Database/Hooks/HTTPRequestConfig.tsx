@@ -40,7 +40,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
   return (
     <FormSection
       header={
-        <FormSectionLabel className="lg:!col-span-4">
+        <FormSectionLabel className="lg:col-span-4!">
           {functionType === 'http_request'
             ? 'HTTP Request'
             : functionType === 'supabase_function'
@@ -49,7 +49,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
         </FormSectionLabel>
       }
     >
-      <FormSectionContent loading={false} className="lg:!col-span-8">
+      <FormSectionContent loading={false} className="lg:col-span-8!">
         <FormField
           control={form.control}
           name="http_method"

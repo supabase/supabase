@@ -66,7 +66,7 @@ const ProjectLints: NextPageWithLayout = () => {
   return (
     <div className="h-full flex flex-col">
       <FormHeader
-        className="py-4 px-6 !-mb-px"
+        className="py-4 px-6 -mb-px!"
         title="Security Advisor"
         docsUrl={`${DOCS_URL}/guides/database/database-linter`}
       />
