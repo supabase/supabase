@@ -91,10 +91,8 @@ const buttonVariants = cva(
         link: `
           text-brand-600
           border
-          border-transparent
+          border-transparent/0
           hover:bg-brand-400
-          border-opacity-0
-          bg-opacity-0
           shadow-none
           focus-visible:outline-border-strong
           data-[state=open]:bg-brand-400

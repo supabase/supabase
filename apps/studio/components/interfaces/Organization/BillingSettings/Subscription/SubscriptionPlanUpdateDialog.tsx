@@ -523,21 +523,23 @@ export const SubscriptionPlanUpdateDialog = ({
 
                                       const content = (
                                         <>
+                                          {planItem && (
+                                            <TableRow className="text-foreground-light">
+                                              <TableCell className="!py-2 px-0">
+                                                {planItem.description}
+                                              </TableCell>
+                                              <TableCell
+                                                className="text-right py-2 px-0"
+                                                translate="no"
+                                              >
+                                                {formatCurrency(planItem.total_price)}
+                                              </TableCell>
+                                            </TableRow>
+                                          )}
+
                                           {/* Combined projects section */}
                                           {allProjects.length > 0 && (
                                             <>
-                                              <TableRow className="text-foreground-light">
-                                                <TableCell className="!py-2 px-0">
-                                                  {planItem?.description}
-                                                </TableCell>
-                                                <TableCell
-                                                  className="text-right py-2 px-0"
-                                                  translate="no"
-                                                >
-                                                  {formatCurrency(planItem?.total_price)}
-                                                </TableCell>
-                                              </TableRow>
-
                                               <TableRow className="text-foreground-light">
                                                 <TableCell className="!py-2 px-0 flex items-center gap-1">
                                                   <span>Compute</span>

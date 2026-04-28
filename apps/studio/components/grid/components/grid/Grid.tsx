@@ -346,7 +346,7 @@ export const Grid = memo(
               <RowContextMenuProvider>
                 <DataGrid
                   ref={ref}
-                  className={`${gridClass} flex-grow`}
+                  className={`${gridClass} grow`}
                   rowClass={computedRowClass}
                   columns={columnsWithDirtyCellClass}
                   rows={rows ?? []}

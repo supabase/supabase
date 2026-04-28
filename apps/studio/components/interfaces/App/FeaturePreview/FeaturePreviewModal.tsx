@@ -29,9 +29,12 @@ import { FloatingMobileToolbarPreview } from './FloatingMobileToolbarPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
+import { RLSTesterPreview } from './RLSTesterPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
+import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 
@@ -45,6 +48,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR]: <FloatingMobileToolbarPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]: <RLSTesterPreview />,
 }
 
 export const FeaturePreviewModal = () => {
@@ -60,6 +64,12 @@ export const FeaturePreviewModal = () => {
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
 
+  const { dismissBanner } = useBannerStack()
+  const [, setIsDismissedRlsTesterBanner] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.RLS_TESTER_BANNER_DISMISSED(ref ?? ''),
+    false
+  )
+
   const { flags, onUpdateFlag } = featurePreviewContext
   const allFeaturePreviews = (
     IS_PLATFORM ? featurePreviews : featurePreviews.filter((x) => !x.isPlatformOnly)
@@ -72,6 +82,12 @@ export const FeaturePreviewModal = () => {
 
   const toggleFeature = () => {
     if (!selectedFeature) return
+
+    if (selectedFeature.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER) {
+      dismissBanner('rls-tester-banner')
+      setIsDismissedRlsTesterBanner(true)
+    }
+
     onUpdateFlag(selectedFeature.key, !isSelectedFeatureEnabled)
     sendEvent({
       action: isSelectedFeatureEnabled ? 'feature_preview_disabled' : 'feature_preview_enabled',

@@ -36,7 +36,7 @@ export const ProjectBranchSelectorTrigger = forwardRef<
         <div className="relative flex h-8 aspect-square shrink-0 items-center bg-background-muted group-hover:border-stronger justify-center rounded border border-strong text-xs">
           {selectedOrgInitial}
         </div>
-        <div className="text-left flex-grow min-w-0">
+        <div className="text-left grow min-w-0">
           <div className="w-full truncate text-foreground leading-tight max-w-[250px]">
             {displayProjectName}
           </div>

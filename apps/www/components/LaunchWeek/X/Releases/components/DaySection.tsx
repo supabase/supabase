@@ -1,12 +1,12 @@
+import { DayLink } from '.'
 import { ArrowRightIcon } from '@heroicons/react/outline'
 import { useBreakpoint } from 'common'
+import { Edit2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { cn } from 'ui'
 
-import { DayLink } from '.'
 import { WeekDayProps } from '../data'
-import { Edit2 } from 'lucide-react'
 
 const DaySection = ({ day }: { day: WeekDayProps }) => {
   const isMobile = useBreakpoint(639)
@@ -55,7 +55,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
               cssGroup
             )}
           >
-            <div className="relative p-4 sm:p-6 md:p-8 z-20 flex-grow flex flex-col items-start justify-between gap-2 w-full lg:w-3/5 text-left">
+            <div className="relative p-4 sm:p-6 md:p-8 z-20 grow flex flex-col items-start justify-between gap-2 w-full lg:w-3/5 text-left">
               <div className="relative w-full flex items-center gap-2 text-sm translate-x-0 !ease-[.24,0,.22,.99] duration-200 group-hover:-translate-x-6 transition-transform">
                 <Edit2 className="w-4 min-w-4 group-hover:opacity-0 transition-opacity" />
                 <span>Blog post</span>

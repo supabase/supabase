@@ -3,7 +3,16 @@ import { Pause } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
@@ -91,21 +100,23 @@ const PauseProjectButton = () => {
         Pause project
       </ButtonTooltip>
 
-      <ConfirmationModal
-        variant={'destructive'}
-        visible={isModalOpen}
-        loading={isPausing}
-        title="Pause this project?"
-        confirmLabel="Pause project"
-        confirmLabelLoading="Pausing project"
-        onCancel={() => setIsModalOpen(false)}
-        onConfirm={requestPauseProject}
-      >
-        <p className="text-foreground-light text-sm">
-          Are you sure you want to pause this project? It will not be accessible until you unpause
-          it.
-        </p>
-      </ConfirmationModal>
+      <AlertDialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Pause project?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This project will be unavailable while paused. Your data stays safe, and you can
+              resume it later from the dashboard while it remains within the restore window.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPausing}>Cancel</AlertDialogCancel>
+            <AlertDialogAction disabled={isPausing} onClick={requestPauseProject} variant="danger">
+              {isPausing ? 'Pausing project...' : 'Pause project'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

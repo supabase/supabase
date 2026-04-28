@@ -374,9 +374,9 @@ export const FileExplorerAndEditor = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.1 }}
-            className="absolute inset-0 bg bg-opacity-30 z-10 flex items-center justify-center"
+            className="absolute inset-0 bg/30 z-10 flex items-center justify-center"
           >
-            <div className="w-96 py-20 bg bg-opacity-60 border-2 border-dashed border-muted flex items-center justify-center">
+            <div className="w-96 py-20 bg/60 border-2 border-dashed border-muted flex items-center justify-center">
               {isExtractingZip && extractionProgress ? (
                 <div className="text-center space-y-2">
                   <div className="text-base">Extracting zip file...</div>
@@ -412,7 +412,7 @@ export const FileExplorerAndEditor = ({
         </div>
       </div>
 
-      <div className="flex-grow min-w-0">
+      <div className="grow min-w-0">
         {selectedFile && isBinaryFile(selectedFile.name) ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">

@@ -2,8 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 const CONTENT_API_URL = process.env.NEXT_PUBLIC_CONTENT_API_URL!
 
-// Default export needed by Next.js convention
-// eslint-disable-next-line no-restricted-exports
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST'])

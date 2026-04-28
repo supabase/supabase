@@ -9,7 +9,7 @@ export interface RoleImpersonationRadioProps<T extends string> {
   icon?: React.ReactNode
 }
 
-function RoleImpersonationRadio<T extends string>({
+export function RoleImpersonationRadio<T extends string>({
   label,
   value,
   isSelected,
@@ -67,5 +67,3 @@ function RoleImpersonationRadio<T extends string>({
     </label>
   )
 }
-
-export default RoleImpersonationRadio

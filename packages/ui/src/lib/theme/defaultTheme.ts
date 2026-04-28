@@ -207,40 +207,6 @@ export default {
   },
 
   /*
-   * Badge
-   *
-   */
-
-  badge: {
-    base: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-normal bg-opacity-10',
-    size: {
-      large: 'px-3 py-0.5 rounded-full text-sm',
-    },
-    dot: '-ml-0.5 mr-1.5 h-2 w-2 rounded-full',
-    color: {
-      brand: 'bg-brand-500 text-brand-600 border border-brand-500',
-      brandAlt: 'bg-brand bg-opacity-100 text-background border border-brand',
-      scale: 'bg-background text-foreground-light border border-strong',
-      tomato: `bg-tomato-200 text-tomato-1100 border border-tomato-700`,
-      red: `bg-red-200 text-red-1100 border border-red-700`,
-      crimson: `bg-crimson-200 text-crimson-1100 border border-crimson-700`,
-      pink: `bg-pink-200 text-pink-1100 border border-pink-700`,
-      purple: `bg-purple-200 text-purple-1100 border border-purple-700`,
-      violet: `bg-violet-200 text-violet-1100 border border-violet-700`,
-      indigo: `bg-indigo-200 text-indigo-1100 border border-indigo-700`,
-      blue: `bg-blue-200 text-blue-1100 border border-blue-700`,
-      green: `bg-opacity-10 bg-brand-500 text-brand-600 border border-brand-500`,
-      grass: `bg-grass-200 text-grass-1100 border border-grass-700`,
-      orange: `bg-orange-200 text-orange-1100 border border-orange-700`,
-      yellow: `bg-yellow-200 text-yellow-1100 border border-yellow-700`,
-      amber: `bg-amber-200 text-amber-1100 border border-amber-700`,
-      gold: `bg-gold-200 text-gold-1100 border border-gold-700`,
-      gray: `bg-200 text-gray-1100 border border-gray-700`,
-      slate: `bg-slate-200 text-slate-1100 border border-slate-700`,
-    },
-  },
-
-  /*
    * Alert
    *
    */
@@ -538,7 +504,7 @@ export default {
   toggle: {
     base: `
       p-0 relative
-      inline-flex flex-shrink-0
+      inline-flex shrink-0
       border-2 border-transparent
       rounded-full
       cursor-pointer
@@ -1014,7 +980,7 @@ export default {
   // Icon
 
   icon: {
-    container: `flex-shrink-0 flex items-center justify-center rounded-full p-3`,
+    container: `shrink-0 flex items-center justify-center rounded-full p-3`,
   },
 
   loading: {
@@ -1031,4 +997,4 @@ export default {
       m-auto
     `,
   },
-}
+} as const

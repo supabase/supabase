@@ -75,10 +75,10 @@ export const VectorsBuckets = () => {
                     <div className="py-0">
                       <PageSectionTitle>Buckets</PageSectionTitle>
                     </div>
-                    <div className="flex flex-grow justify-between gap-x-2 items-center">
+                    <div className="flex grow justify-between gap-x-2 items-center">
                       <Input
                         size="tiny"
-                        className="flex-grow lg:flex-grow-0 w-52"
+                        className="grow lg:grow-0 w-52"
                         placeholder="Search for a bucket"
                         value={filterString}
                         onChange={(e) => setFilterString(e.target.value)}

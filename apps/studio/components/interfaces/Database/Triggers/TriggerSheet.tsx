@@ -438,7 +438,7 @@ export const TriggerSheet = ({
                                 )}
                               >
                                 <div className="flex items-center gap-2">
-                                  <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background focus-within:bg-opacity-10">
+                                  <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background focus-within:bg-foreground/10">
                                     <Terminal size="18" strokeWidth={2} width={14} />
                                   </div>
                                   <p>

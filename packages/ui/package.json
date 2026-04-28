@@ -15,8 +15,8 @@
     "test:report": "open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@tailwindcss/forms": "^0.5.0",
-    "@tailwindcss/typography": "^0.5.9",
+    "@tailwindcss/forms": "^0.5.11",
+    "@tailwindcss/typography": "^0.5.19",
     "class-variance-authority": "^0.6.1",
     "clsx": "^1.2.1",
     "cmdk": "^1.1.1",

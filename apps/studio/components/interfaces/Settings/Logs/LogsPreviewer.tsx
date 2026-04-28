@@ -329,7 +329,7 @@ export const LogsPreviewer = ({
           )}
         </div>
       </div>
-      <div className="relative flex flex-col flex-grow flex-1 overflow-auto">
+      <div className="relative flex flex-col grow flex-1 overflow-auto">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable

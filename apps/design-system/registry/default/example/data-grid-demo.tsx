@@ -141,7 +141,7 @@ export default function DataGridDemo() {
   return (
     <div className="h-full w-full flex flex-col relative min-h-[400px] rounded-md border overflow-hidden">
       <DataGrid
-        className="flex-grow border-t-0 bg-dash-canvas"
+        className="grow border-t-0 bg-dash-canvas"
         rowHeight={44}
         headerRowHeight={36}
         columns={columns}
