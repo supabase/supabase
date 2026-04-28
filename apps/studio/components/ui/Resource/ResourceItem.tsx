@@ -104,13 +104,10 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
     if (href) {
       return (
         <Link
-          ref={ref as never}
           href={href}
           target={target}
           rel={rel}
           className={rootClassName}
-          onClick={onClick}
-          {...props}
         >
           {content}
         </Link>
