@@ -19,7 +19,6 @@ type PublicationSelectionProps = {
 export const PublicationSelection = ({
   form,
   sourceId,
-  visible,
   onSelectNewPublication,
 }: PublicationSelectionProps) => {
   const { ref: projectRef } = useParams()

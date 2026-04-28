@@ -58,13 +58,6 @@ const defaults = {
   },
 }
 
-const utils = {
-  border: {
-    hover: 'border-opacity-50 hover:border-opacity-100',
-    fix: 'border-opacity-100',
-  },
-}
-
 const default__padding_and_text = {
   tiny: `${defaults.size.text.tiny} ${defaults.size.padding.tiny}`,
   small: `${defaults.size.text.small} ${defaults.size.padding.small}`,
@@ -463,52 +456,6 @@ export default {
     actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
     textarea_actions_container: 'absolute inset-y-1.5 right-0 pl-3 pr-1 flex space-x-1 items-start',
     textarea_actions_container_items: 'flex items-center',
-  },
-
-  /*
-   * Select
-   */
-
-  select: {
-    base: `
-      block
-      box-border
-      w-full
-      rounded-md
-      shadow-sm
-      transition-all
-      text-foreground
-      border
-      focus-visible:shadow-md
-      ${defaults.focus}
-      focus-visible:border-foreground-muted
-      focus-visible:ring-background-control
-      ${defaults.placeholder}
-
-      appearance-none
-      bg-none
-    `,
-    variants: {
-      standard: `
-        bg-background
-        border border-strong
-        `,
-      error: `
-        bg-destructive-200
-        border border-destructive-500
-        focus:ring-destructive-400
-        placeholder:text-destructive-400
-       `,
-    },
-    container: 'relative',
-    with_icon: with_icon_spacing_sizes,
-    size: {
-      ...default__padding_and_text,
-    },
-    disabled: 'opacity-50',
-    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 mr-5 flex items-center',
-    chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
-    chevron: 'h-5 w-5 text-foreground-lighter',
   },
 
   sidepanel: {

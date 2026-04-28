@@ -28,7 +28,7 @@ export const generateOrganizationSettingsMenuItems = ({
   showSsoSettings = true,
   showLegalDocuments = true,
   showPlatformWebhooks = true,
-  showPrivateApps = false,
+  showPrivateApps: _showPrivateApps = false,
 }: OrganizationSettingsMenuItemsProps) => [
   {
     key: 'general',
@@ -225,7 +225,6 @@ export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   return (
     <WithSidebar
       title="Organization Settings"
-      breadcrumbs={[]}
       sections={sections}
       header={
         <div className="border-default flex min-h-[var(--header-height)] items-center border-b px-6">

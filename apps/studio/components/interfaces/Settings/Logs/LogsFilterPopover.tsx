@@ -78,7 +78,7 @@ const LogsFilterPopover = ({
             setOpen(false)
           }}
         >
-          {options.options.map((x, i: number) => (
+          {options.options.map((x) => (
             <Label
               key={x.key}
               htmlFor={`${options.key}.${x.key}`}

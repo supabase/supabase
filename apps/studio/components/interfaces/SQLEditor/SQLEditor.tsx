@@ -50,7 +50,7 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import { useAddDefinitions } from './useAddDefinitions'
-import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { UtilityPanel } from './UtilityPanel/UtilityPanel'
 import {
   isExplainQuery,
   isExplainSql,
@@ -627,7 +627,7 @@ export const SQLEditor = () => {
 
   const complete = useCallback(
     async (
-      prompt: string,
+      _prompt: string,
       options?: {
         headers?: Record<string, string>
         body?: { completionMetadata?: any }

@@ -132,6 +132,13 @@ export const useIsFloatingMobileToolbarEnabled = () => {
   return showFloatingMobileToolbar && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR]
 }
 
+export const useIsRLSTesterEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const rlsTesterEnabled = useFlag('rlsTester')
+
+  return rlsTesterEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
+}
+
 export const useFeaturePreviewModal = () => {
   const featurePreviews = useFeaturePreviews()
   const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')

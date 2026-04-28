@@ -1,11 +1,9 @@
-import { useParams } from 'common'
 import { motion } from 'framer-motion'
 
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { useTabsStateSnapshot } from '@/state/tabs'
 
 export const TabPreview = ({ tab }: { tab: string }) => {
-  const { ref } = useParams()
   const tabs = useTabsStateSnapshot()
 
   const tabData = tabs.tabsMap[tab]

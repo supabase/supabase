@@ -209,7 +209,6 @@ export const CreateOrUpdateCustomProviderSheet = ({
         scopes: values.scopes.split(',').map((s) => s.trim()),
         issuer: values.issuer,
         pkce_enabled: true,
-        enabled: true,
         email_optional: values.email_optional,
         ...payload,
       })

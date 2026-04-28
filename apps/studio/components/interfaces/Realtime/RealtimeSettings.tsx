@@ -45,11 +45,10 @@ export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization, isSuccess: isSuccessOrganization } = useSelectedOrganizationQuery()
-  const {
-    can: canUpdateConfig,
-    isLoading: isLoadingPermissions,
-    isSuccess: isPermissionsLoaded,
-  } = useAsyncCheckPermissions(PermissionAction.REALTIME_ADMIN_READ, '*')
+  const { can: canUpdateConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.REALTIME_ADMIN_READ,
+    '*'
+  )
 
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
 
@@ -57,12 +56,7 @@ export const RealtimeSettings = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const {
-    data,
-    error,
-    isPending: isLoading,
-    isError,
-  } = useRealtimeConfigurationQuery({
+  const { data, error, isError } = useRealtimeConfigurationQuery({
     projectRef,
   })
 
@@ -126,7 +120,7 @@ export const RealtimeSettings = () => {
   const isDisablingRealtime = !isRealtimeDisabled && suspend
   const isEnablingRealtime = isRealtimeDisabled && !suspend
 
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (data) => {
+  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (_data) => {
     if (!projectRef) return console.error('Project ref is required')
     setIsConfirmNextModalOpen(true)
   }

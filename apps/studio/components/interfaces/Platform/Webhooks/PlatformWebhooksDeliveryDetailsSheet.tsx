@@ -1,6 +1,5 @@
 import { Copy, RotateCcw } from 'lucide-react'
 import {
-  AlertDialog,
   Badge,
   Button,
   Card,
