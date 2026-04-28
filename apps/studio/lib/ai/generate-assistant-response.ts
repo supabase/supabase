@@ -8,7 +8,15 @@ import {
   type ToolSet,
   type UIMessage,
 } from 'ai'
-import { startSpan, traced, withCurrent, wrapAISDK, type Span } from 'braintrust'
+import {
+  startSpan,
+  traced,
+  updateSpan,
+  withCurrent,
+  withParent,
+  wrapAISDK,
+  type Span,
+} from 'braintrust'
 import { source } from 'common-tags'
 
 import { buildAssistantEvalOutput } from '@/evals/output'
@@ -156,32 +164,83 @@ export async function generateAssistantResponse({
           for (const step of steps) {
             for (const toolCall of step.toolCalls) {
               if (toolCall.toolName === 'rename_chat') {
-                const { newName } = toolCall.input as { newName: string }
-                span.log({ metadata: { chatName: newName } })
+                const { input } = toolCall
+                if (
+                  typeof input === 'object' &&
+                  input !== null &&
+                  'newName' in input &&
+                  typeof input.newName === 'string'
+                ) {
+                  span.log({ metadata: { chatName: input.newName } })
+                }
               }
             }
           }
-          span.log({
-            output: buildAssistantEvalOutput(finishReason, steps) satisfies AssistantEvalOutput,
-          })
-          span.end()
+
+          const UI_EXECUTED_TOOLS = ['execute_sql', 'deploy_edge_function']
+          const hasDynamicToolCalls = steps.some((step) =>
+            step.toolCalls.some((tc) => UI_EXECUTED_TOOLS.includes(tc.toolName))
+          )
+
+          if (!hasDynamicToolCalls) {
+            span.log({
+              output: buildAssistantEvalOutput(finishReason, steps) satisfies AssistantEvalOutput,
+            })
+            span.end()
+          }
+          // If hasDynamicToolCalls: don't log output or end span — Turn 2 will close it
+          // with the combined output via updateSpan
         },
       }),
     } satisfies Parameters<typeof ai.streamText>[0])
   }
 
   if (shouldTrace) {
+    if (parentSpanExport) {
+      // Continuation turn (e.g. after user runs execute_sql result).
+      // Don't create a new span — run under Turn 1's span context so wrapAISDK's
+      // streamText span becomes a sibling of Turn 1's streamText, not a new wrapper.
+      return withParent(parentSpanExport, async () => {
+        const result = await run(undefined)
+
+        // Reconstruct Turn 1's tool calls from the prior assistant message parts.
+        // These appear as tool-invocation parts with state 'output-available'.
+        const priorToolCalls = rawMessages
+          .filter((m) => m.role === 'assistant')
+          .flatMap((m) => m.parts)
+          .filter(isToolUIPart)
+          .filter((p) => p.state === 'output-available')
+          .map((p) => ({
+            type: 'tool-call' as const,
+            toolCallId: p.toolCallId,
+            toolName: p.type === 'dynamic-tool' ? p.toolName : p.type.slice('tool-'.length),
+            input: p.input,
+          }))
+
+        const [finishReason, steps] = await Promise.all([result.finishReason, result.steps])
+
+        const combinedSteps = [{ text: '', toolCalls: priorToolCalls, toolResults: [] }, ...steps]
+
+        updateSpan({
+          exported: parentSpanExport,
+          output: buildAssistantEvalOutput(
+            finishReason,
+            combinedSteps
+          ) satisfies AssistantEvalOutput,
+          metrics: { end: Date.now() / 1000 },
+        })
+
+        return result
+      })
+    }
+
     // startSpan instead of traced() so we control when the span closes — onFinish logs
     // output to the span before we call span.end(), ensuring online scoring sees the output.
-    const span = startSpan({
-      name: 'generateAssistantResponse',
-      type: 'function',
-      ...(parentSpanExport && { parent: parentSpanExport }),
-    })
+    const span = startSpan({ name: 'generateAssistantResponse', type: 'function' })
     onSpanCreated?.(span.id)
 
     // Export span for cross-process continuation so follow-up turns (e.g. after
-    // the user runs an execute_sql result) can attach as child spans in the same trace.
+    // the user runs an execute_sql result) can attach to this span.
     const exportedSpan = await span.export()
     onSpanExported?.(exportedSpan)
 
