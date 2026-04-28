@@ -263,7 +263,7 @@ export const PlatformWebhooksEndpointSheet = ({
           </SheetDescription>
         </SheetHeader>
         <Separator />
-        <SheetSection className="overflow-auto flex-grow px-0 py-0">
+        <SheetSection className="overflow-auto grow px-0 py-0">
           <Form {...form}>
             <form
               id="platform-webhook-endpoint-form"

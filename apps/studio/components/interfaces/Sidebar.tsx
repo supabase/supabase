@@ -239,6 +239,7 @@ const ProjectLinks = () => {
   const { data: project } = useSelectedProjectQuery()
   const { securityLints, errorLints } = useLints()
   const showReports = useIsFeatureEnabled('reports:all')
+  const showLogs = useIsFeatureEnabled('logs:all')
 
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
@@ -269,6 +270,7 @@ const ProjectLinks = () => {
   const otherRoutes = generateOtherRoutes(ref, project, {
     unifiedLogs: isUnifiedLogsEnabled,
     showReports,
+    showLogs,
   })
   const settingsRoutes = generateSettingsRoutes(ref)
 

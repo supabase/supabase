@@ -278,7 +278,7 @@ export const OAuthAppsList = () => {
               disabled={!isOAuthServerEnabled}
               icon={<Plus />}
               onClick={() => setShowCreateSheet(true)}
-              className="flex-grow"
+              className="grow"
               tooltip={{
                 content: {
                   side: 'bottom',

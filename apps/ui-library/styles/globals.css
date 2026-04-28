@@ -88,7 +88,7 @@
     @apply scroll-smooth;
   }
   body {
-    @apply bg text-foreground;
+    @apply bg-default text-foreground;
     /* font-feature-settings: "rlig" 1, "calt" 1; */
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;

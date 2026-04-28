@@ -172,7 +172,7 @@ export const CreateFunction = ({
           <Form {...form}>
             <form
               id={FORM_ID}
-              className="flex-grow overflow-auto"
+              className="grow overflow-auto"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <SheetSection className={focusedEditor ? 'hidden' : ''}>
@@ -265,7 +265,7 @@ export const CreateFunction = ({
                       <div
                         className={cn(
                           'border border-default flex',
-                          focusedEditor ? 'flex-grow ' : 'h-72'
+                          focusedEditor ? 'grow ' : 'h-72'
                         )}
                       >
                         <FunctionEditor

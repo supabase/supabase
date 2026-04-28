@@ -14,7 +14,7 @@ import { CellDetailPanel } from './CellDetailPanel'
 import { formatCellValue, formatClipboardValue } from './Results.utils'
 import { handleCopyCell } from '@/components/grid/SupabaseGrid.utils'
 
-const Results = ({ rows }: { rows: readonly any[] }) => {
+export const Results = ({ rows }: { rows: readonly any[] }) => {
   const [expandCell, setExpandCell] = useState(false)
   const [cellPosition, setCellPosition] = useState<{ column: any; row: any; rowIdx: number }>()
   const contextMenuCellRef = useRef<{ column: string; value: any } | null>(null)
@@ -134,7 +134,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
           <DataGrid
             columns={columns}
             rows={rows}
-            className="flex-grow min-h-0 border-t-0"
+            className="grow min-h-0 border-t-0"
             rowClass={() => '[&>.rdg-cell]:items-center'}
             onSelectedCellChange={setCellPosition}
             onCellKeyDown={handleCopyCell}

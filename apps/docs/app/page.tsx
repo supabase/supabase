@@ -29,7 +29,10 @@ const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata>
       ...(parentAlternates && {
         languages: parentAlternates.languages || undefined,
         media: parentAlternates.media || undefined,
-        types: parentAlternates.types || undefined,
+        types: {
+          ...(parentAlternates.types ?? {}),
+          'text/markdown': '/llms-full.txt',
+        },
       }),
     },
   }

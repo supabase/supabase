@@ -67,7 +67,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
         <Separator />
 
         {selectedDelivery && (
-          <SheetSection className="overflow-auto flex-grow px-0 py-0">
+          <SheetSection className="overflow-auto grow px-0 py-0">
             <div className="space-y-6 p-5">
               <Card>
                 <CardContent className="grid grid-cols-1 gap-4 p-4 @md:grid-cols-2">

@@ -330,7 +330,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                       {
                         key: 'count',
                         header: 'Count',
-                        className: 'text-right flex-shrink-0 ml-auto justify-end',
+                        className: 'text-right shrink-0 ml-auto justify-end',
                         render: (row) => (
                           <div className="flex justify-end items-center gap-2">
                             <div className="text-right text-xs tabular-nums">{row.count}</div>
