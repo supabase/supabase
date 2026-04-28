@@ -4,7 +4,7 @@ description: 'Configure new API keys and ES256 asymmetric authentication for sel
 subtitle: 'Configure new API keys and ES256 asymmetric authentication for self-hosted Supabase.'
 ---
 
-You can configure self-hosted Supabase to use the [new API keys](/docs/guides/api/api-keys) alongside the legacy API keys (`ANON_KEY` and `SERVICE_ROLE_KEY` HS256-signed JWTs).
+You can configure self-hosted Supabase to use the [new API keys](/docs/guides/getting-started/api-keys) alongside the legacy API keys (`ANON_KEY` and `SERVICE_ROLE_KEY` HS256-signed JWTs).
 
 ## Before you begin
 
@@ -71,7 +71,7 @@ docker compose down && docker compose up -d
 
 ### New API keys format
 
-The new API keys use the [same format](/docs/guides/api/api-keys) as the Supabase platform:
+The new API keys use the [same format](/docs/guides/getting-started/api-keys) as the Supabase platform:
 
 ```
 sb_publishable_<22-char-random>_<8-char-checksum>
@@ -267,7 +267,7 @@ end
 
 ## Additional resources
 
-- [Understanding API keys](/docs/guides/api/api-keys) - How API keys work on the Supabase platform
+- [Understanding API keys](/docs/guides/getting-started/api-keys) - How API keys work on the Supabase platform
 - [Auth architecture](/docs/guides/auth/architecture) - How the Auth service handles authentication and token signing
 - [JWT Signing Keys](/docs/guides/auth/signing-keys) - Best practices on managing keys used by Supabase Auth to create and verify JSON Web Tokens
 - [JSON Web Token (JWT)](/docs/guides/auth/jwts) - How to best use JSON Web Tokens with Supabase

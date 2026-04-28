@@ -20,16 +20,16 @@ When a JWT is issued by Supabase Auth, the key used to create its [signature](ht
 
 ### Benefits of the signing keys system
 
-We've designed the Signing keys system to address many problems the legacy system had. It goes hand-in-hand with the [publishable and secret API keys](/docs/guides/api/api-keys).
+We've designed the Signing keys system to address many problems the legacy system had. It goes hand-in-hand with the [publishable and secret API keys](/docs/guides/getting-started/api-keys).
 
 | Benefit                                     | Legacy JWT secret                                                                                                | JWT signing keys                                                                                                                                                                       |
 | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Performance                                 | Increased app latency as JWT validation is done by Auth server.                                                  | If using asymmetric signing key, JWT validation is fast and does not involve Auth server.                                                                                              |
 | Reliability                                 | To ensure secure revocation, Auth server is in the hot path of your application.                                 | If using asymmetric signing key, JWT validation is local and fast and does not involve Auth server.                                                                                    |
 | Security                                    | Requires changing of your application's backend components to fully revoke a compromised secret.                 | If using asymmetric signing key, revocation is automatic via the key discovery endpoint.                                                                                               |
-| Zero-downtime rotation                      | Downtime, sometimes being significant. Requires careful coordination with [API keys](/docs/guides/api/api-keys). | No downtime, as each rotation step is independent and reversible.                                                                                                                      |
+| Zero-downtime rotation                      | Downtime, sometimes being significant. Requires careful coordination with [API keys](/docs/guides/getting-started/api-keys). | No downtime, as each rotation step is independent and reversible.                                                                                                                      |
 | Users signed out during rotation            | Currently active users get immediately signed out.                                                               | No users get signed out.                                                                                                                                                               |
-| Independence from API keys                  | `anon` and `service_role` must be rotated simultaneously.                                                        | [Publishable and secret API keys](/docs/guides/api/api-keys) no longer are based on the JWT signing key and can be independently managed.                                              |
+| Independence from API keys                  | `anon` and `service_role` must be rotated simultaneously.                                                        | [Publishable and secret API keys](/docs/guides/getting-started/api-keys) no longer are based on the JWT signing key and can be independently managed.                                              |
 | Security compliance frameworks (SOC2, etc.) | Difficult to remain aligned as the secret can be extracted from Supabase.                                        | Easier alignment as the private key or shared secret can't be extracted. [Row Level Security](/docs/guides/database/postgres/row-level-security) has strong key revocation guarantees. |
 
 ## Getting started
@@ -58,7 +58,7 @@ Key rotation and revocation are one of the most important processes for maintain
 - The legacy JWT secret has been leaked in logs, committed to source control, or accidentally exposed in the frontend build of your application, a library, desktop or mobile app package, etc.
 - You suspect that a [member of your organization](/docs/guides/platform/access-control) has lost control of their devices, and a malicious actor may have accessed the JWT secret via the Supabase dashboard or by accessing your application's backend configuration.
 - You suspect that an ex-team-member of your organization may be a malicious actor, by abusing the power the legacy JWT secret provides.
-- Make sure you also switch to [publishable and secret API keys](/docs/guides/api/api-keys) and disable the `anon` and `service_role` keys.
+- Make sure you also switch to [publishable and secret API keys](/docs/guides/getting-started/api-keys) and disable the `anon` and `service_role` keys.
 - If you've imported a private key, and you're suspecting that this private key has been compromised on your end similarly.
 
 **Closer alignment to security best practices and compliance frameworks (SOC2, PCI-DSS, ISO27000, HIPAA, ...)**
@@ -233,7 +233,7 @@ Finally, you can use your newly minted JWT by setting the `Authorization: Bearer
 
 <Admonition type="note">
 
-A separate `apikey` header is required to access your project's APIs. This can be a [publishable, secret or the legacy `anon` or `service_role` keys](/docs/guides/api/api-keys). Using your minted JWT is not possible in this header.
+A separate `apikey` header is required to access your project's APIs. This can be a [publishable, secret or the legacy `anon` or `service_role` keys](/docs/guides/getting-started/api-keys). Using your minted JWT is not possible in this header.
 
 </Admonition>
 
