@@ -34,8 +34,8 @@ This Docker Compose configuration includes the following services:
 - **[postgres-meta](https://github.com/supabase/postgres-meta)** - RESTful API for managing Postgres (fetch tables, add roles, run queries)
 - **[PostgreSQL](https://github.com/supabase/postgres)** - Object-relational database with over 30 years of active development
 - **[Edge Runtime](https://github.com/supabase/edge-runtime)** - Web server based on Deno runtime for running JavaScript, TypeScript, and WASM services
-- **[Logflare](https://github.com/Logflare/logflare)** - Log management and event analytics platform
-- **[Vector](https://github.com/vectordotdev/vector)** - High-performance observability data pipeline for logs
+- **[Logflare](https://github.com/Logflare/logflare)** - Log management and event analytics platform (optional via `docker-compose.analytics.yml`)
+- **[Vector](https://github.com/vectordotdev/vector)** - High-performance observability data pipeline for logs (optional via `docker-compose.analytics.yml`)
 - **[Supavisor](https://github.com/supabase/supavisor)** - Supabase's Postgres connection pooler
 
 ## Documentation
@@ -55,6 +55,7 @@ To update your self-hosted Supabase instance:
 4. Pull the latest images: `docker compose pull`
 5. Stop services: `docker compose down`
 6. Start services with new configuration: `docker compose up -d`
+7. Optional analytics stack: `docker compose -f docker-compose.yml -f docker-compose.analytics.yml up -d`
 
 **Note:** Consider to always backup your database before updating.
 
