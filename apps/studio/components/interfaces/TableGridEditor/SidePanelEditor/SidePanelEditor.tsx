@@ -56,7 +56,6 @@ import { tableRowKeys } from '@/data/table-rows/keys'
 import { tableKeys } from '@/data/tables/keys'
 import { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import { getTables } from '@/data/tables/tables-query'
-import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
@@ -137,16 +136,12 @@ const DUMMY_TABLE_API_ACCESS_PARAMS: TableApiAccessParams = {
 }
 
 const createTableApiAccessHandlerParams = ({
-  enabled,
   snap,
   selectedTable,
 }: {
-  enabled: boolean
   snap: DeepReadonly<TableEditorState>
   selectedTable?: PostgresTable
 }): TableApiAccessParams | undefined => {
-  if (!enabled) return undefined
-
   const tableSidePanel = snap.sidePanel?.type === 'table' ? snap.sidePanel : undefined
   if (!tableSidePanel) return undefined
 
@@ -198,7 +193,6 @@ export const SidePanelEditor = ({
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const isApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { updateRow, addRow, isEditPending } = useTableRowOperations()
 
@@ -211,7 +205,6 @@ export const SidePanelEditor = ({
   })
 
   const tableApiAccessParams = createTableApiAccessHandlerParams({
-    enabled: isApiGrantTogglesEnabled,
     snap,
     selectedTable,
   })
@@ -595,7 +588,7 @@ export const SidePanelEditor = ({
     let toastId
     let saveTableError = false
 
-    if (isApiGrantTogglesEnabled && !apiAccessToggleHandler.isSuccess) {
+    if (!apiAccessToggleHandler.isSuccess) {
       if (apiAccessToggleHandler.isPending) {
         toast.info(
           'Cannot save table yet because Data API settings are still loading. Please try again in a moment.'
@@ -687,13 +680,11 @@ export const SidePanelEditor = ({
                 async () => {
                   if (isRealtimeEnabled) await updateTableRealtime(table, true)
 
-                  if (isApiGrantTogglesEnabled) {
-                    const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
-                      ? apiAccessToggleHandler.data.privileges
-                      : undefined
-                    if (privilegesToSet) {
-                      await updateTableApiAccess(table, privilegesToSet)
-                    }
+                  const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
+                    ? apiAccessToggleHandler.data.privileges
+                    : undefined
+                  if (privilegesToSet) {
+                    await updateTableApiAccess(table, privilegesToSet)
                   }
                 }
               )
@@ -762,13 +753,11 @@ export const SidePanelEditor = ({
         })
         if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
-        if (isApiGrantTogglesEnabled) {
-          const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
-            ? apiAccessToggleHandler.data.privileges
-            : undefined
-          if (privilegesToSet) {
-            await updateTableApiAccess(table, privilegesToSet)
-          }
+        const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
+          ? apiAccessToggleHandler.data.privileges
+          : undefined
+        if (privilegesToSet) {
+          await updateTableApiAccess(table, privilegesToSet)
         }
 
         await Promise.all([
@@ -808,13 +797,11 @@ export const SidePanelEditor = ({
         }
         if (isTableLike(table)) {
           await updateTableRealtime(table, isRealtimeEnabled)
-          if (isApiGrantTogglesEnabled) {
-            const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
-              ? apiAccessToggleHandler.data.privileges
-              : undefined
-            if (privilegesToSet) {
-              await updateTableApiAccess(table, privilegesToSet)
-            }
+          const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
+            ? apiAccessToggleHandler.data.privileges
+            : undefined
+          if (privilegesToSet) {
+            await updateTableApiAccess(table, privilegesToSet)
           }
         }
 

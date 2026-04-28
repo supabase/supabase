@@ -136,12 +136,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
         <meta name="description" content="Supabase Studio" />
       </Head>
       <div className={cn('flex flex-col w-screen h-[calc(100vh-48px)]')}>
-        <WithSidebar
-          title=""
-          breadcrumbs={[]}
-          backToDashboardURL={backToDashboardURL}
-          sections={sections}
-        >
+        <WithSidebar backToDashboardURL={backToDashboardURL} sections={sections}>
           {children}
         </WithSidebar>
       </div>

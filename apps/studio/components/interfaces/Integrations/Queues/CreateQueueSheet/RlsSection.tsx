@@ -1,5 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
-import { Badge, FormControl_Shadcn_, FormField_Shadcn_, SheetSection, Switch } from 'ui'
+import { Badge, FormControl, FormField, SheetSection, Switch } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -17,7 +17,7 @@ export function RlsSection({
 }) {
   return (
     <SheetSection className="flex flex-col gap-y-2">
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="enableRls"
         render={({ field }) => (
@@ -31,13 +31,13 @@ export function RlsSection({
             }
             description="Restrict access to your queue by enabling RLS and writing Postgres policies to control access for each role."
           >
-            <FormControl_Shadcn_>
+            <FormControl>
               <Switch
                 checked={field.value}
                 onCheckedChange={field.onChange}
                 disabled={field.disabled || isExposed}
               />
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )}
       />

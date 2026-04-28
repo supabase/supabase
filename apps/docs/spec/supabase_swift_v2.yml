@@ -4133,6 +4133,26 @@ functions:
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
         hideCodeBlock: true
         isSpotlight: true
+  - id: strip-nulls
+    title: stripNulls()
+    description: |
+      Strip null values from the response.
+    notes: |
+      - Requires PostgREST 11.2.0 or later.
+      - Cannot be combined with `.csv()`.
+    examples:
+      - id: strip-nulls
+        name: Strip null values
+        isSpotlight: true
+        code: |
+          ```swift
+          let data = try await supabase
+            .from("characters")
+            .select()
+            .stripNulls()
+            .execute()
+            .value
+          ```
   - id: explain
     title: Using Explain
     description: |

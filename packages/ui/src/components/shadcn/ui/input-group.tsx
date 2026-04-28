@@ -8,20 +8,20 @@ import { Textarea, type TextareaProps } from './textarea'
 
 interface InputGroupProps extends React.ComponentProps<'div'> {
   /**
-   * This props is passed in by <FormControl_Shadcn_> but they should be applied on the input itself. When using
-   * <InputGroup> inside a <Form_Shadcn_>, use <FormInputGroupInput> and <FormInputGroupTextArea> instead of the
+   * This props is passed in by <FormControl> but they should be applied on the input itself. When using
+   * <InputGroup> inside a <Form>, use <FormInputGroupInput> and <FormInputGroupTextArea> instead of the
    * regular <Input> and <Textarea> components.
    */
   id?: string
   /**
-   * This props is passed in by <FormControl_Shadcn_> but they should be applied on the input itself. When using
-   * <InputGroup> inside a <Form_Shadcn_>, use <FormInputGroupInput> and <FormInputGroupTextArea> instead of the
+   * This props is passed in by <FormControl> but they should be applied on the input itself. When using
+   * <InputGroup> inside a <Form>, use <FormInputGroupInput> and <FormInputGroupTextArea> instead of the
    * regular <Input> and <Textarea> components.
    */
   'aria-invalid'?: React.AriaAttributes['aria-invalid']
   /**
-   * This props is passed in by <FormControl_Shadcn_> but they should be applied on the input itself. When using
-   * <InputGroup> inside a <Form_Shadcn_>, use <FormInputGroupInput> and <FormInputGroupTextArea> instead of the
+   * This props is passed in by <FormControl> but they should be applied on the input itself. When using
+   * <InputGroup> inside a <Form>, use <FormInputGroupInput> and <FormInputGroupTextArea> instead of the
    * regular <Input> and <Textarea> components.
    */
   'aria-describedby'?: string
@@ -29,7 +29,7 @@ interface InputGroupProps extends React.ComponentProps<'div'> {
 
 /*
  * Used to group input elements together with addons like labels, buttons, or text. When using this component
- * inside a <Form_Shadcn_>, use FormInputGroupInput and FormInputGroupTextArea instead of the regular Input
+ * inside a <Form>, use FormInputGroupInput and FormInputGroupTextArea instead of the regular Input
  * and Textarea components to ensure proper form field association and accessibility.
  */
 function InputGroup({
@@ -157,7 +157,7 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
 }
 
 /*
- * If you need to use this component inside a <Form_Shadcn_>, use FormInputGroupInput instead.
+ * If you need to use this component inside a <Form>, use FormInputGroupInput instead.
  */
 function InputGroupInput({ className, ...props }: InputProps) {
   return (
@@ -177,7 +177,7 @@ function InputGroupInput({ className, ...props }: InputProps) {
 }
 
 /*
- * If you need to use this component inside a <Form_Shadcn_>, use FormInputGroupTextArea instead.
+ * If you need to use this component inside a <Form>, use FormInputGroupTextArea instead.
  */
 function InputGroupTextarea({ className, ...props }: TextareaProps) {
   return (

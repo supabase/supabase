@@ -360,14 +360,6 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     useOrioleDb?: boolean
     /**
-     * Whether the tableEditorApiAccessToggle PostHog flag was enabled for this user.
-     * Gates the integrations → Data API settings surface only; no longer controls
-     * project-creation revoke behaviour (see dataApiRevokeOnCreateDefaultEnabled).
-     * true/false = flag state when project was created
-     * omitted = PostHog flags had not loaded at the time of project creation
-     */
-    tableEditorApiAccessToggleEnabled?: boolean
-    /**
      * Raw checkbox state for "Automatically expose new tables and functions" at submission.
      * true = default privileges are granted on new entities (current behaviour)
      * false = revoke SQL ran; user must manually grant access per entity
@@ -3211,6 +3203,20 @@ export interface ResourceExhaustionBannerAiAssistantClickedEvent {
 }
 
 /**
+ * User clicked a row in the Unified Logs interface.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface UnifiedLogsRowClickedEvent {
+  action: 'unified_logs_row_clicked'
+  properties: {
+    logType: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -3389,3 +3395,4 @@ export type TelemetryEvent =
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
   | ResourceExhaustionBannerAiAssistantClickedEvent
+  | UnifiedLogsRowClickedEvent

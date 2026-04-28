@@ -14,14 +14,12 @@ import { useCronJobsData } from './CronJobsTab.useCronJobsData'
 import { DeleteCronJob } from './DeleteCronJob'
 import { CreateCronJobSheet } from '@/components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
-import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { cleanPointerEventsNoneOnBody } from '@/lib/helpers'
 import { createNavigationHandler } from '@/lib/navigation'
-import { isGreaterThanOrEqual } from '@/lib/semver'
 
 const EMPTY_CRON_JOB = { jobname: '', schedule: '', active: true, command: '' }
 
@@ -59,16 +57,6 @@ export const CronjobsTab = () => {
   const cronJobForEditing = grid.rows.find((j) => j.jobid.toString() === cronJobIdForEditing)
 
   const [, setCronJobForDeletion] = useQueryState('delete', parseAsString)
-
-  const { data: extensions = [] } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const pgCronExtension = extensions.find((ext) => ext.name === 'pg_cron')
-  const supportsSeconds = pgCronExtension?.installed_version
-    ? isGreaterThanOrEqual(pgCronExtension.installed_version, '1.5')
-    : false
 
   const { mutate: sendEvent } = useSendEventMutation()
 

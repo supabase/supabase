@@ -1,6 +1,6 @@
 'use client'
 
-import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
+import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
 import { Circle } from 'lucide-react'
 import * as React from 'react'
 

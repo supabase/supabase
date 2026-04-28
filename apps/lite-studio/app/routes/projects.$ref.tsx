@@ -4,7 +4,7 @@ import {
   Badge,
   Button,
   Card,
-  Checkbox_Shadcn_ as Checkbox,
+  Checkbox,
   Input,
   Label_Shadcn_ as Label,
   Separator,

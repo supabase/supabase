@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import {
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -23,7 +23,7 @@ export const JoinOrganizationOnSignup = ({
 
   return (
     <div className="space-y-4">
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="joinOrgOnSignup"
         render={({ field }) => (
@@ -32,14 +32,14 @@ export const JoinOrganizationOnSignup = ({
             label="Automatically add users to organization on sign up"
             description="If disabled, users will need to be invited to the organization after signing up"
           >
-            <FormControl_Shadcn_ className="flex items-center gap-2">
+            <FormControl className="flex items-center gap-2">
               <Switch checked={field.value} onCheckedChange={field.onChange} />
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )}
       />
       {joinOrgOnSignup && (
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="roleOnJoin"
           render={({ field }) => (
@@ -49,7 +49,7 @@ export const JoinOrganizationOnSignup = ({
               layout="flex-row-reverse"
               className="justify-between"
             >
-              <FormControl_Shadcn_>
+              <FormControl>
                 <Select_Shadcn_ value={field.value} onValueChange={(val) => field.onChange(val)}>
                   <SelectTrigger_Shadcn_ className="w-52">
                     <SelectValue_Shadcn_ placeholder="Select a role" />
@@ -63,7 +63,7 @@ export const JoinOrganizationOnSignup = ({
                     </SelectGroup_Shadcn_>
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />

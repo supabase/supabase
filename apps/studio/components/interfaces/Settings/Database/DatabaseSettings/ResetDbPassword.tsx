@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Modal } from 'ui'
+import { Button, Card, CardContent, Input, Modal } from 'ui'
 import {
   PageSection,
   PageSectionContent,

@@ -127,7 +127,7 @@ New variables default to empty values in `.env.example`. When empty, the API gat
 
 The new authentication configuration is fully backward compatible:
 
-- **Kong accepts both key types simultaneously.** You can migrate clients incrementally - some using legacy API keys, others using the new ones.
+- **The API Gateway accepts both key types simultaneously.** You can migrate clients incrementally - some using legacy API keys, others using the new ones.
 - **JWKS includes the symmetric key.** `JWT_JWKS` contains both the EC public key (for verifying new ES256 tokens) and the legacy `JWT_SECRET` as a symmetric JWK (for verifying old HS256 tokens). Services that receive `JWT_JWKS` can verify both token types.
 - **No database changes required.** The asymmetric key system operates entirely at the API gateway and service configuration layer.
 
@@ -192,7 +192,7 @@ For **Realtime WebSocket** connections, the API key is sent as a `?apikey=` quer
 
 **Storage** and **Edge Functions** accept requests without an API key. These services handle their own authentication.
 
-### API gateway routing
+### Kong API gateway routing
 
 Kong is configured with two consumers that each accept both the legacy and new API keys:
 
