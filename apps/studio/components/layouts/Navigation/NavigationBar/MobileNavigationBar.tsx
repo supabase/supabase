@@ -10,7 +10,6 @@ import { HomeIcon } from '../LayoutHeader/HomeIcon'
 import { useMobileSheet } from './MobileSheetContext'
 import { OrgSelector } from './OrgSelector'
 import { ProjectBranchSelector } from './ProjectBranchSelector'
-import { useIsFloatingMobileToolbarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
 import { LocalDropdown } from '@/components/interfaces/LocalDropdown'
 import { SidebarContent } from '@/components/interfaces/Sidebar'
@@ -31,7 +30,6 @@ const MobileNavigationBar = ({
   backToDashboardURL?: string
 }) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const showFloatingMobileToolbar = useIsFloatingMobileToolbarEnabled()
   const { ref: projectRef, slug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { isPending: isLoadingOrganizations } = useOrganizationsQuery()
@@ -50,7 +48,7 @@ const MobileNavigationBar = ({
         )}
       >
         <div className={cn('flex min-w-0 shrink items-center gap-2', !IS_PLATFORM && 'pl-2')}>
-          {showFloatingMobileToolbar && backToDashboardURL && (
+          {backToDashboardURL && (
             <div className="flex items-center justify-center ml-1 flex-0 md:hidden h-full aspect-square">
               <Link
                 href={backToDashboardURL}
@@ -73,25 +71,6 @@ const MobileNavigationBar = ({
           )}
         </div>
         <div className="flex shrink-0 gap-2">
-          {!showFloatingMobileToolbar && (
-            <CommandMenuTrigger>
-              <button
-                type="button"
-                className={cn(
-                  'group',
-                  'grow h-[30px] rounded-md',
-                  'p-2',
-                  'flex items-center justify-between',
-                  'bg-transparent border-none text-foreground-lighter',
-                  'hover:bg-transparent/100 hover:border-strong hover:text-foreground-light',
-                  'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
-                  'transition'
-                )}
-              >
-                <Search size={18} strokeWidth={2} />
-              </button>
-            </CommandMenuTrigger>
-          )}
           {IS_PLATFORM && <HeaderUpgradeButton />}
           {IS_PLATFORM ? <UserDropdown /> : <LocalDropdown />}
           {!hideMobileMenu && (
@@ -108,7 +87,7 @@ const MobileNavigationBar = ({
       <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen} data-state="expanded">
         <SidebarContent />
       </MobileSheetNav>
-      {showFloatingMobileToolbar && <FloatingMobileToolbar hideMobileMenu={hideMobileMenu} />}
+      <FloatingMobileToolbar hideMobileMenu={hideMobileMenu} />
     </div>
   )
 }

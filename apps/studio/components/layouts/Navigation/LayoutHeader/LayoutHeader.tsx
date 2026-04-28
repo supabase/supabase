@@ -14,7 +14,6 @@ import { HeaderUpgradeButton } from './HeaderUpgradeButton'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import { MergeRequestButton } from './MergeRequestButton'
-import { useIsFloatingMobileToolbarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
 import { ConnectSheet } from '@/components/interfaces/ConnectSheet/ConnectSheet'
 import { LocalDropdown } from '@/components/interfaces/LocalDropdown'
@@ -71,7 +70,6 @@ export const LayoutHeader = ({
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const showFloatingMobileToolbar = useIsFloatingMobileToolbarEnabled()
   const commandMenuEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
 
   const isAccountPage = router.pathname.startsWith('/account')
@@ -101,12 +99,7 @@ export const LayoutHeader = ({
 
   return (
     <>
-      <header
-        className={cn(
-          'flex h-11 md:h-12 items-center shrink-0 border-b',
-          showFloatingMobileToolbar && 'hidden md:flex'
-        )}
-      >
+      <header className="hidden md:flex h-11 md:h-12 items-center shrink-0 border-b">
         {backToDashboardURL && isAccountPage && (
           <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
             <Link

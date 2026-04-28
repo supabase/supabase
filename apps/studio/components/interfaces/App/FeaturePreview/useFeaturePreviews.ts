@@ -20,7 +20,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const { isEligible: isEnterpriseOrSupabaseOrg } = useIsEnterpriseOrSupabaseOrg()
 
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
-  const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   const rlsTesterEnabled = useFlag('rlsTester')
@@ -89,15 +88,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isNew: false,
       isPlatformOnly: false,
       isDefaultOptIn: false,
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR,
-      name: 'Floating Mobile Toolbar',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/43721',
-      enabled: showFloatingMobileToolbar,
-      isNew: true,
-      isPlatformOnly: false,
-      isDefaultOptIn: true,
-    },
+    }
   ].sort((a, b) => Number(b.isNew) - Number(a.isNew))
 }
