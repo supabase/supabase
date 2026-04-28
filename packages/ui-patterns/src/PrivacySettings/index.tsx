@@ -2,13 +2,39 @@
 
 import { useConsentState } from 'common'
 import Link from 'next/link'
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import { Modal, Toggle } from 'ui'
 
 import { Admonition } from '../admonition'
 
 interface PrivacySettingsProps {
   className?: string
+}
+
+function buildServiceConsentMap(
+  categories:
+    | {
+        isEssential: boolean
+        services: readonly {
+          id: string
+          consent: {
+            status: boolean
+          }
+        }[]
+      }[]
+    | null
+) {
+  const consentMap = new Map<string, boolean>()
+
+  categories?.forEach((category) => {
+    if (category.isEssential) return
+
+    category.services.forEach((service) => {
+      consentMap.set(service.id, service.consent.status)
+    })
+  })
+
+  return consentMap
 }
 
 export const PrivacySettings = ({
@@ -18,14 +44,40 @@ export const PrivacySettings = ({
   const [isOpen, setIsOpen] = useState(false)
   const { categories, updateServices } = useConsentState()
 
-  const [serviceConsentMap, setServiceConsentMap] = useState(() => new Map<string, boolean>())
+  const [serviceConsentMap, setServiceConsentMap] = useState(() =>
+    buildServiceConsentMap(categories)
+  )
+
+  // Reseed the consent map if categories arrive while the modal is open. The
+  // useState initializer above runs once at mount, and the button onClick
+  // below reseeds when the modal opens — but if the user opens the modal
+  // during the SDK init window (categories === null), the modal renders an
+  // "Unable to Load Privacy Settings" admonition with no toggles, then
+  // categories arrives asynchronously and the toggles render. Without this
+  // effect, the map stays empty and a subsequent toggle + Confirm would
+  // submit only the toggled service — exactly the partial-submit bug this
+  // component is meant to prevent.
+  //
+  // The empty-map guard prevents this effect from clobbering in-progress
+  // user toggles in any unforeseen scenario where categories' reference
+  // changes mid-session.
+  useEffect(() => {
+    if (!isOpen || !categories) return
+    setServiceConsentMap((current) =>
+      current.size === 0 ? buildServiceConsentMap(categories) : current
+    )
+  }, [isOpen, categories])
 
   function handleServicesChange(services: { id: string; status: boolean }[]) {
-    let newServiceConsentMap = new Map(serviceConsentMap)
-    services.forEach((service) => {
-      newServiceConsentMap.set(service.id, service.status)
+    setServiceConsentMap((currentConsentMap) => {
+      const nextConsentMap = new Map(currentConsentMap)
+
+      services.forEach((service) => {
+        nextConsentMap.set(service.id, service.status)
+      })
+
+      return nextConsentMap
     })
-    setServiceConsentMap(newServiceConsentMap)
   }
 
   const handleConfirmPreferences = () => {
@@ -44,7 +96,13 @@ export const PrivacySettings = ({
 
   return (
     <>
-      <button {...props} onClick={() => setIsOpen(true)}>
+      <button
+        {...props}
+        onClick={() => {
+          setServiceConsentMap(buildServiceConsentMap(categories))
+          setIsOpen(true)
+        }}
+      >
         {children}
       </button>
 
