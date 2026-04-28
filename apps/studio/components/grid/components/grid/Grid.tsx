@@ -2,13 +2,19 @@ import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { forwardRef, memo, Ref, useCallback, useMemo, useRef, useState } from 'react'
-import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
+import DataGrid, {
+  CalculatedColumn,
+  CellKeyboardEvent,
+  CellKeyDownArgs,
+  DataGridHandle,
+} from 'react-data-grid'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ref as valtioRef } from 'valtio'
 
 import type { GridProps, SupaColumn, SupaRow } from '../../types'
 import { isPendingAddRow, isPendingDeleteRow } from '../../types'
+import { isBoolColumn } from '../../utils/types'
 import { ColumnOverlayItem } from './ColumnOverlayItem'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
@@ -146,6 +152,36 @@ export const Grid = memo(
       const removeAllFilters = useCallback(() => {
         clearFilters()
       }, [clearFilters])
+
+      function handleCellKeyDown(
+        args: CellKeyDownArgs<SupaRow, unknown>,
+        event: CellKeyboardEvent
+      ) {
+        handleCopyCell(args, event)
+        if (event.isGridDefaultPrevented() || args.mode !== 'SELECT') return
+
+        const key = event.key.toLowerCase()
+        if (event.altKey || event.ctrlKey || event.metaKey || (key !== 't' && key !== 'f')) return
+
+        const column = snap.table.columns.find((column) => column.name === args.column.key)
+        if (
+          column === undefined ||
+          !isBoolColumn(column.dataType) ||
+          args.column.renderEditCell == null
+        ) {
+          return
+        }
+
+        event.preventDefault()
+        event.preventGridDefault()
+
+        const nextValue = key === 't'
+        if (args.row[args.column.key] === nextValue) return
+
+        const updatedRows = [...rows]
+        updatedRows[args.rowIdx] = { ...args.row, [args.column.key]: nextValue }
+        onRowsChange(updatedRows, { indexes: [args.rowIdx], column: args.column })
+      }
 
       // Compute columns with cellClass for dirty cells
       // This needs to be computed at render time so it reacts to operation queue changes
@@ -362,7 +398,7 @@ export const Grid = memo(
                       onRowDoubleClick(props.row, { name: props.column.name })
                     }
                   }}
-                  onCellKeyDown={handleCopyCell}
+                  onCellKeyDown={handleCellKeyDown}
                 />
               </RowContextMenuProvider>
               {/* The DragOverlay is necessary to avoid styling issues while dragging a column */}
