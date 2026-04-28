@@ -3,7 +3,6 @@ import { Edit, ExternalLink, FlaskConical, Grid } from 'lucide-react'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, Modal } from 'ui'
 
 import CardButton from '@/components/ui/CardButton'
-import { useAppStateSnapshot } from '@/state/app-state'
 
 interface PolicySelectionProps {
   description: string
@@ -20,8 +19,6 @@ const PolicySelection = ({
   onViewEditor = noop,
   onToggleFeaturePreviewModal,
 }: PolicySelectionProps) => {
-  const snap = useAppStateSnapshot()
-
   return (
     <Modal.Content className="space-y-4 py-4">
       <div className="flex flex-col gap-y-2">

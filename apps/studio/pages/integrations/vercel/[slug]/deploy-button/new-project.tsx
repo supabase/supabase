@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
-import { Alert, Button, Checkbox_Shadcn_, Input, Listbox } from 'ui'
+import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
 import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
@@ -307,7 +307,7 @@ const CreateProject = () => {
       </div>
       <div className="py-2 pb-4">
         <div className="items-top flex space-x-2">
-          <Checkbox_Shadcn_
+          <Checkbox
             id="shouldRunMigrations"
             name="shouldRunMigrations"
             checked={shouldRunMigrations}
@@ -329,7 +329,7 @@ const CreateProject = () => {
       </div>
       <div className="py-2 pb-4">
         <div className="items-top flex space-x-2">
-          <Checkbox_Shadcn_
+          <Checkbox
             id="dataApiDefaultPrivileges"
             name="dataApiDefaultPrivileges"
             checked={dataApiDefaultPrivileges}

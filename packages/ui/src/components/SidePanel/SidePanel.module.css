@@ -116,7 +116,7 @@
 }
 
 .sbui-sidepanel-footer {
-  @apply flex flex-shrink-0;
+  @apply flex shrink-0;
 }
 
 .sbui-sidepanel__trigger {

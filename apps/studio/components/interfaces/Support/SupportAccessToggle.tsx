@@ -42,7 +42,7 @@ export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
             label={
               <div className="flex items-center gap-x-2">
                 <span className="text-foreground">Allow support access to your project</span>
-                <Badge className="bg-opacity-100">Recommended</Badge>
+                <Badge>Recommended</Badge>
               </div>
             }
             description={

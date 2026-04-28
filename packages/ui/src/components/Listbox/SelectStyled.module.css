@@ -97,7 +97,7 @@
 */
 
 /* .sbui-listbox-option-container {
-  @apply list-none p-0 absolute mt-1 w-full bg-white dark:bg-gray-800 shadow-lg border border-solid border-control max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm z-10;
+  @apply list-none p-0 absolute mt-1 w-full bg-white dark:bg-gray-800 shadow-lg border border-solid border-control max-h-60 rounded-md py-1 text-base ring-1 ring-black/5 overflow-auto focus:outline-none sm:text-sm z-10;
 } */
 
 /* .sbui-listbox-option {
@@ -105,7 +105,7 @@
 } */
 
 /* .sbui-listbox-option--active {
-  @apply text-brand-600 dark:text-brand-600 bg-brand-600 bg-opacity-20;
+  @apply text-brand-600 dark:text-brand-600 bg-brand-600/20;
 }
 
 .sbui-listbox-option--disabled {

@@ -233,7 +233,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
           <form
             id={formId}
             onSubmit={form.handleSubmit(onSubmit)}
-            className="overflow-auto flex-grow px-0"
+            className="overflow-auto grow px-0"
           >
             <SheetSection className="flex flex-col gap-y-4">
               <FormField

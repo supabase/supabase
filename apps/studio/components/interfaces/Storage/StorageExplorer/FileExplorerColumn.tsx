@@ -5,7 +5,7 @@ import { ChevronsDown, ChevronsUp, Copy, Eye, FolderPlus, Upload } from 'lucide-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Checkbox_Shadcn_ as Checkbox,
+  Checkbox,
   cn,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
@@ -188,7 +188,7 @@ export const FileExplorerColumn = ({
           className={cn(
             fullWidth ? 'w-full' : 'w-64 border-r border-overlay',
             view === STORAGE_VIEWS.LIST && 'h-full',
-            'hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto'
+            'hide-scrollbar relative flex shrink-0 flex-col overflow-auto'
           )}
           onDragOver={onDragOver}
           onDrop={onDrop}
@@ -269,7 +269,7 @@ export const FileExplorerColumn = ({
             <div
               className={`
                 ${fullWidth ? 'w-full' : 'w-64 border-r border-default'}
-                px-2 py-1 my-1 flex flex-shrink-0 flex-col space-y-2 overflow-auto
+                px-2 py-1 my-1 flex shrink-0 flex-col space-y-2 overflow-auto
               `}
             >
               <ShimmeringLoader />

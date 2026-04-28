@@ -1,20 +1,18 @@
 'use client'
 
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import Panel from '~/components/Panel'
+import type { CustomerStoryType } from '~/data/CustomerStories'
+import customerStories from '~/data/CustomerStories'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import SectionHeader from 'components/UI/SectionHeader'
 import { ArrowRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
-
-import SectionHeader from 'components/UI/SectionHeader'
 import { Button, cn } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import Panel from '~/components/Panel'
-
-import type { CustomerStoryType } from '~/data/CustomerStories'
-import customerStories from '~/data/CustomerStories'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 const CustomersSliderMobile = dynamic(() => import('./CustomersSliderMobile'))
 const CutomsersSliderDesktop = dynamic(() => import('./CutomsersSliderDesktop'))
@@ -124,7 +122,7 @@ export const CompositionCol: React.FC<CompositionColProps> = ({ column, classNam
           <Link
             href={customer.url!}
             key={customer.organization}
-            className="col-span-12 md:col-span-4 w-full h-full flex-grow"
+            className="col-span-12 md:col-span-4 w-full h-full grow"
             onClick={() =>
               sendTelemetryEvent({
                 action: 'homepage_customer_story_card_clicked',
@@ -178,7 +176,7 @@ const CustomerCard: React.FC<CustomerCardProps> = ({
       return (
         <Panel
           hasActiveOnHover
-          outerClassName={cn('h-full w-full md:w-[250px] h-full flex-grow', className)}
+          outerClassName={cn('h-full w-full md:w-[250px] h-full grow', className)}
           innerClassName="flex items-center justify-center"
         >
           <Image
@@ -215,7 +213,7 @@ const CustomerCard: React.FC<CustomerCardProps> = ({
           {showLogo && <LogoComponent logoImage={customer.logo!} />}
 
           <p className="text-base text-foreground-lighter">{customer.title}</p>
-          {children && <span className="text-sm text-foreground-light flex-grow">{children}</span>}
+          {children && <span className="text-sm text-foreground-light grow">{children}</span>}
         </Panel>
       )
   }
