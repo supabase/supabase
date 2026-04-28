@@ -38,8 +38,8 @@ const ROLE_BY_LINT: Record<GraphqlExposureLintName, 'anon' | 'authenticated'> = 
 }
 
 const HIDE_LABEL: Record<GraphqlExposureLintName, string> = {
-  pg_graphql_anon_table_exposed: 'Disable for anonymous users',
-  pg_graphql_authenticated_table_exposed: 'Disable for signed-in users',
+  pg_graphql_anon_table_exposed: 'Hide from anonymous users',
+  pg_graphql_authenticated_table_exposed: 'Hide from signed-in users',
 }
 
 const AUDIENCE_LABEL: Record<GraphqlExposureLintName, string> = {
@@ -107,7 +107,7 @@ export const GraphqlExposureLintCTA = ({
         onCancel={() => setShowConfirmRevoke(false)}
         onConfirm={handleRevoke}
         alert={{
-          title: 'This revokes all privileges',
+          title: `This removes API access for ${AUDIENCE_LABEL[lintName]}`,
           description: `Apps using the ${role} role will not be able to read or write to this ${objectType} via GraphQL or PostgREST. You can re-grant access later from the SQL editor.`,
         }}
       >
@@ -127,8 +127,8 @@ export const GraphqlExposureCallout = ({ projectRef }: { projectRef: string }) =
       title="GraphQL is enabled on this project"
       description={
         <p>
-          This lint only applies because the <code className="text-code-inline">pg_graphql</code>{' '}
-          extension is enabled. If you don't use GraphQL, you can{' '}
+          This check applies because this table is exposed to GraphQL, if this projects doesn't use
+          GraphQL, you can{' '}
           <InlineLink href={`/project/${projectRef}/integrations/graphiql`}>
             disable it from the GraphQL integration page
           </InlineLink>
