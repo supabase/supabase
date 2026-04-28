@@ -42,6 +42,7 @@ function normalizeHtmlImagesToMarkdown(source: string): string {
     if (!src) return _match
 
     const alt = getAttr(attrs, 'alt')
+      .replace(/\\/g, '\\\\')
       .replace(/\]/g, '\\]')
       .replace(/\[/g, '\\[')
       .replace(/\(/g, '\\(')
