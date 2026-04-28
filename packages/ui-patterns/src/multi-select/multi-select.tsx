@@ -286,7 +286,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           role="combobox"
           className={cn(
             'flex w-full min-w-[200px] min-h-[40px] items-center justify-between rounded-md border',
-            'border-alternative bg-foreground/[.026] px-3 py-2 text-sm',
+            'border-alternative bg-control px-3 py-2 text-sm',
             'ring-offset-background placeholder:text-muted-foreground',
             'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
             'disabled:cursor-not-allowed disabled:opacity-50',
