@@ -55,7 +55,7 @@ function SolutionsStickyNav({ type, activeItem, className }: Props) {
           )}
         >
           {/* mobile */}
-          <SectionContainer className="!p-2 flex items-start md:hidden">
+          <SectionContainer className="p-2! flex items-start md:hidden">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -80,7 +80,7 @@ function SolutionsStickyNav({ type, activeItem, className }: Props) {
             </DropdownMenu>
           </SectionContainer>
           {/* desktop */}
-          <SectionContainer className="!py-0 hidden md:flex gap-3 items-center">
+          <SectionContainer className="py-0! hidden md:flex gap-3 items-center">
             {items.map((item: any) => {
               const isActive = item.id === activeItem
 

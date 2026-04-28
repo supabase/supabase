@@ -114,7 +114,7 @@ const RightClickBrandLogo = () => {
                   autoFocus
                   asChild
                   key={menuItem.label}
-                  className="w-full flex justify-between gap-2 items-center !p-2"
+                  className="w-full flex justify-between gap-2 items-center p-2!"
                 >
                   {menuItem.type === 'download' || menuItem.type === 'link' ? (
                     <Link

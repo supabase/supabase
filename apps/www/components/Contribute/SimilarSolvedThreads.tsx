@@ -167,7 +167,7 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
         <button
           type="button"
           onClick={() => setIsExpanded((prev) => !prev)}
-          className="flex w-full items-center gap-1.5 px-[var(--card-padding-x)] py-4 text-left text-xs font-mono uppercase text-card-foreground"
+          className="flex w-full items-center gap-1.5 px-(--card-padding-x) py-4 text-left text-xs font-mono uppercase text-card-foreground"
         >
           Related threads
           <span className="text-foreground-muted tabular-nums font-normal">({threads.length})</span>

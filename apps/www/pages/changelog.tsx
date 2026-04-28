@@ -357,7 +357,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                     id={entry.number.toString()}
                     className="grid pb-12 lg:grid-cols-12 lg:gap-8 lg:pb-36 scroll-mt-32"
                   >
-                    <div className="col-span-12 lg:-ml-[31px] mb-8 lg:mb-0 self-start z-10 sticky top-[65px] lg:top-32 lg:col-span-4">
+                    <div className="col-span-12 lg:ml-[-31px] mb-8 lg:mb-0 self-start z-10 sticky top-[65px] lg:top-32 lg:col-span-4">
                       <div className="flex w-full items-baseline relative bg-background pt-4 lg:pt-0 border-b pb-4 lg:gap-4 lg:border-none lg:pb-0">
                         <div className="hidden lg:flex bg-border border-muted text-foreground-lighter -ml-2.5 h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
                           <GitCommit size={14} strokeWidth={1.5} />
@@ -392,7 +392,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                       </div>
                     </div>
                     <div className="col-span-8 lg:max-w-[calc(100vw-80px)]">
-                      <article className="prose prose-docs max-w-none [overflow-wrap:break-word] [&>*:first-child:not(style):not(script)]:mt-0 [&>style:first-child+*]:mt-0 [&>script:first-child+*]:mt-0 [&>*:last-child:not(style):not(script)]:mb-0">
+                      <article className="prose prose-docs max-w-none wrap-break-word [&>*:first-child:not(style):not(script)]:mt-0 [&>style:first-child+*]:mt-0 [&>script:first-child+*]:mt-0 [&>*:last-child:not(style):not(script)]:mb-0">
                         <MDXRemote {...entry.source} components={mdxComponents('blog')} />
                       </article>
                     </div>

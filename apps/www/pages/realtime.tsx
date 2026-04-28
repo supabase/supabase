@@ -126,8 +126,8 @@ function RealtimePage() {
                 </div>
                 <div className="mx-3 flex items-center">
                   <div className="border-foreground bg-tomato-900 relative -right-4 h-5 w-5 rounded-full border" />
-                  <div className="border-foreground bg-yellow-900 relative -right-2 z-[2] h-5 w-5 rounded-full border" />
-                  <div className="border-foreground bg-indigo-900 z-[3] h-5 w-5 rounded-full border" />
+                  <div className="border-foreground bg-yellow-900 relative -right-2 z-2 h-5 w-5 rounded-full border" />
+                  <div className="border-foreground bg-indigo-900 z-3 h-5 w-5 rounded-full border" />
                 </div>
               </div>
             </div>,
@@ -192,7 +192,7 @@ function RealtimePage() {
 
         <SingleQuote
           id="quote"
-          className="!pb-8 md:!pb-12"
+          className="pb-8! md:pb-12!"
           quote={{
             text: 'Supabase takes out the mental effort from our back-end infrastructure so we can focus on our customers needs.',
             author: 'Aaron Sullivan',
@@ -211,7 +211,7 @@ function RealtimePage() {
           }}
         />
 
-        <SectionContainer className="!pb-0 !mb-0">
+        <SectionContainer className="pb-0! mb-0!">
           <div className="mb-12 prose">
             <h3>What you can build with Realtime</h3>
             <p className="text-foreground-light mt-0">

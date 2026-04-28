@@ -41,7 +41,7 @@ function BlogGridItemSkeleton() {
     <div className="inline-block min-w-full p-2 sm:p-4 h-full">
       <div className="flex flex-col space-y-2">
         <div className="flex flex-col space-y-1">
-          <div className="relative mb-3 w-full aspect-[2/1] lg:aspect-[5/3] overflow-hidden rounded-lg border border-default bg-foreground-muted/20 animate-pulse" />
+          <div className="relative mb-3 w-full aspect-2/1 lg:aspect-5/3 overflow-hidden rounded-lg border border-default bg-foreground-muted/20 animate-pulse" />
           <div className="flex items-center space-x-1.5">
             <div className="h-4 w-24 bg-foreground-muted/20 rounded animate-pulse" />
             <div className="h-4 w-4 bg-foreground-muted/20 rounded animate-pulse" />

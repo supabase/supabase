@@ -103,7 +103,7 @@ ${appJsCode}`
         <CodeBlock
           hideLineNumbers
           wrapperClassName="w-full"
-          className="!bg-transparent h-[500px] lg:h-full overflow-auto p-8 border-none rounded-none"
+          className="bg-transparent! h-[500px] lg:h-full overflow-auto p-8 border-none rounded-none"
           wrapLines
           language="jsx"
         >

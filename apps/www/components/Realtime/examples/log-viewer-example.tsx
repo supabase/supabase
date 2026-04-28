@@ -327,7 +327,7 @@ export default function App() {
       {/* Main content */}
       <div className="flex-1 font-mono text-xs">
         <div className="h-full relative">
-          <div className="h-32 w-full z-10 absolute left-0 right-0 bottom-0 bg-gradient-to-t from-neutral-900 to-transparent" />
+          <div className="h-32 w-full z-10 absolute left-0 right-0 bottom-0 bg-linear-to-t from-neutral-900 to-transparent" />
           <AutoSizer>
             {({ width, height }) => (
               <InfiniteLoader

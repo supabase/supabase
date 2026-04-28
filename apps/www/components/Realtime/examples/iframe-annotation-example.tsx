@@ -275,9 +275,9 @@ export default function App() {
                         <X strokeWidth={1.5} size={14} />
                       </button>
                     </div>
-                    <div className="text-xs  text-neutral-200 break-words">{comment.text}</div>
+                    <div className="text-xs  text-neutral-200 wrap-break-word">{comment.text}</div>
                   </div>
-                  <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-neutral-900/90 mx-auto"></div>
+                  <div className="w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-neutral-900/90 mx-auto"></div>
                 </div>
               ))}
               

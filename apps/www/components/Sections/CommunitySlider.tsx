@@ -146,7 +146,7 @@ const CommunitySlider = () => {
           objectFit={isSm ? 'cover' : 'contain'}
         />
       </div>
-      <SectionContainer className="!py-0">
+      <SectionContainer className="py-0!">
         <div className="col-span-12 text-center relative z-10">
           <h3 className="text-3xl md:text-4xl heading-gradient">
             Join a growing <br />

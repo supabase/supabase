@@ -393,7 +393,7 @@ function ThreadRow({
   }
 
   return (
-    <TableRow className="relative group [&.hovering-badge>td]:hover:!bg-transparent">
+    <TableRow className="relative group [&.hovering-badge>td]:hover:bg-transparent!">
       {/* Thread title and product areas */}
       <TableCell className="w-auto max-w-[600px]">
         <div className="flex items-center gap-3 overflow-hidden">
@@ -617,7 +617,7 @@ function highlightText(text: string, searchTerm: string | null): ReactNode {
     }
     // Add the highlighted match
     parts.push(
-      <mark key={index} className="bg-brand-200 dark:bg-brand-500 dark:!text-foreground px-0.5">
+      <mark key={index} className="bg-brand-200 dark:bg-brand-500 dark:text-foreground! px-0.5">
         {text.slice(index, index + searchTerm.length)}
       </mark>
     )

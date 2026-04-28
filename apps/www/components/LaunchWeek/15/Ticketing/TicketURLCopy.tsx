@@ -32,7 +32,7 @@ export default function TicketURLCopy({
         })
       }}
       className={cn(
-        'font-mono w-full px-2 lg:px-3.5 !pr-1 py-1 rounded-md bg-alternative-200 border flex gap-2 relative text-foreground-light hover:text-foreground text-xs pointer-events-auto justify-between items-center hover:border-stronger transition-all',
+        'font-mono w-full px-2 lg:px-3.5 pr-1! py-1 rounded-md bg-alternative-200 border flex gap-2 relative text-foreground-light hover:text-foreground text-xs pointer-events-auto justify-between items-center hover:border-stronger transition-all',
         className
       )}
     >

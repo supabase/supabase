@@ -47,7 +47,7 @@ const Index = () => {
           ],
         }}
       />
-      <DefaultLayout className="!min-h-fit">
+      <DefaultLayout className="min-h-fit!">
         <div className="bg-alternative">
           <SectionContainer className="space-y-2 text-center">
             <h1 className="text-brand font-mono text-base uppercase tracking-widest">
@@ -90,7 +90,7 @@ const Index = () => {
             </CommandMenuTrigger>
           </SectionContainer>
         </div>
-        <SectionContainer className="text grid gap-5 md:grid-cols-2 xl:grid-cols-3 max-w-7xl !pb-8">
+        <SectionContainer className="text grid gap-5 md:grid-cols-2 xl:grid-cols-3 max-w-7xl pb-8!">
           {data.cards.map((card) => (
             <Panel
               key={card.title}
@@ -120,7 +120,7 @@ const Index = () => {
             </Panel>
           ))}
         </SectionContainer>
-        <SectionContainer className="!pt-0 max-w-7xl">
+        <SectionContainer className="pt-0! max-w-7xl">
           <div className="mx-auto bg-alternative border rounded-xl p-6 lg:p-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 xl:gap-16 justify-between">
               <div className="gap-2 flex flex-col">

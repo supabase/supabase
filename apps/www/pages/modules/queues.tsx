@@ -34,7 +34,7 @@ function CronPage() {
           ],
         }}
       />
-      <DefaultLayout className="!bg-alternative" stickyNavbar={false}>
+      <DefaultLayout className="bg-alternative!" stickyNavbar={false}>
         <ModulesNav activePage={PRODUCT_MODULES_NAMES.QUEUES} docsUrl={pageData.docsUrl} />
         <ProductModulesHeader {...pageData.heroSection} />
         <SectionContainer>{pageData.videoSection.video}</SectionContainer>
@@ -42,7 +42,7 @@ function CronPage() {
         <QueuesSQLSection {...pageData.section1} />
         <QueuesAPISection {...pageData.section2} />
         <ImageParagraphSection {...pageData.section3} />
-        <div className="bg-gradient-to-t from-alternative to-transparent mt-8 lg:mt-24">
+        <div className="bg-linear-to-t from-alternative to-transparent mt-8 lg:mt-24">
           <CTABanner />
         </div>
       </DefaultLayout>

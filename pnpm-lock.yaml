@@ -1859,7 +1859,7 @@ importers:
         specifier: ^7.71.2
         version: 7.72.1(react@18.3.1)
       tailwindcss:
-        specifier: 'catalog:'
+        specifier: 4.2.4
         version: 4.2.4
       tsconfig:
         specifier: workspace:*

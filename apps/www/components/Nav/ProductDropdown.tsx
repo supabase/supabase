@@ -144,7 +144,7 @@ export const ProductDropdown = () => {
                         src={`/${customer.imgUrl}`}
                         alt={customer.title}
                         fill
-                        className="!p-3 object-contain brightness-70 contrast-[.35] filter"
+                        className="p-3! object-contain brightness-70 contrast-[.35] filter"
                       />
                     </div>
                     <div className="flex flex-col">

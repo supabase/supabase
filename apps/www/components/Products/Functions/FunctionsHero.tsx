@@ -172,7 +172,7 @@ const FunctionsHero = () => {
       id="functions-hero"
       className="
         absolute inset-0
-        -left-28 top-4 w-[150%] md:w-[150%] aspect-[978/678]
+        -left-28 top-4 w-[150%] md:w-[150%] aspect-978/678
         sm:-left-32 sm:-top-2
         md:-left-44
         lg:-left-10 lg:-top-10 lg:w-[130%]
@@ -262,7 +262,7 @@ const FunctionsHero = () => {
         </div>
       ))}
       <div className="absolute left-[51.15%] top-[10%] w-px h-[20%] overflow-hidden">
-        <span className="absolute inset-0 w-full bg-gradient-to-t from-current to-transparent h-full delay-1200 animate-slide-in" />
+        <span className="absolute inset-0 w-full bg-linear-to-t from-current to-transparent h-full delay-1200 animate-slide-in" />
       </div>
       {/* Globe background */}
       <Image

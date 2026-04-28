@@ -92,7 +92,7 @@ const CustomerQuotesSection = (props: Props) => {
         <div className="relative h-[300px] w-[300vw] left-[-98vw] md:left-0 mx-auto md:w-full -mb-32 z-0">
           <CustomersVisual />
         </div>
-        <SectionContainer className="!py-0">
+        <SectionContainer className="py-0!">
           <div className="col-span-12 text-center relative z-10">
             <h3 className="text-3xl md:text-4xl heading-gradient">{props.title}</h3>
           </div>

@@ -24,7 +24,7 @@ export const LaunchSection = (props: WeekDayProps) => {
       {/* START timeline dot */}
       <div
         className={[
-          'absolute mt-[4px] -ml-[21px] h-3 w-3 rounded-full border md:-ml-[37px] lg:-ml-[37.5px]',
+          'absolute mt-[4px] ml-[-21px] h-3 w-3 rounded-full border md:ml-[-37px] lg:ml-[-37.5px]',
           props.shipped ? 'border-brand bg-brand-400' : 'border-purple-900 bg-purple-300',
         ].join(' ')}
       ></div>

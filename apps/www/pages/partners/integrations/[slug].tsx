@@ -119,10 +119,10 @@ function Partner({
             </div>
 
             <div
-              className="bg-gradient-to-t from-background-alternative to-background border-b p-6 [&_.swiper-container]:overflow-visible"
+              className="bg-linear-to-t from-background-alternative to-background border-b p-6 [&_.swiper-container]:overflow-visible"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
-              <SectionContainer className="!py-0 !px-3 lg:!px-12 xl:!p-0 mx-auto max-w-5xl">
+              <SectionContainer className="py-0! px-3! lg:px-12! xl:p-0! mx-auto max-w-5xl">
                 <Swiper
                   initialSlide={0}
                   spaceBetween={20}

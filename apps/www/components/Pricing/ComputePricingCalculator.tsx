@@ -202,7 +202,7 @@ const ComputePricingCalculator = ({
                   step={1}
                   className={cn(
                     'w-full cursor-grab active:cursor-grabbing',
-                    !hasInteractedWithSlider && "[&_[data-slot='slider-thumb']]:animate-pulse"
+                    !hasInteractedWithSlider && "**:data-[slot='slider-thumb']:animate-pulse"
                   )}
                 />
               </div>

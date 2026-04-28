@@ -123,7 +123,7 @@ export function ChangelogTimelineList(props: Props) {
             }
           >
             <div className="relative hidden lg:col-span-2 lg:block">
-              <div className="-ml-[42px] text-foreground lg:sticky lg:top-[calc(65px+1rem)] lg:pt-4">
+              <div className="ml-[-42px] text-foreground lg:sticky lg:top-[calc(65px+1rem)] lg:pt-4">
                 <div className="text-foreground-light mb-1 flex items-center gap-2">
                   <div className="bg-border border-muted flex h-5 w-5 shrink-0 items-center justify-center rounded border drop-shadow-sm">
                     <GitCommit size={14} strokeWidth={1.5} />

@@ -61,7 +61,7 @@ const BlogGridItem = ({ post }: Props) => {
             </div>
           )}
           <h3 className="text-foreground max-w-sm text-xl">{post.title}</h3>
-          <p className="text-foreground-light max-w-sm text-base !mb-0">{post.description}</p>
+          <p className="text-foreground-light max-w-sm text-base mb-0!">{post.description}</p>
         </div>
       </div>
     </Link>

@@ -42,7 +42,7 @@ const ProductCard = ({
       outerClassName="relative w-full h-full"
       innerClassName={cn(
         'relative overflow-hidden flex-1 flex flex-row sm:flex-col gap-4 items-start sm:items-center lg:items-start justify-between',
-        'bg-surface-75 w-full h-full text-foreground-lighter [&_strong]:!font-normal [&_strong]:!text-foreground',
+        'bg-surface-75 w-full h-full text-foreground-lighter [&_strong]:font-normal! [&_strong]:text-foreground!',
         'p-4 sm:py-6'
       )}
     >
@@ -81,7 +81,7 @@ const ProductCard = ({
           <h2 className="">{title}</h2>
         </div>
         <div className="flex-1 flex flex-col justify-between gap-2">
-          <p className="text-sm [&_strong]:!text-foreground">{subtitle}</p>
+          <p className="text-sm [&_strong]:text-foreground!">{subtitle}</p>
           {highlights && (
             <span className={cn('hidden lg:block text-foreground', isDatabase && 'md:block')}>
               {highlights}

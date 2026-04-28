@@ -270,7 +270,7 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
                     setSearchTerm('')
                     setShowSearchInput(false)
                   }}
-                  className="text-foreground-light hover:text-foreground bg-control/100 hover:bg-selection"
+                  className="text-foreground-light hover:text-foreground bg-control hover:bg-selection"
                 >
                   <CloseIcon size="14" />
                 </Button>

@@ -66,7 +66,7 @@ export const DevelopersDropdown = () => {
                   <p className="text-foreground-light mb-0 line-clamp-2 group-hover:text-foreground group-focus-visible:text-foreground">
                     {post.title}
                   </p>
-                  <p className="text-sm line-clamp-2 text-foreground-lighter leading-relaxed !mb-0 group-hover:text-foreground-light group-focus-visible:text-foreground-light">
+                  <p className="text-sm line-clamp-2 text-foreground-lighter leading-relaxed mb-0! group-hover:text-foreground-light group-focus-visible:text-foreground-light">
                     {post.description}
                   </p>
                 </Link>
