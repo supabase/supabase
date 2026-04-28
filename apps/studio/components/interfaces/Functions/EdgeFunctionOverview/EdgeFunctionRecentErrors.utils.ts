@@ -75,21 +75,14 @@ export const getDisplayErrorMessage = (group: RecentErrorGroup): string => {
   return summarizeErrorMessage(group.message)
 }
 
-const TROUBLESHOOTING_DOCS_URL = 'https://supabase.com/docs/guides/troubleshooting'
+const TROUBLESHOOTING_DOCS_BASE = 'https://supabase.com/docs/guides/troubleshooting'
 
-export const buildTroubleshootingDocsUrl = ({
-  statusCode,
-  errorMessage,
-}: {
-  statusCode?: string
-  errorMessage?: string
-}): string => {
-  const errorType = errorMessage?.match(/^([A-Z][A-Za-z0-9]*Error)\b/)?.[1]
-  const terms = ['edge function', errorType, statusCode].filter((term): term is string =>
-    Boolean(term)
-  )
-  const search = terms.length > 0 ? terms.join(' ') : 'edge function'
-  return `${TROUBLESHOOTING_DOCS_URL}?search=${encodeURIComponent(search)}`
+export const buildTroubleshootingDocsUrl = ({ statusCode }: { statusCode?: string }): string => {
+  const numericStatusCode = Number(statusCode)
+  if (Number.isFinite(numericStatusCode) && numericStatusCode >= 100) {
+    return `${TROUBLESHOOTING_DOCS_BASE}/edge-function-${numericStatusCode}-response`
+  }
+  return `${TROUBLESHOOTING_DOCS_BASE}?search=${encodeURIComponent('edge function')}`
 }
 
 export const toAlertError = (error: unknown): AlertErrorProps['error'] | undefined => {

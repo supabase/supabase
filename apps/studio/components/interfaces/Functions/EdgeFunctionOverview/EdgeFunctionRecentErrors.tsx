@@ -252,7 +252,6 @@ export const EdgeFunctionRecentErrors = ({
                       const displayMessage = getDisplayErrorMessage(group)
                       const docsUrl = buildTroubleshootingDocsUrl({
                         statusCode: group.lastStatusCode,
-                        errorMessage: displayMessage,
                       })
 
                       return (
