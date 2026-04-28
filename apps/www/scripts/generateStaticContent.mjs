@@ -500,6 +500,7 @@ try {
     const visibleEntries = entries.filter((entry) => !entry.title.includes('[d]'))
     const escapeMd = (value) =>
       String(value ?? '')
+        .replace(/\\/g, '\\\\')
         .replace(/\|/g, '\\|')
         .replace(/\n/g, ' ')
     const mdRows = visibleEntries.map((entry) => {
