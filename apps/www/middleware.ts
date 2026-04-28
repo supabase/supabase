@@ -22,7 +22,7 @@ export function middleware(request: NextRequest) {
 
   // Serve markdown to known LLM clients (Accept header or UA match).
   // Cache-key safety: rewriting to /api-v2/md/<slug> partitions the response
-  // by path, so no Vary: User-Agent is needed (matches Vercel/Sentry pattern).
+  // by path, so no Vary: User-Agent is needed.
   const accept = (request.headers.get('accept') ?? '').toLowerCase()
   const userAgent = request.headers.get('user-agent') ?? ''
   if (accept.includes('text/markdown') || LLM_USER_AGENT.test(userAgent)) {
