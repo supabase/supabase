@@ -8090,6 +8090,11 @@ export interface components {
         has_address: boolean
         id: string
         is_default: boolean
+        shared_payment_token: {
+          expires_at: number | null
+          is_expired: boolean
+          last4: string
+        } | null
         type: string
       }[]
       defaultPaymentMethodId: string | null

@@ -17,6 +17,7 @@ import {
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 
 export const BillingSettings = () => {
   const {
@@ -34,11 +35,12 @@ export const BillingSettings = () => {
   const { data: org } = useSelectedOrganizationQuery()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner
+  const isStripeOrg = org?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
   const billingAccountDataEnabled =
     isBillingAccountDataEnabledOnProfileLevel && isNotOrgWithPartnerBilling
   const billingPaymentMethodsEnabled =
-    isBillingPaymentMethodsEnabledOnProfileLevel && isNotOrgWithPartnerBilling
+    isBillingPaymentMethodsEnabledOnProfileLevel && (isNotOrgWithPartnerBilling || isStripeOrg)
 
   return (
     <>

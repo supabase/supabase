@@ -7,6 +7,7 @@ import { createMockOrganization, render } from '@/tests/helpers'
 
 const mockSelectedOrganization = vi.hoisted(() => vi.fn())
 const mockPush = vi.hoisted(() => vi.fn())
+const mockPartnerManagedResource = vi.hoisted(() => vi.fn())
 
 vi.mock('common', async (importOriginal) => {
   const original = (await importOriginal()) as typeof import('common')
@@ -86,7 +87,10 @@ vi.mock('@/data/organizations/organization-billing-subscription-preview', () => 
 }))
 
 vi.mock('@/components/ui/PartnerManagedResource', () => ({
-  default: () => <div data-testid="partner-managed-resource" />,
+  default: (props: any) => {
+    mockPartnerManagedResource(props)
+    return <div data-testid="partner-managed-resource">{props.details}</div>
+  },
 }))
 
 vi.mock('./EnterpriseCard', () => ({
@@ -126,11 +130,44 @@ describe('PlanUpdateSidePanel', () => {
     )
   })
 
-  it('does not treat Stripe-connected orgs as partner-billed', () => {
+  it('shows Stripe-managed messaging without treating Stripe orgs as partner-billed', () => {
     render(<PlanUpdateSidePanel />)
 
-    expect(screen.queryByTestId('partner-managed-resource')).not.toBeInTheDocument()
+    expect(screen.getByTestId('partner-managed-resource')).toBeInTheDocument()
+    expect(screen.getByText('stripe projects upgrade supabase/free')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Upgrade to Pro' })).toBeInTheDocument()
+  })
+
+  it('uses the current plan in the Stripe Projects upgrade command', () => {
+    mockSelectedOrganization.mockReturnValue(
+      createMockOrganization({
+        slug: 'stripe-org',
+        billing_partner: null,
+        integration_source: 'stripe_projects',
+        managed_by: MANAGED_BY.STRIPE_PROJECTS,
+        plan: { id: 'pro', name: 'Pro' },
+      })
+    )
+
+    render(<PlanUpdateSidePanel />)
+
+    expect(screen.getByText('stripe projects upgrade supabase/pro')).toBeInTheDocument()
+  })
+
+  it('uses the Stripe Projects downgrade command for team plans', () => {
+    mockSelectedOrganization.mockReturnValue(
+      createMockOrganization({
+        slug: 'stripe-org',
+        billing_partner: null,
+        integration_source: 'stripe_projects',
+        managed_by: MANAGED_BY.STRIPE_PROJECTS,
+        plan: { id: 'team', name: 'Team' },
+      })
+    )
+
+    render(<PlanUpdateSidePanel />)
+
+    expect(screen.getByText('stripe projects downgrade supabase/team')).toBeInTheDocument()
   })
 
   it('still shows partner-managed messaging for billing-partner orgs', () => {
