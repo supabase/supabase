@@ -151,17 +151,15 @@ export default function ProjectPage() {
                 />
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="enable-rls"
-                    checked={enableRls}
-                    onCheckedChange={(checked) => setEnableRls(checked)}
-                  />
-                  <Label_Shadcn_ htmlFor="enable-rls">
-                    Enable RLS by default on new tables
-                  </Label_Shadcn_>
-                </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="enable-rls"
+                  checked={enableRls}
+                  onCheckedChange={(checked) => setEnableRls(checked)}
+                />
+                <Label_Shadcn_ htmlFor="enable-rls">
+                  Enable RLS by default on new tables
+                </Label_Shadcn_>
               </div>
 
               <div className="flex items-center gap-3">
