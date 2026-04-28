@@ -27,7 +27,7 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
             toast.error('Failed to redirect because redirect URL is invalid')
             return
           }
-          window.location.href = data.redirectUrl
+          window.open(data.redirectUrl, '_blank', 'noreferrer')
         } else {
           toast.error('Failed to start integration installation')
         }
