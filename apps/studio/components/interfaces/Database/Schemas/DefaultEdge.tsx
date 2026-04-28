@@ -75,7 +75,6 @@ export const DefaultEdge = ({
 
 const EdgeRelationInfo = ({
   data,
-  edgePath,
   source,
   target,
   labelX,

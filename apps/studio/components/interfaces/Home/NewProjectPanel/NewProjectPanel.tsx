@@ -83,7 +83,7 @@ export const NewProjectPanel = () => {
                       </div>
                       <h5>Authentication</h5>
                     </div>
-                    <div className="flex flex-grow md:min-h-[50px] xl:min-h-[75px]">
+                    <div className="flex grow md:min-h-[50px] xl:min-h-[75px]">
                       <p className="text-sm text-foreground-light">
                         A complete user management system that works without any additional tools.
                       </p>

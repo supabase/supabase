@@ -32,8 +32,8 @@ export const ProjectUpgradeFailedBanner = () => {
     .tz(guessLocalTimezone())
     .format('DD MMM YYYY HH:mm:ss')
 
-  const subject = 'Upgrade%20failed%20for%20project'
-  const message = `Upgrade information:%0A• Initiated at: ${initiated_at}%0A• Error: ${error}`
+  const subject = 'Upgrade failed for project'
+  const message = `Upgrade information:\n• Initiated at: ${initiated_at}\n• Error: ${error}`
 
   const initiatedAtEncoded = encodeURIComponent(
     dayjs.utc(initiated_at ?? 0).format('YYYY-MM-DDTHH:mm:ss')

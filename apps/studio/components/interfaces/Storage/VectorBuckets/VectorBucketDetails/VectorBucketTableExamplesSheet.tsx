@@ -71,7 +71,7 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
             </SheetTitle>
           </SheetHeader>
 
-          <div className="overflow-auto flex-grow">
+          <div className="overflow-auto grow">
             <VectorBucketIndexExamples
               bucketName={index.vectorBucketName}
               indexName={index.indexName}

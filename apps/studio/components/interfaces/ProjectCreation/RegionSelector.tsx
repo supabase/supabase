@@ -4,7 +4,7 @@ import type { CloudProvider } from 'shared-data'
 import {
   Badge,
   cn,
-  FormField_Shadcn_,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -124,7 +124,7 @@ export const RegionSelector = ({
 
   return (
     <Panel.Content>
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="dbRegion"
         render={({ field }) => {

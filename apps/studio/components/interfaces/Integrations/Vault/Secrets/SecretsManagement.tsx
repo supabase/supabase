@@ -153,12 +153,12 @@ export const SecretsManagement = () => {
           <LoadingLine loading={isLoading || isRefetching} />
 
           {isError ? (
-            <div className="flex-grow p-4">
+            <div className="grow p-4">
               <AlertError error={error} subject="Failed to load secrets" />
             </div>
           ) : (
             <DataGrid
-              className="flex-grow border-t-0"
+              className="grow border-t-0"
               rowHeight={52}
               headerRowHeight={36}
               columns={columns}

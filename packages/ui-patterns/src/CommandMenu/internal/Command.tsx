@@ -3,9 +3,9 @@
 import { forwardRef, type PropsWithChildren } from 'react'
 import { cn, CommandItem_Shadcn_ } from 'ui'
 
+import { useQuery } from '../api/hooks/queryHooks'
 import { useCommandMenuTelemetryContext } from '../api/hooks/useCommandMenuTelemetryContext'
 import { useCrossCompatRouter } from '../api/hooks/useCrossCompatRouter'
-import { useQuery } from '../api/hooks/queryHooks'
 import { useResetCommandMenu, useSetCommandMenuOpen } from '../api/hooks/viewHooks'
 import type { IActionCommand, ICommand, IRouteCommand } from './types'
 
@@ -108,7 +108,7 @@ const CommandItem = forwardRef<
       {...props}
     >
       <div className="w-full flex flex-row justify-between items-center">
-        <div className="flex flex-row gap-2 flex-grow items-center">
+        <div className="flex flex-row gap-2 grow items-center">
           {command.icon?.()}
           {children}
         </div>

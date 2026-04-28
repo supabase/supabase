@@ -42,7 +42,7 @@ const CronSQLSection: FC<Props> = (props) => {
           <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
         )}
       </div>
-      <ul className="w-full flex-grow rounded-lg max-w-md">
+      <ul className="w-full grow rounded-lg max-w-md">
         <div className="w-full h-full relative">
           <CodeWindow
             code={codeSnippet}

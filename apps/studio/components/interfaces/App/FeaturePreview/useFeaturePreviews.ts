@@ -1,5 +1,7 @@
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 
+import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
+
 export type FeaturePreview = {
   key: string
   name: string
@@ -15,18 +17,29 @@ export type FeaturePreview = {
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
+  const { isEligible: isEnterpriseOrSupabaseOrg } = useIsEnterpriseOrSupabaseOrg()
 
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
+  const rlsTesterEnabled = useFlag('rlsTester')
 
   return [
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER,
+      name: 'RLS Tester',
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/45233',
+      enabled: rlsTesterEnabled,
+      isNew: true,
+      isPlatformOnly: false,
+      isDefaultOptIn: false,
+    },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
       name: 'New Logs interface',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
-      enabled: isUnifiedLogsPreviewAvailable,
+      enabled: isUnifiedLogsPreviewAvailable && isEnterpriseOrSupabaseOrg,
       isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: false,
@@ -45,7 +58,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF,
       name: 'PG Delta Diff',
       discussionsUrl: undefined,
-      isNew: true,
+      isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: true,
       enabled: pgDeltaDiffEnabled,

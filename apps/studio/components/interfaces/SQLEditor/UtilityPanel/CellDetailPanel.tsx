@@ -58,7 +58,7 @@ export const CellDetailPanel = ({ column, value, visible, onClose }: CellDetailP
             />
           </div>
         ) : (
-          <div className="flex-grow py-4 px-4 bg-default overflow-y-auto">
+          <div className="grow py-4 px-4 bg-default overflow-y-auto">
             <Markdown
               remarkPlugins={[remarkGfm]}
               className="!max-w-full markdown-body"

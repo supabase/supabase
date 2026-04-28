@@ -162,7 +162,7 @@ export const ReportBlock = ({
               tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
             />
           }
-          onExecute={(queryType) => {
+          onExecute={(_queryType) => {
             refetch()
           }}
           onUpdateChartConfig={onUpdateChart}

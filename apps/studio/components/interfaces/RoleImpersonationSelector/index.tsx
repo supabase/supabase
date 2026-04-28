@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { cn, DropdownMenuSeparator } from 'ui'
 
 import { AnonIcon, AuthenticatedIcon, ServiceRoleIcon } from './Icons'
-import RoleImpersonationRadio from './RoleImpersonationRadio'
-import UserImpersonationSelector from './UserImpersonationSelector'
+import { RoleImpersonationRadio } from './RoleImpersonationRadio'
+import { UserImpersonationSelector } from './UserImpersonationSelector'
 import { PostgrestRole } from '@/lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
@@ -11,6 +11,7 @@ export interface RoleImpersonationSelectorProps {
   serviceRoleLabel?: string
   padded?: boolean
   disallowAuthenticatedOption?: boolean
+  title?: string
 }
 
 export const RoleImpersonationSelector = ({

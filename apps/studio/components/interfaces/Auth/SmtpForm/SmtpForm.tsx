@@ -10,9 +10,9 @@ import {
   CardContent,
   CardFooter,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
@@ -221,11 +221,11 @@ export const SmtpForm = () => {
   return (
     <PageSection>
       <PageSectionContent>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <Card>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="ENABLE_SMTP"
                   render={({ field }) => (
@@ -243,13 +243,13 @@ export const SmtpForm = () => {
                         </p>
                       }
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Switch
                           checked={field.value}
                           onCheckedChange={field.onChange}
                           disabled={!canUpdateConfig}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -275,7 +275,7 @@ export const SmtpForm = () => {
                         </p>
                       </div>
                       <div className="col-span-8 space-y-4">
-                        <FormField_Shadcn_
+                        <FormField
                           control={form.control}
                           name="SMTP_ADMIN_EMAIL"
                           render={({ field }) => (
@@ -283,18 +283,18 @@ export const SmtpForm = () => {
                               label="Sender email address"
                               description="The email address the emails are sent from."
                             >
-                              <FormControl_Shadcn_>
+                              <FormControl>
                                 <Input_Shadcn_
                                   {...field}
                                   placeholder="noreply@yourdomain.com"
                                   disabled={!canUpdateConfig}
                                 />
-                              </FormControl_Shadcn_>
+                              </FormControl>
                             </FormItemLayout>
                           )}
                         />
 
-                        <FormField_Shadcn_
+                        <FormField
                           control={form.control}
                           name="SMTP_SENDER_NAME"
                           render={({ field }) => (
@@ -302,13 +302,13 @@ export const SmtpForm = () => {
                               label="Sender name"
                               description="Name displayed in the recipient's inbox."
                             >
-                              <FormControl_Shadcn_>
+                              <FormControl>
                                 <Input_Shadcn_
                                   {...field}
                                   placeholder="Your Name"
                                   disabled={!canUpdateConfig}
                                 />
-                              </FormControl_Shadcn_>
+                              </FormControl>
                             </FormItemLayout>
                           )}
                         />
@@ -325,7 +325,7 @@ export const SmtpForm = () => {
                         </p>
                       </div>
                       <div className="col-span-8 space-y-4">
-                        <FormField_Shadcn_
+                        <FormField
                           control={form.control}
                           name="SMTP_HOST"
                           render={({ field }) => (
@@ -333,13 +333,13 @@ export const SmtpForm = () => {
                               label="Host"
                               description="Hostname or IP address of your SMTP server."
                             >
-                              <FormControl_Shadcn_>
+                              <FormControl>
                                 <Input_Shadcn_
                                   {...field}
                                   placeholder="your.smtp.host.com"
                                   disabled={!canUpdateConfig}
                                 />
-                              </FormControl_Shadcn_>
+                              </FormControl>
                             </FormItemLayout>
                           )}
                         />
@@ -355,7 +355,7 @@ export const SmtpForm = () => {
                           />
                         )}
 
-                        <FormField_Shadcn_
+                        <FormField
                           control={form.control}
                           name="SMTP_PORT"
                           render={({ field }) => (
@@ -371,7 +371,7 @@ export const SmtpForm = () => {
                                 </>
                               }
                             >
-                              <FormControl_Shadcn_>
+                              <FormControl>
                                 <Input_Shadcn_
                                   type="number"
                                   value={field.value}
@@ -379,12 +379,12 @@ export const SmtpForm = () => {
                                   placeholder="587"
                                   disabled={!canUpdateConfig}
                                 />
-                              </FormControl_Shadcn_>
+                              </FormControl>
                             </FormItemLayout>
                           )}
                         />
 
-                        <FormField_Shadcn_
+                        <FormField
                           control={form.control}
                           name="SMTP_MAX_FREQUENCY"
                           render={({ field }) => (
@@ -392,7 +392,7 @@ export const SmtpForm = () => {
                               label="Minimum interval per user"
                               description="The minimum time in seconds between emails before another email can be sent to the same user."
                             >
-                              <FormControl_Shadcn_>
+                              <FormControl>
                                 <InputGroup>
                                   <FormInputGroupInput
                                     type="number"
@@ -404,12 +404,12 @@ export const SmtpForm = () => {
                                     <InputGroupText>seconds</InputGroupText>
                                   </InputGroupAddon>
                                 </InputGroup>
-                              </FormControl_Shadcn_>
+                              </FormControl>
                             </FormItemLayout>
                           )}
                         />
 
-                        <FormField_Shadcn_
+                        <FormField
                           control={form.control}
                           name="SMTP_USER"
                           render={({ field }) => (
@@ -417,18 +417,18 @@ export const SmtpForm = () => {
                               label="Username"
                               description="Username for your SMTP server."
                             >
-                              <FormControl_Shadcn_>
+                              <FormControl>
                                 <Input_Shadcn_
                                   {...field}
                                   placeholder="SMTP Username"
                                   disabled={!canUpdateConfig}
                                 />
-                              </FormControl_Shadcn_>
+                              </FormControl>
                             </FormItemLayout>
                           )}
                         />
 
-                        <FormField_Shadcn_
+                        <FormField
                           control={form.control}
                           name="SMTP_PASS"
                           render={({ field }) => (
@@ -436,9 +436,9 @@ export const SmtpForm = () => {
                               label="Password"
                               description="Password for your SMTP server. For security reasons, this password cannot be viewed once saved."
                             >
-                              <FormControl_Shadcn_>
+                              <FormControl>
                                 <Input {...field} reveal copy disabled={!canUpdateConfig} />
-                              </FormControl_Shadcn_>
+                              </FormControl>
                             </FormItemLayout>
                           )}
                         />
@@ -489,7 +489,7 @@ export const SmtpForm = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </PageSectionContent>
     </PageSection>
   )

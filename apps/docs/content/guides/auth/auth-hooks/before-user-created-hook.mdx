@@ -727,7 +727,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js'
 
 const whSecret = Deno.env.get('BEFORE_USER_CREATED_HOOK_SECRET')?.replace('v1,whsec_', '')
 const supabaseUrl = Deno.env.get('SUPABASE_URL')
-const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+const supabaseKey = Deno.env.get('SUPABASE_SECRET_KEY')
 
 const wh = new Webhook(whSecret)
 const supabase = createClient(supabaseUrl, supabaseKey)

@@ -7,8 +7,11 @@ import { CRON_TABLE_COLUMNS, HTTPHeader, secondsPattern } from './CronJobs.const
 import { CronJobTableCell } from './CronJobTableCell'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 
+const escapeSqlLiteral = (value = '') => value.replaceAll("'", "''")
+const unescapeSqlLiteral = (value = '') => value.replaceAll("''", "'")
+
 export function buildCronQuery(name: string, schedule: string, command: string) {
-  const escapedName = name.replace(/'/g, "''")
+  const escapedName = escapeSqlLiteral(name)
   return `select cron.schedule('${escapedName}', '${schedule}', ${command});`
 }
 
@@ -22,11 +25,13 @@ export const buildHttpRequestCommand = (
   return `
 select
   net.${method === 'GET' ? 'http_get' : 'http_post'}(
-      url:='${url}',
+      url:='${escapeSqlLiteral(url)}',
       headers:=jsonb_build_object(${headers
         .filter((v) => v.name && v.value)
-        .map((v) => `'${v.name}', '${v.value}'`)
-        .join(', ')}), ${method === 'POST' && body ? `\n      body:='${body}',` : ''}
+        .map((v) => `'${escapeSqlLiteral(v.name)}', '${escapeSqlLiteral(v.value)}'`)
+        .join(
+          ', '
+        )}), ${method === 'POST' && body ? `\n      body:='${escapeSqlLiteral(body)}',` : ''}
       timeout_milliseconds:=${timeout}
   );`
 }
@@ -41,21 +46,17 @@ const DEFAULT_CRONJOB_COMMAND = {
 } as const
 
 export const parseCronJobCommand = (originalCommand: string, projectRef: string): CronJobType => {
-  const command = originalCommand
-    .replaceAll('$$', ' ')
-    .replaceAll(/\n/g, ' ')
-    .replaceAll(/\s+/g, ' ')
-    .trim()
+  const command = originalCommand.replaceAll('$$', ' ').replaceAll(/\n/g, ' ').trim()
 
-  if (command.toLocaleLowerCase().startsWith('select net.')) {
-    const methodMatch = command.match(/select net\.([^']+)\(\s*url:=/i)
+  if (command.toLocaleLowerCase().match(/^select\s+net\./)) {
+    const methodMatch = command.match(/select\s+net\.([^']+)\(\s*url:=/i)
     const method = methodMatch?.[1] || ''
 
-    const urlMatch = command.match(/url:='([^']+)'/i)
-    const url = urlMatch?.[1] || ''
+    const urlMatch = command.match(/url:='((?:''|[^'])*)'/i)
+    const url = unescapeSqlLiteral(urlMatch?.[1])
 
-    const bodyMatch = command.match(/body:='(.*?)'/i)
-    const body = bodyMatch?.[1] || ''
+    const bodyMatch = command.match(/body:='((?:''|[^'])*)'/i)
+    const body = unescapeSqlLiteral(bodyMatch?.[1])
 
     const timeoutMatch = command.match(/timeout_milliseconds:=(\d+)/i)
     const timeout = timeoutMatch?.[1] || ''
@@ -65,8 +66,9 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
 
     let headersObjs: { name: string; value: string }[] = []
     if (headersJsonBuildObject) {
-      // convert the header string to array of objects, clean up the values, trim them of spaces and remove the quotation marks at start and end
-      const headers = headersJsonBuildObject.split(',').map((s) => s.trim().replace(/^'|'$/g, ''))
+      const headers = headersJsonBuildObject
+        .split(',')
+        .map((s) => unescapeSqlLiteral(s.trim().replace(/^'|'$/g, '')))
 
       for (let i = 0; i < headers.length; i += 2) {
         if (headers[i] && headers[i].length > 0) {
@@ -74,8 +76,8 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
         }
       }
     } else {
-      const headersStringMatch = command.match(/headers:='([^']*)'/i)
-      const headersString = headersStringMatch?.[1] || '{}'
+      const headersStringMatch = command.match(/headers:='((?:''|[^'])*)'/i)
+      const headersString = unescapeSqlLiteral(headersStringMatch?.[1]) || '{}'
       try {
         const parsedHeaders = JSON.parse(headersString)
         headersObjs = Object.entries(parsedHeaders).map(([name, value]) => ({

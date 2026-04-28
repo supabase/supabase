@@ -31,6 +31,8 @@ pnpm typecheck                        # typecheck all packages
 
 **Styling** — Tailwind only, semantic tokens (`bg-muted`, `text-foreground-light`), no hardcoded colors.
 
+**Language** — Use U.S. English everywhere.
+
 ## Studio
 
 Pages router. Co-locate sub-components with parent. Avoid barrel re-export files.

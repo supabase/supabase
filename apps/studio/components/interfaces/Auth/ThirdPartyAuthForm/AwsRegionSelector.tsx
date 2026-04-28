@@ -9,7 +9,7 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  FormControl_Shadcn_,
+  FormControl,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -61,7 +61,7 @@ export const AwsRegionSelector = ({
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <FormControl_Shadcn_>
+        <FormControl>
           <Button
             type="default"
             role="combobox"
@@ -75,7 +75,7 @@ export const AwsRegionSelector = ({
           >
             {value ?? 'Select a region'}
           </Button>
-        </FormControl_Shadcn_>
+        </FormControl>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ id={listboxId} className="p-0" sameWidthAsTrigger>
         <Command_Shadcn_>

@@ -1,6 +1,6 @@
 'use client'
 
-import * as RadixCollapsible from '@radix-ui/react-collapsible'
+import { Collapsible as RadixCollapsible } from 'radix-ui'
 import React from 'react'
 
 import styleHandler from '../../lib/theme/styleHandler'

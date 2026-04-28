@@ -2814,6 +2814,25 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
 
+  - id: strip-nulls
+    title: stripNulls()
+    description: |
+      Strip null values from the response.
+    notes: |
+      - Requires PostgREST 11.2.0 or later.
+    examples:
+      - id: strip-nulls
+        name: Strip null values
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val data = supabase
+            .from("characters")
+            .select {
+              stripNulls()
+            }
+          ```
+
   - id: explain
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
     title: Using Explain

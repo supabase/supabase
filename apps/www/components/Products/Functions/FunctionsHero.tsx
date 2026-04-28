@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
 import { createTimeline } from 'animejs'
 import { Check, Copy } from 'lucide-react'
+import Image from 'next/image'
+import React, { useEffect, useRef, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import Typed from 'typed.js'
 
@@ -257,8 +257,8 @@ const FunctionsHero = () => {
           style={{ left: dot.left, top: dot.top }}
           className="absolute origin-center w-[2.5%] h-[3.6%] flex items-center justify-center opacity-0 transition-opacity animate-fade-in delay-75"
         >
-          <span className="absolute inset-0 w-full h-full rounded-full bg-foreground bg-opacity-20" />
-          <span className="absolute w-4/5 h-4/5 rounded-full bg-foreground bg-opacity-90" />
+          <span className="absolute inset-0 w-full h-full rounded-full bg-foreground/20" />
+          <span className="absolute w-4/5 h-4/5 rounded-full bg-foreground/90" />
         </div>
       ))}
       <div className="absolute left-[51.15%] top-[10%] w-px h-[20%] overflow-hidden">

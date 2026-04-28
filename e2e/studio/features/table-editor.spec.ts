@@ -244,7 +244,8 @@ testRunner('table editor', () => {
     // insert row with enum value
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByText('Insert a new row into').click()
-    await page.getByRole('combobox').selectOption('value1')
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'value1' }).click()
     await page.getByTestId('action-bar-save-row').click()
     await expect(page.getByTestId('side-panel-row-editor')).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'value1' })).toBeVisible()
@@ -252,7 +253,8 @@ testRunner('table editor', () => {
     // insert row with another enum value
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByText('Insert a new row into').click()
-    await page.getByRole('combobox').selectOption('value2')
+    await page.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'value2' }).click()
     await page.getByTestId('action-bar-save-row').click()
     await expect(page.getByRole('gridcell', { name: 'value2' })).toBeVisible({ timeout: 10_000 })
 
@@ -903,7 +905,8 @@ testRunner('table editor', () => {
     const updateTrueResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
-    await booleanEditor.selectOption('true')
+    await booleanEditor.click()
+    await page.getByRole('option', { name: 'true' }).click()
     await page.getByRole('columnheader', { name: 'id' }).click()
     await updateTrueResponse
 
@@ -922,7 +925,8 @@ testRunner('table editor', () => {
     const updateFalseResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
-    await booleanEditor.selectOption('false')
+    await booleanEditor.click()
+    await page.getByRole('option', { name: 'false' }).click()
     await page.getByRole('columnheader', { name: 'id' }).click()
     await updateFalseResponse
 
@@ -1019,7 +1023,8 @@ testRunner('table editor', () => {
     const updateNullResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
-    await booleanEditor.selectOption('null')
+    await booleanEditor.click()
+    await page.getByRole('option', { name: 'null' }).click()
     await page.getByRole('columnheader', { name: 'id' }).click()
     await updateNullResponse
 
@@ -1034,7 +1039,8 @@ testRunner('table editor', () => {
     const updateFalseResponse = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
-    await booleanEditor.selectOption('false')
+    await booleanEditor.click()
+    await page.getByRole('option', { name: 'false' }).click()
     await page.getByRole('columnheader', { name: 'id' }).click()
     await updateFalseResponse
 
@@ -1325,6 +1331,85 @@ testRunner('table editor', () => {
     await page.getByRole('button', { name: 'Import data from CSV' }).click()
     await page.getByRole('tab', { name: 'Upload CSV' }).click()
     await page.setInputFiles('input[type="file"]', csvFilePath)
+    await expect(page.getByText('A total of 3 rows will be')).toBeVisible()
+
+    const waitForCsvInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByRole('button', { name: 'Import data' }).click()
+    await waitForCsvInsert
+    await waitForGridDataToLoad(page, ref)
+    await expect(page.getByText('3 records')).toBeVisible()
+
+    await expect
+      .poll(async () => {
+        const [{ state }] = await query<{ state: string }>(`
+          select format(
+            '%s|%s|%s',
+            (select coalesce(max(id), 0) from public.${tableName}),
+            last_value,
+            is_called
+          ) as state
+          from public.${sequenceName};
+        `)
+        return state
+      })
+      .toBe('229|229|t')
+
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByTestId('name-input').fill('Dave')
+    const insertPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByTestId('action-bar-save-row').click()
+    await insertPromise
+
+    await expect
+      .poll(async () => {
+        const [{ id }] = await query<{ id: string }>(
+          `select id::text as id from public.${tableName} where name = 'Dave'`
+        )
+        return id
+      })
+      .toBe('230')
+  })
+
+  test('pasted CSV text syncs custom owned sequences before the next insert', async ({
+    page,
+    ref,
+  }) => {
+    const tableName = 'pw_table_paste_sequence_sync'
+    const sequenceName = 'pw_table_paste_import_owned_seq'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await query(`drop table if exists public.${tableName} cascade;`)
+        await query(`drop sequence if exists public.${sequenceName};`)
+        await query(`create sequence public.${sequenceName};`)
+        await query(`create table public.${tableName} (
+          id bigint primary key default nextval('public.${sequenceName}'),
+          name text
+        );`)
+        await query(`alter sequence public.${sequenceName} owned by public.${tableName}.id;`)
+      },
+      async () => {
+        await query(`drop table if exists public.${tableName} cascade;`)
+        await query(`drop sequence if exists public.${sequenceName};`)
+      }
+    )
+
+    const waitForTable = waitForTableToLoad(page, ref)
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await waitForTable
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    const csvFilePath = path.join(import.meta.dirname, 'files', 'table-editor-import-sequence.csv')
+    const csvText = fs.readFileSync(csvFilePath, 'utf-8')
+    await page.getByRole('button', { name: 'Import data from CSV' }).click()
+    await page.getByRole('tab', { name: 'Paste text' }).click()
+    await page.getByRole('textbox').fill(csvText)
     await expect(page.getByText('A total of 3 rows will be')).toBeVisible()
 
     const waitForCsvInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {

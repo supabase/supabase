@@ -8,7 +8,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
-  Select,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -76,24 +75,34 @@ export const InputField = ({
       )
     } else {
       return (
-        <Select
-          size="medium"
+        <FormItemLayout
+          isReactForm={false}
           layout="horizontal"
-          value={field.value ?? ''}
           label={field.name}
           labelOptional={field.format}
-          descriptionText={field.comment}
-          disabled={!isEditable}
-          error={errors[field.name]}
-          onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+          description={field.comment}
+          className="[&>div:first-child>span]:text-foreground-lighter"
         >
-          <Select.Option value="">---</Select.Option>
-          {field.enums.map((value: string) => (
-            <Select.Option key={value} value={value}>
-              {value}
-            </Select.Option>
-          ))}
-        </Select>
+          <Select_Shadcn_
+            value={field.value ?? ''}
+            onValueChange={(value: string) => onUpdateField({ [field.name]: value })}
+            disabled={!isEditable}
+          >
+            <SelectTrigger_Shadcn_>
+              <SelectValue_Shadcn_ placeholder="---" />
+            </SelectTrigger_Shadcn_>
+            <SelectContent_Shadcn_>
+              <SelectGroup_Shadcn_>
+                <SelectItem_Shadcn_ value={null as any}>---</SelectItem_Shadcn_>
+                {field.enums.map((value) => (
+                  <SelectItem_Shadcn_ key={value} value={value}>
+                    {value}
+                  </SelectItem_Shadcn_>
+                ))}
+              </SelectGroup_Shadcn_>
+            </SelectContent_Shadcn_>
+          </Select_Shadcn_>
+        </FormItemLayout>
       )
     }
   }

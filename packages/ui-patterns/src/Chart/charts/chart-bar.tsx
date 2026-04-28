@@ -54,8 +54,6 @@ export interface ChartBarProps {
   color?: string
   hoverColor?: string
   chartHighlight?: ChartHighlight
-  updateDateRange?: (from: string, to: string) => void
-  highlightActions?: ChartHighlightAction[]
   syncId?: string
   showHighlightArea?: boolean
   cursor?: string
@@ -80,8 +78,6 @@ export const ChartBar = ({
   color = CHART_COLORS.BRAND,
   hoverColor = CHART_COLORS.BRAND_HOVER,
   chartHighlight,
-  updateDateRange,
-  highlightActions,
   syncId,
   showHighlightArea = true,
   cursor,

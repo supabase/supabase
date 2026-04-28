@@ -66,8 +66,8 @@ export const UpgradingState = () => {
     if (ref) await invalidateProjectDetailsQuery(ref)
   }
 
-  const subject = 'Upgrade%20failed%20for%20project'
-  const message = `Upgrade information:%0A• Initiated at: ${initiated_at}%0A• Target Version: ${target_version}%0A• Error: ${error}`
+  const subject = 'Upgrade failed for project'
+  const message = `Upgrade information:\n• Initiated at: ${initiated_at}\n• Target Version: ${target_version}\n• Error: ${error}`
 
   return (
     <div className="w-full mx-auto my-16 space-y-16 max-w-7xl">
