@@ -386,6 +386,7 @@ export const UnifiedLogs = () => {
                       icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
                       onClick={() => setIsFilterBarOpen((prev) => !prev)}
                       className="hidden w-[26px] sm:flex"
+                      aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
                     />
                   </TooltipTrigger>
                   <TooltipContent side="bottom">

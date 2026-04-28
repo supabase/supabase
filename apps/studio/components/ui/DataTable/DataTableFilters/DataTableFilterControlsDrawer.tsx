@@ -41,6 +41,7 @@ export function DataTableFilterControlsDrawer() {
               icon={<FilterIcon />}
               className="w-[26px]"
               ref={isMobile ? triggerButtonRef : null}
+              aria-label="Open filters"
             />
           </DrawerTrigger>
         </TooltipTrigger>
