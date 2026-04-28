@@ -164,7 +164,7 @@ export const PauseDisabledState = () => {
           </ul>
         </div>
       </Admonition>
-      <div className="border-t flex justify-between items-center px-6 py-4 bg-alternative">
+      <div className="border-t flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center px-6 py-4 bg-alternative">
         <div>
           <p className="text-sm">Export your data</p>
           <p className="text-sm text-foreground-lighter">

@@ -86,6 +86,14 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
       const currentValue = queryClient.getQueryData<T>(queryKey) ?? initialValue
       const valueToStore = value instanceof Function ? value(currentValue) : value
 
+      // Bail out when the value is unchanged (matches useState semantics).
+      // Without this, no-op updates from consumers — like a pruning effect
+      // whose updater returns `current` unchanged — still write to
+      // localStorage and invalidate the query, which churns subscribers and
+      // can cascade into "Maximum update depth exceeded" when two consumers
+      // of the same key are mounted together.
+      if (Object.is(valueToStore, currentValue)) return
+
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(key, JSON.stringify(valueToStore))
       }

@@ -7,6 +7,7 @@ import { KeyboardShortcut } from 'ui'
 
 import { DiffEditor } from '../DiffEditor'
 import ResizableAIWidget from './ResizableAIWidget'
+import { getEditorSelectionParts } from './utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { constructHeaders } from '@/data/fetchers'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -21,6 +22,7 @@ interface AIEditorProps {
     projectRef?: string
     connectionString?: string | null
     orgSlug?: string
+    language?: string
   }
   initialPrompt?: string
   readOnly?: boolean
@@ -251,26 +253,9 @@ export const AIEditor = ({
       label: 'Generate with AI',
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
       run: () => {
-        const selection = editor.getSelection()
-        const model = editor.getModel()
-        if (!model || !selection) return
-
-        const allLines = model.getLinesContent()
-        const startLineIndex = selection.startLineNumber - 1
-        const endLineIndex = selection.endLineNumber
-
-        const beforeSelection = allLines.slice(0, startLineIndex).join('\n') + '\n'
-        const selectedText = allLines.slice(startLineIndex, endLineIndex).join('\n')
-        const afterSelection = '\n' + allLines.slice(endLineIndex).join('\n')
-
-        setPromptState({
-          isOpen: true,
-          selection: selectedText,
-          beforeSelection,
-          afterSelection,
-          startLineNumber: selection?.startLineNumber ?? 0,
-          endLineNumber: selection?.endLineNumber ?? 0,
-        })
+        const selectionParts = getEditorSelectionParts(editor)
+        if (!selectionParts) return
+        setPromptState({ isOpen: true, ...selectionParts })
       },
     })
 

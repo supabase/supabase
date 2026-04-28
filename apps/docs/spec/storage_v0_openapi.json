@@ -991,7 +991,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif"] },
+            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -1278,7 +1278,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif"] },
+            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -1445,7 +1445,7 @@
                       "height": { "type": "integer", "minimum": 0, "example": 100 },
                       "width": { "type": "integer", "minimum": 0, "example": 100 },
                       "resize": { "type": "string", "enum": ["cover", "contain", "fill"] },
-                      "format": { "type": "string", "enum": ["origin", "avif"] },
+                      "format": { "type": "string", "enum": ["origin", "avif", "webp"] },
                       "quality": { "type": "integer", "minimum": 20, "maximum": 100 }
                     }
                   }
@@ -1918,7 +1918,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif"] },
+            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -1985,7 +1985,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif"] },
+            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2055,7 +2055,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif"] },
+            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2116,7 +2116,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif"] },
+            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2332,7 +2332,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif"] },
+            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2395,7 +2395,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif"] },
+            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2457,7 +2457,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif"] },
+            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2524,7 +2524,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif"] },
+            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2679,7 +2679,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif"] },
+            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2746,7 +2746,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif"] },
+            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
             "in": "query",
             "name": "format",
             "required": false

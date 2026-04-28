@@ -9,6 +9,7 @@ import { Admonition } from 'ui-patterns'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { getEditorSelectionParts } from '@/components/ui/AIEditor/utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
@@ -148,26 +149,8 @@ const MonacoEditor = ({
         label: 'Generate SQL',
         keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
         run: () => {
-          const selection = editor.getSelection()
-          const model = editor.getModel()
-          if (!model || !selection) return
-
-          const allLines = model.getLinesContent()
-
-          const startLineIndex = selection.startLineNumber - 1
-          const endLineIndex = selection.endLineNumber
-
-          const beforeSelection = allLines.slice(0, startLineIndex).join('\n') + '\n'
-          const selectedText = allLines.slice(startLineIndex, endLineIndex).join('\n')
-          const afterSelection = '\n' + allLines.slice(endLineIndex).join('\n')
-
-          onPrompt({
-            selection: selectedText,
-            beforeSelection,
-            afterSelection,
-            startLineNumber: selection?.startLineNumber ?? 0,
-            endLineNumber: selection?.endLineNumber ?? 0,
-          })
+          const selectionParts = getEditorSelectionParts(editor)
+          if (selectionParts) onPrompt(selectionParts)
         },
       })
     }

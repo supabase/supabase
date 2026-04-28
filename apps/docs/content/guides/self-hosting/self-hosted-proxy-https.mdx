@@ -10,9 +10,9 @@ HTTPS is required for production self-hosted Supabase deployments. This guide co
 
 You need:
 
-- A working self-hosted Supabase installation. See [Self-Hosting with Docker](/docs/guides/self-hosting/docker).
-- A domain name with DNS pointing to your server's public IP address (to obtain Let's Encrypt certificate).
-- Ports 80 and 443 open.
+- A working self-hosted Supabase installation. See [Self-Hosting with Docker](/docs/guides/self-hosting/docker)
+- A domain name with DNS pointing to your server's public IP address (to obtain Let's Encrypt certificate)
+- Ports 80 and 443 open
 
 ## Set up HTTPS
 
@@ -24,10 +24,10 @@ If you already run [HAProxy](https://www.haproxy.com/), [Traefik](https://traefi
 
 - Proxy to Kong on port `8000` (or `<your-ip>:8000` if the proxy runs outside the Docker network)
 - Enable WebSocket support (required for Realtime)
-- Proxy traffic to Storage directly to the container, bypassing Kong
 - Add `X-Forwarded` headers to all requests
 - Comment out Kong's host port bindings in `docker-compose.yml` if the proxy runs in the same Docker network
 - Update `SUPABASE_PUBLIC_URL`, `API_EXTERNAL_URL`, and `SITE_URL` in `.env` to your HTTPS URL
+- See `volumes/proxy` for example proxy configuration files
 
 </Admonition>
 
@@ -35,15 +35,15 @@ If you already run [HAProxy](https://www.haproxy.com/), [Traefik](https://traefi
 
 Update the URL configuration in your `.env` file to use your HTTPS domain:
 
-```
+```sh name=.env
 SUPABASE_PUBLIC_URL=https://<your-domain>
 API_EXTERNAL_URL=https://<your-domain>
 SITE_URL=https://<your-domain>
 ```
 
-Change the following to your domain name and a **valid** email address:
+For Nginx, change the following to your domain name and a **valid** email address:
 
-```
+```sh name=.env
 PROXY_DOMAIN=your-domain.example.com
 CERTBOT_EMAIL=admin@your-domain.example.com
 ```
@@ -73,7 +73,7 @@ Caddy configuration is in `volumes/proxy/caddy/Caddyfile`.
 </TabPanel>
 <TabPanel id="nginx" label="Nginx + Let's Encrypt">
 
-This option uses a 3rd party Nginx Docker image ([`jonasal/nginx-certbot`](https://github.com/JonasAlfredsson/docker-nginx-certbot)), which includes Certbot for automatic Let's Encrypt certificate issuance and renewal in a single container.
+This option uses a third-party Nginx Docker image ([`jonasal/nginx-certbot`](https://github.com/JonasAlfredsson/docker-nginx-certbot)), which includes Certbot for automatic Let's Encrypt certificate issuance and renewal in a single container.
 
 Start Nginx by using the pre-configured `docker-compose.nginx.yml` overlay:
 
@@ -90,11 +90,17 @@ HTTP-to-HTTPS redirects are handled automatically by the `jonasal/nginx-certbot`
 
 ### Step 3: Verify HTTPS connection
 
+Test the HTTPS connection - you should get a `401` response confirming you could connect to Auth:
+
 ```sh
 curl -I https://<your-domain>/auth/v1/
 ```
 
-You should receive a `401` response confirming you could connect to Auth.
+Check container logs if needed (use `supabase-nginx` for Nginx):
+
+```sh
+docker logs supabase-caddy
+```
 
 ## Self-signed certificates (development only)
 
@@ -125,7 +131,7 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 
 Comment out Kong's **HTTP** port mapping in `docker-compose.yml`:
 
-```yaml
+```yaml name=docker-compose.yml
 kong:
   # ...
   ports:
@@ -134,7 +140,7 @@ kong:
 
 Uncomment the certificate volume mounts and SSL environment variables in `docker-compose.yml`:
 
-```yaml
+```yaml name=docker-compose.yml
 kong:
   # ... existing configuration ...
   volumes:
@@ -151,7 +157,7 @@ kong:
 
 Edit your `.env` file to use HTTPS with the Kong HTTPS port:
 
-```
+```sh name=.env
 SUPABASE_PUBLIC_URL=https://<your-domain>:8443
 API_EXTERNAL_URL=https://<your-domain>:8443
 SITE_URL=https://<your-domain>:8443

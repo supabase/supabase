@@ -52,6 +52,7 @@ Chris Martin
 Chris Stockton
 Chris Ward
 Clayton Kast
+Colin Goodheart-Smithe
 Colin Murray
 Colum Ferry
 Craig Cannon
@@ -198,8 +199,10 @@ Rafael Chacón
 Raminder Singh
 Raúl Barroso
 Riccardo Busetti
+Rob Shields
 Rodrigo Esteves
 Rodrigo Mansueli
+Roman Hernandez
 Ronan Lehane
 Rory Wilding
 Ryan Goulet
