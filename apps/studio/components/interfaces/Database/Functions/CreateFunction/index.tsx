@@ -287,7 +287,7 @@ export const CreateFunction = ({
               ) : (
                 <>
                   <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                    <div className="space-y-8 rounded bg-studio py-4 px-6 border border-overlay">
+                    <div className="space-y-8 rounded-sm bg-studio py-4 px-6 border border-overlay">
                       <FormItem className="flex flex-row items-center justify-between">
                         <div className="space-y-0.5">
                           <FormLabel className="text-base">Show advanced settings</FormLabel>

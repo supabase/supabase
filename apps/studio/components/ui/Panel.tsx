@@ -23,7 +23,7 @@ function Panel(props: PropsWithChildren<PanelProps>) {
     <div
       className={cn(
         'bg-surface-100',
-        'rounded-md border shadow-sm',
+        'rounded-md border shadow-xs',
         props.noHideOverflow ? '' : 'overflow-hidden',
         props.noMargin ? '' : 'mb-4 md:mb-8',
         props.className

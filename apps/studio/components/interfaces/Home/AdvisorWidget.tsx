@@ -221,7 +221,7 @@ export const AdvisorWidget = () => {
                 >
                   Security{' '}
                   {securityErrorCount + securityWarningCount > 0 && (
-                    <div className="rounded bg-warning text-warning-100 px-1">
+                    <div className="rounded-sm bg-warning text-warning-100 px-1">
                       {securityErrorCount + securityWarningCount}
                     </div>
                   )}
@@ -233,7 +233,7 @@ export const AdvisorWidget = () => {
                 >
                   Performance{' '}
                   {performanceErrorCount + performanceWarningCount > 0 && (
-                    <div className="rounded bg-warning text-warning-100 px-1">
+                    <div className="rounded-sm bg-warning text-warning-100 px-1">
                       {performanceErrorCount + performanceWarningCount}
                     </div>
                   )}

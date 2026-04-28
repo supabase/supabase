@@ -347,7 +347,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                         readOnly
                         value={generatedKey.private_key}
                         rows={8}
-                        className="w-full rounded-md border border-control bg-surface-200 px-3 py-2 text-xs font-mono resize-none focus:outline-none"
+                        className="w-full rounded-md border border-control bg-surface-200 px-3 py-2 text-xs font-mono resize-none focus:outline-hidden"
                       />
                       <label className="flex items-center gap-3 cursor-pointer bg-warning-200 border border-warning-400 rounded-md px-3 py-2">
                         <Checkbox

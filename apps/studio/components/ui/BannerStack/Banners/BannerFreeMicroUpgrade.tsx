@@ -30,7 +30,7 @@ export const BannerFreeMicroUpgrade = () => {
       <div className="flex flex-col gap-y-4">
         <div className="flex flex-col gap-y-2 items-start">
           <div className="animate-badge-pulse">
-            <div className="relative inline-flex overflow-hidden rounded">
+            <div className="relative inline-flex overflow-hidden rounded-sm">
               <ComputeBadge
                 infraComputeSize="nano"
                 icon={<ChevronsUpAnimated />}

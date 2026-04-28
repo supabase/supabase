@@ -63,11 +63,11 @@ const IPv4StatusIcon = ({ className, active }: { className?: string; active: boo
       </svg>
 
       {!active ? (
-        <div className="absolute -right-1.5 -top-1.5 bg-destructive rounded w-4 h-4 flex items-center justify-center">
+        <div className="absolute -right-1.5 -top-1.5 bg-destructive rounded-sm w-4 h-4 flex items-center justify-center">
           <X size={10} strokeWidth={4} className="text-white rounded-full" />
         </div>
       ) : (
-        <div className="absolute -right-1.5 -top-1.5 bg-brand-500 rounded w-4 h-4 flex items-center justify-center">
+        <div className="absolute -right-1.5 -top-1.5 bg-brand-500 rounded-sm w-4 h-4 flex items-center justify-center">
           <svg
             width="10"
             height="10"
@@ -220,7 +220,7 @@ export const ConnectionPanel = ({
 
           {type === 'session' && (
             <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
-              <div className="flex w-6 h-6 rounded items-center justify-center gap-2 shrink-0 bg-surface-100">
+              <div className="flex w-6 h-6 rounded-sm items-center justify-center gap-2 shrink-0 bg-surface-100">
                 <WarningIcon />
               </div>
               <div className="flex flex-col">

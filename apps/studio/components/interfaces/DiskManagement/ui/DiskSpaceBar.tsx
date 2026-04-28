@@ -93,7 +93,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
       <div className="relative">
         <div
           className={cn(
-            'h-[35px] relative border rounded-sm w-full transition overflow-visible',
+            'h-[35px] relative border rounded-xs w-full transition overflow-visible',
             showNewSize ? 'bg-selection border border-brand' : 'bg-surface-300'
           )}
         >
@@ -105,7 +105,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
               exit={{ rotateY: -90, zIndex: 2 }}
               transition={{ duration: 0.3 }}
               style={{ transformOrigin: 'left center', backfaceVisibility: 'hidden' }}
-              className="absolute inset-0 rounded-sm overflow-hidden"
+              className="absolute inset-0 rounded-xs overflow-hidden"
             >
               <div className="h-full flex">
                 <div
@@ -183,7 +183,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
               >
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded text-xs text-foreground-light whitespace-nowrap flex items-center gap-x-1">
+                    <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded-sm text-xs text-foreground-light whitespace-nowrap flex items-center gap-x-1">
                       Autoscaling <Info size={12} />
                     </div>
                   </TooltipTrigger>

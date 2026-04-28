@@ -476,7 +476,7 @@ export const GitHubIntegrationConnectionForm = ({
                             disabled={isLoadingGitHubRepos}
                             loading={isLoadingGitHubRepos}
                             icon={
-                              <div className="bg-black shadow rounded p-1 w-6 h-6 flex justify-center items-center">
+                              <div className="bg-black shadow-sm rounded-sm p-1 w-6 h-6 flex justify-center items-center">
                                 {GITHUB_ICON}
                               </div>
                             }
@@ -513,7 +513,7 @@ export const GitHubIntegrationConnectionForm = ({
                                       )
                                     }}
                                   >
-                                    <div className="bg-black shadow rounded p-1 w-5 h-5 flex justify-center items-center">
+                                    <div className="bg-black shadow-sm rounded-sm p-1 w-5 h-5 flex justify-center items-center">
                                       {GITHUB_ICON}
                                     </div>
                                     <span className="truncate" title={repo.name}>

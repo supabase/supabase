@@ -20,7 +20,7 @@ export const RLSTesterPreview = () => {
         height={900}
         quality={100}
         alt="rls-tester-preview"
-        className="rounded border"
+        className="rounded-sm border"
       />
       <div className="space-y-2 mt-4!">
         <p className="text-sm">Enabling this preview will:</p>

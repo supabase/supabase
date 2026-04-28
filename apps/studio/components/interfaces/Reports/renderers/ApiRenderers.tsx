@@ -360,12 +360,12 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
           </span>
         </Button>
         <TextFormatter
-          className="w-10 h-4 text-center rounded bg-surface-300"
+          className="w-10 h-4 text-center rounded-sm bg-surface-300"
           value={datum.method}
         />
         {datum.status_code && (
           <TextFormatter
-            className={`w-10 h-4 text-center rounded ${
+            className={`w-10 h-4 text-center rounded-sm ${
               datum.status_code >= 400
                 ? 'bg-orange-500'
                 : datum.status_code >= 300
@@ -386,7 +386,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
     </CollapsibleTrigger_Shadcn_>
     <CollapsibleContent_Shadcn_ className="pt-2">
       {datum.search ? (
-        <pre className={`syntax-highlight overflow-auto rounded bg-surface-100 p-2 text-xs!`}>
+        <pre className={`syntax-highlight overflow-auto rounded-sm bg-surface-100 p-2 text-xs!`}>
           <div
             className="text-wrap"
             dangerouslySetInnerHTML={{
@@ -630,7 +630,7 @@ export const RequestsByCountryMapRenderer = (
       </ComposableMap>
       {hoverInfo.visible && (
         <div
-          className="pointer-events-none absolute z-10 rounded bg-surface-100 p-1.5 border border-surface-200 text-sm"
+          className="pointer-events-none absolute z-10 rounded-sm bg-surface-100 p-1.5 border border-surface-200 text-sm"
           style={{ left: hoverInfo.x, top: hoverInfo.y }}
         >
           <h3 className="text-foreground-lighter text-sm">{hoverInfo.title}</h3>

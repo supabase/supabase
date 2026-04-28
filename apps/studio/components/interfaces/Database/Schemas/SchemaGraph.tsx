@@ -255,7 +255,7 @@ export const SchemaGraph = () => {
     <>
       <div className="flex items-center justify-between p-4 border-b border-muted h-(--header-height)">
         {isLoadingSchemas && (
-          <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
+          <div className="h-[34px] w-[260px] bg-foreground-lighter rounded-sm shimmering-loader" />
         )}
 
         {isErrorSchemas && <AlertError error={errorSchemas} subject="Failed to retrieve schemas" />}
@@ -450,7 +450,7 @@ export const SchemaGraph = () => {
                     zoomable
                     nodeColor={miniMapNodeColor}
                     maskColor={miniMapMaskColor}
-                    className="border rounded-md shadow-sm"
+                    className="border rounded-md shadow-xs"
                   />
                   <SchemaGraphLegend />
                 </ReactFlow>

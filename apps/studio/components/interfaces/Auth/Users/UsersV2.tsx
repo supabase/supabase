@@ -762,7 +762,7 @@ export const UsersV2 = () => {
                   const isSelected = row.id === selectedUser
                   return [
                     `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-                    '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                    '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
                     '[&>.rdg-cell:first-child>div]:ml-4',
                   ].join(' ')
                 }}

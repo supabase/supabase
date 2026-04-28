@@ -64,7 +64,7 @@ export const OrganizationInvite = () => {
     <div
       className={cn(
         'mx-auto overflow-hidden rounded-md border',
-        'border-muted bg-alternative text-center shadow',
+        'border-muted bg-alternative text-center shadow-sm',
         'md:w-[400px]'
       )}
     >

@@ -41,7 +41,7 @@ const Error404: NextPage = ({}) => {
       </div>
       <div
         className={`absolute select-none opacity-5 filter transition duration-200 ${
-          show404 ? 'blur-sm' : 'blur-none'
+          show404 ? 'blur-xs' : 'blur-none'
         }`}
       >
         <h1 style={{ fontSize: '28rem' }}>404</h1>

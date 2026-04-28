@@ -71,7 +71,7 @@ export const FieldWithSeeMore = ({
 
     if (isApiKeyField && primaryValue && primaryValue !== 'N/A') {
       return (
-        <span className="border border-border rounded px-2 py-1 bg-surface-100 text-xs font-mono text-foreground">
+        <span className="border border-border rounded-sm px-2 py-1 bg-surface-100 text-xs font-mono text-foreground">
           {primaryValue}
         </span>
       )
@@ -94,7 +94,7 @@ export const FieldWithSeeMore = ({
 
   const expandButton = hasAdditionalData ? (
     <CollapsibleTrigger asChild>
-      <button className="w-3 h-3 flex items-center justify-center selection:font-mono text-foreground-lighter text-xs hover:text-foreground-light bg-foreground-muted/75 rounded [&[data-state=open]>svg]:rotate-180 hover:bg-foreground-lighter">
+      <button className="w-3 h-3 flex items-center justify-center selection:font-mono text-foreground-lighter text-xs hover:text-foreground-light bg-foreground-muted/75 rounded-sm [&[data-state=open]>svg]:rotate-180 hover:bg-foreground-lighter">
         <X size={10} className="text-background-surface-400 rotate-45" strokeWidth={3} />
       </button>
     </CollapsibleTrigger>

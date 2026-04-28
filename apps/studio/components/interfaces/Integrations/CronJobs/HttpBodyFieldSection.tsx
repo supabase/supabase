@@ -26,7 +26,7 @@ export const HttpBodyFieldSection = ({ form }: HttpBodyFieldSectionProps) => {
             <FormLabel>HTTP Request Body</FormLabel>
             <FormControl>
               <TextArea_Shadcn_
-                className="h-72 rounded-none px-4 outline-none"
+                className="h-72 rounded-none px-4 outline-hidden"
                 value={field.value}
                 onChange={field.onChange}
               />

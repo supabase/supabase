@@ -316,7 +316,7 @@ export const EdgeFunctionDetails = () => {
               </PageSectionSummary>
             </PageSectionMeta>
             <PageSectionContent>
-              <div className="rounded border bg-surface-100 px-6 py-4 drop-shadow-sm">
+              <div className="rounded-sm border bg-surface-100 px-6 py-4 drop-shadow-xs">
                 <div className="space-y-6">
                   <CommandRender
                     commands={[

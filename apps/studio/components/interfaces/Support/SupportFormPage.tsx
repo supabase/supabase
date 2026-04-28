@@ -262,7 +262,7 @@ function SupportFormBody({
   return (
     <div
       className={cn(
-        'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md',
+        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md',
         `${isSuccess ? 'pt-8' : 'py-8'}`,
         'border-default'
       )}

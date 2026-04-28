@@ -22,7 +22,7 @@ export const UnifiedLogsPreview = () => {
         src={`${BASE_PATH}/img/previews/new-logs-preview.png`}
         width={1296}
         height={900}
-        className="rounded border mb-4"
+        className="rounded-sm border mb-4"
       />
 
       <div className="space-y-2 mt-4!">

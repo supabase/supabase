@@ -115,7 +115,7 @@ export function DataTableFilterCommand({
       <button
         type="button"
         className={cn(
-          'group flex w-full items-center rounded-lg border border-input bg-background px-3 text-muted-foreground ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 hover:bg-accent/50 hover:text-accent-foreground',
+          'group flex w-full items-center rounded-lg border border-input bg-background px-3 text-muted-foreground ring-offset-background focus-within:outline-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 hover:bg-accent/50 hover:text-accent-foreground',
           open ? 'hidden' : 'visible'
         )}
         onClick={() => setOpen(true)}
@@ -127,7 +127,7 @@ export function DataTableFilterCommand({
         )}
         <span
           className={cn(
-            'h-9 w-full max-w-sm truncate py-3 text-left text-xs outline-none disabled:cursor-not-allowed disabled:opacity-50',
+            'h-9 w-full max-w-sm truncate py-3 text-left text-xs outline-hidden disabled:cursor-not-allowed disabled:opacity-50',
             'flex items-center md:max-w-xl lg:max-w-4xl xl:max-w-5xl',
             trimmedInputValue ? 'text-foreground' : 'text-foreground-light'
           )}
@@ -190,7 +190,7 @@ export function DataTableFilterCommand({
           className="text-xs text-foreground"
         />
         <div className="relative">
-          <div className="absolute top-2 z-50 w-full overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-md outline-none animate-in">
+          <div className="absolute top-2 z-50 w-full overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-md outline-hidden animate-in">
             {/* default height is 300px but in case of more, we'd like to tease the user */}
             <CommandList className="max-h-[310px] bg-surface-100">
               <CommandEmpty>No results found.</CommandEmpty>

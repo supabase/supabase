@@ -91,7 +91,7 @@ export const PolicyTemplates = ({
                     <div className="min-w-16 flex items-start">
                       <Badge
                         className={cn(
-                          'rounded! font-mono',
+                          'rounded-sm! font-mono',
                           template.command === 'UPDATE'
                             ? 'bg-blue-400 text-blue-900 border border-blue-800'
                             : ''

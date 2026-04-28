@@ -110,7 +110,7 @@ export const ComputeBadgeWrapper = ({
           <div
             className={cn(
               'flex',
-              showUpgradeGlow && 'relative inline-flex overflow-hidden rounded'
+              showUpgradeGlow && 'relative inline-flex overflow-hidden rounded-sm'
             )}
           >
             <ComputeBadge

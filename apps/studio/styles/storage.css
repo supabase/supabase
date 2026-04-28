@@ -8,7 +8,7 @@
     }
   }
   .sbui-btn {
-    @apply focus:outline-none;
+    @apply focus:outline-hidden;
   }
   .sbui-btn-default {
     @apply border;

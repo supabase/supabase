@@ -160,7 +160,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                   </AccordionItem_Shadcn_>
                 </Accordion_Shadcn_>
               </div>
-              <div className="bg-surface-100 p-4 rounded grid gap-y-4 border">
+              <div className="bg-surface-100 p-4 rounded-sm grid gap-y-4 border">
                 <h4 className="text-sm text-foreground">
                   Schedule {timezone ? `(${timezone})` : ''}
                 </h4>

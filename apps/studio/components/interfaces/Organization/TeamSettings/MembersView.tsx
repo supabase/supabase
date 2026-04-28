@@ -93,7 +93,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
       )}
 
       {isSuccessMembers && (
-        <div className="rounded w-full overflow-hidden overflow-x-scroll">
+        <div className="rounded-sm w-full overflow-hidden overflow-x-scroll">
           <Card>
             <Loading active={!filteredMembers}>
               <Table>

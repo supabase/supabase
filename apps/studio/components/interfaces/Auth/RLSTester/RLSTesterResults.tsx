@@ -62,7 +62,7 @@ export const RLSTesterResults = ({
         </TabsList_Shadcn_>
 
         {!!parseQueryResults && (
-          <div className="border rounded flex items-center justify-between px-3 py-1.5 mt-3">
+          <div className="border rounded-sm flex items-center justify-between px-3 py-1.5 mt-3">
             <div className="flex items-center gap-x-2">
               <p className="text-xs text-foreground-light">Ran as</p>
               {!parseQueryResults.role ? (
@@ -86,7 +86,7 @@ export const RLSTesterResults = ({
         <TabsContent_Shadcn_ value="policies" className="mt-0">
           {!isServiceRole &&
             (!!tableWithRLSEnabledButNoPolicies ? (
-              <Admonition showIcon={false} type="default" className="rounded mt-2">
+              <Admonition showIcon={false} type="default" className="rounded-sm mt-2">
                 <p className="mb-0.5!">This user has no access to any rows from this query</p>
                 <p className="text-foreground-light">
                   The table{' '}
@@ -100,7 +100,7 @@ export const RLSTesterResults = ({
                 </p>
               </Admonition>
             ) : tableWithRLSEnabledWithPolicyFalse ? (
-              <Admonition showIcon={false} type="default" className="rounded mt-2">
+              <Admonition showIcon={false} type="default" className="rounded-sm mt-2">
                 <p className="mb-0.5!">This user has no access to any rows from this query</p>
                 <p className="text-foreground-light">
                   The table{' '}
@@ -117,7 +117,7 @@ export const RLSTesterResults = ({
             ) : null)}
 
           {isServiceRole && (
-            <Admonition showIcon={false} type="default" className="rounded mt-2">
+            <Admonition showIcon={false} type="default" className="rounded-sm mt-2">
               <p className="mb-0.5!">
                 The <code className="text-code-inline">postgres</code> role has access to all rows
                 for this query
@@ -153,7 +153,7 @@ export const RLSTesterResults = ({
           <div
             className={cn(
               'grow flex flex-col border overflow-hidden',
-              results.length === 0 ? 'rounded h-32' : 'rounded-t h-56'
+              results.length === 0 ? 'rounded-sm h-32' : 'rounded-t h-56'
             )}
           >
             <Results rows={results} />

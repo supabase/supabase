@@ -290,7 +290,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                       id="code-id"
                       language="html"
                       isReadOnly={!canUpdateConfig}
-                      className="mb-0! relative h-96 outline-none outline-offset-0 outline-width-0 outline-0"
+                      className="mb-0! relative h-96 outline-hidden outline-offset-0 outline-width-0 outline-0"
                       onInputChange={(e: string | undefined) => {
                         setBodyValue(e ?? '')
                         if (bodyValue !== e) setHasUnsavedChanges(true)

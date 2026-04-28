@@ -107,7 +107,7 @@ export const SortableTab = ({
             e.preventDefault()
             e.stopPropagation()
           }}
-          className="p-0.5 ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
+          className="p-0.5 ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-xs cursor-pointer"
           onMouseDown={(e) => {
             e.preventDefault()
             e.stopPropagation()

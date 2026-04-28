@@ -103,7 +103,7 @@ input.form-control,
   @apply box-border;
   /* @apply  w-full ; */
   @apply rounded-md;
-  @apply shadow-sm;
+  @apply shadow-xs;
   @apply transition-all;
   @apply text-foreground;
   @apply border;
@@ -115,7 +115,7 @@ input.form-control,
   @apply bg-studio;
   @apply border-strong border;
 
-  @apply outline-none;
+  @apply outline-hidden;
   @apply focus:ring-2 focus:ring-current;
 }
 
@@ -168,7 +168,7 @@ input::placeholder {
 }
 
 .billing-input-fixed {
-  @apply w-full appearance-none rounded border bg-gray-700 py-2 px-3 leading-tight text-gray-300 shadow;
+  @apply w-full appearance-none rounded-sm border bg-gray-700 py-2 px-3 leading-tight text-gray-300 shadow-sm;
 }
 
 .input-mono {

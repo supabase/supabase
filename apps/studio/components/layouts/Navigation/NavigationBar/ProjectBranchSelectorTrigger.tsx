@@ -33,7 +33,7 @@ export const ProjectBranchSelectorTrigger = forwardRef<
         onClick={onClick}
         ref={ref}
       >
-        <div className="relative flex h-8 aspect-square shrink-0 items-center bg-background-muted group-hover:border-stronger justify-center rounded border border-strong text-xs">
+        <div className="relative flex h-8 aspect-square shrink-0 items-center bg-background-muted group-hover:border-stronger justify-center rounded-sm border border-strong text-xs">
           {selectedOrgInitial}
         </div>
         <div className="text-left grow min-w-0">

@@ -65,7 +65,7 @@ export const HelpPanel = ({
         </div>
         <div className="px-4">
           <div
-            className="relative space-y-2 overflow-hidden rounded px-4 py-4 pb-12 shadow-md"
+            className="relative space-y-2 overflow-hidden rounded-sm px-4 py-4 pb-12 shadow-md"
             style={{ background: '#404EED' }}
           >
             <a

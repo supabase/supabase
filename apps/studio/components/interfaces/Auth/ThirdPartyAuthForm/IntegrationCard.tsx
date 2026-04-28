@@ -187,7 +187,7 @@ export const IntegrationCard = ({
 
   return (
     <>
-      <div className="bg-surface-100 border overflow-hidden shadow px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
+      <div className="bg-surface-100 border overflow-hidden shadow-sm px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
         <div className="py-1">
           <Image src={getIntegrationTypeIcon(type)} width={21} height={21} alt={`${type} icon`} />
         </div>

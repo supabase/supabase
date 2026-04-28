@@ -287,13 +287,13 @@ export const AuditLogs = () => {
             {isSuccess && (
               <>
                 {logs.length === 0 ? (
-                  <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
+                  <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
                     <p className="prose text-sm">
                       Your organization does not have any audit logs available yet
                     </p>
                   </div>
                 ) : logs.length > 0 && sortedLogs.length === 0 ? (
-                  <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
+                  <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
                     <p className="prose text-sm">
                       No audit logs found based on the filters applied
                     </p>
@@ -391,7 +391,7 @@ export const AuditLogs = () => {
                             <Table.td className="max-w-[250px]">
                               <div className="flex items-center space-x-2">
                                 {hasStatusCode && (
-                                  <p className="bg-surface-200 rounded px-1 flex items-center justify-center text-xs font-mono border">
+                                  <p className="bg-surface-200 rounded-sm px-1 flex items-center justify-center text-xs font-mono border">
                                     {log.action.metadata[0].status}
                                   </p>
                                 )}

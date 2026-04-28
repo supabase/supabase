@@ -134,7 +134,7 @@ export const QueryInsightsChart = ({
               >
                 <span
                   className={cn(
-                    'h-1.5 w-1.5 rounded-sm transition-opacity',
+                    'h-1.5 w-1.5 rounded-xs transition-opacity',
                     hiddenSeries.has(selDataKey) && 'opacity-30'
                   )}
                   style={{ backgroundColor: SEL_COLOR }}

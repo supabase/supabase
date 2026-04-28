@@ -283,7 +283,7 @@ export const EditorPanel = () => {
               if (e.key === 'Enter') commitRename()
               if (e.key === 'Escape') setIsEditingTitle(false)
             }}
-            className="text-xs bg-transparent border-b border-foreground-lighter outline-none w-48 py-0.5"
+            className="text-xs bg-transparent border-b border-foreground-lighter outline-hidden w-48 py-0.5"
             autoFocus
           />
         ) : (

@@ -235,7 +235,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                       </Button>
                     </div>
                     {columns.length === 0 ? (
-                      <div className="flex items-center justify-center rounded border border-strong border-dashed py-4 text-foreground-lighter text-sm">
+                      <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-4 text-foreground-lighter text-sm">
                         Add a column to your table
                       </div>
                     ) : (

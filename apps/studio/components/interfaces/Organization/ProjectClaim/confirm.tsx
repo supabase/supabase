@@ -97,7 +97,7 @@ export const ProjectClaimConfirm = ({
 
             <div className="flex items-center justify-center w-28 relative">
               <div className="h-0.5 w-full border-2 border-dashed border-stronger" />
-              <div className="rounded-full border flex items-center justify-center h-10 w-full shadow-sm">
+              <div className="rounded-full border flex items-center justify-center h-10 w-full shadow-xs">
                 <ChevronsLeftRight className="text-muted-foreground" size={24} />
               </div>
               <div className="h-0.5 w-full border-2 border-dashed border-stronger z-10" />

@@ -96,7 +96,7 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
                   <div className="flex gap-x-3 items-center">
                     <img
                       alt="region icon"
-                      className="w-5 rounded-sm"
+                      className="w-5 rounded-xs"
                       src={`${BASE_PATH}/img/regions/${region.region}.svg`}
                     />
                     <p className="flex items-center gap-x-2">
