@@ -16,25 +16,7 @@ export const PrivacySettings = ({
   ...props
 }: PropsWithChildren<PrivacySettingsProps>) => {
   const [isOpen, setIsOpen] = useState(false)
-  const { updateServices } = useConsentState()
-
-  const categories = [
-    {
-      slug: 'plop',
-      label: 'Analytics and Marketing',
-      description:
-        'By opting in to sharing telemetry data, Supabase can analyze usage patterns to enhance user experience and use it for marketing and advertising purposes',
-      isEssential: false,
-      services: [],
-    },
-    {
-      slug: 'essential',
-      label: 'Essential',
-      description: 'These technologies are necessary for Supabase to function.',
-      isEssential: true,
-      services: [],
-    },
-  ]
+  const { categories, updateServices } = useConsentState()
 
   const [serviceConsentMap, setServiceConsentMap] = useState(() => new Map<string, boolean>())
 
