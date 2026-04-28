@@ -78,7 +78,7 @@ export const PublicationsTables = () => {
             <Admonition
               type="note"
               className="w-[500px]"
-              title="You need additional permissions to update database replications"
+              description="You need additional permissions to update database replications"
             />
           )}
         </div>
