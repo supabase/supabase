@@ -15,12 +15,15 @@ Supabase Storage is an open source object store that integrates natively with Su
 ## Bucket Types
 
 ### Files Buckets
+
 For everyday assets and user content: images, videos, documents, PDFs, archives. Served from the global CDN with fine-grained access controls via RLS policies.
 
 ### Analytics Buckets
+
 For large-scale analytical workloads on open table formats (Apache Iceberg). Designed for historical data, time-series data, logs, and ETL outputs. Optionally queryable via Postgres.
 
 ### Vector Buckets
+
 For AI/ML workloads. Store and index vector embeddings with multiple distance metrics, metadata filtering, and fast similarity queries for RAG systems and AI-powered search.
 
 ## Technical Details

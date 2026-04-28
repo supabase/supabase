@@ -24,7 +24,7 @@ export default function SheetDemo() {
           <SheetTitle>Edit profile</SheetTitle>
           <SheetDescription>Make changes to your profile here.</SheetDescription>
         </SheetHeader>
-        <div className="overflow-auto flex-grow px-0">
+        <div className="overflow-auto grow px-0">
           <SheetSection>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">

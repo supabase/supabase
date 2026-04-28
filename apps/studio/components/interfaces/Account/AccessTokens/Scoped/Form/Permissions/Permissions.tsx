@@ -2,7 +2,7 @@ import { ChevronDown, RotateCcw, X } from 'lucide-react'
 import { Path, PathValue } from 'react-hook-form'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -112,7 +112,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                                   key={action}
                                   className="flex items-center gap-2 cursor-pointer"
                                 >
-                                  <Checkbox_Shadcn_
+                                  <Checkbox
                                     checked={row.actions.includes(action)}
                                     onCheckedChange={(checked) => {
                                       const newActions = checked

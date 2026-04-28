@@ -29,7 +29,7 @@ export const StorageMenuV2 = () => {
   })
 
   return (
-    <Menu type="pills" className="my-2 md:my-4 flex flex-grow flex-col">
+    <Menu type="pills" className="my-2 md:my-4 flex grow flex-col">
       <div className="space-y-4">
         <div className="md:mx-3">
           <Menu.Group title={<span className="uppercase font-mono">Manage</span>} />

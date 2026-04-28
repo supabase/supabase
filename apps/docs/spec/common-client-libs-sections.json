@@ -506,6 +506,20 @@
         "type": "function"
       },
       {
+        "id": "sign-in-with-passkey",
+        "title": "Sign in with a passkey",
+        "slug": "auth-signinwithpasskey",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "register-passkey",
+        "title": "Register a passkey",
+        "slug": "auth-registerpasskey",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "get-claims",
         "title": "Get user claims from verified JWT",
         "slug": "auth-getclaims",
@@ -731,6 +745,65 @@
         ]
       },
       {
+        "id": "passkey-api",
+        "isFunc": false,
+        "title": "Auth Passkey",
+        "slug": "auth-passkey-api",
+        "product": "auth",
+        "type": "function",
+        "items": [
+          {
+            "id": "passkey-list",
+            "title": "List passkeys",
+            "slug": "auth-passkey-list",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-update",
+            "title": "Update a passkey",
+            "slug": "auth-passkey-update",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-delete",
+            "title": "Delete a passkey",
+            "slug": "auth-passkey-delete",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-start-registration",
+            "title": "Start passkey registration",
+            "slug": "auth-passkey-startregistration",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-verify-registration",
+            "title": "Verify passkey registration",
+            "slug": "auth-passkey-verifyregistration",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-start-authentication",
+            "title": "Start passkey authentication",
+            "slug": "auth-passkey-startauthentication",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-verify-authentication",
+            "title": "Verify passkey authentication",
+            "slug": "auth-passkey-verifyauthentication",
+            "product": "auth",
+            "type": "function"
+          }
+        ]
+      },
+      {
         "id": "oauth-server-api",
         "isFunc": false,
         "title": "OAuth Server",
@@ -851,7 +924,30 @@
             "product": "auth-admin",
             "type": "function"
           },
-
+          {
+            "id": "admin-passkey-api",
+            "isFunc": false,
+            "title": "Passkey Admin",
+            "slug": "auth-admin-passkey-api",
+            "product": "auth-admin",
+            "type": "function",
+            "items": [
+              {
+                "id": "admin-list-passkeys",
+                "title": "List passkeys for a user",
+                "slug": "auth-admin-passkey-listpasskeys",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-delete-passkey",
+                "title": "Delete a passkey",
+                "slug": "auth-admin-passkey-deletepasskey",
+                "product": "auth-admin",
+                "type": "function"
+              }
+            ]
+          },
           {
             "id": "oauth-admin-api",
             "isFunc": false,

@@ -103,7 +103,7 @@ export const LayoutHeader = ({
     <>
       <header
         className={cn(
-          'flex h-11 md:h-12 items-center flex-shrink-0 border-b',
+          'flex h-11 md:h-12 items-center shrink-0 border-b',
           showFloatingMobileToolbar && 'hidden md:flex'
         )}
       >

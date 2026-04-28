@@ -4,7 +4,7 @@ import { ChevronDown, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   Label_Shadcn_,
   Popover_Shadcn_,
@@ -107,7 +107,7 @@ export const FilterPopover = <T extends Record<string, any>>({
 
     return (
       <div key={value} className="group flex items-center gap-x-2">
-        <Checkbox_Shadcn_
+        <Checkbox
           id={value}
           checked={selectedOptions.includes(value)}
           onCheckedChange={() => {
