@@ -257,7 +257,7 @@ If the JWT secret is secure, substitute the `service_role` JWT-based key with a 
 
 Since the start of Supabase, the JWT-based `anon` and `service_role` keys were the right trade-off against simplicity and relative security for your project. Unfortunately they pose some real challenges in live applications, especially around rotation and security best practices.
 
-The main reasons for preferring the publishable and secret keys (`sb_publishable_...` and `sb_secret_...`) are:
+The main reasons for preferring the publishable and secret keys (`sb_publishable_...` and `sb_secret_...`) are to avoid the following shortcomings of the legacy JWT-based keys:
 
 - Tight coupling between the JWT secret (which itself can be compromised, if you mint your own JWTs), the `anon` (low privilege) and `service_role` (high privilege) and `authenticated` (issued by Supabase Auth) Postgres roles.
 - Inability to independently rotate each aspect of the keys, without downtime.
