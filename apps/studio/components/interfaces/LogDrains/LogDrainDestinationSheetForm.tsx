@@ -338,7 +338,6 @@ export function LogDrainDestinationSheetForm({
   // it produces a correct union type of all possible configs. Unfortunately, this type was not designed correctly
   // and it does not include `type` inside the config itself, so it's not trivial to create `discriminatedUnion`
   // out of it, therefore for an ease of use now, we bail to `any` until the better time come.
-  const defaultConfig = (defaultValues?.config || {}) as any
   const defaultType = defaultValues?.type || 'webhook'
   const defaultHeaderEntries = useMemo(() => {
     const config = (defaultValues?.config || {}) as any
