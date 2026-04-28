@@ -97,7 +97,7 @@ create table public.profiles (
 
 GRANT SELECT ON public.profiles TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
-  
+
 alter table public.profiles enable row level security;
 
 create table public.rooms_users (
