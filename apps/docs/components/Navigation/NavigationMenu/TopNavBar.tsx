@@ -32,7 +32,7 @@ const TopNavBar: FC = () => {
     <>
       <nav
         aria-label="top bar"
-        className="w-full z-40 flex flex-col border-b backdrop-blur backdrop-filter bg-default/75"
+        className="w-full z-40 flex flex-col border-b backdrop-blur-sm backdrop-filter bg-default/75"
       >
         <div className="w-full px-5 lg:pl-10 flex justify-between h-(--header-height) gap-3">
           <div className="hidden lg:flex h-full items-center justify-center gap-2">

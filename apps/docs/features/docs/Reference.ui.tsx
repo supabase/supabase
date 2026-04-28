@@ -110,7 +110,7 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
         'bg-linear-to-b from-background from-85% to-transparent to-100%',
         'text-2xl font-medium text-foreground',
         'scroll-mt-[calc(var(--header-height)+1rem)]',
-        'focus:outline-none',
+        'focus:outline-hidden',
         monoFont && 'font-mono',
         className
       )}
@@ -127,7 +127,7 @@ export function CollapsibleDetails({ title, content }: { title: string; content:
         className={cn(
           'group',
           'w-full h-8',
-          'border bg-surface-100 rounded',
+          'border bg-surface-100 rounded-sm',
           'px-5',
           'flex items-center gap-3',
           'text-xs text-foreground-light',

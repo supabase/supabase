@@ -133,7 +133,7 @@ pre[class*='language-'] {
 
 .method-list-item-validation {
   code {
-    @apply text-xs bg-control rounded;
+    @apply text-xs bg-control rounded-sm;
     padding: 1px 6px;
   }
 }

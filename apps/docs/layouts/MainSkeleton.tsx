@@ -265,7 +265,7 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
         'left-0',
         'right-0',
         'z-10',
-        'backdrop-blur-sm backdrop-filter bg-alternative/90',
+        'backdrop-blur-xs backdrop-filter bg-alternative/90',
         mobileMenuOpen ? 'absolute h-full w-full top-0 left-0' : 'hidden h-0',
         // always hide on desktop
         'lg:hidden'
@@ -324,7 +324,7 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
           'w-full lg:w-auto',
           'h-fit lg:h-screen overflow-y-scroll lg:overflow-auto',
           'overscroll-contain',
-          'backdrop-blur backdrop-filter bg-background',
+          'backdrop-blur-sm backdrop-filter bg-background',
           'flex flex-col grow'
         )}
       >
@@ -411,7 +411,7 @@ function SidebarSkeleton({
           className={cn(
             'sticky',
             'transition-all top-0 z-10',
-            'backdrop-blur backdrop-filter bg-background'
+            'backdrop-blur-sm backdrop-filter bg-background'
           )}
         >
           {hideSideNav ? null : menuName ? (

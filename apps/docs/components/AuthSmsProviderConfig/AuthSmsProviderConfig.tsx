@@ -68,7 +68,7 @@ const AuthSmsProviderConfig = () => {
               headingRef.current?.focus()
             }}
           >
-            <DialogHeader className="pb-0 [&>h3]:m-0! [&>h3>a]:hidden! [&>h3:focus-visible]:outline-none">
+            <DialogHeader className="pb-0 [&>h3]:m-0! [&>h3>a]:hidden! [&>h3:focus-visible]:outline-hidden">
               <Heading tag="h3" ref={headingRef} tabIndex={-1}>
                 {selectedProvider.name}
               </Heading>

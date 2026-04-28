@@ -31,7 +31,7 @@ interface PopUpProps extends PropsWithChildren {
 
 const buttonClassName = cn(
   'relative px-1 py-0 -my-px',
-  'rounded bg-surface-200 border border-dashed',
+  'rounded-sm bg-surface-200 border border-dashed',
   'transition-colors hover:border-strong group/inline-popup'
 )
 
