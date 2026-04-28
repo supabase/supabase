@@ -192,8 +192,8 @@ export const AuthorizeRequesterDetails = ({
                 </p>
                 <p className="mt-1 text-xs text-foreground-lighter">
                   Authorizing {name} grants it the following{' '}
-                  <InlineLink href={OAUTH_SCOPES_DOCS_URL}>permissions</InlineLink> to the selected
-                  organization. Only continue if you trust this app.
+                  <InlineLink href={OAUTH_SCOPES_DOCS_URL}>access permissions</InlineLink> to the
+                  selected organization. Only continue if you trust this app.
                 </p>
               </div>
 
