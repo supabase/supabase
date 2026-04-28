@@ -488,6 +488,7 @@ const MultiSelectorContent = React.forwardRef<HTMLDivElement, PopoverContentProp
             event.stopPropagation()
           }
         }}
+        sameWidthAsTrigger
         {...props}
       >
         {children}
