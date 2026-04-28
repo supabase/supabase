@@ -256,6 +256,7 @@ allow_list = [
     "Kysely",
     "LangChain",
     "Laravel",
+    "[Ll]eaderboard",
     "LineString",
     "LinkedIn",
     "LlamaIndex",

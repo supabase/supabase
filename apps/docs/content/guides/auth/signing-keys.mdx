@@ -249,7 +249,7 @@ This is to ensure you have the ability, should you need it, to go back to the le
 
 Unfortunately `anon` and `service_role` are not just API keys, but are also valid JSON Web Tokens, signed by the legacy JWT secret. Revoking the legacy JWT secret means that your application no longer trusts any JWT signed with it. Therefore before you revoke the legacy JWT secret, you must disable the `anon` and `service_role` to ensure a consistent security setup.
 
-### I am using JWT-based `anon` key in a mobile, desktop, or CLI application and need to rotate my `service_role` JWT secret?
+### Using JWT-based `anon` key in a mobile, desktop, or CLI application and need to rotate a `service_role` JWT secret?
 
 If the JWT secret is secure, substitute the `service_role` JWT-based key with a new secret key which you can create in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard. This prevents downtime for your application.
 
@@ -269,11 +269,11 @@ The main reasons for preferring the publishable and secret keys (`sb_publishable
 - JWTs are large, hard to parse, verify, and manipulate -- leading to insecure logging or bad security practices.
 - They were signed with a symmetric JWT secret.
 
-### Can I still use my old `anon` and `service-role` API keys after enabling the publishable and secret keys?
+### Can you still use an old `anon` and `service-role` API keys after enabling the publishable and secret keys?
 
 Yes. This allows you to transition between the API keys with zero downtime by gradually swapping your clients while both sets of keys are active. See the next question for how to deactivate your keys once all your clients are switched over.
 
-### How do I deactivate the `anon` and `service_role` JWT-based API keys after moving to publishable and secret keys?
+### How to deactivate the `anon` and `service_role` JWT-based API keys after moving to publishable and secret keys?
 
 You can do this in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard. To prevent downtime in your application's components, use the last used indicators on the page to confirm that these are no longer used before deactivating.
 
