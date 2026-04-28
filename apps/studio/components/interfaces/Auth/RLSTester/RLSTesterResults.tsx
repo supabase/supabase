@@ -38,7 +38,7 @@ export const RLSTesterResults = ({
   )
 
   const noAccessToData =
-    (!isServiceRole && !!tableWithRLSEnabledButNoPolicies) || tableWithRLSEnabledWithPolicyFalse
+    !isServiceRole && (!!tableWithRLSEnabledButNoPolicies || !!tableWithRLSEnabledWithPolicyFalse)
 
   return (
     <div className="p-5 pt-4">
@@ -98,7 +98,7 @@ export const RLSTesterResults = ({
             </Admonition>
           )}
 
-          {tableWithRLSEnabledWithPolicyFalse && (
+          {!isServiceRole && tableWithRLSEnabledWithPolicyFalse && (
             <Admonition showIcon={false} type="default" className="rounded mt-2">
               <p className="!mb-0.5">This user has no access to any rows from this query</p>
               <p className="text-foreground-light">
