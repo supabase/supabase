@@ -1,3 +1,4 @@
+import { Hotkey } from '@tanstack/react-hotkeys'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
@@ -58,7 +59,9 @@ export const UtilityActions = ({
   const snippet = snapV2.snippets[id]
   const isFavorite = snippet !== undefined ? snippet.snippet.favorite : false
 
-  const formatKeys = hotkeyToKeys(SHORTCUT_DEFINITIONS[SHORTCUT_IDS.SQL_EDITOR_FORMAT].sequence[0])
+  const hotkeySequnece: Hotkey | undefined =
+    SHORTCUT_DEFINITIONS[SHORTCUT_IDS.SQL_EDITOR_FORMAT].sequence[0]
+  const formatKeys = hotkeySequnece ? hotkeyToKeys(hotkeySequnece) : undefined
 
   const toggleIntellisense = () => {
     setIntellisenseEnabled(!intellisenseEnabled)
@@ -123,7 +126,7 @@ export const UtilityActions = ({
               <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
               Prettify SQL
             </span>
-            <KeyboardShortcut keys={formatKeys} />
+            {formatKeys && <KeyboardShortcut keys={formatKeys} />}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -184,7 +187,7 @@ export const UtilityActions = ({
           <TooltipContent side="bottom" className="p-1 pl-2.5">
             <div className="flex items-center gap-2.5">
               <span>Prettify SQL</span>
-              <KeyboardShortcut keys={formatKeys} />
+              {formatKeys && <KeyboardShortcut keys={formatKeys} />}
             </div>
           </TooltipContent>
         </Tooltip>
