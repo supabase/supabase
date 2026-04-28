@@ -109,7 +109,7 @@
     "@types/three": "^0.169.0",
     "@types/uuid": "^9.0.8",
     "api-types": "workspace:*",
-    "postcss": "^8.5.3",
+    "postcss": "catalog:",
     "react-hook-form": "^7.71.2",
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",

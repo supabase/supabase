@@ -17,6 +17,7 @@ catalog:
   lodash: ^4.18.1
   lodash-es: ^4.18.1
   next: 16.2.3
+  postcss: ^8.5.10
   radix-ui: ^1.4.3
   react: ^18.3.0
   react-dom: ^18.3.0
