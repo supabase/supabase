@@ -186,6 +186,15 @@ describe('www middleware', () => {
       expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/auth')
     })
 
+    it('falls through for UAs that embed a match as a substring', () => {
+      for (const ua of ['chatgpt-userscript/2.0', 'NotPerplexityBot']) {
+        const req = makeRequest('/auth', { userAgent: ua })
+        const res = middleware(req)
+
+        expect(res.headers.get('x-middleware-rewrite')).toBeNull()
+      }
+    })
+
     it('falls through for browser user agents', () => {
       const req = makeRequest('/auth', {
         userAgent:

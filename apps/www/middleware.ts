@@ -7,7 +7,7 @@ import { MD_PAGES } from './app/api-v2/md/content.generated'
 // Training crawlers (GPTBot, CCBot, ClaudeBot, Anthropic-AI) are intentionally
 // excluded; they are governed by robots.txt and serving them content that
 // differs from the human HTML page would risk SEO and cloaking penalties.
-const LLM_USER_AGENT = /Claude-User|Claude-Web|ChatGPT-User|PerplexityBot/i
+const LLM_USER_AGENT = /\bClaude-User\b|\bClaude-Web\b|\bChatGPT-User\b|\bPerplexityBot\b/i
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -24,7 +24,8 @@ export function middleware(request: NextRequest) {
   // Cache-key safety: rewriting to /api-v2/md/<slug> partitions the response
   // by path, so no Vary: User-Agent is needed.
   const accept = (request.headers.get('accept') ?? '').toLowerCase()
-  const userAgent = request.headers.get('user-agent') ?? ''
+  // Cap UA length before regex test to bound CPU on the edge hot path.
+  const userAgent = (request.headers.get('user-agent') ?? '').slice(0, 512)
   if (accept.includes('text/markdown') || LLM_USER_AGENT.test(userAgent)) {
     // Strip trailing slash so /auth/ and /auth resolve to the same allowlist entry.
     // (NextURL's pathname setter preserves the trailing-slash style of the cloned
