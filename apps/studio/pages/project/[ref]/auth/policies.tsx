@@ -1,6 +1,6 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Search, X } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
