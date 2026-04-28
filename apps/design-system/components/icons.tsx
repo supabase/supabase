@@ -20,9 +20,9 @@ function Icons() {
               <GridItem>
                 <icon.component
                   size={21}
-                  className="group-data-[state=open]:scale-125 transition-all"
+                  className="group-data-open:scale-125 transition-all"
                 />
-                <span className="bg-surface-100 rounded-full border px-2 font-mono text-xs text-foreground-lighter group-data-[state=open]:text-foreground">
+                <span className="bg-surface-100 rounded-full border px-2 font-mono text-xs text-foreground-lighter group-data-open:text-foreground">
                   {icon.name}
                 </span>
               </GridItem>
