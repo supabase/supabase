@@ -377,7 +377,7 @@ export const UnifiedLogs = () => {
             className="flex max-w-full flex-1 flex-col overflow-hidden"
           >
             <div ref={topBarRef} className="top-0 z-10 flex flex-col gap-2 bg-background pb-3">
-              <div className="flex items-center gap-2 px-2 pt-2.5 pb-0.5">
+              <div className="flex flex-wrap items-center gap-2 px-2 pt-2.5 pb-0.5">
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -398,24 +398,26 @@ export const UnifiedLogs = () => {
                     </p>
                   </TooltipContent>
                 </Tooltip>
-                <div className="block sm:hidden">
-                  <DataTableFilterControlsDrawer />
-                </div>
-                <div className="min-w-0 flex-1 [&_[cmdk-input-wrapper]]:!px-3 [&_button]:!px-3 [&_button>span]:!h-[26px] [&_button>span]:!py-0 [&_input]:!h-[26px] [&_input]:!py-0">
+                <div className="order-first w-full min-w-0 sm:order-none sm:w-auto sm:flex-1 [&_[cmdk-input-wrapper]]:!px-3 [&_button]:!px-3 [&_button>span]:!h-[26px] [&_button>span]:!py-0 [&_input]:!h-[26px] [&_input]:!py-0">
                   <DataTableFilterCommand
                     placeholder="Search logs..."
                     searchParamsParser={SEARCH_PARAMS_PARSER}
                   />
                 </div>
-                <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />
-                <DataTableViewOptions />
-                <DownloadLogsButton searchParameters={searchParameters} />
-                {fetchPreviousPage ? (
-                  <LiveButton
-                    fetchPreviousPage={fetchPreviousPage}
-                    searchParamsParser={SEARCH_PARAMS_PARSER}
-                  />
-                ) : null}
+                <div className="block sm:hidden">
+                  <DataTableFilterControlsDrawer />
+                </div>
+                <div className="ml-auto flex items-center gap-2">
+                  <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />
+                  <DataTableViewOptions />
+                  <DownloadLogsButton searchParameters={searchParameters} />
+                  {fetchPreviousPage ? (
+                    <LiveButton
+                      fetchPreviousPage={fetchPreviousPage}
+                      searchParamsParser={SEARCH_PARAMS_PARSER}
+                    />
+                  ) : null}
+                </div>
               </div>
               <TimelineChart
                 data={unifiedLogsChart}
