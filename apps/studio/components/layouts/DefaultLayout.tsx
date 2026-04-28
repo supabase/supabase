@@ -4,7 +4,6 @@ import { PropsWithChildren, useEffect, useState } from 'react'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
-import { BannerStackProvider } from '../ui/BannerStack/BannerStackProvider'
 import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
 import MobileNavigationBar from './Navigation/NavigationBar/MobileNavigationBar'
 import { MobileSheetProvider } from './Navigation/NavigationBar/MobileSheetContext'
@@ -82,50 +81,48 @@ export const DefaultLayout = ({
       <LayoutSidebarProvider>
         <ProjectContextProvider projectRef={ref}>
           <MobileSheetProvider>
-            <BannerStackProvider>
-              <div className="flex flex-col h-screen w-screen">
-                {/* Top Banner */}
-                <AppBannerWrapper />
-                <div className="flex-shrink-0">
-                  {isMobile && (
-                    <MobileNavigationBar
-                      hideMobileMenu={hideMobileMenu}
-                      backToDashboardURL={backToDashboardURL}
-                    />
-                  )}
-                  <LayoutHeader headerTitle={headerTitle} backToDashboardURL={backToDashboardURL} />
-                </div>
-                {/* Main Content Area */}
-                <div className="flex flex-1 w-full overflow-y-hidden">
-                  {/* Sidebar - Only show for project pages, not account pages */}
-                  {!router.pathname.startsWith('/account') && <Sidebar />}
-                  {/* Main Content with Layout Sidebar */}
-                  <ResizablePanelGroup
-                    orientation="horizontal"
-                    className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
-                    autoSaveId="default-layout-content"
-                  >
-                    <ResizablePanel
-                      id="panel-content"
-                      className="w-full"
-                      minSize={`${contentMinSizePercentage}`}
-                      maxSize={`${contentMaxSizePercentage}`}
-                      defaultSize={`${contentMaxSizePercentage}`}
-                    >
-                      <div className="h-full overflow-y-auto">{children}</div>
-                    </ResizablePanel>
-                    <LayoutSidebar
-                      minSize={`${100 - contentMaxSizePercentage}`}
-                      maxSize={`${100 - contentMinSizePercentage}`}
-                      defaultSize={`${100 - contentMaxSizePercentage}`}
-                    />
-                  </ResizablePanelGroup>
-                </div>
+            <div className="flex flex-col h-screen w-screen">
+              {/* Top Banner */}
+              <AppBannerWrapper />
+              <div className="flex-shrink-0">
+                {isMobile && (
+                  <MobileNavigationBar
+                    hideMobileMenu={hideMobileMenu}
+                    backToDashboardURL={backToDashboardURL}
+                  />
+                )}
+                <LayoutHeader headerTitle={headerTitle} backToDashboardURL={backToDashboardURL} />
               </div>
+              {/* Main Content Area */}
+              <div className="flex flex-1 w-full overflow-y-hidden">
+                {/* Sidebar - Only show for project pages, not account pages */}
+                {!router.pathname.startsWith('/account') && <Sidebar />}
+                {/* Main Content with Layout Sidebar */}
+                <ResizablePanelGroup
+                  orientation="horizontal"
+                  className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
+                  autoSaveId="default-layout-content"
+                >
+                  <ResizablePanel
+                    id="panel-content"
+                    className="w-full"
+                    minSize={`${contentMinSizePercentage}`}
+                    maxSize={`${contentMaxSizePercentage}`}
+                    defaultSize={`${contentMaxSizePercentage}`}
+                  >
+                    <div className="h-full overflow-y-auto">{children}</div>
+                  </ResizablePanel>
+                  <LayoutSidebar
+                    minSize={`${100 - contentMaxSizePercentage}`}
+                    maxSize={`${100 - contentMinSizePercentage}`}
+                    defaultSize={`${100 - contentMaxSizePercentage}`}
+                  />
+                </ResizablePanelGroup>
+              </div>
+            </div>
 
-              <BannerStack />
-              <StudioMobileSheetNav />
-            </BannerStackProvider>
+            <BannerStack />
+            <StudioMobileSheetNav />
           </MobileSheetProvider>
         </ProjectContextProvider>
       </LayoutSidebarProvider>
