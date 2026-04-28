@@ -53,6 +53,8 @@ import { decode } from 'npm:base64-arraybuffer'
 
 console.log('Hello from Amazon Bedrock!')
 
+const SUPABASE_PUBLISHABLE_KEYS = JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')!)
+
 Deno.serve(async (req) => {
   prepareVirtualFile('./aws/config')
   prepareVirtualFile('./aws/credentials')
@@ -102,8 +104,9 @@ Deno.serve(async (req) => {
     const supabaseClient = createClient(
       // Supabase API URL - env var exported by default.
       Deno.env.get('SUPABASE_URL')!,
-      // Supabase API PUB KEY - env var exported by default.
-      Deno.env.get('SUPABASE_PUBLISHABLE_KEY')!
+      // Using the default Supabase API PUB KEY.
+      // If you want to use a different api key, change 'default' to your preferred key name
+      SUPABASE_PUBLISHABLE_KEYS['default']
     )
 
     const { data: upload, error: uploadError } = await supabaseClient.storage
