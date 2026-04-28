@@ -333,11 +333,12 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
           </FormItemLayout>
 
           {selectedEntity && (
-            <FormItemLayout label="Select up to 32 columns" isReactForm={false}>
+            <FormItemLayout id="columns" label="Select up to 32 columns" isReactForm={false}>
               {isLoadingTableColumns && <ShimmeringLoader className="py-4" />}
               {isSuccessTableColumns && (
                 <MultiSelector values={selectedColumns} onValuesChange={setSelectedColumns}>
                   <MultiSelectorTrigger
+                    id="columns"
                     mode="inline-combobox"
                     label={
                       selectedColumns.length === 0

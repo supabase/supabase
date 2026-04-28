@@ -304,7 +304,7 @@ export const PolicyDetailsV2 = ({
             name="roles"
             render={({ field }) => (
               <FormItem className="col-span-12 flex flex-col gap-y-1">
-                <FormLabel>
+                <FormLabel htmlFor="roles">
                   Target Roles <code className="text-code-inline">to</code> clause
                 </FormLabel>
                 <FormControl>
@@ -315,6 +315,7 @@ export const PolicyDetailsV2 = ({
                     size="small"
                   >
                     <MultiSelectorTrigger
+                      id="roles"
                       mode="inline-combobox"
                       label={
                         field.value.length === 0
