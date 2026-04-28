@@ -56,7 +56,7 @@ export const ReportBlockContainer = ({
               <h3 className="heading-meta truncate">{label}</h3>
               {badge && <div className="flex items-center shrink-0">{badge}</div>}
             </div>
-            <div className="flex items-center">{actions}</div>
+            <div className="flex items-center shrink-0">{actions}</div>
           </div>
         </TooltipTrigger>
         {tooltip && (
@@ -67,13 +67,13 @@ export const ReportBlockContainer = ({
       </Tooltip>
       <div
         className={cn(
-          'relative flex flex-col flex-grow w-full',
+          'relative flex flex-col grow w-full',
           hasChildren && 'border-t overflow-hidden'
         )}
       >
         <div
           className={cn(
-            'flex flex-col flex-grow items-center overflow-hidden',
+            'flex flex-col grow items-center overflow-hidden',
             loading && 'pointer-events-none'
           )}
         >

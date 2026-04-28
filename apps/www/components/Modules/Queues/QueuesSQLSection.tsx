@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { type FC, type ReactNode } from 'react'
 import { cn } from 'ui'
 import { TextLink } from 'ui-patterns/TextLink'
 
@@ -17,9 +17,9 @@ select * from pgmq.pop('my_special_queue');
 `
 interface Props {
   id: string
-  label: string | JSX.Element
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
+  label: ReactNode
+  heading: ReactNode
+  subheading: ReactNode
   className?: string
   cta?: {
     label: string
@@ -36,7 +36,7 @@ const QueuesSQLSection: FC<Props> = (props) => {
         props.className
       )}
     >
-      <ul className="w-full flex-grow rounded-lg max-w-md">
+      <ul className="w-full grow rounded-lg max-w-md">
         <div className="w-full h-full relative">
           <CodeWindow
             code={codeSnippet}

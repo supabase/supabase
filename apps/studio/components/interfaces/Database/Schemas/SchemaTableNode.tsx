@@ -13,6 +13,7 @@ import {
   Table2,
 } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { toast } from 'sonner'
 import {
   Button,
   cn,
@@ -20,6 +21,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Tooltip,
   TooltipContent,
@@ -28,9 +30,12 @@ import {
 
 import { useSchemaGraphContext } from './SchemaGraphContext'
 import { TableNodeData } from './Schemas.constants'
+import { getTableDefinitionAsMarkdown } from './Schemas.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import { getTableDefinition } from '@/data/database/table-definition-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { formatSql } from '@/lib/formatSql'
 
 // ReactFlow is scaling everything by the factor of 2
 export const TABLE_NODE_WIDTH = 320
@@ -91,7 +96,7 @@ export const TableNode = ({
               itemHeight
             )}
           >
-            <div className="min-w-0 flex flex-shrink gap-x-1 items-center">
+            <div className="min-w-0 flex shrink gap-x-1 items-center">
               <Table2 strokeWidth={1} size={12} className="text-light" />
               <span className="whitespace-nowrap overflow-hidden text-ellipsis" title={data.name}>
                 {data.name}
@@ -100,7 +105,7 @@ export const TableNode = ({
             {
               // Hide the actions while downloading the schema as png/svg
               !schemaGraphContext.isDownloading ? (
-                <div className="flex flex-shrink-0 items-center gap-2">
+                <div className="flex shrink-0 items-center gap-2">
                   {data.description && (
                     <Tooltip>
                       <TooltipTrigger asChild className="cursor-default ">
@@ -128,16 +133,6 @@ export const TableNode = ({
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="flex items-center space-x-2 whitespace-nowrap"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            copyToClipboard(data.name)
-                          }}
-                        >
-                          <Copy size={12} />
-                          <span>Copy name</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="flex items-center space-x-2 whitespace-nowrap"
                           onClick={() =>
                             router.push(
                               buildTableEditorUrl({
@@ -150,6 +145,73 @@ export const TableNode = ({
                         >
                           <TableEditor size={12} />
                           <p>View in Table Editor</p>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="flex items-center space-x-2 whitespace-nowrap"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            copyToClipboard(data.name)
+                          }}
+                        >
+                          <Copy size={12} />
+                          <span>Copy name</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          key="copy-schema-sql"
+                          className="space-x-2"
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            const toastId = toast.loading('Getting table schema...')
+
+                            const formattedSchema = getTableDefinition({
+                              id: data.id,
+                              projectRef: project?.ref,
+                              connectionString: project?.connectionString,
+                            }).then((tableDefinition) => {
+                              if (!tableDefinition) {
+                                throw new Error('Failed to get table schema')
+                              }
+                              return formatSql(tableDefinition)
+                            })
+
+                            try {
+                              await copyToClipboard(formattedSchema, () => {
+                                toast.success('Table schema copied to clipboard', { id: toastId })
+                              })
+                            } catch (err) {
+                              toast.error(
+                                'Failed to copy schema: ' + ((err as Error).message || err),
+                                {
+                                  id: toastId,
+                                }
+                              )
+                            }
+                          }}
+                        >
+                          <Copy size={12} />
+                          <span>Copy as SQL</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          key="copy-schema-markdown"
+                          className="space-x-2"
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            const markdown = getTableDefinitionAsMarkdown(data)
+
+                            try {
+                              await copyToClipboard(markdown, () => {
+                                toast.success('Table schema copied to clipboard')
+                              })
+                            } catch (err) {
+                              toast.error(
+                                'Failed to copy schema: ' + ((err as Error).message || err)
+                              )
+                            }
+                          }}
+                        >
+                          <Copy size={12} />
+                          <span>Copy as Markdown</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -186,27 +248,27 @@ export const TableNode = ({
                     strokeWidth={1}
                     className={cn(
                       // 'sb-grid-column-header__inner__primary-key'
-                      'flex-shrink-0',
+                      'shrink-0',
                       'text-light'
                     )}
                   />
                 )}
                 {column.isNullable && (
-                  <DiamondIcon size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
+                  <DiamondIcon size={8} strokeWidth={1} className="shrink-0 text-light" />
                 )}
                 {!column.isNullable && (
                   <DiamondIcon
                     size={8}
                     strokeWidth={1}
                     fill="currentColor"
-                    className="flex-shrink-0 text-light"
+                    className="shrink-0 text-light"
                   />
                 )}
                 {column.isUnique && (
-                  <Fingerprint size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
+                  <Fingerprint size={8} strokeWidth={1} className="shrink-0 text-light" />
                 )}
                 {column.isIdentity && (
-                  <Hash size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
+                  <Hash size={8} strokeWidth={1} className="shrink-0 text-light" />
                 )}
               </div>
               <div className="flex w-full justify-between min-w-0">
@@ -222,7 +284,7 @@ export const TableNode = ({
                 >
                   {column.name}
                 </span>
-                <span className="flex-shrink-0 pl-2 pr-1 inline-flex justify-end font-mono text-lighter text-[0.4rem] group-hover:hidden">
+                <span className="shrink-0 pl-2 pr-1 inline-flex justify-end font-mono text-lighter text-[0.4rem] group-hover:hidden">
                   {column.format}
                 </span>
               </div>

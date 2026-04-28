@@ -31,7 +31,7 @@ export const HomeIcon = ({ className }: { className?: string }) => {
   const href = IS_PLATFORM ? getDefaultOrgRedirect() : '/project/default'
 
   return (
-    <Link href={href} className={cn('items-center justify-center flex-shrink-0 flex', className)}>
+    <Link href={href} className={cn('items-center justify-center shrink-0 flex', className)}>
       <img
         alt="Supabase"
         src={`${router.basePath}/img/supabase-logo.svg`}

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { toast } from 'sonner'
-import { Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
+import { Button, cn, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -21,6 +21,7 @@ import {
 } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from '@/components/ui/AlertError'
 import { OrganizationBillingSubscriptionPreviewData } from '@/data/organizations/organization-billing-subscription-preview'
+import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useConfirmPendingSubscriptionChangeMutation } from '@/data/subscriptions/org-subscription-confirm-pending-change'
 import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subscription-update-mutation'
@@ -64,11 +65,16 @@ interface Props {
   planMeta: any
   subscriptionPreviewError: any
   subscriptionPreviewIsLoading: boolean
+  subscriptionPreviewIsFetching: boolean
   subscriptionPreviewInitialized: boolean
   subscriptionPreview: OrganizationBillingSubscriptionPreviewData | undefined
   subscription: any
   currentPlanMeta: any
   projects: OrgProject[]
+  onAddressChange?: (address: CustomerAddress) => void
+  onTaxIdChange?: (taxId: CustomerTaxId | null) => void
+  useAsDefaultBillingAddress: boolean
+  onUseAsDefaultBillingAddressChange: (useAsDefault: boolean) => void
 }
 
 export const SubscriptionPlanUpdateDialog = ({
@@ -77,11 +83,16 @@ export const SubscriptionPlanUpdateDialog = ({
   planMeta,
   subscriptionPreviewError,
   subscriptionPreviewIsLoading,
+  subscriptionPreviewIsFetching,
   subscriptionPreviewInitialized,
   subscriptionPreview,
   subscription,
   currentPlanMeta,
   projects,
+  onAddressChange,
+  onTaxIdChange,
+  useAsDefaultBillingAddress,
+  onUseAsDefaultBillingAddressChange,
 }: Props) => {
   const { resolvedTheme } = useTheme()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -90,6 +101,7 @@ export const SubscriptionPlanUpdateDialog = ({
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
   const paymentMethodSelectionRef = useRef<{
     createPaymentMethod: PaymentMethodElementRef['createPaymentMethod']
+    validateBillingProfile: () => Promise<boolean>
   }>(null)
 
   const billingViaPartner = subscription?.billing_via_partner === true
@@ -169,6 +181,14 @@ export const SubscriptionPlanUpdateDialog = ({
 
     setPaymentConfirmationLoading(true)
 
+    if (paymentMethodSelectionRef.current) {
+      const isValid = await paymentMethodSelectionRef.current.validateBillingProfile()
+      if (!isValid) {
+        setPaymentConfirmationLoading(false)
+        return
+      }
+    }
+
     const result = await paymentMethodSelectionRef.current?.createPaymentMethod()
     if (result) {
       setSelectedPaymentMethod(result.paymentMethod.id)
@@ -234,14 +254,32 @@ export const SubscriptionPlanUpdateDialog = ({
   // Derives the itemized charge breakdown rows shown above "Charge today".
   // Example: Pro -> Team upgrade with proration, tax, and credits:
   //   Team Plan            $25.00
-  //   Unused Time on Pro   -$8.33
-  //   Subtotal             $16.67
   //   Tax (10%)             $1.67
+  //   Subtotal             $26.67
+  //   Unused Time on Pro   -$8.33
   //   Credits              -$5.00
   //   ─────────────────────────────
   //   Charge today         $13.34
   const breakdownItems = useMemo(() => {
     const items: BreakdownItem[] = []
+
+    if (hasTax && tax) {
+      items.push({
+        type: 'amount',
+        label: `Tax (${tax.tax_rate_percentage}%)`,
+        amount: tax.tax_amount,
+      })
+      if (taxableAmount !== newPlanCost) {
+        items.push({ type: 'amount', label: 'Subtotal', amount: taxableAmount! })
+      }
+    }
+
+    if (taxFailed) {
+      items.push({
+        type: 'notice',
+        label: 'Tax could not be estimated and may be applied separately',
+      })
+    }
 
     if (currentPlanId !== 'free' && proratedCredit > 0) {
       items.push({
@@ -249,25 +287,8 @@ export const SubscriptionPlanUpdateDialog = ({
         label: `Unused Time on ${currentPlanName} Plan`,
         amount: -proratedCredit,
         tooltip:
-          'Your previous plan was charged upfront, so a plan change will prorate any unused time in credits. If the prorated credits exceed the new plan charge, the excessive credits are added to your organization for future use.',
-      })
-    }
-
-    if (hasTax && tax) {
-      if (taxableAmount !== newPlanCost) {
-        items.push({ type: 'amount', label: 'Subtotal', amount: taxableAmount! })
-      }
-      items.push({
-        type: 'amount',
-        label: `Tax (${tax.tax_rate_percentage}%)`,
-        amount: tax.tax_amount,
-      })
-    }
-
-    if (taxFailed) {
-      items.push({
-        type: 'notice',
-        label: 'Tax could not be estimated and may be applied separately',
+          'Your previous plan was charged upfront, so a plan change will prorate any unused time in credits. If the prorated credits exceed the new plan charge, the excessive credits are added to your organization for future use.' +
+          (hasTax ? ' Includes proportional tax if applicable.' : ''),
       })
     }
 
@@ -325,16 +346,22 @@ export const SubscriptionPlanUpdateDialog = ({
           <div className="p-8 pb-8 flex flex-col xl:col-span-3">
             <div className="flex-1">
               <div>
-                {!billingViaPartner && subscriptionPreview != null && changeType === 'upgrade' && (
-                  <div className="space-y-2 mb-4">
-                    <PaymentMethodSelection
-                      ref={paymentMethodSelectionRef}
-                      selectedPaymentMethod={selectedPaymentMethod}
-                      onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
-                      readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
-                    />
-                  </div>
-                )}
+                {!billingViaPartner &&
+                  subscriptionPreviewInitialized &&
+                  changeType === 'upgrade' && (
+                    <div className="space-y-2 mb-4">
+                      <PaymentMethodSelection
+                        ref={paymentMethodSelectionRef}
+                        selectedPaymentMethod={selectedPaymentMethod}
+                        onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
+                        readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
+                        onAddressChange={onAddressChange}
+                        onTaxIdChange={onTaxIdChange}
+                        useAsDefaultBillingAddress={useAsDefaultBillingAddress}
+                        onUseAsDefaultBillingAddressChange={onUseAsDefaultBillingAddressChange}
+                      />
+                    </div>
+                  )}
 
                 {billingViaPartner && (
                   <div className="mb-4">
@@ -368,7 +395,12 @@ export const SubscriptionPlanUpdateDialog = ({
               )}
               {subscriptionPreviewInitialized && (
                 <>
-                  <div className="mt-2 mb-4 text-foreground-light text-sm">
+                  <div
+                    className={cn(
+                      'mt-2 mb-4 text-foreground-light text-sm transition-opacity',
+                      subscriptionPreviewIsFetching && 'opacity-50'
+                    )}
+                  >
                     {breakdownItems.map((item, i) =>
                       item.type === 'amount' ? (
                         <div
@@ -491,21 +523,23 @@ export const SubscriptionPlanUpdateDialog = ({
 
                                       const content = (
                                         <>
+                                          {planItem && (
+                                            <TableRow className="text-foreground-light">
+                                              <TableCell className="!py-2 px-0">
+                                                {planItem.description}
+                                              </TableCell>
+                                              <TableCell
+                                                className="text-right py-2 px-0"
+                                                translate="no"
+                                              >
+                                                {formatCurrency(planItem.total_price)}
+                                              </TableCell>
+                                            </TableRow>
+                                          )}
+
                                           {/* Combined projects section */}
                                           {allProjects.length > 0 && (
                                             <>
-                                              <TableRow className="text-foreground-light">
-                                                <TableCell className="!py-2 px-0">
-                                                  {planItem?.description}
-                                                </TableCell>
-                                                <TableCell
-                                                  className="text-right py-2 px-0"
-                                                  translate="no"
-                                                >
-                                                  {formatCurrency(planItem?.total_price)}
-                                                </TableCell>
-                                              </TableRow>
-
                                               <TableRow className="text-foreground-light">
                                                 <TableCell className="!py-2 px-0 flex items-center gap-1">
                                                   <span>Compute</span>
@@ -631,7 +665,7 @@ export const SubscriptionPlanUpdateDialog = ({
                 (it) =>
                   it.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
                   it.status === PROJECT_STATUS.COMING_UP
-              ).length === 5 &&
+              ).length === 0 &&
                 subscriptionPreview?.plan_change_type !== 'downgrade' && (
                   <div className="pb-2">
                     <Admonition title="Empty organization" type="warning">
@@ -668,7 +702,7 @@ export const SubscriptionPlanUpdateDialog = ({
               <div className="flex space-x-2">
                 <Button
                   loading={isUpdating || paymentConfirmationLoading || isConfirming}
-                  disabled={subscriptionPreviewIsLoading}
+                  disabled={subscriptionPreviewIsLoading || subscriptionPreviewIsFetching}
                   type="primary"
                   onClick={onUpdateSubscription}
                   className="flex-1"

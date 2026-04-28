@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { getEdgeFunctionsLastHourStats } from './edge-functions-last-hour-stats-query'
 import { post } from '@/data/fetchers'
 
-vi.mock('data/fetchers', () => ({
+vi.mock('@/data/fetchers', () => ({
   post: vi.fn(),
   handleError: vi.fn(),
 }))

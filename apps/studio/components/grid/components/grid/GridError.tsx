@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useCallback } from 'react'
 import { Button } from 'ui'
@@ -5,14 +6,13 @@ import { Admonition } from 'ui-patterns'
 
 import { isFilterRelatedError } from './GridError.utils'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
-import { useTableFilterNew } from '@/components/grid/hooks/useTableFilterNew'
 import { useTableSort } from '@/components/grid/hooks/useTableSort'
-import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from '@/components/ui/AlertError'
 import { HighCostError } from '@/components/ui/HighQueryCost'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-query'
+import { tableRowKeys } from '@/data/table-rows/keys'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
@@ -22,21 +22,28 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
-  const newFilterBarEnabled = useIsTableFilterBarEnabled()
-  const { filters: oldFilters, clearFilters: clearOldFilters } = useTableFilter()
-  const { filters: newFilters, clearFilters: clearNewFilters } = useTableFilterNew()
+  const queryClient = useQueryClient()
+  const { data: project } = useSelectedProjectQuery()
+  const { filters, clearFilters } = useTableFilter()
   const { sorts } = useTableSort()
 
   const snap = useTableEditorTableStateSnapshot()
   const tableEditorSnap = useTableEditorStateSnapshot()
 
   const removeAllFilters = useCallback(() => {
-    if (newFilterBarEnabled) {
-      clearNewFilters()
-    } else {
-      clearOldFilters()
+    clearFilters()
+  }, [clearFilters])
+
+  const handleLoadData = useCallback(() => {
+    if (!!tableId) {
+      tableEditorSnap.setTableToIgnorePreflightCheck(tableId)
+
+      // Remove the cached error so useQuery re-fetches on the next render.
+      queryClient.removeQueries({
+        queryKey: tableRowKeys.tableRowsAndCount(project?.ref, tableId),
+      })
     }
-  }, [clearOldFilters, clearNewFilters, newFilterBarEnabled])
+  }, [tableEditorSnap, tableId, queryClient, project?.ref])
 
   if (!error) return null
 
@@ -46,7 +53,7 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
   const isForeignTableMissingVaultKeyError =
     isForeignTable && error?.message?.includes('query vault failed')
 
-  const hasActiveFilters = oldFilters.length > 0 || newFilters.length > 0
+  const hasActiveFilters = filters.length > 0
 
   const hasFilterRelatedError = hasActiveFilters && isFilterRelatedError(error?.message)
 
@@ -63,9 +70,7 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
           'Remove any sorts or filters on unindexed columns, or',
           'Create indexes for columns that you want to filter or sort on',
         ]}
-        onSelectLoadData={() => {
-          if (!!tableId) tableEditorSnap.setTableToIgnorePreflightCheck(tableId)
-        }}
+        onSelectLoadData={handleLoadData}
       />
     )
   } else if (isForeignTableMissingVaultKeyError) {

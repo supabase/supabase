@@ -1,11 +1,11 @@
-import { Link, Menu, Plus, Settings, X } from 'lucide-react'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { GripVertical, Link, Plus, Settings, X } from 'lucide-react'
 import { useState } from 'react'
-import { DraggableProvidedDragHandleProps } from 'react-beautiful-dnd'
 import {
   Badge,
   Button,
   Checkbox,
-  Checkbox_Shadcn_,
   cn,
   Command_Shadcn_,
   CommandGroup_Shadcn_,
@@ -56,7 +56,6 @@ interface ColumnProps {
   isNewRecord: boolean
   hasForeignKeys: boolean
   hasImportContent: boolean
-  dragHandleProps?: DraggableProvidedDragHandleProps | null
   onUpdateColumn: (changes: Partial<ColumnField>) => void
   onRemoveColumn: () => void
   onEditForeignKey: (relation?: ForeignKey) => void
@@ -69,7 +68,6 @@ export const Column = ({
   isNewRecord = false,
   hasForeignKeys = false,
   hasImportContent = false,
-  dragHandleProps,
   onUpdateColumn,
   onRemoveColumn,
   onEditForeignKey,
@@ -108,12 +106,28 @@ export const Column = ({
     .map((r) => getRelationStatus(r))
     .some((x) => x !== undefined)
 
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition } =
+    useSortable({
+      id: column.id,
+    })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
   return (
-    <div className="flex w-full items-center">
+    <div className="flex w-full items-center" ref={setNodeRef} style={style}>
       <div className={`w-[5%] ${!isNewRecord ? 'hidden' : ''}`}>
-        <div className="cursor-drag" {...dragHandleProps}>
-          <Menu strokeWidth={1} size={16} />
-        </div>
+        <button
+          ref={setActivatorNodeRef}
+          {...attributes}
+          {...listeners}
+          className="opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab text-foreground"
+          type="button"
+        >
+          <GripVertical size={16} strokeWidth={1.5} />
+        </button>
       </div>
       <div className="w-[25%]">
         <div className="flex w-[95%] items-center justify-between">
@@ -270,9 +284,9 @@ export const Column = ({
       </div>
       <div className="w-[10%]">
         <Checkbox
-          label=""
+          aria-label="Check to make this column a primary key"
           checked={column.isPrimaryKey}
-          onChange={() => {
+          onCheckedChange={() => {
             const updatedValue = !column.isPrimaryKey
             onUpdateColumn({
               isPrimaryKey: updatedValue,
@@ -312,7 +326,7 @@ export const Column = ({
                     label="Is Nullable"
                     description="Specify if the column can assume a NULL value if no value is provided"
                   >
-                    <Checkbox_Shadcn_
+                    <Checkbox
                       id="isNullable"
                       checked={column.isNullable}
                       onCheckedChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
@@ -327,7 +341,7 @@ export const Column = ({
                     label="Is Unique"
                     description="Enforce if values in the column should be unique across rows"
                   >
-                    <Checkbox_Shadcn_
+                    <Checkbox
                       id="isUnique"
                       checked={column.isUnique}
                       onCheckedChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
@@ -342,7 +356,7 @@ export const Column = ({
                     label="Is Identity"
                     description="Automatically assign a sequential unique number to the column"
                   >
-                    <Checkbox_Shadcn_
+                    <Checkbox
                       id="isIdentity"
                       checked={column.isIdentity}
                       onCheckedChange={() => {
@@ -361,7 +375,7 @@ export const Column = ({
                     label="Define as Array"
                     description="Define your column as a variable-length multidimensional array"
                   >
-                    <Checkbox_Shadcn_
+                    <Checkbox
                       id="defineAsArray"
                       checked={column.isArray}
                       onCheckedChange={() => {

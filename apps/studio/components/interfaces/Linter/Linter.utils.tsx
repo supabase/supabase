@@ -320,6 +320,58 @@ export const lintInfoMap: LintInfo[] = [
     docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0024_permissive_rls_policy`,
     category: 'security',
   },
+  {
+    name: 'public_bucket_allows_listing',
+    title: 'Public Bucket Allows Listing',
+    icon: <Box className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef, metadata }) => {
+      const bucketId = (metadata as Record<string, string | undefined> | undefined)?.bucket_id
+      return `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucketId ?? metadata?.name ?? '')}`
+    },
+    linkText: 'View bucket',
+    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0025_public_bucket_allows_listing`,
+    category: 'security',
+  },
+  {
+    name: 'pg_graphql_anon_table_exposed',
+    title: 'Public Can See Object in GraphQL Schema',
+    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/editor?schema=${metadata?.schema}&table=${metadata?.name}`,
+    linkText: 'View object',
+    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0026_pg_graphql_anon_table_exposed`,
+    category: 'security',
+  },
+  {
+    name: 'pg_graphql_authenticated_table_exposed',
+    title: 'Signed-In Users Can See Object in GraphQL Schema',
+    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/editor?schema=${metadata?.schema}&table=${metadata?.name}`,
+    linkText: 'View object',
+    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0027_pg_graphql_authenticated_table_exposed`,
+    category: 'security',
+  },
+  {
+    name: 'anon_security_definer_function_executable',
+    title: 'Public Can Execute SECURITY DEFINER Function',
+    icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/database/functions?schema=${metadata?.schema}&search=${metadata?.name}`,
+    linkText: 'View function',
+    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0028_anon_security_definer_function_executable`,
+    category: 'security',
+  },
+  {
+    name: 'authenticated_security_definer_function_executable',
+    title: 'Signed-In Users Can Execute SECURITY DEFINER Function',
+    icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/database/functions?schema=${metadata?.schema}&search=${metadata?.name}`,
+    linkText: 'View function',
+    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable`,
+    category: 'security',
+  },
 ]
 
 export const LintCTA = ({
@@ -363,12 +415,7 @@ export const EntityTypeIcon = ({ type }: { type: string | undefined }) => {
 }
 
 export const LintEntity = ({ metadata }: { metadata: Lint['metadata'] }) => {
-  return (
-    (metadata &&
-      (metadata.entity ||
-        (metadata.schema && metadata.name && `${metadata.schema}.${metadata.name}`))) ??
-    undefined
-  )
+  return getLintEntityString(metadata)
 }
 
 export const LintCategoryBadge = ({ category }: { category: string }) => {
@@ -396,13 +443,7 @@ export const NoIssuesFound = ({ level }: { level: string }) => {
 
 export const createLintSummaryPrompt = (lint: Lint) => {
   const title = lintInfoMap.find((item) => item.name === lint.name)?.title ?? lint.title
-  const entity =
-    (lint.metadata &&
-      (lint.metadata.entity ||
-        (lint.metadata.schema &&
-          lint.metadata.name &&
-          `${lint.metadata.schema}.${lint.metadata.name}`))) ||
-    'N/A'
+  const entity = getLintEntityString(lint.metadata) || 'N/A'
   const schema = lint.metadata?.schema ?? 'N/A'
   const issue = lint.detail ? lint.detail.replace(/\\`/g, '`') : 'N/A'
   const description = lint.description ? lint.description.replace(/\\`/g, '`') : 'N/A'
@@ -412,4 +453,23 @@ Entity: ${entity}
 Schema: ${schema}
 Issue Details: ${issue}
 Description: ${description}`
+}
+
+export const getLintEntityString = (metadata: Lint['metadata']) => {
+  if (!metadata) {
+    return undefined
+  }
+
+  if (metadata.entity) {
+    return metadata.entity
+  }
+
+  if (metadata.schema && metadata.name) {
+    const extendedMetadata = metadata as typeof metadata & { arguments?: string }
+    const args =
+      typeof extendedMetadata.arguments === 'string' ? extendedMetadata.arguments : undefined
+    return `${metadata.schema}.${metadata.name}${args !== undefined ? `(${args})` : ''}`
+  }
+
+  return undefined
 }

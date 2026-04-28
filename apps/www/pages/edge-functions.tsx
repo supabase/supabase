@@ -24,6 +24,8 @@ const ProductsCta = dynamic(() => import('~/components/Sections/ProductsCta2'))
 const TimedAccordionPanels = dynamic(() => import('~/components/Sections/TimedAccordionPanels'))
 const TimedAccordionSection = dynamic(() => import('~/components/Sections/TimedAccordionSection'))
 
+// When updating page content, also update public/llms/edge-functions.txt
+
 function EdgeFunctions() {
   const { basePath } = useRouter()
   const isXs = useBreakpoint(640)

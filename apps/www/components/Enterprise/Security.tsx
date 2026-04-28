@@ -1,14 +1,14 @@
 import type { LucideIcon } from 'lucide-react'
-import React, { FC } from 'react'
+import React, { type FC, type ReactNode } from 'react'
 import { TextLink } from 'ui-patterns/TextLink'
 
 import SectionContainer from '@/components/Layouts/SectionContainer'
 
 export interface SecuritySectionProps {
   id: string
-  label: string | JSX.Element
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
+  label: ReactNode
+  heading: ReactNode
+  subheading: ReactNode
   features: FeatureProps[]
   cta: {
     label: string
@@ -19,7 +19,7 @@ export interface SecuritySectionProps {
 export type Story = {
   url: string
   heading: string
-  subheading: string | JSX.Element
+  subheading: ReactNode
 }
 
 type FeatureProps = {

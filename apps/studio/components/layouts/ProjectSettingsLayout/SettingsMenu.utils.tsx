@@ -83,7 +83,7 @@ export const useGenerateSettingsMenu = () => {
         {
           name: 'API Keys',
           key: 'api-keys',
-          url: `/project/${ref}/settings/api-keys/new`,
+          url: `/project/${ref}/settings/api-keys`,
           items: [],
           disabled: !isProjectActive,
         },

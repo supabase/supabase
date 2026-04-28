@@ -171,7 +171,7 @@ function BarChart<D extends Datum = Datum>({
             key={xAxisKey}
           />
           <Tooltip
-            content={(props) =>
+            content={(_props) =>
               syncId && isHovered && isCurrentChart && hoveredIndex !== null ? (
                 <div className="bg-black/90 text-white p-2 rounded text-xs">
                   <div className="font-medium">

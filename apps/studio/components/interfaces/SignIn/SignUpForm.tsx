@@ -13,9 +13,9 @@ import {
   AlertTitle_Shadcn_,
   Button,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -143,15 +143,15 @@ export const SignUpForm = () => {
           isSubmitted ? 'max-h-[100px] opacity-0 pointer-events-none' : 'max-h-[1000px] opacity-100'
         )}
       >
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField_Shadcn_
+            <FormField
               key="email"
               name="email"
               control={form.control}
               render={({ field }) => (
                 <FormItemLayout name="email" label="Email">
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Input_Shadcn_
                       id="email"
                       autoComplete="email"
@@ -159,18 +159,18 @@ export const SignUpForm = () => {
                       {...field}
                       placeholder="you@example.com"
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               key="password"
               name="password"
               control={form.control}
               render={({ field }) => (
                 <FormItemLayout name="password" label="Password">
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <div className="relative">
                       <Input_Shadcn_
                         id="password"
@@ -191,7 +191,7 @@ export const SignUpForm = () => {
                         onClick={() => setPasswordHidden((prev) => !prev)}
                       />
                     </div>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -225,7 +225,7 @@ export const SignUpForm = () => {
               Sign up
             </Button>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </div>
     </div>
   )

@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
 import { orgSSOKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'

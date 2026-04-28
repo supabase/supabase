@@ -65,7 +65,7 @@ const EventCallout = ({ className, size = 'tiny', ...props }: PropsWithChildren<
               alt="event thumbnail"
             /> */}
             </div>
-            <div className="flex flex-col gap-2 md:gap-3 flex-grow max-w-xl xl:justify-center">
+            <div className="flex flex-col gap-2 md:gap-3 grow max-w-xl xl:justify-center">
               <div className="flex flex-row text-sm">
                 <span className="uppercase text-brand font-mono">Webinar</span>
                 <span className="mx-3 pl-3 border-l">23 Oct 2024 at 10AM PST</span>

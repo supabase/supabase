@@ -1,9 +1,8 @@
-import { useParams } from 'common'
 import { geoCentroid } from 'd3-geo'
 import sumBy from 'lodash/sumBy'
 import { ChevronRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { Fragment, useRef, useState } from 'react'
+import { Fragment, useRef, useState, type ReactNode } from 'react'
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
 import {
   Alert_Shadcn_,
@@ -171,7 +170,6 @@ export const TopApiRoutesRenderer = (
     avg?: number
   }>
 ) => {
-  const { ref: projectRef } = useParams()
   const [showMore, setShowMore] = useState(false)
 
   const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200 !border-x-0 !rounded-none'
@@ -576,7 +574,7 @@ export const RequestsByCountryMapRenderer = (
                     if (code) present.add(code)
                   }
 
-                  const markers: JSX.Element[] = []
+                  const markers: ReactNode[] = []
                   for (const iso2 in countsByIso2) {
                     const count = countsByIso2[iso2]
                     if (count <= 0) continue

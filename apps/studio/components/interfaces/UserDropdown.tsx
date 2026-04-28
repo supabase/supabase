@@ -3,7 +3,6 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
-  Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -43,7 +42,7 @@ export function UserDropdown({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild className={cn('border flex-shrink-0 px-3', triggerClassName)}>
+      <DropdownMenuTrigger asChild className={cn('border shrink-0 px-3', triggerClassName)}>
         <ButtonTooltip
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
@@ -106,7 +105,7 @@ export function UserDropdown({
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2" asChild>
+              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
                 <Link
                   href="https://supabase.com/changelog"
                   target="_blank"

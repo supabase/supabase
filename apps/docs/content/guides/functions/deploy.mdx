@@ -103,7 +103,7 @@ curl --request POST 'https://<project_id>.supabase.co/functions/v1/hello-world' 
 import { createClient } from '@supabase/supabase-js'
 
 // Create a single supabase client for interacting with your database
-const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key')
+const supabase = createClient('https://xyzcompany.supabase.co', 'sb_publishable_...')
 
 const { data, error } = await supabase.functions.invoke('hello-world', {
   body: { name: 'Functions' },
@@ -126,7 +126,7 @@ You should now see the expected response:
 
 <Admonition type="note">
 
-You can also test the function through the Dashboard. To see how that works, check out the [Dashboard Quickstart guide](/docs/guides/dashboard/quickstart).
+You can also test the function through the Dashboard. To see how that works, check out the [Dashboard Quickstart guide](/docs/guides/functions/quickstart-dashboard).
 
 </Admonition>
 

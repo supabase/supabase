@@ -13,8 +13,8 @@ const { mockRouter, mockRegisterOpenMenu, mockSetMobileSheetContent } = vi.hoist
   mockSetMobileSheetContent: vi.fn(),
 }))
 
-vi.mock('lib/constants', async () => {
-  const actual = await vi.importActual<Record<string, unknown>>('lib/constants')
+vi.mock('@/lib/constants', async () => {
+  const actual = await vi.importActual<Record<string, unknown>>('@/lib/constants')
   return {
     ...actual,
     IS_PLATFORM: false,
@@ -46,23 +46,23 @@ vi.mock('next/head', async () => {
   return { default: Head }
 })
 
-vi.mock('hooks/custom-content/useCustomContent', () => ({
+vi.mock('@/hooks/custom-content/useCustomContent', () => ({
   useCustomContent: () => ({ appTitle: 'Supabase' }),
 }))
 
-vi.mock('hooks/misc/useIsFeatureEnabled', () => ({
+vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: () => false,
 }))
 
-vi.mock('hooks/misc/useLocalStorage', () => ({
+vi.mock('@/hooks/misc/useLocalStorage', () => ({
   useLocalStorageQuery: () => [''],
 }))
 
-vi.mock('hooks/misc/withAuth', () => ({
+vi.mock('@/hooks/misc/withAuth', () => ({
   withAuth: <T,>(Component: T) => Component,
 }))
 
-vi.mock('state/app-state', () => ({
+vi.mock('@/state/app-state', () => ({
   useAppStateSnapshot: () => ({
     lastRouteBeforeVisitingAccountPage: '',
   }),

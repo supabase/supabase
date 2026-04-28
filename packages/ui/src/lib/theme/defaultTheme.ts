@@ -35,10 +35,11 @@ const defaults = {
   `,
   size: {
     // buttons, inputs, input labels use these sizes
+    // text-base on mobile (below md) to avoid zoom on focus
     text: {
       tiny: 'text-xs',
-      small: 'text-sm leading-4',
-      medium: 'text-sm',
+      small: 'text-base md:text-sm leading-4',
+      medium: 'text-base md:text-sm',
       large: 'text-base',
       xlarge: 'text-base',
     },
@@ -54,13 +55,6 @@ const defaults = {
   overlay: {
     base: `absolute inset-0 bg-background opacity-50`,
     container: `fixed inset-0 transition-opacity`,
-  },
-}
-
-const utils = {
-  border: {
-    hover: 'border-opacity-50 hover:border-opacity-100',
-    fix: 'border-opacity-100',
   },
 }
 
@@ -209,40 +203,6 @@ export default {
     },
     animate: {
       ...default___animations.accordion,
-    },
-  },
-
-  /*
-   * Badge
-   *
-   */
-
-  badge: {
-    base: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-normal bg-opacity-10',
-    size: {
-      large: 'px-3 py-0.5 rounded-full text-sm',
-    },
-    dot: '-ml-0.5 mr-1.5 h-2 w-2 rounded-full',
-    color: {
-      brand: 'bg-brand-500 text-brand-600 border border-brand-500',
-      brandAlt: 'bg-brand bg-opacity-100 text-background border border-brand',
-      scale: 'bg-background text-foreground-light border border-strong',
-      tomato: `bg-tomato-200 text-tomato-1100 border border-tomato-700`,
-      red: `bg-red-200 text-red-1100 border border-red-700`,
-      crimson: `bg-crimson-200 text-crimson-1100 border border-crimson-700`,
-      pink: `bg-pink-200 text-pink-1100 border border-pink-700`,
-      purple: `bg-purple-200 text-purple-1100 border border-purple-700`,
-      violet: `bg-violet-200 text-violet-1100 border border-violet-700`,
-      indigo: `bg-indigo-200 text-indigo-1100 border border-indigo-700`,
-      blue: `bg-blue-200 text-blue-1100 border border-blue-700`,
-      green: `bg-opacity-10 bg-brand-500 text-brand-600 border border-brand-500`,
-      grass: `bg-grass-200 text-grass-1100 border border-grass-700`,
-      orange: `bg-orange-200 text-orange-1100 border border-orange-700`,
-      yellow: `bg-yellow-200 text-yellow-1100 border border-yellow-700`,
-      amber: `bg-amber-200 text-amber-1100 border border-amber-700`,
-      gold: `bg-gold-200 text-gold-1100 border border-gold-700`,
-      gray: `bg-200 text-gray-1100 border border-gray-700`,
-      slate: `bg-slate-200 text-slate-1100 border border-slate-700`,
     },
   },
 
@@ -464,397 +424,6 @@ export default {
     textarea_actions_container_items: 'flex items-center',
   },
 
-  /*
-   * Select
-   */
-
-  select: {
-    base: `
-      block
-      box-border
-      w-full
-      rounded-md
-      shadow-sm
-      transition-all
-      text-foreground
-      border
-      focus-visible:shadow-md
-      ${defaults.focus}
-      focus-visible:border-foreground-muted
-      focus-visible:ring-background-control
-      ${defaults.placeholder}
-
-      appearance-none
-      bg-none
-    `,
-    variants: {
-      standard: `
-        bg-background
-        border border-strong
-        `,
-      error: `
-        bg-destructive-200
-        border border-destructive-500
-        focus:ring-destructive-400
-        placeholder:text-destructive-400
-       `,
-    },
-    container: 'relative',
-    with_icon: with_icon_spacing_sizes,
-    size: {
-      ...default__padding_and_text,
-    },
-    disabled: 'opacity-50',
-    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 mr-5 flex items-center',
-    chevron_container: 'absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none',
-    chevron: 'h-5 w-5 text-foreground-lighter',
-  },
-
-  /*
-   * Input Number
-   */
-
-  inputNumber: {
-    base: `
-      block
-      box-border
-      w-full
-      rounded-md
-      shadow-sm
-      transition-all
-      text-foreground
-      border
-      focus-visible:shadow-md
-      ${defaults.focus}
-      focus-visible:border-foreground-muted
-      focus-visible:ring-background-control
-      ${defaults.placeholder}
-
-      appearance-none
-      bg-none
-    `,
-    variants: {
-      standard: `
-        bg-control
-        border border-strong
-      `,
-      error: `
-        bg-destructive-200
-        border border-destructive-500
-        focus:ring-destructive-400
-        placeholder:text-destructive-400
-       `,
-    },
-    disabled: 'opacity-50',
-    container: 'relative',
-    with_icon: with_icon_spacing_sizes,
-    size: {
-      ...default__padding_and_text,
-    },
-    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
-  },
-
-  /*
-   *  Checkbox
-   *
-   *
-   * This Checkbox requires a plugin in your config:
-
-    ```
-    // tailwind.config.js
-    module.exports = {
-      // ...
-      plugins: [
-        // ...
-        require('@tailwindcss/forms'),
-      ],
-    }
-    ```
-   *
-   *
-  */
-
-  checkbox: {
-    base: `
-      bg-transparent
-      ${defaults.focus}
-      focus:ring-border-muted
-      text-brand
-      border-strong
-      shadow-sm
-      rounded
-      cursor-pointer
-    `,
-    container: `flex cursor-pointer leading-none`,
-    size: {
-      tiny: `h-3 w-3 mt-1 mr-3`,
-      small: `h-3.5 w-3.5 mt-0.5 mr-3.5`,
-      medium: `h-4 w-4 mt-0.5 mr-3.5`,
-      large: `h-5 w-5 mt-0.5 mr-4`,
-      xlarge: `h-5 w-5 mt-0.5 mr-4`,
-    },
-    disabled: 'opacity-50',
-    label: {
-      base: `text-foreground-light cursor-pointer`,
-      ...defaults.size.text,
-    },
-    label_before: {
-      base: 'text-border',
-      ...defaults.size.text,
-    },
-    label_after: {
-      base: 'text-border',
-      ...defaults.size.text,
-    },
-    description: {
-      base: `text-foreground-lighter`,
-      ...defaults.size.text,
-    },
-    group: `space-y-3`,
-  },
-
-  /*
-   *  Radio
-   *
-   *
-   * This Radio requires a plugin in your config:
-
-    ```
-    // tailwind.config.js
-    module.exports = {
-      // ...
-      plugins: [
-        // ...
-        require('@tailwindcss/forms'),
-      ],
-    }
-    ```
-   *
-   *
-  */
-
-  radio: {
-    base: `
-      absolute
-      ${defaults.focus}
-      focus:ring-brand-400
-      border-strong
-
-      text-brand
-      shadow-sm
-      cursor-pointer
-      peer
-
-      bg-surface-100
-    `,
-    hidden: `absolute opacity-0`,
-    size: {
-      tiny: `h-3 w-3`,
-      small: `h-3.5 w-3.5`,
-      medium: `h-4 w-4`,
-      large: `h-5 w-5`,
-      xlarge: `h-5 w-5`,
-    },
-    variants: {
-      cards: {
-        container: {
-          base: `relative cursor-pointer flex`,
-          align: {
-            vertical: 'flex flex-col space-y-1',
-            horizontal: 'flex flex-row space-x-2',
-          },
-        },
-        group: `-space-y-px shadow-sm`,
-        base: `
-          transition
-          border
-          first:rounded-tl-md first:rounded-tr-md
-          last:rounded-bl-md last:rounded-br-md
-        `,
-        size: {
-          tiny: `px-5 py-3`,
-          small: `px-6 py-4`,
-          medium: `px-6 py-4`,
-          large: `px-8 p-4`,
-          xlarge: `px-8 p-4`,
-        },
-        inactive: `
-          bg-surface-200
-          border-alternative
-          hover:border-strong
-          hover:bg-surface-300
-        `,
-        active: `
-          bg-selection z-10
-          border-stronger
-          border-1
-        `,
-        radio_offset: 'left-4',
-      },
-
-      'stacked-cards': {
-        container: {
-          base: `relative cursor-pointer flex items-center justify-between`,
-          align: {
-            vertical: 'flex flex-col space-y-1',
-            horizontal: 'flex flex-row space-x-2',
-          },
-        },
-        group: `space-y-3`,
-        base: `
-          transition
-          rounded-md
-          border
-          shadow-sm
-        `,
-        size: {
-          tiny: `px-5 py-3`,
-          small: `px-6 py-4`,
-          medium: `px-6 py-4`,
-          large: `px-8 p-4`,
-          xlarge: `px-8 p-4`,
-        },
-        inactive: `
-          bg-surface-200
-          border-alternative
-          hover:border-strong
-          hover:bg-surface-300
-        `,
-        active: `
-          bg-selection z-10
-          border-stronger
-          border-1
-        `,
-        radio_offset: 'left-4',
-      },
-
-      'small-cards': {
-        container: {
-          base: `relative cursor-pointer flex`,
-          align: {
-            vertical: 'flex flex-col space-y-1 items-center justify-center',
-            horizontal: 'flex flex-row space-x-2',
-          },
-        },
-        group: `flex flex-row gap-3`,
-        base: `
-          transition
-          border
-          rounded-lg
-          grow
-          items-center
-          flex-wrap
-          justify-center
-          shadow-sm
-        `,
-        size: {
-          tiny: `px-5 py-3`,
-          small: `px-6 py-4`,
-          medium: `px-6 py-4`,
-          large: `px-8 p-4`,
-          xlarge: `px-8 p-4`,
-        },
-        inactive: `
-          bg-surface-200
-          border-alternative
-          hover:border-strong
-          hover:bg-surface-300
-        `,
-        active: `
-          bg-selection z-10
-          border-stronger border-1
-        `,
-        radio_offset: 'left-4',
-      },
-
-      'large-cards': {
-        container: {
-          base: `relative cursor-pointer flex`,
-          align: {
-            vertical: 'flex flex-col space-y-1',
-            horizontal: 'flex flex-row space-x-2',
-          },
-        },
-        group: `grid grid-cols-12 gap-3`,
-        base: `
-          transition
-          border border-stronger
-          shadow-sm
-          rounded-lg
-          grow
-        `,
-        size: {
-          tiny: `px-5 py-3`,
-          small: `px-6 py-4`,
-          medium: `px-6 py-4`,
-          large: `px-8 p-4`,
-          xlarge: `px-8 p-4`,
-        },
-        inactive: `
-          bg-surface-200
-          border-alternative
-          hover:border-strong
-          hover:bg-surface-300
-        `,
-        active: `
-          bg-selection z-10
-          border-strong
-          border-1
-        `,
-        radio_offset: 'left-4',
-      },
-
-      list: {
-        container: {
-          base: `relative cursor-pointer flex`,
-          size: {
-            tiny: `pl-6`,
-            small: `pl-6`,
-            medium: `pl-7`,
-            large: `pl-7`,
-            xlarge: `pl-7`,
-          },
-          align: {
-            vertical: 'flex flex-col space-y-1',
-            horizontal: 'flex flex-row space-x-2',
-          },
-        },
-        group: `space-y-4`,
-        base: ``,
-        size: {
-          tiny: `0`,
-          small: `0`,
-          medium: `0`,
-          large: `0`,
-          xlarge: `0`,
-        },
-        active: ``,
-        radio_offset: 'left-0',
-      },
-    },
-    label: {
-      base: `text-foreground-light cursor-pointer`,
-      ...defaults.size.text,
-    },
-    label_before: {
-      base: 'text-border',
-      ...defaults.size.text,
-    },
-    label_after: {
-      base: 'text-border',
-      ...defaults.size.text,
-    },
-    description: {
-      base: `text-foreground-lighter`,
-      ...defaults.size.text,
-    },
-    optionalLabel: {
-      base: `text-foreground-lighter`,
-      ...defaults.size.text,
-    },
-    disabled: `opacity-50 cursor-auto border-dashed`,
-  },
-
   sidepanel: {
     base: `
       z-50
@@ -935,7 +504,7 @@ export default {
   toggle: {
     base: `
       p-0 relative
-      inline-flex flex-shrink-0
+      inline-flex shrink-0
       border-2 border-transparent
       rounded-full
       cursor-pointer
@@ -1063,8 +632,8 @@ export default {
     },
     size: {
       tiny: 'text-xs',
-      small: 'text-sm leading-4',
-      medium: 'text-sm',
+      small: 'text-base md:text-sm leading-4',
+      medium: 'text-base md:text-sm',
       large: 'text-base',
       xlarge: 'text-base',
     },
@@ -1411,7 +980,7 @@ export default {
   // Icon
 
   icon: {
-    container: `flex-shrink-0 flex items-center justify-center rounded-full p-3`,
+    container: `shrink-0 flex items-center justify-center rounded-full p-3`,
   },
 
   loading: {
@@ -1428,4 +997,4 @@ export default {
       m-auto
     `,
   },
-}
+} as const

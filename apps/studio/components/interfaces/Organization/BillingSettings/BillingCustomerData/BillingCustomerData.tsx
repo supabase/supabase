@@ -3,34 +3,34 @@ import { loadStripe, StripeAddressElement, StripeElementsOptions } from '@stripe
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import {
-  getAddressElementAppearanceOptions,
-  STRIPE_ELEMENT_FONTS,
-} from 'components/interfaces/Billing/Payment/Payment.utils'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import { organizationKeys } from 'data/organizations/keys'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
-import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
-import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
+import { Button, Card, CardFooter, Form } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BillingCustomerDataForm } from './BillingCustomerDataForm'
 import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
+import {
+  getAddressElementAppearanceOptions,
+  STRIPE_ELEMENT_FONTS,
+} from '@/components/interfaces/Billing/Payment/Payment.utils'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import NoPermission from '@/components/ui/NoPermission'
+import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
+import { organizationKeys } from '@/data/organizations/keys'
+import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
+import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
+import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -64,7 +64,6 @@ export const BillingCustomerData = () => {
   const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation({
     onError: () => {},
   })
-  const { mutateAsync: updateTaxId } = useOrganizationTaxIdUpdateMutation({ onError: () => {} })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const addressElementRef = useRef<StripeAddressElement | null>(null)
@@ -87,27 +86,12 @@ export const BillingCustomerData = () => {
       setIsSubmitting(true)
 
       try {
-        try {
-          await updateCustomerProfile({
-            slug,
-            address: data.address,
-            billing_name: data.billing_name,
-          })
-        } catch (error) {
-          toast.error(
-            `Failed updating billing address: ${error instanceof Error ? error.message : 'Unknown error'}`
-          )
-          throw error
-        }
-
-        try {
-          await updateTaxId({ slug, taxId: data.tax_id })
-        } catch (error) {
-          toast.error(
-            `Failed updating tax ID: ${error instanceof Error ? error.message : 'Unknown error'}`
-          )
-          throw error
-        }
+        await updateCustomerProfile({
+          slug,
+          address: data.address,
+          billing_name: data.billing_name,
+          tax_id: data.tax_id,
+        })
 
         toast.success('Successfully updated billing data')
 
@@ -116,11 +100,22 @@ export const BillingCustomerData = () => {
           (prev) => {
             if (!prev) return prev
             return prev.map((org) =>
-              org.slug === slug ? { ...org, organization_missing_tax_id: data.tax_id == null } : org
+              org.slug === slug
+                ? {
+                    ...org,
+                    ...(data.address !== undefined ? { organization_missing_address: false } : {}),
+                    ...(data.tax_id !== undefined
+                      ? { organization_missing_tax_id: data.tax_id == null }
+                      : {}),
+                  }
+                : org
             )
           }
         )
       } catch (error) {
+        toast.error(
+          `Failed updating billing data: ${error instanceof Error ? error.message : 'Unknown error'}`
+        )
         throw error
       } finally {
         setIsSubmitting(false)
@@ -165,6 +160,9 @@ export const BillingCustomerData = () => {
       }) as any,
     [resolvedTheme]
   )
+  const isPartnerBilledOrganization = isPartnerBillingOrganization(
+    selectedOrganization?.billing_partner
+  )
 
   return (
     <ScaffoldSection>
@@ -180,8 +178,7 @@ export const BillingCustomerData = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {selectedOrganization?.managed_by !== undefined &&
-        selectedOrganization?.managed_by !== 'supabase' ? (
+        {selectedOrganization && isPartnerBilledOrganization ? (
           <PartnerManagedResource
             managedBy={selectedOrganization?.managed_by}
             resource="Billing Addresses"

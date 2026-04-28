@@ -54,9 +54,7 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
-import { useIsAPIDocsSidePanelEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
-import { APIDocsButton } from '@/components/ui/APIDocsButton'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
@@ -99,7 +97,6 @@ export const UsersV2 = () => {
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const {
@@ -722,9 +719,6 @@ export const UsersV2 = () => {
               </div>
 
               <div className="flex items-center gap-x-2">
-                {isNewAPIDocsEnabled && (
-                  <APIDocsButton section={['user-management']} source="auth-users" />
-                )}
                 <ButtonTooltip
                   size="tiny"
                   icon={<RefreshCw />}
@@ -752,14 +746,14 @@ export const UsersV2 = () => {
         <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
         <ResizablePanelGroup
           orientation="horizontal"
-          className="relative flex flex-grow bg-alternative min-h-0"
+          className="relative flex grow bg-alternative min-h-0"
           autoSaveId="query-performance-layout-v1"
         >
           <ResizablePanel>
             <div className="flex flex-col w-full h-full">
               <DataGrid
                 ref={gridRef}
-                className="flex-grow border-t-0"
+                className="grow border-t-0"
                 rowHeight={44}
                 headerRowHeight={36}
                 columns={columns}

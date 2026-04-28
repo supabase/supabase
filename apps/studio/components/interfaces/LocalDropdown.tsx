@@ -2,9 +2,7 @@ import { FlaskConical, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
-  Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +20,7 @@ import {
 import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 import { ProfileImage } from '@/components/ui/ProfileImage'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export const LocalDropdown = ({
   triggerClassName,
@@ -37,7 +36,7 @@ export const LocalDropdown = ({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className={cn('border flex-shrink-0 px-3', triggerClassName)} asChild>
+      <DropdownMenuTrigger className={cn('border shrink-0 px-3', triggerClassName)} asChild>
         <ButtonTooltip
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"

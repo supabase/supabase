@@ -670,6 +670,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/integrations/partners/{ref}/{listing_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Creates a partner integration and returns the redirect URL */
+    post: operations['PartnerIntegrationsController_createIntegration']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/integrations/private-link/{slug}': {
     parameters: {
       query?: never
@@ -1060,6 +1077,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/credits/preview': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Preview for credit top-up */
+    post: operations['OrgCreditsController_previewTopUp']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/credits/redeem': {
     parameters: {
       query?: never
@@ -1347,6 +1381,23 @@ export interface paths {
      * @description Results are cached per organization for up to 24 hours. Signed status may not reflect immediately after a document is completed.
      */
     get: operations['OrgDocumentsController_getDpaSignedStatus']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/documents/iso27001-certificate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get ISO 27001 certificate URL */
+    get: operations['OrgDocumentsController_getIso27001CertificateUrl']
     put?: never
     post?: never
     delete?: never
@@ -1848,6 +1899,40 @@ export interface paths {
     put?: never
     /** Confirm subscription change and apply pending changes */
     post: operations['OrganizationsController_confirmSubscription']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/onboarding-survey': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Submit onboarding survey for a newly created organization */
+    post: operations['OrganizationsController_handleOnboardingSurvey']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/preview-creation': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Preview tax breakdown for organization creation */
+    post: operations['OrganizationsController_previewOrganizationCreation']
     delete?: never
     options?: never
     head?: never
@@ -3750,6 +3835,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/replication/{ref}/tenants': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * Delete tenant
+     * @description Delete the replication tenant for the project. Requires bearer auth.
+     */
+    delete: operations['ReplicationTenantsController_deleteTenant']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/replication/{ref}/tenants-sources': {
     parameters: {
       query?: never
@@ -4675,6 +4780,7 @@ export interface components {
       billing_name?: string
       /** @enum {boolean} */
       clear_tax_id?: true
+      dry_run?: boolean
       tax_id?: {
         country?: string
         type: string
@@ -4746,10 +4852,6 @@ export interface components {
       name: string
       payment_intent_id: string
       size?: string
-    }
-    ConfirmRequestDto: {
-      organization_id?: number
-      organization_name?: string
     }
     ConfirmResponseDto: {
       organization_slug: string
@@ -4940,11 +5042,24 @@ export interface components {
       workdir: string
     }
     CreateInvitationBody: {
-      email: string
+      /**
+       * Format: email
+       * @deprecated
+       */
+      email?: string
+      emails?: string[]
       require_sso?: boolean
       role_id: number
       role_scoped_projects?: string[]
     }
+    CreateInvitationResponse: {
+      failed: {
+        /** Format: email */
+        email: string
+        error: string
+      }[]
+      succeeded: string[]
+    } | null
     CreateNamespaceBody: {
       namespace: string
     }
@@ -5043,6 +5158,8 @@ export interface components {
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
+        | 'analytics_config:read'
+        | 'analytics_config:write'
         | 'auth:read'
         | 'auth:write'
         | 'database:read'
@@ -5122,13 +5239,9 @@ export interface components {
       | {
           billing_email: string | null
           /** @enum {string|null} */
-          billing_partner:
-            | 'fly'
-            | 'aws_marketplace'
-            | 'vercel_marketplace'
-            | 'stripe_projects'
-            | null
+          billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
           id: number
+          integration_source: string | null
           is_owner: boolean
           name: string
           opt_in_tags: string[]
@@ -5176,6 +5289,8 @@ export interface components {
         | 'action_runs_read'
         | 'action_runs_write'
         | 'advisors_read'
+        | 'analytics_config_read'
+        | 'analytics_config_write'
         | 'analytics_logs_read'
         | 'analytics_usage_read'
         | 'api_gateway_keys_read'
@@ -5639,6 +5754,8 @@ export interface components {
         | 'action_runs_read'
         | 'action_runs_write'
         | 'advisors_read'
+        | 'analytics_config_read'
+        | 'analytics_config_write'
         | 'analytics_logs_read'
         | 'analytics_usage_read'
         | 'api_gateway_keys_read'
@@ -5954,6 +6071,7 @@ export interface components {
       billing_name?: string
       billing_via_partner: boolean
       email: string
+      prepaid_credits_balance?: number
       tax_id: {
         country: string
         type: string
@@ -6029,6 +6147,23 @@ export interface components {
     }
     DeclineAuthorizationResponse: {
       id: string
+    }
+    DeleteDestinationPipelineResponse: {
+      /**
+       * @description Whether the destination was deleted. True when no other pipelines remain attached to it.
+       * @example true
+       */
+      destination_deleted: boolean
+      /**
+       * @description Destination id
+       * @example 2001
+       */
+      destination_id: number
+      /**
+       * @description Pipeline id
+       * @example 1012
+       */
+      pipeline_id: number
     }
     DeleteOAuthAppResponse: {
       client_id: string
@@ -6252,6 +6387,8 @@ export interface components {
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
+        | 'analytics_config:read'
+        | 'analytics_config:write'
         | 'auth:read'
         | 'auth:write'
         | 'database:read'
@@ -6619,7 +6756,7 @@ export interface components {
       }[]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_projects'
+      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace'
       billing_via_partner: boolean
       current_period_end: number
       current_period_start: number
@@ -6631,6 +6768,7 @@ export interface components {
         id: 'free' | 'pro' | 'team' | 'enterprise' | 'platform'
         name: string
       }
+      prepaid_credits_balance?: number
       project_addons: {
         addons: {
           /** @enum {string} */
@@ -7019,7 +7157,6 @@ export interface components {
       SECURITY_SB_FORWARDED_FOR_ENABLED: boolean
       SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: boolean
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean
-      SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: boolean
       SESSIONS_INACTIVITY_TIMEOUT: number
       SESSIONS_SINGLE_PER_USER: boolean
       SESSIONS_TAGS: string
@@ -7234,6 +7371,7 @@ export interface components {
             | 'security.audit_logs_days'
             | 'security.questionnaire'
             | 'security.soc2_report'
+            | 'security.iso27001_certificate'
             | 'security.private_link'
             | 'security.enforce_mfa'
             | 'log.retention_days'
@@ -7558,6 +7696,8 @@ export interface components {
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
+        | 'analytics_config:read'
+        | 'analytics_config:write'
         | 'auth:read'
         | 'auth:write'
         | 'database:read'
@@ -7580,6 +7720,13 @@ export interface components {
         | 'storage:write'
       )[]
       website: string
+    }
+    OnboardingSurveyBody: {
+      building?: string
+      heard_from?: string
+      kind?: string
+      size?: string
+      slug: string
     }
     OrganizationProjectsResponse: {
       pagination: {
@@ -7641,6 +7788,7 @@ export interface components {
           type: 'PRIMARY' | 'READ_REPLICA'
         }[]
         inserted_at: string
+        integration_source: string | null
         is_branch: boolean
         name: string
         ref: string
@@ -7667,8 +7815,9 @@ export interface components {
     OrganizationResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_projects' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
       id: number
+      integration_source: string | null
       is_owner: boolean
       name: string
       opt_in_tags: string[]
@@ -7737,9 +7886,10 @@ export interface components {
     OrganizationSlugResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_projects' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
       has_oriole_project: boolean
       id: number
+      integration_source: string | null
       name: string
       opt_in_tags: string[]
       plan: {
@@ -7904,6 +8054,23 @@ export interface components {
       organization_id: number
       overdue_invoice_count: number
     }
+    PartnerIntegrationsResponse: {
+      /**
+       * Format: date-time
+       * @description When the integration link expires (1 hour from creation). The user must begin the flow before this time.
+       */
+      expiresAt: string
+      /**
+       * Format: uuid
+       * @description Unique identifier for the integration record
+       */
+      integrationId: string
+      /**
+       * Format: uri
+       * @description URL to redirect the user's browser to
+       */
+      redirectUrl: string
+    }
     PauseStatusResponse: {
       can_restore: boolean
       last_paused_on: string | null
@@ -7923,6 +8090,11 @@ export interface components {
         has_address: boolean
         id: string
         is_default: boolean
+        shared_payment_token: {
+          expires_at: number | null
+          is_expired: boolean
+          last4: string
+        } | null
         type: string
       }[]
       defaultPaymentMethodId: string | null
@@ -8200,6 +8372,67 @@ export interface components {
       is_updatable: boolean
       name: string
       schema: string
+    }
+    PreviewCreditTopUpRequest: {
+      address?: {
+        city?: string | null
+        country: string
+        line1: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
+      }
+      amount: number
+      tax_id?: {
+        country: string
+        type: string
+        value: string
+      }
+    }
+    PreviewCreditTopUpResponse: {
+      amount: number
+      currency: string
+      tax: {
+        currency: string
+        tax_amount: number
+        tax_rate_percentage: number
+        total_amount_excluding_tax: number
+        total_amount_including_tax: number
+      } | null
+      /** @enum {string} */
+      tax_status: 'calculated' | 'not_applicable' | 'failed'
+      total: number
+    }
+    PreviewOrganizationCreationBody: {
+      address?: {
+        city?: string | null
+        country: string
+        line1: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
+      }
+      tax_id?: {
+        country?: string
+        type: string
+        value: string
+      }
+      /** @enum {string} */
+      tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team'
+    }
+    PreviewOrganizationCreationResponse: {
+      currency: string
+      plan_price: number
+      tax: {
+        currency: string
+        tax_amount: number
+        tax_rate_percentage: number
+        total_amount_excluding_tax: number
+        total_amount_including_tax: number
+      } | null
+      /** @enum {string} */
+      tax_status: 'calculated' | 'not_applicable' | 'failed'
+      total: number
     }
     PreviewProjectTransferResponse: {
       errors: {
@@ -8547,6 +8780,7 @@ export interface components {
         | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
       inserted_at: string
+      integration_source: string | null
       is_branch_enabled: boolean
       is_physical_backups_enabled: boolean
       lastDatabaseResizeAt?: string
@@ -9888,6 +10122,7 @@ export interface components {
           usage: number
         }[]
         description: string
+        item_name: string
         metadata?: {
           is_branch?: boolean
           is_read_replica?: boolean
@@ -9957,6 +10192,15 @@ export interface components {
         usage_original?: number
       }[]
       subscription_id: string
+      tax: {
+        currency: string
+        tax_amount: number
+        tax_rate_percentage: number
+        total_amount_excluding_tax: number
+        total_amount_including_tax: number
+      } | null
+      /** @enum {string} */
+      tax_status: 'calculated' | 'not_applicable' | 'failed'
     }
     UpdateAddonBody: {
       /** @enum {string} */
@@ -10325,7 +10569,6 @@ export interface components {
       SECURITY_SB_FORWARDED_FOR_ENABLED?: boolean | null
       SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD?: boolean | null
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION?: boolean | null
-      SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD?: boolean | null
       SESSIONS_INACTIVITY_TIMEOUT?: number | null
       SESSIONS_SINGLE_PER_USER?: boolean | null
       SESSIONS_TAGS?: string | null
@@ -10480,6 +10723,8 @@ export interface components {
         | 'action_runs_read'
         | 'action_runs_write'
         | 'advisors_read'
+        | 'analytics_config_read'
+        | 'analytics_config_write'
         | 'analytics_logs_read'
         | 'analytics_usage_read'
         | 'api_gateway_keys_read'
@@ -13156,6 +13401,65 @@ export interface operations {
       }
     }
   }
+  PartnerIntegrationsController_createIntegration: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The id of the listing in the marketplace database */
+        listing_id: string
+        /** @description Supabase project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PartnerIntegrationsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Project or listing not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve listing or project, or failed to create partner integration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   PrivateLinkController_getPrivateLinkConfig: {
     parameters: {
       query?: never
@@ -13832,6 +14136,27 @@ export interface operations {
           'application/json': components['schemas']['ListPlatformAppsResponse']
         }
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   PlatformAppsController_createPlatformApp: {
@@ -13858,6 +14183,27 @@ export interface operations {
           'application/json': components['schemas']['CreatePlatformAppResponse']
         }
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   PlatformAppsController_getPlatformApp: {
@@ -13881,6 +14227,27 @@ export interface operations {
           'application/json': components['schemas']['GetPlatformAppResponse']
         }
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   PlatformAppsController_deletePlatformApp: {
@@ -13897,6 +14264,27 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
         headers: {
           [name: string]: unknown
         }
@@ -13929,6 +14317,27 @@ export interface operations {
           'application/json': components['schemas']['GetPlatformAppResponse']
         }
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   PlatformAppSigningKeysController_listPlatformAppSigningKeys: {
@@ -13951,6 +14360,27 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ListPlatformAppSigningKeysResponse']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -13975,6 +14405,27 @@ export interface operations {
           'application/json': components['schemas']['CreatePlatformAppSigningKeyResponse']
         }
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   PlatformAppSigningKeysController_deletePlatformAppSigningKey: {
@@ -13992,6 +14443,27 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
         headers: {
           [name: string]: unknown
         }
@@ -14019,6 +14491,27 @@ export interface operations {
           'application/json': components['schemas']['ListPlatformAppInstallationsResponse']
         }
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   PlatformAppInstallationsController_installPlatformApp: {
@@ -14045,6 +14538,27 @@ export interface operations {
           'application/json': components['schemas']['InstallPlatformAppResponse']
         }
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   PlatformAppInstallationsController_getPlatformAppInstallation: {
@@ -14068,6 +14582,27 @@ export interface operations {
           'application/json': components['schemas']['GetPlatformAppInstallationResponse']
         }
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   PlatformAppInstallationsController_uninstallPlatformInstallation: {
@@ -14084,6 +14619,27 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
         headers: {
           [name: string]: unknown
         }
@@ -14111,6 +14667,27 @@ export interface operations {
         content: {
           'application/json': components['schemas']['UpdatePlatformAppInstallationResponse']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -14216,6 +14793,54 @@ export interface operations {
       }
       /** @description Failed to determine available Postgres versions */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgCreditsController_previewTopUp: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PreviewCreditTopUpRequest']
+      }
+    }
+    responses: {
+      /** @description Credit top-up preview with tax calculation. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PreviewCreditTopUpResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
         headers: {
           [name: string]: unknown
         }
@@ -15267,6 +15892,49 @@ export interface operations {
       }
     }
   }
+  OrgDocumentsController_getIso27001CertificateUrl: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrgDocumentUrlResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   OrgDocumentsController_getSoc2Type2ReportUrl: {
     parameters: {
       query?: never
@@ -15697,11 +16365,14 @@ export interface operations {
       }
     }
     responses: {
+      /** @description Batch invitations result when using "emails" field. null/no body when using legacy "email" field. */
       201: {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['CreateInvitationResponse']
+        }
       }
       /** @description Unauthorized */
       401: {
@@ -17249,6 +17920,50 @@ export interface operations {
       }
     }
   }
+  OrganizationsController_handleOnboardingSurvey: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OnboardingSurveyBody']
+      }
+    }
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationsController_previewOrganizationCreation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PreviewOrganizationCreationBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PreviewOrganizationCreationResponse']
+        }
+      }
+    }
+  }
   ColumnPrivilegesController_getColumnPrivileges: {
     parameters: {
       query?: never
@@ -17901,6 +18616,7 @@ export interface operations {
           | 'security.audit_logs_days'
           | 'security.questionnaire'
           | 'security.soc2_report'
+          | 'security.iso27001_certificate'
           | 'security.private_link'
           | 'security.enforce_mfa'
           | 'log.retention_days'
@@ -23031,7 +23747,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['DeleteDestinationPipelineResponse']
+        }
       }
       /** @description Unauthorized */
       401: {
@@ -23042,6 +23760,20 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Pipeline or destination not found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Pipeline is still active. */
+      409: {
         headers: {
           [name: string]: unknown
         }
@@ -23201,6 +23933,20 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Destination not found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Destination has an active or attached pipeline. */
+      409: {
         headers: {
           [name: string]: unknown
         }
@@ -23521,6 +24267,20 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Pipeline not found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Pipeline is still active. */
+      409: {
         headers: {
           [name: string]: unknown
         }
@@ -24274,6 +25034,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Source not found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Rate limit exceeded */
       429: {
         headers: {
@@ -24335,6 +25102,69 @@ export interface operations {
         content?: never
       }
       /** @description Unexpected error while listing tables. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationTenantsController_deleteTenant: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Tenant deleted. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Tenant not found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Tenant has active pipelines. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while deleting tenant. */
       500: {
         headers: {
           [name: string]: unknown
@@ -26368,11 +27198,7 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ConfirmRequestDto']
-      }
-    }
+    requestBody?: never
     responses: {
       200: {
         headers: {

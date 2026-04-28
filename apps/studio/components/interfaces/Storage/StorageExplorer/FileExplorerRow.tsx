@@ -17,7 +17,6 @@ import {
   Trash2,
 } from 'lucide-react'
 import type { CSSProperties } from 'react'
-import { useContextMenu } from 'react-contexify'
 import {
   Checkbox,
   cn,
@@ -36,13 +35,13 @@ import {
 } from 'ui'
 
 import {
-  CONTEXT_MENU_KEYS,
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
   STORAGE_VIEWS,
   URL_EXPIRY_DURATION,
 } from '../Storage.constants'
 import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
+import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyPathToFolder } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
@@ -127,8 +126,8 @@ export const FileExplorerRow = ({
     downloadFolder,
     selectRangeItems,
   } = useStorageExplorerStateSnapshot()
-  const { show } = useContextMenu()
   const { onCopyUrl } = useCopyUrl()
+  const ctx = useFileExplorerContextMenu()
 
   const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
@@ -272,18 +271,6 @@ export const FileExplorerRow = ({
   const createdAt = item.created_at ? new Date(item.created_at).toLocaleString() : '-'
   const updatedAt = item.updated_at ? new Date(item.updated_at).toLocaleString() : '-'
 
-  const displayMenu = (event: any, rowType: STORAGE_ROW_TYPES) => {
-    show(event, {
-      id:
-        rowType === STORAGE_ROW_TYPES.FILE
-          ? CONTEXT_MENU_KEYS.STORAGE_ITEM
-          : CONTEXT_MENU_KEYS.STORAGE_FOLDER,
-      props: {
-        item: itemWithColumnIndex,
-      },
-    })
-  }
-
   const nameWidth =
     view === STORAGE_VIEWS.LIST && item.isCorrupted
       ? `calc(100% - 60px)`
@@ -301,12 +288,7 @@ export const FileExplorerRow = ({
     <div
       style={style}
       className="h-full border-b border-default"
-      onContextMenu={(event) => {
-        event.stopPropagation()
-        item.type === STORAGE_ROW_TYPES.FILE
-          ? displayMenu(event, STORAGE_ROW_TYPES.FILE)
-          : displayMenu(event, STORAGE_ROW_TYPES.FOLDER)
-      }}
+      onContextMenu={(e) => ctx?.onRowContextMenu(e, rowOptions)}
     >
       <div
         className={cn(
@@ -351,15 +333,15 @@ export const FileExplorerRow = ({
               </div>
             )}
             <Checkbox
-              label={''}
-              className={`w-full ${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
+              className={`${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
                 isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
               }`}
               checked={isSelected}
-              onChange={(event) => {
-                event.stopPropagation()
-                onCheckItem((event.nativeEvent as KeyboardEvent).shiftKey)
+              // use onClick instead of onCheckedChange to handle shift-key selection
+              onClick={(event) => {
+                onCheckItem(event.nativeEvent.shiftKey)
               }}
+              aria-label="Check to select this item"
             />
           </div>
           <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>
@@ -388,7 +370,7 @@ export const FileExplorerRow = ({
 
         <div
           className={`flex items-center justify-end ${
-            view === STORAGE_VIEWS.LIST ? 'flex-grow' : 'w-[10%]'
+            view === STORAGE_VIEWS.LIST ? 'grow' : 'w-[10%]'
           }`}
           onClick={(event) =>
             // Stops click event from this div, to resolve an issue with menu item's click event triggering unexpected row select

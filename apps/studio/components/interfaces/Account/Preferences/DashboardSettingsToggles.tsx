@@ -1,13 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Card, Form_Shadcn_ } from 'ui'
+import { Card, Form } from 'ui'
 import * as z from 'zod'
 
 import { DashboardToggle } from './DashboardToggle'
 import { useIsInlineEditorSetting, useIsQueueOperationsSetting } from './useDashboardSettings'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const DashboardSettingsSchema = z.object({
   inlineEditorEnabled: z.boolean(),
@@ -61,7 +61,7 @@ export const DashboardSettingsToggles = () => {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <Card>
         <DashboardToggle
           form={form}
@@ -75,11 +75,10 @@ export const DashboardSettingsToggles = () => {
           name="queueOperationsEnabled"
           label="Queue table operations"
           description="Review and batch table edits in Table Editor before saving them to your database."
-          discussionsUrl="https://github.com/orgs/supabase/discussions/42460"
           onToggle={handleQueueOperationsToggle}
           isLast
         />
       </Card>
-    </Form_Shadcn_>
+    </Form>
   )
 }

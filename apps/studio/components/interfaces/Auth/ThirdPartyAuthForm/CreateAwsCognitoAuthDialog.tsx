@@ -13,9 +13,9 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Separator,
 } from 'ui'
@@ -108,10 +108,10 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
         </DialogHeader>
         <Separator />
         <DialogSection>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {/* Enabled flag can't be changed for now because there's no update API call for integrations */}
-              {/* <FormField_Shadcn_
+              {/* <FormField
               key="enabled"
               control={form.control}
               name="enabled"
@@ -121,13 +121,13 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
                   label={`Enable Amazon Cognito Auth Connection`}
                   layout="flex"
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       disabled={field.disabled}
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -136,7 +136,7 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
                 This will enable a JWT token from Amazon Cognito project to access data from this
                 Supabase project.
               </p>
-              <FormField_Shadcn_
+              <FormField
                 key="awsCognitoUserPoolId"
                 control={form.control}
                 name="awsCognitoUserPoolId"
@@ -151,14 +151,14 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
                       >
                         https://cognito-idp.{awsRegion}.amazonaws.com/
                       </Button>
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_ className="rounded-l-none border-l-0 z-50" {...field} />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </div>
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="awsRegion"
                 render={({ field }) => (
@@ -168,7 +168,7 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
         <DialogFooter>
           {!isCreating && (

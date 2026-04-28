@@ -1,8 +1,9 @@
+import { describe, expect, test } from 'vitest'
+
 import {
   formatCellValue,
   formatClipboardValue,
-} from 'components/interfaces/SQLEditor/UtilityPanel/Results.utils'
-import { describe, expect, test } from 'vitest'
+} from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
 
 describe('formatClipboardValue', () => {
   test('returns empty string for null', () => {

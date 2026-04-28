@@ -1,15 +1,15 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Command } from 'lucide-react'
 import type { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { KeyboardShortcut } from 'ui'
 
 import { DiffEditor } from '../DiffEditor'
 import ResizableAIWidget from './ResizableAIWidget'
+import { getEditorSelectionParts } from './utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { constructHeaders } from '@/data/fetchers'
-import { detectOS } from '@/lib/helpers'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AIEditorProps {
@@ -22,6 +22,7 @@ interface AIEditorProps {
     projectRef?: string
     connectionString?: string | null
     orgSlug?: string
+    language?: string
   }
   initialPrompt?: string
   readOnly?: boolean
@@ -58,7 +59,6 @@ export const AIEditor = ({
   executeQuery,
   onMount,
 }: AIEditorProps) => {
-  const os = detectOS()
   const { toggleSidebar } = useSidebarManagerSnapshot()
   const editorRef = useRef<monacoEditor.IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<monacoEditor.IStandaloneDiffEditor | null>(null)
@@ -86,7 +86,7 @@ export const AIEditor = ({
 
   const complete = useCallback(
     async (
-      prompt: string,
+      _prompt: string,
       options?: {
         headers?: Record<string, string>
         body?: { completionMetadata?: any }
@@ -205,16 +205,16 @@ export const AIEditor = ({
     })
 
     if (language === 'javascript' || language === 'typescript') {
-      // The Deno libs are loaded as a raw text via raw-loader in next.config.js. They're passed as raw text to the
+      // The Deno libs are loaded as a raw text via raw-loader in next.config.ts. They're passed as raw text to the
       // Monaco editor.
-      import('public/deno/edge-runtime.d.ts' as string)
+      import('@/public/deno/edge-runtime.d.ts' as string)
         .then((module) => {
           monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
         })
         .catch((error) => {
           console.error('Failed to load Deno edge-runtime typings:', error)
         })
-      import('public/deno/lib.deno.d.ts' as string)
+      import('@/public/deno/lib.deno.d.ts' as string)
         .then((module) => {
           monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
         })
@@ -253,26 +253,9 @@ export const AIEditor = ({
       label: 'Generate with AI',
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
       run: () => {
-        const selection = editor.getSelection()
-        const model = editor.getModel()
-        if (!model || !selection) return
-
-        const allLines = model.getLinesContent()
-        const startLineIndex = selection.startLineNumber - 1
-        const endLineIndex = selection.endLineNumber
-
-        const beforeSelection = allLines.slice(0, startLineIndex).join('\n') + '\n'
-        const selectedText = allLines.slice(startLineIndex, endLineIndex).join('\n')
-        const afterSelection = '\n' + allLines.slice(endLineIndex).join('\n')
-
-        setPromptState({
-          isOpen: true,
-          selection: selectedText,
-          beforeSelection,
-          afterSelection,
-          startLineNumber: selection?.startLineNumber ?? 0,
-          endLineNumber: selection?.endLineNumber ?? 0,
-        })
+        const selectionParts = getEditorSelectionParts(editor)
+        if (!selectionParts) return
+        setPromptState({ isOpen: true, ...selectionParts })
       },
     })
 
@@ -360,11 +343,7 @@ export const AIEditor = ({
     const handleKeyboard = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         handleReset()
-      } else if (
-        event.key === 'Enter' &&
-        (os === 'macos' ? event.metaKey : event.ctrlKey) &&
-        isDiffMode
-      ) {
+      } else if (event.key === 'Enter' && (event.metaKey || event.ctrlKey) && isDiffMode) {
         event.preventDefault()
         handleAcceptDiff()
       }
@@ -372,7 +351,7 @@ export const AIEditor = ({
 
     window.addEventListener('keydown', handleKeyboard)
     return () => window.removeEventListener('keydown', handleKeyboard)
-  }, [os, isDiffMode, handleAcceptDiff, handleReset])
+  }, [isDiffMode, handleAcceptDiff, handleReset])
 
   return (
     <div className="flex-1 overflow-hidden flex flex-col h-full relative">
@@ -454,7 +433,13 @@ export const AIEditor = ({
                 exit={{ y: 5, opacity: 0 }}
                 className="text-foreground-lighter absolute bottom-4 left-4 z-10 font-mono text-xs flex items-center gap-1"
               >
-                Hit {os === 'macos' ? <Command size={12} /> : `CTRL+`}K to edit with the Assistant
+                Hit{' '}
+                <KeyboardShortcut
+                  keys={['Meta', 'k']}
+                  variant="inline"
+                  className="text-xs text-foreground-lighter"
+                />{' '}
+                to edit with the Assistant
               </motion.p>
             )}
           </AnimatePresence>

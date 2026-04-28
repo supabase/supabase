@@ -135,7 +135,7 @@ export const AuditLogs = () => {
     })
     ?.filter((log) => {
       if (filters.projects.length > 0) {
-        return filters.projects.includes(log.target.metadata.project_ref || '')
+        return filters.projects.includes(log.target.metadata.ref || '')
       } else {
         return log
       }
@@ -347,7 +347,7 @@ export const AuditLogs = () => {
                         const logOrgSlug = log.target.metadata.org_slug ?? log.target.metadata.slug
 
                         const project = projects?.find((project) => project.ref === logProjectRef)
-                        const organization = organizations?.find((org) => logOrgSlug)
+                        const organization = organizations?.find((org) => org.slug === logOrgSlug)
 
                         const hasStatusCode = log.action.metadata[0]?.status !== undefined
                         const userIcon =
