@@ -7,7 +7,7 @@ import { MD_PAGES } from './app/api-v2/md/content.generated'
 // Training crawlers (GPTBot, CCBot, ClaudeBot, Anthropic-AI) are intentionally
 // excluded; they are governed by robots.txt and serving them content that
 // differs from the human HTML page would risk SEO and cloaking penalties.
-const LLM_USER_AGENT = /Claude-User|Claude-Web|ChatGPT-User|OAI-SearchBot|PerplexityBot/i
+const LLM_USER_AGENT = /Claude-User|Claude-Web|ChatGPT-User|PerplexityBot/i
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl

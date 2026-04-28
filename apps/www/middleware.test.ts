@@ -172,6 +172,13 @@ describe('www middleware', () => {
       expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/auth')
     })
 
+    it('rewrites for Claude-Web', () => {
+      const req = makeRequest('/pricing', { userAgent: 'Claude-Web/1.0' })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/pricing')
+    })
+
     it('rewrites for PerplexityBot', () => {
       const req = makeRequest('/auth/', { userAgent: 'PerplexityBot/1.0' })
       const res = middleware(req)
