@@ -483,7 +483,7 @@ export function SurveyChart({
                   type="default"
                   size="tiny"
                   onClick={() => setIsExpanded(true)}
-                  className="shadow-sm"
+                  className="shadow-xs"
                 >
                   Show more
                 </Button>

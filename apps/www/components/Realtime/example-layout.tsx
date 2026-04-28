@@ -71,7 +71,7 @@ ${appJsCode}`
             type="outline"
             onClick={onPrevious}
             disabled={!onPrevious}
-            className="p-1 rounded hover:bg-surface-200 text-foreground-light disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1 rounded-sm hover:bg-surface-200 text-foreground-light disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Previous example"
           >
             <ChevronLeft size={16} />
@@ -80,7 +80,7 @@ ${appJsCode}`
             type="outline"
             onClick={onNext}
             disabled={!onNext}
-            className="p-1 rounded hover:bg-surface-200 text-foreground-light disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1 rounded-sm hover:bg-surface-200 text-foreground-light disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Next example"
           >
             <ChevronRight size={16} />

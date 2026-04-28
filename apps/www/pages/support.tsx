@@ -71,7 +71,7 @@ const Index = () => {
                   border-control
                   hover:bg-surface-100
                   transition 
-                  rounded"
+                  rounded-sm"
               >
                 <div className="flex items-center flex-1 space-x-2">
                   <Search className="text-foreground-light" size={18} strokeWidth={2} />
@@ -81,7 +81,7 @@ const Index = () => {
                   />
                 </div>
                 <div className="flex items-center h-full space-x-1">
-                  <div className="hidden text-foreground-lighter md:flex items-center justify-center h-5 w-10 border rounded bg-surface-300 border-foreground-lighter/30 gap-1">
+                  <div className="hidden text-foreground-lighter md:flex items-center justify-center h-5 w-10 border rounded-sm bg-surface-300 border-foreground-lighter/30 gap-1">
                     <Command size={12} strokeWidth={1.5} />
                     <span className="text-[12px]">K</span>
                   </div>

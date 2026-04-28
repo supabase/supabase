@@ -119,7 +119,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
         />
         <nav
           className={cn(
-            `relative z-40 border-default border-b backdrop-blur-sm transition-all duration-300`,
+            `relative z-40 border-default border-b backdrop-blur-xs transition-all duration-300`,
             showLaunchWeekNavMode && 'border-muted border-b bg-transparent',
             isTransparent && 'border-transparent backdrop-blur-none'
           )}

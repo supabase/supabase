@@ -37,7 +37,7 @@ export default function TicketURLCopy({
       )}
     >
       <span className="truncate">{displayUrl}</span>
-      <div className="w-6 min-w-6 h-6 flex items-center justify-center shrink-0 border border-strong rounded bg-muted hover:bg-selection hover:border-stronger">
+      <div className="w-6 min-w-6 h-6 flex items-center justify-center shrink-0 border border-strong rounded-sm bg-muted hover:bg-selection hover:border-stronger">
         {copied ? <Check size={14} strokeWidth={3} /> : <Copy size={14} strokeWidth={1.5} />}
       </div>
     </button>

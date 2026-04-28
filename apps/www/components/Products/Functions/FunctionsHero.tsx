@@ -201,7 +201,7 @@ const FunctionsHero = () => {
               ref={typerRef}
               className="opacity-0 flex-1 text-left animate-fade-in text-foreground text-xs md:text-sm font-mono"
             />
-            <div className="text-foreground rounded p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="text-foreground rounded-sm p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
               {copied ? (
                 <span className="text-brand">
                   <Check className="w-3.5 h-3.5" />

@@ -87,7 +87,7 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
                     key={link.url}
                     href={link.url}
                     target={link.target ?? '_self'}
-                    className="px-2 py-1 pointer-events-auto border transition-colors text-foreground-light bg-surface-100 hover:bg-surface-200 rounded text-xs"
+                    className="px-2 py-1 pointer-events-auto border transition-colors text-foreground-light bg-surface-100 hover:bg-surface-200 rounded-sm text-xs"
                   >
                     {link.label}
                   </Link>

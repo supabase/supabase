@@ -163,7 +163,7 @@ export const LaunchSection = (props: WeekDayProps) => {
           <div className="flex flex-col gap-12">
             {props.articles &&
               props.articles.map((article: Article, index) => (
-                <div key={article.url + index} className="bg-surface-100 rounded border">
+                <div key={article.url + index} className="bg-surface-100 rounded-sm border">
                   <div className="p-6 px-10">
                     <ArticleButtonListItem {...article} />
                   </div>

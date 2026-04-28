@@ -104,7 +104,7 @@ const CommunitySlider = () => {
   }, [ref.current, swiperInstance?.autoplay])
 
   const Card = (card: CardInterface) => (
-    <div className="bg-surface-100 hover:border-strong border-overlay rounded-2xl border p-6 drop-shadow-sm flex flex-col gap-4">
+    <div className="bg-surface-100 hover:border-strong border-overlay rounded-2xl border p-6 drop-shadow-xs flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <div className="h-10 w-10 overflow-hidden rounded-full border border-control">
           <Image src={card.avatar!} layout="responsive" width="64" height="64" alt={card.author} />

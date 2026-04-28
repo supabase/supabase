@@ -21,7 +21,7 @@ const LW8CalloutsSection = () => {
                 <span>Replay recordings</span>
               </div>
             </div>
-            <div className="relative flex aspect-video! h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
+            <div className="relative flex aspect-video! h-[80px] md:h-[100px] gap-2 z-10 rounded-sm overflow-hidden">
               <Image
                 src="/images/launchweek/8/twitter-spaces-thumb.svg"
                 alt="twitter spaces thumbnail"
@@ -45,7 +45,7 @@ const LW8CalloutsSection = () => {
                 <span>Finished</span>
               </div>
             </div>
-            <div className="relative flex aspect-video! h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
+            <div className="relative flex aspect-video! h-[80px] md:h-[100px] gap-2 z-10 rounded-sm overflow-hidden">
               <Image
                 src="/images/launchweek/8/lw8-hackathon-thumb.svg"
                 alt="hackathon thumbnail"

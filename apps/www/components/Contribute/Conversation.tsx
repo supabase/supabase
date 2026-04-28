@@ -87,7 +87,7 @@ export async function Conversation({ thread }: { thread: ThreadRow }) {
           </header>
 
           {/* Question */}
-          <div className="border border-border rounded-lg p-6 bg-surface-100 min-w-0 shadow-sm">
+          <div className="border border-border rounded-lg p-6 bg-surface-100 min-w-0 shadow-xs">
             <div className="text-foreground min-w-0">
               <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
                 {question.content}

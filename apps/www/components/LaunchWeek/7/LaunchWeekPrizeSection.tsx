@@ -24,7 +24,7 @@ export default function LaunchWeekPrizeSection({
             viewport={{ once: true, margin: '-150px' }}
             transition={{ type: 'spring', bounce: 0, delay: 0.2 }}
           >
-            <div className="w-[40px] h-[40px] rounded-sm bg-[#32313F] flex items-center justify-center">
+            <div className="w-[40px] h-[40px] rounded-xs bg-[#32313F] flex items-center justify-center">
               <svg
                 width="21"
                 height="22"

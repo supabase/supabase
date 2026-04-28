@@ -35,7 +35,7 @@ interface TabConfig {
 }
 
 function CountSkeleton() {
-  return <span className="inline-block min-w-[24px] h-5 bg-surface-300 animate-pulse rounded" />
+  return <span className="inline-block min-w-[24px] h-5 bg-surface-300 animate-pulse rounded-sm" />
 }
 
 function ThreadsTable({

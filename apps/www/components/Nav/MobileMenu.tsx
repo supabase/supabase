@@ -87,8 +87,8 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
               rounded-lg border
               bg-alternative-200 text-foreground-light
               hover:text-foreground hover:border-foreground-muted
-              focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-none
-              focus-visible:rounded focus-visible:ring-foreground-lighter
+              focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-hidden
+              focus-visible:rounded-sm focus-visible:ring-foreground-lighter
             "
           >
             <div className="flex flex-col gap-1 leading-3!">
@@ -190,7 +190,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
           ) : (
             <Link
               href={menuItem.url}
-              className="block py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded"
+              className="block py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:rounded-sm"
             >
               {menuItem.title}
             </Link>
@@ -215,14 +215,14 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
               <Link
                 href="/"
                 as="/"
-                className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
+                className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-xs"
               >
                 <SupabaseWordmark />
               </Link>
               <button
                 onClick={() => setOpen(false)}
                 type="button"
-                className="inline-flex items-center justify-center p-2 rounded-md text-foreground-lighter focus:ring-brand hover:text-foreground-light transition-colors focus:outline-none focus:ring-2 focus:ring-inset"
+                className="inline-flex items-center justify-center p-2 rounded-md text-foreground-lighter focus:ring-brand hover:text-foreground-light transition-colors focus:outline-hidden focus:ring-2 focus:ring-inset"
               >
                 <span className="sr-only">Close menu</span>
                 <svg

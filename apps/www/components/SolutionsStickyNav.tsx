@@ -50,7 +50,7 @@ function SolutionsStickyNav({ type, activeItem, className }: Props) {
       <div className="absolute inset-0 z-30 h-full w-full pointer-events-none">
         <nav
           className={cn(
-            'sticky z-30 flex items-center bg-background/90 w-full border-b backdrop-blur-sm pointer-events-auto top-[65px]',
+            'sticky z-30 flex items-center bg-background/90 w-full border-b backdrop-blur-xs pointer-events-auto top-[65px]',
             className
           )}
         >

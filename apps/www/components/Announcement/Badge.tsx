@@ -48,7 +48,7 @@ const AnnouncementBadge = ({
           hover:border-foreground-muted/30
           shadow-md
           overflow-hidden
-          focus-visible:outline-none focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full
+          focus-visible:outline-hidden focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full
           `,
         !badge && 'pl-5'
       )}

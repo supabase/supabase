@@ -39,7 +39,7 @@ const BlogGridItem = ({ post }: Props) => {
     >
       <div className="flex flex-col space-y-2">
         <div className="flex flex-col space-y-1">
-          <div className="border-default relative mb-3 w-full aspect-[1.91/1] overflow-hidden rounded-lg border shadow-sm">
+          <div className="border-default relative mb-3 w-full aspect-[1.91/1] overflow-hidden rounded-lg border shadow-xs">
             <Image
               fill
               sizes={BLOG_GRID_IMAGE_SIZES}

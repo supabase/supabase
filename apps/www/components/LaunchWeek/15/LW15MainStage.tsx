@@ -73,7 +73,7 @@ const DayCard = ({ day }: { day: WeekDayProps }) =>
   ) : (
     <div
       className={cn(
-        'group/main block w-full bg-surface-200 dark:bg-transparent h-full xl:flex-1 xl:h-auto xl:aspect-217/275 relative overflow-hidden rounded border dark:border-muted'
+        'group/main block w-full bg-surface-200 dark:bg-transparent h-full xl:flex-1 xl:h-auto xl:aspect-217/275 relative overflow-hidden rounded-sm border dark:border-muted'
       )}
     >
       <div className="w-full h-full relative z-10 flex flex-col justify-between gap-4">
@@ -105,7 +105,7 @@ const DayCardShipped = ({ day }: { day: WeekDayProps }) => {
   return (
     <div
       className={cn(
-        'group/main block w-full h-full xl:flex-1 xl:h-auto xl:aspect-217/275 relative overflow-hidden rounded border border-strong text-white',
+        'group/main block w-full h-full xl:flex-1 xl:h-auto xl:aspect-217/275 relative overflow-hidden rounded-sm border border-strong text-white',
         day.isToday && 'ring-1 ring-foreground-lighter ring-offset-2 ring-offset-background'
       )}
     >
@@ -133,7 +133,7 @@ const DayCardShipped = ({ day }: { day: WeekDayProps }) => {
             className="block lg:opacity-0 lg:blur-lg duration-300 group-hover/main:lg:blur-none transition-all group-hover/main:lg:opacity-100"
             ref={hiddenRef}
           >
-            <Button type="outline" size="small" className="text-current rounded-sm border-dashed">
+            <Button type="outline" size="small" className="text-current rounded-xs border-dashed">
               <Link href={day.blog!}>Read more</Link>
             </Button>
           </div>

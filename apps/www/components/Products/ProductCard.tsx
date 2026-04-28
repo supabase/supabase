@@ -30,7 +30,7 @@ const ProductCard = ({
   <Link
     href={url}
     className={cn(
-      'group relative w-full sm:h-[400px] flex flex-col gap-5 lg:flex-row focus:outline-none focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-xl',
+      'group relative w-full sm:h-[400px] flex flex-col gap-5 lg:flex-row focus:outline-hidden focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-xl',
       className
     )}
     onClick={onClick}

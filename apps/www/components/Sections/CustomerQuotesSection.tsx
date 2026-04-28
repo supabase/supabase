@@ -52,7 +52,7 @@ const CustomerQuotesSection = (props: Props) => {
       <m.div
         initial={initial}
         animate={isInView ? animate : initial}
-        className="bg-background hover:border-control border-background-overlay-default rounded-2xl border p-6 drop-shadow-sm flex flex-col justify-between"
+        className="bg-background hover:border-control border-background-overlay-default rounded-2xl border p-6 drop-shadow-xs flex flex-col justify-between"
       >
         <div className="flex flex-col gap-4">
           <div className="h-24 w-full flex items-center justify-center pb-3">

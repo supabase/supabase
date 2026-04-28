@@ -175,7 +175,7 @@ function FloatingStatBubbles() {
         <motion.div
           key={bubble.id}
           className={cn(
-            'absolute pointer-events-none px-3 py-2 bg-surface-100 border rounded-lg shadow-sm'
+            'absolute pointer-events-none px-3 py-2 bg-surface-100 border rounded-lg shadow-xs'
           )}
           style={{
             top: `${bubble.top}%`,

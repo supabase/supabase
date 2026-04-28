@@ -15,7 +15,7 @@ const LWAnnouncement = () => {
           <span className="text-foreground-light">Explore all the announcements</span>
         </div>
       </div>
-      <div className="relative flex items-center justify-center aspect-video! h-[80px] md:h-[80px] gap-2 z-10 rounded overflow-hidden">
+      <div className="relative flex items-center justify-center aspect-video! h-[80px] md:h-[80px] gap-2 z-10 rounded-sm overflow-hidden">
         <Image
           src="/images/launchweek/8/lw8-og.jpg"
           alt="Launch Week 8"

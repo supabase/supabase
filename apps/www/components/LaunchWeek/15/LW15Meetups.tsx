@@ -246,7 +246,7 @@ const MeetupOverlayCard = ({ meetup, mousePosition, visible }: MeetupOverlayCard
         top: mousePosition.y + 15,
       }}
     >
-      <div className="bg-black dark:bg-foreground text-white dark:text-background p-2 rounded-sm shadow-lg border w-screen max-w-xs flex flex-col gap-2">
+      <div className="bg-black dark:bg-foreground text-white dark:text-background p-2 rounded-xs shadow-lg border w-screen max-w-xs flex flex-col gap-2">
         <div className="w-full flex justify-between items-start gap-1 h-8">
           <LWSVG className="h-full w-auto" />
           <div className="relative h-full flex-1 overflow-hidden">

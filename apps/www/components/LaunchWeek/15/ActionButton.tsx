@@ -5,7 +5,7 @@ import { cn } from 'ui'
 import { useCommandMenuOpen } from 'ui-patterns'
 
 const actionButtonVariants = cva(
-  'pl-1.5 pr-3 py-1.5 rounded shadow flex justify-center items-center gap-2 outline outline-1 -outline-offset-1 cursor-pointer flex-nowrap',
+  'pl-1.5 pr-3 py-1.5 rounded-sm shadow-sm flex justify-center items-center gap-2 outline outline-1 -outline-offset-1 cursor-pointer flex-nowrap',
   {
     variants: {
       variant: {
@@ -22,7 +22,7 @@ const actionButtonVariants = cva(
 )
 
 const iconVariants = cva(
-  'w-5 h-5 px-2 rounded-sm outline outline-1 -outline-offset-1 inline-flex flex-col justify-center items-center gap-2',
+  'w-5 h-5 px-2 rounded-xs outline outline-1 -outline-offset-1 inline-flex flex-col justify-center items-center gap-2',
   {
     variants: {
       variant: {

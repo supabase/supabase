@@ -161,7 +161,7 @@ const EventListSkeleton = () => {
         <div key={`skeleton-group-${groupIdx}`} className="flex flex-col gap-y-2 relative">
           <div className="absolute top-2 left-[-59px] rounded-full size-1.5 bg-foreground-muted" />
 
-          <div className="h-6 bg-surface-200 rounded animate-pulse w-64" />
+          <div className="h-6 bg-surface-200 rounded-sm animate-pulse w-64" />
 
           <div className="flex flex-col gap-y-4">
             {[1, 2, 3, 4].map((eventIdx) => (
@@ -170,11 +170,11 @@ const EventListSkeleton = () => {
                 className="bg-surface-100 border rounded-md p-3 flex justify-between items-start"
               >
                 <div className="flex flex-col gap-2 flex-1">
-                  <div className="h-6 bg-surface-200 rounded animate-pulse w-3/4" />
+                  <div className="h-6 bg-surface-200 rounded-sm animate-pulse w-3/4" />
 
                   <div className="flex gap-2 items-center">
                     <div className="size-5 rounded-full bg-surface-200 animate-pulse" />
-                    <div className="h-4 bg-surface-200 rounded animate-pulse w-32" />
+                    <div className="h-4 bg-surface-200 rounded-sm animate-pulse w-32" />
                   </div>
                 </div>
 

@@ -55,7 +55,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
               bg-surface-75
               min-h-[210px] group sm:aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
               hover:border-strong transition-colors border border-muted
-              rounded-xl text-2xl bg-contain shadow-sm`,
+              rounded-xl text-2xl bg-contain shadow-xs`,
               cssGroup
             )}
           >

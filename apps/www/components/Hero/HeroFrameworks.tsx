@@ -135,7 +135,7 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
             >
               <div
                 className={cn(
-                  'm-1 bg-(--color-bg-darkest) h-16 w-16 flex items-center justify-center rounded-md group-hover:border transition-all text-foreground-light border-foreground-light hover:shadow',
+                  'm-1 bg-(--color-bg-darkest) h-16 w-16 flex items-center justify-center rounded-md group-hover:border transition-all text-foreground-light border-foreground-light hover:shadow-sm',
                   !!activeFramework &&
                     activeFramework.name !== framework.name &&
                     'text-foreground-muted',

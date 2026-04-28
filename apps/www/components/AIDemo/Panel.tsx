@@ -204,7 +204,7 @@ export const AIDemoPanel = ({ incomingMessages = [] }: { incomingMessages?: Demo
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask your data anything..."
               className={cn(
-                'w-full bg-background-muted rounded-md [&>textarea]:border [&>textarea]:rounded-md [&>textarea]:outline-none! [&>textarea]:ring-offset-0! [&>textarea]:ring-0! focus:outline-none'
+                'w-full bg-background-muted rounded-md [&>textarea]:border [&>textarea]:rounded-md [&>textarea]:outline-hidden! [&>textarea]:ring-offset-0! [&>textarea]:ring-0! focus:outline-hidden'
               )}
             />
           </form>

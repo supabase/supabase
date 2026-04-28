@@ -431,7 +431,7 @@ const data: () => {
           ),
           image: (
             <div className="w-full p-4 lg:p-6 xl:p-8 h-full flex items-center justify-center">
-              <div className="left-4 lg:left-6 xl:left-8 absolute w-full md:w-[600px] bg-surface-100 border border-overlay flex flex-col overflow-hidden rounded shadow-sm">
+              <div className="left-4 lg:left-6 xl:left-8 absolute w-full md:w-[600px] bg-surface-100 border border-overlay flex flex-col overflow-hidden rounded-sm shadow-xs">
                 <div className="border-b border-overlay flex justify-between w-full py-3 px-5">
                   <div className="max-w-[85%] flex items-center space-x-3 truncate">
                     <div className="h-5 m-0 text-sm truncate cursor-pointer text-foreground">
@@ -465,7 +465,7 @@ const data: () => {
           ),
           image: (
             <div className="w-full p-4 lg:p-6 xl:p-8 h-full flex items-center justify-center">
-              <div className="w-full bg-surface-100 border border-overlay flex flex-col overflow-hidden rounded shadow-sm">
+              <div className="w-full bg-surface-100 border border-overlay flex flex-col overflow-hidden rounded-sm shadow-xs">
                 <div className="border-b border-overlay flex justify-between w-full py-3 px-5">
                   <div className="max-w-[85%] flex items-center space-x-3 truncate">
                     <h3 className="h-5 m-0 text-sm truncate cursor-pointer text-foreground">

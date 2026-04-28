@@ -110,7 +110,7 @@ const Partners = () => {
                 label="View docs"
               />
             </div>
-            <div className="col-span-1 md:col-span-2 w-full max-w-4xl grid gap-8 rounded">
+            <div className="col-span-1 md:col-span-2 w-full max-w-4xl grid gap-8 rounded-sm">
               <Panel
                 hasInnerShimmer={false}
                 hasActiveOnHover={true}
@@ -151,7 +151,7 @@ const Partners = () => {
           <h2 className="text-2xl sm:text-3xl xl:text-4xl text-center tracking-[-.5px]">
             Partner benefits
           </h2>
-          <div className="grid mt-8 lg:mt-16 gap-8 rounded md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid mt-8 lg:mt-16 gap-8 rounded-sm md:grid-cols-2 xl:grid-cols-4">
             {pageData.featureBlocks.map((item, i) => {
               return (
                 <div
