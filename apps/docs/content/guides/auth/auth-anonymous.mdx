@@ -334,7 +334,7 @@ if (updateError) {
     password: 'user_password',
   })
 
-  if (existingUser) {
+  if (existingUser && anonData.session) {
     // 5. Reassign entities tied to the anonymous user
     // This step will vary based on your specific use case and data model
     const { data: reassignData, error: reassignError } = await supabase
