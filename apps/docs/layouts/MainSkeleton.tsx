@@ -305,7 +305,7 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
         'fixed lg:relative z-40 lg:z-auto',
         mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-full',
         'lg:w-[420px] !lg:left-0',
-        'lg:top-[var(--header-height)] lg:sticky',
+        'lg:top-(--header-height) lg:sticky',
         'h-screen lg:h-[calc(100vh-var(--header-height))]',
         // desktop override any left styles
         'lg:left-0',
@@ -318,12 +318,12 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
     >
       <div
         className={cn(
-          'top-0 lg:top-[var(--header-height)]',
+          'top-0 lg:top-(--header-height)',
           'h-full',
           'relative lg:sticky',
           'w-full lg:w-auto',
           'h-fit lg:h-screen overflow-y-scroll lg:overflow-auto',
-          '[overscroll-behavior:contain]',
+          'overscroll-contain',
           'backdrop-blur backdrop-filter bg-background',
           'flex flex-col grow'
         )}
@@ -332,7 +332,7 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
           Main menu
         </span>
         <div className="top-0 sticky h-0 z-10">
-          <div className="bg-gradient-to-b from-background to-transparent h-4 w-full"></div>
+          <div className="bg-linear-to-b from-background to-transparent h-4 w-full"></div>
         </div>
         <div
           className={cn(

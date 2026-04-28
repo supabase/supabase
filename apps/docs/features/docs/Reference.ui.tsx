@@ -40,7 +40,7 @@ function Section({ slug, link, columns = 'single', children }: SectionProps) {
       link={link}
       className={cn(
         'grid grid-cols-[1fr] gap-x-16 gap-y-8',
-        singleColumn ? 'max-w-3xl' : '@4xl/article:grid-cols-[1fr,1fr]'
+        singleColumn ? 'max-w-3xl' : '@4xl/article:grid-cols-[1fr_1fr]'
       )}
     >
       {children}
@@ -99,7 +99,7 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
     <h2
       tabIndex={-1} // For programmatic focus on auto-scroll to section
       className={cn(
-        'sticky top-0 z-[1]',
+        'sticky top-0 z-1',
         'w-full',
         // Enough padding to cover the background when stuck to the top,
         // then readjust with negative margin to prevent it looking too
@@ -107,7 +107,7 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
         'pt-[calc(var(--header-height)+1rem)] -mt-[calc(var(--header-height)+1rem-2px)]',
         // Same for bottom
         'pb-8 -mb-3',
-        'bg-gradient-to-b from-background from-85% to-transparent to-100%',
+        'bg-linear-to-b from-background from-85% to-transparent to-100%',
         'text-2xl font-medium text-foreground',
         'scroll-mt-[calc(var(--header-height)+1rem)]',
         'focus:outline-none',
@@ -131,14 +131,14 @@ export function CollapsibleDetails({ title, content }: { title: string; content:
           'px-5',
           'flex items-center gap-3',
           'text-xs text-foreground-light',
-          'data-[state=open]:bg-surface-200',
-          'data-[state=open]:rounded-b-none data-[state=open]:border-b-0',
+          'data-open:bg-surface-200',
+          'data-open:rounded-b-none data-open:border-b-0',
           'transition-safe-all ease-out'
         )}
       >
         <ChevronRight
           size={12}
-          className="group-data-[state=open]:rotate-90 transition-transform"
+          className="group-data-open:rotate-90 transition-transform"
         />
         {title}
       </CollapsibleTrigger_Shadcn_>
@@ -294,8 +294,8 @@ function TypeSubDetails({
           'flex items-center gap-2',
           'text-left text-sm text-foreground-light',
           'hover:bg-surface-100',
-          'data-[state=open]:w-full',
-          'data-[state=open]:rounded-b-none data-[state=open]:rounded-tl-lg data-[state=open]:rounded-tr-lg',
+          'data-open:w-full',
+          'data-open:rounded-b-none data-open:rounded-tl-lg data-open:rounded-tr-lg',
           'transition [transition-property:width,background-color]',
           className
         )}
@@ -304,7 +304,7 @@ function TypeSubDetails({
           size={14}
           className={cn(
             'text-foreground-muted',
-            'group-data-[state=closed]:rotate-45',
+            'group-data-closed:rotate-45',
             'transition-transform'
           )}
         />
@@ -352,7 +352,7 @@ export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['paramete
         )}
       </div>
       {param.description && (
-        <div className="prose break-words text-sm">
+        <div className="prose wrap-break-word text-sm">
           <ReactMarkdown>{param.description}</ReactMarkdown>
         </div>
       )}
@@ -513,8 +513,8 @@ export function ApiSchemaParamSubdetails({
           'flex items-center gap-2',
           'text-left text-sm text-foreground-light',
           'hover:bg-surface-100',
-          'data-[state=open]:w-full',
-          'data-[state=open]:rounded-b-none data-[state=open]:rounded-tl-lg data-[state=open]:rounded-tr-lg',
+          'data-open:w-full',
+          'data-open:rounded-b-none data-open:rounded-tl-lg data-open:rounded-tr-lg',
           'transition [transition-property:width,background-color]',
           className
         )}
@@ -523,7 +523,7 @@ export function ApiSchemaParamSubdetails({
           size={14}
           className={cn(
             'text-foreground-muted',
-            'group-data-[state=closed]:rotate-45',
+            'group-data-closed:rotate-45',
             'transition-transform'
           )}
         />

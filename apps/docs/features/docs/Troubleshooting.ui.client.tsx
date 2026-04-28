@@ -140,11 +140,11 @@ function TroubleshootingFilterMobileCollapsed(props: TroubleshootingFilterProps)
             <span>Filters</span>
             <ChevronDown
               size={16}
-              className="group-data-[state=open]:rotate-180 transition-transform"
+              className="group-data-open:rotate-180 transition-transform"
             />
           </div>
           {numberFiltersApplied > 0 && (
-            <div className="group-data-[state=open]:hidden text-sm text-left">
+            <div className="group-data-open:hidden text-sm text-left">
               {numberFiltersApplied} filter{numberFiltersApplied > 1 ? 's' : ''} applied
             </div>
           )}
