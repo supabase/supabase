@@ -3,6 +3,12 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 import { MD_PAGES } from './app/api-v2/md/content.generated'
 
+// Live-fetch LLM agents that retrieve pages on behalf of a user prompt.
+// Training crawlers (GPTBot, CCBot, ClaudeBot, Anthropic-AI) are intentionally
+// excluded; they are governed by robots.txt and serving them content that
+// differs from the human HTML page would risk SEO and cloaking penalties.
+const LLM_USER_AGENT = /Claude-User|Claude-Web|ChatGPT-User|OAI-SearchBot|PerplexityBot/i
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -14,9 +20,12 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Content negotiation: Accept: text/markdown on known pages
+  // Serve markdown to known LLM clients (Accept header or UA match).
+  // Cache-key safety: rewriting to /api-v2/md/<slug> partitions the response
+  // by path, so no Vary: User-Agent is needed (matches Vercel/Sentry pattern).
   const accept = (request.headers.get('accept') ?? '').toLowerCase()
-  if (accept.includes('text/markdown')) {
+  const userAgent = request.headers.get('user-agent') ?? ''
+  if (accept.includes('text/markdown') || LLM_USER_AGENT.test(userAgent)) {
     // Strip trailing slash so /auth/ and /auth resolve to the same allowlist entry.
     // (NextURL's pathname setter preserves the trailing-slash style of the cloned
     // origin, which would otherwise leak through to the rewrite target.)
