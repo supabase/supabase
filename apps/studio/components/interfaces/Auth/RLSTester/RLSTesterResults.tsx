@@ -84,35 +84,37 @@ export const RLSTesterResults = ({
         )}
 
         <TabsContent_Shadcn_ value="policies" className="mt-0">
-          {!isServiceRole && !!tableWithRLSEnabledButNoPolicies && (
-            <Admonition showIcon={false} type="default" className="rounded mt-2">
-              <p className="!mb-0.5">This user has no access to any rows from this query</p>
-              <p className="text-foreground-light">
-                The table{' '}
-                <code className="text-code-inline">
-                  {tableWithRLSEnabledButNoPolicies.schema}.{tableWithRLSEnabledButNoPolicies.table}
-                </code>{' '}
-                has RLS enabled but no policies set up for the{' '}
-                <code className="text-code-inline !break-keep">{parseQueryResults.role}</code> role.
-              </p>
-            </Admonition>
-          )}
-
-          {!isServiceRole && tableWithRLSEnabledWithPolicyFalse && (
-            <Admonition showIcon={false} type="default" className="rounded mt-2">
-              <p className="!mb-0.5">This user has no access to any rows from this query</p>
-              <p className="text-foreground-light">
-                The table{' '}
-                <code className="text-code-inline">
-                  {tableWithRLSEnabledWithPolicyFalse.schema}.
-                  {tableWithRLSEnabledWithPolicyFalse.table}
-                </code>{' '}
-                has a policy that evaluates to
-                <code className="text-code-inline !break-keep">false</code> for the{' '}
-                <code className="text-code-inline !break-keep">{parseQueryResults.role}</code> role.
-              </p>
-            </Admonition>
-          )}
+          {!isServiceRole &&
+            (!!tableWithRLSEnabledButNoPolicies ? (
+              <Admonition showIcon={false} type="default" className="rounded mt-2">
+                <p className="!mb-0.5">This user has no access to any rows from this query</p>
+                <p className="text-foreground-light">
+                  The table{' '}
+                  <code className="text-code-inline">
+                    {tableWithRLSEnabledButNoPolicies.schema}.
+                    {tableWithRLSEnabledButNoPolicies.table}
+                  </code>{' '}
+                  has RLS enabled but no policies set up for the{' '}
+                  <code className="text-code-inline !break-keep">{parseQueryResults.role}</code>{' '}
+                  role.
+                </p>
+              </Admonition>
+            ) : tableWithRLSEnabledWithPolicyFalse ? (
+              <Admonition showIcon={false} type="default" className="rounded mt-2">
+                <p className="!mb-0.5">This user has no access to any rows from this query</p>
+                <p className="text-foreground-light">
+                  The table{' '}
+                  <code className="text-code-inline">
+                    {tableWithRLSEnabledWithPolicyFalse.schema}.
+                    {tableWithRLSEnabledWithPolicyFalse.table}
+                  </code>{' '}
+                  has a policy that evaluates to
+                  <code className="text-code-inline !break-keep">false</code> for the{' '}
+                  <code className="text-code-inline !break-keep">{parseQueryResults.role}</code>{' '}
+                  role.
+                </p>
+              </Admonition>
+            ) : null)}
 
           {isServiceRole && (
             <Admonition showIcon={false} type="default" className="rounded mt-2">
