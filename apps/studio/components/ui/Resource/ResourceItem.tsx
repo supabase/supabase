@@ -48,7 +48,7 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
     const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
       onKeyDown?.(event)
 
-      if (event.defaultPrevented || !onClick) return
+      if (event.defaultPrevented || !onClick || event.target !== event.currentTarget) return
 
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
