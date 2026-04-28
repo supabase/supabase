@@ -80,7 +80,6 @@ export function ApiAuthorizationMainView({
   onApprove,
   onDecline,
 }: ApiAuthorizationMainViewProps): ReactNode {
-  const isMcpClient = requester.registration_type === 'dynamic'
   const isExpired = dayjs().isAfter(dayjs(requester.expires_at))
   const showReadyContent = !isExpired && organizations._tag === 'success'
 
@@ -126,7 +125,6 @@ export function ApiAuthorizationMainView({
                     name={requester.name}
                     domain={requester.domain}
                     scopes={requester.scopes}
-                    isMcpClient={isMcpClient}
                   />
                   <FormFooter
                     approvalState={approvalState}
