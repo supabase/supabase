@@ -90,7 +90,7 @@ export const SigningKeyRow = ({
       <div className="min-w-0 flex">
         <Badge
           className={cn(
-            'bg-opacity-100 bg-200 border-foreground-muted',
+            'bg-default-200/100 border-foreground-muted',
             'rounded-l-none',
             'gap-2 py-2 h-6 min-w-0 overflow-hidden flex items-center flex-1'
           )}

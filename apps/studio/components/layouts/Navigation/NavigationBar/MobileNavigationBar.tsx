@@ -83,7 +83,7 @@ const MobileNavigationBar = ({
                   'p-2',
                   'flex items-center justify-between',
                   'bg-transparent border-none text-foreground-lighter',
-                  'hover:bg-opacity-100 hover:border-strong hover:text-foreground-light',
+                  'hover:bg-transparent/100 hover:border-strong hover:text-foreground-light',
                   'focus-visible:!outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600',
                   'transition'
                 )}
