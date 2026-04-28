@@ -1,10 +1,9 @@
+import { remarkCodeHike, type CodeHikeConfig } from '@code-hike/mdx'
+import { preprocessMdxWithCodeTabs } from '~/components/CodeTabs'
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import { serialize } from 'next-mdx-remote/serialize'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
-
-import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
-import { preprocessMdxWithCodeTabs } from '~/components/CodeTabs'
 
 // mdx2 needs self-closing tags.
 // dragging an image onto a GitHub discussion creates an <img>
@@ -41,12 +40,7 @@ function normalizeHtmlImagesToMarkdown(source: string): string {
     const src = getAttr(attrs, 'src')
     if (!src) return _match
 
-    const alt = getAttr(attrs, 'alt')
-      .replace(/\\/g, '\\\\')
-      .replace(/\]/g, '\\]')
-      .replace(/\[/g, '\\[')
-      .replace(/\(/g, '\\(')
-      .replace(/\)/g, '\\)')
+    const alt = getAttr(attrs, 'alt').replace(/[\\[\]\(\)]/g, '\\$&')
 
     return `![${alt}](${src})`
   })
