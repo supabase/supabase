@@ -50,8 +50,8 @@ Bundle grants with your RLS setup in the same migration. They belong together: `
 
 By default on existing projects, tables and functions you create in `public` are automatically granted `SELECT`, `INSERT`, `UPDATE`, `DELETE` (or `EXECUTE` for functions) to `anon`, `authenticated`, and `service_role`. That means a new table is reachable through the Data API the moment it lands, even if you forgot to enable RLS or did not intend to expose it.
 
-Supabase is moving the platform default to **revoke** these automatic grants, so that exposure becomes opt-in:
-{/* TODO: link to changelog */}
+Supabase is moving the platform default to **revoke** these automatic grants, so that exposure becomes opt-in, read more about the change in [this changelog entry](https://github.com/orgs/supabase/discussions/45329).
+
 To opt an existing project in today, open the [SQL Editor](/dashboard/project/_/sql/new) and run:
 
 ```sql
