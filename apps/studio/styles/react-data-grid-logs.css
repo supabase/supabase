@@ -1,3 +1,5 @@
+@reference "./main.css";
+
 .data-grid--simple-logs {
   .rdg {
     overflow-x: auto;
