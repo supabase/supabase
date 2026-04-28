@@ -34,7 +34,7 @@ import type { ResponseError } from '@/types'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 
-const UserImpersonationSelector = () => {
+export const UserImpersonationSelector = () => {
   const [searchText, setSearchText] = useState('')
   const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
   const [externalUserId, setExternalUserId] = useState('')
@@ -421,8 +421,6 @@ const UserImpersonationSelector = () => {
   )
 }
 
-export default UserImpersonationSelector
-
 // Base interface for shared impersonation row props to reduce
 // duplication between user and external auth impersonation displays
 interface BaseImpersonatingRowProps {
@@ -462,7 +460,7 @@ const BaseImpersonatingRow = ({
       </div>
 
       <Button type="default" onClick={onClick} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
+        {isImpersonating ? 'Stop impersonating' : 'Impersonate'}
       </Button>
     </div>
   )
@@ -558,7 +556,7 @@ const UserRow = ({ user, onClick, isImpersonating = false, isLoading = false }: 
       </div>
 
       <Button type="default" onClick={() => onClick(user)} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
+        {isImpersonating ? 'Stop impersonating' : 'Impersonate'}
       </Button>
     </div>
   )

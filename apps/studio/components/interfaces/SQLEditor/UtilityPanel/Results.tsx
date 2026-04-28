@@ -14,7 +14,7 @@ import { CellDetailPanel } from './CellDetailPanel'
 import { formatCellValue, formatClipboardValue } from './Results.utils'
 import { handleCopyCell } from '@/components/grid/SupabaseGrid.utils'
 
-const Results = ({ rows }: { rows: readonly any[] }) => {
+export const Results = ({ rows }: { rows: readonly any[] }) => {
   const [expandCell, setExpandCell] = useState(false)
   const [cellPosition, setCellPosition] = useState<{ column: any; row: any; rowIdx: number }>()
   const contextMenuCellRef = useRef<{ column: string; value: any } | null>(null)

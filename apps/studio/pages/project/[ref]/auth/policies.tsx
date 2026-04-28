@@ -20,11 +20,13 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { useIsRLSTesterEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from '@/components/interfaces/Auth/Policies/Policies'
 import { PoliciesDataProvider } from '@/components/interfaces/Auth/Policies/PoliciesDataContext'
 import { getGeneralPolicyTemplates } from '@/components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
 import { PolicyEditorPanel } from '@/components/interfaces/Auth/Policies/PolicyEditorPanel'
 import { generatePolicyUpdateSQL } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { RLSTesterSheet } from '@/components/interfaces/Auth/RLSTester/RLSTesterSheet'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -109,7 +111,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
+
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
+  const rlsTesterEnabled = useIsRLSTesterEnabled()
+
   const { openSidebar } = useSidebarManagerSnapshot()
   const {
     setValue: setEditorPanelValue,
@@ -274,6 +279,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           </PageHeaderSummary>
           <PageHeaderAside>
             <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
+            {rlsTesterEnabled && <RLSTesterSheet handleSelectEditPolicy={handleSelectEditPolicy} />}
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
