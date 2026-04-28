@@ -78,7 +78,7 @@ const BucketPage: NextPageWithLayout = () => {
             {bucket?.public && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Badge variant="warning" className="flex flex-shrink-0">
+                  <Badge variant="warning" className="flex shrink-0">
                     Public
                   </Badge>
                 </TooltipTrigger>

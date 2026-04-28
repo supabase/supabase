@@ -74,7 +74,7 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
         </SheetSection>
       )}
 
-      <SheetSection className="flex-grow overflow-auto px-0 py-0">
+      <SheetSection className="grow overflow-auto px-0 py-0">
         <FormItemLayout
           isReactForm={false}
           layout="horizontal"

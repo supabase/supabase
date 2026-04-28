@@ -81,7 +81,7 @@
     "config": "workspace:^",
     "lodash": "catalog:",
     "mdast-util-toc": "^6.1.1",
-    "postcss": "^8.5.3",
+    "postcss": "catalog:",
     "react-dropzone": "^14.3.8",
     "react-router": "^7.13.2",
     "rimraf": "^4.1.3",

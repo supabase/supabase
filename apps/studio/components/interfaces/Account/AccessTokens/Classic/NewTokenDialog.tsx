@@ -205,7 +205,7 @@ export const NewTokenDialog = ({
                 render={({ field }) => (
                   <FormItemLayout name="expiresAt" label="Expires in">
                     <div className="flex gap-2">
-                      <FormControl className="flex-grow">
+                      <FormControl className="grow">
                         <Select_Shadcn_ value={field.value} onValueChange={handleExpiryChange}>
                           <SelectTrigger_Shadcn_>
                             <SelectValue_Shadcn_ placeholder="Expires at" />

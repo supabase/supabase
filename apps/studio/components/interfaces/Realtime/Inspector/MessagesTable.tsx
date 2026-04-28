@@ -143,7 +143,7 @@ const MessagesTable = ({
       <section className="flex w-full flex-col md:max-h-[calc(100vh-var(--header-height)-3rem)]">
         <ShimmerLine active={enabled} />
         <div className={cn('flex h-full flex-row', enabled ? 'border-brand-400' : null)}>
-          <div className="flex flex-grow flex-col">
+          <div className="flex grow flex-col">
             {enabled && (
               <div className="w-full h-9 px-4 bg-surface-100 items-center inline-flex justify-between text-foreground-light">
                 <div className="inline-flex gap-2.5 text-xs">

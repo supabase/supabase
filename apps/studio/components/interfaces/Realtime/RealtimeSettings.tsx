@@ -362,7 +362,7 @@ export const RealtimeSettings = () => {
                                 : 'You may adjust this setting in the organization billing settings'}
                             </p>
                           </div>
-                          <div className="flex-grow flex items-center justify-end">
+                          <div className="grow flex items-center justify-end">
                             {isFreePlan ? (
                               <UpgradePlanButton
                                 source="realtimeSettings"
@@ -416,7 +416,7 @@ export const RealtimeSettings = () => {
                                 : 'You may adjust this setting in the organization billing settings'}
                             </p>
                           </div>
-                          <div className="flex-grow flex items-center justify-end">
+                          <div className="grow flex items-center justify-end">
                             {isFreePlan ? (
                               <UpgradePlanButton
                                 source="realtimeSettings"
@@ -470,7 +470,7 @@ export const RealtimeSettings = () => {
                                 : 'You may adjust this setting in the organization billing settings'}
                             </p>
                           </div>
-                          <div className="flex-grow flex items-center justify-end">
+                          <div className="grow flex items-center justify-end">
                             {isFreePlan ? (
                               <UpgradePlanButton
                                 addon="spendCap"

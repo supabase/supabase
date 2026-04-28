@@ -88,7 +88,7 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
         <Form {...form}>
           <form
             id={FORM_ID}
-            className="flex-grow overflow-auto gap-2 flex flex-col"
+            className="grow overflow-auto gap-2 flex flex-col"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <FormField

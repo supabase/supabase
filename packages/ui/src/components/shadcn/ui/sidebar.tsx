@@ -210,7 +210,7 @@ const Sidebar = React.forwardRef<
         className={cn(
           overflowing ? 'w-12' : '',
           'relative group peer hidden md:block text-sidebar-foreground',
-          'flex-shrink-0'
+          'shrink-0'
         )}
         data-state={state}
         data-collapsible={state === 'collapsed' ? collapsible : ''}

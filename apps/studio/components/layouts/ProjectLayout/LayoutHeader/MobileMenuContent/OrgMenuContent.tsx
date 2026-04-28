@@ -117,7 +117,7 @@ export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
       <div className="flex flex-col h-full">
         <div
           className={cn(
-            'flex-shrink-0 flex items-center gap-2 border-b border-default px-3 min-h-[var(--header-height)]'
+            'shrink-0 flex items-center gap-2 border-b border-default px-3 min-h-[var(--header-height)]'
           )}
         >
           <Button
