@@ -1,3 +1,4 @@
+import { type SafeSqlFragment } from '@supabase/pg-meta'
 import { TABLE_EVENT_ACTIONS } from 'common/telemetry-constants'
 
 import {
@@ -253,12 +254,10 @@ export const checkIfAppendLimitRequired = (sql: string, limit: number = 0) => {
   return { cleanedSql, appendAutoLimit }
 }
 
-export const suffixWithLimit = (sql: string, limit: number = 0) => {
+export const suffixWithLimit = (sql: SafeSqlFragment, limit: number = 0): SafeSqlFragment => {
   const { cleanedSql, appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
-  const formattedSql = appendAutoLimit
-    ? cleanedSql.endsWith(';')
-      ? sql.replace(/[;]+$/, ` limit ${limit};`)
-      : `${sql} limit ${limit};`
-    : sql
-  return formattedSql
+  if (!appendAutoLimit) return sql
+  return (
+    cleanedSql.endsWith(';') ? sql.replace(/[;]+$/, ` limit ${limit};`) : `${sql} limit ${limit};`
+  ) as SafeSqlFragment
 }

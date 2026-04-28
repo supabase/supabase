@@ -1,4 +1,3 @@
-import { type PostgresPolicy } from '@supabase/postgres-meta'
 import {
   Badge,
   cn,
@@ -13,12 +12,13 @@ import { Results } from '../../SQLEditor/UtilityPanel/Results'
 import { RLSTableCard } from './RLSTableCard'
 import { ParseQueryResults } from './RLSTester.types'
 import { useTestQueryRLS } from './useTestQueryRLS'
+import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 
 interface RLSTesterResultsProps {
   results: Object[]
   autoLimit: boolean
   parseQueryResults: ParseQueryResults
-  handleSelectEditPolicy: (policy: PostgresPolicy) => void
+  handleSelectEditPolicy: (policy: Policy) => void
 }
 
 export const RLSTesterResults = ({

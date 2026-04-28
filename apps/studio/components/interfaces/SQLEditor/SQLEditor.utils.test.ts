@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta'
 import { stripIndent } from 'common-tags'
 import { describe, expect, it, test } from 'vitest'
 
@@ -136,19 +137,19 @@ select * from cities
 // [Joshen] These will just need to test the cases when appendAutoLimit returns true then
 describe('SQLEditor.utils.ts:suffixWithLimit', () => {
   test('Should add the limit param properly if query ends without a semi colon', () => {
-    const sql = 'select * from countries'
+    const sql = safeSql`select * from countries`
     const limit = 100
     const formattedSql = suffixWithLimit(sql, limit)
     expect(formattedSql).toBe('select * from countries limit 100;')
   })
   test('Should add the limit param properly if query ends with a semi colon', () => {
-    const sql = 'select * from countries;'
+    const sql = safeSql`select * from countries;`
     const limit = 100
     const formattedSql = suffixWithLimit(sql, limit)
     expect(formattedSql).toBe('select * from countries limit 100;')
   })
   test('Should add the limit param properly if query ends with multiple semi colon', () => {
-    const sql = 'select * from countries;;;;;;;'
+    const sql = safeSql`select * from countries;;;;;;;`
     const limit = 100
     const formattedSql = suffixWithLimit(sql, limit)
     expect(formattedSql).toBe('select * from countries limit 100;')

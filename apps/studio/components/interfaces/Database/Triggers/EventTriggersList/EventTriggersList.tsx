@@ -8,7 +8,7 @@ import { EmptyStatePresentational } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { EventTriggerList } from './EventTriggerList'
-import { generateEventTriggerCreateSQL } from './EventTriggerList.utils'
+import { generateEventTriggerCreateSQL, type EventTrigger } from './EventTriggerList.utils'
 import { DEFAULT_EVENT_TRIGGER_SQL, EVENT_TRIGGER_TEMPLATES } from './EventTriggers.constants'
 import { DeleteEventTrigger } from '@/components/interfaces/Database/Triggers/DeleteEventTrigger'
 import {
@@ -20,10 +20,7 @@ import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabaseEventTriggerDeleteMutation } from '@/data/database-event-triggers/database-event-trigger-delete-mutation'
-import {
-  useDatabaseEventTriggersQuery,
-  type DatabaseEventTrigger,
-} from '@/data/database-event-triggers/database-event-triggers-query'
+import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -45,7 +42,7 @@ export const EventTriggersList = () => {
     parseAsJson(selectFilterSchema.parse)
   )
   const ownerFilterValue = ownerFilter ?? DEFAULT_OWNER_FILTER
-  const [triggerToDelete, setTriggerToDelete] = useState<DatabaseEventTrigger | null>(null)
+  const [triggerToDelete, setTriggerToDelete] = useState<EventTrigger | null>(null)
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const {
@@ -87,7 +84,7 @@ export const EventTriggersList = () => {
     openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
   }
 
-  const editEventTrigger = (trigger: DatabaseEventTrigger) => {
+  const editEventTrigger = (trigger: EventTrigger) => {
     setEditorPanelInitialPrompt(`Update the event trigger "${trigger.name}" that...`)
     const sql = generateEventTriggerCreateSQL(trigger)
     setEditorPanelValue(sql.length > 0 ? sql : DEFAULT_EVENT_TRIGGER_SQL)
@@ -95,7 +92,7 @@ export const EventTriggersList = () => {
     openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
   }
 
-  const editEventTriggerWithAssistant = (trigger: DatabaseEventTrigger) => {
+  const editEventTriggerWithAssistant = (trigger: EventTrigger) => {
     const sql = generateEventTriggerCreateSQL(trigger)
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({
@@ -123,7 +120,7 @@ export const EventTriggersList = () => {
     })
   }
 
-  const duplicateEventTrigger = (trigger: DatabaseEventTrigger) => {
+  const duplicateEventTrigger = (trigger: EventTrigger) => {
     const duplicateTrigger = { ...trigger, name: `${trigger.name}_duplicate` }
     setEditorPanelInitialPrompt('Create a new event trigger that...')
     const sql = generateEventTriggerCreateSQL(duplicateTrigger)
@@ -132,7 +129,7 @@ export const EventTriggersList = () => {
     openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
   }
 
-  const handleDeleteEventTrigger = (trigger: DatabaseEventTrigger) => {
+  const handleDeleteEventTrigger = (trigger: EventTrigger) => {
     setTriggerToDelete(trigger)
   }
 

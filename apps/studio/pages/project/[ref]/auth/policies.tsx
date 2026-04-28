@@ -1,4 +1,5 @@
-import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
+import { ident, safeSql } from '@supabase/pg-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Search, X } from 'lucide-react'
@@ -25,7 +26,10 @@ import { Policies } from '@/components/interfaces/Auth/Policies/Policies'
 import { PoliciesDataProvider } from '@/components/interfaces/Auth/Policies/PoliciesDataContext'
 import { getGeneralPolicyTemplates } from '@/components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
 import { PolicyEditorPanel } from '@/components/interfaces/Auth/Policies/PolicyEditorPanel'
-import { generatePolicyUpdateSQL } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import {
+  generatePolicyUpdateSQL,
+  type Policy,
+} from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { RLSTesterSheet } from '@/components/interfaces/Auth/RLSTester/RLSTesterSheet'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -61,7 +65,7 @@ import type { NextPageWithLayout } from '@/types'
  */
 const getTableFilterState = (
   tables: PostgresTable[],
-  policies: PostgresPolicy[],
+  policies: Array<Policy>,
   searchString?: string
 ) => {
   const sortedTables = tables.slice().sort((a, b) => a.name.localeCompare(b.name))
@@ -75,8 +79,7 @@ const getTableFilterState = (
   const filter = searchString.toLowerCase()
   const matchingPolicyKeys = new Set(
     policies
-      // @ts-ignore Type instantiation is excessively deep and possibly infinite
-      .filter((policy: PostgresPolicy) => policy.name.toLowerCase().includes(filter))
+      .filter((policy: Policy) => policy.name.toLowerCase().includes(filter))
       .map((policy) => `${policy.schema}.${policy.table}`)
   )
 
@@ -192,8 +195,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
       setShowCreatePolicy(true)
 
       if (isInlineEditorEnabled) {
-        const defaultSql = `create policy "replace_with_policy_name"
-  on ${schema}.${table}
+        const defaultSql = safeSql`create policy "replace_with_policy_name"
+  on ${ident(schema)}.${ident(table)}
   for select
   to authenticated
   using (
@@ -212,7 +215,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   )
 
   const handleSelectEditPolicy = useCallback(
-    (policy: PostgresPolicy) => {
+    (policy: Policy) => {
       setSelectedTable(undefined)
 
       if (isInlineEditorEnabled) {
