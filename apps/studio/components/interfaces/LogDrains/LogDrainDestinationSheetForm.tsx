@@ -394,6 +394,7 @@ export function LogDrainDestinationSheetForm({
   })
 
   const type = form.watch('type')
+  const tls = form.watch('tls')
 
   useEffect(() => {
     if (mode === 'create' && !open) {
@@ -897,7 +898,7 @@ export function LogDrainDestinationSheetForm({
                       )}
                     />
 
-                    {form.watch('tls') && (
+                    {tls && (
                       <div className="grid gap-4 px-content">
                         <FormField
                           name="ca_cert"
