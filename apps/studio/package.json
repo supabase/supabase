@@ -151,7 +151,6 @@
     "@radix-ui/react-use-escape-keydown": "^1.1.1",
     "@smithy/property-provider": "^4.0.4",
     "@supabase/postgres-meta": "^0.64.4",
-    "@tailwindcss/container-queries": "^0.1.1",
     "@testing-library/dom": "^10.0.0",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",

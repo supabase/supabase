@@ -10,7 +10,6 @@ module.exports = config({
     './../../packages/ui/src/**/*.{tsx,ts,js}',
     './../../packages/ui-patterns/src/**/*.{tsx,ts,js}',
   ],
-  plugins: [require('@tailwindcss/container-queries')],
   theme: {
     extend: {
       maxWidth: {

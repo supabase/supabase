@@ -268,9 +268,6 @@ importers:
       '@shikijs/compat':
         specifier: ^1.1.7
         version: 1.6.0
-      '@tailwindcss/container-queries':
-        specifier: ^0.1.1
-        version: 0.1.1(tailwindcss@3.4.19(tsx@4.20.3)(yaml@2.8.3))
       '@types/lodash.template':
         specifier: 4.5.0
         version: 4.5.0
@@ -355,9 +352,6 @@ importers:
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.104.1
-      '@tailwindcss/container-queries':
-        specifier: ^0.1.1
-        version: 0.1.1(tailwindcss@3.4.19(tsx@4.20.3)(yaml@2.8.3))
       '@tanstack/react-query':
         specifier: ^5.13.4
         version: 5.83.0(react@18.3.1)
@@ -1211,9 +1205,6 @@ importers:
       '@supabase/postgres-meta':
         specifier: ^0.64.4
         version: 0.64.6(encoding@0.1.13)(supports-color@8.1.1)
-      '@tailwindcss/container-queries':
-        specifier: ^0.1.1
-        version: 0.1.1(tailwindcss@3.4.19(tsx@4.20.3)(yaml@2.8.3))
       '@testing-library/dom':
         specifier: ^10.0.0
         version: 10.4.1
@@ -7869,11 +7860,6 @@ packages:
 
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
-
-  '@tailwindcss/container-queries@0.1.1':
-    resolution: {integrity: sha512-p18dswChx6WnTSaJCSGx6lTmrGzNNvm2FtXmiO6AuA1V4U5REyoqwmT6kgAsIMdjo07QdAfYXHJ4hnMtfHzWgA==}
-    peerDependencies:
-      tailwindcss: '>=3.2.0'
 
   '@tailwindcss/forms@0.5.11':
     resolution: {integrity: sha512-h9wegbZDPurxG22xZSoWtdzc41/OlNEUQERNqI/0fOwa2aVlWGu7C35E/x6LDyD3lgtztFSSjKZyuVM0hxhbgA==}
@@ -24359,10 +24345,6 @@ snapshots:
   '@swc/helpers@0.5.15':
     dependencies:
       tslib: 2.8.1
-
-  '@tailwindcss/container-queries@0.1.1(tailwindcss@3.4.19(tsx@4.20.3)(yaml@2.8.3))':
-    dependencies:
-      tailwindcss: 3.4.19(tsx@4.20.3)(yaml@2.8.3)
 
   '@tailwindcss/forms@0.5.11(tailwindcss@3.4.19(tsx@4.20.3)(yaml@2.8.3))':
     dependencies:
