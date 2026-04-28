@@ -183,7 +183,6 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
                       <DropdownMenuItem
                         className="space-x-2"
                         onClick={() => {
-                          const sql = generateTriggerCreateSQL(x)
                           editTrigger(x)
                         }}
                       >

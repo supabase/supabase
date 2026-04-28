@@ -56,7 +56,6 @@ const FormSchema = z
 export const CreateClerkAuthIntegrationDialog = ({
   visible,
   onClose,
-  onDelete,
 }: CreateClerkAuthIntegrationProps) => {
   const { ref: projectRef } = useParams()
   const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({

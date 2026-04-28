@@ -1,8 +1,8 @@
 import { ChevronRight, MoreVertical } from 'lucide-react'
+import Link from 'next/link'
 import { forwardRef, HTMLAttributes, KeyboardEvent, ReactNode } from 'react'
 import {
   Button,
-  CardContent,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -21,11 +21,14 @@ export interface ResourceItemProps extends HTMLAttributes<HTMLDivElement> {
   onClick?: () => void
   children?: ReactNode
   actions?: ResourceAction[]
+  href?: string
+  target?: string
+  rel?: string
 }
 
 export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
   (
-    { media, meta, onClick, children, className, actions, onKeyDown, role, tabIndex, ...props },
+    { media, meta, onClick, children, className, actions, href, target, rel, onKeyDown, role, tabIndex, ...props },
     ref
   ) => {
     const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -39,21 +42,8 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
       }
     }
 
-    return (
-      <CardContent
-        ref={ref}
-        className={cn(
-          'flex items-center justify-between text-sm gap-4',
-          '!border-b-0',
-          onClick && 'cursor-pointer transition-colors duration-150 hover:bg-surface-200',
-          className
-        )}
-        onClick={onClick}
-        onKeyDown={handleKeyDown}
-        role={onClick ? 'button' : role}
-        tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
-        {...props}
-      >
+    const content = (
+      <>
         {media && (
           <div className="text-foreground-light flex items-center justify-center">{media}</div>
         )}
@@ -88,7 +78,43 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
         ) : (
           onClick && <ChevronRight strokeWidth={1.5} size={16} />
         )}
-      </CardContent>
+      </>
+    )
+
+    const rootClassName = cn(
+      'py-4 px-[var(--card-padding-x)] border-b last:border-none flex items-center justify-between text-sm gap-4',
+      (onClick || href) && 'cursor-pointer transition-colors duration-150 hover:bg-surface-200',
+      className
+    )
+
+    if (href) {
+      return (
+        <Link
+          ref={ref as never}
+          href={href}
+          target={target}
+          rel={rel}
+          className={rootClassName}
+          onClick={onClick}
+          {...props}
+        >
+          {content}
+        </Link>
+      )
+    }
+
+    return (
+      <div
+        ref={ref}
+        className={rootClassName}
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        role={onClick ? 'button' : role}
+        tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
+        {...props}
+      >
+        {content}
+      </div>
     )
   }
 )

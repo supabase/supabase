@@ -4,11 +4,9 @@ import { PropsWithChildren, ReactNode } from 'react'
 import { cn, Menu } from 'ui'
 
 import type { SidebarSection } from './AccountLayout.types'
-import { useAppStateSnapshot } from '@/state/app-state'
 
 interface WithSidebarProps {
-  title: string
-  breadcrumbs: any[]
+  title?: string
   sections: SidebarSection[]
   header?: ReactNode
   subitems?: any[]
@@ -21,7 +19,6 @@ interface WithSidebarProps {
 export const WithSidebar = ({
   title,
   header,
-  breadcrumbs = [],
   children,
   sections,
   subitems,
@@ -31,7 +28,6 @@ export const WithSidebar = ({
   backToDashboardURL,
 }: PropsWithChildren<WithSidebarProps>) => {
   const noContent = !sections && !customSidebarContent
-  const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
 
   return (
     <div className="flex flex-col md:flex-row h-full">
@@ -55,7 +51,6 @@ export const WithSidebar = ({
 }
 
 export const SidebarContent = ({
-  title,
   header,
   sections,
   subitems,
@@ -147,7 +142,7 @@ interface SectionWithHeadersProps {
   subitemsParentKey?: number
 }
 
-const SectionWithHeaders = ({ section, subitems, subitemsParentKey }: SectionWithHeadersProps) => (
+const SectionWithHeaders = ({ section, subitems }: SectionWithHeadersProps) => (
   <div key={section.heading} className="my-6 space-y-8">
     <div className="mx-3">
       {section.heading && (

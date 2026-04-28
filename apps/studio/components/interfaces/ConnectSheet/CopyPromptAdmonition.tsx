@@ -1,5 +1,4 @@
 import { type RefObject } from 'react'
-import { Badge } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import CopyButton from '@/components/ui/CopyButton'

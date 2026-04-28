@@ -3,7 +3,7 @@ import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack
 import { flexRender } from '@tanstack/react-table'
 import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
-import { Fragment, memo, ReactNode, UIEvent, useCallback, useRef } from 'react'
+import { Fragment, ReactNode, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn } from 'ui'
 
 import { formatCompactNumber } from './DataTable.utils'
@@ -13,7 +13,7 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 // TODO: add a possible chartGroupBy
-export interface DataTableInfiniteProps<TData, TValue, TMeta> {
+export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   columns: ColumnDef<TData, TValue>[]
   defaultColumnVisibility?: VisibilityState
   totalRows?: number
@@ -232,9 +232,3 @@ function DataTableRow<TData>({
     </TableRow>
   )
 }
-
-// [Joshen] Using MemoizedRow will cause the column visibility to break as the rows aren't getting re-rendered
-const MemoizedRow = memo(
-  DataTableRow,
-  (prev, next) => prev.row.id === next.row.id && prev.selected === next.selected
-) as typeof DataTableRow

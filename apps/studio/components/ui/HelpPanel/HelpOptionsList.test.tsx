@@ -62,9 +62,7 @@ describe('HelpOptionsList', () => {
     expect(routerMock.asPath).toBe('/')
   })
 
-  it('exposes keyboard-accessible help options', async () => {
-    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
-
+  it('renders docs as an external link', () => {
     customRender(
       <HelpOptionsList
         isPlatform
@@ -73,13 +71,10 @@ describe('HelpOptionsList', () => {
       />
     )
 
-    const docsOption = screen.getByRole('button', { name: /docs/i })
+    const docsOption = screen.getByRole('link', { name: /docs/i })
 
-    expect(docsOption).toHaveAttribute('tabindex', '0')
-
-    docsOption.focus()
-    await userEvent.keyboard('{Enter}')
-
-    expect(openSpy).toHaveBeenCalledWith(`${DOCS_URL}/`, '_blank', 'noopener,noreferrer')
+    expect(docsOption).toHaveAttribute('href', `${DOCS_URL}/`)
+    expect(docsOption).toHaveAttribute('target', '_blank')
+    expect(docsOption).toHaveAttribute('rel', 'noreferrer noopener')
   })
 })

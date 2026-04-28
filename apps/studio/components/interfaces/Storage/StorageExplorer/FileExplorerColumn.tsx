@@ -5,7 +5,7 @@ import { ChevronsDown, ChevronsUp, Copy, Eye, FolderPlus, Upload } from 'lucide-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Checkbox_Shadcn_ as Checkbox,
+  Checkbox,
   cn,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
