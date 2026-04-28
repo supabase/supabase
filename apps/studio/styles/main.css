@@ -7,6 +7,8 @@
 
 @config '../tailwind.config.ts';
 
+@import 'config/typography.css';
+
 :root {
   --chart-1: var(--brand-default);
   --chart-2: 173 58% 39%;

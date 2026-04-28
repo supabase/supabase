@@ -6,6 +6,8 @@
 
 @config '../tailwind.config.js';
 
+@import 'config/typography.css';
+
 @font-face {
   font-family: 'custom-font';
   src:
