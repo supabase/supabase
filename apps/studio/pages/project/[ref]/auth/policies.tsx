@@ -115,7 +115,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
   const rlsTesterEnabled = useIsRLSTesterEnabled()
-  const rlsTesterVisible = useFlag('rlsTester')
 
   const { openSidebar } = useSidebarManagerSnapshot()
   const {
@@ -237,7 +236,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const handleResetSearch = useCallback(() => setSearchString(''), [setSearchString])
 
   useEffect(() => {
-    if (!rlsTesterVisible || rlsTesterEnabled) return
+    if (rlsTesterEnabled) return
 
     if (!isRlsTesterBannerDismissed) {
       addBanner({
@@ -253,7 +252,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     return () => {
       dismissBanner('rls-tester-banner')
     }
-  }, [addBanner, dismissBanner, isRlsTesterBannerDismissed, rlsTesterEnabled, rlsTesterVisible])
+  }, [addBanner, dismissBanner, isRlsTesterBannerDismissed, rlsTesterEnabled])
 
   useEffect(() => {
     if (!isTriggerPermissionsLoaded) return

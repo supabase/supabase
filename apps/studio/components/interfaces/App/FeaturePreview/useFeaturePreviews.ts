@@ -22,14 +22,13 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
-  const rlsTesterEnabled = useFlag('rlsTester')
 
   return [
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER,
       name: 'RLS Tester',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/45233',
-      enabled: rlsTesterEnabled,
+      enabled: true,
       isNew: true,
       isPlatformOnly: false,
       isDefaultOptIn: false,

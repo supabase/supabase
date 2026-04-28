@@ -91,12 +91,12 @@ export const UserSelector = () => {
               onValueChange={setSearchText}
             />
 
-            <CommandEmpty_Shadcn_>No user found</CommandEmpty_Shadcn_>
-
-            {isError && (
+            {isError ? (
               <Admonition showIcon={false} type="warning" className="border-0 rounded-none text-xs">
                 Failed to fetch users: {error.message}
               </Admonition>
+            ) : (
+              <CommandEmpty_Shadcn_>No user found</CommandEmpty_Shadcn_>
             )}
 
             <CommandList_Shadcn_>
