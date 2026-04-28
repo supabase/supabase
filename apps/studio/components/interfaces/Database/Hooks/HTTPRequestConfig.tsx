@@ -3,15 +3,15 @@ import Link from 'next/link'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  useWatch_Shadcn_,
+  useWatch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -35,7 +35,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
 
   const edgeFunctions = functions ?? []
-  const functionType = useWatch_Shadcn_({ control: form.control, name: 'function_type' })
+  const functionType = useWatch({ control: form.control, name: 'function_type' })
 
   return (
     <FormSection
@@ -50,17 +50,17 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
       }
     >
       <FormSectionContent loading={false} className="lg:!col-span-8">
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="http_method"
           render={({ field }) => (
             <FormItemLayout label="Method" layout="vertical" className="gap-1">
               <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                <FormControl_Shadcn_>
+                <FormControl>
                   <SelectTrigger_Shadcn_>
                     <SelectValue_Shadcn_ />
                   </SelectTrigger_Shadcn_>
-                </FormControl_Shadcn_>
+                </FormControl>
                 <SelectContent_Shadcn_>
                   <SelectItem_Shadcn_ value="GET">GET</SelectItem_Shadcn_>
                   <SelectItem_Shadcn_ value="POST">POST</SelectItem_Shadcn_>
@@ -71,7 +71,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
         />
 
         {functionType === 'http_request' ? (
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="http_url"
             render={({ field }) => (
@@ -81,9 +81,9 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
                 className="gap-1"
                 description="URL of the HTTP request. Must include HTTP/HTTPS"
               >
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Input_Shadcn_ {...field} placeholder="http://api.com/path/resource" />
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
             )}
           />
@@ -98,7 +98,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
             </div>
           </div>
         ) : functionType === 'supabase_function' && edgeFunctions.length > 0 ? (
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="http_url"
             render={({ field }) => (
@@ -108,11 +108,11 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
                 className="gap-1"
               >
                 <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <SelectTrigger_Shadcn_>
                       <SelectValue_Shadcn_ placeholder="Select an edge function" />
                     </SelectTrigger_Shadcn_>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                   <SelectContent_Shadcn_>
                     {edgeFunctions.map((fn) => {
                       const restUrl = selectedProject?.restUrl
@@ -132,7 +132,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
           />
         ) : null}
 
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="timeout_ms"
           render={({ field }) => (
@@ -142,7 +142,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
               layout="vertical"
               className="gap-1"
             >
-              <FormControl_Shadcn_>
+              <FormControl>
                 <div className="relative">
                   <Input_Shadcn_
                     {...field}
@@ -154,7 +154,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
                     ms
                   </span>
                 </div>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />

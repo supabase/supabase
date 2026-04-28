@@ -21,7 +21,7 @@ const AuthConfigPage = async () => {
     <GuideTemplate
       meta={meta}
       editLink={newEditLink(
-        'supabase/supabase/blob/master/apps/docs/app/guides/(with-sidebar)/self-hosting/auth/config/page.tsx'
+        'supabase/supabase/blob/master/apps/docs/app/guides/self-hosting/auth/config/page.tsx'
       )}
     >
       <MDXRemoteBase source={descriptionMdx} />

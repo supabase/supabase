@@ -1,7 +1,7 @@
 // End of third-party imports
 
 import { compact } from 'lodash'
-import { File, FileCode, Plus, X } from 'lucide-react'
+import { FileCode, Plus, X } from 'lucide-react'
 import {
   useCallback,
   useEffect,

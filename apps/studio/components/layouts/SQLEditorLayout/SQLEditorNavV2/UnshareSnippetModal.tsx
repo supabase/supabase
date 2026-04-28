@@ -21,7 +21,7 @@ export const UnshareSnippetModal = ({
   const { ref: projectRef } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const { mutate: upsertContent, isPending: isUpserting } = useContentUpsertMutation({
+  const { mutate: upsertContent } = useContentUpsertMutation({
     onError: (error) => {
       toast.error(`Failed to update query: ${error.message}`)
     },

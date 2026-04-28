@@ -45,6 +45,7 @@ export const SHORTCUT_IDS = {
   NAV_ORG_USAGE: 'nav.org-usage',
   NAV_ORG_BILLING: 'nav.org-billing',
   NAV_ORG_SETTINGS: 'nav.org-settings',
+  SHORTCUTS_OPEN_REFERENCE: 'shortcuts.open-reference',
 
   // Table editor shortcuts
   ...TABLE_EDITOR_SHORTCUT_IDS,
@@ -285,6 +286,13 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     label: 'Go to Organization Settings',
     sequence: ['G', 'O'],
     showInSettings: false,
+  },
+  [SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE]: {
+    id: SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE,
+    label: 'Show all keyboard shortcuts',
+    sequence: ['Mod+/'],
+    showInSettings: false,
+    options: { ignoreInputs: true },
   },
 
   // Table editor shortcut registration

@@ -1,13 +1,6 @@
 import { Plus, Trash } from 'lucide-react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import {
-  Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
-} from 'ui'
+import { Button, FormControl, FormField, FormItem, FormMessage, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { SSOConfigFormSchema } from './SSOConfig'
@@ -45,15 +38,15 @@ export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfig
         <div className="grid gap-2 w-full">
           {fields.map((field, idx) => (
             <div key={field.id} className="flex gap-2 items-top">
-              <FormField_Shadcn_
+              <FormField
                 name={`domains.${idx}.value`}
                 render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex-1">
-                    <FormControl_Shadcn_>
+                  <FormItem className="flex-1">
+                    <FormControl>
                       <Input_Shadcn_ {...field} autoComplete="off" placeholder="example.com" />
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
 

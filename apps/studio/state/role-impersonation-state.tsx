@@ -125,3 +125,20 @@ export function useSubscribeToImpersonatedRole(
 export function isRoleImpersonationEnabled(impersonationRole?: ImpersonationRole) {
   return impersonationRole?.type === 'postgrest'
 }
+
+export const getImpersonatedUser = (state: RoleImpersonationState) => {
+  return state.role?.type === 'postgrest' &&
+    state.role.role === 'authenticated' &&
+    state.role.userType === 'native'
+    ? state.role.user
+    : undefined
+}
+
+export const getImpersonatedExternalAuth = (state: RoleImpersonationState) => {
+  return state.role?.type === 'postgrest' &&
+    state.role.role === 'authenticated' &&
+    state.role.userType === 'external' &&
+    state.role.externalAuth
+    ? state.role.externalAuth.sub
+    : undefined
+}

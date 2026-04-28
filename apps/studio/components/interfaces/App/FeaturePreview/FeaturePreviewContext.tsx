@@ -125,14 +125,11 @@ export const useIsJitDbAccessEnabled = () => {
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
-// [Joshen] Temporarily leaving this in, will eventually clean up this flag + old Header component completely
-export const useIsTableFilterBarEnabled = () => true
-
-export const useIsFloatingMobileToolbarEnabled = () => {
+export const useIsRLSTesterEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
+  const rlsTesterEnabled = useFlag('rlsTester')
 
-  return showFloatingMobileToolbar && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR]
+  return rlsTesterEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
 }
 
 export const useFeaturePreviewModal = () => {

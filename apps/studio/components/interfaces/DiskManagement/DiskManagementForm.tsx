@@ -13,7 +13,7 @@ import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Form_Shadcn_,
+  Form,
   Separator,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -374,7 +374,7 @@ export function DiskManagementForm() {
         <Separator />
       </ScaffoldContainer>
 
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form
           id="disk-compute-form"
           onSubmit={form.handleSubmit(onSubmit)}
@@ -561,7 +561,7 @@ export function DiskManagementForm() {
             ) : null}
           </AnimatePresence>
         </form>
-      </Form_Shadcn_>
+      </Form>
     </>
   )
 }

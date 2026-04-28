@@ -21,7 +21,7 @@ export const QueryInsightsChartTooltip = ({ active, payload }: TooltipProps<numb
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
               <circle cx="5" cy="5" r="3" fill={entry.color} />
             </svg>
-            <span className="text-foreground-lighter ml-1 flex-grow">{entry.name}</span>
+            <span className="text-foreground-lighter ml-1 grow">{entry.name}</span>
             <span className="ml-3.5">
               {typeof entry.value === 'number'
                 ? isTimeMetric(typeof entry.dataKey === 'string' ? entry.dataKey : '')

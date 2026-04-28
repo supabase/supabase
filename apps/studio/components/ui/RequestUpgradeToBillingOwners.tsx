@@ -14,9 +14,9 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   TextArea_Shadcn_,
   Tooltip,
   TooltipContent,
@@ -167,7 +167,7 @@ export const RequestUpgradeToBillingOwners = ({
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
               <DialogTitle>{titleText}</DialogTitle>
@@ -207,7 +207,7 @@ export const RequestUpgradeToBillingOwners = ({
                   )}
                 </div>
               </div>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="note"
                 render={({ field }) => (
@@ -216,7 +216,7 @@ export const RequestUpgradeToBillingOwners = ({
                     label="Add a note to your request (optional)"
                     layout="vertical"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <TextArea_Shadcn_
                         id="note"
                         {...field}
@@ -229,7 +229,7 @@ export const RequestUpgradeToBillingOwners = ({
                             : 'e.g. We need to upgrade to the Pro plan to use this feature'
                         }
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -244,7 +244,7 @@ export const RequestUpgradeToBillingOwners = ({
               </Button>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

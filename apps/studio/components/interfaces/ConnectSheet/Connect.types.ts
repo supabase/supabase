@@ -75,8 +75,6 @@ export interface FieldOption {
   description?: string
 }
 
-type FieldOptionsResolver = (state: ConnectState) => FieldOption[]
-
 interface FieldDefinition {
   id: string
   type: FieldType

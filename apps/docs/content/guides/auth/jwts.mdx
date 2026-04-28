@@ -67,7 +67,7 @@ A [digital signature](https://en.wikipedia.org/wiki/Digital_signature) using a [
 Supabase creates JWTs in these cases for you:
 
 1. When using Supabase Auth, an access token (JWT) is created for each user while they remain signed in. These are short lived, so they are continuously issued as your user interacts with Supabase APIs.
-2. As the legacy JWT-based [API keys](/docs/guides/api/api-keys) `anon` and `service_role`. These have a 10 year expiry and are signed with a shared secret, making them hard to rotate or expire. These JWTs express public access via the `anon` key, or elevated access via the `service_role` key. We strongly recommend switching to publishable and secret API keys.
+2. As the legacy JWT-based [API keys](/docs/guides/getting-started/api-keys) `anon` and `service_role`. These have a 10 year expiry and are signed with a shared secret, making them hard to rotate or expire. These JWTs express public access via the `anon` key, or elevated access via the `service_role` key. We strongly recommend switching to publishable and secret API keys.
 3. On-the-fly when using publishable or secret API keys. Each API key is transformed into a short-lived JWT that is then used to authorize access to your data. Accessing these short-lived tokens is generally not possible.
 
 In addition to creating JWTs, Supabase can also accept JWTs from other Auth servers via the [Third-Party Auth](/docs/guides/auth/third-party/overview) feature or ones you've made yourself using the legacy JWT secret or if you've imported in [JWT Signing Key](/docs/guides/auth/signing-keys).
@@ -265,4 +265,4 @@ Check the JWT verification libraries for your language on how to securely verify
 - JWT debugger: https://jwt.io/
 - [JWT Signing Keys](/docs/guides/auth/signing-keys)
 - [JWT Claims Reference](/docs/guides/auth/jwt-fields) - Complete reference for all JWT claims used by Supabase Auth
-- [API keys](/docs/guides/api/api-keys)
+- [API keys](/docs/guides/getting-started/api-keys)

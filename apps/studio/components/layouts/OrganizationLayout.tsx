@@ -8,7 +8,6 @@ import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, cn
 import { useRegisterOrgMenu } from './OrganizationLayout/useRegisterOrgMenu'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerIcon from '@/components/ui/PartnerIcon'
-import { PARTNER_TO_NAME } from '@/components/ui/PartnerManagedResource'
 import { useAwsRedirectQuery } from '@/data/integrations/aws-redirect-query'
 import { useVercelRedirectQuery } from '@/data/integrations/vercel-redirect-query'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
