@@ -42,7 +42,7 @@ export function ComponentPreview({
       return (
         <p className="text-sm text-muted-foreground">
           Component{' '}
-          <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
+          <code className="relative rounded-sm bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
             {name}
           </code>{' '}
           not found in registry.
