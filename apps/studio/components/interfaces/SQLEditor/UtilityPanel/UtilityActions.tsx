@@ -32,7 +32,7 @@ export type UtilityActionsProps = {
   executeQuery: () => void
 }
 
-const UtilityActions = ({
+export const UtilityActions = ({
   id,
   isExecuting = false,
   isDisabled = false,
@@ -211,5 +211,3 @@ const UtilityActions = ({
     </div>
   )
 }
-
-export default UtilityActions

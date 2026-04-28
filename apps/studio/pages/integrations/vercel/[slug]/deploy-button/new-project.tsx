@@ -3,7 +3,18 @@ import { useParams } from 'common'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
-import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
+import {
+  Alert,
+  Button,
+  Checkbox,
+  Input,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
@@ -65,7 +76,7 @@ const CreateProject = () => {
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
-  const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region.displayName)
+  const [dbRegion, setDbRegion] = useState<string>(PROVIDERS.AWS.default_region.displayName)
 
   const track = useTrack()
   const snapshot = useIntegrationInstallationSnapshot()
@@ -276,33 +287,38 @@ const CreateProject = () => {
       </div>
       <div className="py-2">
         <div className="mt-1">
-          <Listbox
+          <FormItemLayout
+            id="region"
+            isReactForm={false}
+            layout="vertical"
             label="Region"
-            type="select"
-            value={dbRegion}
-            onChange={(region) => setDbRegion(region)}
-            descriptionText="Select a region close to your users for the best performance."
+            description="Select a region close to your users for the best performance."
+            className="gap-[2px]"
+            size="tiny"
           >
-            {Object.keys(AWS_REGIONS).map((option: string, i) => {
-              const label = Object.values(AWS_REGIONS)[i].displayName
-              return (
-                <Listbox.Option
-                  key={option}
-                  label={label}
-                  value={label}
-                  addOnBefore={() => (
-                    <img
-                      alt="region icon"
-                      className="w-5 rounded-sm"
-                      src={`${BASE_PATH}/img/regions/${Object.values(AWS_REGIONS)[i].code}.svg`}
-                    />
-                  )}
-                >
-                  <span className="text-foreground">{label}</span>
-                </Listbox.Option>
-              )
-            })}
-          </Listbox>
+            <Select_Shadcn_ value={dbRegion} onValueChange={(region) => setDbRegion(region)}>
+              <SelectTrigger_Shadcn_ id="region">
+                <SelectValue_Shadcn_ />
+              </SelectTrigger_Shadcn_>
+              <SelectContent_Shadcn_>
+                {Object.keys(AWS_REGIONS).map((option: string, i) => {
+                  const label = Object.values(AWS_REGIONS)[i].displayName
+                  return (
+                    <SelectItem_Shadcn_ key={option} value={label}>
+                      <div className="flex gap-2">
+                        <img
+                          alt="region icon"
+                          className="w-5 rounded-sm"
+                          src={`${BASE_PATH}/img/regions/${Object.values(AWS_REGIONS)[i].code}.svg`}
+                        />
+                        <span>{label}</span>
+                      </div>
+                    </SelectItem_Shadcn_>
+                  )
+                })}
+              </SelectContent_Shadcn_>
+            </Select_Shadcn_>
+          </FormItemLayout>
         </div>
       </div>
       <div className="py-2 pb-4">

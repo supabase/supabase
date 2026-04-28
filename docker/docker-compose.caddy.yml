@@ -1,5 +1,18 @@
 services:
 
+  # By default, Kong is used as the API gateway and its ports/env are reset
+  # below so Caddy can terminate TLS in front of it.
+  #
+  # When running Envoy instead, e.g.:
+  #   docker compose -f docker-compose.yml -f docker-compose.envoy.yml \
+  #                  -f docker-compose.caddy.yml up -d
+  # comment out the `kong:` block below and uncomment the `api-gw:` block
+  # (and the matching `depends_on` entry further down) so Caddy sits in front
+  # of Envoy rather than Kong.
+
+  #api-gw:
+  #  ports: !reset []
+
   kong:
     ports: !reset []
     environment:
@@ -14,6 +27,8 @@ services:
       - "443:443"
       - "443:443/udp"
     depends_on:
+      #api-gw:
+      #  condition: service_healthy
       kong:
         condition: service_healthy
       studio:

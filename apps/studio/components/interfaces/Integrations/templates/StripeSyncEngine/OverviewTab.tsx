@@ -313,7 +313,7 @@ export const StripeSyncEngineOverviewTab = () => {
                       startTime: Date.now(),
                     })
                   })}
-                  className="overflow-auto flex-grow px-0 flex flex-col"
+                  className="overflow-auto grow px-0 flex flex-col"
                 >
                   <SheetHeader>
                     <SheetTitle>

@@ -146,7 +146,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
         </SectionContainer>
 
         <div className="py-[1.25px] bg-gradient-to-r from-background via-border to-background">
-          <div className="bg-alternative overflow-clip">
+          <div className="bg-alternative text-clip">
             <SectionContainer className="md:!pt-16 md:grid md:max-h-[500px] grid-cols-1 md:grid-cols-5 md:gap-8">
               <div
                 className="
@@ -464,7 +464,7 @@ const JobItem = ({ job }: { job: JobItemProps }) => {
       "
       target="_blank"
     >
-      <h4 className="text-base min-w-[240px] lg:min-w-[316px] flex-grow sm:truncate mr-6">
+      <h4 className="text-base min-w-[240px] lg:min-w-[316px] grow sm:truncate mr-6">
         {job.title}
       </h4>
       <div className="flex justify-between justify-[normal] pt-2 md:pt-0 lg:w-1/3 items-center">

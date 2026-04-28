@@ -545,7 +545,7 @@ export const JWTSettings = () => {
       >
         <ul className="space-y-4 text-sm">
           <li className="flex gap-2 bg border rounded-md p-4">
-            <Lightbulb size={24} className="flex-shrink-0 text-brand" />
+            <Lightbulb size={24} className="shrink-0 text-brand" />
 
             <div className="flex flex-col gap-2">
               <p>Use new JWT Signing Keys and API Keys instead</p>
@@ -560,7 +560,7 @@ export const JWTSettings = () => {
             </div>
           </li>
           <li className="flex gap-2 px-4">
-            <CloudOff size={24} className="text-foreground-light flex-shrink-0" />
+            <CloudOff size={24} className="text-foreground-light shrink-0" />
 
             <div className="flex flex-col gap-2">
               <p>Your application will experience significant downtime</p>
@@ -585,7 +585,7 @@ export const JWTSettings = () => {
           </li>
 
           <li className="flex gap-2 px-4">
-            <Power size={24} className="text-foreground-light flex-shrink-0" />
+            <Power size={24} className="text-foreground-light shrink-0" />
             <div className="flex flex-col gap-2">
               <p>Your project and database will be restarted</p>
               <p className="text-foreground-light">
@@ -597,7 +597,7 @@ export const JWTSettings = () => {
             </div>
           </li>
           <li className="flex gap-2 px-4">
-            <Hourglass size={24} className="text-foreground-light flex-shrink-0" />
+            <Hourglass size={24} className="text-foreground-light shrink-0" />
             <div className="flex flex-col gap-2">
               <p>20-minute cooldown period</p>
               <p className="text-foreground-light">
@@ -607,7 +607,7 @@ export const JWTSettings = () => {
             </div>
           </li>
           <li className="flex gap-2 px-4">
-            <TriangleAlert size={24} className="text-foreground-light flex-shrink-0" />
+            <TriangleAlert size={24} className="text-foreground-light shrink-0" />
             <div className="flex flex-col gap-2">
               <p>Irreversible change! This cannot be undone!</p>
               <p className="text-foreground-light">

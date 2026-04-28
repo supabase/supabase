@@ -317,7 +317,7 @@ export default function TimezoneSelector({ value, onChange }: TimezoneSelectorPr
                         )}
                       >
                         <span className="truncate">{zone.label}</span>
-                        <span className="text-xs text-foreground-lighter flex-shrink-0 ml-2">
+                        <span className="text-xs text-foreground-lighter shrink-0 ml-2">
                           {zone.offset}
                         </span>
                       </button>

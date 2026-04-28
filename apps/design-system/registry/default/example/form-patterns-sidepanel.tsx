@@ -139,7 +139,7 @@ export default function FormPatternsSidePanel() {
             <form
               id={formId}
               onSubmit={form.handleSubmit(onSubmit)}
-              className="overflow-auto flex-grow px-0"
+              className="overflow-auto grow px-0"
             >
               {/* Text Input */}
               <SheetSection>

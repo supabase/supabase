@@ -1,18 +1,18 @@
-'use client'
-
 import { ArrowDownIcon } from '@heroicons/react/outline'
+import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
-import PricingPlans from '~/components/Pricing/PricingPlans'
-import { useOrganizations } from '~/data/organizations'
-import { hasConsented, posthogClient } from 'common'
+import PricingAddons from '~/components/Pricing/PricingAddons'
+import PricingComputeSection from '~/components/Pricing/PricingComputeSection'
+import PricingDiskSection from '~/components/Pricing/PricingDiskSection'
+import PricingFAQs from '~/components/Pricing/PricingFAQs'
 import { ArrowUpRight } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
-const EXPERIMENT_ID = 'pricingPageExperiment' as const
+import HashAnchorScroll from './HashAnchorScroll'
+import PricingComparisonSection from './PricingComparisonSection'
+import PricingPlansSection from './PricingPlansSection'
+
 export type PricingPageExperimentVariant =
   | 'control'
   // GROWTH-694: flexibility/hourly billing
@@ -23,77 +23,10 @@ export type PricingPageExperimentVariant =
   | 'multi_project' // "first project included, additional from $10/mo" on Pro card
   | 'estimate_cta' // "estimate your cost" link on Pro card scrolling to calculator
 
-const PricingComputeSection = dynamic(() => import('~/components/Pricing/PricingComputeSection'))
-const PricingAddons = dynamic(() => import('~/components/Pricing/PricingAddons'))
-const PricingComparisonTable = dynamic(() => import('~/components/Pricing/PricingComparisonTable'))
-const PricingFAQs = dynamic(() => import('~/components/Pricing/PricingFAQs'))
-const CTABanner = dynamic(() => import('~/components/CTABanner'))
-const PricingDiskSection = dynamic(() => import('~/components/Pricing/PricingDiskSection'))
-
 export default function PricingContent() {
-  const pathname = usePathname()
-
-  // Ability to scroll into pricing sections like storage
-  useEffect(() => {
-    /**
-     * As we render a mobile and a desktop row for each item and just display based on screen size, we cannot navigate by simple id hash
-     * on both mobile and desktop. To handle both cases, we actually need to check screen size
-     */
-
-    const hash = window.location.hash.slice(1)
-    if (!hash) return
-
-    let device = 'desktop'
-    if (window.matchMedia('screen and (max-width: 1024px)').matches) {
-      device = 'mobile'
-    }
-
-    const element = document.querySelector(`#${hash}-${device}`)
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
-    }
-  }, [pathname])
-
-  const { isLoading, organizations } = useOrganizations()
-  const hasExistingOrganizations = !isLoading && organizations.length > 0
-
-  // Pricing value/flexibility A/B experiment
-  // Uses client-side PostHog directly — server-side evaluation lacks full person context for www pages.
-  // DevToolbar overrides (x-ph-flag-overrides cookie) are respected in local dev via posthogClient.getFeatureFlag.
-  const [flagValue, setFlagValue] = useState<PricingPageExperimentVariant | false | undefined>(
-    () =>
-      posthogClient.getFeatureFlag(EXPERIMENT_ID) as
-        | PricingPageExperimentVariant
-        | false
-        | undefined
-  )
-
-  useEffect(() => {
-    return posthogClient.onFeatureFlags(() => {
-      const value = posthogClient.getFeatureFlag(EXPERIMENT_ID)
-      setFlagValue(value as PricingPageExperimentVariant | false | undefined)
-    })
-  }, [])
-
-  const validVariants: PricingPageExperimentVariant[] = [
-    'control',
-    'flexibility',
-    'flexibility_card',
-    'hourly_rate',
-    'multi_project',
-    'estimate_cta',
-  ]
-  const isInExperiment = validVariants.includes(flagValue as PricingPageExperimentVariant)
-  const showFlexibilitySection = flagValue === 'flexibility'
-
-  useEffect(() => {
-    if (!isInExperiment) return
-
-    posthogClient.captureExperimentExposure(EXPERIMENT_ID, { variant: flagValue }, hasConsented())
-  }, [isInExperiment, flagValue])
-
   return (
     <DefaultLayout>
+      <HashAnchorScroll />
       <div className="relative z-10 pt-8 pb-4 xl:py-16">
         <div className="mx-auto max-w-7xl px-8 text-center sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
@@ -108,22 +41,7 @@ export default function PricingContent() {
         </div>
       </div>
 
-      <PricingPlans
-        organizations={organizations}
-        hasExistingOrganizations={hasExistingOrganizations}
-        experimentVariant={isInExperiment ? (flagValue as PricingPageExperimentVariant) : undefined}
-      />
-
-      {showFlexibilitySection && (
-        <div className="mx-auto max-w-xl px-8 mt-10 xl:mt-16 text-center">
-          <p className="text-foreground text-sm">
-            Need more power for a launch? Scale up instantly.{' '}
-            <span className="text-foreground-light">
-              Scale back down after — you only pay for the hours you use.
-            </span>
-          </p>
-        </div>
-      )}
+      <PricingPlansSection />
 
       <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
         <div className="flex justify-center gap-2">
@@ -179,10 +97,7 @@ export default function PricingContent() {
         <PricingAddons />
       </div>
 
-      <PricingComparisonTable
-        organizations={organizations}
-        hasExistingOrganizations={hasExistingOrganizations}
-      />
+      <PricingComparisonSection />
 
       <div id="faq" className="border-t">
         <PricingFAQs />

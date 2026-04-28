@@ -255,7 +255,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
           </SheetDescription>
         </SheetHeader>
 
-        <SheetSection className="p-0 flex-grow">
+        <SheetSection className="p-0 grow">
           {!isExposed ? (
             <Admonition
               type="default"

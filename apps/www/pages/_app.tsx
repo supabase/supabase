@@ -1,6 +1,7 @@
 import '@code-hike/mdx/styles.css'
 import 'config/code-hike.css'
 import '../styles/index.css'
+import '../pages/launch-week/launchWeek.css'
 
 import {
   AuthProvider,
@@ -26,6 +27,7 @@ import { useConsentToast } from 'ui-patterns/consent'
 
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 import { useWwwCommandMenuTelemetry } from '../hooks/useWwwCommandMenuTelemetry'
+import { MD_PAGES } from '@/app/api-v2/md/content.generated'
 import { Toaster } from '@/app/toaster'
 import { WwwCommandMenu } from '@/components/CommandMenu'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '@/lib/constants'
@@ -53,10 +55,20 @@ export default function App({ Component, pageProps }: AppProps) {
     themeColor = 'FFFFFF'
   }
 
+  // Advertise the .md version for AI agents on pages that have one.
+  const cleanPath = (router.asPath ?? '/').split('?')[0].split('#')[0].replace(/\/$/, '') || '/'
+  const mdSlug = cleanPath === '/' ? 'homepage' : cleanPath.slice(1)
+  const mdAlternateHref = MD_PAGES.has(mdSlug)
+    ? cleanPath === '/'
+      ? '/homepage.md'
+      : `${cleanPath}.md`
+    : null
+
   return (
     <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        {mdAlternateHref && <link rel="alternate" type="text/markdown" href={mdAlternateHref} />}
       </Head>
       <MetaFaviconsPagesRouter
         applicationName={applicationName}

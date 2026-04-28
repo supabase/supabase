@@ -1,12 +1,81 @@
 ---
 id: 'securing-your-api'
 title: 'Securing your API'
-description: 'Securing your Data API with Postgres Row Level Security.'
+description: 'Secure your Data API with explicit grants and Postgres Row Level Security.'
 ---
 
-The data APIs are designed to work with Postgres Row Level Security (RLS). If you use [Supabase Auth](/docs/guides/auth), you can restrict data based on the logged-in user.
+The Data API is designed to work with Postgres' built-in access controls. Two layers work together:
 
-To control access to your data, you can use [Policies](/docs/guides/auth#policies).
+1. **Grants** determine which Postgres roles (`anon`, `authenticated`, `service_role`) can reach a given table, view, or function over the Data API.
+2. **Row Level Security (RLS) policies** then determine which rows those roles can read or modify from the tables exposed in step 1.
+3. **Both together** grant control _whether_ a role can touch an object. RLS controls _what_ rows they see.
+
+## Grant access explicitly
+
+A table isn't reachable through the Data API unless you have granted a role privileges on it. Grant the minimum privileges each role needs. For example:
+
+```sql
+-- Read-only access for anonymous clients
+grant select on table public.your_table to anon;
+
+-- Full access for signed-in users (still subject to RLS)
+grant select, insert, update, delete on table public.your_table to authenticated;
+
+-- Full access for server-side code using the service role
+grant select, insert, update, delete on table public.your_table to service_role;
+
+-- For functions, grant EXECUTE to the roles that should call them
+grant execute on function public.your_function() to anon, authenticated;
+```
+
+If a required grant is missing, PostgREST returns a `42501` error with a hint that names the exact `GRANT` statement you need:
+
+```json
+{
+  "code": "42501",
+  "message": "permission denied for table your_table",
+  "hint": "Grant the required privileges to the current role with: GRANT SELECT ON public.your_table TO anon;"
+}
+```
+
+See [the Database API 42501 errors troubleshooting guide](/docs/guides/troubleshooting/database-api-42501-errors) for the full troubleshooting flow.
+
+<Admonition type="tip">
+
+Bundle grants with your RLS setup in the same migration. They belong together: `grant` controls role access, `enable row level security` and policies control row access.
+
+</Admonition>
+
+## Default privileges for new tables and functions
+
+By default on existing projects, tables and functions you create in `public` are automatically granted `SELECT`, `INSERT`, `UPDATE`, `DELETE` (or `EXECUTE` for functions) to `anon`, `authenticated`, and `service_role`. That means a new table is reachable through the Data API the moment it lands, even if you forgot to enable RLS or did not intend to expose it.
+
+Supabase is moving the platform default to **revoke** these automatic grants, so that exposure becomes opt-in:
+{/* TODO: link to changelog */}
+To opt an existing project in today, open the [SQL Editor](/dashboard/project/_/sql/new) and run:
+
+```sql
+alter default privileges for role postgres in schema public
+  revoke select, insert, update, delete on tables from anon, authenticated, service_role;
+
+alter default privileges for role postgres in schema public
+  revoke execute on functions from anon, authenticated, service_role;
+
+alter default privileges for role postgres in schema public
+  revoke usage, select on sequences from anon, authenticated, service_role;
+
+alter default privileges for role postgres in schema public
+  revoke execute on functions from public;
+```
+
+## Disable the Data API
+
+If your app never uses Supabase client libraries, REST, or GraphQL data endpoints, turn the Data API off:
+
+1. Open the [Data API integration overview](/dashboard/project/_/integrations/data_api/overview) in the Dashboard.
+2. Turn **Enable Data API** off.
+
+With the Data API disabled, none of the auto-generated REST endpoints respond, regardless of grants or RLS.
 
 ## Add RLS policies
 
@@ -39,7 +108,7 @@ Any table created through the Supabase Dashboard will have RLS enabled by defaul
 
 ```sql
 alter table
-  todos enable row level security;
+  your_table enable row level security;
 ```
 
 </TabPanel>
@@ -49,7 +118,7 @@ With RLS enabled, you can create Policies that allow or disallow users to access
 
 <Admonition type="danger">
 
-Any exposed table **without RLS enabled** can be accessed by roles with matching Data API grants (for example, `anon`). Always make sure RLS is enabled, or that you've got other controls in place to avoid unauthorized access to your project's data.
+Any granted table **without RLS enabled** can be accessed by roles with matching Data API grants (for example, `anon`). Always make sure RLS is enabled, or that you've got other controls in place to avoid unauthorized access to your project's data.
 
 </Admonition>
 
@@ -255,14 +324,14 @@ To clear old entries in the `private.rate_limits` table, set up a [pg_cron](/doc
 
 <TabPanel id="use-additional-api-key" label="Use additional API keys">
 
-Some applications can benefit from using additional API keys managed by the application **in addition to the [Supabase API keys](/docs/guides/api/api-keys)**. This is commonly necessary in cases like:
+Some applications can benefit from using additional API keys managed by the application **in addition to the [Supabase API keys](/docs/guides/getting-started/api-keys)**. This is commonly necessary in cases like:
 
 - Applications that use the Data API without RLS policies.
 - Applications that do not use [Supabase Auth](/auth) or any other authentication system and rely on the `anon` role.
 
 <Admonition type="tip">
 
-Using the `apikey` header with the [Supabase API keys](/docs/guides/api/api-keys) is mandatory and not configurable. If you use additional API keys, you have to distribute both the `publishable` API key and your application's custom API key.
+Using the `apikey` header with the [Supabase API keys](/docs/guides/getting-started/api-keys) is mandatory and not configurable. If you use additional API keys, you have to distribute both the `publishable` API key and your application's custom API key.
 
 </Admonition>
 

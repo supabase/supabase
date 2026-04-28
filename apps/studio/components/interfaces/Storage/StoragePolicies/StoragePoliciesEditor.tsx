@@ -118,7 +118,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
                 className={cn(
                   'text-xs font-mono leading-[1.1] px-2 py-1 rounded-full border font-normal whitespace-nowrap transition-colors duration-200',
                   allowedClientLibraryMethods.includes(method)
-                    ? 'bg-brand bg-opacity-10 text-brand-600 border-brand-500'
+                    ? 'bg-brand/10 text-brand-600 border-brand-500'
                     : 'bg-surface-75 text-foreground-lighter border-muted'
                 )}
               >

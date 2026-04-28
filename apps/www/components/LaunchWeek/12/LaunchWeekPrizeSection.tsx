@@ -1,8 +1,9 @@
+import Image from 'next/image'
 import React from 'react'
 import { cn } from 'ui'
+
 import LabelBadge from './LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
-import Image from 'next/image'
 import PrizeActions from './Releases/PrizeActions'
 
 export default function LaunchWeekPrizeSection({ className }: { className?: string }) {
@@ -55,10 +56,10 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
           />
           <div className="w-full min-h-[400px] flex flex-col gap-4 items-stretch">
             <LaunchWeekPrizeCard
-              className="relative flex-grow"
+              className="relative grow"
               content={
                 <div className="flex flex-col h-full justify-end">
-                  <div className="relative flex-grow w-full">
+                  <div className="relative grow w-full">
                     <Image
                       src="/images/launchweek/12/world-tour-tshirt.png"
                       alt="Supabase Launch Week 12 World Tour T-Shirt"
