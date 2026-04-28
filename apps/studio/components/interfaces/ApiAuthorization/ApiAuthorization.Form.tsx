@@ -1,17 +1,20 @@
 import dayjs from 'dayjs'
-import { Building2, Check, ChevronDown, ChevronUp } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   Card,
   CardContent,
-  cn,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Select_Shadcn_,
 } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
@@ -21,7 +24,6 @@ import {
   RequesterLogo,
 } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
 import {
-  InterstitialExpandableContent,
   InterstitialLayout,
   InterstitialMetadataPill,
   LogoPair,
@@ -231,53 +233,6 @@ function OrganizationSelector({
   organizations,
   disabled = false,
 }: OrganizationSelectorProps): ReactNode {
-  const [showAll, setShowAll] = useState(false)
-  const visibleOrganizations = organizations.slice(0, 3)
-  const additionalOrganizations = organizations.slice(3)
-  const hiddenCount = additionalOrganizations.length
-
-  const renderOrganization = (organization: Organization, selectedOrgSlug: string | undefined) => {
-    const isSelected = selectedOrgSlug === organization.slug
-
-    return (
-      <button
-        key={organization.slug}
-        type="button"
-        role="radio"
-        aria-checked={isSelected}
-        disabled={disabled}
-        onClick={() => {
-          form.setValue('selectedOrgSlug', organization.slug, { shouldValidate: true })
-          form.trigger('selectedOrgSlug')
-        }}
-        className={cn(
-          'flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition-colors',
-          'disabled:cursor-not-allowed disabled:opacity-70',
-          isSelected
-            ? 'border-brand bg-brand-200 text-foreground'
-            : 'border-muted bg-surface-100 hover:border-strong'
-        )}
-      >
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-          <Building2 className="size-5 text-foreground-lighter" strokeWidth={1.5} />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-medium text-foreground">
-            {organization.name}
-          </span>
-          <span className="block truncate text-sm text-foreground-lighter">
-            {organization.plan?.name ?? 'Supabase organization'}
-          </span>
-        </span>
-        {isSelected && (
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand text-background">
-            <Check className="size-4" strokeWidth={2} />
-          </span>
-        )}
-      </button>
-    )
-  }
-
   return (
     <Form {...form}>
       <FormField
@@ -285,48 +240,45 @@ function OrganizationSelector({
         name="selectedOrgSlug"
         render={({ field, fieldState }) => (
           <FormItem className="space-y-2">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
+                Organization
+              </p>
+              {requestedOrganizationSlug && (
+                <p className="text-xs text-foreground-lighter">
+                  Pre-selected by {requester.name}
+                </p>
+              )}
+            </div>
             <FormControl>
-              <section className="space-y-2" aria-label="Organization">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
-                    Organization
-                  </p>
-                  {requestedOrganizationSlug && (
-                    <p className="text-xs text-foreground-lighter">
-                      Pre-selected by {requester.name}
-                    </p>
-                  )}
-                </div>
-                <div
-                  role="radiogroup"
+              <Select_Shadcn_
+                value={field.value ?? ''}
+                disabled={disabled}
+                onValueChange={(value) => {
+                  field.onChange(value)
+                  form.trigger('selectedOrgSlug')
+                }}
+              >
+                <SelectTrigger_Shadcn_
+                  size="small"
                   aria-label="Organization to grant API access to"
                   aria-invalid={fieldState.invalid}
                   aria-describedby={fieldState.error ? 'organization-selection-error' : undefined}
-                  className="space-y-2"
                 >
-                  {visibleOrganizations.map((organization) =>
-                    renderOrganization(organization, field.value)
-                  )}
-                  {hiddenCount > 0 && (
-                    <Button
-                      type="text"
-                      size="tiny"
-                      block
-                      iconRight={showAll ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                      onClick={() => setShowAll((value) => !value)}
+                  <SelectValue_Shadcn_ placeholder="Select an organization" />
+                </SelectTrigger_Shadcn_>
+                <SelectContent_Shadcn_>
+                  {organizations.map((organization) => (
+                    <SelectItem_Shadcn_
+                      key={organization.slug}
+                      value={organization.slug}
+                      className="text-xs"
                     >
-                      {showAll ? 'Show fewer' : `Show ${hiddenCount} more`}
-                    </Button>
-                  )}
-                  <InterstitialExpandableContent show={showAll}>
-                    <div className="space-y-2">
-                      {additionalOrganizations.map((organization) =>
-                        renderOrganization(organization, field.value)
-                      )}
-                    </div>
-                  </InterstitialExpandableContent>
-                </div>
-              </section>
+                      {organization.name}
+                    </SelectItem_Shadcn_>
+                  ))}
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
             </FormControl>
             <FormMessage id="organization-selection-error" className="text-xs" />
           </FormItem>

@@ -229,7 +229,9 @@ describe('ApiAuthorizationScreen', () => {
           mockBothEndpoints(createMockAuthResponse({ name: 'My OAuth App' }))
           renderScreen()
           await screen.findByText('Authorize API access for My OAuth App')
-          expect(screen.getByRole('radiogroup')).toBeInTheDocument()
+          expect(
+            screen.getByRole('combobox', { name: 'Organization to grant API access to' })
+          ).toBeInTheDocument()
           expect(screen.getByRole('button', { name: /Authorize My OAuth App/ })).toBeInTheDocument()
           expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
         })
@@ -237,15 +239,15 @@ describe('ApiAuthorizationScreen', () => {
         test('auto-selects the only organization when no organization_slug is provided', async () => {
           mockBothEndpoints()
           renderScreen()
-          const radio = await screen.findByRole('radio', { name: /My Org/ })
-          expect(radio).toHaveAttribute('aria-checked', 'true')
+          await screen.findByRole('combobox', { name: 'Organization to grant API access to' })
+          expect(screen.getByText('My Org')).toBeInTheDocument()
         })
 
         test('pre-selects organization when organization_slug matches a user organization', async () => {
           mockBothEndpoints(createMockAuthResponse(), [DEFAULT_ORG, SECOND_ORG])
           renderScreen({ organization_slug: 'second-org' })
-          const secondOrg = await screen.findByRole('radio', { name: /Second Org/ })
-          expect(secondOrg).toHaveAttribute('aria-checked', 'true')
+          await screen.findByRole('combobox', { name: 'Organization to grant API access to' })
+          expect(screen.getByText('Second Org')).toBeInTheDocument()
           expect(screen.getByText('Pre-selected by Test App')).toBeInTheDocument()
         })
       })
@@ -281,7 +283,9 @@ describe('ApiAuthorizationScreen', () => {
           expect(
             screen.queryByRole('button', { name: /Authorize Test App/ })
           ).not.toBeInTheDocument()
-          expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument()
+          expect(
+            screen.queryByRole('combobox', { name: 'Organization to grant API access to' })
+          ).not.toBeInTheDocument()
         })
 
         test('does not show expiration warning when request has not expired', async () => {
@@ -355,17 +359,17 @@ describe('ApiAuthorizationScreen', () => {
         })
       })
 
-      describe('mock organisation list', () => {
-        test('shows expandable additional organizations in mock mode', async () => {
+      describe('mock organisation dropdown', () => {
+        test('shows all mock organizations in the dropdown', async () => {
           const user = userEvent.setup()
           renderScreen({ mock: 'ready' })
 
-          await screen.findByRole('radio', { name: /Toolshed/ })
-          expect(screen.getByRole('button', { name: 'Show 1 more' })).toBeInTheDocument()
+          const selector = await screen.findByRole('combobox', {
+            name: 'Organization to grant API access to',
+          })
+          await user.click(selector)
 
-          await user.click(screen.getByRole('button', { name: 'Show 1 more' }))
-
-          expect(await screen.findByRole('radio', { name: /Northwind Labs/ })).toBeInTheDocument()
+          expect(await screen.findByRole('option', { name: /Northwind Labs/ })).toBeInTheDocument()
         })
       })
     })

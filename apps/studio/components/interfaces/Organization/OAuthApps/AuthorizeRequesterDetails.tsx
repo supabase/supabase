@@ -1,7 +1,7 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import { Check, ChevronDown, ChevronUp, Eye, Info, Pencil } from 'lucide-react'
+import { Check, ChevronDown, ChevronUp, Info } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Button, Card, CardContent, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, Button, Card, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { PERMISSIONS_DESCRIPTIONS } from './OAuthApps.constants'
 import { InterstitialExpandableContent, LogoBox } from '@/components/layouts/InterstitialLayout'
@@ -245,15 +245,9 @@ function PermissionSummaryRow({
           {permissions.map(({ label }) => label).join(', ')}
         </span>
       </p>
-      <span
-        className={cn(
-          'inline-flex shrink-0 items-center gap-1',
-          getPermissionLevelClassName(level)
-        )}
-      >
-        <PermissionLevelIcon level={level} />
+      <Badge variant={getPermissionLevelBadgeVariant(level)} className="shrink-0">
         {formatPermissionLevel(level)}
-      </span>
+      </Badge>
     </div>
   )
 }
@@ -279,7 +273,7 @@ function PermissionDetails({
 
           return (
             <div key={group.label} className="border-b border-muted last:border-b-0 px-4 py-3">
-              <p className="mb-2 text-xs font-medium uppercase tracking-wider text-foreground-light">
+              <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-foreground-lighter">
                 {group.label}
               </p>
               <div className="divide-y divide-muted">
@@ -307,15 +301,9 @@ function PermissionDetails({
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    <span
-                      className={cn(
-                        'inline-flex items-center gap-1 text-sm',
-                        getPermissionLevelClassName(permission.level)
-                      )}
-                    >
-                      <PermissionLevelIcon level={permission.level} />
+                    <Badge variant={getPermissionLevelBadgeVariant(permission.level)}>
                       {formatPermissionLevel(permission.level)}
-                    </span>
+                    </Badge>
                   </div>
                 ))}
               </div>
@@ -347,14 +335,6 @@ function getRequestedPermissions(scopes: OAuthScope[]): RequestedPermission[] {
   )
 }
 
-function PermissionLevelIcon({ level, className }: { level: PermissionLevel; className?: string }) {
-  if (level === 'read') {
-    return <Eye className={cn('size-4', className)} strokeWidth={1.5} />
-  }
-
-  return <Pencil className={cn('size-4', className)} strokeWidth={1.5} />
-}
-
 function formatPermissionLevel(level: PermissionLevel) {
   if (level === 'read') return 'Read'
   if (level === 'write') return 'Write'
@@ -365,6 +345,6 @@ function formatPermissionDescription(description: string) {
   return description.charAt(0).toUpperCase() + description.slice(1)
 }
 
-function getPermissionLevelClassName(level: PermissionLevel) {
-  return level === 'read' ? 'text-foreground-lighter' : 'text-warning'
+function getPermissionLevelBadgeVariant(level: PermissionLevel) {
+  return level === 'read' ? 'default' : 'warning'
 }
