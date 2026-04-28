@@ -129,7 +129,7 @@ export const GraphqlExposureCallout = ({ projectRef }: { projectRef: string }) =
         <p>
           This check applies because this table is exposed to GraphQL. If this projects doesn't use
           GraphQL, you can{' '}
-          <InlineLink href={`/project/${projectRef}/integrations/graphiql`}>
+          <InlineLink href={`/project/${projectRef}/database/extensions`}>
             disable it from the GraphQL integration page
           </InlineLink>
           .
