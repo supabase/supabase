@@ -667,7 +667,7 @@ export const AnalyticsBucketFields = ({
                   {s3AccessKeyId === CREATE_NEW_KEY && (
                     <Admonition
                       type="default"
-                      description="A new set of S3 access keys will be created"
+                      description="A new set of S3 access keys will be created."
                     />
                   )}
                 </div>
