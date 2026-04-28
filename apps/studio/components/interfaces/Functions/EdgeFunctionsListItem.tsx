@@ -26,8 +26,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
   const { ref } = useParams()
   const [isCopied, setIsCopied] = useState(false)
 
-  const showEdgeFunctionsRequestMetrics = useFlag('edgeFunctionsRequestMetrics') === true
-  const showLastHourStats = IS_PLATFORM && showEdgeFunctionsRequestMetrics
+  const showLastHourStats = useFlag('edgeFunctionsRequestMetrics')
 
   const { data: endpoint } = useProjectApiUrl({ projectRef: ref })
   const functionUrl = `${endpoint}/functions/v1/${item.slug}`

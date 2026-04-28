@@ -41,8 +41,7 @@ import type { NextPageWithLayout } from '@/types'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const showEdgeFunctionsRequestMetrics = useFlag('edgeFunctionsRequestMetrics') === true
-  const showLastHourStats = IS_PLATFORM && showEdgeFunctionsRequestMetrics
+  const showLastHourStats = useFlag('edgeFunctionsRequestMetrics')
 
   const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
   const [sort, setSortQueryParam] = useQueryState(
