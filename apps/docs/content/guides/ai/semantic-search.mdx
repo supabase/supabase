@@ -152,7 +152,7 @@ In this scenario, you'll likely use a Postgres client library to establish a dir
 
 ### Filtering vector search by metadata
 
-In real applications you usually want to combine the similarity search with a filter on another column, for example only matching documents in a given category, owned by a specific user, or carrying matching metadata in a `jsonb` column. The recommended pattern is to push the filter into the SQL function so the planner can combine it with the vector predicate, rather than chaining `.eq()` after `rpc()`, which filters rows already returned to the client.
+In real applications you usually want to combine the similarity search with a filter on another column, for example only matching documents in a given category, owned by a specific user, or carrying matching metadata in a `jsonb` column. The recommended pattern is to push the filter into the SQL function so the planner can combine it with the vector predicate. Chaining `.eq()` after `rpc()` is applied by PostgREST as an outer filter on the function's result, _after_ the function has already executed its similarity ranking and `limit` — so the vector planner can't use it, and selective filters can leave you with fewer than `match_count` rows.
 
 Assuming you've added a `category text` column to `documents`, you can extend the cosine variant of `match_documents` with a typed filter parameter:
 
