@@ -127,7 +127,7 @@ export const GraphqlExposureCallout = ({ projectRef }: { projectRef: string }) =
       title="GraphQL is enabled on this project"
       description={
         <p>
-          This check applies because this table is exposed to GraphQL, if this projects doesn't use
+          This check applies because this table is exposed to GraphQL. If this projects doesn't use
           GraphQL, you can{' '}
           <InlineLink href={`/project/${projectRef}/integrations/graphiql`}>
             disable it from the GraphQL integration page
