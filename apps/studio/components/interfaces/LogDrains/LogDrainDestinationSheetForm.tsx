@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import Link from 'next/link'
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -340,8 +340,12 @@ export function LogDrainDestinationSheetForm({
   // out of it, therefore for an ease of use now, we bail to `any` until the better time come.
   const defaultConfig = (defaultValues?.config || {}) as any
   const defaultType = defaultValues?.type || 'webhook'
-  const defaultHeaderEntries = headerRecordToRows(
-    mode === 'create' ? getDefaultHeadersByType(defaultType) : defaultConfig?.headers || {}
+  const defaultHeaderEntries = useMemo(
+    () =>
+      headerRecordToRows(
+        mode === 'create' ? getDefaultHeadersByType(defaultType) : defaultConfig?.headers || {}
+      ),
+    [mode, defaultType, defaultConfig]
   )
 
   const sentryEnabled = useFlag('SentryLogDrain')
@@ -358,9 +362,8 @@ export function LogDrainDestinationSheetForm({
 
   const track = useTrack()
 
-  const form = useForm<LogDrainDestinationFormValues>({
-    resolver: zodResolver(formSchema),
-    values: {
+  const formValues = useMemo(
+    () => ({
       name: defaultValues?.name || '',
       description: defaultValues?.description || '',
       type: defaultType,
@@ -383,14 +386,20 @@ export function LogDrainDestinationSheetForm({
       endpoint: defaultConfig?.endpoint || '',
       protocol: defaultConfig?.protocol || 'http/protobuf',
       host: defaultConfig?.host || '',
-      port: defaultConfig?.port ?? ('' as unknown as number),
+      port: (defaultConfig?.port ?? '') as number,
       tls: defaultConfig?.tls ?? false,
       structured_data: defaultConfig?.structured_data || '',
       cipher_key: defaultConfig?.cipher_key || '',
       ca_cert: defaultConfig?.ca_cert || '',
       client_cert: defaultConfig?.client_cert || '',
       client_key: defaultConfig?.client_key || '',
-    },
+    }),
+    [defaultValues, defaultType, defaultConfig, defaultHeaderEntries, mode]
+  )
+
+  const form = useForm<LogDrainDestinationFormValues>({
+    resolver: zodResolver(formSchema),
+    values: formValues,
   })
 
   const type = form.watch('type')
@@ -405,9 +414,7 @@ export function LogDrainDestinationSheetForm({
   useEffect(() => {
     if (!open || mode !== 'create') return
 
-    form.setValue('headerEntries', headerRecordToRows(getDefaultHeadersByType(type)), {
-      shouldValidate: true,
-    })
+    form.setValue('headerEntries', headerRecordToRows(getDefaultHeadersByType(type)))
   }, [form, mode, open, type])
 
   return (
