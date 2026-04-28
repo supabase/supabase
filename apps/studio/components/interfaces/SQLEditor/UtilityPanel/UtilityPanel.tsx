@@ -189,7 +189,7 @@ export const UtilityPanel = ({
         />
       </TabsList_Shadcn_>
 
-      <TabsContent_Shadcn_ asChild value="results" className="mt-0 flex-grow">
+      <TabsContent_Shadcn_ asChild value="results" className="mt-0 grow">
         <UtilityTabResults
           id={id}
           isExecuting={isExecuting}
@@ -200,11 +200,11 @@ export const UtilityPanel = ({
         />
       </TabsContent_Shadcn_>
 
-      <TabsContent_Shadcn_ asChild value="explain" className="mt-0 flex-grow">
+      <TabsContent_Shadcn_ asChild value="explain" className="mt-0 grow">
         <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
       </TabsContent_Shadcn_>
 
-      <TabsContent_Shadcn_ asChild value="chart" className="mt-0 flex-grow">
+      <TabsContent_Shadcn_ asChild value="chart" className="mt-0 grow">
         <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />
       </TabsContent_Shadcn_>
     </Tabs_Shadcn_>

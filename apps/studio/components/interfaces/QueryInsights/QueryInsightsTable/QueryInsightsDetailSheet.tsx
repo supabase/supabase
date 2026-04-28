@@ -96,7 +96,7 @@ export const QueryInsightsDetailSheet = ({
               )}
             </TabsList_Shadcn_>
           </div>
-          <TabsContent_Shadcn_ value="details" className="mt-0 flex-grow min-h-0 overflow-y-auto">
+          <TabsContent_Shadcn_ value="details" className="mt-0 grow min-h-0 overflow-y-auto">
             {activeSheetRow && (
               <QueryDetail
                 selectedRow={activeSheetRow}
@@ -105,12 +105,12 @@ export const QueryInsightsDetailSheet = ({
               />
             )}
           </TabsContent_Shadcn_>
-          <TabsContent_Shadcn_ value="indexes" className="mt-0 flex-grow min-h-0 overflow-y-auto">
+          <TabsContent_Shadcn_ value="indexes" className="mt-0 grow min-h-0 overflow-y-auto">
             {activeSheetRow && <QueryIndexes selectedRow={activeSheetRow} />}
           </TabsContent_Shadcn_>
           <TabsContent_Shadcn_
             value="explain"
-            className="mt-0 flex-grow min-h-0 flex flex-col overflow-hidden"
+            className="mt-0 grow min-h-0 flex flex-col overflow-hidden"
           >
             {explainLoadingQuery ? (
               <div className="px-6 py-4 flex items-center gap-2 text-sm text-foreground-light">
@@ -118,7 +118,7 @@ export const QueryInsightsDetailSheet = ({
               </div>
             ) : activeSheetRow && explainResults[activeSheetRow.query]?.length > 0 ? (
               <>
-                <div className="flex items-center justify-between px-5 py-2 border-b flex-shrink-0">
+                <div className="flex items-center justify-between px-5 py-2 border-b shrink-0">
                   <p className="text-xs text-foreground-lighter">EXPLAIN ANALYZE output</p>
                   <Button
                     type="default"

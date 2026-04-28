@@ -84,7 +84,7 @@ export const DefaultLayout = ({
             <div className="flex flex-col h-screen w-screen">
               {/* Top Banner */}
               <AppBannerWrapper />
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 {isMobile && (
                   <MobileNavigationBar
                     hideMobileMenu={hideMobileMenu}

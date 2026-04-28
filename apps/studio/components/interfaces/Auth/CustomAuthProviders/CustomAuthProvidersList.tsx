@@ -78,7 +78,7 @@ const NewProviderButton = ({
       disabled={!canCreateProvider}
       icon={<Plus />}
       onClick={() => setShowCreateSheet(true)}
-      className="flex-grow"
+      className="grow"
     >
       New Provider
     </Button>

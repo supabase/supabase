@@ -86,7 +86,7 @@ export function OrgSelector() {
   if (isMobile) {
     return (
       <>
-        <SidebarMenu className="flex-shrink">
+        <SidebarMenu className="shrink">
           <SidebarMenuItem>
             {isLoadingOrganizations ? <ShimmeringLoader className="p-2 w-[90px]" /> : triggerButton}
           </SidebarMenuItem>

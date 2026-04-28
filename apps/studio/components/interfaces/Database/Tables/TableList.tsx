@@ -210,7 +210,7 @@ export const TableList = ({
       <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
         <div className="flex gap-2 items-center">
           <SchemaSelector
-            className="flex-grow lg:flex-grow-0 w-[180px]"
+            className="grow lg:grow-0 w-[180px]"
             size="tiny"
             showError={false}
             selectedSchemaName={selectedSchema}
@@ -263,10 +263,10 @@ export const TableList = ({
             </PopoverContent_Shadcn_>
           </Popover_Shadcn_>
         </div>
-        <div className="flex flex-grow justify-between gap-2 items-center">
+        <div className="flex grow justify-between gap-2 items-center">
           <Input
             size="tiny"
-            className="flex-grow lg:flex-grow-0 w-52"
+            className="grow lg:grow-0 w-52"
             placeholder="Search for a table"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}

@@ -83,7 +83,7 @@ export const HeaderBanner = ({ variant, title, description, onDismiss }: HeaderB
             onDismiss && 'pr-7 md:px-7'
           )}
         >
-          <Icon className={cn('flex-shrink-0 w-5 h-5 md:w-4 md:h-4', iconStyles)} />
+          <Icon className={cn('shrink-0 w-5 h-5 md:w-4 md:h-4', iconStyles)} />
           {/* Title and description */}
           <div
             className={cn(
@@ -110,7 +110,7 @@ export const HeaderBanner = ({ variant, title, description, onDismiss }: HeaderB
           <Button
             type="text"
             size="tiny"
-            className="opacity-75 z-[1] flex-shrink-0 p-0.5 h-auto absolute right-5 md:right-4 top-1/2 -translate-y-1/2"
+            className="opacity-75 z-[1] shrink-0 p-0.5 h-auto absolute right-5 md:right-4 top-1/2 -translate-y-1/2"
             onClick={onDismiss}
             aria-label="Dismiss banner"
           >

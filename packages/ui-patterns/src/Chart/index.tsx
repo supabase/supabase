@@ -263,7 +263,7 @@ const ChartMetric = React.forwardRef<HTMLDivElement, ChartMetricProps>(
           {status && (
             <span
               className={cn(
-                'flex-shrink-0 w-1.5 h-1.5 rounded-full flex',
+                'shrink-0 w-1.5 h-1.5 rounded-full flex',
                 status === 'positive' && 'bg-brand',
                 status === 'negative' && 'bg-destructive',
                 status === 'warning' && 'bg-warning',

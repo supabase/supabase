@@ -193,7 +193,7 @@ export const CreateAnalyticsBucketForm = ({
 
   return (
     <>
-      <Section className="flex flex-col !p-0 flex-grow">
+      <Section className="flex flex-col !p-0 grow">
         <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <FormField

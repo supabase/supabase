@@ -31,7 +31,7 @@ export function RLSDisableModalContent() {
           </li>
 
           <li className="flex gap-3">
-            <Lock size={14} className="flex-shrink-0" />
+            <Lock size={14} className="shrink-0" />
             <div>
               <strong>Before you turn off Row Level Security, consider:</strong>
               <ul className="space-y-2 mt-2">
