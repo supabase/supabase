@@ -2,6 +2,8 @@
 
 import { cva, VariantProps } from 'class-variance-authority'
 import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
+// @ts-ignore Required to avoid TS error: The inferred type of MultiSelectorContent cannot be named without a reference to @radix-ui
+import type { Popover as PopoverPrimitive } from 'radix-ui'
 import React, { useEffect } from 'react'
 import {
   Badge,
