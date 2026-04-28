@@ -205,7 +205,7 @@ export const EditWrapperSheet = ({
                 Edit {wrapperMeta.label} wrapper: {wrapper.name}
               </SheetTitle>
             </SheetHeader>
-            <SheetSection className="flex-grow overflow-y-auto">
+            <SheetSection className="grow overflow-y-auto">
               <PageSection>
                 <PageSectionMeta>
                   <PageSectionSummary>

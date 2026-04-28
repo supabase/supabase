@@ -329,16 +329,22 @@ where "name" like 'pg_net%';
 
 ### Alter settings
 
-Change variables:
+You must change the `pg_net` settings at the system level.
+
+<Admonition type="note">
+
+Changing these settings requires superuser privileges. Contact Support to have the required permission granted for the parameter you want to change, e.g.:
 
 ```sql
-alter role "postgres" set pg_net.ttl to '24 hours';
-alter role "postgres" set pg_net.batch_size to 500;
+grant alter system on parameter pg_net.ttl to postgres;
 ```
 
-Then reload the settings and restart the `pg_net` background worker with:
+</Admonition>
+
+Once the privilege is assigned, apply the setting at the system level and restart the background worker:
 
 ```sql
+alter system set pg_net.ttl to '24 hours';
 select net.worker_restart();
 ```
 

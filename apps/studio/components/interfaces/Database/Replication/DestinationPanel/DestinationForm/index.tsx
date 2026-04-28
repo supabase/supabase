@@ -506,7 +506,7 @@ export const DestinationForm = ({
 
   return (
     <>
-      <SheetSection className="flex-grow overflow-auto px-0 py-0">
+      <SheetSection className="grow overflow-auto px-0 py-0">
         {hasNoAvailableDestinations && !editMode ? (
           <NoDestinationsAvailable />
         ) : (

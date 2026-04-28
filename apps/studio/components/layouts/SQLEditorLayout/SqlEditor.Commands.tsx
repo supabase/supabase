@@ -197,7 +197,7 @@ function SnippetSelector({
   const isSQLSnippet = selectedSnippet?.type === 'sql'
 
   return (
-    <div className="w-full flex-grow min-h-0 grid gap-4 md:grid-cols-2">
+    <div className="w-full grow min-h-0 grid gap-4 md:grid-cols-2">
       <CommandList_Shadcn_
         className={cn(
           '!h-full min-h-0 max-h-[unset] py-2 overflow-hidden',
@@ -205,7 +205,7 @@ function SnippetSelector({
         )}
       >
         {!!snippets && snippets.length > 0 && (
-          <CommandGroup_Shadcn_ className="flex-grow min-h-0 overflow-auto">
+          <CommandGroup_Shadcn_ className="grow min-h-0 overflow-auto">
             {snippets.map((snippet) => (
               <CommandItem_Shadcn_
                 key={snippet.id}
@@ -220,7 +220,7 @@ function SnippetSelector({
           </CommandGroup_Shadcn_>
         )}
         {canCreateNew && (
-          <div className="min-h-fit flex-grow-0">
+          <div className="min-h-fit grow-0">
             <hr className="mt-4 mb-2 mx-2" />
             <CommandGroup_Shadcn_ forceMount={true}>
               <CommandItem_Shadcn_

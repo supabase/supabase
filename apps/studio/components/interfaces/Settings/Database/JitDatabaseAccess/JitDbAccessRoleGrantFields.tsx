@@ -1,7 +1,8 @@
 import dayjs from 'dayjs'
+import type { Control } from 'react-hook-form'
 import {
   Checkbox,
-  Input_Shadcn_,
+  cn,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -11,27 +12,43 @@ import {
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
+import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 
-import { JIT_EXPIRY_MODE_OPTIONS, JIT_MAX_CUSTOM_EXPIRY_YEARS } from './JitDbAccess.constants'
-import type { JitRoleGrantDraft, JitRoleOption } from './JitDbAccess.types'
-import { getRelativeDatetimeByMode } from './JitDbAccess.utils'
+import type { JitRoleGrantDraft, JitRoleOption, JitUserRuleDraft } from './JitDbAccess.types'
+import { createEmptyIpRange, getRelativeDatetimeByMode } from './JitDbAccess.utils'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DOCS_URL } from '@/lib/constants'
 
+const EXPIRY_MODE_OPTIONS: Array<{ value: JitRoleGrantDraft['expiryMode']; label: string }> = [
+  { value: '1h', label: '1 hour' },
+  { value: '1d', label: '1 day' },
+  { value: '7d', label: '7 days' },
+  { value: '30d', label: '30 days' },
+  { value: 'custom', label: 'Custom' },
+  { value: 'never', label: 'Never' },
+]
+
+const MAX_CUSTOM_EXPIRY_YEARS = 1
+
 interface JitDbAccessRoleGrantFieldsProps {
+  control: Control<JitUserRuleDraft>
+  grantIndex: number
   role: JitRoleOption
   grant: JitRoleGrantDraft
   onChange: (next: JitRoleGrantDraft) => void
 }
 
 export function JitDbAccessRoleGrantFields({
+  control,
+  grantIndex,
   role,
   grant,
   onChange,
 }: JitDbAccessRoleGrantFieldsProps) {
   const isSuperuserRole = role.id === 'postgres'
   const isReadOnlyRole = role.id === 'supabase_read_only_user'
+  const showRoleAdmonition = isSuperuserRole || isReadOnlyRole
   const checkboxId = `jit-role-${role.id}`
 
   return (
@@ -86,6 +103,7 @@ export function JitDbAccessRoleGrantFields({
                 type="warning"
                 showIcon={false}
                 layout="vertical"
+                className="rounded-md mb-2"
                 title="Grants full database control"
                 description={
                   <>
@@ -115,11 +133,11 @@ export function JitDbAccessRoleGrantFields({
                     with only the permissions required.
                   </>
                 }
-                className="rounded-md"
+                className="rounded-md mb-2"
               />
             )}
 
-            <div className="space-y-2 border-t border-muted pt-3">
+            <div className={cn('space-y-2', !showRoleAdmonition && 'border-t border-muted pt-3')}>
               <p className="text-sm text-foreground">Expires in</p>
               <div className="flex gap-2">
                 <div className="flex-1">
@@ -158,7 +176,7 @@ export function JitDbAccessRoleGrantFields({
                       <SelectValue_Shadcn_ placeholder="Expires in" />
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
-                      {JIT_EXPIRY_MODE_OPTIONS.map((option) => (
+                      {EXPIRY_MODE_OPTIONS.map((option) => (
                         <SelectItem_Shadcn_ key={option.value} value={option.value}>
                           {option.label}
                         </SelectItem_Shadcn_>
@@ -174,7 +192,7 @@ export function JitDbAccessRoleGrantFields({
                     contentSide="top"
                     to={grant.expiry || undefined}
                     minDate={new Date()}
-                    maxDate={dayjs().add(JIT_MAX_CUSTOM_EXPIRY_YEARS, 'year').toDate()}
+                    maxDate={dayjs().add(MAX_CUSTOM_EXPIRY_YEARS, 'year').toDate()}
                     onChange={(value) => {
                       const selectedDate = value.to || value.from || ''
                       onChange({
@@ -216,18 +234,19 @@ export function JitDbAccessRoleGrantFields({
                 Restricted IP addresses{' '}
                 <span className="font-normal text-foreground-lighter">(optional)</span>
               </p>
-              <Input_Shadcn_
-                value={grant.ipRanges}
-                onChange={(event) =>
-                  onChange({
-                    ...grant,
-                    hasIpRestriction: event.target.value.trim().length > 0,
-                    ipRanges: event.target.value,
-                  })
-                }
-                placeholder="e.g. 192.168.0.0/24, 203.0.113.4/32"
+              <SingleValueFieldArray
+                control={control}
+                name={`grants.${grantIndex}.ipRanges` as const}
+                valueFieldName="value"
+                createEmptyRow={createEmptyIpRange}
+                placeholder="192.168.0.0/24"
+                addLabel="Add IP restriction"
+                removeLabel="Remove IP restriction"
+                minimumRows={1}
+                inputAutoComplete="off"
+                rowsClassName="space-y-2"
+                addButtonClassName="w-min"
               />
-              <p className="text-xs text-foreground-lighter">Comma-separated CIDR ranges</p>
             </div>
           </div>
         </div>

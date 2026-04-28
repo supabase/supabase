@@ -107,11 +107,11 @@ export const FilesBuckets = () => {
                   <EmptyBucketState bucketType="files" onCreateBucket={() => setVisible(true)} />
                 ) : (
                   <>
-                    <div className="flex flex-grow justify-between gap-x-2 items-center mb-4">
+                    <div className="flex grow justify-between gap-x-2 items-center mb-4">
                       <div className="flex items-center gap-x-2">
                         <Input
                           size="tiny"
-                          className="flex-grow lg:flex-grow-0 w-52"
+                          className="grow lg:grow-0 w-52"
                           placeholder="Search for a bucket"
                           value={filterString}
                           onChange={(e) => setFilterString(e.target.value)}

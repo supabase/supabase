@@ -20,17 +20,17 @@ When a JWT is issued by Supabase Auth, the key used to create its [signature](ht
 
 ### Benefits of the signing keys system
 
-We've designed the Signing keys system to address many problems the legacy system had. It goes hand-in-hand with the [publishable and secret API keys](/docs/guides/api/api-keys).
+We've designed the Signing keys system to address many problems the legacy system had. It goes hand-in-hand with the [publishable and secret API keys](/docs/guides/getting-started/api-keys).
 
-| Benefit                                     | Legacy JWT secret                                                                                                | JWT signing keys                                                                                                                                                                       |
-| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Performance                                 | Increased app latency as JWT validation is done by Auth server.                                                  | If using asymmetric signing key, JWT validation is fast and does not involve Auth server.                                                                                              |
-| Reliability                                 | To ensure secure revocation, Auth server is in the hot path of your application.                                 | If using asymmetric signing key, JWT validation is local and fast and does not involve Auth server.                                                                                    |
-| Security                                    | Requires changing of your application's backend components to fully revoke a compromised secret.                 | If using asymmetric signing key, revocation is automatic via the key discovery endpoint.                                                                                               |
-| Zero-downtime rotation                      | Downtime, sometimes being significant. Requires careful coordination with [API keys](/docs/guides/api/api-keys). | No downtime, as each rotation step is independent and reversible.                                                                                                                      |
-| Users signed out during rotation            | Currently active users get immediately signed out.                                                               | No users get signed out.                                                                                                                                                               |
-| Independence from API keys                  | `anon` and `service_role` must be rotated simultaneously.                                                        | [Publishable and secret API keys](/docs/guides/api/api-keys) no longer are based on the JWT signing key and can be independently managed.                                              |
-| Security compliance frameworks (SOC2, etc.) | Difficult to remain aligned as the secret can be extracted from Supabase.                                        | Easier alignment as the private key or shared secret can't be extracted. [Row Level Security](/docs/guides/database/postgres/row-level-security) has strong key revocation guarantees. |
+| Benefit                                     | Legacy JWT secret                                                                                                            | JWT signing keys                                                                                                                                                                       |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Performance                                 | Increased app latency as JWT validation is done by Auth server.                                                              | If using asymmetric signing key, JWT validation is fast and does not involve Auth server.                                                                                              |
+| Reliability                                 | To ensure secure revocation, Auth server is in the hot path of your application.                                             | If using asymmetric signing key, JWT validation is local and fast and does not involve Auth server.                                                                                    |
+| Security                                    | Requires changing of your application's backend components to fully revoke a compromised secret.                             | If using asymmetric signing key, revocation is automatic via the key discovery endpoint.                                                                                               |
+| Zero-downtime rotation                      | Downtime, sometimes being significant. Requires careful coordination with [API keys](/docs/guides/getting-started/api-keys). | No downtime, as each rotation step is independent and reversible.                                                                                                                      |
+| Users signed out during rotation            | Currently active users get immediately signed out.                                                                           | No users get signed out.                                                                                                                                                               |
+| Independence from API keys                  | `anon` and `service_role` must be rotated simultaneously.                                                                    | [Publishable and secret API keys](/docs/guides/getting-started/api-keys) no longer are based on the JWT signing key and can be independently managed.                                  |
+| Security compliance frameworks (SOC2, etc.) | Difficult to remain aligned as the secret can be extracted from Supabase.                                                    | Easier alignment as the private key or shared secret can't be extracted. [Row Level Security](/docs/guides/database/postgres/row-level-security) has strong key revocation guarantees. |
 
 ## Getting started
 
@@ -58,7 +58,7 @@ Key rotation and revocation are one of the most important processes for maintain
 - The legacy JWT secret has been leaked in logs, committed to source control, or accidentally exposed in the frontend build of your application, a library, desktop or mobile app package, etc.
 - You suspect that a [member of your organization](/docs/guides/platform/access-control) has lost control of their devices, and a malicious actor may have accessed the JWT secret via the Supabase dashboard or by accessing your application's backend configuration.
 - You suspect that an ex-team-member of your organization may be a malicious actor, by abusing the power the legacy JWT secret provides.
-- Make sure you also switch to [publishable and secret API keys](/docs/guides/api/api-keys) and disable the `anon` and `service_role` keys.
+- Make sure you also switch to [publishable and secret API keys](/docs/guides/getting-started/api-keys) and disable the `anon` and `service_role` keys.
 - If you've imported a private key, and you're suspecting that this private key has been compromised on your end similarly.
 
 **Closer alignment to security best practices and compliance frameworks (SOC2, PCI-DSS, ISO27000, HIPAA, ...)**
@@ -233,7 +233,7 @@ Finally, you can use your newly minted JWT by setting the `Authorization: Bearer
 
 <Admonition type="note">
 
-A separate `apikey` header is required to access your project's APIs. This can be a [publishable, secret or the legacy `anon` or `service_role` keys](/docs/guides/api/api-keys). Using your minted JWT is not possible in this header.
+A separate `apikey` header is required to access your project's APIs. This can be a [publishable, secret or the legacy `anon` or `service_role` keys](/docs/guides/getting-started/api-keys). Using your minted JWT is not possible in this header.
 
 </Admonition>
 
@@ -248,3 +248,45 @@ This is to ensure you have the ability, should you need it, to go back to the le
 ### Why does revoking the legacy JWT secret require disabling of `anon` and `service_role` API keys?
 
 Unfortunately `anon` and `service_role` are not just API keys, but are also valid JSON Web Tokens, signed by the legacy JWT secret. Revoking the legacy JWT secret means that your application no longer trusts any JWT signed with it. Therefore before you revoke the legacy JWT secret, you must disable the `anon` and `service_role` to ensure a consistent security setup.
+
+### Using JWT-based `anon` key in a mobile, desktop, or CLI application and need to rotate a `service_role` JWT secret?
+
+If the JWT secret is secure, substitute the `service_role` JWT-based key with a new secret key which you can create in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard. This prevents downtime for your application.
+
+### Why are `anon` and `service_role` JWT-based keys no longer recommended?
+
+Since the start of Supabase, the JWT-based `anon` and `service_role` keys were the right trade-off against simplicity and relative security for your project. Unfortunately they pose some real challenges in live applications, especially around rotation and security best practices.
+
+The main reasons for preferring the publishable and secret keys (`sb_publishable_...` and `sb_secret_...`) are:
+
+- Tight coupling between the JWT secret (which itself can be compromised, if you mint your own JWTs), the `anon` (low privilege) and `service_role` (high privilege) and `authenticated` (issued by Supabase Auth) Postgres roles.
+- Inability to independently rotate each aspect of the keys, without downtime.
+- Inability to roll-back an unnecessary or problematic JWT secret rotation.
+- Publishing new versions of mobile applications can take days and often weeks in the app review phase with Apple's App Store and Google's Play Store. A forced rotation can cause weeks of downtime for mobile app users.
+- Users may continue using desktop, CLI and mobile apps with very old versions, making rotation impossible without a forced version upgrade.
+- JWTs had 10-year expiry duration, giving malicious actors more to work with.
+- JWTs were self-referential and full of redundant information not necessary for achieving their primary purpose.
+- JWTs are large, hard to parse, verify, and manipulate -- leading to insecure logging or bad security practices.
+- They were signed with a symmetric JWT secret.
+
+### Can you still use an old `anon` and `service-role` API keys after enabling the publishable and secret keys?
+
+Yes. This allows you to transition between the API keys with zero downtime by gradually swapping your clients while both sets of keys are active. See the next question for how to deactivate your keys once all your clients are switched over.
+
+### How to deactivate the `anon` and `service_role` JWT-based API keys after moving to publishable and secret keys?
+
+You can do this in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard. To prevent downtime in your application's components, use the last used indicators on the page to confirm that these are no longer used before deactivating.
+
+You can re-activate them should you need to.
+
+### How are publishable and secret keys implemented on the hosted platform?
+
+When your applications use the Supabase APIs they go through a component called the API Gateway on the Supabase hosted platform. This provides us (and therefore you) with the following features:
+
+- Observability and logging.
+- Performance and request routing (such as to read-replicas).
+- Security, for blocking malicious patterns or behavior on a global scale.
+
+This API Gateway component is able to verify the API key (sent in the `apikey` request header, or for WebSocket in a query param) against your project's publishable and secret key list. If the match is found, it mints a temporary, short-lived JWT that is then forwarded down to your project's servers.
+
+It may be possible to replicate similar behavior if you self-host by using programmable proxies such as [Kong](https://konghq.com/), [Envoy](https://www.envoyproxy.io/), [NGINX](https://nginx.org/) or similar.

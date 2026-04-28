@@ -36,7 +36,7 @@ const QueuesSQLSection: FC<Props> = (props) => {
         props.className
       )}
     >
-      <ul className="w-full flex-grow rounded-lg max-w-md">
+      <ul className="w-full grow rounded-lg max-w-md">
         <div className="w-full h-full relative">
           <CodeWindow
             code={codeSnippet}

@@ -47,7 +47,7 @@ export const OperationQueueSidePanel = () => {
             </SheetDescription>
           </SheetHeader>
 
-          <SheetSection className="overflow-auto flex-grow p-0">
+          <SheetSection className="overflow-auto grow p-0">
             <OperationList operations={operations} />
           </SheetSection>
 

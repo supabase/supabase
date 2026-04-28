@@ -50,7 +50,7 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import { useAddDefinitions } from './useAddDefinitions'
-import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { UtilityPanel } from './UtilityPanel/UtilityPanel'
 import {
   isExplainQuery,
   isExplainSql,
@@ -863,7 +863,7 @@ export const SQLEditor = () => {
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
           <ResizablePanel defaultSize="50" maxSize="70">
-            <div className="flex-grow overflow-y-auto border-b h-full">
+            <div className="grow overflow-y-auto border-b h-full">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
                   <Loader2 className="animate-spin text-brand" />

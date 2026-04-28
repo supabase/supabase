@@ -122,14 +122,14 @@ const LinterDataGrid = ({
   return (
     <ResizablePanelGroup
       orientation="horizontal"
-      className="relative flex flex-grow bg-alternative min-h-0"
+      className="relative flex grow bg-alternative min-h-0"
       autoSaveId="linter-layout-v1"
     >
       <ResizablePanel>
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
-          className={cn('flex-1 flex-grow h-full')}
+          className={cn('flex-1 grow h-full')}
           rowHeight={44}
           headerRowHeight={36}
           columns={columns}

@@ -1076,19 +1076,19 @@ testRunner('table editor', () => {
       .click()
     await page.getByRole('menuitem', { name: 'Edit table' }).click()
 
-    // Open foreign key selector
-    await page.getByRole('button', { name: 'Add foreign key relation' }).click()
-
-    // Select schema (should default to public)
-    await expect(page.getByRole('button', { name: 'Select a schema' })).toContainText('public')
-
     // Select target table
     const tableQueryPromise = waitForApiResponseWithTimeout(page, (response) =>
       response.url().includes(`table-public-${targetTableName}`)
     )
 
-    await page.getByRole('button', { name: 'Select a table to reference to' }).click()
-    await page.getByRole('menuitem', { name: `public ${targetTableName}` }).click()
+    // Open foreign key selector
+    await page.getByRole('button', { name: 'Add foreign key relation' }).click()
+
+    // Select schema (should default to public)
+    await expect(page.getByRole('combobox', { name: 'Select a schema' })).toContainText('public')
+
+    await page.getByRole('combobox', { name: 'Select a table to reference to' }).click()
+    await page.getByRole('option', { name: `public ${targetTableName}` }).click()
 
     // Wait for table columns to load
     await tableQueryPromise
@@ -1099,15 +1099,12 @@ testRunner('table editor', () => {
     ).toBeVisible()
 
     // Select source column (id from source table)
-    await page.getByRole('button', { name: '---' }).first().click()
-    await page.getByRole('menuitem', { name: 'id int8' }).click()
-
-    // Wait for the first dropdown to update - there should only be one '---' button left now
-    await expect(page.getByRole('button', { name: '---' })).toHaveCount(1)
+    await page.getByRole('combobox', { name: 'Column from public.pw_table_fk_source' }).click()
+    await page.getByRole('option', { name: 'id int8' }).click()
 
     // Select target column (id from target table)
-    await page.getByRole('button', { name: '---' }).first().click()
-    await page.getByRole('menuitem', { name: 'id int8' }).click()
+    await page.getByRole('combobox', { name: 'Column from public.pw_table_fk_target' }).click()
+    await page.getByRole('option', { name: 'id int8' }).click()
 
     // Verify cascade action options are visible
     await expect(page.getByText('Action if referenced row is updated')).toBeVisible()

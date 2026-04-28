@@ -99,7 +99,10 @@ export async function clippy(
       break
     }
 
-    const pagePath = pageSection.page.path
+    const pagePath = options?.useAltSearchIndex
+      ? // @ts-ignore
+        pageSection.page_nimbus.path
+      : pageSection.page.path
 
     // Include source reference with each section
     contextText += `[Source ${sourceIndex}: ${pagePath}]\n${content.trim()}\n---\n`

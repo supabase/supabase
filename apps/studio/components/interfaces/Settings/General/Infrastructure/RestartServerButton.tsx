@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag } from 'common'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -26,6 +26,7 @@ import {
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { type ResponseError } from '@/types'
 
 const RestartServerButton = () => {
   const router = useRouter()
@@ -69,6 +70,7 @@ const RestartServerButton = () => {
     })
 
   const isLoading = isRestartingProject || isRestartingServices
+  const hasRestartDropdown = canRestartProject && canRestart && !projectRestartDisabled
 
   const requestProjectRestart = () => {
     if (!canRestartProject) {
@@ -84,7 +86,7 @@ const RestartServerButton = () => {
     restartProjectServices({ ref: projectRef, region: projectRegion, services: ['postgresql'] })
   }
 
-  const onRestartFailed = (error: any, type: string) => {
+  const onRestartFailed = (error: ResponseError, type: string) => {
     toast.error(`Unable to restart ${type}: ${error.message}`)
     setServiceToRestart(undefined)
   }
@@ -99,11 +101,11 @@ const RestartServerButton = () => {
   return (
     <>
       {projectSettingsRestartProject ? (
-        <div className="flex">
+        <div className="flex w-full @lg:w-auto">
           <ButtonTooltip
             type="default"
             className={cn(
-              'px-3 hover:z-10',
+              'flex-1 px-3 hover:z-10 @lg:flex-none',
               canRestartProject && canRestart ? 'rounded-r-none' : ''
             )}
             disabled={
@@ -131,12 +133,12 @@ const RestartServerButton = () => {
           >
             Restart project
           </ButtonTooltip>
-          {canRestartProject && canRestart && !projectRestartDisabled && (
+          {hasRestartDropdown && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   type="default"
-                  className="rounded-l-none px-[4px] py-[5px] -ml-[1px]"
+                  className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-[1px]"
                   icon={<ChevronDown />}
                   disabled={!canRestartProject}
                 />
@@ -149,11 +151,11 @@ const RestartServerButton = () => {
                     setServiceToRestart('database')
                   }}
                 >
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     <p className="block text-foreground">Fast database reboot</p>
                     <p className="block text-foreground-light">
-                      Restarts only the database - faster but may not be able to recover from all
-                      failure modes
+                      Restarts only the database. Faster, but may not be able to recover from all
+                      failure modes.
                     </p>
                   </div>
                 </DropdownMenuItem>
@@ -164,6 +166,8 @@ const RestartServerButton = () => {
       ) : (
         <Button
           type="default"
+          icon={<RefreshCw />}
+          className="w-full @lg:w-auto"
           disabled={isLoading}
           onClick={() => {
             setServiceToRestart('database')
