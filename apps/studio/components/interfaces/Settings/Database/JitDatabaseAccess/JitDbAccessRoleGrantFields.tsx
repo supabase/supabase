@@ -247,7 +247,6 @@ export function JitDbAccessRoleGrantFields({
                 rowsClassName="space-y-2"
                 addButtonClassName="w-min"
               />
-              <p className="text-xs text-foreground-lighter">One CIDR range per row</p>
             </div>
           </div>
         </div>
