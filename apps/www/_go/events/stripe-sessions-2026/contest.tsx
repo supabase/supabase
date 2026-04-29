@@ -6,8 +6,7 @@ const page: GoPageInput = {
   slug: 'stripe/contest',
   metadata: {
     title: 'Win an iPhone 17 Pro Max | Supabase at Stripe Sessions',
-    description:
-      'Enter for a 1-in-10 chance to win an iPhone 17 Pro Max at Stripe Sessions 2026.',
+    description: 'Enter for a 1-in-10 chance to win an iPhone 17 Pro Max at Stripe Sessions 2026.',
   },
   hero: {
     title: 'Win an iPhone 17 Pro Max',
@@ -68,6 +67,10 @@ stripe projects env --sync`}</code>
               Install the Stripe Sync Engine →
             </Link>
           </div>
+
+          <p className="text-foreground-light text-sm">
+            Both options must be completed by Monday, May 11, 2026 at 12:00 PM PST.
+          </p>
 
           <p className="text-xs text-foreground-lighter mt-4">
             No purchase necessary. Void where prohibited.{' '}
