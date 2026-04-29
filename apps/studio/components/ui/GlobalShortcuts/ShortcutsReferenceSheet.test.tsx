@@ -23,7 +23,7 @@ describe('ShortcutsReferenceSheet', () => {
     renderShortcutsReferenceSheet()
 
     expect(await screen.findByText('Keyboard shortcuts')).toBeInTheDocument()
-    expect(screen.getByRole('searchbox', { name: 'Search shortcuts' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Search shortcuts')).toBeInTheDocument()
     expect(screen.getByText('Command Menu')).toBeInTheDocument()
     expect(screen.getByText('Navigation')).toBeInTheDocument()
     expect(screen.getByText('Open command menu')).toBeInTheDocument()
@@ -35,7 +35,7 @@ describe('ShortcutsReferenceSheet', () => {
 
     renderShortcutsReferenceSheet()
 
-    await user.type(screen.getByRole('searchbox', { name: 'Search shortcuts' }), 'navigation')
+    await user.type(screen.getByLabelText('Search shortcuts'), 'navigation')
 
     expect(screen.getByText('Navigation')).toBeInTheDocument()
     expect(screen.queryByText('Command Menu')).not.toBeInTheDocument()
@@ -50,10 +50,7 @@ describe('ShortcutsReferenceSheet', () => {
 
     renderShortcutsReferenceSheet()
 
-    await user.type(
-      screen.getByRole('searchbox', { name: 'Search shortcuts' }),
-      'Go to Organization Integrations'
-    )
+    await user.type(screen.getByLabelText('Search shortcuts'), 'Go to Organization Integrations')
 
     expect(screen.getByText('Navigation')).toBeInTheDocument()
     expect(screen.getByText('Go to Organization Integrations')).toBeInTheDocument()
@@ -61,12 +58,28 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.queryByText('Command Menu')).not.toBeInTheDocument()
   })
 
+  it('shows a clear button when searching and resets the list when clicked', async () => {
+    const user = userEvent.setup()
+
+    renderShortcutsReferenceSheet()
+
+    await user.type(screen.getByLabelText('Search shortcuts'), 'navigation')
+
+    expect(screen.getByRole('button', { name: 'Clear search' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Clear search' }))
+
+    expect(screen.getByLabelText('Search shortcuts')).toHaveValue('')
+    expect(screen.getByText('Command Menu')).toBeInTheDocument()
+    expect(screen.getByText('Navigation')).toBeInTheDocument()
+  })
+
   it.each(['⌘Esc', 'Mod+/'])('does not search shortcut values like %s', async (query) => {
     const user = userEvent.setup()
 
     renderShortcutsReferenceSheet()
 
-    await user.type(screen.getByRole('searchbox', { name: 'Search shortcuts' }), query)
+    await user.type(screen.getByLabelText('Search shortcuts'), query)
 
     expect(screen.getByText('No matching shortcuts found')).toBeInTheDocument()
     expect(screen.queryByText('Navigation')).not.toBeInTheDocument()
@@ -77,7 +90,7 @@ describe('ShortcutsReferenceSheet', () => {
 
     renderShortcutsReferenceSheet()
 
-    await user.type(screen.getByRole('searchbox', { name: 'Search shortcuts' }), 'totally missing')
+    await user.type(screen.getByLabelText('Search shortcuts'), 'totally missing')
 
     expect(screen.getByText('No matching shortcuts found')).toBeInTheDocument()
   })

@@ -1,6 +1,7 @@
+import { CircleX } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import {
-  Input,
+  Button,
   KeyboardShortcut,
   Sheet,
   SheetContent,
@@ -9,6 +10,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS } from '@/state/shortcuts/registry'
@@ -110,7 +112,7 @@ const ShortcutSequence = ({ sequence }: Pick<ShortcutDefinition, 'sequence'>) =>
     {sequence.map((step, index) => (
       <Fragment key={`${step}-${index}`}>
         {index > 0 && <span className="text-foreground-lighter text-[11px]">then</span>}
-        <KeyboardShortcut keys={hotkeyToKeys(step)} />
+        <KeyboardShortcut keys={hotkeyToKeys(step)} variant="pill" />
       </Fragment>
     ))}
   </div>
@@ -126,21 +128,33 @@ export function ShortcutsReferenceSheet({ open, onOpenChange }: ShortcutsReferen
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex flex-col gap-0 p-0 sm:max-w-[520px]">
+      <SheetContent className="flex w-full flex-col gap-0 p-0 sm:max-w-[520px]">
         <SheetHeader className="shrink-0 py-3">
           <SheetTitle>Keyboard shortcuts</SheetTitle>
           <SheetDescription className="sr-only">
             Browse and search available keyboard shortcuts.
           </SheetDescription>
         </SheetHeader>
-        <div className="shrink-0 px-5 pb-4">
+        <div className="shrink-0 bg-studio px-5 pt-4 pb-4">
           <Input
             aria-label="Search shortcuts"
             autoFocus={open}
+            className="w-full"
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search shortcuts..."
-            type="search"
             value={search}
+            actions={
+              search ? (
+                <Button
+                  aria-label="Clear search"
+                  size="tiny"
+                  type="text"
+                  icon={<CircleX size={14} />}
+                  onClick={() => setSearch('')}
+                  className="h-5 w-5 p-0"
+                />
+              ) : null
+            }
           />
         </div>
         <SheetSection className="flex flex-1 flex-col gap-6 overflow-y-auto px-5 py-4">
@@ -156,7 +170,7 @@ export function ShortcutsReferenceSheet({ open, onOpenChange }: ShortcutsReferen
                   {definitions.map((definition) => (
                     <li
                       key={definition.id}
-                      className="flex min-h-10 items-center justify-between gap-4 border-b py-2 last:border-b-0"
+                      className="flex min-h-10 items-center justify-between gap-4 border-b border-muted py-2 last:border-b-0"
                     >
                       <span className="text-sm text-foreground">{definition.label}</span>
                       <ShortcutSequence sequence={definition.sequence} />
