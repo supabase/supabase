@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -25,7 +24,6 @@ interface EnableRuleModalProps {
 
 export const EnableRuleModal = ({ lint, rule }: EnableRuleModalProps) => {
   const { ref } = useParams()
-  const router = useRouter()
 
   const [open, setOpen] = useState(false)
 

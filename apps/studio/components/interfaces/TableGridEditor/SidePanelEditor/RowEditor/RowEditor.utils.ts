@@ -1,7 +1,7 @@
 import { MAX_ARRAY_SIZE, MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import dayjs from 'dayjs'
-import { compact, isEqual, isNull, isString, isUndefined, omitBy } from 'lodash'
+import { compact, isEqual, isString, isUndefined, omitBy } from 'lodash'
 
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import {

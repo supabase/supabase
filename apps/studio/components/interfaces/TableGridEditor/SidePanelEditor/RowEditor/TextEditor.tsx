@@ -128,7 +128,7 @@ export const TextEditor = ({
     >
       <div className="relative flex flex-auto h-full flex-col gap-y-4">
         {view === 'edit' ? (
-          <div className="w-full h-full flex-grow">
+          <div className="w-full h-full grow">
             <Editor
               key={value}
               theme="supabase"
@@ -161,7 +161,7 @@ export const TextEditor = ({
             />
           </div>
         ) : (
-          <SidePanel.Content className="py-4 bg-default flex-grow">
+          <SidePanel.Content className="py-4 bg-default grow">
             <Markdown
               remarkPlugins={[remarkGfm]}
               className="bg-default markdown-body"

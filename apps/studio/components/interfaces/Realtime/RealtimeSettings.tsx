@@ -45,11 +45,10 @@ export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization, isSuccess: isSuccessOrganization } = useSelectedOrganizationQuery()
-  const {
-    can: canUpdateConfig,
-    isLoading: isLoadingPermissions,
-    isSuccess: isPermissionsLoaded,
-  } = useAsyncCheckPermissions(PermissionAction.REALTIME_ADMIN_READ, '*')
+  const { can: canUpdateConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.REALTIME_ADMIN_READ,
+    '*'
+  )
 
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
 
@@ -57,12 +56,7 @@ export const RealtimeSettings = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const {
-    data,
-    error,
-    isPending: isLoading,
-    isError,
-  } = useRealtimeConfigurationQuery({
+  const { data, error, isError } = useRealtimeConfigurationQuery({
     projectRef,
   })
 
@@ -126,7 +120,7 @@ export const RealtimeSettings = () => {
   const isDisablingRealtime = !isRealtimeDisabled && suspend
   const isEnablingRealtime = isRealtimeDisabled && !suspend
 
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (data) => {
+  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (_data) => {
     if (!projectRef) return console.error('Project ref is required')
     setIsConfirmNextModalOpen(true)
   }
@@ -368,7 +362,7 @@ export const RealtimeSettings = () => {
                                 : 'You may adjust this setting in the organization billing settings'}
                             </p>
                           </div>
-                          <div className="flex-grow flex items-center justify-end">
+                          <div className="grow flex items-center justify-end">
                             {isFreePlan ? (
                               <UpgradePlanButton
                                 source="realtimeSettings"
@@ -422,7 +416,7 @@ export const RealtimeSettings = () => {
                                 : 'You may adjust this setting in the organization billing settings'}
                             </p>
                           </div>
-                          <div className="flex-grow flex items-center justify-end">
+                          <div className="grow flex items-center justify-end">
                             {isFreePlan ? (
                               <UpgradePlanButton
                                 source="realtimeSettings"
@@ -476,7 +470,7 @@ export const RealtimeSettings = () => {
                                 : 'You may adjust this setting in the organization billing settings'}
                             </p>
                           </div>
-                          <div className="flex-grow flex items-center justify-end">
+                          <div className="grow flex items-center justify-end">
                             {isFreePlan ? (
                               <UpgradePlanButton
                                 addon="spendCap"

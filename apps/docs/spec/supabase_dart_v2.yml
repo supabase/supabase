@@ -3857,6 +3857,7 @@ functions:
       - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/postgres-changes#replication-setup).
       - `stream()` will emit the initial data as well as any further change on the database as `Stream<List<Map<String, dynamic>>>` by combining Postgrest and Realtime.
       - Takes a list of primary key column names that will be used to update and delete the proper records within the SDK.
+      - To use a private Realtime channel, pass `channelOptions: const RealtimeChannelConfig(private: true)` to the `stream()` call.
       - The following filters are available
         - `.eq('column', value)` listens to rows where the column equals the value
         - `.neq('column', value)` listens to rows where the column does not equal the value

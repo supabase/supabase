@@ -68,6 +68,10 @@ functions:
     $ref: '@supabase/auth-js.GoTrueClient.signInWithSSO'
   - id: sign-in-with-web3
     $ref: '@supabase/auth-js.GoTrueClient.signInWithWeb3'
+  - id: sign-in-with-passkey
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithPasskey'
+  - id: register-passkey
+    $ref: '@supabase/auth-js.GoTrueClient.registerPasskey'
   - id: get-claims
     $ref: '@supabase/auth-js.GoTrueClient.getClaims'
   - id: sign-out
@@ -124,6 +128,34 @@ functions:
     $ref: '@supabase/auth-js.GoTrueMFAApi.unenroll'
   - id: mfa-get-authenticator-assurance-level
     $ref: '@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
+  - id: passkey-api
+    title: Auth Passkey
+    notes: |
+      This section contains methods for WebAuthn passkey registration, authentication, and management. Methods are invoked behind the `supabase.auth.passkey` namespace.
+
+      Passkey support is an experimental feature. Enable it when creating the client:
+
+      ```ts
+      const supabase = createClient(supabaseUrl, publishableKey, {
+        auth: {
+          experimental: { passkey: true },
+        },
+      })
+      ```
+  - id: passkey-list
+    $ref: '@supabase/auth-js.AuthPasskeyApi.list'
+  - id: passkey-update
+    $ref: '@supabase/auth-js.AuthPasskeyApi.update'
+  - id: passkey-delete
+    $ref: '@supabase/auth-js.AuthPasskeyApi.delete'
+  - id: passkey-start-registration
+    $ref: '@supabase/auth-js.AuthPasskeyApi.startRegistration'
+  - id: passkey-verify-registration
+    $ref: '@supabase/auth-js.AuthPasskeyApi.verifyRegistration'
+  - id: passkey-start-authentication
+    $ref: '@supabase/auth-js.AuthPasskeyApi.startAuthentication'
+  - id: passkey-verify-authentication
+    $ref: '@supabase/auth-js.AuthPasskeyApi.verifyAuthentication'
   - id: admin-api
     title: Overview
     notes: |
@@ -169,6 +201,14 @@ functions:
     $ref: '@supabase/auth-js.GoTrueAdminMFAApi.listFactors'
   - id: mfa-delete-factor
     $ref: '@supabase/auth-js.GoTrueAdminMFAApi.deleteFactor'
+  - id: admin-passkey-api
+    title: Passkey Admin API
+    notes: |
+      Contains passkey administration methods. Requires a secret key.
+  - id: admin-list-passkeys
+    $ref: '@supabase/auth-js.GoTrueAdminPasskeyApi.listPasskeys'
+  - id: admin-delete-passkey
+    $ref: '@supabase/auth-js.GoTrueAdminPasskeyApi.deletePasskey'
   - id: admin-custom-providers-api
     title: Custom OIDC/OAuth Provider Admin API
     notes: |

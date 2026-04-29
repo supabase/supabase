@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   Form,
   Label_Shadcn_,
@@ -461,7 +461,7 @@ export const PolicyEditorPanel = memo(function ({
 
                     {supportWithCheck && (
                       <div className="px-5 py-3 flex items-center gap-x-2">
-                        <Checkbox_Shadcn_
+                        <Checkbox
                           id="use-check"
                           name="use-check"
                           checked={showCheckBlock}

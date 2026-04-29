@@ -1079,6 +1079,12 @@ withTestDatabase('update table - replica identity', async ({ executeQuery }) => 
   expect(res!.replica_identity).toBe('NOTHING')
 })
 
+withTestDatabase('update table - replica identity INDEX requires index name', async () => {
+  expect(() =>
+    pgMeta.tables.update({ id: 1, name: 'test', schema: 'public' }, { replica_identity: 'INDEX' })
+  ).toThrow('replica_identity_index is required')
+})
+
 withTestDatabase('update table - primary keys', async ({ executeQuery }) => {
   // Create test table with a column
   const { sql: createSql } = await pgMeta.tables.create({ name: 'test_pk' })

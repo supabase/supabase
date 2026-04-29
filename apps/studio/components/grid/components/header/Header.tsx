@@ -30,6 +30,8 @@ import {
   useExportAllRowsAsSql,
 } from '@/components/layouts/TableEditorLayout/ExportAllRows'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
 import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
@@ -41,6 +43,8 @@ import {
   useRoleImpersonationStateSnapshot,
   useSubscribeToImpersonatedRole,
 } from '@/state/role-impersonation-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
@@ -103,6 +107,19 @@ const InsertButton = () => {
 
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
+  useShortcut(SHORTCUT_IDS.TABLE_EDITOR_INSERT_ROW, () => onAddRow?.(), {
+    registerInCommandMenu: true,
+    enabled: onAddRow !== undefined && canAddNew && canCreateColumns,
+  })
+  useShortcut(SHORTCUT_IDS.TABLE_EDITOR_INSERT_COLUMN, () => onAddColumn?.(), {
+    registerInCommandMenu: true,
+    enabled: onAddColumn !== undefined && canAddNew && canCreateColumns,
+  })
+  useShortcut(SHORTCUT_IDS.TABLE_EDITOR_IMPORT_CSV, () => onImportData?.(), {
+    registerInCommandMenu: true,
+    enabled: onImportData !== undefined && canAddNew && canCreateColumns,
+  })
+
   if (!canAddNew || !canCreateColumns) return null
 
   return (
@@ -121,8 +138,8 @@ const InsertButton = () => {
         {[
           ...(onAddRow !== undefined
             ? [
-                <DropdownMenuItem key="add-row" className="group space-x-2" onClick={onAddRow}>
-                  <div className="-mt-2 pr-1.5">
+                <DropdownMenuItem key="add-row" className="group gap-x-3" onClick={onAddRow}>
+                  <div className="-mt-2 pr-1.5 shrink-0">
                     <div className="border border-foreground-lighter w-[15px] h-[4px]" />
                     <div className="border border-foreground-lighter w-[15px] h-[4px] my-[2px]" />
                     <div
@@ -132,21 +149,21 @@ const InsertButton = () => {
                       ])}
                     />
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0 pr-4">
                     <p>Insert row</p>
                     <p className="text-foreground-light">Insert a new row into {snap.table.name}</p>
                   </div>
+                  <ShortcutBadge
+                    shortcutId={SHORTCUT_IDS.TABLE_EDITOR_INSERT_ROW}
+                    className="shrink-0"
+                  />
                 </DropdownMenuItem>,
               ]
             : []),
           ...(onAddColumn !== undefined
             ? [
-                <DropdownMenuItem
-                  key="add-column"
-                  className="group space-x-2"
-                  onClick={onAddColumn}
-                >
-                  <div className="flex -mt-2 pr-1.5">
+                <DropdownMenuItem key="add-column" className="group gap-x-3" onClick={onAddColumn}>
+                  <div className="flex -mt-2 pr-1.5 shrink-0">
                     <div className="border border-foreground-lighter w-[4px] h-[15px]" />
                     <div className="border border-foreground-lighter w-[4px] h-[15px] mx-[2px]" />
                     <div
@@ -156,12 +173,16 @@ const InsertButton = () => {
                       ])}
                     />
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0 pr-4">
                     <p>Insert column</p>
                     <p className="text-foreground-light">
                       Insert a new column into {snap.table.name}
                     </p>
                   </div>
+                  <ShortcutBadge
+                    shortcutId={SHORTCUT_IDS.TABLE_EDITOR_INSERT_COLUMN}
+                    className="shrink-0"
+                  />
                 </DropdownMenuItem>,
               ]
             : []),
@@ -169,7 +190,7 @@ const InsertButton = () => {
             ? [
                 <DropdownMenuItem
                   key="import-data"
-                  className="group space-x-2"
+                  className="group gap-x-3"
                   onClick={() => {
                     onImportData()
                     sendEvent({
@@ -182,7 +203,7 @@ const InsertButton = () => {
                     })
                   }}
                 >
-                  <div className="relative -mt-2">
+                  <div className="relative -mt-2 shrink-0">
                     <FileText size={18} strokeWidth={1.5} className="-translate-x-[2px]" />
                     <ArrowUp
                       className={cn(
@@ -193,10 +214,14 @@ const InsertButton = () => {
                       size={12}
                     />
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0 pr-4">
                     <p>Import data from CSV</p>
                     <p className="text-foreground-light">Insert new rows from a CSV</p>
                   </div>
+                  <ShortcutBadge
+                    shortcutId={SHORTCUT_IDS.TABLE_EDITOR_IMPORT_CSV}
+                    className="shrink-0"
+                  />
                 </DropdownMenuItem>,
               ]
             : []),
@@ -260,6 +285,14 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
 
   const onSelectAllRows = () => {
     snap.setSelectedRows(new Set(allRows.map((row) => row.idx)), true)
+  }
+
+  const onToggleSelectAllInTable = () => {
+    if (snap.allRowsSelected) {
+      snap.setSelectedRows(new Set(), false)
+    } else {
+      onSelectAllRows()
+    }
   }
 
   const onRowsDelete = () => {
@@ -386,28 +419,37 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
     <>
       <div className="flex items-center gap-x-2">
         {snap.editable && (
-          <ButtonTooltip
-            type="default"
-            size="tiny"
-            icon={<Trash />}
-            onClick={onRowsDelete}
-            disabled={snap.allRowsSelected && isImpersonatingRole}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text:
-                  snap.allRowsSelected && isImpersonatingRole
-                    ? 'Table truncation is not supported when impersonating a role'
-                    : undefined,
-              },
+          <Shortcut
+            id={SHORTCUT_IDS.TABLE_EDITOR_DELETE_SELECTED_ROWS}
+            onTrigger={onRowsDelete}
+            options={{
+              registerInCommandMenu: true,
+              enabled: !(snap.allRowsSelected && isImpersonatingRole),
             }}
           >
-            {snap.allRowsSelected
-              ? `Delete all rows in table`
-              : snap.selectedRows.size > 1
-                ? `Delete ${snap.selectedRows.size} rows`
-                : `Delete ${snap.selectedRows.size} row`}
-          </ButtonTooltip>
+            <ButtonTooltip
+              type="default"
+              size="tiny"
+              icon={<Trash />}
+              onClick={onRowsDelete}
+              disabled={snap.allRowsSelected && isImpersonatingRole}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text:
+                    snap.allRowsSelected && isImpersonatingRole
+                      ? 'Table truncation is not supported when impersonating a role'
+                      : undefined,
+                },
+              }}
+            >
+              {snap.allRowsSelected
+                ? `Delete all rows in table`
+                : snap.selectedRows.size > 1
+                  ? `Delete ${snap.selectedRows.size} rows`
+                  : `Delete ${snap.selectedRows.size} row`}
+            </ButtonTooltip>
+          </Shortcut>
         )}
 
         {!snap.allRowsSelected ? (
@@ -473,14 +515,20 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {!snap.allRowsSelected && totalRows > allRows.length && (
+        {snap.selectedRows.size > 0 && totalRows > allRows.length && (
           <>
             <div className="h-6 ml-0.5">
               <Separator orientation="vertical" />
             </div>
-            <Button type="text" onClick={() => onSelectAllRows()}>
-              Select all rows in table
-            </Button>
+            <Shortcut
+              id={SHORTCUT_IDS.TABLE_EDITOR_SELECT_ALL_IN_TABLE}
+              onTrigger={onToggleSelectAllInTable}
+              options={{ registerInCommandMenu: true }}
+            >
+              <Button type="text" onClick={onToggleSelectAllInTable}>
+                {snap.allRowsSelected ? 'Deselect all rows in table' : 'Select all rows in table'}
+              </Button>
+            </Shortcut>
           </>
         )}
       </div>

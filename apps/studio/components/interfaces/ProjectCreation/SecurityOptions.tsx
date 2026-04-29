@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { UseFormReturn } from 'react-hook-form'
 import {
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   FormControl,
   FormDescription,
@@ -40,7 +40,7 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
             render={({ field }) => (
               <FormItem className="flex items-start gap-3">
                 <FormControl>
-                  <Checkbox_Shadcn_
+                  <Checkbox
                     checked={field.value}
                     disabled={field.disabled}
                     onCheckedChange={(value) => field.onChange(value === true)}
@@ -77,7 +77,7 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
               >
                 <FormControl>
                   {dataApi ? (
-                    <Checkbox_Shadcn_
+                    <Checkbox
                       checked={field.value}
                       disabled={field.disabled}
                       onCheckedChange={(value) => field.onChange(value === true)}
@@ -86,7 +86,7 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <span className="cursor-not-allowed">
-                          <Checkbox_Shadcn_ checked={field.value} disabled />
+                          <Checkbox checked={field.value} disabled />
                         </span>
                       </TooltipTrigger>
                       <TooltipContent side="top">
@@ -120,7 +120,7 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
             render={({ field }) => (
               <FormItem className="flex items-start gap-3">
                 <FormControl>
-                  <Checkbox_Shadcn_
+                  <Checkbox
                     checked={field.value}
                     disabled={field.disabled}
                     onCheckedChange={(value) => field.onChange(value === true)}

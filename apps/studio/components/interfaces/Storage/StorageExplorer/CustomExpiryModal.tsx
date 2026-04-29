@@ -92,7 +92,7 @@ export const CustomExpiryModal = () => {
             noValidate
             className="flex items-start space-x-2"
           >
-            <div className="flex-grow">
+            <div className="grow">
               <FormField
                 control={form.control}
                 name="expiresIn"

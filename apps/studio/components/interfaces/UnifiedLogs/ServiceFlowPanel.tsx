@@ -89,17 +89,10 @@ export function ServiceFlowPanel({
         <ResizableHandle withHandle className="z-10" />
         <ResizablePanel
           id="log-sidepanel"
-          minSize={448}
-          maxSize={720}
-          className={cn(
-            'bg-dash-sidebar',
-            'z-40',
-            'border-l fixed right-0 top-0 bottom-0',
-            'md:absolute md:h-auto',
-            // ' md:w-3/4',
-            'xl:z-[1]',
-            'xl:relative xl:border-l-0'
-          )}
+          defaultSize={45}
+          minSize={400}
+          maxSize={400}
+          className={cn('bg-dash-sidebar border-t')}
         >
           <div className="h-full overflow-auto">
             {/* Service Flow Header with navigation */}
@@ -219,7 +212,7 @@ export function ServiceFlowPanel({
                   </TabsContent>
                 )}
 
-                <TabsContent value="raw-json" className="flex-grow overflow-auto">
+                <TabsContent value="raw-json" className="grow overflow-auto">
                   {isLoading && shouldShowServiceFlow && (
                     <div className="flex items-center gap-3 text-foreground-light p-3 bg-surface-100 border-b border-border">
                       <Skeleton className="h-4 w-4 rounded-full animate-pulse" />

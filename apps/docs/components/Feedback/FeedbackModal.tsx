@@ -72,7 +72,7 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
               )}
             />
             <div className="flex gap-2 text-xs text-foreground-light leading-relaxed">
-              <span className="flex-shrink-0 mt-0.5">💡</span>
+              <span className="shrink-0 mt-0.5">💡</span>
               <div>
                 <strong>Need help or support?</strong> This feedback form is for documentation
                 improvements only. For technical support, please submit a{' '}

@@ -239,7 +239,7 @@ export const EditHookPanel = () => {
         )
 
       // replacer function with JSON.stringify to handle quotes properly
-      const stringifiedParameters = JSON.stringify(parameters, (key, value) => {
+      const stringifiedParameters = JSON.stringify(parameters, (_key, value) => {
         if (typeof value === 'string') {
           // Return the raw string without any additional escaping
           return value

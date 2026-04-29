@@ -11,7 +11,6 @@ import {
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react'
-import { toPng, toSvg } from 'html-to-image'
 import { Check, ChevronDown, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
@@ -20,7 +19,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import '@xyflow/react/dist/style.css'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { toast } from 'sonner'
 import {
   AlertDialog,
   AlertDialogAction,

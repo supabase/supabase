@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -220,7 +220,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                                       className="text-foreground"
                                     >
                                       <div className="flex items-center gap-3 w-full">
-                                        <Checkbox_Shadcn_
+                                        <Checkbox
                                           checked={selectedPermissions.includes(perm.id)}
                                           onCheckedChange={() => toggle(perm.id)}
                                           onClick={(e) => e.stopPropagation()}
@@ -350,7 +350,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                         className="w-full rounded-md border border-control bg-surface-200 px-3 py-2 text-xs font-mono resize-none focus:outline-none"
                       />
                       <label className="flex items-center gap-3 cursor-pointer bg-warning-200 border border-warning-400 rounded-md px-3 py-2">
-                        <Checkbox_Shadcn_
+                        <Checkbox
                           id="key-copied"
                           checked={keyCopied}
                           onCheckedChange={(v) => setKeyCopied(Boolean(v))}

@@ -87,7 +87,7 @@ const DocsAiPage = () => {
           />
         )}
       </CommandHeader>
-      <div className={cn('flex-grow min-h-0 overflow-auto')}>
+      <div className={cn('grow min-h-0 overflow-auto')}>
         {!hasError && messages.length > 0 && <AiMessages messages={messages} />}
         {!hasError && messages.length === 0 && <EmptyState handleSubmit={handleSubmit} />}
         {hasError && <ErrorState handleReset={handleReset} />}
@@ -198,7 +198,7 @@ function AiMessages({ messages }: { messages: Array<Message> }) {
       <CommandList_Shadcn_ />
       <div
         className={cn(
-          'flex-grow min-h-0 overflow-auto p-4',
+          'grow min-h-0 overflow-auto p-4',
           'grid gap-6 md:grid-cols-[max-content,1fr] grid-rows-[max-content]'
         )}
       >

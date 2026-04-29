@@ -14,7 +14,7 @@ import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import { RowContextMenuProvider, RowRenderer } from './RowRenderer'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
-import { handleCopyCell } from '@/components/grid/SupabaseGrid.utils'
+import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 import { formatForeignKeys } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -346,7 +346,7 @@ export const Grid = memo(
               <RowContextMenuProvider>
                 <DataGrid
                   ref={ref}
-                  className={`${gridClass} flex-grow`}
+                  className={`${gridClass} grow`}
                   rowClass={computedRowClass}
                   columns={columnsWithDirtyCellClass}
                   rows={rows ?? []}
@@ -362,7 +362,13 @@ export const Grid = memo(
                       onRowDoubleClick(props.row, { name: props.column.name })
                     }
                   }}
-                  onCellKeyDown={handleCopyCell}
+                  onCellKeyDown={(args, event) =>
+                    handleCellKeyDown(args, event, {
+                      rows: rows ?? [],
+                      columns: snap.table.columns,
+                      onRowsChange,
+                    })
+                  }
                 />
               </RowContextMenuProvider>
               {/* The DragOverlay is necessary to avoid styling issues while dragging a column */}

@@ -170,7 +170,7 @@ Review and change URL configuration variables:
 
   Throughout the self-hosting guides, `<your-domain>` stands for the host where your Supabase instance is reachable: your domain name, your server's IP, or `localhost`, depending on your setup.
 
-  - **Default setup:** Kong listens on port `8000`, so the full URL is `http://<your-domain>:8000`.
+  - **Default setup:** The API gateway (Kong) listens on port `8000`, so the full URL is `http://<your-domain>:8000`.
   - **Behind a [reverse proxy](/docs/guides/self-hosting/self-hosted-proxy-https):** the proxy terminates TLS on port `443`, so the URL becomes `https://<your-domain>`.
 
 </Admonition>
@@ -291,7 +291,7 @@ Each of the APIs is available through the same API gateway:
 
 ## Configuring HTTPS
 
-By default, Supabase is accessible over HTTP. For production deployments, especially when using OAuth providers, you need HTTPS with a valid TLS certificate. The recommended approach is to place a reverse proxy (such as Caddy or Nginx) in front of Kong.
+By default, Supabase is accessible over HTTP. For production deployments, especially when using OAuth providers, you need HTTPS with a valid TLS certificate. The recommended approach is to place a reverse proxy (such as Caddy or Nginx) in front of the API gateway.
 
 See the [Configure HTTPS](/docs/guides/self-hosting/self-hosted-proxy-https) guide for detailed setup instructions.
 
@@ -351,7 +351,7 @@ Supabase is built from open source tools, each chosen or developed for productio
 If the tools and communities already exist, with an MIT, Apache 2, PostgreSQL, or equivalent open source license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves.
 
 <Image
-  alt="Diagram showing the architecture of Supabase. The Kong API gateway sits in front of 7 services: GoTrue, PostgREST, Realtime, Storage, pg_meta, Functions, and pg_graphql. All the services talk to a single Postgres instance."
+  alt="Diagram showing the architecture of Supabase. The API gateway (Kong) sits in front of 7 services: GoTrue, PostgREST, Realtime, Storage, pg_meta, Functions, and pg_graphql. All the services talk to a single Postgres instance."
   src={{
     dark: "/docs/img/supabase-architecture.svg",
     light: "/docs/img/supabase-architecture--light.svg",
