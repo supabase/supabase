@@ -1,7 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { EyeOff, Lock } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
+import { Badge, Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -39,14 +40,14 @@ const ROLE_BY_LINT: Record<GraphqlExposureLintName, 'anon' | 'authenticated'> = 
   pg_graphql_authenticated_table_exposed: 'authenticated',
 }
 
-const HIDE_LABEL: Record<GraphqlExposureLintName, string> = {
-  pg_graphql_anon_table_exposed: 'Hide from anonymous users',
-  pg_graphql_authenticated_table_exposed: 'Hide from signed-in users',
+const AUDIENCE: Record<GraphqlExposureLintName, { lower: string; upper: string }> = {
+  pg_graphql_anon_table_exposed: { lower: 'anonymous users', upper: 'Anonymous users' },
+  pg_graphql_authenticated_table_exposed: { lower: 'signed-in users', upper: 'Signed-in users' },
 }
 
-const AUDIENCE_LABEL: Record<GraphqlExposureLintName, string> = {
-  pg_graphql_anon_table_exposed: 'anonymous users',
-  pg_graphql_authenticated_table_exposed: 'signed-in users',
+const TRIGGER_LABEL: Record<GraphqlExposureLintName, string> = {
+  pg_graphql_anon_table_exposed: 'Remove access for anonymous users',
+  pg_graphql_authenticated_table_exposed: 'Remove access for signed-in users',
 }
 
 export const GraphqlExposureLintCTA = ({
@@ -64,7 +65,7 @@ export const GraphqlExposureLintCTA = ({
   const name = metadata?.name
   const objectType = metadata?.type ?? 'object'
   const role = ROLE_BY_LINT[lintName]
-  const audience = AUDIENCE_LABEL[lintName]
+  const audience = AUDIENCE[lintName]
   const canAct = !!schema && !!name
 
   const revokeSql = canAct
@@ -74,7 +75,7 @@ export const GraphqlExposureLintCTA = ({
   const { mutate: executeSql, isPending: isRevoking } = useExecuteSqlMutation({
     onSuccess: async () => {
       toast.success(
-        `Revoked access to ${schema}.${name} from ${role}. ${audience} can no longer query this ${objectType} via GraphQL or Data API.`
+        `Revoked access to ${schema}.${name} from ${role}. ${audience.upper} can no longer query this ${objectType} via GraphQL or Data API.`
       )
       setShowConfirmRevoke(false)
       await queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) })
@@ -97,25 +98,69 @@ export const GraphqlExposureLintCTA = ({
   return (
     <>
       <Button type="primary" disabled={!canAct} onClick={() => setShowConfirmRevoke(true)}>
-        {HIDE_LABEL[lintName]}
+        {TRIGGER_LABEL[lintName]}
       </Button>
       <ConfirmationModal
         visible={showConfirmRevoke}
-        size="medium"
-        variant="warning"
-        title={canAct ? `Hide ${schema}.${name} from ${audience}?` : `Hide from ${audience}?`}
-        confirmLabel={HIDE_LABEL[lintName]}
-        confirmLabelLoading="Revoking..."
+        size="xlarge"
+        title={
+          canAct
+            ? `Remove access to ${schema}.${name} for ${audience.lower}?`
+            : `Remove access for ${audience.lower}?`
+        }
+        confirmLabel="Remove access"
+        confirmLabelLoading="Removing access..."
         cancelLabel="Cancel"
         loading={isRevoking}
         onCancel={() => setShowConfirmRevoke(false)}
         onConfirm={handleRevoke}
-        alert={{
-          title: `This removes API access for ${AUDIENCE_LABEL[lintName]}`,
-          description: `Apps using the ${role} role will not be able to read or write to this ${objectType} via GraphQL or Data API. You can re-grant access later from the SQL editor.`,
-        }}
       >
-        <p className="text-sm text-foreground-light">The following statement will be executed:</p>
+        <p className="text-sm text-foreground mb-6">
+          This change affects both schema visibility and data access for {audience.lower}.
+          Alternatively, you can{' '}
+          <InlineLink href={`/project/${projectRef}/database/extensions`}>
+            disable GraphQL
+          </InlineLink>{' '}
+          to remove schema visibility.
+        </p>
+
+        <div className="space-y-5">
+          <div className="flex gap-3">
+            <Lock className="text-foreground-light shrink-0 mt-0.5" size={20} strokeWidth={1.5} />
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-foreground">Data API access removed</p>
+                <Badge variant="warning">Breaking change</Badge>
+              </div>
+              <p className="text-sm text-foreground-light mt-1">
+                {audience.upper} will no longer be able to read or write to this {objectType} via
+                Supabase APIs (GraphQL or Data API), even if RLS policies allow it.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <EyeOff className="text-foreground-light shrink-0 mt-0.5" size={20} strokeWidth={1.5} />
+            <div>
+              <p className="text-sm text-foreground">Schema hidden from GraphQL</p>
+              <p className="text-sm text-foreground-light mt-1">
+                This {objectType} will no longer appear in the GraphQL schema. {audience.upper}{' '}
+                won't be able to discover its name, columns, or relationships.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <Admonition
+          type="warning"
+          title="When to keep access"
+          description={`If your app needs ${audience.lower} to query this ${objectType}, keep access and ignore this warning. Be aware that this ${objectType}'s schema will remain visible via the GraphQL API.`}
+          className="mt-6"
+        />
+
+        <p className="text-sm text-foreground-light mt-6">
+          The following statement will be executed:
+        </p>
         <pre className="mt-2 px-3 py-2 rounded bg-surface-200 text-xs font-mono whitespace-pre-wrap break-all">
           {revokeSql}
         </pre>
