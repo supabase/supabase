@@ -333,7 +333,7 @@ Once configured, your users sign in with \`signInWithOAuth({ provider: 'custom:m
 - Developers who need precise control over endpoint configuration`,
     icon: Shield,
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
-    heroImage: 'https://www.youtube.com/watch?v=WrX3FfKj6I8',
+    heroImage: 'https://www.youtube-nocookie.com/embed/WrX3FfKj6I8',
     docsUrl: 'https://supabase.com/docs/guides/auth/custom-oauth-providers',
     slug: 'custom-oidc-providers',
     status: {
