@@ -10,6 +10,8 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import AddNewSecretForm from './AddNewSecretForm'
+import { DefaultEdgeFunctionSecrets } from './DefaultEdgeFunctionSecrets'
+import { isInternalEdgeFunctionSecret } from './DefaultEdgeFunctionSecrets.utils'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
 import { EditSecretSheet } from './EditSecretSheet'
 import AlertError from '@/components/ui/AlertError'
@@ -61,11 +63,13 @@ export const EdgeFunctionSecrets = () => {
     },
   })
 
-  const secrets =
+  const customSecrets = data.filter((secret) => !isInternalEdgeFunctionSecret(secret.name))
+  const filteredCustomSecrets =
     searchString.length > 0
-      ? (data?.filter((secret) => secret.name.toLowerCase().includes(searchString.toLowerCase())) ??
-        [])
-      : (data ?? [])
+      ? customSecrets.filter((secret) =>
+          secret.name.toLowerCase().includes(searchString.toLowerCase())
+        )
+      : customSecrets
 
   const headers = [
     <TableHead key="secret-name">Name</TableHead>,
@@ -109,78 +113,84 @@ export const EdgeFunctionSecrets = () => {
           {isError && <AlertError error={error} subject="Failed to retrieve project secrets" />}
 
           {isSuccess && (
-            <>
-              <div className="mb-10">
-                {!canUpdateSecrets ? (
-                  <NoPermission resourceText="manage this project's edge function secrets" />
-                ) : (
-                  <AddNewSecretForm />
-                )}
-              </div>
-              {canUpdateSecrets && !canReadSecrets ? (
-                <NoPermission resourceText="view this project's edge function secrets" />
-              ) : canReadSecrets ? (
-                <div className="space-y-4 mt-4">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-                    <Input
-                      size="small"
-                      className="w-full md:w-80"
-                      placeholder="Search for a secret"
-                      value={searchString}
-                      onChange={(e) => setSearchString(e.target.value)}
-                      icon={<Search />}
-                    />
-                  </div>
+            <div className="space-y-10">
+              {canUpdateSecrets ? (
+                <AddNewSecretForm />
+              ) : (
+                <NoPermission resourceText="manage this project's edge function secrets" />
+              )}
 
-                  <Card>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>{headers}</TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {secrets.length > 0 ? (
-                          secrets.map((secret) => (
-                            <EdgeFunctionSecret
-                              key={secret.name}
-                              secret={secret}
-                              onSelectEdit={() => setSelectedIdToEdit(secret.name)}
-                              onSelectDelete={() => setSelectedIdToDelete(secret.name)}
-                            />
-                          ))
-                        ) : secrets.length === 0 && searchString.length > 0 ? (
-                          <TableRow className="[&>td]:hover:bg-inherit">
-                            <TableCell colSpan={headers.length}>
-                              <p className="text-sm text-foreground">No results found</p>
-                              <p className="text-sm text-foreground-light">
-                                Your search for "{searchString}" did not return any results
-                              </p>
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          <TableRow className="[&>td]:hover:bg-inherit">
-                            <TableCell colSpan={headers.length}>
-                              <p className="text-sm text-foreground">No secrets created</p>
-                              <p className="text-sm text-foreground-lighter">
-                                This project has no custom secrets yet.{' '}
-                                <code className="text-code-inline !text-foreground-lighter whitespace-nowrap">
-                                  SUPABASE_*
-                                </code>{' '}
-                                <InlineLink
-                                  href={`${DOCS_URL}/guides/functions/secrets#default-secrets`}
-                                >
-                                  default secrets
-                                </InlineLink>{' '}
-                                are still available.
-                              </p>
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </Card>
+              <section className="space-y-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                  <div className="space-y-1">
+                    <h3 className="text-foreground text-base">Custom secrets</h3>
+                    <p className="text-sm text-foreground-light">
+                      Secrets you have defined for this project.
+                    </p>
+                  </div>
+                  <Input
+                    size="small"
+                    className="w-full md:w-80"
+                    placeholder="Search for a secret"
+                    value={searchString}
+                    onChange={(e) => setSearchString(e.target.value)}
+                    icon={<Search />}
+                  />
                 </div>
-              ) : null}
-            </>
+
+                <Card>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>{headers}</TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredCustomSecrets.length > 0 ? (
+                        filteredCustomSecrets.map((secret) => (
+                          <EdgeFunctionSecret
+                            key={secret.name}
+                            secret={secret}
+                            onSelectEdit={() => setSelectedIdToEdit(secret.name)}
+                            onSelectDelete={() => setSelectedIdToDelete(secret.name)}
+                          />
+                        ))
+                      ) : customSecrets.length === 0 ? (
+                        <TableRow className="[&>td]:hover:bg-inherit">
+                          <TableCell colSpan={headers.length}>
+                            <p className="text-sm text-foreground">No custom secrets created</p>
+                            <p className="text-sm text-foreground-lighter">
+                              This project has no custom secrets yet.
+                            </p>
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        <TableRow className="[&>td]:hover:bg-inherit">
+                          <TableCell colSpan={headers.length}>
+                            <p className="text-sm text-foreground">No results found</p>
+                            <p className="text-sm text-foreground-light">
+                              Your search for "{searchString}" did not return any results
+                            </p>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </Card>
+              </section>
+
+              <section className="space-y-4">
+                <div className="space-y-1">
+                  <h3 className="text-foreground text-base">Default secrets</h3>
+                  <p className="text-sm text-foreground-light">
+                    Reserved secrets available in every project. Read more about{' '}
+                    <InlineLink href={`${DOCS_URL}/guides/functions/secrets#default-secrets`}>
+                      default secrets
+                    </InlineLink>
+                    .
+                  </p>
+                </div>
+                <DefaultEdgeFunctionSecrets />
+              </section>
+            </div>
           )}
         </>
       )}
