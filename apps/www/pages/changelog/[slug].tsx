@@ -14,7 +14,7 @@ import {
   fetchChangelogDiscussionByNumber,
   type ChangelogLabel,
 } from '@/lib/changelog-github'
-import { discussionDisplayDate } from '@/lib/changelog.utils'
+import { changelogEntrySlug, discussionDisplayDate } from '@/lib/changelog.utils'
 import mdxComponents from '@/lib/mdx/mdxComponents'
 import { mdxSerialize } from '@/lib/mdx/mdxSerialize'
 
@@ -23,21 +23,22 @@ type PageProps = {
   url: string
   created_at: string
   number: number
+  slug: string
   source: MDXRemoteSerializeResult
   labels: ChangelogLabel[]
 }
 
-const ChangelogDetailPage = ({ title, url, created_at, number, source, labels }: PageProps) => (
+const ChangelogDetailPage = ({ title, url, created_at, slug, source, labels }: PageProps) => (
   <>
     <Head>
-      <link rel="alternate" type="text/markdown" href={`/changelog/${number}.md`} />
+      <link rel="alternate" type="text/markdown" href={`/changelog/${slug}.md`} />
     </Head>
     <NextSeo
       title={`${title} · Changelog`}
       description={title}
       openGraph={{
         title,
-        url: `https://supabase.com/changelog/${number}`,
+        url: `https://supabase.com/changelog/${slug}`,
         type: 'article',
       }}
     />
@@ -67,7 +68,7 @@ const ChangelogDetailPage = ({ title, url, created_at, number, source, labels }:
 
           <aside className="border-default border-t pt-6 lg:col-span-4 lg:border-t-0 lg:pl-4 lg:pt-0">
             <div className="thin-scrollbar lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
-              <ChangelogDetailSidebar number={number} url={url} labels={labels} />
+              <ChangelogDetailSidebar slug={slug} url={url} labels={labels} />
             </div>
           </aside>
         </div>
@@ -78,19 +79,15 @@ const ChangelogDetailPage = ({ title, url, created_at, number, source, labels }:
 )
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: [],
-    fallback: 'blocking',
-  }
+  return { paths: [], fallback: 'blocking' }
 }
 
 export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
-  const raw = params?.number
-  const numStr = Array.isArray(raw) ? raw[0] : raw
-  const number = Number(numStr)
-  if (!Number.isFinite(number)) {
-    return { notFound: true }
-  }
+  const raw = params?.slug
+  const slugStr = Array.isArray(raw) ? raw[0] : (raw ?? '')
+  // The slug always starts with the numeric discussion number.
+  const number = parseInt(slugStr, 10)
+  if (!Number.isFinite(number) || number <= 0) return { notFound: true }
 
   try {
     const octokit = createChangelogOctokit()
@@ -103,6 +100,13 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
 
     if (!discussion || discussion.category?.id !== CHANGELOG_CATEGORY_ID) {
       return { notFound: true }
+    }
+
+    const expectedSlug = changelogEntrySlug(number, discussion.title)
+
+    // Redirect number-only or mismatched slugs to the canonical slug URL.
+    if (slugStr !== expectedSlug) {
+      return { redirect: { destination: `/changelog/${expectedSlug}`, permanent: true } }
     }
 
     const source = await mdxSerialize(discussion.body)
@@ -118,6 +122,7 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
         url: discussion.url,
         created_at,
         number,
+        slug: expectedSlug,
         source,
         labels: discussion.labels?.nodes ?? [],
       },

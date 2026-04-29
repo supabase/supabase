@@ -95,7 +95,7 @@ const nextConfig = {
         ],
       },
       {
-        source: '/changelog/:number.md',
+        source: '/changelog/:slug.md',
         headers: [
           { key: 'Content-Type', value: 'text/markdown; charset=utf-8' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },

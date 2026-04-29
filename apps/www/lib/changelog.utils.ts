@@ -149,8 +149,16 @@ export function changelogLabelDisplayName(name: string): string {
   return CHANGELOG_LABEL_DISPLAY_NAME[name.toLowerCase()] ?? name
 }
 
-const GITHUB_CHANGELOG_DISCUSSIONS_BASE =
-  'https://github.com/orgs/supabase/discussions/categories/changelog'
+/** Generates the URL slug for a changelog entry: `<number>-<slugified-title>`. */
+export function changelogEntrySlug(number: number, title: string): string {
+  const titlePart = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80)
+    .replace(/-+$/, '')
+  return `${number}-${titlePart}`
+}
 
 /** Internal changelog index URL with preselected tag filter (nuqs `tags` param). */
 export function changelogTagFilterUrl(labelName: string) {

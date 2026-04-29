@@ -1,6 +1,6 @@
 /**
  * Pure ESM changelog RSS document builder (used by generateStaticContent.mjs and re-exported from rss.tsx).
- * @typedef {{ number?: number; title: string; url: string; sortDate: string; labels?: string[] }} ChangelogRssItemInput
+ * @typedef {{ number?: number; slug?: string; title: string; url: string; sortDate: string; labels?: string[] }} ChangelogRssItemInput
  */
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc.js'
@@ -25,7 +25,11 @@ function buildItemsXml(sorted) {
   return sorted
     .map((e) => {
       const encodedTitle = xmlEncodeRss(e.title)
-      const canonicalUrl = e.number ? `https://supabase.com/changelog/${e.number}` : e.url
+      const canonicalUrl = e.slug
+        ? `https://supabase.com/changelog/${e.slug}`
+        : e.number
+          ? `https://supabase.com/changelog/${e.number}`
+          : e.url
       const encodedCanonical = xmlEncodeRss(canonicalUrl)
       const pubDate = formatRssPubDate(e.sortDate)
       return `      <item>
@@ -36,6 +40,22 @@ function buildItemsXml(sorted) {
       </item>`
     })
     .join('\n')
+}
+
+/**
+ * Generates the URL slug for a changelog entry: `<number>-<slugified-title>`.
+ * Mirrors changelogEntrySlug in apps/www/lib/changelog.utils.ts.
+ * @param {number} number
+ * @param {string} title
+ */
+export function changelogEntrySlug(number, title) {
+  const titlePart = String(title ?? '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80)
+    .replace(/-+$/, '')
+  return `${number}-${titlePart}`
 }
 
 /**

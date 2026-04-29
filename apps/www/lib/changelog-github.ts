@@ -3,7 +3,7 @@ import { Octokit } from '@octokit/core'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import dayjs from 'dayjs'
 
-import { discussionDisplayDate } from './changelog.utils'
+import { changelogEntrySlug, discussionDisplayDate } from './changelog.utils'
 
 export const CHANGELOG_CATEGORY_ID = 'DIC_kwDODMpXOc4CAFUr'
 
@@ -11,6 +11,7 @@ export type ChangelogLabel = { name: string; color: string }
 
 export type ChangelogTimelineIndexItem = {
   number: number
+  slug: string
   title: string
   url: string
   sortDate: string
@@ -168,6 +169,7 @@ export async function getChangelogTimelineSortedIndex(): Promise<ChangelogTimeli
   return raw
     .map((item) => ({
       number: item.number,
+      slug: changelogEntrySlug(item.number, item.title),
       title: item.title,
       url: item.url,
       sortDate: discussionDisplayDate(item) ?? item.createdAt,

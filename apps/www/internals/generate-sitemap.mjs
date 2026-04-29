@@ -64,7 +64,7 @@ async function generate() {
       if (route === '/partners/integrations/[slug]') return null
       if (route === '/launch-week/ticket-image') return null
       if (route === '/launch-week/tickets/[username]') return null
-      if (route === '/changelog/[number]') return null
+      if (route === '/changelog/[slug]') return null
 
       /**
        * Blog based urls
@@ -120,7 +120,7 @@ async function generate() {
   const changelogDetailUrls = (() => {
     try {
       const rss = readFileSync('public/changelog-rss.xml', 'utf-8')
-      const matches = [...rss.matchAll(/<link>(https:\/\/supabase\.com\/changelog\/\d+)<\/link>/g)]
+      const matches = [...rss.matchAll(/<link>(https:\/\/supabase\.com\/changelog\/\d+[^<]*)<\/link>/g)]
       const uniqueUrls = [...new Set(matches.map((match) => match[1]))]
 
       return uniqueUrls.map(

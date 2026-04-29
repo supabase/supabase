@@ -391,7 +391,7 @@ try {
     const { Octokit } = await import('@octokit/core')
     const { paginateGraphql } = await import('@octokit/plugin-paginate-graphql')
 
-    const { generateChangelogRssXml, generateChangelogTagRssXml, labelToFileSlug } =
+    const { generateChangelogRssXml, generateChangelogTagRssXml, labelToFileSlug, changelogEntrySlug } =
       await import('../lib/changelog-rss.mjs')
     const rewritesPath = path.join(__dirname, 'data/changelog-deleted-discussions.json')
     const rewrites = JSON.parse(await fs.readFile(rewritesPath, 'utf8'))
@@ -465,6 +465,7 @@ try {
 
     const entries = collected.map((item) => ({
       number: item.number,
+      slug: changelogEntrySlug(item.number, item.title),
       title: item.title,
       url: item.url,
       sortDate: discussionDisplayDate({ title: item.title, createdAt: item.createdAt }),
@@ -506,7 +507,7 @@ try {
     const mdRows = visibleEntries.map((entry) => {
       const date = dayjs(entry.sortDate).isValid() ? dayjs(entry.sortDate).format('YYYY-MM-DD') : ''
       const labels = (entry.labels ?? []).join(', ')
-      return `| ${date} | ${entry.number} | ${escapeMd(labels)} | ${escapeMd(entry.title)} | [/changelog/${entry.number}.md](https://supabase.com/changelog/${entry.number}.md) |`
+      return `| ${date} | ${entry.number} | ${escapeMd(labels)} | ${escapeMd(entry.title)} | [/changelog/${entry.slug}.md](https://supabase.com/changelog/${entry.slug}.md) |`
     })
     const changelogMd = `# Supabase Changelog
 
@@ -531,9 +532,10 @@ ${mdRows.join('\n')}
         .replace(/\n/g, ' ')
         .trim()
       const labelsYaml = (entry.labels ?? []).map((l) => `  - ${l}`).join('\n')
-      const pageUrl = `https://supabase.com/changelog/${entry.number}`
+      const pageUrl = `https://supabase.com/changelog/${entry.slug}`
       const entryMd = `---
 number: ${entry.number}
+slug: ${entry.slug}
 published: ${published}
 discussion: ${entry.url}
 labels:
@@ -546,7 +548,7 @@ page: ${pageUrl}
 ${entry.body ?? ''}
 `
       await fs.writeFile(
-        path.join(changelogEntryMdDir, `${entry.number}.md`),
+        path.join(changelogEntryMdDir, `${entry.slug}.md`),
         entryMd.trim() + '\n',
         'utf8'
       )

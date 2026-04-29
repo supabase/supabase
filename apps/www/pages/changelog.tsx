@@ -40,6 +40,7 @@ const FEATURED_COUNT = 3
 
 type FeaturedEntry = {
   number: number
+  slug: string
   title: string
   url: string
   created_at: string
@@ -81,6 +82,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
               }) ?? discussion.createdAt
             return {
               number: meta.number,
+              slug: meta.slug,
               title: discussion.title,
               url: discussion.url ?? '',
               created_at,
@@ -362,7 +364,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                         </div>
                         <div className="flex w-full flex-col gap-1">
                           {entry.title && (
-                            <Link href={`/changelog/${entry.number}`}>
+                            <Link href={`/changelog/${entry.slug}`}>
                               <h3 className="text-foreground text-lg hover:underline">
                                 {entry.title}
                               </h3>

@@ -141,7 +141,7 @@ export function ChangelogTimelineList(props: Props) {
 
             <div className="min-w-0 lg:col-span-10 [&>*:last-child]:border-b-0">
               {yearItems.map((item) => (
-                <TimelineRow key={item.number} item={item} href={`/changelog/${item.number}`} />
+                <TimelineRow key={item.number} item={item} href={`/changelog/${item.slug}`} />
               ))}
             </div>
           </div>

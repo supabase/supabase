@@ -10,15 +10,15 @@ import type { ChangelogLabel } from '@/lib/changelog-github'
 import { SITE_ORIGIN } from '@/lib/constants'
 
 type Props = {
-  number: number
+  slug: string
   url: string
   labels: ChangelogLabel[]
   className?: string
 }
 
-export function ChangelogDetailSidebar({ number, url, labels, className }: Props) {
+export function ChangelogDetailSidebar({ slug, url, labels, className }: Props) {
   const { copied, copyMarkdown } = useCopyMarkdownFromUrl()
-  const mdPath = `/changelog/${number}.md`
+  const mdPath = `/changelog/${slug}.md`
   const mdAbs = `${SITE_ORIGIN}${mdPath}`
   const aiPrompt = `Read from ${mdAbs} so I can ask questions about its contents`
 
