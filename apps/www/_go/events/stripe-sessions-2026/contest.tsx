@@ -33,7 +33,7 @@ const page: GoPageInput = {
       id: 'how-to-enter',
       title: 'How to enter',
       children: (
-        <div className="flex flex-col gap-8 w-full max-w-2xl">
+        <div className="flex flex-col gap-8 w-full max-w-2xl mx-auto">
           <p className="text-foreground-light text-lg text-center">
             Choose either path. Both qualify.
           </p>
