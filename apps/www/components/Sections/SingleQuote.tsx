@@ -1,8 +1,7 @@
-import Link from 'next/link'
-import React, { FC } from 'react'
-import { cn } from 'ui'
-
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import Link from 'next/link'
+import React, { type FC, type ReactNode } from 'react'
+import { cn } from 'ui'
 
 interface Props {
   id: string
@@ -17,9 +16,9 @@ interface Props {
 type Quote = {
   text: string
   author: string
-  logo?: string | JSX.Element
+  logo?: ReactNode
   role: string
-  avatar?: string | JSX.Element
+  avatar?: ReactNode
   link?: string
 }
 

@@ -1,13 +1,12 @@
 import { Upload } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-
 import {
   Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
   Input_Shadcn_,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
@@ -15,6 +14,7 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { SSOConfigFormSchema } from './SSOConfig'
 
 export const SSOMetadata = ({
@@ -79,24 +79,24 @@ export const SSOMetadata = ({
             </TabsTrigger_Shadcn_>
           </TabsList_Shadcn_>
           <TabsContent_Shadcn_ value="url">
-            <FormField_Shadcn_
+            <FormField
               name="metadataXmlUrl"
               render={({ field }) => (
-                <FormItem_Shadcn_>
-                  <FormControl_Shadcn_>
+                <FormItem>
+                  <FormControl>
                     <Input_Shadcn_
                       {...field}
                       placeholder="https://example.com/metadata.xml"
                       autoComplete="off"
                     />
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
           </TabsContent_Shadcn_>
           <TabsContent_Shadcn_ value="file">
-            <FormField_Shadcn_
+            <FormField
               name="metadataXmlUrl"
               render={() => (
                 <div className="flex flex-col gap-2 max-w-md">
@@ -110,7 +110,6 @@ export const SSOMetadata = ({
                     />
                     <Button
                       type="default"
-                      size="small"
                       icon={<Upload className="w-4 h-4" />}
                       onClick={() => fileInputRef.current?.click()}
                     >
@@ -118,7 +117,7 @@ export const SSOMetadata = ({
                     </Button>
                     {fileName && <span className="text-xs text-foreground-light">{fileName}</span>}
                   </div>
-                  <FormMessage_Shadcn_ />
+                  <FormMessage />
                 </div>
               )}
             />

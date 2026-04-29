@@ -1,8 +1,8 @@
-import { PlanId } from 'data/subscriptions/types'
 import dayjs from 'dayjs'
 
 import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
+import { PlanId } from '@/data/subscriptions/types'
 
 export const LAYOUT_COLUMN_COUNT = 2
 
@@ -380,7 +380,7 @@ limit 12
     queries: {
       mostFrequentlyInvoked: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
+        sql: (_params, where, orderBy, runIndexAdvisor = false, _filterIndexAdvisor = false) => `
         -- reports-query-performance-most-frequently-invoked
 set search_path to public, extensions;
 
@@ -437,7 +437,7 @@ select
       },
       mostTimeConsuming: {
         queryType: 'db',
-        sql: (_, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
+        sql: (_, where, orderBy, runIndexAdvisor = false, _filterIndexAdvisor = false) => `
         -- reports-query-performance-most-time-consuming
 set search_path to public, extensions;
 
@@ -486,7 +486,7 @@ select
       },
       slowestExecutionTime: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
+        sql: (_params, where, orderBy, runIndexAdvisor = false, _filterIndexAdvisor = false) => `
         -- reports-query-performance-slowest-execution-time
 set search_path to public, extensions;
 
@@ -546,7 +546,25 @@ select
       },
       unified: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => {
+        sql: (
+          _params,
+          where,
+          orderBy,
+          runIndexAdvisor = false,
+          filterIndexAdvisor = false,
+          page = 1,
+          pageSize = 20
+        ) => {
+          const offset = (page - 1) * pageSize
+          // When filtering by index suggestions we need a larger scan window since we don't
+          // know how many rows will match. Cap at a reasonable upper bound to avoid running
+          // index_advisor() across the entire dataset on any code path where it's active.
+          const INDEX_ADVISOR_SCAN_CAP = 500
+          const baseScanTarget =
+            filterIndexAdvisor && runIndexAdvisor ? offset + pageSize * 10 : offset + pageSize
+          const baseCteLimit = runIndexAdvisor
+            ? Math.min(baseScanTarget, INDEX_ADVISOR_SCAN_CAP)
+            : baseScanTarget
           const baseQuery = `
         -- reports-query-performance-unified
         set search_path to public, extensions;
@@ -586,7 +604,7 @@ select
           -- skip queries that were never actually executed
           WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
           ${orderBy || 'order by total_time desc'}
-          limit 50
+          ${baseCteLimit !== null ? `limit ${baseCteLimit}` : ''}
         ),
         query_results as (
           select
@@ -616,7 +634,7 @@ select
         from query_results
         ${filterIndexAdvisor && runIndexAdvisor ? `where (index_advisor_result->>'has_suggestion')::boolean = true` : ''}
         ${orderBy || 'order by total_time desc'}
-        limit 20`
+        limit ${pageSize} offset ${offset}`
 
           return baseQuery
         },
@@ -636,7 +654,7 @@ select
       },
       queryMetrics: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
+        sql: (_params, where, orderBy, _runIndexAdvisor = false, _filterIndexAdvisor = false) => `
         -- reports-query-performance-metrics
         set search_path to public, extensions;
 

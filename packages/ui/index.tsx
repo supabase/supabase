@@ -1,12 +1,7 @@
-// Markdown components
-
-export * from './src/lib/Markdown'
-
 // GENERAL
 
 export * from './src/components/Button'
 export * from './src/components/Icon/IconBackground'
-export * from './src/components/Image'
 
 // DISPLAYS
 
@@ -15,9 +10,6 @@ export * from './src/components/Tabs'
 export * from './src/components/Alert'
 export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
-export * from './src/components/CodeBlock'
-export * from './src/components/SimpleCodeBlock'
-export * from './src/components/Mermaid'
 
 // NAV
 
@@ -44,17 +36,8 @@ export * from './src/lib/utils'
 
 // DATA ENTRY
 
-export * from './src/components/Select'
-export * from './src/components/Listbox'
-export * from './src/components/Checkbox'
 export * from './src/components/Input'
-export * from './src/components/InputNumber'
-export * from './src/components/Radio'
-export * from './src/components/Toggle'
-export * from './src/components/Form'
 export * from './src/components/ExpandingTextArea'
-
-export * from './src/components/PrePostTab'
 
 // layout
 export * from './src/components/LoadingLine'
@@ -142,17 +125,7 @@ export {
   FieldTitle as FieldTitle_Shadcn_,
 } from './src/components/shadcn/ui/field'
 
-export {
-  useFormField as useFormField_Shadcn_,
-  Form as Form_Shadcn_,
-  FormItem as FormItem_Shadcn_,
-  FormLabel as FormLabel_Shadcn_,
-  FormControl as FormControl_Shadcn_,
-  FormDescription as FormDescription_Shadcn_,
-  FormMessage as FormMessage_Shadcn_,
-  FormField as FormField_Shadcn_,
-  useWatch as useWatch_Shadcn_,
-} from './src/components/shadcn/ui/form'
+export * from './src/components/shadcn/ui/form'
 
 export {
   Popover as Popover_Shadcn_,
@@ -182,11 +155,7 @@ export {
   SelectScrollDownButton as SelectScrollDownButton_Shadcn_,
 } from './src/components/shadcn/ui/select'
 
-export {
-  RadioGroup as RadioGroup_Shadcn_,
-  RadioGroupItem as RadioGroupItem_Shadcn_,
-  RadioGroupLargeItem as RadioGroupLargeItem_Shadcn_,
-} from './src/components/shadcn/ui/radio-group'
+export * from './src/components/shadcn/ui/radio-group'
 
 export { Slider as Slider_Shadcn_ } from './src/components/shadcn/ui/slider'
 
@@ -210,9 +179,11 @@ export { TextArea as TextArea_Shadcn_ } from './src/components/shadcn/ui/text-ar
 
 export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
 
+export * from './src/components/shadcn/ui/input-group'
+
 export * from './src/components/shadcn/ui/switch'
 
-export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbox'
+export * from './src/components/shadcn/ui/checkbox'
 
 export * from './src/components/shadcn/ui/scroll-area'
 
@@ -268,16 +239,9 @@ export * from './src/components/TreeView'
 export * from './src/components/shadcn/ui/chart'
 export * from './src/components/shadcn/ui/sidebar'
 
-// links
-
-export * from './src/components/TextLink'
-
-// used for LW
-export * from './src/layout/banners'
-
+// ICONS
 export * from './src/components/StatusIcon'
 
-// ICONS
 // export icons
 export * from './src/components/Icon/icons/IconBriefcase2'
 export * from './src/components/Icon/icons/IconBroadcast'
@@ -287,6 +251,7 @@ export * from './src/components/Icon/icons/IconDiscord'
 export * from './src/components/Icon/icons/IconDiscussions'
 export * from './src/components/Icon/icons/IconDocumentation'
 export * from './src/components/Icon/icons/IconGitHubSolid'
+export * from './src/components/Icon/icons/IconInstagram'
 export * from './src/components/Icon/icons/IconIntegrations'
 export * from './src/components/Icon/icons/IconLifeBuoy2'
 export * from './src/components/Icon/icons/IconLinkedinSolid'
@@ -294,6 +259,7 @@ export * from './src/components/Icon/icons/IconMicSolid'
 export * from './src/components/Icon/icons/IconPartners'
 export * from './src/components/Icon/icons/IconPresence'
 export * from './src/components/Icon/icons/IconProductHunt'
+export * from './src/components/Icon/icons/IconTikTok'
 export * from './src/components/Icon/icons/IconTwitterX'
 export * from './src/components/Icon/icons/IconYCombinator'
 export * from './src/components/Icon/icons/IconYoutubeSolid'

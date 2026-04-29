@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Badge, Button, Menu } from 'ui'
+
 import { ProductMenuGroupItem } from './ProductMenu.types'
 
 interface ProductMenuItemProps {
@@ -29,7 +30,7 @@ export const ProductMenuItem = ({
           <span className="truncate flex-1 min-w-0">{name}</span>
           {label !== undefined && (
             <Badge
-              className="flex-shrink-0"
+              className="shrink-0"
               variant={label.toLowerCase() === 'new' ? 'success' : 'warning'}
             >
               {label}
@@ -57,7 +58,7 @@ export const ProductMenuItem = ({
     }
 
     return (
-      <Link href={url} className="block" target={target}>
+      <Link href={url} className="block" target={target} onClick={onClick}>
         {menuItem}
       </Link>
     )

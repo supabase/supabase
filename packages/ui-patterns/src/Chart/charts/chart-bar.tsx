@@ -54,8 +54,6 @@ export interface ChartBarProps {
   color?: string
   hoverColor?: string
   chartHighlight?: ChartHighlight
-  updateDateRange?: (from: string, to: string) => void
-  highlightActions?: ChartHighlightAction[]
   syncId?: string
   showHighlightArea?: boolean
   cursor?: string
@@ -80,8 +78,6 @@ export const ChartBar = ({
   color = CHART_COLORS.BRAND,
   hoverColor = CHART_COLORS.BRAND_HOVER,
   chartHighlight,
-  updateDateRange,
-  highlightActions,
   syncId,
   showHighlightArea = true,
   cursor,
@@ -114,8 +110,8 @@ export const ChartBar = ({
   const yAxisConfig = {
     tick: showYAxis,
     hide: !showYAxis,
-    tickMargin: showYAxis ? YAxisProps?.tickMargin ?? 4 : 0,
-    width: showYAxis ? YAxisProps?.width ?? undefined : 0,
+    tickMargin: showYAxis ? (YAxisProps?.tickMargin ?? 4) : 0,
+    width: showYAxis ? (YAxisProps?.width ?? undefined) : 0,
     axisLine: { stroke: CHART_COLORS.AXIS },
     tickLine: { stroke: CHART_COLORS.AXIS },
     ...YAxisProps,

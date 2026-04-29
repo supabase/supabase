@@ -371,6 +371,38 @@ test.describe('Filter Bar', () => {
       }
     })
 
+    test('Enter on equals fallback applies filter and returns focus to freeform', async ({
+      page,
+      ref,
+    }) => {
+      const tableName = `${tableNamePrefix}_op_default_equals`
+      const columnName = 'name'
+
+      await createTable(tableName, columnName, [{ name: 'forgecode' }, { name: 'other' }])
+
+      try {
+        await setupFilterBarPage(page, ref, toUrl(`/project/${ref}/editor?schema=public`))
+        await navigateToTable(page, ref, tableName)
+
+        await selectColumnFilter(page, columnName)
+
+        const operatorInput = page.getByTestId(`filter-operator-${columnName}`)
+        await operatorInput.fill('forgecode')
+
+        await expect(page.getByText('Equals: "forgecode"')).toBeVisible()
+
+        const rowsWaiter = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=table-rows-')
+        await page.keyboard.press('Enter')
+        await rowsWaiter
+
+        await expect(getFilterBarInput(page)).toBeFocused()
+        await expect(page.getByRole('gridcell', { name: 'forgecode' })).toBeVisible()
+        await expect(page.getByRole('gridcell', { name: 'other' })).not.toBeVisible()
+      } finally {
+        await dropTable(tableName)
+      }
+    })
+
     test('Backspace on empty operator removes condition', async ({ page, ref }) => {
       const tableName = `${tableNamePrefix}_op_bksp`
       const columnName = 'name'
@@ -1096,6 +1128,8 @@ test.describe('Filter Bar', () => {
 
         await query(`ALTER TABLE ${tableName} DROP COLUMN first_name`)
 
+        // Wait for the filter bar's debounced URL sync (500ms) before reloading
+        await page.waitForURL(/filter=/, { timeout: 5000 })
         await page.reload({ waitUntil: 'networkidle' })
 
         await expect(page.getByText('No results found — check your filter values')).toBeVisible({

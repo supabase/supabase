@@ -1,19 +1,18 @@
 'use client'
 
-import React from 'react'
+import { useBreakpoint } from 'common'
+import { ChevronRight, Sparkles } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ChevronRight, Sparkles } from 'lucide-react'
+import React from 'react'
+import { NavigationMenuLink } from 'ui'
+import { TextLink } from 'ui-patterns/TextLink'
 
-import { useBreakpoint } from 'common'
-import { TextLink } from 'ui'
-import { NavigationMenuLink } from 'ui/src/components/shadcn/ui/navigation-menu'
 import MenuItem from './MenuItem'
-
-import ComparisonsData from 'data/Comparisons'
-import CustomersData from 'data/CustomerStories'
-import MainProductsData from 'data/MainProducts'
-import ProductModulesData from 'data/ProductModules'
+import ComparisonsData from '@/data/Comparisons'
+import CustomersData from '@/data/CustomerStories'
+import MainProductsData from '@/data/MainProducts'
+import ProductModulesData from '@/data/ProductModules'
 
 export const ProductDropdown = () => {
   const isTablet = useBreakpoint(1279)
@@ -140,7 +139,7 @@ export const ProductDropdown = () => {
                     href={customer.url}
                     className="group flex items-center gap-3 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded"
                   >
-                    <div className="relative rounded-md bg-background border group-hover:border-foreground-muted/50 h-14 w-28 xl:h-14 xl:w-20 flex-shrink-0 overflow-auto">
+                    <div className="relative rounded-md bg-background border group-hover:border-foreground-muted/50 h-14 w-28 xl:h-14 xl:w-20 shrink-0 overflow-auto">
                       <Image
                         src={`/${customer.imgUrl}`}
                         alt={customer.title}

@@ -23,7 +23,7 @@ function DraftModeBanner({ onDismiss }: DraftModeBannerProps) {
             </p>
           </div>
           {onDismiss && (
-            <div className="order-2 flex-shrink-0 sm:order-3 sm:ml-3">
+            <div className="order-2 shrink-0 sm:order-3 sm:ml-3">
               <button
                 type="button"
                 className="-mr-1 flex p-2 rounded-md sm:-mr-2"

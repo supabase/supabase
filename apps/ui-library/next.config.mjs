@@ -4,6 +4,14 @@ import { withContentlayer } from 'next-contentlayer2'
 const nextConfig = {
   transpilePackages: ['ui', 'common', 'shared-data', 'icons', 'tsconfig'],
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
+  turbopack: {
+    rules: {
+      '*.md': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+    },
+  },
   async redirects() {
     return [
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
@@ -16,6 +24,12 @@ const nextConfig = {
             },
           ]
         : []),
+      // Add a redirect to make the custom block for tanstack-db
+      {
+        source: '/r/tanstack-db-nextjs.json',
+        destination: '/api/registry/tanstack-db',
+        permanent: true,
+      },
     ]
   },
   eslint: {

@@ -1,9 +1,11 @@
+import days, { endOfLW7, WeekDayProps } from '~/components/LaunchWeek/7/lw7_days'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useEffect } from 'react'
 import { Accordion } from 'ui'
 
-import days, { WeekDayProps, endOfLW7 } from '~/components/LaunchWeek/7/lw7_days'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import {
   AccordionHeader,
   CartTitle,
@@ -13,9 +15,6 @@ import {
   SmallCard,
   StyledArticleBadge,
 } from './components'
-
-import { useBreakpoint } from 'common/hooks/useBreakpoint'
-import { motion } from 'framer-motion'
 import Day5 from './Day5'
 
 export const defaultEase = [0.25, 0.25, 0, 1]
@@ -275,7 +274,7 @@ export default function LW7Releases() {
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      basis-1/2 lg:flex-shrink xl:basis-2/3 border border-[#232323] rounded-xl h-full py-10 sm:py-14 px-8 lg:px-10 xs:text-2xl text-xl text-center shadow-lg
+                      basis-1/2 lg:shrink xl:basis-2/3 border border-[#232323] rounded-xl h-full py-10 sm:py-14 px-8 lg:px-10 xs:text-2xl text-xl text-center shadow-lg
                     `}
                     initial="default"
                     animate="default"

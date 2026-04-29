@@ -1,14 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { useParams } from 'common'
-import { PerformanceSettingsForm } from 'components/interfaces/Auth/PerformanceSettingsForm'
-import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import NoPermission from 'components/ui/NoPermission'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -19,6 +10,15 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { PerformanceSettingsForm } from '@/components/interfaces/Auth/PerformanceSettingsForm'
+import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import NoPermission from '@/components/ui/NoPermission'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import type { NextPageWithLayout } from '@/types'
 
 const PerformancePage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -66,7 +66,7 @@ const PerformancePage: NextPageWithLayout = () => {
 
 PerformancePage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <AuthLayout title="Performance">{page}</AuthLayout>
   </DefaultLayout>
 )
 

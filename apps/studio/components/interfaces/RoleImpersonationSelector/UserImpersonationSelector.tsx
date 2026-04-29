@@ -1,19 +1,9 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ChevronDown, User as IconUser, Loader2, Search, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { keepPreviousData } from '@tanstack/react-query'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
-import { useCustomAccessTokenHookDetails } from 'hooks/misc/useCustomAccessTokenHookDetails'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import type { ResponseError } from 'types'
 import {
   Button,
   cn,
@@ -30,11 +20,21 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
+import { useCustomAccessTokenHookDetails } from '@/hooks/misc/useCustomAccessTokenHookDetails'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
+import type { ResponseError } from '@/types'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 
-const UserImpersonationSelector = () => {
+export const UserImpersonationSelector = () => {
   const [searchText, setSearchText] = useState('')
   const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
   const [externalUserId, setExternalUserId] = useState('')
@@ -421,8 +421,6 @@ const UserImpersonationSelector = () => {
   )
 }
 
-export default UserImpersonationSelector
-
 // Base interface for shared impersonation row props to reduce
 // duplication between user and external auth impersonation displays
 interface BaseImpersonatingRowProps {
@@ -462,7 +460,7 @@ const BaseImpersonatingRow = ({
       </div>
 
       <Button type="default" onClick={onClick} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
+        {isImpersonating ? 'Stop impersonating' : 'Impersonate'}
       </Button>
     </div>
   )
@@ -558,7 +556,7 @@ const UserRow = ({ user, onClick, isImpersonating = false, isLoading = false }: 
       </div>
 
       <Button type="default" onClick={() => onClick(user)} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
+        {isImpersonating ? 'Stop impersonating' : 'Impersonate'}
       </Button>
     </div>
   )

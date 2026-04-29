@@ -1,25 +1,25 @@
-import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
+import { THRESHOLD_COUNT } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import { useTableSort } from 'components/grid/hooks/useTableSort'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isForeignTable, isTable } from 'data/table-editor/table-editor-types'
-import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { RoleImpersonationState } from 'lib/role-impersonation'
 import { AlertCircle, ArrowLeft, ArrowRight, HelpCircle, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { DropdownControl } from '../../common/DropdownControl'
 import { formatEstimatedCount } from './Pagination.utils'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import { useTableSort } from '@/components/grid/hooks/useTableSort'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { isForeignTable, isTable } from '@/data/table-editor/table-editor-types'
+import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
+import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { RoleImpersonationState } from '@/lib/role-impersonation'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 const rowsPerPageOptions = [
   { value: 100, label: '100 rows' },
@@ -102,7 +102,6 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   )
   const count = data?.count ?? 0
   const hasCountData = count >= 0
-  const isEstimateCount = data?.is_estimate ?? false
   const countString = data?.is_estimate ? formatEstimatedCount(count) : count.toLocaleString()
   const maxPages = Math.ceil(count / tableEditorSnap.rowsPerPage)
   const totalPages = count > 0 ? maxPages : 1

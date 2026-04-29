@@ -2,8 +2,6 @@ import { formatDistanceToNow } from 'date-fns'
 import { LoaderCircle, Search, X } from 'lucide-react'
 import { ParserBuilder } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
-
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import {
   cn,
   Command_Shadcn_ as Command,
@@ -15,6 +13,7 @@ import {
   CommandSeparator_Shadcn_ as CommandSeparator,
   Separator,
 } from 'ui'
+
 import type { DataTableFilterField } from '../DataTable.types'
 import { formatCompactNumber } from '../DataTable.utils'
 import { Kbd } from '../primitives/Kbd'
@@ -26,6 +25,7 @@ import {
   getWordByCaretPosition,
   replaceInputByFieldType,
 } from './DataTableFilters.utils'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 
 // FIXME: there is an issue on cmdk if I wanna only set a single slider value...
 
@@ -65,9 +65,6 @@ export function DataTableFilterCommand({
   const queryFields = filterFields.filter(
     (x) => typeof x.value === 'string' && currentWord.includes(`${x.value}:`)
   )
-
-  // [Joshen] Temporarily disabling as this conflicts with our current CMD K behaviour
-  // useHotKey(() => setOpen((open) => !open), 'k')
 
   useEffect(() => {
     // TODO: we could check for ARRAY_DELIMITER or SLIDER_DELIMITER to auto-set filter when typing
@@ -130,7 +127,7 @@ export function DataTableFilterCommand({
         )}
         <span
           className={cn(
-            'h-9 w-full max-w-sm truncate py-3 text-left text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50',
+            'h-9 w-full max-w-sm truncate py-3 text-left text-xs outline-none disabled:cursor-not-allowed disabled:opacity-50',
             'flex items-center md:max-w-xl lg:max-w-4xl xl:max-w-5xl',
             trimmedInputValue ? 'text-foreground' : 'text-foreground-light'
           )}
@@ -190,7 +187,7 @@ export function DataTableFilterCommand({
             setCurrentWord(word)
           }}
           placeholder={placeholder}
-          className="text-foreground"
+          className="text-xs text-foreground"
         />
         <div className="relative">
           <div className="absolute top-2 z-50 w-full overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-md outline-none animate-in">

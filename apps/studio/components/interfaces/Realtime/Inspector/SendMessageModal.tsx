@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { tryParseJson } from 'lib/helpers'
 import { Input, Modal } from 'ui'
+
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { tryParseJson } from '@/lib/helpers'
 
 interface SendMessageModalProps {
   visible: boolean
@@ -51,7 +51,7 @@ export const SendMessageModal = ({
         <Input
           label="Message name"
           size="small"
-          className="flex-grow"
+          className="grow"
           value={values.message}
           onChange={(v) => setValues({ ...values, message: v.target.value })}
         />

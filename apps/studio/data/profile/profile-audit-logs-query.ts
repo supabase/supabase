@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { profileKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { AuditLog } from '@/data/organizations/organization-audit-logs-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ProfileAuditLogsVariables = {
   iso_timestamp_start: string

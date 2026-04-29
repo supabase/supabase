@@ -1,14 +1,15 @@
 'use client'
 
-import * as NavigationMenuPrimitive from '@radix-ui/react-navigation-menu'
+import { NavigationMenu as NavigationMenuPrimitive } from 'radix-ui'
 import { cva } from 'class-variance-authority'
 import { ChevronDown } from 'lucide-react'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
 
-interface NavigationMenuProps
-  extends React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root> {
+interface NavigationMenuProps extends React.ComponentPropsWithoutRef<
+  typeof NavigationMenuPrimitive.Root
+> {
   viewportClassName?: string | undefined
   renderViewport?: boolean | undefined
 }

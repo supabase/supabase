@@ -1,4 +1,5 @@
-import dynamic from 'next/dynamic'
+import { CubeIcon } from '@heroicons/react/outline'
+import { useBreakpoint } from 'common'
 import {
   Check,
   ClipboardCheck,
@@ -15,33 +16,29 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
-import { CubeIcon } from '@heroicons/react/outline'
-import { cn, IconPartners, Image } from 'ui'
+import dynamic from 'next/dynamic'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { Image } from 'ui-patterns/Image'
 
+import { companyStats } from '../company-stats'
 import MainProducts from '../MainProducts'
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
 import {
   FrameworkLink,
-  type FrameworkLinkProps,
+  getEditors,
   type FeaturesSection,
   type HeroSection,
   type Metadata,
-  getEditors,
 } from './solutions.utils'
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
-
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { useBreakpoint } from 'common'
-import { useSendTelemetryEvent } from 'lib/telemetry'
-import { companyStats } from '../company-stats'
+import type { SecuritySectionProps } from '@/components/Enterprise/Security'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import RealtimeLogs from '@/components/Products/Functions/RealtimeLogs'
+import type { DXSectionProps } from '@/components/Solutions/DeveloperExperienceSection'
+import type { FeatureGridProps } from '@/components/Solutions/FeatureGrid'
+import type { MPCSectionProps } from '@/components/Solutions/MPCSection'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import type { ResultsSectionProps } from '@/components/Solutions/ResultsSection'
+import { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
@@ -65,12 +62,12 @@ const data: () => {
 
   return {
     metadata: {
-      metaTitle: 'Supabase for Startups',
+      metaTitle: 'Supabase is for Startups',
       metaDescription: 'Build fast. Scale easily. Trust your stack.',
     },
     heroSection: {
       id: 'hero',
-      title: 'Supabase for Startups',
+      title: 'Supabase is for Startups',
       h1: (
         <>
           <span className="block text-foreground">Build fast. Scale easily.</span>
@@ -87,7 +84,7 @@ const data: () => {
       image: undefined,
       ctas: [
         {
-          label: 'Start your company',
+          label: 'Get started with Supabase',
           href: 'https://supabase.com/dashboard',
           type: 'primary' as any,
           onClick: () =>

@@ -1,12 +1,12 @@
 'use client'
 
-import Link from 'next/link'
-
-import { Check } from 'lucide-react'
-import { plans } from 'shared-data/plans'
-import { Button, cn } from 'ui'
 import { Organization } from '~/data/organizations'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { Check } from 'lucide-react'
+import Link from 'next/link'
+import { plans } from 'shared-data/plans'
+import { Button, cn } from 'ui'
+
 import UpgradePlan from './UpgradePlan'
 
 interface PricingPlansProps {
@@ -66,14 +66,11 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                       )}
                     </div>
                   </div>
-                  <p
-                    className={cn(
-                      'text-foreground-light mb-4 text-sm 2xl:pr-4',
-                      isProPlan && 'xl:mb-12'
-                    )}
-                  >
-                    {plan.description}
-                  </p>
+                  <div className={cn('flex flex-col', isProPlan && 'xl:mb-12')}>
+                    <p className="text-foreground-light text-sm 2xl:pr-4 mb-4">
+                      {plan.description}
+                    </p>
+                  </div>
                   {isUpgradablePlan && hasExistingOrganizations ? (
                     <UpgradePlan
                       planId={plan.planId}
@@ -125,11 +122,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
 
                           {plan.warning && (
                             <div className="mt-4 flex flex-col gap-1">
-                              <span
-                                className={cn(
-                                  'text-[13px] leading-4 inline-flex gap-1 items-center'
-                                )}
-                              >
+                              <span className="text-[13px] leading-4 inline-flex gap-1 items-center">
                                 {plan.warning}
                               </span>
                               {(plan.name === 'Pro' || plan.name === 'Team') && (

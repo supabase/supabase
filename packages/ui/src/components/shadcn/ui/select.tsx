@@ -1,8 +1,8 @@
 'use client'
 
-import * as SelectPrimitive from '@radix-ui/react-select'
 import { cva, VariantProps } from 'class-variance-authority'
 import { Check, ChevronDown, ChevronUp } from 'lucide-react'
+import { Select as SelectPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../../lib/constants'
@@ -54,11 +54,12 @@ const SelectTrigger = React.forwardRef<
       SelectTriggerVariants({ size }),
       className
     )}
+    tabIndex={0}
     {...props}
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 text-foreground-lighter flex-shrink-0" strokeWidth={1.5} />
+      <ChevronDown className="h-4 w-4 text-foreground-lighter shrink-0" strokeWidth={1.5} />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ))

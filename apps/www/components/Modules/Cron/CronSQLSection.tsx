@@ -1,9 +1,9 @@
-import React, { FC } from 'react'
-import type { LucideIcon } from 'lucide-react'
+import React, { type FC, type ReactNode } from 'react'
+import { cn } from 'ui'
+import { TextLink } from 'ui-patterns/TextLink'
 
-import { cn, TextLink } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import CodeWindow from '~/components/CodeWindow'
+import CodeWindow from '@/components/CodeWindow'
+import SectionContainer from '@/components/Layouts/SectionContainer'
 
 const codeSnippet = `
 select
@@ -15,9 +15,9 @@ select
 `
 interface Props {
   id: string
-  label: string | JSX.Element
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
+  label: ReactNode
+  heading: ReactNode
+  subheading: ReactNode
   className?: string
   cta?: {
     label: string
@@ -42,7 +42,7 @@ const CronSQLSection: FC<Props> = (props) => {
           <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
         )}
       </div>
-      <ul className="w-full flex-grow rounded-lg max-w-md">
+      <ul className="w-full grow rounded-lg max-w-md">
         <div className="w-full h-full relative">
           <CodeWindow
             code={codeSnippet}

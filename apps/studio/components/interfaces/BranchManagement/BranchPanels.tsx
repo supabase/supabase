@@ -1,14 +1,15 @@
 import dayjs from 'dayjs'
 import { Github } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import type { Branch } from 'data/branches/branches-query'
-import Link from 'next/link'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { WorkflowLogs } from './WorkflowLogs'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import type { Branch } from '@/data/branches/branches-query'
 
 interface BranchManagementSectionProps {
   header: string | ReactNode
@@ -86,7 +87,6 @@ export const BranchRow = ({
     : null
   const isDeletionPending = willBeDeletedIn !== null && willBeDeletedIn < 0
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
-  const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
   const navigateUrl = rowLink ?? `/project/${branch.project_ref}`
 
@@ -137,12 +137,14 @@ export const BranchRow = ({
           </p>
         ) : (
           <p className="text-xs text-foreground-lighter">
-            {daysFromNow > 1
-              ? `Updated on ${formattedUpdatedAt}`
-              : `Updated ${formattedTimeFromNow}`}
+            {daysFromNow > 1 ? 'Updated on' : 'Updated'}{' '}
+            <TimestampInfo
+              utcTimestamp={branch.updated_at}
+              label={daysFromNow <= 1 ? formattedTimeFromNow : undefined}
+            />
           </p>
         )}
-        <WorkflowLogs projectRef={branch.project_ref} status={branch.status} />
+        <WorkflowLogs branch={branch} />
         {rowActions}
       </div>
     </div>

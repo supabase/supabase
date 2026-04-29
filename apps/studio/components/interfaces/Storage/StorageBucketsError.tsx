@@ -1,8 +1,9 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import type { ResponseError } from 'types'
 import { Alert, Button } from 'ui'
+
 import { SupportLink } from '../Support/SupportLink'
+import type { ResponseError } from '@/types'
 
 export interface StorageBucketsErrorProps {
   error: ResponseError
@@ -12,7 +13,7 @@ const StorageBucketsError = ({ error }: StorageBucketsErrorProps) => {
   const { ref } = useParams()
 
   return (
-    <div className="storage-container flex items-center justify-center flex-grow">
+    <div className="storage-container flex items-center justify-center grow">
       <div>
         <Alert
           withIcon

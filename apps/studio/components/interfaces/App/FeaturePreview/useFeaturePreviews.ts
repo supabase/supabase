@@ -1,6 +1,8 @@
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 
-type FeaturePreview = {
+import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
+
+export type FeaturePreview = {
   key: string
   name: string
   discussionsUrl?: string
@@ -15,25 +17,27 @@ type FeaturePreview = {
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const tableEditorNewFilterBar = useFlag('tableEditorNewFilterBar')
+  const { isEligible: isEnterpriseOrSupabaseOrg } = useIsEnterpriseOrSupabaseOrg()
+
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
+  const jitDbAccessEnabled = useFlag('jitDbAccess')
 
   return [
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER,
+      name: 'RLS Tester',
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/45233',
+      enabled: true,
+      isNew: true,
+      isPlatformOnly: false,
+      isDefaultOptIn: false,
+    },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
       name: 'New Logs interface',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
-      enabled: isUnifiedLogsPreviewAvailable,
-      isNew: false,
-      isPlatformOnly: true,
-      isDefaultOptIn: false,
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
-      name: 'Branching via dashboard',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/branching-2-0',
-      enabled: true,
+      enabled: isUnifiedLogsPreviewAvailable && isEnterpriseOrSupabaseOrg,
       isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: false,
@@ -52,7 +56,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF,
       name: 'PG Delta Diff',
       discussionsUrl: undefined,
-      isNew: true,
+      isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: true,
       enabled: pgDeltaDiffEnabled,
@@ -67,13 +71,13 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       enabled: platformWebhooksEnabled,
     },
     {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
-      name: 'Project API documentation',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-      enabled: true,
-      isNew: false,
-      isPlatformOnly: false,
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
+      name: 'JIT database access',
+      discussionsUrl: undefined,
+      isNew: true,
+      isPlatformOnly: true,
       isDefaultOptIn: false,
+      enabled: jitDbAccessEnabled,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
@@ -83,24 +87,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isNew: false,
       isPlatformOnly: false,
       isDefaultOptIn: false,
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS,
-      name: 'Queue table operations',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/42460',
-      enabled: true,
-      isNew: true,
-      isPlatformOnly: false,
-      isDefaultOptIn: false,
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR,
-      name: 'New Table Filter Bar',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/42461',
-      enabled: true,
-      isNew: true,
-      isPlatformOnly: false,
-      isDefaultOptIn: tableEditorNewFilterBar,
     },
   ].sort((a, b) => Number(b.isNew) - Number(a.isNew))
 }

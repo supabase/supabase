@@ -1,11 +1,11 @@
+import { useParams } from 'common'
 import { BookOpen } from 'lucide-react'
 import Link from 'next/link'
-
-import { useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
+
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 
 const GrafanaPromoBanner = () => (
   <Alert_Shadcn_ className="relative overflow-hidden">
@@ -37,11 +37,11 @@ const GrafanaPromoBanner = () => (
     </svg>
 
     <div className="flex flex-col md:flex-row gap-2 mt-1">
-      <AlertTitle_Shadcn_ className="flex-grow">Advanced observability</AlertTitle_Shadcn_>
+      <AlertTitle_Shadcn_ className="grow">Advanced observability</AlertTitle_Shadcn_>
       <GrafanaBannerActions className="hidden xl:flex" />
     </div>
     <AlertDescription_Shadcn_ className="relative flex flex-col xl:flex-row gap-2 md:max-w-lg">
-      <p className="flex-grow">
+      <p className="grow">
         Set up the Supabase Grafana Dashboard to visualize over 200 database performance and health
         metrics on your Supabase project.
       </p>

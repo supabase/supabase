@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
-
-import { formatCurrency } from 'lib/helpers'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+import { formatCurrency } from '@/lib/helpers'
 
 interface BillingChangeBadgeProps {
   beforePrice?: number
@@ -33,8 +33,8 @@ export const BillingChangeBadge = ({
           <Badge
             variant="default"
             className={cn(
-              !free ? `bg-alternative` : `bg-violet-200 border-violet-900 text-violet-1100`,
-              `bg-opacity-100 text-warning`,
+              free ? `bg-violet-200/100 border-violet-900` : 'bg-alternative/100',
+              `text-warning`,
               className
             )}
           >

@@ -1,10 +1,10 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
 import { Button, Modal } from 'ui'
-
-import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
-import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 import { Admonition } from 'ui-patterns'
+
+import { useNetworkRestrictionsQuery } from '@/data/network-restrictions/network-restrictions-query'
+import { useNetworkRestrictionsApplyMutation } from '@/data/network-restrictions/network-retrictions-apply-mutation'
 
 interface RemoveRestrictionModalProps {
   visible: boolean

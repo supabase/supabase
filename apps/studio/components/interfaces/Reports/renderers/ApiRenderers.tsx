@@ -1,7 +1,26 @@
-import { useParams } from 'common'
-import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
+import { geoCentroid } from 'd3-geo'
+import sumBy from 'lodash/sumBy'
+import { ChevronRight } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { Fragment, useRef, useState, type ReactNode } from 'react'
+import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
 import {
-  MAP_CHART_THEME,
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Button,
+  Collapsible,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  WarningIcon,
+} from 'ui'
+import * as z from 'zod'
+
+import { queryParamsToObject } from '../Reports.utils'
+import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
+import { COUNTRY_LAT_LON } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
+import {
   buildCountsByIso2,
   computeMarkerRadius,
   extractIso2FromFeatureProps,
@@ -10,38 +29,18 @@ import {
   isKnownCountryCode,
   isMicroCountry,
   iso2ToCountryName,
-} from 'components/interfaces/Reports/utils/geo'
+  MAP_CHART_THEME,
+} from '@/components/interfaces/Reports/utils/geo'
 import {
-  TextFormatter,
   jsonSyntaxHighlight,
-} from 'components/interfaces/Settings/Logs/LogsFormatters'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import BarChart from 'components/ui/Charts/BarChart'
-import { geoCentroid } from 'd3-geo'
-import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { BASE_PATH } from 'lib/constants'
-import sumBy from 'lodash/sumBy'
-import { ChevronRight } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import { Fragment, useRef, useState } from 'react'
-import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
-import type { ResponseError } from 'types'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Collapsible,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  WarningIcon,
-} from 'ui'
-import * as z from 'zod'
-
-import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
-import { queryParamsToObject } from '../Reports.utils'
+  TextFormatter,
+} from '@/components/interfaces/Settings/Logs/LogsFormatters'
+import Table from '@/components/to-be-cleaned/Table'
+import AlertError from '@/components/ui/AlertError'
+import BarChart from '@/components/ui/Charts/BarChart'
+import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
+import { BASE_PATH } from '@/lib/constants'
+import type { ResponseError } from '@/types'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -171,7 +170,6 @@ export const TopApiRoutesRenderer = (
     avg?: number
   }>
 ) => {
-  const { ref: projectRef } = useParams()
   const [showMore, setShowMore] = useState(false)
 
   const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200 !border-x-0 !rounded-none'
@@ -453,10 +451,6 @@ export const RequestsByCountryMapRenderer = (
                   const iso2 = extractIso2FromFeatureProps(
                     (geo.properties || undefined) as Record<string, unknown> | undefined
                   )
-                  // Skip Antarctica entirely (causes hover issues)
-                  if ((title || '').toLowerCase() === 'antarctica') {
-                    return null
-                  }
                   const value = iso2 ? countsByIso2[iso2] || 0 : 0
                   const baseOpacity = getFillOpacity(value, max, theme)
                   const tooltipTitle = title
@@ -580,7 +574,7 @@ export const RequestsByCountryMapRenderer = (
                     if (code) present.add(code)
                   }
 
-                  const markers: JSX.Element[] = []
+                  const markers: ReactNode[] = []
                   for (const iso2 in countsByIso2) {
                     const count = countsByIso2[iso2]
                     if (count <= 0) continue

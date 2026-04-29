@@ -428,3 +428,16 @@ export const createWrappedSymbol = (name: string, display: string): Symbol => {
 // unreachable.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function neverGuard(_: never): any {}
+
+export function isObject(
+  maybeObject: unknown
+): maybeObject is Record<string | symbol | number, unknown> {
+  return maybeObject !== null && typeof maybeObject === 'object' && !Array.isArray(maybeObject)
+}
+
+export function isObjectContainingKeys<T extends string | symbol | number>(
+  maybeObject: unknown,
+  keys: Array<T>
+): maybeObject is { [K in T]: unknown } {
+  return isObject(maybeObject) && keys.every((key) => key in maybeObject)
+}

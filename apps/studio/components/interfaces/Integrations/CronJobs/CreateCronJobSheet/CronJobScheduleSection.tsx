@@ -1,11 +1,6 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { useDebounce } from 'use-debounce'
-
-import { useSqlCronGenerateMutation } from 'data/ai/sql-cron-mutation'
-import { useCronTimezoneQuery } from 'data/database-cron-jobs/database-cron-timezone-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Accordion_Shadcn_,
   AccordionContent_Shadcn_,
@@ -13,19 +8,24 @@ import {
   AccordionTrigger_Shadcn_,
   Button,
   cn,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   Input_Shadcn_,
   SheetSection,
   Switch,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { useDebounce } from 'use-debounce'
+
 import { formatScheduleString, getScheduleMessage } from '../CronJobs.utils'
 import CronSyntaxChart from '../CronSyntaxChart'
 import { type CreateCronJobForm } from './CreateCronJobSheet.constants'
+import { useSqlCronGenerateMutation } from '@/data/ai/sql-cron-mutation'
+import { useCronTimezoneQuery } from '@/data/database-cron-jobs/database-cron-timezone-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface CronJobScheduleSectionProps {
   form: UseFormReturn<CreateCronJobForm>
@@ -75,14 +75,14 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
 
   return (
     <SheetSection>
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="schedule"
         render={({ field }) => {
           return (
-            <FormItem_Shadcn_ className="flex flex-col gap-1">
+            <FormItem className="flex flex-col gap-1">
               <div className="flex flex-row justify-between">
-                <FormLabel_Shadcn_>Schedule</FormLabel_Shadcn_>
+                <FormLabel>Schedule</FormLabel>
                 <span className="text-foreground-lighter text-xs">
                   {useNaturalLanguage
                     ? 'Describe your schedule in words'
@@ -90,7 +90,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                 </span>
               </div>
 
-              <FormControl_Shadcn_>
+              <FormControl>
                 {useNaturalLanguage ? (
                   <Input
                     value={inputValue}
@@ -114,8 +114,8 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                     }}
                   />
                 )}
-              </FormControl_Shadcn_>
-              <FormMessage_Shadcn_ />
+              </FormControl>
+              <FormMessage />
               <div className="flex flex-col gap-y-4 mt-3 mb-2">
                 <div className="flex items-center gap-2">
                   <Switch
@@ -187,7 +187,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                   </span>
                 )}
               </div>
-            </FormItem_Shadcn_>
+            </FormItem>
           )
         }}
       />

@@ -5,13 +5,13 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
@@ -43,15 +43,15 @@ export default function InputOTPForm() {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="pin"
           render={({ field }) => (
-            <FormItem_Shadcn_>
-              <FormLabel_Shadcn_>One-Time Password</FormLabel_Shadcn_>
-              <FormControl_Shadcn_>
+            <FormItem>
+              <FormLabel>One-Time Password</FormLabel>
+              <FormControl>
                 <InputOTP maxLength={6} {...field}>
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />
@@ -62,17 +62,17 @@ export default function InputOTPForm() {
                     <InputOTPSlot index={5} />
                   </InputOTPGroup>
                 </InputOTP>
-              </FormControl_Shadcn_>
-              <FormDescription_Shadcn_>
+              </FormControl>
+              <FormDescription>
                 Please enter the one-time password sent to your phone.
-              </FormDescription_Shadcn_>
-              <FormMessage_Shadcn_ />
-            </FormItem_Shadcn_>
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
         <Button htmlType="submit">Submit</Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

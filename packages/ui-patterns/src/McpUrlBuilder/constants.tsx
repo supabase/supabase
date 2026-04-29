@@ -1,6 +1,7 @@
-import { CodeBlock } from 'ui/src/components/CodeBlock'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import type {
+  AntigravityMcpConfig,
   ClaudeCodeMcpConfig,
   CodexMcpConfig,
   FactoryMcpConfig,
@@ -189,7 +190,7 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           After adding the server, enable remote MCP client support by adding this to your{' '}
@@ -288,7 +289,7 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
-    alternateInstructions: (config, onCopy) => {
+    alternateInstructions: (_config, onCopy) => {
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">
@@ -307,6 +308,42 @@ export const MCP_CLIENTS: McpClient[] = [
     },
   },
   {
+    key: 'antigravity',
+    label: 'Antigravity',
+    icon: 'antigravity',
+    configFile: '~/.gemini/antigravity/mcp_config.json',
+    externalDocsUrl: 'https://antigravity.google/docs/mcp',
+    transformConfig: (config): AntigravityMcpConfig => {
+      return {
+        mcpServers: {
+          supabase: {
+            serverUrl: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+    alternateInstructions: (_config, _onCopy) => (
+      <div className="space-y-2">
+        <p className="text-xs text-foreground-light">
+          After saving the config, restart Antigravity. It will prompt you to complete the OAuth
+          flow to authenticate with Supabase.
+        </p>
+        <p className="text-xs text-foreground-light">
+          To edit the config from within Antigravity, click the <strong>···</strong> menu at the top
+          of the Agent pane &gt; <strong>MCP Servers</strong> &gt;{' '}
+          <strong>Manage MCP Servers</strong> &gt; <strong>View raw config</strong>. From the Manage
+          MCP Servers page you can also <strong>Refresh</strong> server configs and enable/disable
+          servers.
+        </p>
+        <p className="text-xs text-foreground-light">
+          If you run into authentication issues, open the command palette and run{' '}
+          <strong>Authentication: Remove Dynamic Authentication Providers</strong> to clear cached
+          OAuth credentials and re-authenticate.
+        </p>
+      </div>
+    ),
+  },
+  {
     key: 'windsurf',
     label: 'Windsurf',
     icon: 'windsurf',
@@ -323,12 +360,12 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    primaryInstructions: (config, onCopy) => (
+    primaryInstructions: (_config, _onCopy) => (
       <p className="text-xs text-warning">
         Ensure you are running Windsurf version <code>0.1.37</code> or higher.
       </p>
     ),
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, _onCopy) => (
       <p className="text-xs text-foreground-light">
         Windsurf does not currently support remote MCP servers over HTTP transport. You need to use
         the mcp-remote package as a proxy.
@@ -385,7 +422,7 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, _onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           For more details, see{' '}
@@ -435,7 +472,7 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, _onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           Restart Factory or type <code>/mcp</code> within droid to complete OAuth authentication
@@ -464,7 +501,7 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           After adding the configuration, run the following command to authenticate:

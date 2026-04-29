@@ -1,6 +1,4 @@
 import { useParams } from 'common'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
 import { useMemo } from 'react'
 import {
   createMcpCopyHandler,
@@ -13,6 +11,8 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 function McpCursorContent({ state, projectKeys }: StepContentProps) {
   const { ref: projectRef } = useParams()
@@ -79,7 +79,6 @@ function McpCursorContentInner({
     <McpConfigurationDisplay
       className="space-y-4"
       theme="dark"
-      basePath={BASE_PATH}
       selectedClient={selectedClient}
       clientConfig={clientConfig}
       onCopyCallback={handleCopy}

@@ -1,13 +1,13 @@
-import React, { FC } from 'react'
-
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import Panel from '../Panel'
 import type { Testimonials } from '~/data/solutions/solutions.utils'
+import React, { type FC, type ReactNode } from 'react'
+
+import Panel from '../Panel'
 
 export type Story = {
   url: string
   heading: string
-  subheading: string | JSX.Element
+  subheading: ReactNode
 }
 
 const EnterpriseSecurity: FC<Testimonials> = (props) => {

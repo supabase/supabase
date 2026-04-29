@@ -1,7 +1,12 @@
+import { useParams } from 'common'
+import { Database } from 'icons'
 import { Loader2, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
+import { AWS_REGIONS } from 'shared-data'
+import { Badge, Button } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns'
 
 import { ReadReplicaDetails } from '@/components/interfaces/Database/Replication/ReadReplicas/ReadReplicaDetails'
 import {
@@ -11,6 +16,8 @@ import {
 import { DropReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/DropReplicaConfirmationModal'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { RestartReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/RestartReplicaConfirmationModal'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ScaffoldDescription, ScaffoldTitle } from '@/components/layouts/Scaffold'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -20,14 +27,7 @@ import {
   ReplicaInitializationStatus,
   useReadReplicasStatusesQuery,
 } from '@/data/read-replicas/replicas-status-query'
-import { useParams } from 'common'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { Database } from 'icons'
-import { AWS_REGIONS } from 'shared-data'
-import type { NextPageWithLayout } from 'types'
-import { Badge, Button } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReadReplicaPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -179,7 +179,7 @@ const DatabaseReadReplicaPage: NextPageWithLayout = () => {
 
 DatabaseReadReplicaPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database Replication">{page}</DatabaseLayout>
+    <DatabaseLayout title="Replication">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

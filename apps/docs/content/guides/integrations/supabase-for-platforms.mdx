@@ -204,7 +204,7 @@ curl https://api.supabase.com/v1/projects/{ref}/database/migrations \
   --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
   --header 'Content-Type: application/json' \
   --data '{
-    "query": "create table public.todos (id serial primary key, task text not null); alter table public.todos enable row level security;",
+    "query": "create table public.todos (id serial primary key, task text not null); grant select on public.todos to anon; grant select, insert, update, delete on public.todos to authenticated; grant select, insert, update, delete on public.todos to service_role; alter table public.todos enable row level security;",
     "name": "Create a todos table"
   }'
 ```
@@ -374,12 +374,6 @@ curl https://api.supabase.com/v1/projects/database/backups/restore-pitr \
 ## Claim flow
 
 Management API endpoint: [`GET /v1/oauth/authorize/project-claim`](https://api.supabase.com/api/v1#tag/oauth/get/v1/oauth/authorize/project-claim)
-
-<Admonition type="note" title="Contact us for access to claim flow">
-
-Only select customers have access to claim flow. Submit this [form](/solutions/ai-builders#talk-to-partnerships-team) to get access.
-
-</Admonition>
 
 Your users may want to claim the project that currently lives in your org so that they can have more control over it.
 

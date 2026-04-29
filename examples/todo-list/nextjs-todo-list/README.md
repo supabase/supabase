@@ -63,7 +63,6 @@ Supabase integrates seamlessly with Vercel's preview branches, giving each branc
 
 1. Ensure the Vercel project is linked to a Git repository.
 2. Configure the "Preview" environment variables in Vercel:
-
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 

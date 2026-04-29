@@ -1,20 +1,20 @@
 import { Editor } from '@monaco-editor/react'
 import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
+import { useParams } from 'common'
 import { Loader } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
+import { Button, cn, SidePanel } from 'ui'
 
-import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, SidePanel, cn } from 'ui'
 import { ActionBar } from '../ActionBar'
 import { isValueTruncated } from './RowEditor.utils'
+import { Markdown } from '@/components/interfaces/Markdown'
+import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface TextEditorProps {
   visible: boolean
@@ -128,7 +128,7 @@ export const TextEditor = ({
     >
       <div className="relative flex flex-auto h-full flex-col gap-y-4">
         {view === 'edit' ? (
-          <div className="w-full h-full flex-grow">
+          <div className="w-full h-full grow">
             <Editor
               key={value}
               theme="supabase"
@@ -161,7 +161,7 @@ export const TextEditor = ({
             />
           </div>
         ) : (
-          <SidePanel.Content className="py-4 bg-default flex-grow">
+          <SidePanel.Content className="py-4 bg-default grow">
             <Markdown
               remarkPlugins={[remarkGfm]}
               className="bg-default markdown-body"

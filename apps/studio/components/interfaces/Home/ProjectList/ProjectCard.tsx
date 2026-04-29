@@ -1,17 +1,7 @@
-import CardButton from 'components/ui/CardButton'
-import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
-import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
-import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
-import type { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH } from 'lib/constants'
 import { Copy, Github, MoreVertical, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
 import InlineSVG from 'react-inlinesvg'
 import { toast } from 'sonner'
-import type { Organization } from 'types'
 import {
   Button,
   copyToClipboard,
@@ -23,6 +13,18 @@ import {
 
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
+import CardButton from '@/components/ui/CardButton'
+import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
+import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
+import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
+import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
+import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH } from '@/lib/constants'
+import type { Organization } from '@/types'
 
 export interface ProjectCardProps {
   slug?: string
@@ -58,6 +60,10 @@ export const ProjectCard = ({
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
+  const projectManagedBy = getManagedByFromOrganizationPartner(
+    undefined,
+    project.integration_source
+  )
   const projectStatus = inferProjectStatus(project.status)
 
   return (
@@ -71,7 +77,7 @@ export const ProjectCard = ({
             <div className="w-full flex flex-col gap-y-4 justify-between px-5">
               <div className="flex flex-col gap-y-0.5 relative">
                 <div className="flex items-center justify-between">
-                  <h5 className="text-sm flex-shrink truncate pr-5">{name}</h5>
+                  <h5 className="text-sm shrink truncate pr-5">{name}</h5>
                   <div onClick={(e) => e.preventDefault()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -115,17 +121,14 @@ export const ProjectCard = ({
                 <p className="text-sm text-foreground-lighter">{desc}</p>
               </div>
               <div className="flex items-center gap-x-1.5 relative overflow-hidden">
-                <ProjectCardStatus
-                  projectStatus={projectStatus}
-                  resourceWarnings={resourceWarnings}
-                  renderMode="badge"
-                />
                 {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
                   <ComputeBadgeWrapper
                     slug={slug}
                     projectRef={project.ref}
                     cloudProvider={project.cloud_provider}
                     computeSize={getComputeSize(project)}
+                    resourceWarnings={resourceWarnings}
+                    badgeClassName="text-[10px] leading-none tracking-[0.07em]"
                   />
                 )}
                 {isVercelIntegrated && (
@@ -137,6 +140,7 @@ export const ProjectCard = ({
                     />
                   </div>
                 )}
+                <PartnerIcon organization={{ managed_by: projectManagedBy }} />
                 {isGithubIntegrated && (
                   <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md min-w-0">
                     <div className="w-5 h-5 p-1 flex items-center justify-center shrink-0">

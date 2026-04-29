@@ -11,10 +11,12 @@ import passwordBasedAuthTanstack from './default/blocks/password-based-auth-tans
 import realtimeAvatarStack from './default/blocks/realtime-avatar-stack/registry-item.json' with { type: 'json' }
 import realtimeChat from './default/blocks/realtime-chat/registry-item.json' with { type: 'json' }
 import realtimeCursor from './default/blocks/realtime-cursor/registry-item.json' with { type: 'json' }
+import realtimeMonaco from './default/blocks/realtime-monaco/registry-item.json' with { type: 'json' }
 import socialAuthNextjs from './default/blocks/social-auth-nextjs/registry-item.json' with { type: 'json' }
 import socialAuthReactRouter from './default/blocks/social-auth-react-router/registry-item.json' with { type: 'json' }
 import socialAuthReact from './default/blocks/social-auth-react/registry-item.json' with { type: 'json' }
 import socialAuthTanstack from './default/blocks/social-auth-tanstack/registry-item.json' with { type: 'json' }
+import tanstackDbNextjs from './default/blocks/tanstack-db/registry-item.json' with { type: 'json' }
 import { registryItemAppend } from './utils'
 
 const combine = (component: RegistryItem) => {
@@ -50,6 +52,10 @@ export const blocks = [
   ...combine(currentUserAvatar as RegistryItem),
   ...combine(realtimeAvatarStack as RegistryItem),
   ...combine(realtimeChat as RegistryItem),
+  ...combine(realtimeMonaco as RegistryItem),
   // infinite query hook is intentionally not combined with the clients since it depends on clients having database types.
   infiniteQueryHook as RegistryItem,
+
+  // tanstack-db is served dynamically via API route, but we register it here for the static build
+  registryItemAppend(tanstackDbNextjs as RegistryItem, [nextjsClient!]),
 ] as RegistryItem[]

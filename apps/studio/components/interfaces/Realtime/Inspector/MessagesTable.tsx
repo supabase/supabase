@@ -1,12 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import NoPermission from 'components/ui/NoPermission'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import { isEqual } from 'lodash'
 import { ExternalLink, Loader2, Megaphone } from 'lucide-react'
 import Link from 'next/link'
@@ -19,6 +12,13 @@ import type { LogData } from './Messages.types'
 import MessageSelection from './MessageSelection'
 import NoChannelEmptyState from './NoChannelEmptyState'
 import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
+import { DocsButton } from '@/components/ui/DocsButton'
+import NoPermission from '@/components/ui/NoPermission'
+import ShimmerLine from '@/components/ui/ShimmerLine'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 export const isErrorLog = (l: LogData) => {
   return l.message === 'SYSTEM' && l.metadata?.status === 'error'
@@ -143,7 +143,7 @@ const MessagesTable = ({
       <section className="flex w-full flex-col md:max-h-[calc(100vh-var(--header-height)-3rem)]">
         <ShimmerLine active={enabled} />
         <div className={cn('flex h-full flex-row', enabled ? 'border-brand-400' : null)}>
-          <div className="flex flex-grow flex-col">
+          <div className="flex grow flex-col">
             {enabled && (
               <div className="w-full h-9 px-4 bg-surface-100 items-center inline-flex justify-between text-foreground-light">
                 <div className="inline-flex gap-2.5 text-xs">

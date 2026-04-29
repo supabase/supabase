@@ -1,7 +1,3 @@
-import type {
-  InfraMonitoringMultiResponse,
-  InfraMonitoringSingleResponse,
-} from 'data/analytics/infra-monitoring-query'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -9,6 +5,10 @@ import {
   parseInfrastructureMetrics,
   parseNumericValue,
 } from './DatabaseInfrastructureSection.utils'
+import type {
+  InfraMonitoringMultiResponse,
+  InfraMonitoringSingleResponse,
+} from '@/data/analytics/infra-monitoring-query'
 
 describe('parseNumericValue', () => {
   it('returns number value as-is', () => {

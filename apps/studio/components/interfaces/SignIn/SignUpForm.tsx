@@ -7,24 +7,24 @@ import { parseAsString, useQueryStates } from 'nuqs'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { useSignUpMutation } from 'data/misc/signup-mutation'
-import { BASE_PATH } from 'lib/constants'
-import { buildPathWithParams } from 'lib/gotrue'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
   cn,
+  Form,
+  FormControl,
+  FormField,
+  Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import PasswordConditionsHelper from './PasswordConditionsHelper'
+import { useSignUpMutation } from '@/data/misc/signup-mutation'
+import { BASE_PATH } from '@/lib/constants'
+import { buildPathWithParams } from '@/lib/gotrue'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -143,15 +143,15 @@ export const SignUpForm = () => {
           isSubmitted ? 'max-h-[100px] opacity-0 pointer-events-none' : 'max-h-[1000px] opacity-100'
         )}
       >
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField_Shadcn_
+            <FormField
               key="email"
               name="email"
               control={form.control}
               render={({ field }) => (
                 <FormItemLayout name="email" label="Email">
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Input_Shadcn_
                       id="email"
                       autoComplete="email"
@@ -159,18 +159,18 @@ export const SignUpForm = () => {
                       {...field}
                       placeholder="you@example.com"
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               key="password"
               name="password"
               control={form.control}
               render={({ field }) => (
                 <FormItemLayout name="password" label="Password">
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <div className="relative">
                       <Input_Shadcn_
                         id="password"
@@ -183,15 +183,15 @@ export const SignUpForm = () => {
                       />
                       <Button
                         type="default"
-                        title={passwordHidden ? `Hide password` : `Show password`}
-                        aria-label={passwordHidden ? `Hide password` : `Show password`}
+                        title={passwordHidden ? `Show password` : `Hide password`}
+                        aria-label={passwordHidden ? `Show password` : `Hide password`}
                         className="absolute right-1 top-1 px-1.5"
                         icon={passwordHidden ? <Eye /> : <EyeOff />}
                         disabled={isSubmitting}
                         onClick={() => setPasswordHidden((prev) => !prev)}
                       />
                     </div>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -225,7 +225,7 @@ export const SignUpForm = () => {
               Sign up
             </Button>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </div>
     </div>
   )

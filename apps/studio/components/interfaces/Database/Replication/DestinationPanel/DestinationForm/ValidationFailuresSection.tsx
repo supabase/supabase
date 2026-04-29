@@ -1,4 +1,3 @@
-import type { ValidationFailure } from 'data/replication/validate-destination-mutation'
 import {
   Accordion_Shadcn_,
   AccordionContent_Shadcn_,
@@ -9,6 +8,8 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
+import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
+
 interface ValidationFailuresSectionProps {
   destinationFailures: ValidationFailure[]
   pipelineFailures: ValidationFailure[]
@@ -18,7 +19,7 @@ export const ValidationFailuresSection = ({
   destinationFailures,
   pipelineFailures,
 }: ValidationFailuresSectionProps) => {
-  const validationIssues = [...destinationFailures, ...pipelineFailures].sort((a, b) =>
+  const validationIssues = [...destinationFailures, ...pipelineFailures].sort((a, _b) =>
     a.failure_type === 'critical' ? -1 : 1
   )
 

@@ -1,8 +1,6 @@
 'use client'
 
 import { useCallback, useEffect, useRef, type ReactNode } from 'react'
-
-import { type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,7 +12,9 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
-interface DiscardChangesConfirmationDialogProps extends ConfirmOnCloseModalProps {
+import { type ConfirmOnCloseModalProps } from '@/hooks/ui/useConfirmOnClose'
+
+export interface DiscardChangesConfirmationDialogProps extends ConfirmOnCloseModalProps {
   title?: ReactNode
   description?: ReactNode
   confirmLabel?: ReactNode

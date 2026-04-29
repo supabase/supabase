@@ -1,8 +1,8 @@
 import type { Row } from '@tanstack/react-table'
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
-
 import { Button, cn, ResizableHandle, ResizablePanel } from 'ui'
+
 import { LogsList } from './LogsList'
 
 export const LogsListPanel = ({ selectedRow }: { selectedRow?: Row<any> }) => {
@@ -38,7 +38,7 @@ export const LogsListPanel = ({ selectedRow }: { selectedRow?: Row<any> }) => {
               </Button>
             </div>
             {open && (
-              <div className="flex-grow overflow-auto border-t">
+              <div className="grow overflow-auto border-t">
                 <LogsList logs={selectedRow?.original?.logs} />
               </div>
             )}

@@ -1,8 +1,8 @@
 'use client'
 
-import { Slot } from '@radix-ui/react-slot'
 import { cva, VariantProps } from 'class-variance-authority'
 import { Loader2 } from 'lucide-react'
+import { Slot } from 'radix-ui'
 import { cloneElement, forwardRef, isValidElement } from 'react'
 
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
@@ -91,10 +91,8 @@ const buttonVariants = cva(
         link: `
           text-brand-600
           border
-          border-transparent
+          border-transparent/0
           hover:bg-brand-400
-          border-opacity-0
-          bg-opacity-0
           shadow-none
           focus-visible:outline-border-strong
           data-[state=open]:bg-brand-400
@@ -157,7 +155,7 @@ const buttonVariants = cva(
   }
 )
 
-const IconContainerVariants = cva('', {
+const IconContainerVariants = cva('inline-flex items-center justify-center shrink-0', {
   variants: {
     size: {
       tiny: '[&_svg]:h-[14px] [&_svg]:w-[14px]',
@@ -208,7 +206,8 @@ const loadingVariants = cva('', {
 export interface ButtonProps
   // omit `type` as we use it to change type of button
   // replaced with `htmlType`
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'>,
+  extends
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'>,
     // omit 'disabled' as it is included in HTMLButtonElement
     Omit<ButtonVariantProps, 'disabled'>,
     Omit<LoadingVariantProps, 'type'> {
@@ -239,7 +238,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const Comp = asChild ? Slot : 'button'
+    const Comp = asChild ? Slot.Slot : 'button'
     const { className, tabIndex } = props
     const showIcon = loading || icon
     // decrecating 'showIcon' for rightIcon

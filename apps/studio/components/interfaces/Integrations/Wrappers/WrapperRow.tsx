@@ -1,8 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import type { FDW } from 'data/fdw/fdws-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { partition } from 'lodash'
 import { ChevronRight, Edit, ExternalLink, Table2, Trash } from 'lucide-react'
 import Link from 'next/link'
@@ -11,6 +8,9 @@ import { Badge, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } f
 
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { convertKVStringArrayToJson, formatWrapperTables } from './Wrappers.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import type { FDW } from '@/data/fdw/fdws-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface WrapperRowProps {
   wrapper: FDW
@@ -64,7 +64,7 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
 
           return (
             <div key={table.id} className="flex items-center">
-              <Badge className="bg-surface-300 bg-opacity-100 gap-2 font-mono text-[0.75rem] h-6 text-foreground rounded-r-none">
+              <Badge className="bg-surface-300/100 gap-2 font-mono text-[0.75rem] h-6 text-foreground rounded-r-none">
                 <div className="relative w-3 h-3 flex items-center justify-center">
                   {integration.icon({ className: 'p-0' })}
                 </div>

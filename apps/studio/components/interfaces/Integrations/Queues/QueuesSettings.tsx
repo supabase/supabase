@@ -1,44 +1,33 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { QUEUES_SCHEMA } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { Button, Form, FormControl, FormField, FormItem, Switch } from 'ui'
+import { Admonition } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import {
   FormPanelContainer,
   FormPanelContent,
   FormPanelFooter,
-} from 'components/ui/Forms/FormPanel'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import {
-  QUEUES_SCHEMA,
-  useDatabaseQueueToggleExposeMutation,
-} from 'data/database-queues/database-queues-toggle-postgrest-mutation'
-import { useDatabaseQueuesVersionQuery } from 'data/database-queues/database-queues-version-query'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
-import {
-  Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  Switch,
-} from 'ui'
-import { Admonition } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
-// [Joshen] Not convinced with the UI and layout but getting the functionality out first
+} from '@/components/ui/Forms/FormPanel'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
+import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
+import { useDatabaseQueueToggleExposeMutation } from '@/data/database-queues/database-queues-toggle-postgrest-mutation'
+import { useDatabaseQueuesVersionQuery } from '@/data/database-queues/database-queues-version-query'
+import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 export const QueuesSettings = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -197,15 +186,15 @@ export const QueuesSettings = () => {
           title="Settings"
           description="Manage your queues via any client library or Data APIs endpoints"
         />
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id="pgmq-postgrest" onSubmit={form.handleSubmit(onSubmit)}>
             <FormPanelContainer>
               <FormPanelContent className="px-8 py-8">
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="enable"
                   render={({ field }) => (
-                    <FormItem_Shadcn_ className="w-full">
+                    <FormItem className="w-full">
                       <FormItemLayout
                         className="w-full"
                         layout="flex"
@@ -243,7 +232,7 @@ export const QueuesSettings = () => {
                           </>
                         }
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             name="enable"
                             size="large"
@@ -253,7 +242,7 @@ export const QueuesSettings = () => {
                             checked={field.value}
                             onCheckedChange={(value) => field.onChange(value)}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                       {tablesWithoutRLS.length > 0 && (
                         <Admonition
@@ -317,13 +306,15 @@ export const QueuesSettings = () => {
                           </p>
                         </Admonition>
                       )}
-                    </FormItem_Shadcn_>
+                    </FormItem>
                   )}
                 />
               </FormPanelContent>
 
               <FormPanelFooter className="flex px-8 py-4 flex items-center justify-between">
-                <DocsButton href="https://github.com/tembo-io/pgmq?tab=readme-ov-file#sql-examples" />
+                <DocsButton
+                  href={`${DOCS_URL}/guides/queues/quickstart#expose-queues-to-client-side-consumers`}
+                />
                 <div className="flex items-center gap-x-2">
                   <Button
                     type="default"
@@ -344,7 +335,7 @@ export const QueuesSettings = () => {
               </FormPanelFooter>
             </FormPanelContainer>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </div>
 
       <ConfirmationModal

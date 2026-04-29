@@ -1,7 +1,4 @@
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { useQueuesQuery } from 'data/database-queues/database-queues-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { RefreshCw, Search, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -13,6 +10,9 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { CreateQueueSheet } from './CreateQueueSheet'
 import { formatQueueColumns, prepareQueuesForDataGrid } from './Queues.utils'
+import AlertError from '@/components/ui/AlertError'
+import { useQueuesQuery } from '@/data/database-queues/database-queues-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const QueuesTab = () => {
   const router = useRouter()
@@ -102,7 +102,7 @@ export const QueuesTab = () => {
           <LoadingLine loading={isLoading || isRefetching} />
 
           <DataGrid
-            className="flex-grow border-t-0"
+            className="grow border-t-0"
             rowHeight={44}
             headerRowHeight={36}
             columns={columns}

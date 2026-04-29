@@ -1,13 +1,4 @@
 import { useParams } from 'common'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import {
-  LintCategoryBadge,
-  LintEntity,
-  lintInfoMap,
-  NoIssuesFound,
-} from 'components/interfaces/Linter/Linter.utils'
-import { Lint } from 'data/lint/lint-query'
-import { useTrack } from 'lib/telemetry/track'
 import { X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useRef } from 'react'
@@ -18,6 +9,15 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import LintDetail from './LintDetail'
 import { EntityTypeIcon } from './Linter.utils'
+import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
+import {
+  LintCategoryBadge,
+  LintEntity,
+  lintInfoMap,
+  NoIssuesFound,
+} from '@/components/interfaces/Linter/Linter.utils'
+import { Lint } from '@/data/lint/lint-query'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface LinterDataGridProps {
   isLoading: boolean
@@ -71,7 +71,11 @@ const LinterDataGrid = ({
       name: 'Description',
       description: undefined,
       minWidth: 400,
-      value: (row: any) => <ReactMarkdown className="text-xs">{row.description}</ReactMarkdown>,
+      value: (row: any) => (
+        <div className="text-xs">
+          <ReactMarkdown>{row.description}</ReactMarkdown>
+        </div>
+      ),
     },
   ]
 
@@ -118,14 +122,14 @@ const LinterDataGrid = ({
   return (
     <ResizablePanelGroup
       orientation="horizontal"
-      className="relative flex flex-grow bg-alternative min-h-0"
+      className="relative flex grow bg-alternative min-h-0"
       autoSaveId="linter-layout-v1"
     >
       <ResizablePanel>
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
-          className={cn('flex-1 flex-grow h-full')}
+          className={cn('flex-1 grow h-full')}
           rowHeight={44}
           headerRowHeight={36}
           columns={columns}
@@ -191,7 +195,7 @@ const LinterDataGrid = ({
               </div>
               <Button type="text" icon={<X />} onClick={handleSidepanelClose} />
             </div>
-            <div className="p-6 flex-grow min-h-0 overflow-y-auto">
+            <div className="p-6 grow min-h-0 overflow-y-auto">
               <LintDetail lint={selectedLint} projectRef={ref!} />
             </div>
           </ResizablePanel>

@@ -13,6 +13,8 @@ const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSec
 const OpenSourceSection = dynamic(() => import('~/components/OpenSourceSection'))
 const CTABanner = dynamic(() => import('components/CTABanner/index'))
 
+// When updating page content, also update public/llms/homepage.txt
+
 const Index = () => {
   const content = getContent()
 

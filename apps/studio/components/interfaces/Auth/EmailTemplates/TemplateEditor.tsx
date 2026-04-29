@@ -1,25 +1,18 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import type { editor } from 'monaco-editor'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { FormSchema } from 'types'
 import {
   Button,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Label_Shadcn_,
   Tooltip,
@@ -28,7 +21,16 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { SpamValidation } from './SpamValidation'
+import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import type { FormSchema } from '@/types'
 
 interface TemplateEditorProps {
   template: FormSchema
@@ -65,7 +67,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
   const [validationResult, setValidationResult] = useState<ValidateSpamResponse>()
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
   const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
 
@@ -79,7 +81,10 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     return result
   }, [authConfig, properties])
 
-  const form = useForm({ defaultValues: INITIAL_VALUES })
+  const form = useForm({
+    defaultValues: INITIAL_VALUES,
+    resolver: zodResolver(template.validationSchema),
+  })
 
   const onSubmit = (values: any) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -203,21 +208,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   }, [authConfig, properties, messageSlug, form])
 
   useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault()
-        e.returnValue = '' // deprecated, but older browsers still require this
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [hasUnsavedChanges])
-
-  useEffect(() => {
     if (projectRef && id && !!authConfig) {
       const [subjectKey] = Object.keys(properties)
 
@@ -237,14 +227,14 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   }, [hasChanges])
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <CardContent>
           {Object.keys(properties).map((x: string) => {
             const property = properties[x]
             if (property.type === 'string' && x !== messageSlug) {
               return (
-                <FormField_Shadcn_
+                <FormField
                   key={x}
                   control={form.control}
                   name={x}
@@ -268,9 +258,9 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                         ) : null
                       }
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_ id={x} {...field} disabled={!canUpdateConfig} />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -376,6 +366,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
           </>
         )}
       </form>
-    </Form_Shadcn_>
+      <PreventNavigationOnUnsavedChanges hasChanges={hasChanges} />
+    </Form>
   )
 }

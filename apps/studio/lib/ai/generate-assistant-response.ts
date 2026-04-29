@@ -8,21 +8,15 @@ import {
   type ToolSet,
   type UIMessage,
 } from 'ai'
-import { traced, wrapAISDK, type Span } from 'braintrust'
+import { startSpan, traced, withCurrent, wrapAISDK, type Span } from 'braintrust'
 import { source } from 'common-tags'
-import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { IS_TRACING_ENABLED } from 'lib/ai/braintrust-logger'
-import {
-  CHAT_PROMPT,
-  EDGE_FUNCTION_PROMPT,
-  GENERAL_PROMPT,
-  LIMITATIONS_PROMPT,
-  PG_BEST_PRACTICES,
-  REALTIME_PROMPT,
-  RLS_PROMPT,
-  SECURITY_PROMPT,
-} from 'lib/ai/prompts'
-import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
+
+import { buildAssistantEvalOutput } from '@/evals/output'
+import type { AssistantEvalInput, AssistantEvalOutput } from '@/evals/scorer'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
+import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from '@/lib/ai/prompts'
+import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 
 const { streamText: tracedStreamText } = wrapAISDK(ai)
 
@@ -35,7 +29,7 @@ export async function generateAssistantResponse({
   projectRef,
   chatId,
   chatName,
-  isHipaaEnabled,
+  allowTracing,
   userId,
   orgId,
   planId,
@@ -53,7 +47,7 @@ export async function generateAssistantResponse({
   projectRef?: string
   chatId?: string
   chatName?: string
-  isHipaaEnabled?: boolean
+  allowTracing?: boolean
   userId?: string
   orgId?: number
   planId?: string
@@ -63,16 +57,12 @@ export async function generateAssistantResponse({
   abortSignal?: AbortSignal
   onSpanCreated?: (spanId: string) => void
 }) {
-  const shouldTrace = IS_TRACING_ENABLED && !isHipaaEnabled
+  const shouldTrace = allowTracing ?? IS_TRACING_ENABLED
 
   const run = async (span?: Span) => {
-    if (span) {
-      onSpanCreated?.(span.id)
-    }
-
     // Only returns last 7 messages
     // Filters out tools with invalid states
-    // Filters out tool outputs based on opt-in level using renderingToolOutputParser
+    // Filters out tool outputs based on opt-in level
     const messages = (rawMessages || []).slice(-7).map((msg) => {
       if (msg && msg.role === 'assistant' && 'results' in msg) {
         const cleanedMsg = { ...msg }
@@ -98,19 +88,25 @@ export async function generateAssistantResponse({
 
     const schemasString =
       aiOptInLevel !== 'disabled' && getSchemas
-        ? await traced(async () => getSchemas(), { name: 'getSchemas', type: 'function' })
+        ? shouldTrace
+          ? await traced(async () => getSchemas(), { name: 'getSchemas', type: 'function' })
+          : await getSchemas()
         : "You don't have access to any schemas."
 
     // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
     const system = source`
       ${GENERAL_PROMPT}
       ${CHAT_PROMPT}
-      ${PG_BEST_PRACTICES}
-      ${RLS_PROMPT}
-      ${EDGE_FUNCTION_PROMPT}
-      ${REALTIME_PROMPT}
       ${SECURITY_PROMPT}
       ${LIMITATIONS_PROMPT}
+
+      ## Available Knowledge
+
+      Before writing SQL or answering questions about the following topics, call \`load_knowledge\` to load detailed knowledge:
+      - \`pg_best_practices\` — PostgreSQL best practices. Always load before writing any SQL, even simple queries.
+      - \`rls\` — Row Level Security policies
+      - \`edge_functions\` — Supabase Edge Functions
+      - \`realtime\` — Supabase Realtime
     `
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
@@ -139,29 +135,42 @@ export async function generateAssistantResponse({
             },
           ]
         : []),
-      ...convertToModelMessages(messages),
+      ...(await convertToModelMessages(messages)),
     ]
 
     const streamTextFn = shouldTrace ? tracedStreamText : ai.streamText
 
-    const streamTextArgs = {
+    return streamTextFn({
       model,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),
-      onFinish: ({ steps }) => {
-        for (const step of steps) {
-          for (const toolCall of step.toolCalls) {
-            if (toolCall.toolName === 'rename_chat') {
-              const { newName } = toolCall.input as { newName: string }
-              span?.log({ metadata: { chatName: newName } })
+      ...(span && {
+        onFinish: ({ steps, finishReason }) => {
+          for (const step of steps) {
+            for (const toolCall of step.toolCalls) {
+              if (toolCall.toolName === 'rename_chat') {
+                const { newName } = toolCall.input as { newName: string }
+                span.log({ metadata: { chatName: newName } })
+              }
             }
           }
-        }
-      },
-    } satisfies Parameters<typeof ai.streamText>[0]
+          span.log({
+            output: buildAssistantEvalOutput(finishReason, steps) satisfies AssistantEvalOutput,
+          })
+          span.end()
+        },
+      }),
+    } satisfies Parameters<typeof ai.streamText>[0])
+  }
+
+  if (shouldTrace) {
+    // startSpan instead of traced() so we control when the span closes — onFinish logs
+    // output to the span before we call span.end(), ensuring online scoring sees the output.
+    const span = startSpan({ name: 'generateAssistantResponse', type: 'function' })
+    onSpanCreated?.(span.id)
 
     const lastUserMessage = rawMessages.findLast((m) => m.role === 'user')
     const lastUserText = lastUserMessage?.parts
@@ -169,8 +178,8 @@ export async function generateAssistantResponse({
       .map((p) => p.text)
       .join('\n')
 
-    span?.log({
-      input: lastUserText,
+    span.log({
+      input: { prompt: lastUserText ?? '' } satisfies AssistantEvalInput,
       metadata: {
         projectRef,
         chatId,
@@ -185,11 +194,7 @@ export async function generateAssistantResponse({
       },
     })
 
-    return streamTextFn(streamTextArgs)
-  }
-
-  if (shouldTrace) {
-    return traced(run, { type: 'function', name: 'generateAssistantResponse' })
+    return withCurrent(span, () => run(span))
   }
 
   return run()

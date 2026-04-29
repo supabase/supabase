@@ -1,13 +1,8 @@
+import { useDebounce } from '@uidotdev/usehooks'
+import { useParams } from 'common'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
-import { useDebounce } from '@uidotdev/usehooks'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import type { Bucket } from 'data/storage/buckets-query'
-import { useLatest } from 'hooks/misc/useLatest'
-import { IS_PLATFORM } from 'lib/constants'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
@@ -17,19 +12,23 @@ import { FileExplorerHeader } from './FileExplorerHeader'
 import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
 import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
+import { useStoragePreference } from './useStoragePreference'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import type { Bucket } from '@/data/storage/buckets-query'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const StorageExplorer = () => {
+  const { ref, bucketId } = useParams()
   const storageExplorerRef = useRef(null)
   const {
-    bucketId,
     projectRef,
-    view,
     columns,
     selectedItems,
     openedFolders,
     selectedItemsToMove,
     selectedBucket,
-    openBucket,
     fetchFolderContents,
     fetchMoreFolderContents,
     fetchFoldersByPath,
@@ -42,8 +41,9 @@ export const StorageExplorer = () => {
     setSelectedFilePreview,
     setSelectedItemsToMove,
   } = useStorageExplorerStateSnapshot()
+  const { view } = useStoragePreference(projectRef)
 
-  useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
+  useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { data: bucket, isLoading: isBucketQueryLoading } = useSelectedBucket()
 
   // Detect when transitioning between buckets to avoid showing stale content from the previous bucket.
@@ -93,12 +93,7 @@ export const StorageExplorer = () => {
 
   useEffect(() => {
     if (bucket && projectRef) fetchContents(bucket)
-  }, [bucketId, bucket, projectRef, debouncedSearchString, fetchContents])
-
-  const openBucketRef = useLatest(openBucket)
-  useEffect(() => {
-    if (bucket && !!projectRef) openBucketRef.current(bucket)
-  }, [bucketId, bucket, projectRef, openBucketRef])
+  }, [bucket, projectRef, debouncedSearchString, selectedBucket.id, fetchContents])
 
   /** Checkbox selection methods */
   /** [Joshen] We'll only support checkbox selection for files ONLY */

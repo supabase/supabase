@@ -2,10 +2,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { AiIconAnimation, Button } from 'ui'
+
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 
 interface AIAssistantOptionProps {
   projectRef?: string | null
@@ -49,7 +49,7 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
           className="w-full overflow-hidden border rounded-md relative bg-200"
         >
           <div className="flex items-center p-6">
-            <div className="flex flex-col gap-3 z-[2] flex-shrink-0 w-full">
+            <div className="flex flex-col gap-3 z-[2] shrink-0 w-full">
               <div>
                 <h5 className="text-sm font-medium text-foreground">Try Supabase Assistant</h5>
                 <p className="text-sm text-foreground-lighter">

@@ -1,13 +1,13 @@
 import { useParams } from 'common'
-import CopyButton from 'components/ui/CopyButton'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { X } from 'lucide-react'
 import { useMemo } from 'react'
 import { Button, cn } from 'ui'
 
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
+import CopyButton from '@/components/ui/CopyButton'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export interface MessageSelectionProps {
   log: LogData | null
@@ -24,9 +24,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   return (
-    <div
-      className={cn('relative flex h-full flex-grow flex-col border-l overflow-y-scroll bg-200')}
-    >
+    <div className={cn('relative flex h-full grow flex-col border-l overflow-y-scroll bg-200')}>
       <div
         className={cn(
           'absolute flex h-full w-full flex-col items-center justify-center gap-2 bg-200 text-center opacity-0 transition-all',
@@ -66,7 +64,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
           </div>
         </div>
       </div>
-      <div className="relative h-px flex-grow">
+      <div className="relative h-px grow">
         <div className="pt-4 flex flex-col gap-4">
           <div className="px-4 flex flex-row justify-between items-center">
             <div className="transition">

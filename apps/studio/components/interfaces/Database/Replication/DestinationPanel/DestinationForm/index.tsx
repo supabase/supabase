@@ -1,38 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { CreateAnalyticsBucketSheet } from 'components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import {
-  BatchConfig,
-  useCreateDestinationPipelineMutation,
-} from 'data/replication/create-destination-pipeline-mutation'
-import { useReplicationDestinationByIdQuery } from 'data/replication/destination-by-id-query'
-import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
-import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
-import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-helper'
-import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
-import {
-  useValidateDestinationMutation,
-  type ValidationFailure,
-} from 'data/replication/validate-destination-mutation'
-import { useValidatePipelineMutation } from 'data/replication/validate-pipeline-mutation'
-import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
-import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  PipelineStatusRequestStatus,
-  usePipelineRequestStatus,
-} from 'state/replication-pipeline-request-status'
-import { Button, DialogSectionSeparator, Form_Shadcn_, SheetFooter, SheetSection } from 'ui'
+import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 'ui'
 import * as z from 'zod'
 
 import {
@@ -54,6 +28,32 @@ import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PublicationSelection } from './PublicationSelection'
 import { ReplicationDisclaimerDialog } from './ReplicationDisclaimerDialog'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
+import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import {
+  BatchConfig,
+  useCreateDestinationPipelineMutation,
+} from '@/data/replication/create-destination-pipeline-mutation'
+import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
+import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
+import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
+import { useRestartPipelineHelper } from '@/data/replication/restart-pipeline-helper'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
+import { useUpdateDestinationPipelineMutation } from '@/data/replication/update-destination-pipeline-mutation'
+import {
+  useValidateDestinationMutation,
+  type ValidationFailure,
+} from '@/data/replication/validate-destination-mutation'
+import { useValidatePipelineMutation } from '@/data/replication/validate-pipeline-mutation'
+import { useIcebergNamespaceCreateMutation } from '@/data/storage/iceberg-namespace-create-mutation'
+import { useS3AccessKeyCreateMutation } from '@/data/storage/s3-access-key-create-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
 
 const formId = 'destination-editor'
 
@@ -506,11 +506,11 @@ export const DestinationForm = ({
 
   return (
     <>
-      <SheetSection className="flex-grow overflow-auto px-0 py-0">
+      <SheetSection className="grow overflow-auto px-0 py-0">
         {hasNoAvailableDestinations && !editMode ? (
           <NoDestinationsAvailable />
         ) : (
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
               <div className="p-5 flex flex-col gap-y-6">
                 <p className="text-sm font-medium text-foreground">Destination details</p>
@@ -555,7 +555,7 @@ export const DestinationForm = ({
                 </>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
         )}
       </SheetSection>
 

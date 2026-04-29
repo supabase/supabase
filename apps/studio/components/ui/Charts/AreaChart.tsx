@@ -1,13 +1,13 @@
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { Area, AreaChart as RechartAreaChart, Tooltip, XAxis } from 'recharts'
-import { useChartHoverState } from './useChartHoverState'
 
-import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import { ChartHeader } from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
+import { useChartHoverState } from './useChartHoverState'
+import { CHART_COLORS, DateTimeFormats } from '@/components/ui/Charts/Charts.constants'
 
 export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -125,7 +125,7 @@ const AreaChart = ({
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
           <Tooltip
-            content={(props) =>
+            content={(_props) =>
               syncId && syncTooltip && hoveredIndex !== null ? (
                 <div className="bg-black/90 text-white p-2 rounded text-xs">
                   <div className="font-medium">

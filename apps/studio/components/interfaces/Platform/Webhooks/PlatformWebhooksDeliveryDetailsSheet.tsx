@@ -1,9 +1,5 @@
-import { Copy } from 'lucide-react'
-
-import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { Copy, RotateCcw } from 'lucide-react'
 import {
-  AlertDialog,
   Badge,
   Button,
   Card,
@@ -11,6 +7,7 @@ import {
   Separator,
   Sheet,
   SheetContent,
+  SheetFooter,
   SheetHeader,
   SheetSection,
   SheetTitle,
@@ -20,8 +17,11 @@ import {
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
 import type { WebhookDelivery } from './PlatformWebhooks.types'
 import { formatDeliveryStatus, statusBadgeVariant } from './PlatformWebhooksView.utils'
+import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
 interface PlatformWebhooksDeliveryDetailsSheetProps {
   deliveryAttempt: number | null
@@ -32,6 +32,7 @@ interface PlatformWebhooksDeliveryDetailsSheetProps {
   selectedDelivery: WebhookDelivery | null
   onCopy: (value: string, label: string) => void
   onOpenChange: (open: boolean) => void
+  onRetryDelivery: (deliveryId: string) => void
   onTabChange: (tab: 'event' | 'response') => void
 }
 
@@ -44,8 +45,12 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
   selectedDelivery,
   onCopy,
   onOpenChange,
+  onRetryDelivery,
   onTabChange,
 }: PlatformWebhooksDeliveryDetailsSheetProps) => {
+  const retryableDelivery =
+    selectedDelivery && selectedDelivery.status !== 'success' ? selectedDelivery : null
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent size="default" className="flex flex-col gap-0">
@@ -62,7 +67,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
         <Separator />
 
         {selectedDelivery && (
-          <SheetSection className="overflow-auto flex-grow px-0 py-0">
+          <SheetSection className="overflow-auto grow px-0 py-0">
             <div className="space-y-6 p-5">
               <Card>
                 <CardContent className="grid grid-cols-1 gap-4 p-4 @md:grid-cols-2">
@@ -180,6 +185,18 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
               </Tabs>
             </div>
           </SheetSection>
+        )}
+
+        {retryableDelivery && (
+          <SheetFooter className="shrink-0">
+            <Button
+              type="default"
+              icon={<RotateCcw />}
+              onClick={() => onRetryDelivery(retryableDelivery.id)}
+            >
+              Retry delivery
+            </Button>
+          </SheetFooter>
         )}
       </SheetContent>
     </Sheet>

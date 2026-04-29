@@ -1,8 +1,6 @@
 'use client'
 
 import { IS_PLATFORM } from 'common'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import { Database } from 'lucide-react'
 import { useMemo } from 'react'
@@ -22,6 +20,8 @@ import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { ContextSearchResults } from './ContextSearchResults'
 import { orderCommandSectionsByPriority } from './ordering'
 import type { SearchContextValue } from './SearchContext.types'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface SearchContextOption {
   value: SearchContextValue

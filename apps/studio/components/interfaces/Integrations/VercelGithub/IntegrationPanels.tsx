@@ -3,17 +3,17 @@ import { ArrowRight, ExternalLink, Github } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { forwardRef, HTMLAttributes, ReactNode, RefAttributes } from 'react'
+import { Badge, Button, cn } from 'ui'
 
-import { Markdown } from 'components/interfaces/Markdown'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type {
   Integration,
   IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { BASE_PATH } from 'lib/constants'
-import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import { Badge, Button, cn } from 'ui'
+} from '@/data/integrations/integrations.types'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { BASE_PATH } from '@/lib/constants'
+import { getIntegrationConfigurationUrl } from '@/lib/integration-utils'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -172,7 +172,7 @@ export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnec
         >
           <div className="flex flex-col gap-1 min-w-0">
             <div className="flex items-center gap-2">
-              <div className="flex-shrink-0 flex gap-x-2 items-center max-w-40 ">
+              <div className="shrink-0 flex gap-x-2 items-center max-w-40 ">
                 <HandleIcon type={'Supabase'} />
                 <span title={project?.name} className="text-sm truncate">
                   {project?.name}
@@ -181,7 +181,7 @@ export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnec
 
               <ArrowRight
                 size={14}
-                className="flex-shrink-0 text-foreground-lighter"
+                className="shrink-0 text-foreground-lighter"
                 strokeWidth={1.5}
               />
 
@@ -226,7 +226,7 @@ export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnec
             </div>
           </div>
 
-          <div className="flex-shrink-0">{actions}</div>
+          <div className="shrink-0">{actions}</div>
         </div>
       </li>
     )

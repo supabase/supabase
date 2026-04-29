@@ -79,8 +79,6 @@ from supabase import create_client
 client = create_client("YOUR_SUPABASE_URL", "YOUR_SUPABASE_KEY")
 movies = client.table("movies")
 
-movies = supabase.table("movies")
-
 # Select
 selected = [PublicMovies(m) for m in movies.select("*").execute().data]
 

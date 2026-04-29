@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   update-docs:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
@@ -42,17 +42,20 @@ jobs:
 
       - name: Regenerate JS client libraries tsdoc files
         working-directory: apps/docs/spec
+        env:
+          SOURCE: ${{ github.event.inputs.source }}
+          VERSION: ${{ github.event.inputs.version }}
         run: |
           echo "Regenerating tsdoc files for JS client libraries..."
-          echo "Source: ${{ github.event.inputs.source }}"
-          echo "Version: ${{ github.event.inputs.version }}"
+          echo "Source: ${SOURCE}"
+          echo "Version: ${VERSION}"
           make
 
       - name: Generate new typespec snapshot
         working-directory: apps/docs
         run: |
           echo "Generating new typespec snapshot for review..."
-          npx vitest run --update ./features/docs/Reference.typeSpec.test.ts
+          npx vitest run --update --dir features/docs
 
       - name: Generate token
         id: app-token
@@ -68,7 +71,7 @@ jobs:
           commit-message: 'docs: update js sdk docs (${{ github.event.inputs.version }})'
           title: 'docs: update js sdk docs (${{ github.event.inputs.version }})'
           body: |
-            Updates JS sdk documentation following stable release. 
+            Updates JS sdk documentation following stable release.
             Ran `make` in apps/docs/spec to regenerate tsdoc files.
 
             **Details:**

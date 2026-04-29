@@ -1,11 +1,11 @@
-import { useVaultSecretDeleteMutation } from 'data/vault/vault-secret-delete-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { Modal } from 'ui'
 
+import { useVaultSecretDeleteMutation } from '@/data/vault/vault-secret-delete-mutation'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const DeleteSecretModal = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -68,7 +68,7 @@ export const DeleteSecretModal = () => {
         <div className="space-y-1">
           <p className="text-sm">{selectedSecret?.description}</p>
           <p className="text-sm text-foreground-light">
-            ID: <span className="font-mono">{selectedSecret?.id}</span>
+            ID: <code className="text-code-inline">{selectedSecret?.id}</code>
           </p>
         </div>
       </Modal.Content>

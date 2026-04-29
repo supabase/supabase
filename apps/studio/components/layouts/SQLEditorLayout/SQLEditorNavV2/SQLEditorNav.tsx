@@ -1,28 +1,9 @@
 import { keepPreviousData } from '@tanstack/react-query'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Heart } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
-import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
-import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
-import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
-import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { EmptyPrivateQueriesPanel } from 'components/layouts/SQLEditorLayout/PrivateSqlSnippetEmpty'
-import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
-import { useSqlEditorTabsCleanup } from 'components/layouts/Tabs/Tabs.utils'
-import { useContentCountQuery } from 'data/content/content-count-query'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
-import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from 'data/content/sql-folders-query'
-import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProfile } from 'lib/profile'
-import { useSnippetFolders, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { TreeView } from 'ui'
 import {
   InnerSideBarEmptyPanel,
@@ -32,14 +13,33 @@ import {
   InnerSideMenuSeparator,
 } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { CommunitySnippetsSection } from './CommunitySnippetsSection'
 import { DeleteSnippetsModal } from './DeleteSnippetsModal'
+import { ShareSnippetModal } from './ShareSnippetModal'
 import SQLEditorLoadingSnippets from './SQLEditorLoadingSnippets'
 import { DEFAULT_SECTION_STATE, type SectionState } from './SQLEditorNav.constants'
 import { formatFolderResponseForTreeView, getLastItemIds, ROOT_NODE } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
-import { ShareSnippetModal } from './ShareSnippetModal'
 import { UnshareSnippetModal } from './UnshareSnippetModal'
+import DownloadSnippetModal from '@/components/interfaces/SQLEditor/DownloadSnippetModal'
+import { MoveQueryModal } from '@/components/interfaces/SQLEditor/MoveQueryModal'
+import RenameQueryModal from '@/components/interfaces/SQLEditor/RenameQueryModal'
+import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
+import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { EmptyPrivateQueriesPanel } from '@/components/layouts/SQLEditorLayout/PrivateSqlSnippetEmpty'
+import EditorMenuListSkeleton from '@/components/layouts/TableEditorLayout/EditorMenuListSkeleton'
+import { useSqlEditorTabsCleanup } from '@/components/layouts/Tabs/Tabs.utils'
+import { useContentCountQuery } from '@/data/content/content-count-query'
+import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { useSQLSnippetFoldersDeleteMutation } from '@/data/content/sql-folders-delete-mutation'
+import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from '@/data/content/sql-folders-query'
+import { useSqlSnippetsQuery } from '@/data/content/sql-snippets-query'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProfile } from '@/lib/profile'
+import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface SQLEditorNavProps {
   sort?: 'inserted_at' | 'name'
@@ -169,6 +169,16 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         ? [ROOT_NODE]
         : formatFolderResponseForTreeView({ folders, contents: privateSnippets }),
     [folders, privateSnippets]
+  )
+
+  const privateSnippetsTreeNodeIds = useMemo(
+    () => new Set(privateSnippetsTreeState.map((node) => node.id.toString())),
+    [privateSnippetsTreeState]
+  )
+
+  const validExpandedFolderIds = useMemo(
+    () => expandedFolderIds.filter((id) => privateSnippetsTreeNodeIds.has(id)),
+    [expandedFolderIds, privateSnippetsTreeNodeIds]
   )
 
   const privateSnippetsLastItemIds = useMemo(
@@ -644,7 +654,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                   setExpandedFolderIds(expandedFolderIds.filter((x) => x !== folderId))
                 }
               }}
-              expandedIds={expandedFolderIds}
+              expandedIds={validExpandedFolderIds}
               nodeRenderer={({ element, ...props }) => {
                 const isOpened = Object.values(tabs.tabsMap).some(
                   (tab) => tab.metadata?.sqlId === element.metadata?.id

@@ -15,7 +15,7 @@ Today we're introducing **Supabase ETL**: a change-data-capture pipeline that re
 
 Supabase ETL reads changes from your Postgres database and writes them to external destinations. It uses logical replication to capture inserts, updates, deletes and truncates as they happen. **Setup takes minutes in the Supabase Dashboard.**
 
-The first supported destinations are [Analytics Buckets](/blog/introducing-analytics-buckets) (powered by Iceberg) and BigQuery.
+The first supported destination is Google BigQuery.
 
 Supabase ETL is open source. You can find the code on GitHub at [github.com/supabase/etl](http://github.com/supabase/etl).
 
@@ -69,11 +69,7 @@ Navigate to `Database` in your Supabase Dashboard. Select the `Replication` tab 
 
 ### Step 3: Add a destination
 
-Click `Add Destination` and choose your destination type.
-
-**Note:** For Analytics Buckets, you will need to create an analytics bucket first in the Storage section.
-
-Configure the destination with your bucket credentials and select your publication. Click Create and `Start` to begin replication.
+Click `Add Destination` and choose your destination.
 
 ### Step 4: Monitor your pipeline
 
@@ -81,17 +77,7 @@ The Dashboard shows pipeline status and lag. You can start, stop, restart, or de
 
 ## Available destinations
 
-Our goal with Supabase ETL is to let you connect your existing data systems to Supabase. We're actively expanding the list of supported destinations. Right now, the official destinations are Analytics Buckets and BigQuery.
-
-### Analytics Buckets
-
-[Analytics Buckets](https://supabase.com/docs/guides/storage/analytics/introduction) are specialized storage buckets built on Apache Iceberg, an open table format designed for large analytical datasets. Your data is stored in Parquet files on S3.
-
-When you replicate to Analytics Buckets, your tables are created with a changelog structure. Each row includes a `cdc_operation` column indicating whether the change was an `INSERT`, `UPDATE`, or `DELETE`. **This append-only format preserves the complete history of all changes.**
-
-You can query Analytics Buckets from PyIceberg, Apache Spark, DuckDB, Amazon Athena, or any tool that supports the Iceberg REST Catalog API.
-
-### BigQuery
+Our goal with Supabase ETL is to let you connect your existing data systems to Supabase. We're actively expanding the list of supported destinations. Right now, the official destination is Google BigQuery.
 
 BigQuery is Google's serverless data warehouse, built for large-scale analytics. It handles petabytes of data and integrates well with existing BI tools and data pipelines.
 

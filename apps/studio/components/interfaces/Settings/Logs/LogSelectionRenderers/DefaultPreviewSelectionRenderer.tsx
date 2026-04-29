@@ -1,5 +1,3 @@
-import { Service } from 'data/graphql/graphql'
-import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -17,6 +15,9 @@ import { TimestampInfo } from 'ui-patterns'
 import { ErrorCodeDialog } from '../ErrorCodeDialog'
 import type { LogSearchCallback, PreviewLogData } from '../Logs.types'
 import { ResponseCodeFormatter } from '../LogsFormatters'
+import { ErrorCodeTooltip } from '@/components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
+import { Service } from '@/data/graphql/graphql'
+import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 
 const LogRowCodeBlock = ({ value, className }: { value: string; className?: string }) => (
   <pre
@@ -25,7 +26,7 @@ const LogRowCodeBlock = ({ value, className }: { value: string; className?: stri
       className
     )}
   >
-    {JSON.stringify(value, null, 2)}
+    {typeof value === 'string' ? value : JSON.stringify(value, null, 2)}
   </pre>
 )
 
@@ -47,7 +48,7 @@ const PropertyRow = ({
 
   const service = path?.startsWith('/auth/') ? Service.Auth : undefined
 
-  const handleSearch: LogSearchCallback = async (event: string, { query }: { query?: string }) => {
+  const handleSearch: LogSearchCallback = async (_event: string, { query }: { query?: string }) => {
     setSearch(query || '')
   }
 
@@ -60,6 +61,7 @@ const PropertyRow = ({
   const isUserAgent = keyName === 'user_agent'
   const isEventMessage = keyName === 'event_message'
   const isPath = keyName === 'path'
+  const isErrorCode = keyName === 'error_code'
 
   function getSearchPairs() {
     if (isSearch && typeof value === 'string') {
@@ -163,6 +165,10 @@ const PropertyRow = ({
                   <div className="flex items-center gap-1 justify-end">
                     <ResponseCodeFormatter value={value} />
                   </div>
+                ) : isErrorCode ? (
+                  <ErrorCodeTooltip errorCode={String(value)} service={service}>
+                    <div className="truncate">{value}</div>
+                  </ErrorCodeTooltip>
                 ) : (
                   <div className="truncate">{value}</div>
                 )}

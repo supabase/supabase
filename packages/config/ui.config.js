@@ -4,7 +4,18 @@ const radixUiColors = require('@radix-ui/colors')
 const brandColors = require('./default-colors')
 const svgToDataUri = require('mini-svg-data-uri')
 
-const { default: flattenColorPalette } = require('tailwindcss/lib/util/flattenColorPalette')
+function flattenColorPalette(colors) {
+  return Object.assign(
+    {},
+    ...Object.entries(colors ?? {}).flatMap(([key, value]) =>
+      typeof value === 'object'
+        ? Object.entries(flattenColorPalette(value)).map(([k, v]) => ({
+            [key + (k === 'DEFAULT' ? '' : '-' + k)]: v,
+          }))
+        : [{ [key]: value }]
+    )
+  )
+}
 
 // exclude these colors from the included set from Radix
 const excludedRadixColors = [
@@ -300,8 +311,24 @@ const uiConfig = {
   },
   plugins: [
     require('@mertasan/tailwindcss-variables'),
-    function ({ addUtilities, addVariant }) {
-      // addVariant('data-open', '&:[data-state=open]')
+    function ({ addBase, addUtilities, addComponents, addVariant }) {
+      // hide the up/down arrows in number inputs for webkit browsers
+      addBase({
+        'input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button':
+          {
+            '-webkit-appearance': 'none',
+            margin: '0',
+          },
+      })
+      // [Ivan] Not sure if it's used.
+      addComponents({
+        ".dropdown-content[data-state='open']": {
+          animation: 'fadeIn 50ms ease-out',
+        },
+        ".dropdown-content[data-state='closed']": {
+          animation: 'fadeOut 50ms ease-in',
+        },
+      })
       addUtilities({
         '.line-loading-bg': {
           background: 'rgb(0, 0, 0)',
@@ -313,18 +340,6 @@ const uiConfig = {
           background:
             'linear-gradient(90deg,rgba(0, 0, 0, 0) 0%,rgba(33, 33, 33, 0.65) 50%,rgba(0, 0, 0, 0) 100%)',
         },
-        ".dropdown-content[data-state='open']": {
-          animation: 'fadeIn 50ms ease-out',
-        },
-        ".dropdown-content[data-state='closed']": {
-          animation: 'fadeOut 50ms ease-in',
-        },
-        // "[data-state='open'] .accordion-content-animation": {
-        //   animation: 'slideDown 200ms ease-out',
-        // }
-        // "[data-state='closed'] .accordion-content-animation": {
-        //   animation: 'slideUp 200ms ease-in',
-        // },
         '.no-scrollbar': {
           /* Hide scrollbar for IE, Edge*/
           '-ms-overflow-style': 'none',
@@ -346,11 +361,6 @@ const uiConfig = {
           '-webkit-mask-image': 'linear-gradient(to left, white 98%, transparent 100%)',
           'mask-image': 'linear-gradient(to left, white 98%, transparent 100%)',
         },
-        'input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button':
-          {
-            '-webkit-appearance': 'none',
-            margin: '0',
-          },
       })
       addVariant('data-open-parent', '[data-state="open"] &')
       addVariant('data-closed-parent', '[data-state="closed"] &')

@@ -2,6 +2,7 @@ import path from 'path'
 import { expect } from '@playwright/test'
 
 import { env } from '../env.config.js'
+import { expectClipboardValue } from '../utils/clipboard.js'
 import {
   createBucket,
   createFolder,
@@ -217,10 +218,86 @@ test.describe('Storage', () => {
     await createBucketViaApi(bucketName, false)
     await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
+
     await createFolder(page, folderName)
 
     // Rename the folder
     await renameItem(page, folderName, newFolderName)
+  })
+
+  test('can copy a file url regardless of the opened folders', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_urls`
+    const folderName = 'test_folder'
+    const rootFileName = 'test-file.txt'
+    const rootFilePath = path.join(import.meta.dirname, 'files', rootFileName)
+    const folderFileName = 'test-file-2.txt'
+    const folderFilePath = path.join(import.meta.dirname, 'files', folderFileName)
+
+    // Create a bucket via API and navigate to it
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, true)
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+    await uploadFile(page, rootFilePath, rootFileName)
+    // Create a folder
+    await createFolder(page, folderName)
+    // Wait for the folder file input
+    await expect(page.getByText('Drop your files here')).toBeVisible()
+    await uploadFile(page, folderFilePath, folderFileName)
+
+    // Right-click on the folder file to open context menu
+    const folderFile = page.getByTitle(folderFileName)
+    await folderFile.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Get URL' }).click()
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${folderName}/${folderFileName}`,
+    })
+    await expect(page.getByRole('menuitem', { name: 'Get URL' })).not.toBeVisible()
+
+    // Right-click on the root file to open context menu while the folder is still open
+    const rootFile = page.getByTitle(rootFileName)
+    await rootFile.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Get URL' }).click()
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${rootFileName}`,
+    })
+    await expect(page.getByRole('menuitem', { name: 'Get URL' })).not.toBeVisible()
+
+    // Click the actions button on the folder file to open dropdown menu
+    await page.getByRole('button', { name: `${folderFileName} actions` }).click()
+    await page.getByRole('menuitem', { name: 'Get URL' }).click()
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${folderName}/${folderFileName}`,
+    })
+    await expect(page.getByRole('menuitem', { name: 'Get URL' })).not.toBeVisible()
+
+    // Click the actions button on the root file to open dropdown menu while the folder is still open
+    await page.getByRole('button', { name: `${rootFileName} actions` }).click()
+    await page.getByRole('menuitem', { name: 'Get URL' }).click()
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${rootFileName}`,
+    })
+    await expect(page.getByRole('menuitem', { name: 'Get URL' })).not.toBeVisible()
+
+    // Click the folder file to open its preview pane
+    await folderFile.click()
+    await page.getByRole('button', { name: 'Get URL' }).click()
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${folderName}/${folderFileName}`,
+    })
+
+    // Click the root file to open its preview pane while folder is still open
+    await rootFile.click()
+    await page.getByRole('button', { name: 'Get URL' }).click()
+    await expectClipboardValue({
+      page,
+      value: `storage/v1/object/public/${bucketName}/${rootFileName}`,
+    })
   })
 
   test('resets folder name when renaming with empty string', async ({ page, ref }) => {

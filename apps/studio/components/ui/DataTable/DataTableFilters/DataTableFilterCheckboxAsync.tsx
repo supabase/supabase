@@ -1,15 +1,15 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
+import { useParams } from 'common'
 import { Loader2, Search } from 'lucide-react'
 import { useState } from 'react'
+import { Checkbox, cn, Label_Shadcn_ as Label, Skeleton } from 'ui'
 
-import { useParams } from 'common'
-import { useUnifiedLogsFacetCountQuery } from 'data/logs/unified-logs-facet-count-query'
-import { Checkbox_Shadcn_ as Checkbox, cn, Label_Shadcn_ as Label, Skeleton } from 'ui'
 import type { DataTableCheckboxFilterField } from '../DataTable.types'
 import { formatCompactNumber } from '../DataTable.utils'
 import { InputWithAddons } from '../primitives/InputWithAddons'
 import { useDataTable } from '../providers/DataTableProvider'
-import { keepPreviousData } from '@tanstack/react-query'
+import { useUnifiedLogsFacetCountQuery } from '@/data/logs/unified-logs-facet-count-query'
 
 export function DataTableFilterCheckboxAsync<TData>({
   value: _value,
@@ -107,7 +107,7 @@ export function DataTableFilterCheckboxAsync<TData>({
                       <span className="truncate font-normal block">{option.label}</span>
                     )}
                   </div>
-                  <span className="flex-shrink-0 flex items-center justify-center font-mono text-xs">
+                  <span className="shrink-0 flex items-center justify-center font-mono text-xs">
                     {isLoadingCounts ? (
                       <Skeleton className="h-4 w-4" />
                     ) : facetedValue?.has(option.value) ? (

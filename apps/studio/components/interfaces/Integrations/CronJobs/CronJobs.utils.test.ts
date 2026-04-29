@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
+
 import { cronPattern, secondsPattern } from './CronJobs.constants'
-import { parseCronJobCommand } from './CronJobs.utils'
+import { formatCronJobColumns, parseCronJobCommand } from './CronJobs.utils'
 
 describe('parseCronJobCommand', () => {
   it('should return a default object when the command is null', () => {
@@ -164,13 +165,13 @@ describe('parseCronJobCommand', () => {
   })
 
   it('should return an HTTP request config with POST method, some headers and empty body', () => {
-    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('fst', '1', 'snd', '2'), body:='', timeout_milliseconds:=1000 );`
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('fst', '1', 'snd', 'O''Reilly'), body:='', timeout_milliseconds:=1000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
       method: 'POST',
       httpHeaders: [
         { name: 'fst', value: '1' },
-        { name: 'snd', value: '2' },
+        { name: 'snd', value: "O'Reilly" },
       ],
       httpBody: '',
       timeoutMs: 1000,
@@ -221,16 +222,26 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return an HTTP request config with POST method, plain JSON headers and plain JSON body with ::jsonb typecasting', () => {
-    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:='{"fst": "1", "snd": "2"}'::jsonb,body:='{"key": "value"}'::jsonb,timeout_milliseconds:=5000);`
+  it('should return an HTTP request config with POST method, plain JSON headers and plain JSON body with escaped SQL strings and ::jsonb typecasting', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:='{"X-Name":"O''Reilly"}'::jsonb,body:='{"message":"hello  there","name":"O''Reilly"}'::jsonb,timeout_milliseconds:=5000);`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://example.com/api/endpoint',
       method: 'POST',
-      httpHeaders: [
-        { name: 'fst', value: '1' },
-        { name: 'snd', value: '2' },
-      ],
-      httpBody: '{"key": "value"}',
+      httpHeaders: [{ name: 'X-Name', value: "O'Reilly" }],
+      httpBody: `{"message":"hello  there","name":"O'Reilly"}`,
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should parse a POST body without swallowing later quoted arguments', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', body:='{"payload":"ok"}'::jsonb, headers:='{"Authorization":"Bearer demo"}'::jsonb, timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'Authorization', value: 'Bearer demo' }],
+      httpBody: '{"payload":"ok"}',
       timeoutMs: 5000,
       type: 'http_request',
       snippet: command,
@@ -270,12 +281,47 @@ describe('parseCronJobCommand', () => {
     { description: 'every weekend at 10 AM', command: '0 10 * * 0,6' },
     { description: 'every quarter hour', command: '*/15 * * * *' },
     { description: 'twice daily at 8 AM and 8 PM', command: '0 8,20 * * *' },
+    { description: 'last day of every month at midnight (pg_cron $ syntax)', command: '0 0 $ * *' },
+    { description: 'last day of every month at noon (pg_cron $ syntax)', command: '0 12 $ * *' },
   ]
+
+  const cronPatternRejectTests = [
+    { description: '$ in minute field', command: '$ * * * *' },
+    { description: '$ in hour field', command: '* $ * * *' },
+    { description: '$ in month field', command: '* * * $ *' },
+    { description: '$ in day-of-week field', command: '* * * * $' },
+  ]
+
+  cronPatternRejectTests.forEach(({ description, command }) => {
+    it(`should not match the regex for a cronPattern with "${description}"`, () => {
+      expect(command).not.toMatch(cronPattern)
+    })
+  })
 
   // Replace the single cronPattern test with forEach
   cronPatternTests.forEach(({ description, command }) => {
     it(`should match the regex for a cronPattern with "${description}"`, () => {
       expect(command).toMatch(cronPattern)
     })
+  })
+})
+
+describe('formatCronJobColumns', () => {
+  it('enables resizing for informational columns and keeps utility columns fixed', () => {
+    const columns = formatCronJobColumns({
+      onSelectEdit: () => undefined,
+      onSelectDelete: () => undefined,
+    })
+
+    const columnsByKey = Object.fromEntries(columns.map((column) => [String(column.key), column]))
+
+    expect(columnsByKey.jobname.resizable).toBe(true)
+    expect(columnsByKey.jobname.minWidth).toBeGreaterThan(0)
+    expect(columnsByKey.schedule.resizable).toBe(true)
+    expect(columnsByKey.latest_run.resizable).toBe(true)
+    expect(columnsByKey.next_run.resizable).toBe(true)
+    expect(columnsByKey.command.resizable).toBe(true)
+    expect(columnsByKey.active.resizable).toBe(false)
+    expect(columnsByKey.actions.resizable).toBe(false)
   })
 })

@@ -1,28 +1,28 @@
 // End of third-party imports
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { InlineLink } from 'components/ui/InlineLink'
 import type { UseFormReturn } from 'react-hook-form'
 import {
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  cn,
+  FormControl,
+  FormField,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
-  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import {
   CATEGORY_OPTIONS,
-  type ExtendedSupportCategories,
   SEVERITY_OPTIONS,
+  type ExtendedSupportCategories,
 } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 interface CategoryAndSeverityInfoProps {
   form: UseFormReturn<SupportFormValues>
@@ -69,14 +69,14 @@ interface CategorySelectorProps {
 
 function CategorySelector({ form }: CategorySelectorProps) {
   return (
-    <FormField_Shadcn_
+    <FormField
       name="category"
       control={form.control}
       render={({ field }) => {
         const { ref: _ref, ...fieldWithoutRef } = field
         return (
           <FormItemLayout hideMessage layout="vertical" label="What are you having issues with?">
-            <FormControl_Shadcn_>
+            <FormControl>
               <Select_Shadcn_
                 {...fieldWithoutRef}
                 defaultValue={field.value}
@@ -102,7 +102,7 @@ function CategorySelector({ form }: CategorySelectorProps) {
                   </SelectGroup_Shadcn_>
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )
       }}
@@ -116,14 +116,14 @@ interface SeveritySelectorProps {
 
 function SeveritySelector({ form }: SeveritySelectorProps) {
   return (
-    <FormField_Shadcn_
+    <FormField
       name="severity"
       control={form.control}
       render={({ field }) => {
         const { ref, ...fieldWithoutRef } = field
         return (
           <FormItemLayout hideMessage layout="vertical" label="Severity">
-            <FormControl_Shadcn_>
+            <FormControl>
               <Select_Shadcn_
                 {...fieldWithoutRef}
                 defaultValue={field.value}
@@ -147,7 +147,7 @@ function SeveritySelector({ form }: SeveritySelectorProps) {
                   </SelectGroup_Shadcn_>
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )
       }}

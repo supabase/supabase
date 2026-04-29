@@ -1,6 +1,7 @@
-import '@code-hike/mdx/styles'
-import 'config/code-hike.scss'
+import '@code-hike/mdx/styles.css'
+import 'config/code-hike.css'
 import '../styles/index.css'
+import '../pages/launch-week/launchWeek.css'
 
 import {
   AuthProvider,
@@ -11,23 +12,25 @@ import {
   ThemeProvider,
   useThemeSandbox,
 } from 'common'
+import MetaFaviconsPagesRouter, {
+  DEFAULT_FAVICON_ROUTE,
+  DEFAULT_FAVICON_THEME_COLOR,
+} from 'common/MetaFavicons/pages-router'
 import { DevToolbar, DevToolbarProvider } from 'dev-tools'
 import { DefaultSeo } from 'next-seo'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { SonnerToaster, themes, TooltipProvider } from 'ui'
+import { themes, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsentToast } from 'ui-patterns/consent'
 
-import MetaFaviconsPagesRouter, {
-  DEFAULT_FAVICON_ROUTE,
-  DEFAULT_FAVICON_THEME_COLOR,
-} from 'common/MetaFavicons/pages-router'
-import { WwwCommandMenu } from '~/components/CommandMenu'
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 import { useWwwCommandMenuTelemetry } from '../hooks/useWwwCommandMenuTelemetry'
+import { MD_PAGES } from '@/app/api-v2/md/content.generated'
+import { Toaster } from '@/app/toaster'
+import { WwwCommandMenu } from '@/components/CommandMenu'
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '@/lib/constants'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -52,10 +55,20 @@ export default function App({ Component, pageProps }: AppProps) {
     themeColor = 'FFFFFF'
   }
 
+  // Advertise the .md version for AI agents on pages that have one.
+  const cleanPath = (router.asPath ?? '/').split('?')[0].split('#')[0].replace(/\/$/, '') || '/'
+  const mdSlug = cleanPath === '/' ? 'homepage' : cleanPath.slice(1)
+  const mdAlternateHref = MD_PAGES.has(mdSlug)
+    ? cleanPath === '/'
+      ? '/homepage.md'
+      : `${cleanPath}.md`
+    : null
+
   return (
     <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        {mdAlternateHref && <link rel="alternate" type="text/markdown" href={mdAlternateHref} />}
       </Head>
       <MetaFaviconsPagesRouter
         applicationName={applicationName}
@@ -100,7 +113,7 @@ export default function App({ Component, pageProps }: AppProps) {
             >
               <TooltipProvider delayDuration={0}>
                 <CommandProvider app="www" onTelemetry={onTelemetry}>
-                  <SonnerToaster position="top-right" />
+                  <Toaster />
                   <Component {...pageProps} />
                   <WwwCommandMenu />
                   <PageTelemetry

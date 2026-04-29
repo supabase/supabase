@@ -1,31 +1,31 @@
+import { useParams } from 'common'
 import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-
-import { InlineLink } from '@/components/ui/InlineLink'
-import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
+  cn,
   IconBroadcast,
   IconDatabaseChanges,
   IconPresence,
   Input,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  Toggle,
-  cn,
+  Switch,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig
@@ -102,12 +102,12 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                   Presence
                 </label>
               </div>
-              <Toggle
+              <Switch
                 id="toggle-presence"
-                size="tiny"
+                size="small"
                 checked={tempConfig.enablePresence}
-                onChange={() =>
-                  setTempConfig({ ...tempConfig, enablePresence: !tempConfig.enablePresence })
+                onCheckedChange={(checked) =>
+                  setTempConfig((current) => ({ ...current, enablePresence: checked }))
                 }
               />
             </div>
@@ -126,12 +126,12 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                   Broadcast
                 </label>
               </div>
-              <Toggle
+              <Switch
                 id="toggle-broadcast"
-                size="tiny"
+                size="small"
                 checked={tempConfig.enableBroadcast}
-                onChange={() =>
-                  setTempConfig({ ...tempConfig, enableBroadcast: !tempConfig.enableBroadcast })
+                onCheckedChange={(checked) =>
+                  setTempConfig((current) => ({ ...current, enableBroadcast: checked }))
                 }
               />
             </div>
@@ -156,13 +156,13 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                   Database changes
                 </label>
               </div>
-              <Toggle
+              <Switch
                 id="toggle-db-changes"
-                size="tiny"
+                size="small"
                 checked={tempConfig.enableDbChanges}
                 disabled={!config.enableDbChanges}
-                onChange={() =>
-                  setTempConfig({ ...tempConfig, enableDbChanges: !tempConfig.enableDbChanges })
+                onCheckedChange={(checked) =>
+                  setTempConfig((current) => ({ ...current, enableDbChanges: checked }))
                 }
               />
             </div>
@@ -204,7 +204,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                   <p className="w-[60px] flex justify-end text-sm">AND</p>
                   <Input
                     size="tiny"
-                    className="flex-grow"
+                    className="grow"
                     placeholder="body=eq.hey"
                     value={tempConfig.filter}
                     onChange={(v) => setTempConfig({ ...tempConfig, filter: v.target.value })}

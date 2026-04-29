@@ -1,4 +1,3 @@
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
@@ -25,6 +24,7 @@ import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { ReadReplicaForm } from './ReadReplicaForm'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from '@/lib/constants'
 
 interface DestinationPanelProps {
@@ -36,7 +36,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
   const { hasAccess: hasETLReplicationAccess } = useCheckEntitlements('replication.etl')
 
   const [urlDestinationType, setDestinationType] = useQueryState(
-    'type',
+    'destinationType',
     parseAsStringEnum<DestinationType>([
       'Read Replica',
       'BigQuery',
@@ -102,7 +102,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
               <SheetDescription>
                 {editMode
                   ? 'Update the configuration for this destination'
-                  : 'A destination is an external platform that automatically receives your database changes in real time.'}
+                  : 'A destination can be a read replica or an external platform that receives your database changes in real time.'}
               </SheetDescription>
             </SheetHeader>
 
