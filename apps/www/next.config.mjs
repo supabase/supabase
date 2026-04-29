@@ -186,15 +186,12 @@ const nextConfig = {
     return rewrites
   },
   async redirects() {
-    // For static (no-param) /docs/guides/ redirects, auto-generate .md variants so
-    // renamed/deleted pages redirect correctly when fetched as markdown.
-    // Wildcard redirects (/:match*, /:path*) already capture the .md suffix naturally
-    // and don't need duplicates.
+    // For /docs/guides/ redirects, auto-generate .md variants so renamed/deleted pages
+    // redirect correctly when fetched as markdown
     const docsMdRedirects = redirects
       .filter(
         (r) =>
           r.source.startsWith('/docs/guides/') &&
-          !r.source.includes(':') &&
           typeof r.destination === 'string' &&
           r.destination.startsWith('/')
       )
