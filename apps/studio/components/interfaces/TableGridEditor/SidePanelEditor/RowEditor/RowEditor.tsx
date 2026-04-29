@@ -199,7 +199,7 @@ export const RowEditor = ({
                 checked={createMore}
                 onCheckedChange={(checked) => setCreateMore(checked)}
               />
-              <Label_Shadcn_ htmlFor="create-more">Create More</Label_Shadcn_>
+              <Label_Shadcn_ htmlFor="create-more">Create more</Label_Shadcn_>
             </div>
           )}
         </ActionBar>
