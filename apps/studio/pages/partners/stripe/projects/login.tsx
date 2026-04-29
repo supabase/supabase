@@ -163,7 +163,7 @@ const StripeProjectsLoginPage = () => {
         ) : effectiveIsSuccess ? (
           <>
             <StripeIcon />
-            <h2 className="py-2 text-lg font-medium text-balance ">
+            <h2 className="py-2 text-lg font-medium text-balance">
               Stripe Projects is requesting access
             </h2>
             <p className="text-sm text-center text-foreground-light text-balance">
@@ -210,18 +210,16 @@ const StripeProjectsLoginPage = () => {
               </>
             ) : (
               // No linked org — a new one will be created
-              <>
-                <div className="py-6">
-                  <Button
-                    size="small"
-                    type="primary"
-                    disabled={effectiveIsConfirming}
-                    onClick={handleApprove}
-                  >
-                    Authorize Stripe Projects
-                  </Button>
-                </div>
-              </>
+              <div className="py-6">
+                <Button
+                  size="small"
+                  type="primary"
+                  disabled={effectiveIsConfirming}
+                  onClick={handleApprove}
+                >
+                  Authorize Stripe Projects
+                </Button>
+              </div>
             )}
           </>
         ) : effectiveIsError ? (
