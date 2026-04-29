@@ -33,10 +33,12 @@ const page: GoPageInput = {
       id: 'how-to-enter',
       title: 'How to enter',
       children: (
-        <div className="flex flex-col items-center gap-8 w-full max-w-2xl">
-          <p className="text-foreground-light text-lg">Choose either path. Both qualify.</p>
+        <div className="flex flex-col gap-8 w-full max-w-2xl mx-auto">
+          <p className="text-foreground-light text-lg text-center">
+            Choose either path. Both qualify.
+          </p>
 
-          <div className="flex flex-col gap-3 w-full">
+          <div className="flex flex-col gap-3">
             <h3 className="text-foreground font-semibold text-lg">Option 1: Via Stripe Projects</h3>
             <p className="text-foreground-light">
               Provision a full Supabase backend from your terminal without opening a dashboard.
@@ -52,7 +54,7 @@ stripe projects env --sync`}</code>
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 w-full">
+          <div className="flex flex-col gap-3">
             <h3 className="text-foreground font-semibold text-lg">
               Option 2: Via the Stripe Sync Engine
             </h3>
@@ -68,11 +70,11 @@ stripe projects env --sync`}</code>
             </Link>
           </div>
 
-          <p className="text-foreground-light text-sm w-full">
+          <p className="text-foreground-light text-sm">
             Both options must be completed by Monday, May 11, 2026 at 12:00 PM PST.
           </p>
 
-          <p className="text-xs text-foreground-lighter mt-4">
+          <p className="text-xs text-foreground-lighter mt-4 text-center">
             No purchase necessary. Void where prohibited.{' '}
             <Link href="/go/contest-rules" className="underline">
               Official rules
