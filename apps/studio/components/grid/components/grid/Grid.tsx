@@ -15,7 +15,7 @@ import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import { RowContextMenuContent } from '../menu/RowContextMenu'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
-import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
+import { handleCellKeyDown, handleSelectedCellCopy } from '@/components/grid/SupabaseGrid.utils'
 import { formatForeignKeys } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -280,6 +280,14 @@ export const Grid = memo(
           onDragOver={onDragOver}
           onDragLeave={onDragOver}
           onDrop={onFileDrop}
+          onCopyCapture={(event) =>
+            handleSelectedCellCopy({
+              event: event.nativeEvent,
+              selectedCellPosition: snap.selectedCellPosition,
+              gridColumns: snap.gridColumns,
+              rows: rows ?? [],
+            })
+          }
         >
           {/* Render no rows fallback outside of the DataGrid */}
           {(rows ?? []).length === 0 && (

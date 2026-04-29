@@ -4,15 +4,8 @@ import {
   formatFilterURLParams,
   formatSortURLParams,
   handleCellKeyDown,
+  handleSelectedCellCopy,
 } from '@/components/grid/SupabaseGrid.utils'
-
-const { copyToClipboard } = vi.hoisted(() => ({
-  copyToClipboard: vi.fn(),
-}))
-
-vi.mock('ui', () => ({
-  copyToClipboard,
-}))
 
 // Sort URL syntax: `column:order`
 describe('SupabaseGrid.utils: formatSortURLParams', () => {
@@ -86,11 +79,7 @@ describe('SupabaseGrid.utils: formatFilterURLParams', () => {
 })
 
 describe('SupabaseGrid.utils: handleCellKeyDown', () => {
-  beforeEach(() => {
-    copyToClipboard.mockReset()
-  })
-
-  test('should copy the selected cell value when Meta+C is pressed', () => {
+  test('should ignore copy key handling and allow browser copy flow', () => {
     const args = {
       mode: 'SELECT',
       column: { key: 'name' },
@@ -108,7 +97,33 @@ describe('SupabaseGrid.utils: handleCellKeyDown', () => {
     } as unknown as Parameters<typeof handleCellKeyDown>[1]
 
     handleCellKeyDown(args, event)
+  })
+})
 
-    expect(copyToClipboard).toHaveBeenCalledWith('hello from safari')
+describe('SupabaseGrid.utils: handleSelectedCellCopy', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  test('should set clipboard data for the selected cell', () => {
+    vi.spyOn(window, 'getSelection').mockReturnValue({
+      isCollapsed: true,
+    } as Selection)
+
+    const setData = vi.fn()
+    const preventDefault = vi.fn()
+
+    handleSelectedCellCopy({
+      event: {
+        clipboardData: { setData } as unknown as DataTransfer,
+        preventDefault,
+      },
+      selectedCellPosition: { idx: 0, rowIdx: 0 },
+      gridColumns: [{ key: 'name' }],
+      rows: [{ name: 'hello from safari' }] as any,
+    })
+
+    expect(setData).toHaveBeenCalledWith('text/plain', 'hello from safari')
+    expect(preventDefault).toHaveBeenCalled()
   })
 })

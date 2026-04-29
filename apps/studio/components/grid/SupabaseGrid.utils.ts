@@ -9,8 +9,6 @@ import {
   CellKeyDownArgs,
   RowsChangeData,
 } from 'react-data-grid'
-import { copyToClipboard } from 'ui'
-
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import type { Sort, SupaColumn, SupaRow, SupaTable } from './types'
@@ -284,12 +282,6 @@ export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
   const { mode, column, row, rowIdx } = args
   if (mode !== 'SELECT') return
   const key = event.key.toLowerCase()
-
-  if (key === 'c' && (event.metaKey || event.ctrlKey)) {
-    const cellValue = row[column.key] ?? ''
-    const value = formatClipboardValue(cellValue)
-    copyToClipboard(value)
-  }
   // Let registered shortcuts win over rdg's "type a key to enter edit mode" default.
   if (eventMatchesAnyShortcut(event.nativeEvent, tableEditorRegistry)) {
     event.preventGridDefault()
@@ -319,4 +311,29 @@ export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
   const updatedRows = [...context.rows]
   updatedRows[rowIdx] = { ...row, [column.key]: nextValue }
   context.onRowsChange(updatedRows, { indexes: [rowIdx], column })
+}
+
+export function handleSelectedCellCopy<TRow extends SupaRow = SupaRow>({
+  event,
+  selectedCellPosition,
+  gridColumns,
+  rows,
+}: {
+  event: Pick<ClipboardEvent, 'clipboardData' | 'preventDefault'>
+  selectedCellPosition: { idx: number; rowIdx: number } | null
+  gridColumns: Pick<CalculatedColumn<TRow, unknown>, 'key'>[]
+  rows: TRow[]
+}) {
+  if (!selectedCellPosition) return
+
+  const selectedText = window.getSelection()
+  if (selectedText?.isCollapsed === false) return
+
+  const column = gridColumns[selectedCellPosition.idx]
+  const row = rows[selectedCellPosition.rowIdx]
+  if (!column || !row) return
+
+  const value = formatClipboardValue(row[column.key] ?? '')
+  event.clipboardData?.setData('text/plain', value)
+  event.preventDefault()
 }
