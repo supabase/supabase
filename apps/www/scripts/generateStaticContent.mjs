@@ -499,26 +499,41 @@ try {
 
     // LLM-friendly changelog markdown index (RSS remains canonical syndication format).
     const visibleEntries = entries.filter((entry) => !entry.title.includes('[d]'))
-    const escapeMd = (value) =>
-      String(value ?? '')
-        .replace(/\\/g, '\\\\')
-        .replace(/\|/g, '\\|')
-        .replace(/\n/g, ' ')
-    const mdRows = visibleEntries.map((entry) => {
+
+    /**
+     * Extracts the first meaningful paragraph from a markdown body.
+     * Skips headings, code fences, HTML blocks, and empty lines.
+     */
+    const extractSummary = (body) => {
+      if (!body) return ''
+      for (const para of body.split(/\n{2,}/)) {
+        const trimmed = para.trim()
+        if (
+          !trimmed ||
+          trimmed.startsWith('#') ||
+          trimmed.startsWith('```') ||
+          trimmed.startsWith('<') ||
+          trimmed.startsWith('|') ||
+          trimmed.startsWith('---')
+        ) continue
+        const oneLiner = trimmed.replace(/\n/g, ' ')
+        return oneLiner.length > 200 ? oneLiner.slice(0, 200).replace(/\s+\S*$/, '') + '…' : oneLiner
+      }
+      return ''
+    }
+
+    const mdSections = visibleEntries.map((entry) => {
       const date = dayjs(entry.sortDate).isValid() ? dayjs(entry.sortDate).format('YYYY-MM-DD') : ''
       const labels = (entry.labels ?? []).join(', ')
-      return `| ${date} | ${entry.number} | ${escapeMd(labels)} | ${escapeMd(entry.title)} | [/changelog/${entry.slug}.md](https://supabase.com/changelog/${entry.slug}.md) |`
+      const meta = [date, labels, `[supabase.com/changelog/${entry.slug}](https://supabase.com/changelog/${entry.slug})`]
+        .filter(Boolean)
+        .join(' · ')
+      const summary = extractSummary(entry.body)
+      return [`## ${entry.title}`, meta, summary].filter(Boolean).join('\n\n')
     })
-    const changelogMd = `# Supabase Changelog
-
-All paths are relative to \`https://supabase.com\`.
-
-| Date | # | Labels | Title | Path |
-| --- | --- | --- | --- | --- |
-${mdRows.join('\n')}
-`
+    const changelogMd = `# Supabase Changelog\n\n${mdSections.join('\n\n---\n\n')}\n`
     const changelogMdPath = path.join(__dirname, '../public/changelog.md')
-    await fs.writeFile(changelogMdPath, changelogMd.trim() + '\n', 'utf8')
+    await fs.writeFile(changelogMdPath, changelogMd, 'utf8')
     console.log(`✅ Generated changelog.md (${visibleEntries.length} entries)`)
 
     // One markdown file per entry → /changelog/<number>.md (same content shape as the web page body).
