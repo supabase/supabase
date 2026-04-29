@@ -8094,6 +8094,11 @@ export interface components {
         has_address: boolean
         id: string
         is_default: boolean
+        shared_payment_token?: {
+          expires_at: number | null
+          is_expired: boolean
+          last4: string
+        } | null
         type: string
       }[]
       defaultPaymentMethodId: string | null
@@ -9811,7 +9816,7 @@ export interface components {
     SignedUrlsResponse: {
       error: string | null
       path: string | null
-      signedUrl: string
+      signedUrl: string | null
     }
     SignUpBody: {
       /** Format: email */
