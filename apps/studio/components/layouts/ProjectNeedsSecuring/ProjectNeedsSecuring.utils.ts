@@ -12,17 +12,19 @@ export const getExposedSchemas = (dbSchema: string | null | undefined) => {
 }
 
 export const formatRlsDescription = (count: number) => {
-  const noun = count === 1 ? 'table' : 'tables'
+  const isSingular = count === 1
+  const noun = isSingular ? 'table' : 'tables'
+  const verb = isSingular ? 'has' : 'have'
+  const pronoun = isSingular ? 'its' : 'their'
 
-  return `${count} ${noun} has RLS disabled which means anyone can access its data via the Data API.`
+  return `${count} ${noun} ${verb} RLS disabled which means anyone can access ${pronoun} data via the Data API.`
 }
 
 export const buildSecurityPromptMarkdown = (issueCount: number, tables: ProjectSecurityTable[]) => {
-  const noun = issueCount === 1 ? 'table' : 'tables'
   const header = [
     '## Project security review',
     '',
-    `${issueCount} ${noun} has RLS disabled which means anyone can access its data via the Data API.`,
+    formatRlsDescription(issueCount),
     '',
     '### Tables',
     '',
