@@ -15,6 +15,7 @@ type JitDbAccessGrantVariables = {
       allowed_cidrs?: Array<{ cidr: string }>
       allowed_cidrs_v6?: Array<{ cidr: string }>
     }
+    branches_only?: boolean
   }>
 }
 

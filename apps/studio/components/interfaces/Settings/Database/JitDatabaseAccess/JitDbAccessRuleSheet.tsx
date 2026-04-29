@@ -58,6 +58,7 @@ const grantSchema = z.object({
   hasExpiry: z.boolean(),
   expiry: z.string(),
   ipRanges: z.array(z.object({ value: z.string() })),
+  branchesOnly: z.boolean(),
 })
 
 function createJitRuleSchema(mode: SheetMode, membersWithRules: Set<string>) {

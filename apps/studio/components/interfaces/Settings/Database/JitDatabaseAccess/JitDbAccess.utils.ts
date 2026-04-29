@@ -38,6 +38,7 @@ export function createEmptyGrant(roleId: string): JitRoleGrantDraft {
     hasExpiry: true,
     expiry: getRelativeDatetimeByMode('1h'),
     ipRanges: [createEmptyIpRange()],
+    branchesOnly: false,
   }
 }
 
@@ -274,6 +275,7 @@ export function mapJitMembersToUserRules(
           allowedNetworks.length > 0
             ? allowedNetworks.map((cidr) => ({ value: cidr }))
             : [createEmptyIpRange()],
+        branchesOnly: (roleObj as any).branches_only === true,
       }
     })
 
@@ -325,6 +327,7 @@ export function serializeDraftRolesForGrantMutation(draft: JitUserRuleDraft) {
         role: grant.roleId,
         ...(typeof expires_at === 'number' ? { expires_at } : {}),
         ...(allowed_networks ? { allowed_networks } : {}),
+        ...(grant.branchesOnly ? { branches_only: true } : {}),
       }
     })
 }

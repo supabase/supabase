@@ -34,6 +34,7 @@ export type JitRoleGrantDraft = {
   hasExpiry: boolean
   expiry: string
   ipRanges: JitIpRangeDraft[]
+  branchesOnly: boolean
 }
 
 export type JitUserRuleDraft = {

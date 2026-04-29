@@ -8,6 +8,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Switch,
   WarningIcon,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
@@ -138,6 +139,18 @@ export function JitDbAccessRoleGrantFields({
             )}
 
             <div className={cn('space-y-2', !showRoleAdmonition && 'border-t border-muted pt-3')}>
+              <div className="flex items-center justify-between gap-x-4">
+                <div className="space-y-2">
+                  <p className="text-sm text-foreground">Branches only</p>
+                  <p className="text-xs text-foreground-lighter">
+                    Restrict access to preview branch databases only.
+                  </p>
+                </div>
+                <Switch
+                  checked={grant.branchesOnly}
+                  onCheckedChange={(checked) => onChange({ ...grant, branchesOnly: checked })}
+                />
+              </div>
               <p className="text-sm text-foreground">Expires in</p>
               <div className="flex gap-2">
                 <div className="flex-1">
