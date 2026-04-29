@@ -135,9 +135,11 @@ To authenticate the user making WebSocket requests, you can pass the JWT in URL 
 ```ts
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
+const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL'),
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  // If you want to use a different api key, change 'default' to your preferred key name
+  SUPABASE_SECRET_KEYS['default']
 )
 
 Deno.serve((req) => {
@@ -188,9 +190,11 @@ Deno.serve((req) => {
 ```ts
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
+const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL'),
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  // If you want to use a different api key, change 'default' to your preferred key name
+  SUPABASE_SECRET_KEYS['default']
 )
 
 Deno.serve((req) => {

@@ -204,7 +204,7 @@ curl https://api.supabase.com/v1/projects/{ref}/database/migrations \
   --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
   --header 'Content-Type: application/json' \
   --data '{
-    "query": "create table public.todos (id serial primary key, task text not null); alter table public.todos enable row level security;",
+    "query": "create table public.todos (id serial primary key, task text not null); grant select on public.todos to anon; grant select, insert, update, delete on public.todos to authenticated; grant select, insert, update, delete on public.todos to service_role; alter table public.todos enable row level security;",
     "name": "Create a todos table"
   }'
 ```

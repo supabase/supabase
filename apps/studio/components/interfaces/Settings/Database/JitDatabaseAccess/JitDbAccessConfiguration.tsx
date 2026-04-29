@@ -256,8 +256,7 @@ export const JitDbAccessConfiguration = () => {
 
   const showToggleFailedWarning =
     isSuccessConfiguration &&
-    !!jitDbAccessConfiguration &&
-    'appliedSuccessfully' in jitDbAccessConfiguration &&
+    jitDbAccessConfiguration?.state !== 'unavailable' &&
     !jitDbAccessConfiguration.appliedSuccessfully
 
   const projectReference = ref ? (

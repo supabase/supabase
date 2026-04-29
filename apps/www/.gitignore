@@ -32,6 +32,12 @@ public/sitemap_www.xml
 # Generated .md content bundle (built by scripts/generateMdContent.mjs)
 app/api-v2/md/content.generated.ts
 
+# Changelog generated feeds and markdown (built by content:build)
+/public/changelog-rss.xml
+/public/changelog-rss
+/public/changelog.md
+/public/changelog
+
 # contentlayer
 .contentlayer
 .vercel
