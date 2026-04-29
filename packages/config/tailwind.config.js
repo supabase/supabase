@@ -436,6 +436,13 @@ const uiConfig = ui({
     function ({ addVariant }) {
       addVariant('not-disabled', '&:not(:disabled)')
     },
+    function ({ addUtilities }) {
+      // The bg class worked in Tailwind 3, but stopped working in TW 4. This is a custom utility to add it back in, as
+      // it's used in a lot of places across the codebase. We should deprecate it and use `bg-default` instead.
+      addUtilities({
+        '.bg': { backgroundColor: 'hsl(var(--background-default))' },
+      })
+    },
   ],
 })
 
