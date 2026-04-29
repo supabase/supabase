@@ -63,6 +63,8 @@ export const JitDbAccessConfiguration = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
 
+  const parentProjectRef = project?.parent_project_ref
+
   const [enabled, setEnabled] = useState(false)
   const [, setShowCreateRuleSheet] = useQueryState('jit_new', parseAsBoolean.withDefault(false))
   const [ruleIdToEdit, setRuleIdToEdit] = useQueryState('jit_edit', parseAsString)
@@ -302,7 +304,26 @@ export const JitDbAccessConfiguration = () => {
         </PageSectionMeta>
 
         <PageSectionContent className="space-y-4">
-          {isErrorJitDbAccessConfiguration && (
+          {parentProjectRef && (
+            <Admonition
+              type="note"
+              title="Managed in the main branch"
+              description={
+                <>
+                  Temporary access rules are configured in the main branch and apply across all
+                  preview branches.{' '}
+                  <Link
+                    href={`/project/${parentProjectRef}/settings/database`}
+                    className="text-foreground underline"
+                  >
+                    Go to main branch settings
+                  </Link>
+                </>
+              }
+            />
+          )}
+
+          {!parentProjectRef && isErrorJitDbAccessConfiguration && (
             <AlertError
               projectRef={ref}
               subject="Failed to load temporary access"
@@ -311,7 +332,7 @@ export const JitDbAccessConfiguration = () => {
             />
           )}
 
-          {!isErrorJitDbAccessConfiguration && isJitDbAccessUnavailable && (
+          {!parentProjectRef && !isErrorJitDbAccessConfiguration && isJitDbAccessUnavailable && (
             <Admonition
               type="note"
               layout="responsive"
@@ -347,7 +368,7 @@ export const JitDbAccessConfiguration = () => {
             />
           )}
 
-          {!isErrorJitDbAccessConfiguration && !isJitDbAccessUnavailable && (
+          {!parentProjectRef && !isErrorJitDbAccessConfiguration && !isJitDbAccessUnavailable && (
             <Card>
               <CardContent className="space-y-4">
                 <FormLayout
@@ -408,7 +429,7 @@ export const JitDbAccessConfiguration = () => {
             </Card>
           )}
 
-          {enabled && !isJitDbAccessUnavailable && !isUpdatingJitDbAccess && (
+          {!parentProjectRef && enabled && !isJitDbAccessUnavailable && !isUpdatingJitDbAccess && (
             <>
               {isErrorJitMembers && (
                 <AlertError
