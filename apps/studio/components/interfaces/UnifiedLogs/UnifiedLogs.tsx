@@ -433,7 +433,7 @@ export const UnifiedLogs = () => {
             <ResizablePanelGroup key="main-logs" orientation="vertical" className="flex-1">
               <ResizablePanel
                 defaultSize="100"
-                minSize="30"
+                minSize="10"
                 className={cn(
                   'bg',
                   isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'

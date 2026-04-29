@@ -3,8 +3,8 @@ import { Check, Copy } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
-  cn,
   copyToClipboard,
+  ResizableHandle,
   ResizablePanel,
   Skeleton,
   Tabs_Shadcn_ as Tabs,
@@ -90,12 +90,12 @@ export function ServiceFlowPanel({
   if (selectedRowKey) {
     return (
       <>
+        <ResizableHandle withHandle />
         <ResizablePanel
           id="log-sidepanel"
-          defaultSize={45}
-          minSize={400}
-          maxSize={400}
-          className={cn('bg-dash-sidebar border-t')}
+          defaultSize={380}
+          minSize={380}
+          className="bg-dash-sidebar"
         >
           <div className="flex h-full flex-col overflow-hidden">
             <Tabs
