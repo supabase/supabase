@@ -2,7 +2,6 @@ import { useParams } from 'common'
 import { useState } from 'react'
 import {
   cn,
-  ResizableHandle,
   ResizablePanel,
   Skeleton,
   Tabs_Shadcn_ as Tabs,
@@ -87,7 +86,6 @@ export function ServiceFlowPanel({
   if (selectedRowKey) {
     return (
       <>
-        <ResizableHandle withHandle className="z-10" />
         <ResizablePanel
           id="log-sidepanel"
           defaultSize={45}
@@ -102,7 +100,7 @@ export function ServiceFlowPanel({
               onValueChange={setActiveTab}
               className="flex h-full w-full flex-col"
             >
-              <div className="flex items-center justify-between px-4">
+              <div className="flex items-center justify-between px-4 border-b border-border">
                 <TabsList className="flex h-auto gap-x-4 rounded-none !border-none">
                   {shouldShowServiceFlow && (
                     <TabsTrigger

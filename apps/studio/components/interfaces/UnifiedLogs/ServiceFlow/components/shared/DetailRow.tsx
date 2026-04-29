@@ -41,8 +41,11 @@ export const DetailRow = ({
     filterValue ?? (typeof value === 'string' || typeof value === 'number' ? value : undefined)
 
   const labelEl = (
-    <span className="truncate text-xs uppercase tracking-wide text-foreground-lighter">
-      {label}
+    <span className="flex min-w-0 items-center gap-2 truncate text-xs uppercase tracking-wide text-foreground-lighter">
+      <span aria-hidden className="select-none font-mono text-foreground-muted">
+        └
+      </span>
+      <span className="truncate">{label}</span>
     </span>
   )
 
@@ -63,7 +66,7 @@ export const DetailRow = ({
     value
   )
 
-  const rowClass = 'flex items-center justify-between gap-3 px-4 py-1.5'
+  const rowClass = 'flex h-9 items-center justify-between gap-3 px-4'
 
   if (isFilterable && resolvedFilterValue !== undefined) {
     return (

@@ -1,13 +1,13 @@
 import { Table } from '@tanstack/react-table'
+import { ChevronRight, Clock, Database } from 'lucide-react'
 import { memo, ReactNode } from 'react'
-import { Badge } from 'ui'
 
 import { ColumnSchema } from '../../../UnifiedLogs.schema'
 import { getStatusLevel } from '../../../UnifiedLogs.utils'
 import { postgresDetailsFields, postgresPrimaryFields } from '../../config/serviceFlowFields'
 import { BlockFieldConfig } from '../../types'
 import { DetailRow } from '../shared/DetailRow'
-import { DetailSection } from '../shared/DetailSection'
+import { DetailSectionHeader } from '../shared/DetailSection'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
@@ -77,7 +77,6 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
   filterFields,
   table,
 }: PostgresFlowDetailProps) {
-  // Request started — timestamp summary
   const timestampMs = data?.timestamp
     ? data.timestamp / 1000
     : data?.date
@@ -85,72 +84,53 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
       : null
   const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 
-  // Operation result — postgres severity (LOG / ERROR / FATAL / etc.)
   const severity: string | undefined = enrichedData?.error_severity ?? (data as any)?.error_severity
-  const eventMessage: string | undefined =
-    enrichedData?.event_message ?? (data as any)?.event_message
-  const isErrorSeverity = !!severity && ['error', 'fatal'].includes(severity.toLowerCase())
 
   return (
-    <div className="divide-y divide-border border-t border-border">
-      <DetailSection
-        title="Request started"
-        collapsible={false}
-        summary={
-          formattedTime ? (
-            <span className="font-mono text-sm text-foreground">{formattedTime}</span>
-          ) : null
-        }
+    <div className="[&>*:nth-child(even)]:bg-surface-100/50">
+      <DetailSectionHeader
+        title="Requested started"
+        icon={Clock}
+        summary={formattedTime ?? undefined}
       />
 
-      <DetailSection title="Postgres" defaultOpen>
-        {postgresPrimaryFields.map((field) => (
-          <FieldDetailRow
-            key={field.id}
-            config={field}
-            data={data}
-            enrichedData={enrichedData}
-            isLoading={isLoading}
-            filterFields={filterFields}
-            table={table}
-          />
-        ))}
+      <DetailSectionHeader title="Postgres" icon={Database} />
 
-        <DetailSection title="Connection & Session Details" defaultOpen={false}>
-          {postgresDetailsFields.map((field) => (
-            <FieldDetailRow
-              key={field.id}
-              config={field}
-              data={data}
-              enrichedData={enrichedData}
-              isLoading={isLoading}
-              filterFields={filterFields}
-              table={table}
-            />
-          ))}
-        </DetailSection>
-      </DetailSection>
+      {postgresPrimaryFields.map((field) => (
+        <FieldDetailRow
+          key={field.id}
+          config={field}
+          data={data}
+          enrichedData={enrichedData}
+          isLoading={isLoading}
+          filterFields={filterFields}
+          table={table}
+        />
+      ))}
 
-      <DetailSection
+      <DetailSectionHeader title="Connection & Session Details" icon={ChevronRight} />
+
+      {postgresDetailsFields.map((field) => (
+        <FieldDetailRow
+          key={field.id}
+          config={field}
+          data={data}
+          enrichedData={enrichedData}
+          isLoading={isLoading}
+          filterFields={filterFields}
+          table={table}
+        />
+      ))}
+
+      <DetailSectionHeader
         title="Operation result"
-        defaultOpen={!!eventMessage}
-        collapsible={!!eventMessage}
+        icon={Clock}
         summary={
           severity ? (
-            <Badge variant={isErrorSeverity ? 'destructive' : 'default'}>
-              {severity.toUpperCase()}
-            </Badge>
-          ) : null
+            <span className="font-mono text-sm uppercase text-foreground">{severity}</span>
+          ) : undefined
         }
-      >
-        {eventMessage ? (
-          <div className="px-4 py-2">
-            <div className="max-h-40 overflow-y-auto whitespace-pre-wrap break-all rounded border border-border bg-surface-100 p-3 font-mono text-xs leading-relaxed">
-              {eventMessage}
-            </div>
-          </div>
-        ) : null}
-      </DetailSection>
+      />
     </div>
   )
 })
