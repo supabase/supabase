@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import type { GetStaticPaths, GetStaticProps } from 'next'
 import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 import Link from 'next/link'
 
 import { ChangelogDetailSidebar } from '@/components/Changelog/ChangelogDetailSidebar'
@@ -28,6 +29,9 @@ type PageProps = {
 
 const ChangelogDetailPage = ({ title, url, created_at, number, source, labels }: PageProps) => (
   <>
+    <Head>
+      <link rel="alternate" type="text/markdown" href={`/changelog/${number}.md`} />
+    </Head>
     <NextSeo
       title={`${title} · Changelog`}
       description={title}

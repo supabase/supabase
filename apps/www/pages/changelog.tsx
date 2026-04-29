@@ -5,6 +5,7 @@ import type { GetServerSideProps } from 'next'
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 import Link from 'next/link'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
@@ -177,6 +178,9 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
 
   return (
     <>
+      <Head>
+        <link rel="alternate" type="text/markdown" href="/changelog.md" />
+      </Head>
       <NextSeo
         title={TITLE}
         description={DESCRIPTION}

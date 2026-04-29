@@ -79,6 +79,40 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: '/changelog-rss.xml',
+        headers: [
+          { key: 'Content-Type', value: 'application/rss+xml; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+        ],
+      },
+      {
+        source: '/changelog-rss/:slug.xml',
+        headers: [
+          { key: 'Content-Type', value: 'application/rss+xml; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+        ],
+      },
+      {
+        source: '/changelog/:number.md',
+        headers: [
+          { key: 'Content-Type', value: 'text/markdown; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+          { key: 'Vary', value: 'Accept' },
+        ],
+      },
+      {
+        source: '/changelog.md',
+        headers: [
+          { key: 'Content-Type', value: 'text/markdown; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+          { key: 'Vary', value: 'Accept' },
+        ],
+      },
+      {
         source: '/',
         headers: [
           {
