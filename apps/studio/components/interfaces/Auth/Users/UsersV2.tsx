@@ -1,5 +1,5 @@
-import { USER_SEARCH_INDEXES } from '@supabase/pg-meta'
 import type { OptimizedSearchColumns } from '@supabase/pg-meta'
+import { USER_SEARCH_INDEXES } from '@supabase/pg-meta'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
@@ -38,7 +38,6 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { ref } from 'valtio'
 
 import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'

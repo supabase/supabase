@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { SqlEditor, TableEditor } from 'icons'
-import { Copy, ExternalLink, Trash, UserIcon } from 'lucide-react'
+import { Copy, Trash, UserIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Column, useRowSelection } from 'react-data-grid'
 import {
