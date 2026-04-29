@@ -62,9 +62,9 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
     const restIndex = visible.slice(FEATURED_COUNT)
 
     const octokit = createChangelogOctokit()
-    const featured = (
-      await Promise.all(
-        firstMeta.map(async (meta): Promise<FeaturedEntry | null> => {
+    const featuredResults = await Promise.all(
+      firstMeta.map(
+        async (meta): Promise<FeaturedEntry | { failedMeta: ChangelogTimelineIndexItem }> => {
           try {
             const discussion = await fetchChangelogDiscussionByNumber(
               octokit,
@@ -72,7 +72,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
               'supabase',
               meta.number
             )
-            if (!discussion) return null
+            if (!discussion) return { failedMeta: meta }
             const source = await mdxSerialize(discussion.body)
             const created_at =
               discussionDisplayDate({
@@ -89,14 +89,20 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
             }
           } catch (e) {
             console.error(e)
-            return null
+            return { failedMeta: meta }
           }
-        })
+        }
       )
-    ).filter((e): e is FeaturedEntry => e != null)
+    )
+
+    const featured = featuredResults.filter((e): e is FeaturedEntry => !('failedMeta' in e))
+    const fallbackItems = featuredResults
+      .filter((e): e is { failedMeta: ChangelogTimelineIndexItem } => 'failedMeta' in e)
+      .map((e) => e.failedMeta)
+    const restIndexWithFallbacks = fallbackItems.concat(restIndex)
 
     res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
-    return { props: { featured, restIndex, allIndex } }
+    return { props: { featured, restIndex: restIndexWithFallbacks, allIndex } }
   } catch (e) {
     console.error(e)
     res.setHeader('Cache-Control', 'private, no-store, max-age=0, must-revalidate')

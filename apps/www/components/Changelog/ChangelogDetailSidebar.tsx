@@ -1,11 +1,13 @@
 'use client'
 
-import { LabelBadges } from '~/components/Changelog/ChangelogTimelineList'
-import type { ChangelogLabel } from '~/lib/changelog-github'
 import { useCopyMarkdownFromUrl } from 'common'
 import { Chatgpt, Claude } from 'icons'
 import { Check, Copy, ExternalLink } from 'lucide-react'
 import { cn } from 'ui'
+
+import { LabelBadges } from '@/components/Changelog/ChangelogTimelineList'
+import type { ChangelogLabel } from '@/lib/changelog-github'
+import { SITE_ORIGIN } from '@/lib/constants'
 
 type Props = {
   number: number
@@ -17,7 +19,7 @@ type Props = {
 export function ChangelogDetailSidebar({ number, url, labels, className }: Props) {
   const { copied, copyMarkdown } = useCopyMarkdownFromUrl()
   const mdPath = `/changelog/${number}.md`
-  const mdAbs = `https://supabase.com${mdPath}`
+  const mdAbs = `${SITE_ORIGIN}${mdPath}`
   const aiPrompt = `Read from ${mdAbs} so I can ask questions about its contents`
 
   return (

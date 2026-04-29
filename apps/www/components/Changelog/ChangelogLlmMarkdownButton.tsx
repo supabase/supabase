@@ -12,12 +12,12 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
+import { SITE_ORIGIN } from '@/lib/constants'
+
 type Props = {
   className?: string
   markdownPath?: string
 }
-
-const SITE_ORIGIN = 'https://supabase.com'
 
 export function ChangelogLlmMarkdownButton({ className, markdownPath = '/changelog.md' }: Props) {
   const { copied, copyMarkdown } = useCopyMarkdownFromUrl()
