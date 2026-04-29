@@ -1,8 +1,12 @@
-import { ContextMenuContent } from '@ui/components/shadcn/ui/context-menu'
 import { Copy, Edit, ListFilter, Trash } from 'lucide-react'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
-import { ContextMenuItem_Shadcn_, ContextMenuSeparator_Shadcn_, copyToClipboard } from 'ui'
+import {
+  copyToClipboard,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from 'ui'
 
 import { useTableRowOperations } from '../../hooks/useTableRowOperations'
 import { formatClipboardValue } from '../../utils/common'
@@ -82,35 +86,35 @@ export const RowContextMenuContent = ({
   }, [getRowAndColumn])
 
   return (
-    <ContextMenuContent className="!min-w-36">
-      <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onCopyCellContent}>
+    <DropdownMenuContent className="!min-w-36">
+      <DropdownMenuItem className="gap-x-2" onSelect={onCopyCellContent}>
         <Copy size={12} />
         <span className="text-xs">Copy cell</span>
-      </ContextMenuItem_Shadcn_>
-      <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onCopyRowContent}>
+      </DropdownMenuItem>
+      <DropdownMenuItem className="gap-x-2" onSelect={onCopyRowContent}>
         <Copy size={12} />
         <span className="text-xs">Copy row</span>
-      </ContextMenuItem_Shadcn_>
+      </DropdownMenuItem>
       {isFilterByValueVisible() && (
-        <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onFilterByValue}>
+        <DropdownMenuItem className="gap-x-2" onSelect={onFilterByValue}>
           <ListFilter size={12} />
           <span className="text-xs">Filter by value</span>
-        </ContextMenuItem_Shadcn_>
+        </DropdownMenuItem>
       )}
       {snap.editable && (
         <>
-          <ContextMenuSeparator_Shadcn_ />
-          <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onEditRowClick}>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="gap-x-2" onSelect={onEditRowClick}>
             <Edit size={12} />
             <span className="text-xs">Edit row</span>
-          </ContextMenuItem_Shadcn_>
-          <ContextMenuSeparator_Shadcn_ />
-          <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onDeleteRow}>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="gap-x-2" onSelect={onDeleteRow}>
             <Trash size={12} />
             <span className="text-xs">Delete row</span>
-          </ContextMenuItem_Shadcn_>
+          </DropdownMenuItem>
         </>
       )}
-    </ContextMenuContent>
+    </DropdownMenuContent>
   )
 }

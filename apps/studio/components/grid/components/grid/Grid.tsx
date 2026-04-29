@@ -4,7 +4,7 @@ import type { PostgresColumn } from '@supabase/postgres-meta'
 import { forwardRef, memo, Ref, useCallback, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
-import { Button, cn, ContextMenu_Shadcn_, ContextMenuTrigger_Shadcn_ } from 'ui'
+import { Button, cn, DropdownMenu, DropdownMenuTrigger } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ref as valtioRef } from 'valtio'
 
@@ -213,6 +213,7 @@ export const Grid = memo(
       const [draggedColumn, setDraggedColumn] = useState<SupaColumn | undefined>(undefined)
       const contextMenuTriggerRef = useRef<HTMLDivElement>(null)
       const [contextMenuKey, setContextMenuKey] = useState(0)
+      const [isContextMenuOpen, setIsContextMenuOpen] = useState(false)
       const [contextMenuRow, setContextMenuRow] = useState<SupaRow | null>(null)
       const [contextMenuCellPosition, setContextMenuCellPosition] = useState<{
         idx: number
@@ -234,18 +235,12 @@ export const Grid = memo(
           flushSync(() => {
             setContextMenuRow(row)
             setContextMenuCellPosition(position)
+            setIsContextMenuOpen(true)
           })
           setContextMenuKey((prev) => prev + 1)
 
           trigger.style.left = `${event.clientX}px`
           trigger.style.top = `${event.clientY}px`
-          trigger.dispatchEvent(
-            new MouseEvent('contextmenu', {
-              bubbles: true,
-              clientX: event.clientX,
-              clientY: event.clientY,
-            })
-          )
         },
         []
       )
@@ -402,10 +397,14 @@ export const Grid = memo(
               items={columnsWithDirtyCellClass.map((column) => column.key)}
               strategy={horizontalListSortingStrategy}
             >
-              <ContextMenu_Shadcn_ modal={false}>
-                <ContextMenuTrigger_Shadcn_ asChild>
+              <DropdownMenu
+                modal={false}
+                open={isContextMenuOpen}
+                onOpenChange={setIsContextMenuOpen}
+              >
+                <DropdownMenuTrigger asChild>
                   <div ref={contextMenuTriggerRef} className="fixed pointer-events-none w-0 h-0" />
-                </ContextMenuTrigger_Shadcn_>
+                </DropdownMenuTrigger>
                 {contextMenuRow && (
                   <RowContextMenuContent
                     key={contextMenuKey}
@@ -440,7 +439,7 @@ export const Grid = memo(
                     })
                   }
                 />
-              </ContextMenu_Shadcn_>
+              </DropdownMenu>
               {/* The DragOverlay is necessary to avoid styling issues while dragging a column */}
               <DragOverlay>
                 {draggedColumn ? <ColumnOverlayItem column={draggedColumn} /> : null}
