@@ -2,6 +2,7 @@ import { useHotkeySequence } from '@tanstack/react-hotkeys'
 import { Fragment, useCallback } from 'react'
 import { KeyboardShortcut } from 'ui'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import type { ICommand } from 'ui-patterns/CommandMenu/api/types'
 
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS, type ShortcutId } from './registry'
 import type { ShortcutOptions } from './types'
@@ -12,10 +13,7 @@ import useLatest from '@/hooks/misc/useLatest'
 const hotkeyToKeys = (hotkey: string): string[] =>
   hotkey.split('+').map((part) => (part === 'Mod' ? 'Meta' : part))
 
-const orderShortcutCommands = (
-  commands: Array<{ id: string }>,
-  commandsToInsert: Array<{ id: string }>
-) => {
+const orderShortcutCommands = (commands: ICommand[], commandsToInsert: ICommand[]): ICommand[] => {
   const mergedCommands = [...commands, ...commandsToInsert]
 
   return mergedCommands.sort((a, b) => {
