@@ -32,6 +32,8 @@ export const useDestinationInformation = ({ id }: { id?: number | null }) => {
       ? 'BigQuery'
       : 'iceberg' in destination.config
         ? 'Analytics Bucket'
+        : 'ducklake' in destination.config
+          ? 'DuckLake'
         : undefined
 
   const {
