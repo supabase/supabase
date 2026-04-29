@@ -38,6 +38,7 @@ import {
 import Table from '@/components/to-be-cleaned/Table'
 import AlertError from '@/components/ui/AlertError'
 import BarChart from '@/components/ui/Charts/BarChart'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
 import { BASE_PATH } from '@/lib/constants'
 import type { ResponseError } from '@/types'
@@ -364,15 +365,9 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
           value={datum.method}
         />
         {datum.status_code && (
-          <TextFormatter
-            className={`w-10 h-4 text-center rounded-sm ${
-              datum.status_code >= 400
-                ? 'bg-orange-500'
-                : datum.status_code >= 300
-                  ? 'bg-yellow-500'
-                  : 'bg-green-500'
-            }`}
-            value={String(datum.status_code)}
+          <DataTableColumnStatusCode
+            value={datum.status_code}
+            level={String(Math.floor(datum.status_code / 100))}
           />
         )}
         <div className=" truncate max-w-sm lg:max-w-lg">
