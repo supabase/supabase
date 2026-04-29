@@ -151,7 +151,11 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
               description="An S3 path where DuckLake data files will be written"
             >
               <FormControl>
-                <Input_Shadcn_ {...field} placeholder="s3://bucket/path" value={field.value ?? ''} />
+                <Input_Shadcn_
+                  {...field}
+                  placeholder="s3://bucket/path"
+                  value={field.value ?? ''}
+                />
               </FormControl>
             </FormItemLayout>
           )}
@@ -309,7 +313,9 @@ export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelS
                   value={field.value === false ? 'false' : 'true'}
                   onValueChange={(value) => field.onChange(value === 'true')}
                 >
-                  <SelectTrigger_Shadcn_>{field.value === false ? 'false' : 'true'}</SelectTrigger_Shadcn_>
+                  <SelectTrigger_Shadcn_>
+                    {field.value === false ? 'false' : 'true'}
+                  </SelectTrigger_Shadcn_>
                   <SelectContent_Shadcn_>
                     <SelectItem_Shadcn_ value="true">true</SelectItem_Shadcn_>
                     <SelectItem_Shadcn_ value="false">false</SelectItem_Shadcn_>

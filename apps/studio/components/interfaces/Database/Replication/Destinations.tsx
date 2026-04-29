@@ -62,7 +62,7 @@ export const Destinations = () => {
         ? 'Analytics Bucket'
         : etlEnableDucklake
           ? 'DuckLake'
-        : null
+          : null
 
   const prefetchedRef = useRef(false)
   const [filterString, setFilterString] = useState<string>('')
@@ -110,7 +110,7 @@ export const Destinations = () => {
   const hasDestinations = isDestinationsSuccess && destinationsData?.destinations.length > 0
   const filteredDestinations =
     filterString.length === 0
-      ? (destinations ?? [])
+      ? destinations ?? []
       : (destinations ?? []).filter((destination) =>
           destination.name.toLowerCase().includes(filterString.toLowerCase())
         )

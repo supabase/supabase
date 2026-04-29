@@ -34,7 +34,7 @@ export const useDestinationInformation = ({ id }: { id?: number | null }) => {
         ? 'Analytics Bucket'
         : 'ducklake' in destination.config
           ? 'DuckLake'
-        : undefined
+          : undefined
 
   const {
     data: pipelinesData,

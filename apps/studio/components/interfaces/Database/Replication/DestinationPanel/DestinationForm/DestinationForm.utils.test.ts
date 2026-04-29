@@ -145,8 +145,7 @@ describe('DestinationForm.utils DuckLake', () => {
       },
       {
         path: 'ducklakeMetadataSchema',
-        message:
-          'DuckLake metadata schema must contain only letters, numbers, and underscores',
+        message: 'DuckLake metadata schema must contain only letters, numbers, and underscores',
       },
     ])
   })
