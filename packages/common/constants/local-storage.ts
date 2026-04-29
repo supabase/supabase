@@ -22,9 +22,9 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
   UI_PREVIEW_QUEUE_OPERATIONS: 'supabase-ui-queue-operations',
   UI_PREVIEW_PG_DELTA_DIFF: 'supabase-ui-pg-delta-diff',
-  UI_PREVIEW_FLOATING_MOBILE_TOOLBAR: 'supabase-ui-floating-mobile-toolbar',
   UI_PREVIEW_PLATFORM_WEBHOOKS: 'supabase-ui-platform-webhooks',
   UI_PREVIEW_JIT_DB_ACCESS: 'supabase-ui-jit-db-access',
+  UI_PREVIEW_RLS_TESTER: 'supabase-ui-rls-tester',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
@@ -80,23 +80,16 @@ export const LOCAL_STORAGE_KEYS = {
   // api keys view switcher for new and legacy api keys
   API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
 
+  // Shortcut preferences
+  SHORTCUT_STORAGE_KEY: 'supabase-shortcut-preferences',
+
   LAST_VISITED_ORGANIZATION: 'last-visited-organization',
 
   // user impersonation selector previous searches
   USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>
     `user-impersonation-selector-previous-searches-${ref}`,
 
-  HOTKEY_COMMAND_MENU: 'supabase-dashboard-hotkey-command-menu',
-
   LAST_OPENED_SIDE_BAR: (ref: string) => `last-opened-sidebar-${ref}`,
-
-  // Project sidebar hotkeys
-  HOTKEY_SIDEBAR: (sidebarId: string) => `supabase-dashboard-hotkey-sidebar-${sidebarId}`,
-
-  HOTKEY_COPY_MARKDOWN: 'supabase-dashboard-hotkey-copy-markdown',
-  HOTKEY_COPY_JSON: 'supabase-dashboard-hotkey-copy-json',
-  HOTKEY_COPY_CSV: 'supabase-dashboard-hotkey-copy-csv',
-  HOTKEY_DOWNLOAD_CSV: 'supabase-dashboard-hotkey-download-csv',
 
   // Index Advisor notice dismissed
   INDEX_ADVISOR_NOTICE_DISMISSED: (ref: string) => `index-advisor-notice-dismissed-${ref}`,
@@ -104,8 +97,14 @@ export const LOCAL_STORAGE_KEYS = {
   // RLS event trigger banner dismissed
   RLS_EVENT_TRIGGER_BANNER_DISMISSED: (ref: string) => `rls-event-trigger-banner-dismissed-${ref}`,
 
+  RLS_TESTER_BANNER_DISMISSED: (ref: string) => `rls-tester-banner-dismissed-${ref}`,
+
   // Observability banner dismissed
   OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
+  ORGANIZATION_MARKETPLACE_BANNER_DISMISSED: (orgSlug: string, managedBy: string) =>
+    `organization-marketplace-banner-dismissed-${orgSlug}-${managedBy}`,
+  PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
+    `project-integration-banner-dismissed-${ref}-${integrationSource}`,
 
   // Tax ID banner dismissed
   TAX_ID_BANNER_DISMISSED: (slug: string) => `tax-id-banner-dismissed-${slug}`,

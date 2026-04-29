@@ -190,7 +190,7 @@ const IntegrationsPage: NextPageWithLayout = () => {
                     {/* Featured Integrations */}
                     {groupedIntegrations.featured.length > 0 && (
                       <div
-                        className="grid grid-cols-2 @4xl:grid-cols-3 gap-4 mb-4 items-stretch pb-6 mb-6 border-b"
+                        className="grid grid-cols-2 @4xl:grid-cols-3 gap-4 mb-4 items-stretch pb-6 border-b"
                         style={{ gridAutoRows: 'minmax(110px, auto)' }}
                       >
                         {groupedIntegrations.featured.map((integration) => (

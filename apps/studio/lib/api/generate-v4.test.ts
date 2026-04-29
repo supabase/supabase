@@ -47,7 +47,6 @@ test('generateV4 calls the tool sanitizer', async () => {
     getOrgAIDetails: vi.fn().mockResolvedValue({
       aiOptInLevel: 'schema_and_log_and_data',
       hasAccessToAdvanceModel: true,
-      isDpaSigned: false,
     }),
     getProjectAIDetails: vi.fn().mockResolvedValue({
       region: 'us-east-1',

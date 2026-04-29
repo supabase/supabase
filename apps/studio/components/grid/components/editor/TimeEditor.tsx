@@ -17,12 +17,6 @@ interface TimeEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellPro
   format: string
 }
 
-/**
- * original input time format 'HH:mm'
- * when step=1, it becomes 'HH:mm:ss'
- */
-const INPUT_TIME_FORMAT = 'HH:mm:ss'
-
 function BaseEditor<TRow, TSummaryRow = unknown>({
   row,
   column,

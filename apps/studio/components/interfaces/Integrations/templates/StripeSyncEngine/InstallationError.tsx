@@ -1,9 +1,7 @@
-import { useParams } from 'common'
 import { Button } from 'ui'
 
 import { useStripeSyncStatus } from './useStripeSyncStatus'
 import AlertError from '@/components/ui/AlertError'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const InstallationError = ({
   error,

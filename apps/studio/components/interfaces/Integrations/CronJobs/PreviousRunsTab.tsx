@@ -183,7 +183,7 @@ export const PreviousRunsTab = () => {
     <div className="h-full flex flex-col">
       <LoadingLine loading={isFetching} />
       <DataGrid
-        className="flex-grow border-t-0"
+        className="grow border-t-0"
         rowHeight={44}
         headerRowHeight={36}
         onScroll={handleScroll}

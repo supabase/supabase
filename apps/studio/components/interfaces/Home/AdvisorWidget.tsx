@@ -126,7 +126,7 @@ export const AdvisorWidget = () => {
   ) => {
     const topIssues = lints
       .filter((lint) => lint.level === LINTER_LEVELS.ERROR || lint.level === LINTER_LEVELS.WARN)
-      .sort((a, b) => (a.level === LINTER_LEVELS.ERROR ? -1 : 1))
+      .sort((a, _b) => (a.level === LINTER_LEVELS.ERROR ? -1 : 1))
 
     return (
       <div className="h-full">

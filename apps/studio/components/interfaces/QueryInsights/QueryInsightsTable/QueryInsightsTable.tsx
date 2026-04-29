@@ -333,7 +333,7 @@ export const QueryInsightsTable = ({
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <div className="overflow-x-auto flex-shrink-0 bg-surface-100 border-b">
+      <div className="overflow-x-auto shrink-0 bg-surface-100 border-b">
         <div className="flex items-center justify-between px-6 h-10 min-w-max">
           <div className="flex items-center gap-x-1.5">
             <TwoOptionToggle
@@ -452,7 +452,7 @@ export const QueryInsightsTable = ({
             <DataGrid
               ref={triageGridRef}
               style={{ height: '100%' }}
-              className="flex-1 flex-grow h-full"
+              className="flex-1 grow h-full"
               rowHeight={60}
               headerRowHeight={36}
               columns={triageColumns}
@@ -508,7 +508,7 @@ export const QueryInsightsTable = ({
             <DataGrid
               ref={gridRef}
               style={{ height: '100%' }}
-              className={cn('flex-1 flex-grow h-full')}
+              className={cn('flex-1 grow h-full')}
               rowHeight={44}
               headerRowHeight={36}
               columns={columns}

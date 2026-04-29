@@ -149,7 +149,7 @@ View the [complete code](https://github.com/supabase/supabase/tree/master/exampl
 
 ### Seeding data
 
-Now that you are managing your database with migrations scripts, it would be great have some seed data to use every time you reset the database.
+Now that you are managing your database with migrations, it would be great have some seed data to use every time you reset the database.
 
 <StepHikeCompact>
 
@@ -199,6 +199,12 @@ You should now see the `employees` table, along with your seed data in the Dashb
 ### Diffing changes
 
 This workflow is great if you know SQL and are comfortable creating tables and columns. If not, you can still use the Dashboard to create tables and columns, and then use the CLI to diff your changes and create migrations.
+
+<Admonition type="caution">
+
+Only use the Dashboard to make schema changes on your **local** database, then capture them with `supabase db diff`. Making schema changes directly on your **remote** database (via the SQL editor or Table Editor) bypasses the migration history and will cause `db push` to fail with sync errors. Once you're using migrations, all schema changes to your remote database should go through migration files only.
+
+</Admonition>
 
 <StepHikeCompact>
 
@@ -343,3 +349,146 @@ supabase db push --include-seed
 </StepHikeCompact>
 
 Visiting your live project on [Supabase](/dashboard/project/_), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.
+
+## Working with a team
+
+When multiple developers share a Supabase project, a few rules keep migrations from getting out of sync.
+
+**The golden rule: never change the remote database directly.** Once you're using migrations, all schema changes — even small ones — should go through migration files. Using the Dashboard's SQL editor or Table Editor on your remote database bypasses the migration history, and `db push` will start failing with sync errors.
+
+**The team workflow:**
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Create a migration locally">
+      Each developer creates migration files on their own branch, never touching the remote database directly.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash name=Terminal
+supabase migration new your_change_description
+```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Test and commit">
+      Reset your local database to apply the migration, then commit the migration file to git.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash name=Terminal
+supabase db reset
+git add supabase/migrations
+git commit -m "add migration: your_change_description"
+```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Pull and reset when a teammate merges a migration">
+      After pulling new migration files from git, reset your local database to apply them.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash name=Terminal
+git pull
+supabase db reset
+```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="One person deploys to remote">
+      Coordinate so only one person runs `db push` at a time. Migration files are applied in timestamp order, so concurrent pushes from different machines can cause conflicts.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash name=Terminal
+supabase db push
+```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+<Admonition type="tip">
+
+For a more automated deployment approach, consider using [Supabase Branching](/docs/guides/deployment/branching) or a CI/CD pipeline that runs `supabase db push` on merge to your main branch.
+
+</Admonition>
+
+## Diagnosing and fixing sync errors
+
+If `db push` fails with errors suggesting you run `supabase migration repair`, your local migration files and the remote database's migration history are out of sync. Here's how to diagnose and fix it.
+
+### How migration tracking works
+
+Supabase tracks which migrations have been applied on each database in a table called `supabase_migrations.schema_migrations`. When you run `supabase db push`, it compares your local `supabase/migrations` folder against that table and runs only the ones not yet applied, in order.
+
+Git tracks your migration _files_. Supabase tracks what's been _applied to each database_. These are two separate systems that need to stay in sync.
+
+### Step 1: Check what's out of sync
+
+Start by listing the migration status across local and remote:
+
+```bash name=Terminal
+supabase migration list
+```
+
+This shows which migrations are applied locally, which are applied on the remote, and where they diverge.
+
+### Step 2: If you made changes on the remote database directly
+
+Pull the current remote state into a migration file to get back in sync:
+
+```bash name=Terminal
+supabase db pull
+```
+
+This creates a new migration file capturing the current remote schema. Commit it to git, then follow the standard workflow going forward.
+
+### Step 3: If the migration history table is wrong
+
+If a migration shows as missing in the remote history table but the schema change is actually already there (for example, it was applied manually), you can mark it as applied without re-running it:
+
+```bash name=Terminal
+supabase migration repair --status applied <migration-timestamp>
+```
+
+Or if a migration is recorded as applied but was never actually run:
+
+```bash name=Terminal
+supabase migration repair --status reverted <migration-timestamp>
+```
+
+<Admonition type="caution">
+
+`migration repair` updates the tracking table only — it does not apply or revert any SQL. Use it to correct the history record when you know the actual database state is correct.
+
+</Admonition>

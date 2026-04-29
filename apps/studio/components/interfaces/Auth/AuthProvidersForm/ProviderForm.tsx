@@ -10,7 +10,7 @@ import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
+  Form,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -165,7 +165,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   const form = useForm({
     defaultValues: INITIAL_VALUES,
     resolver: zodResolver(provider.validationSchema),
-    shouldUnregister: true,
+    shouldUnregister: false,
   })
 
   useEffect(() => {
@@ -216,11 +216,11 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
             />
             <SheetTitle>{provider.title}</SheetTitle>
           </SheetHeader>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form
               id={formId}
               name={formId}
-              className="overflow-y-auto flex-grow px-0"
+              className="overflow-y-auto grow px-0"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <AuthAlert
@@ -273,7 +273,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                 </SheetSection>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
           <SheetFooter className="shrink-0">
             <div className="flex items-center justify-between w-full">
               <DocsButton href={provider.link} />

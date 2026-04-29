@@ -48,7 +48,7 @@ const PropertyRow = ({
 
   const service = path?.startsWith('/auth/') ? Service.Auth : undefined
 
-  const handleSearch: LogSearchCallback = async (event: string, { query }: { query?: string }) => {
+  const handleSearch: LogSearchCallback = async (_event: string, { query }: { query?: string }) => {
     setSearch(query || '')
   }
 

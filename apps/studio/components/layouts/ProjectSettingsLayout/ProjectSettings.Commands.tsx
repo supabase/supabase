@@ -97,7 +97,8 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         : []),
       {
         id: 'nav-project-settings-restart-project',
-        name: 'Restart project',
+        name: 'Project availability',
+        value: 'project availability restart project pause project resume project',
         route: `/project/${ref}/settings/general#restart-project`,
         defaultHidden: true,
       },

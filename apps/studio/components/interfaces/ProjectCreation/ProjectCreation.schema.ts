@@ -37,6 +37,7 @@ export const FormSchema = z
     githubInstallationId: z.number().optional(),
     githubRepositoryName: z.string().optional().default(''),
     dataApi: z.boolean(),
+    dataApiDefaultPrivileges: z.boolean(),
     enableRlsEventTrigger: z.boolean(),
     postgresVersionSelection: z.string(),
     useOrioleDb: z.boolean(),

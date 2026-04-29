@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { geoCentroid } from 'd3-geo'
 import sumBy from 'lodash/sumBy'
 import { ChevronRight } from 'lucide-react'
@@ -171,7 +170,6 @@ export const TopApiRoutesRenderer = (
     avg?: number
   }>
 ) => {
-  const { ref: projectRef } = useParams()
   const [showMore, setShowMore] = useState(false)
 
   const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200 !border-x-0 !rounded-none'

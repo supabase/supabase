@@ -139,7 +139,7 @@ export const ProductDropdown = () => {
                     href={customer.url}
                     className="group flex items-center gap-3 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded"
                   >
-                    <div className="relative rounded-md bg-background border group-hover:border-foreground-muted/50 h-14 w-28 xl:h-14 xl:w-20 flex-shrink-0 overflow-auto">
+                    <div className="relative rounded-md bg-background border group-hover:border-foreground-muted/50 h-14 w-28 xl:h-14 xl:w-20 shrink-0 overflow-auto">
                       <Image
                         src={`/${customer.imgUrl}`}
                         alt={customer.title}

@@ -115,7 +115,7 @@ export function ApiKeyPill({
           InputVariants({ size: 'tiny' }),
           'w-[100px] sm:w-[140px] md:w-[180px] lg:w-[340px] gap-0 font-mono rounded-full',
           isSecret ? 'overflow-hidden' : '',
-          show ? 'ring-1 ring-foreground-lighter ring-opacity-50' : 'ring-0 ring-opacity-0',
+          show ? 'ring-1 ring-foreground-lighter/50' : 'ring-0 ring-foreground-lighter/0',
           'transition-all cursor-text relative'
         )}
         style={{ userSelect: 'all' }}

@@ -14,9 +14,9 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   TextArea_Shadcn_,
   Tooltip,
   TooltipContent,
@@ -48,6 +48,7 @@ interface RequestUpgradeToBillingOwnersProps {
   /** Used in the default message template, e.g: "Upgrade to ..." */
   featureProposition?: string
   className?: string
+  type?: 'primary' | 'default'
 }
 
 export const RequestUpgradeToBillingOwners = ({
@@ -57,6 +58,7 @@ export const RequestUpgradeToBillingOwners = ({
   featureProposition,
   children,
   className,
+  type = 'primary',
 }: PropsWithChildren<RequestUpgradeToBillingOwnersProps>) => {
   const [open, setOpen] = useState(false)
   const track = useTrack()
@@ -121,10 +123,8 @@ export const RequestUpgradeToBillingOwners = ({
 
   const defaultValues = {
     note: !!addon
-      ? addon === 'spendCap'
-        ? `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
-        : `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
-      : `We'd like to upgrade to the ${plan} plan ${!!featureProposition ? ` to ${featureProposition} ` : ''}${target}`,
+      ? `We'd like to ${isFreePlan ? 'upgrade to Pro and ' : ''}${action} ${target} so that we can ${featureProposition}`
+      : `We'd like to upgrade to the ${plan} plan ${!!featureProposition ? `to ${featureProposition} ` : ''}${target}`,
   }
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -162,12 +162,12 @@ export const RequestUpgradeToBillingOwners = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button block={block} type="primary" className={className}>
+        <Button block={block} type={type} className={className}>
           {buttonText}
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
               <DialogTitle>{titleText}</DialogTitle>
@@ -207,7 +207,7 @@ export const RequestUpgradeToBillingOwners = ({
                   )}
                 </div>
               </div>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="note"
                 render={({ field }) => (
@@ -216,7 +216,7 @@ export const RequestUpgradeToBillingOwners = ({
                     label="Add a note to your request (optional)"
                     layout="vertical"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <TextArea_Shadcn_
                         id="note"
                         {...field}
@@ -229,7 +229,7 @@ export const RequestUpgradeToBillingOwners = ({
                             : 'e.g. We need to upgrade to the Pro plan to use this feature'
                         }
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -244,7 +244,7 @@ export const RequestUpgradeToBillingOwners = ({
               </Button>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

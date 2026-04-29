@@ -11,9 +11,9 @@ import {
   CardContent,
   CardFooter,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Switch,
 } from 'ui'
@@ -104,6 +104,13 @@ export const GitHubIntegrationConnectionForm = ({
       onSuccess: () => {
         toast.success('GitHub integration successfully updated')
       },
+      onError: (error) => {
+        // Don't show error toast when connection already exists - the branch
+        // settings update will still proceed and show its own success toast
+        if (!error.message?.includes('already exists')) {
+          toast.error(`Failed to create GitHub connection: ${error.message}`)
+        }
+      },
     })
 
   const { mutateAsync: deleteConnection, isPending: isDeletingConnection } =
@@ -170,9 +177,6 @@ export const GitHubIntegrationConnectionForm = ({
   const enableProductionSync = githubSettingsForm.watch('enableProductionSync')
   const newBranchPerPr = githubSettingsForm.watch('new_branch_per_pr')
   const currentRepositoryId = githubSettingsForm.watch('repositoryId')
-
-  // Calculate selected repository based on current form value
-  const selectedRepository = githubRepos.find((repo) => repo.id === currentRepositoryId)
 
   const handleCreateOrUpdateConnection = async (data: z.infer<typeof GitHubSettingsSchema>) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
@@ -373,7 +377,7 @@ export const GitHubIntegrationConnectionForm = ({
 
   return (
     <>
-      <Form_Shadcn_ {...githubSettingsForm}>
+      <Form {...githubSettingsForm}>
         <form
           onSubmit={githubSettingsForm.handleSubmit(handleCreateOrUpdateConnection)}
           className={cn(!isParentProject && 'opacity-25 pointer-events-none')}
@@ -414,23 +418,34 @@ export const GitHubIntegrationConnectionForm = ({
                   exit={{ opacity: 0, y: -16 }}
                 >
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={githubSettingsForm.control}
                       name="supabaseDirectory"
                       render={({ field }) => (
                         <FormItemLayout
                           layout="flex-row-reverse"
                           label="Working directory"
-                          description="Path to working directory with your supabase folder"
+                          description={
+                            <>
+                              Relative path to the directory containing your{' '}
+                              <code className="text-code-inline whitespace-nowrap">supabase/</code>{' '}
+                              folder.{' '}
+                              <InlineLink
+                                href={`${DOCS_URL}/guides/deployment/branching/github-integration#set-the-working-directory`}
+                              >
+                                Learn more
+                              </InlineLink>
+                            </>
+                          }
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Input_Shadcn_
                               {...field}
-                              placeholder="supabase"
+                              placeholder="."
                               autoComplete="off"
                               disabled={!canUpdateGitHubConnection}
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -438,7 +453,7 @@ export const GitHubIntegrationConnectionForm = ({
                   <CardContent>
                     {/* Production Branch Sync Section */}
                     <div className="space-y-4">
-                      <FormField_Shadcn_
+                      <FormField
                         control={githubSettingsForm.control}
                         name="enableProductionSync"
                         render={({ field }) => (
@@ -447,13 +462,13 @@ export const GitHubIntegrationConnectionForm = ({
                             label="Deploy to production"
                             description="Deploy changes to production on push including PR merges"
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                                 disabled={!canUpdateGitHubConnection}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -464,7 +479,7 @@ export const GitHubIntegrationConnectionForm = ({
                           !enableProductionSync && 'opacity-25 pointer-events-none'
                         )}
                       >
-                        <FormField_Shadcn_
+                        <FormField
                           control={githubSettingsForm.control}
                           name="branchName"
                           render={({ field }) => (
@@ -474,13 +489,13 @@ export const GitHubIntegrationConnectionForm = ({
                               description="The GitHub branch to sync with your production database (e.g., main, master)"
                             >
                               <div className="relative w-full">
-                                <FormControl_Shadcn_>
+                                <FormControl>
                                   <Input_Shadcn_
                                     {...field}
                                     autoComplete="off"
                                     disabled={!canUpdateGitHubConnection || !enableProductionSync}
                                   />
-                                </FormControl_Shadcn_>
+                                </FormControl>
                                 <div className="absolute top-2.5 right-3 flex items-center gap-2">
                                   {isCheckingBranch && (
                                     <Loader2 size={14} className="animate-spin" />
@@ -518,7 +533,7 @@ export const GitHubIntegrationConnectionForm = ({
 
                     {/* Automatic Branching Section */}
                     <div className="space-y-4">
-                      <FormField_Shadcn_
+                      <FormField
                         disabled={!hasAccessToBranching}
                         control={githubSettingsForm.control}
                         name="new_branch_per_pr"
@@ -529,13 +544,13 @@ export const GitHubIntegrationConnectionForm = ({
                             className={cn(!hasAccessToBranching && 'opacity-25')}
                             description="Create preview branches for every pull request"
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch
                                 checked={!hasAccessToBranching ? false : field.value}
                                 onCheckedChange={field.onChange}
                                 disabled={!hasAccessToBranching || !canCreateGitHubConnection}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -547,7 +562,7 @@ export const GitHubIntegrationConnectionForm = ({
                             'opacity-25 pointer-events-none'
                         )}
                       >
-                        <FormField_Shadcn_
+                        <FormField
                           control={githubSettingsForm.control}
                           name="branchLimit"
                           render={({ field }) => (
@@ -556,7 +571,7 @@ export const GitHubIntegrationConnectionForm = ({
                               label="Branch limit"
                               description="Maximum number of preview branches"
                             >
-                              <FormControl_Shadcn_>
+                              <FormControl>
                                 <Input_Shadcn_
                                   {...field}
                                   type="number"
@@ -568,12 +583,12 @@ export const GitHubIntegrationConnectionForm = ({
                                     !canUpdateGitHubConnection
                                   }
                                 />
-                              </FormControl_Shadcn_>
+                              </FormControl>
                             </FormItemLayout>
                           )}
                         />
 
-                        <FormField_Shadcn_
+                        <FormField
                           control={githubSettingsForm.control}
                           name="supabaseChangesOnly"
                           render={({ field }) => (
@@ -582,7 +597,7 @@ export const GitHubIntegrationConnectionForm = ({
                               label="Supabase changes only"
                               description="Only create branches when Supabase files change"
                             >
-                              <FormControl_Shadcn_>
+                              <FormControl>
                                 <Switch
                                   checked={!hasAccessToBranching ? false : field.value}
                                   onCheckedChange={(val) => field.onChange(val)}
@@ -592,7 +607,7 @@ export const GitHubIntegrationConnectionForm = ({
                                     !canUpdateGitHubConnection
                                   }
                                 />
-                              </FormControl_Shadcn_>
+                              </FormControl>
                             </FormItemLayout>
                           )}
                         />
@@ -645,7 +660,7 @@ export const GitHubIntegrationConnectionForm = ({
             </AnimatePresence>
           </Card>
         </form>
-      </Form_Shadcn_>
+      </Form>
 
       <ConfirmationModal
         variant="warning"

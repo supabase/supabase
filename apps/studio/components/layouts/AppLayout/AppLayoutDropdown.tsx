@@ -48,7 +48,7 @@ export interface AppLayoutDropdownWithPopoverProps {
 export function AppLayoutDropdownWithPopover({
   linkHref,
   linkContent,
-  linkClassName = 'flex items-center gap-2 flex-shrink-0 text-sm',
+  linkClassName = 'flex items-center gap-2 shrink-0 text-sm',
   commandContent,
   open,
   onOpenChange,
@@ -56,7 +56,7 @@ export function AppLayoutDropdownWithPopover({
 }: AppLayoutDropdownWithPopoverProps) {
   return (
     <Popover_Shadcn_ open={open} onOpenChange={onOpenChange} modal={false}>
-      <div className="flex items-center flex-shrink-0">
+      <div className="flex items-center shrink-0">
         <Link href={linkHref} className={linkClassName}>
           {linkContent}
         </Link>

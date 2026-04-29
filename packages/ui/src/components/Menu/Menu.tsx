@@ -43,16 +43,7 @@ interface ItemProps {
   style?: React.CSSProperties
 }
 
-export function Item({
-  children,
-  icon,
-  active,
-  rounded,
-  onClick,
-  doNotCloseOverlay = false,
-  showActiveBar = false,
-  style,
-}: ItemProps) {
+export function Item({ children, icon, active, onClick, style }: ItemProps) {
   const __styles = styleHandler('menu')
 
   const { type } = useMenuContext()
