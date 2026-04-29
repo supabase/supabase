@@ -1,7 +1,10 @@
 import { useParams } from 'common'
+import { Check, Copy } from 'lucide-react'
 import { useState } from 'react'
 import {
+  Button,
   cn,
+  copyToClipboard,
   ResizablePanel,
   Skeleton,
   Tabs_Shadcn_ as Tabs,
@@ -46,6 +49,7 @@ export function ServiceFlowPanel({
   const { table, filterFields } = useDataTable()
   const { ref: projectRef } = useParams()
   const [activeTab, setActiveTab] = useState('overview')
+  const [jsonCopied, setJsonCopied] = useState(false)
 
   const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
 
@@ -206,9 +210,26 @@ export function ServiceFlowPanel({
                     <span className="text-sm">Enriching log...</span>
                   </div>
                 )}
+                <div className="sticky top-2 z-10 flex justify-end px-2 -mb-9 pointer-events-none">
+                  <Button
+                    size="tiny"
+                    type="default"
+                    className="pointer-events-auto px-1.5"
+                    icon={jsonCopied ? <Check size={12} /> : <Copy size={12} />}
+                    onClick={() => {
+                      copyToClipboard(JSON.stringify(formattedJsonData, null, 2))
+                      setJsonCopied(true)
+                      setTimeout(() => setJsonCopied(false), 1000)
+                    }}
+                  >
+                    {jsonCopied ? 'Copied' : ''}
+                  </Button>
+                </div>
                 <CodeBlock
                   language="json"
-                  className="max-h-[800px] overflow-auto rounded-none border-none [&_code]:!leading-tight [&_pre]:!leading-tight"
+                  hideCopy
+                  wrapperClassName="!overflow-visible"
+                  className="rounded-none border-none [&_code]:!leading-tight [&_pre]:!leading-tight"
                 >
                   {JSON.stringify(formattedJsonData, null, 2)}
                 </CodeBlock>
