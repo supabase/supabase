@@ -3,14 +3,8 @@ import { useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  LogoLoader,
-  WarningIcon,
-} from 'ui'
+import { Button, LogoLoader } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 import { APIAuthorizationLayout } from '@/components/layouts/APIAuthorizationLayout'
 import { useConfirmAccountRequestMutation } from '@/data/partners/stripe-projects-confirm-mutation'
@@ -136,8 +130,8 @@ const StripeProjectsLoginPage = () => {
   const linkedOrg = effectiveAccountRequest?.linked_organization
   const emailMatches = effectiveAccountRequest?.email_matches ?? false
 
-  const loadingText = linkedOrg ? 'Completing authorization...' : 'Creating your organization...'
-  const successTitle = linkedOrg ? 'Authorization complete' : 'Organization created'
+  const loadingText = linkedOrg ? 'Authorizing...' : 'Creating organization...'
+  const successTitle = linkedOrg ? 'Authorized' : 'Organization created'
   const successDescription = linkedOrg
     ? null
     : 'Your Supabase organization has been created and linked to your Stripe account.'
@@ -149,7 +143,7 @@ const StripeProjectsLoginPage = () => {
           mock: {mockParam}
         </div>
       )}
-      <div className="flex flex-col items-center min-h-[500px]">
+      <div className="flex flex-col items-center min-h-[500px] max-w-[400px] mx-auto">
         {effectiveIsConfirming ? (
           <>
             <LogoLoader />
@@ -159,37 +153,37 @@ const StripeProjectsLoginPage = () => {
           <>
             <StripeIcon />
             <h2 className="py-2 text-lg font-medium">{successTitle}</h2>
-            {successDescription && (
-              <p className="text-sm text-foreground-light">{successDescription}</p>
-            )}
-            <p className="pt-2 text-sm text-foreground-muted">You can now close this window</p>
+            <p className="text-sm text-center text-foreground-light">
+              {successDescription && `${successDescription} `}
+              You can close this window.
+            </p>
           </>
         ) : effectiveIsPending ? (
           <LogoLoader />
         ) : effectiveIsSuccess ? (
           <>
             <StripeIcon />
-            <h2 className="py-2 text-lg font-medium">Stripe Projects is requesting access</h2>
-            <p className="text-center text-foreground-light">
-              Stripe Projects wants to connect to your Supabase account.
+            <h2 className="py-2 text-lg font-medium text-balance ">
+              Stripe Projects is requesting access
+            </h2>
+            <p className="text-sm text-center text-foreground-light text-balance">
+              Stripe Projects wants to connect to the Supabase account for{' '}
+              <strong>{effectiveAccountRequest?.email}</strong>.
+              {emailMatches && !linkedOrg && (
+                <> This will create a new Supabase organization linked to Stripe.</>
+              )}
             </p>
-            <p className="text-center text-sm text-foreground-lighter">
-              This request is for <strong>{effectiveAccountRequest?.email}</strong>.
-            </p>
-
             {!emailMatches ? (
               <>
-                <Alert_Shadcn_ variant="warning" className="mt-4">
-                  <WarningIcon />
-                  <AlertTitle_Shadcn_>Wrong account</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
+                <Admonition type="warning" className="mt-4">
+                  <p className="text-sm text-foreground-light">
                     You're signed in as a different account. Sign out and sign back in as{' '}
-                    <strong>{effectiveAccountRequest?.email}</strong>, then return to Stripe to
-                    restart the request.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
+                    <strong className="text-foreground">{effectiveAccountRequest?.email}</strong>.
+                    Then return to Stripe to restart the request.
+                  </p>
+                </Admonition>
                 <div className="py-6">
-                  <Button size="large" type="primary" onClick={() => signOut()}>
+                  <Button size="small" type="default" onClick={() => signOut()}>
                     Sign out
                   </Button>
                 </div>
@@ -197,13 +191,15 @@ const StripeProjectsLoginPage = () => {
             ) : linkedOrg ? (
               // Org already linked to this Stripe account — inform user and confirm
               <>
-                <p className="mt-4 text-sm text-foreground-light text-center">
-                  <strong>{linkedOrg.name}</strong> is already connected to your Stripe account.
-                  Confirm to complete the request.
-                </p>
+                <Admonition type="note" className="mt-4" showIcon>
+                  <p className="text-sm text-foreground-light">
+                    <strong className="text-foreground">{linkedOrg.name}</strong> is already linked
+                    to Stripe. Authorize Stripe Projects to continue.
+                  </p>
+                </Admonition>
                 <div className="py-6">
                   <Button
-                    size="large"
+                    size="small"
                     type="primary"
                     disabled={effectiveIsConfirming}
                     onClick={handleApprove}
@@ -215,12 +211,9 @@ const StripeProjectsLoginPage = () => {
             ) : (
               // No linked org — a new one will be created
               <>
-                <p className="mt-4 text-sm text-foreground-light text-center">
-                  Approving will create a new Supabase organization linked to your Stripe account.
-                </p>
                 <div className="py-6">
                   <Button
-                    size="large"
+                    size="small"
                     type="primary"
                     disabled={effectiveIsConfirming}
                     onClick={handleApprove}
@@ -236,7 +229,7 @@ const StripeProjectsLoginPage = () => {
             <h2 className="py-2 text-lg font-medium text-destructive">Error</h2>
             <p className="text-foreground-light">{error?.message}</p>
             <div className="py-6">
-              <Button size="large" type="default" onClick={() => signOut()}>
+              <Button size="small" type="default" onClick={() => signOut()}>
                 Sign out
               </Button>
             </div>
