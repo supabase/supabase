@@ -1,8 +1,12 @@
-import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
-import { DEFAULT_EDGE_FUNCTION_SECRETS } from './DefaultEdgeFunctionSecrets.utils'
+import type { DefaultEdgeFunctionSecret } from './DefaultEdgeFunctionSecrets.utils'
 
-export const DefaultEdgeFunctionSecrets = () => {
+interface DefaultEdgeFunctionSecretsProps {
+  secrets: DefaultEdgeFunctionSecret[]
+}
+
+export const DefaultEdgeFunctionSecrets = ({ secrets }: DefaultEdgeFunctionSecretsProps) => {
   return (
     <Card>
       <Table>
@@ -13,13 +17,16 @@ export const DefaultEdgeFunctionSecrets = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {DEFAULT_EDGE_FUNCTION_SECRETS.map((defaultSecret) => (
-            <TableRow key={defaultSecret.name}>
+          {secrets.map((secret) => (
+            <TableRow key={secret.name}>
               <TableCell>
-                <p className="truncate py-2">{defaultSecret.name}</p>
+                <div className="flex items-center gap-x-2 py-2">
+                  <p className="truncate">{secret.name}</p>
+                  {secret.isDeprecated && <Badge variant="warning">Deprecated</Badge>}
+                </div>
               </TableCell>
               <TableCell>
-                <p className="text-sm text-foreground-light">{defaultSecret.description}</p>
+                <p className="text-sm text-foreground-light">{secret.description}</p>
               </TableCell>
             </TableRow>
           ))}

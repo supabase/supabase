@@ -11,7 +11,10 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import AddNewSecretForm from './AddNewSecretForm'
 import { DefaultEdgeFunctionSecrets } from './DefaultEdgeFunctionSecrets'
-import { isInternalEdgeFunctionSecret } from './DefaultEdgeFunctionSecrets.utils'
+import {
+  getVisibleDefaultEdgeFunctionSecrets,
+  isInternalEdgeFunctionSecret,
+} from './DefaultEdgeFunctionSecrets.utils'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
 import { EditSecretSheet } from './EditSecretSheet'
 import AlertError from '@/components/ui/AlertError'
@@ -42,6 +45,11 @@ export const EdgeFunctionSecrets = () => {
 
   const customSecrets = useMemo(
     () => data.filter((secret) => !isInternalEdgeFunctionSecret(secret.name)),
+    [data]
+  )
+
+  const visibleDefaultSecrets = useMemo(
+    () => getVisibleDefaultEdgeFunctionSecrets(new Set(data.map((secret) => secret.name))),
     [data]
   )
 
@@ -197,7 +205,7 @@ export const EdgeFunctionSecrets = () => {
                     .
                   </p>
                 </div>
-                <DefaultEdgeFunctionSecrets />
+                <DefaultEdgeFunctionSecrets secrets={visibleDefaultSecrets} />
               </section>
             </div>
           )}
