@@ -2,23 +2,23 @@ import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { forwardRef, memo, Ref, useCallback, useMemo, useRef, useState } from 'react'
-import { flushSync } from 'react-dom'
 import DataGrid, {
   CalculatedColumn,
   CellClickArgs,
   CellMouseEvent,
   DataGridHandle,
 } from 'react-data-grid'
+import { flushSync } from 'react-dom'
 import { Button, cn, DropdownMenu, DropdownMenuTrigger } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ref as valtioRef } from 'valtio'
 
 import type { GridProps, SupaColumn, SupaRow } from '../../types'
 import { isPendingAddRow, isPendingDeleteRow } from '../../types'
+import { RowContextMenuContent } from '../menu/RowContextMenu'
 import { ColumnOverlayItem } from './ColumnOverlayItem'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
-import { RowContextMenuContent } from '../menu/RowContextMenu'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 import { formatForeignKeys } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
@@ -237,22 +237,25 @@ export const Grid = memo(
           const trigger = contextMenuTriggerRef.current
           if (!trigger) return
 
+          trigger.style.left = `${event.clientX}px`
+          trigger.style.top = `${event.clientY}px`
+
           flushSync(() => {
             setContextMenuRow(row)
             setContextMenuCellPosition(position)
+            setContextMenuKey((prev) => prev + 1)
             setIsContextMenuOpen(true)
           })
-          setContextMenuKey((prev) => prev + 1)
-
-          trigger.style.left = `${event.clientX}px`
-          trigger.style.top = `${event.clientY}px`
         },
         []
       )
 
-      const handleCellClick = useCallback((_: unknown, event: React.MouseEvent<HTMLElement>) => {
-        event.currentTarget.focus()
-      }, [])
+      const handleCellClick = useCallback(
+        (_: CellClickArgs<SupaRow, unknown>, event: React.MouseEvent<HTMLElement>) => {
+          event.currentTarget.focus()
+        },
+        []
+      )
 
       const handleCellContextMenu = useCallback(
         (args: CellClickArgs<SupaRow, unknown>, event: CellMouseEvent) => {

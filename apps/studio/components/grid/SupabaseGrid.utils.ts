@@ -10,6 +10,7 @@ import {
   RowsChangeData,
 } from 'react-data-grid'
 import { toast } from 'sonner'
+
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import type { Sort, SupaColumn, SupaRow, SupaTable } from './types'

@@ -1,5 +1,12 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
+import {
+  formatFilterURLParams,
+  formatSortURLParams,
+  handleCellKeyDown,
+} from '@/components/grid/SupabaseGrid.utils'
+import { writeTextToClipboard } from '@/components/grid/utils/clipboard'
+
 const { toastError, toastSuccess } = vi.hoisted(() => ({
   toastError: vi.fn(),
   toastSuccess: vi.fn(),
@@ -11,13 +18,6 @@ vi.mock('sonner', () => ({
     success: toastSuccess,
   },
 }))
-
-import {
-  formatFilterURLParams,
-  formatSortURLParams,
-  handleCellKeyDown,
-} from '@/components/grid/SupabaseGrid.utils'
-import { writeTextToClipboard } from '@/components/grid/utils/clipboard'
 
 // Sort URL syntax: `column:order`
 describe('SupabaseGrid.utils: formatSortURLParams', () => {
