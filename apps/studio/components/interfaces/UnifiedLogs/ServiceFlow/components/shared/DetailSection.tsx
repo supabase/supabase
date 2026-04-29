@@ -17,12 +17,12 @@ export const DetailSectionHeader = ({ title, icon: Icon, summary }: DetailSectio
       ) : (
         <span className="w-3.5 shrink-0" aria-hidden />
       )}
-      <span className="truncate text-xs font-medium uppercase tracking-wider text-foreground-light">
+      <span className="truncate text-xs uppercase tracking-wider text-foreground-light font-mono">
         {title}
       </span>
     </div>
     {summary !== undefined && summary !== null && summary !== '' ? (
-      <span className="truncate text-right font-mono text-sm text-foreground">{summary}</span>
+      <span className="truncate text-right font-mono text-xs text-foreground">{summary}</span>
     ) : null}
   </div>
 )

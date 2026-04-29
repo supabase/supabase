@@ -40,7 +40,10 @@ export const DetailRow = ({
 
   const labelEl = (
     <span className="flex min-w-0 items-center gap-2 truncate text-xs uppercase tracking-wide text-foreground-lighter">
-      <span aria-hidden className="select-none font-mono text-foreground-muted translate-y-0.5">
+      <span
+        aria-hidden
+        className="select-none font-mono text-foreground-muted translate-y-0.5 ml-4"
+      >
         └
       </span>
       <span className="truncate font-mono">{label}</span>

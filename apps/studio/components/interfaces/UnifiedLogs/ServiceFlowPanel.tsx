@@ -125,7 +125,7 @@ export function ServiceFlowPanel({
               </div>
 
               {shouldShowServiceFlow && (
-                <TabsContent value="overview" className="mt-0 grow overflow-auto">
+                <TabsContent value="overview" className="mt-0 grow overflow-auto py-2">
                   {error ? (
                     <div className="py-8 text-center text-destructive">
                       Error: {error.toString()}
