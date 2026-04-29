@@ -74,7 +74,7 @@ export const GraphqlExposureLintCTA = ({
   const { mutate: executeSql, isPending: isRevoking } = useExecuteSqlMutation({
     onSuccess: async () => {
       toast.success(
-        `Revoked access to ${schema}.${name} from ${role}. ${audience} can no longer query this ${objectType} via GraphQL or PostgREST.`
+        `Revoked access to ${schema}.${name} from ${role}. ${audience} can no longer query this ${objectType} via GraphQL or Data API.`
       )
       setShowConfirmRevoke(false)
       await queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) })
@@ -112,7 +112,7 @@ export const GraphqlExposureLintCTA = ({
         onConfirm={handleRevoke}
         alert={{
           title: `This removes API access for ${AUDIENCE_LABEL[lintName]}`,
-          description: `Apps using the ${role} role will not be able to read or write to this ${objectType} via GraphQL or PostgREST. You can re-grant access later from the SQL editor.`,
+          description: `Apps using the ${role} role will not be able to read or write to this ${objectType} via GraphQL or Data API. You can re-grant access later from the SQL editor.`,
         }}
       >
         <p className="text-sm text-foreground-light">The following statement will be executed:</p>
