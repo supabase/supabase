@@ -13,7 +13,7 @@ export const ShimmeringLoader = forwardRef<HTMLDivElement, ShimmeringLoader>(
     return (
       <div
         ref={ref}
-        className={cn('shimmering-loader rounded py-3', className)}
+        className={cn('shimmering-loader rounded-sm py-3', className)}
         style={{
           ...style,
           animationFillMode: 'backwards',

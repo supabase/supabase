@@ -49,7 +49,7 @@ export function ExpandableVideo({
   }, [isMobile])
 
   const CliccablePreview = () => (
-    <div className="video-container overflow-hidden rounded hover:cursor-pointer">
+    <div className="video-container overflow-hidden rounded-sm hover:cursor-pointer">
       <div
         className="
           absolute inset-0 z-10
@@ -76,7 +76,7 @@ export function ExpandableVideo({
         fill
         sizes="100%"
         priority={priority}
-        className="absolute inset-0 object-cover blur-sm scale-105"
+        className="absolute inset-0 object-cover blur-xs scale-105"
       />
     </div>
   )

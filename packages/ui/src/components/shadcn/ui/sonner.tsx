@@ -54,7 +54,7 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
           closeButton: cn(
             // unset all styles set from sonner
             'absolute right-2 top-2 rounded-md text-foreground/50 opacity-0 transition-opacity',
-            'hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100',
+            'hover:text-foreground focus:opacity-100 focus:outline-hidden focus:ring-2 group-hover:opacity-100',
             'group-[.destructive]:text-destructive-300 group-[.destructive]:hover:text-destructive-50',
             'group-[.destructive]:focus:ring-destructive-400 group-[.destructive]:focus:ring-offset-destructive-600',
             'left-auto transform-none bg-transparent border-0 border-transparent hover:bg-transparent! hover:border-transparent'

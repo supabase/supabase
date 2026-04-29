@@ -55,7 +55,7 @@ const IconContainer = (
   <div
     className={cn(
       'w-6 h-6',
-      'bg-surface-100 border rounded',
+      'bg-surface-100 border rounded-sm',
       'flex items-center justify-center',
       'text-foreground-muted',
       'group-aria-selected:bg-surface-200 group-aria-selected:text-foreground-lighter group-aria-selected:[&_svg]:scale-[103%]',

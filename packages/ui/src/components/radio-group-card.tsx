@@ -57,7 +57,7 @@ const RadioGroupCardItem = React.forwardRef<
                 group-focus:border-foreground-muted
                 group-hover:border-foreground-muted
                 ring-offset-background
-                group-focus:outline-none
+                group-focus:outline-hidden
                 group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2
                 group-disabled:cursor-not-allowed group-disabled:opacity-50
                 flex items-center justify-center
