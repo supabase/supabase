@@ -173,13 +173,13 @@ export const GraphqlExposureCallout = ({ projectRef }: { projectRef: string }) =
   return (
     <Admonition
       type="default"
-      title="GraphQL is enabled on this project"
+      title="Why this appears"
       description={
         <p>
-          This check applies because this table is exposed to GraphQL. If this projects doesn't use
-          GraphQL, you can{' '}
+          These warnings are triggered by GraphQL exposing your table schemas. If you're not using
+          GraphQL, disable it from the{' '}
           <InlineLink href={`/project/${projectRef}/database/extensions`}>
-            disable it from the GraphQL integration page
+            Database integration page
           </InlineLink>
           .
         </p>
