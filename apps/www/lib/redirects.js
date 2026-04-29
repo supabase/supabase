@@ -1,13 +1,33 @@
 module.exports = [
   {
     permanent: true,
+    source: '/ui/docs/ai-editors-rules/prompts',
+    destination: '/ui/docs/ai-editors-rules/skills',
+  },
+  {
+    permanent: true,
     source: '/auth/Auth',
     destination: '/auth',
   },
   {
     permanent: true,
+    source: '/docs/guides/api/api-keys',
+    destination: '/docs/guides/getting-started/api-keys',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database/hardening-data-api',
-    destination: '/docs/guides/api/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/hardening-data-api',
+    destination: '/docs/guides/api/securing-your-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/data-api',
+    destination: '/docs/guides/api/securing-your-api',
   },
   {
     permanent: true,
@@ -3117,4 +3137,13 @@ module.exports = [
     source: '/docs/llms-full.txt',
     destination: '/llms-full.txt',
   },
+  // Legacy product .txt URLs → new .md routes
+  { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },
+  { permanent: true, source: '/llms/auth.txt', destination: '/auth.md' },
+  { permanent: true, source: '/llms/database.txt', destination: '/database.md' },
+  { permanent: true, source: '/llms/edge-functions.txt', destination: '/edge-functions.md' },
+  { permanent: true, source: '/llms/realtime.txt', destination: '/realtime.md' },
+  { permanent: true, source: '/llms/storage.txt', destination: '/storage.md' },
+  { permanent: true, source: '/llms/vector.txt', destination: '/vector.md' },
+  { permanent: true, source: '/llms/pricing.txt', destination: '/pricing.md' },
 ]

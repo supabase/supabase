@@ -29,7 +29,7 @@ interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
 }
 
 export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
-  ({ disabled, onDeleteConnection, ...props }, ref) => {
+  ({ disabled, onDeleteConnection, ...props }, _ref) => {
     const router = useRouter()
     const { data: org } = useSelectedOrganizationQuery()
 
@@ -155,8 +155,9 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
           loading={isDeleting}
         >
           <p className="text-sm text-foreground-light">
-            Deleting this GitHub connection will stop automatic creation and merging of preview
-            branches. Existing preview branches will remain unchanged.
+            {type === 'Vercel'
+              ? 'Deleting this Vercel connection will stop syncing environment variables to your Vercel project. Existing environment variables will remain unchanged.'
+              : 'Deleting this GitHub connection will stop automatic creation and merging of preview branches. Existing preview branches will remain unchanged.'}
           </p>
         </ConfirmationModal>
       </>

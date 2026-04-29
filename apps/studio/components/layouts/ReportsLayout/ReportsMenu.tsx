@@ -179,7 +179,7 @@ const ReportsMenu = () => {
               type="default"
               icon={<Plus />}
               disabled={!canCreateCustomReport}
-              className="justify-start flex-grow"
+              className="justify-start grow"
               onClick={() => {
                 setShowNewReportModal(true)
               }}
@@ -237,7 +237,7 @@ const ReportsMenu = () => {
                       >
                         <Link
                           href={subItem.url}
-                          className="flex-grow h-7 flex justify-between items-center pl-3"
+                          className="grow h-7 flex justify-between items-center pl-3"
                         >
                           <span>{subItem.name}</span>
                         </Link>

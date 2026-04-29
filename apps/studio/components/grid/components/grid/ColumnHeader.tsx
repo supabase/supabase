@@ -40,7 +40,7 @@ export function ColumnHeader<R>({
   return (
     <div ref={setNodeRef} style={style} className="w-full bg-surface-200">
       <div className={`sb-grid-column-header ${cursor}`}>
-        <div className="sb-grid-column-header__inner flex-grow" {...attributes} {...listeners}>
+        <div className="sb-grid-column-header__inner grow" {...attributes} {...listeners}>
           <ColumnIcon type={columnType} name={column.name as string} foreignKey={foreignKey} />
           {isPrimaryKey && (
             <Tooltip>
@@ -87,6 +87,7 @@ export function ColumnHeader<R>({
                   className="flex items-center"
                   onClick={() => openSheet(column.name as string)}
                 >
+                  <span className="sr-only">View {column.name} index suggestion</span>
                   <Lightbulb size={14} strokeWidth={2} className="!text-warning" />
                 </button>
               </TooltipTrigger>

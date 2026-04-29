@@ -1,299 +1,142 @@
 /*
  * @file events.ts
- * @description Unified api to fetch events from Luma and Filesystem.
+ * @description Fetch events from the Notion "Developer Events" database.
+ * Only events with "Publish to Web" select set to "Yes" are returned.
+ *
+ * Notion DB schema (actual column names):
+ *   Event Name          -> title
+ *   Start Date          -> date
+ *   End Date            -> date
+ *   Publish to Web      -> select  ("Yes" / other)
+ *   Publish to Web Description -> rich_text
+ *   URL                 -> rich_text  (event URL)
+ *   Book Meeting Link   -> url
+ *   Location            -> rich_text
+ *   Category            -> multi_select
+ *   Are you speaking at this event? -> multi_select
+ *   Participation       -> multi_select
  */
-import supabase from 'lib/supabase'
-import { getSortedPosts } from 'lib/posts'
-import authors from 'lib/authors.json'
-import { EventHost, SUPABASE_HOST, SupabaseEvent } from './eventsTypes'
+import { queryDatabase } from 'lib/notion'
 
-/**
- * Parse hosts from either a comma-separated string of author IDs or an array of host objects
- * Maps author IDs to EventHost objects using the authors.json file
- */
-function parseHostsFromAuthors(
-  hostsData?: string | Array<{ name: string; avatar_url?: string | null }>
-): EventHost[] {
-  if (!hostsData) return [SUPABASE_HOST]
+import { SUPABASE_HOST, SupabaseEvent } from './eventsTypes'
 
-  // Handle array format (new format from MDX files)
-  if (Array.isArray(hostsData)) {
-    const hosts = hostsData
-      .map((host) => {
-        // Try to find author by name for additional data
-        const author = authors.find((a: any) => a.author === host.name || a.author_id === host.name)
+// The actual DB ID (child database inside the page)
+const NOTION_EVENTS_DB_ID_FALLBACK = '21b5004b775f8058872fe8fa81e2c7ac'
 
-        if (author) {
-          return {
-            id: (author as any).author_id || host.name,
-            email: (author as any).author_url || '',
-            name: (author as any).author || host.name,
-            first_name: (author as any).author?.split(' ')[0] || host.name?.split(' ')[0] || null,
-            last_name:
-              (author as any).author?.split(' ').slice(1).join(' ') ||
-              host.name?.split(' ').slice(1).join(' ') ||
-              null,
-            avatar_url: host.avatar_url || (author as any).author_image_url || '',
-          }
-        }
+// ─── Helpers ────────────────────────────────────────────────────────────────
 
-        // Return host as-is if no author match
-        return {
-          id: host.name,
-          email: '',
-          name: host.name,
-          first_name: host.name?.split(' ')[0] || null,
-          last_name: host.name?.split(' ').slice(1).join(' ') || null,
-          avatar_url: host.avatar_url || '',
-        }
-      })
-      .filter((host): host is EventHost => host !== null && host.name !== null)
-
-    return hosts.length > 0 ? hosts : [SUPABASE_HOST]
-  }
-
-  // Handle string format (legacy format)
-  const hostIds = hostsData.split(',').map((id) => id.trim())
-  const hosts = hostIds
-    .map((hostId) => {
-      const author = authors.find((a: any) => a.author_id === hostId)
-      if (!author) return null
-
-      return {
-        id: (author as any).author_id || hostId,
-        email: (author as any).author_url || '',
-        name: (author as any).author || null,
-        first_name: (author as any).author?.split(' ')[0] || null,
-        last_name: (author as any).author?.split(' ').slice(1).join(' ') || null,
-        avatar_url: (author as any).author_image_url || '',
-      }
-    })
-    .filter((host): host is EventHost => host !== null)
-
-  return hosts.length > 0 ? hosts : [SUPABASE_HOST]
-}
-
-interface LumaEvent {
-  id: string
-  name: string
-  start_at: string
-  end_at: string
-  timezone: string
-  location: string
-  url: string
-  hosts: Array<{
-    id: string
-    email: string
-    name: string | null
-    first_name: string | null
-    last_name: string | null
-    avatar_url: string
-  }>
-}
-
-interface MeetupRecord {
-  id: string
-  city: string
-  country?: string
-  link: string
-  start_at: string
-  timezone: string
-  launch_week: string
-}
-
-interface EventRecord {
-  slug: string
-  type: string
-  title: string
-  date: string
-  end_date?: string
-  description: string
-  thumb: string
-  cover_url: string
-  path: string
-  url: string
-  tags?: string[]
-  categories?: string[]
-  timezone?: string
-  location?: string
-  onDemand?: boolean
-  disable_page_build?: boolean
-  link?: {
-    href: string
-    target?: '_blank' | '_self'
-    label?: string
-  }
-}
-
-/**
- * Get the nearest upcoming event from an array of events
- * Returns the event with the closest date to now that is still in the future
- */
-export const getFeaturedEvent = (events: SupabaseEvent[]): SupabaseEvent | null => {
-  if (!events || events.length === 0) return null
-
-  const now = new Date()
-
-  // Filter for upcoming events only
-  const upcomingEvents = events.filter((event) => {
-    const eventDate = new Date(event.end_date || event.date)
-    return eventDate >= now
-  })
-
-  if (upcomingEvents.length === 0) return null
-
-  // Sort by date ascending and return the nearest one
-  const sortedEvents = upcomingEvents.sort((a, b) => {
-    const dateA = new Date(a.date)
-    const dateB = new Date(b.date)
-    return dateA.getTime() - dateB.getTime()
-  })
-
-  return sortedEvents[0]
-}
-
-export const getLumaEvents = async (): Promise<SupabaseEvent[]> => {
+function isSafeHttpUrl(url: string): boolean {
   try {
-    const afterDate = new Date().toISOString()
-    const url = new URL('/api-v2/luma-events', window.location.origin)
-    url.searchParams.append('after', afterDate)
+    const parsed = new URL(url)
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
 
-    const res = await fetch(url.toString())
-    const data = await res.json()
+function getTitle(page: any): string {
+  const prop = Object.values(page.properties).find((p: any) => p.type === 'title') as any
+  return prop?.title?.map((t: any) => t.plain_text).join('') ?? ''
+}
 
-    if (data.success) {
-      const transformedEvents: SupabaseEvent[] = data.events.map((event: LumaEvent) => {
-        let categories = []
-        const isMeetup = event.name.toLowerCase().includes('meetup')
-        if (isMeetup) categories.push('meetup')
+function getRichText(page: any, name: string): string {
+  const prop = page.properties[name]
+  if (!prop || prop.type !== 'rich_text') return ''
+  return prop.rich_text.map((t: any) => t.plain_text).join('')
+}
+
+function getUrl(page: any, name: string): string {
+  const prop = page.properties[name]
+  if (!prop || prop.type !== 'url') return ''
+  return prop.url ?? ''
+}
+
+function getDate(page: any, name: string): string | null {
+  const prop = page.properties[name]
+  if (!prop || prop.type !== 'date' || !prop.date) return null
+  const raw = prop.date.start ?? null
+  if (!raw) return null
+  // Normalize date-only strings to noon UTC so the event day displays correctly
+  // in all timezones (T00:00:00Z rolls back to the previous day for UTC-negative zones)
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    return `${raw}T12:00:00Z`
+  }
+  return raw
+}
+
+function getMultiSelect(page: any, name: string): string[] {
+  const prop = page.properties[name]
+  if (!prop || prop.type !== 'multi_select') return []
+  return prop.multi_select.map((s: any) => s.name)
+}
+
+// ─── Main fetch ─────────────────────────────────────────────────────────────
+
+/**
+ * Fetch events from Notion where "Publish to Web" select = "Yes".
+ * Returns SupabaseEvent objects sorted by start date ascending.
+ */
+export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
+  const apiKey = process.env.NOTION_EVENTS_API_KEY
+  const dbId = process.env.NOTION_EVENTS_DB_ID_ACTUAL ?? NOTION_EVENTS_DB_ID_FALLBACK
+
+  if (!apiKey) {
+    console.error('NOTION_EVENTS_API_KEY is not set')
+    return []
+  }
+
+  try {
+    const pages = await queryDatabase(
+      dbId,
+      apiKey,
+      { property: 'Publish to Web', select: { equals: 'Yes' } },
+      [{ property: 'Start Date', direction: 'ascending' }]
+    )
+
+    return pages
+      .map((page): SupabaseEvent | null => {
+        const title = getTitle(page)
+        const startDate = getDate(page, 'Start Date')
+        if (!title || !startDate) return null
+
+        const endDate = getDate(page, 'End Date')
+        const description =
+          getRichText(page, 'Publish to Web Description') || getRichText(page, 'Notes')
+        const rawEventUrl = getRichText(page, 'URL')
+        const eventUrl = isSafeHttpUrl(rawEventUrl) ? rawEventUrl : ''
+        const rawMeetingLink = getUrl(page, 'Book Meeting Link')
+        const meetingLink = isSafeHttpUrl(rawMeetingLink) ? rawMeetingLink : ''
+        const location = getRichText(page, 'Location')
+        const categories = ['conference']
+        const speakingAnswers = getMultiSelect(page, 'Are you speaking at this event?')
+        const isSpeaking = speakingAnswers.includes('Yes')
 
         return {
-          slug: '',
+          slug: page.id,
           type: 'event',
-          title: event?.name || '',
-          date: event?.start_at || '',
-          description: '',
+          title,
+          date: startDate,
+          end_date: endDate ?? undefined,
+          description,
           thumb: '',
-          cover_url: '',
+          cover_url: page.cover?.external?.url ?? page.cover?.file?.url ?? '',
           path: '',
-          url: event?.url || '',
+          url: eventUrl,
           tags: categories,
           categories,
-          timezone: event?.timezone || 'America/Los_Angeles',
-          location: event?.location || '',
-          hosts: isMeetup ? [SUPABASE_HOST] : event?.hosts || [],
-          source: 'luma',
+          timezone: '',
+          location,
+          hosts: [SUPABASE_HOST],
+          source: 'notion',
           disable_page_build: true,
-          link: {
-            href: event?.url || '#',
-            target: '_blank',
-          },
+          isSpeaking,
+          meetingLink: meetingLink || undefined,
+          link: eventUrl ? { href: eventUrl, target: '_blank' } : undefined,
         }
       })
-      return transformedEvents
-    }
-
-    return []
+      .filter((e): e is SupabaseEvent => e !== null)
   } catch (error) {
-    console.error('Error fetching Luma events:', error)
+    console.error('Error fetching Notion events:', error)
     return []
-  }
-}
-
-export const getStaticEvents = async (): Promise<{
-  upcomingEvents: SupabaseEvent[]
-  onDemandEvents: SupabaseEvent[]
-  categories: { [key: string]: number }
-}> => {
-  const { data: meetups, error } = await supabase
-    .from('meetups')
-    .select('id, city, country, link, start_at, timezone, launch_week')
-    .eq('is_published', true)
-
-  if (error) console.log('meetups error: ', error)
-
-  const meetupEvents: SupabaseEvent[] =
-    meetups?.map((meetup: any) => ({
-      slug: '',
-      type: 'event',
-      title: `Launch Week ${meetup.launch_week.slice(2)} Meetup: ${meetup.city}, ${meetup.country}`,
-      date: meetup.start_at,
-      description: '',
-      thumb: '',
-      cover_url: '',
-      path: '',
-      url: meetup.link || '',
-      tags: ['meetup', 'launch-week'],
-      categories: ['meetup'],
-      timezone: meetup.timezone || 'America/Los_Angeles',
-      location: `${meetup.city}, ${meetup.country}`,
-      hosts: [SUPABASE_HOST],
-      source: 'supabase',
-      disable_page_build: true,
-      link: {
-        href: meetup.link || '#',
-        target: '_blank',
-      },
-    })) ?? []
-
-  const staticEvents = getSortedPosts({
-    directory: '_events',
-    runner: '** EVENTS PAGE **',
-  })
-
-  const allEvents: SupabaseEvent[] = [
-    ...staticEvents.map(
-      (post): SupabaseEvent => ({
-        slug: post.slug || '',
-        type: (post as any).type || 'event',
-        title: post.title || '',
-        date: post.date || '',
-        description: post.description || '',
-        thumb: post.thumb || '',
-        cover_url: (post as any).cover_url || '',
-        path: post.path || '',
-        // For webinars, use internal path; for other events, use external link if available
-        url:
-          (post as any).type === 'webinar'
-            ? post.url || post.path || ''
-            : post.link?.href || post.url || post.path || '',
-        tags: post.tags || [],
-        categories: post.categories || [],
-        timezone: (post as any).timezone || 'America/Los_Angeles',
-        location: (post as any).location || '',
-        hosts: parseHostsFromAuthors((post as any).hosts),
-        source: 'file',
-        end_date: (post as any).end_date,
-        onDemand: (post as any).onDemand,
-        disable_page_build: (post as any).disable_page_build,
-        link: (post as any).link,
-      })
-    ),
-    ...meetupEvents,
-  ]
-
-  const upcomingEvents = allEvents.filter((event: SupabaseEvent) =>
-    event.end_date ? new Date(event.end_date) >= new Date() : new Date(event.date) >= new Date()
-  )
-
-  const onDemandEvents = allEvents.filter((event: SupabaseEvent) => event.onDemand === true)
-
-  const categories = upcomingEvents.reduce(
-    (acc: { [key: string]: number }, event: SupabaseEvent) => {
-      acc.all = (acc.all || 0) + 1
-
-      event.categories?.forEach((category) => {
-        acc[category] = (acc[category] || 0) + 1
-      })
-
-      return acc
-    },
-    { all: 0 }
-  )
-
-  return {
-    upcomingEvents,
-    onDemandEvents,
-    categories,
   }
 }

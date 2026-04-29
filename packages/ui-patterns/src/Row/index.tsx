@@ -188,7 +188,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
           }
         >
           {childrenArray.map((child, index) => (
-            <div key={index} className="flex-shrink-0" style={{ width: 'var(--column-width)' }}>
+            <div key={index} className="shrink-0" style={{ width: 'var(--column-width)' }}>
               {child}
             </div>
           ))}

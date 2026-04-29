@@ -1,5 +1,5 @@
 import '@/styles/globals.css'
-import '../../studio/styles/typography.scss'
+import 'config/typography.css'
 
 import type { Metadata, Viewport } from 'next'
 

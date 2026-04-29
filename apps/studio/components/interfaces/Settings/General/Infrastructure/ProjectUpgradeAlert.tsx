@@ -12,9 +12,9 @@ import {
   AlertTitle_Shadcn_,
   Badge,
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Modal,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -149,7 +149,7 @@ export const ProjectUpgradeAlert = () => {
         onCancel={() => setShowUpgradeModal(false)}
         header="Confirm to upgrade Postgres version"
       >
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onConfirmUpgrade)}>
             <Admonition
               type="warning"
@@ -238,12 +238,12 @@ export const ProjectUpgradeAlert = () => {
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 )}
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="postgresVersionSelection"
                   render={({ field }) => (
                     <FormItemLayout label="Select the version of Postgres to upgrade to">
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger_Shadcn_>
                             <SelectValue_Shadcn_ placeholder="Select a Postgres version" />
@@ -270,7 +270,7 @@ export const ProjectUpgradeAlert = () => {
                             </SelectGroup_Shadcn_>
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -290,7 +290,7 @@ export const ProjectUpgradeAlert = () => {
               </Button>
             </Modal.Content>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </Modal>
     </>
   )

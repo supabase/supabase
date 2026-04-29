@@ -71,10 +71,6 @@ const nextConfig = {
       'public/**/*',
     ],
   },
-  outputFileTracingIncludes: {
-    '/llms-full.txt': ['./data/llms/**/*'],
-    '/llms/[slug]': ['./data/llms/**/*'],
-  },
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: false,
@@ -138,6 +134,15 @@ const nextConfig = {
           {
             key: 'X-Robots-Tag',
             value: 'noindex',
+          },
+        ],
+      },
+      {
+        source: '/enterprise-terms',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
           },
         ],
       },

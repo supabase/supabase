@@ -14,9 +14,9 @@ export const AlgorithmHoverCard = ({ algorithm, legacy }: AlgorithmHoverCardProp
   return (
     <div className="flex items-center gap-x-2">
       {algorithm === 'HS256' ? (
-        <RectangleEllipsis className="flex-shrink-0" size={14} />
+        <RectangleEllipsis className="shrink-0" size={14} />
       ) : (
-        <LockKeyholeOpen className="flex-shrink-0" size={14} />
+        <LockKeyholeOpen className="shrink-0" size={14} />
       )}
       <p>{legacy ? `Legacy ${details.label}` : details.label}</p>
       <HoverCard closeDelay={50} openDelay={300}>
@@ -55,7 +55,7 @@ export const AlgorithmHoverCard = ({ algorithm, legacy }: AlgorithmHoverCardProp
                   rel="noopener noreferrer"
                   className="text-xs text-brand hover:text-brand-600 flex items-center"
                 >
-                  <ExternalLink className="w-3 h-3 mr-1 flex-shrink-0" />
+                  <ExternalLink className="w-3 h-3 mr-1 shrink-0" />
                   <span className="truncate">{link.label}</span>
                 </a>
               ))}

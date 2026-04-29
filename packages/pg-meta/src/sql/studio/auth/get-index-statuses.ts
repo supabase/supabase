@@ -1,4 +1,4 @@
-import { literal } from '../../../pg-format'
+import { joinSqlFragments, literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
 
 export const USER_SEARCH_INDEXES = [
   'idx_users_email',
@@ -10,11 +10,12 @@ export const USER_SEARCH_INDEXES = [
   'users_phone_key',
 ]
 
-export const getIndexStatusesSQL = () => {
-  return `SELECT c.relname as index_name, i.indisvalid as is_valid, i.indisready as is_ready
+export const getIndexStatusesSQL = (): SafeSqlFragment => {
+  const indexNames = joinSqlFragments(USER_SEARCH_INDEXES.map(literal), ', ')
+  return safeSql`SELECT c.relname as index_name, i.indisvalid as is_valid, i.indisready as is_ready
     FROM pg_index i
     JOIN pg_class c ON c.oid = i.indexrelid
     JOIN pg_namespace n ON n.oid = c.relnamespace
     WHERE n.nspname = 'auth'
-    AND c.relname IN (${USER_SEARCH_INDEXES.map(literal).join(', ')});`
+    AND c.relname IN (${indexNames});`
 }

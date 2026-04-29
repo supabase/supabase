@@ -29,6 +29,17 @@ function getAssetPrefix() {
   return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA?.substring(0, 12) ?? 'unknown'}`
 }
 
+const marketplaceApiUrl = process.env.NEXT_PUBLIC_MARKETPLACE_API_URL
+  ? new URL(process.env.NEXT_PUBLIC_MARKETPLACE_API_URL)
+  : null
+
+const marketplaceApiProtocol: 'http' | 'https' | null =
+  marketplaceApiUrl?.protocol === 'https:'
+    ? 'https'
+    : marketplaceApiUrl?.protocol === 'http:'
+      ? 'http'
+      : null
+
 // Use `satisfies` instead of `: NextConfig` so TypeScript preserves narrow
 // inferred types (e.g. async headers → Promise). This avoids TS2345 when
 // wrapper functions (bundle-analyzer, sentry) resolve their `next` peer
@@ -576,17 +587,20 @@ const nextConfig = {
         port: '',
         pathname: '**',
       },
+      ...(marketplaceApiUrl
+        ? [
+            {
+              ...(marketplaceApiProtocol ? { protocol: marketplaceApiProtocol } : {}),
+              hostname: marketplaceApiUrl.hostname,
+              port: marketplaceApiUrl.port,
+              pathname: '**',
+            },
+          ]
+        : []),
     ],
   },
-  transpilePackages: [
-    'ui',
-    'ui-patterns',
-    'common',
-    'shared-data',
-    'api-types',
-    'icons',
-    'libpg-query',
-  ],
+  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'api-types', 'icons'],
+  serverExternalPackages: ['libpg-query'],
   turbopack: {
     rules: {
       '*.md': {

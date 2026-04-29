@@ -116,7 +116,7 @@ parameters:
     required: false
     default: '1000'
     description: |
-      The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests.
+      The maximum number of rows returned from a view, table, or function. Limits payload size for accidental or malicious requests.
     links:
       - name: 'PostgREST configuration'
         link: 'https://postgrest.org/en/stable/configuration.html'

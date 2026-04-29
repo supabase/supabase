@@ -18,6 +18,7 @@ import {
   UserX,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import type { ReactNode } from 'react'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { Image } from 'ui-patterns/Image'
 
@@ -45,9 +46,9 @@ interface Quote {
   text: string
   author: string
   role: string
-  logo?: string | JSX.Element
+  logo?: ReactNode
   link?: string
-  avatar?: string | JSX.Element
+  avatar?: ReactNode
 }
 
 interface AIBuilderEcosystemSection {
@@ -918,7 +919,7 @@ const data: () => {
             '## Overview of implementing Supabase Auth SSR\n1. Install @supabase/supabase-js and...',
           code: `1. Install @supabase/supabase-js and @supabase/ssr packages.
 2. Set up environment variables.
-3. Write two utility functions with \u0060createClient\u0060 functions to create a browser client and a server client. 
+3. Write two utility functions with \u0060createClient\u0060 functions to create a browser client and a server client.
 4. Hook up middleware to refresh auth tokens
 `,
           language: 'markdown',

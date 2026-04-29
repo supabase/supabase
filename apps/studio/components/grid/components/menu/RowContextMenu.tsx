@@ -8,7 +8,6 @@ import { useTableRowOperations } from '../../hooks/useTableRowOperations'
 import { formatClipboardValue } from '../../utils/common'
 import { buildFilterFromCellValue, isComplexValue } from '../header/filter/FilterPopoverNew.utils'
 import type { SupaRow } from '@/components/grid/types'
-import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
@@ -19,7 +18,6 @@ type RowContextMenuContentProps = {
 export const RowContextMenuContent = ({ row }: RowContextMenuContentProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
-  const isTableFilterBarEnabled = useIsTableFilterBarEnabled()
   const { deleteRows } = useTableRowOperations()
 
   const onDeleteRow = useCallback(() => {
@@ -72,13 +70,11 @@ export const RowContextMenuContent = ({ row }: RowContextMenuContentProps) => {
   }, [getRowAndColumn, snap])
 
   const isFilterByValueVisible = useCallback(() => {
-    if (!isTableFilterBarEnabled) return false
-
     const result = getRowAndColumn()
     if (!result) return false
 
     return !isComplexValue(result.row[result.column.key])
-  }, [isTableFilterBarEnabled, getRowAndColumn])
+  }, [getRowAndColumn])
 
   return (
     <ContextMenuContent className="!min-w-36">

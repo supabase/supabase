@@ -12,9 +12,9 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Separator,
 } from 'ui'
@@ -96,10 +96,10 @@ export const CreateAuth0IntegrationDialog = ({
         </DialogHeader>
         <Separator />
         <DialogSection>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {/* Enabled flag can't be changed for now because there's no update API call for integrations */}
-              {/* <FormField_Shadcn_
+              {/* <FormField
               key="enabled"
               control={form.control}
               name="enabled"
@@ -109,13 +109,13 @@ export const CreateAuth0IntegrationDialog = ({
                   label={`Enable Auth0 Auth Connection`}
                   layout="flex"
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       disabled={field.disabled}
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -124,7 +124,7 @@ export const CreateAuth0IntegrationDialog = ({
                 This will enable a JWT token from your Auth0 project to access data from this
                 Supabase project.
               </p>
-              <FormField_Shadcn_
+              <FormField
                 key="auth0DomainName"
                 control={form.control}
                 name="auth0DomainName"
@@ -139,12 +139,12 @@ export const CreateAuth0IntegrationDialog = ({
                       >
                         https://
                       </Button>
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_
                           className="border-l-0 rounded-none border-r-0 z-50"
                           {...field}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                       <Button
                         type="default"
                         size="small"
@@ -158,7 +158,7 @@ export const CreateAuth0IntegrationDialog = ({
                 )}
               />
             </form>
-          </Form_Shadcn_>
+          </Form>
         </DialogSection>
         <DialogFooter>
           {!isCreating && (

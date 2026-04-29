@@ -4,14 +4,7 @@ import { useEffect } from 'react'
 import type { SubmitHandler } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  DialogSectionSeparator,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-} from 'ui'
+import { Button, DialogSectionSeparator, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CategoryAndSeverityInfo } from './CategoryAndSeverityInfo'
@@ -109,7 +102,7 @@ export const LinkSupportTicketForm = ({
   }, [isSuccess])
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form
         id="link-support-ticket-form"
         onSubmit={form.handleSubmit(onSubmit)}
@@ -118,14 +111,14 @@ export const LinkSupportTicketForm = ({
         <div className="flex flex-col py-6 gap-y-6">
           <h3 className="px-6 text-xl">Link support ticket to account</h3>
           <div className="px-6 flex flex-col gap-y-8">
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="conversation_id"
               render={({ field }) => (
                 <FormItemLayout hideMessage layout="vertical" label="Conversation ID">
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Input_Shadcn_ {...field} readOnly />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -176,6 +169,6 @@ export const LinkSupportTicketForm = ({
           </Button>
         </div>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

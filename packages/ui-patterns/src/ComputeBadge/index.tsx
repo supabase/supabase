@@ -26,15 +26,15 @@ export function ComputeBadge({ infraComputeSize, className, icon, ...props }: Co
         'transition-all',
         // Variant styles
         !hasComputeSize
-          ? 'bg-surface-75 text-foreground-light border border-strong'
+          ? 'bg-surface-75 group-data-[state=open]:bg-surface-75/20 text-foreground-light border border-strong'
           : smallCompute
-            ? 'bg-surface-75 text-foreground-light border border-strong bg-opacity-50'
-            : 'bg-brand bg-opacity-10 text-brand-600 border border-brand-500',
+            ? 'bg-surface-75/50 group-data-[state=open]:bg-surface-75/75 text-foreground-light border border-strong'
+            : 'bg-brand/10 group-data-[state=open]:bg-brand/20 text-brand-600 border border-brand-500',
         // Hover card interaction styles
-        'group-data-[state=open]:bg-opacity-20 group-data-[state=open]:ring-2 group-data-[state=open]:ring-opacity-20',
+        'group-data-[state=open]:ring-2',
         smallCompute
-          ? 'group-data-[state=open]:ring-foreground-muted group-data-[state=open]:bg-opacity-75'
-          : 'group-data-[state=open]:ring-brand',
+          ? 'group-data-[state=open]:ring-foreground-muted/20'
+          : 'group-data-[state=open]:ring-brand/20',
         className
       )}
       {...props}

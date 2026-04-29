@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { BarChart2, Bot, ChevronRight, ExternalLink, Telescope } from 'lucide-react'
+import { BarChart2, ChevronRight, ExternalLink, Telescope } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { AiIconAnimation, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { AiIconAnimation, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { StatusCode } from 'ui-patterns'
 import {
   Chart,
@@ -41,7 +41,6 @@ import {
 } from './OverviewUsage.constants'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import AlertError from '@/components/ui/AlertError'
-import { getStatusColor } from '@/components/ui/DataTable/DataTable.utils'
 import { ErrorCodeTooltip } from '@/components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
 import { Service } from '@/data/graphql/graphql'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -53,7 +52,6 @@ const StatCard = ({
   previous,
   loading,
   suffix = '',
-  invert = false,
   href,
   tooltip,
 }: {
@@ -332,7 +330,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                       {
                         key: 'count',
                         header: 'Count',
-                        className: 'text-right flex-shrink-0 ml-auto justify-end',
+                        className: 'text-right shrink-0 ml-auto justify-end',
                         render: (row) => (
                           <div className="flex justify-end items-center gap-2">
                             <div className="text-right text-xs tabular-nums">{row.count}</div>

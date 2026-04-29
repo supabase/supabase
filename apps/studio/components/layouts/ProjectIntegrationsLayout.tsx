@@ -85,8 +85,8 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
       items: [],
     },
     ...categories.map((category) => ({
-      name: category.title,
-      key: category.slug,
+      name: category.name ?? '',
+      key: category.slug ?? '',
       url: `/project/${ref}/integrations?category=${category.slug}`,
       items: [],
     })),

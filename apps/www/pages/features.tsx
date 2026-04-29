@@ -1,17 +1,15 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/compat/router'
-import { NextSeo } from 'next-seo'
-import { motion } from 'framer-motion'
-import { Search } from 'lucide-react'
-import { debounce } from 'lib/helpers'
-
-import { Button, Checkbox, cn, Input } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
-
 import { features } from '~/data/features'
+import { motion } from 'framer-motion'
+import { debounce } from 'lib/helpers'
+import { Search } from 'lucide-react'
+import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/compat/router'
+import Link from 'next/link'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Button, Checkbox, cn, Input } from 'ui'
 
 function FeaturesPage() {
   const router = useRouter()
@@ -139,7 +137,7 @@ function FeaturesPage() {
                   <Checkbox
                     id="self-hosted-filter"
                     checked={showSelfHostedOnly}
-                    onChange={() => setShowSelfHostedOnly(!showSelfHostedOnly)}
+                    onCheckedChange={() => setShowSelfHostedOnly(!showSelfHostedOnly)}
                     className="[&_input]:m-0"
                   />
                   <label
@@ -163,7 +161,7 @@ function FeaturesPage() {
                         <Checkbox
                           id={product}
                           checked={selectedProducts.includes(product)}
-                          onChange={() => handleProductChange(product)}
+                          onCheckedChange={() => handleProductChange(product)}
                           className="[&_input]:m-0"
                         />
                         <label
@@ -220,7 +218,7 @@ function FeaturesPage() {
                         <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:!aspect-video bg-alternative flex items-center justify-center shadow-inner border border-muted">
                           <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
                         </div>
-                        <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto flex-grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
+                        <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
                           <h3 className="text-sm md:text-base text-foreground !leading-5">
                             {feature.title}
                           </h3>
