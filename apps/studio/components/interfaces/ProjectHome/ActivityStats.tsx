@@ -71,10 +71,8 @@ export const ActivityStats = () => {
       .sort((a, b) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf())[0]
   }, [backupsData])
 
-  const { data: githubConnections } = useGitHubConnectionsQuery(
-    { organizationId: organization?.id },
-    { enabled: !!organization?.id }
-  )
+  const { data: githubConnections, isPending: isLoadingGithubConnections } =
+    useGitHubConnectionsQuery({ organizationId: organization?.id }, { enabled: !!organization?.id })
   const githubConnection = githubConnections?.find(
     (connection) => connection.project.ref === parentProjectRef
   )
@@ -121,12 +119,16 @@ export const ActivityStats = () => {
           icon={<Github size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>GitHub</span>}
           value={
-            <p
-              className={cn('truncate', !githubConnection && 'text-foreground-lighter')}
-              title={githubLabelText}
-            >
-              {githubLabelText}
-            </p>
+            isLoadingGithubConnections ? (
+              <Skeleton className="h-6 w-24" />
+            ) : (
+              <p
+                className={cn('truncate', !githubConnection && 'text-foreground-lighter')}
+                title={githubLabelText}
+              >
+                {githubLabelText}
+              </p>
+            )
           }
         />
 

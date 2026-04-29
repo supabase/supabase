@@ -185,10 +185,10 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                     <CommandEmpty_Shadcn_>No repositories found.</CommandEmpty_Shadcn_>
                     {repositories.length > 0 ? (
                       <CommandGroup_Shadcn_>
-                        {repositories.map((repo, i) => (
+                        {repositories.map((repo) => (
                           <CommandItem_Shadcn_
                             key={repo.id}
-                            value={`${repo.name.replaceAll('"', '')}-${i}`}
+                            value={`${repo.name.replaceAll('"', '')}-${repo.id}`}
                             className="flex gap-2 items-center"
                             onSelect={() => {
                               field.onChange(repo.id)
