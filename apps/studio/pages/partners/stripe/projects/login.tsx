@@ -174,7 +174,7 @@ const StripeProjectsLoginPage = () => {
               Stripe Projects wants to connect to your Supabase account.
             </p>
             <p className="text-center text-sm text-foreground-lighter">
-              This request is for <strong>{effectiveAccountRequest.email}</strong>.
+              This request is for <strong>{effectiveAccountRequest?.email}</strong>.
             </p>
 
             {!emailMatches ? (
@@ -184,7 +184,7 @@ const StripeProjectsLoginPage = () => {
                   <AlertTitle_Shadcn_>Wrong account</AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_>
                     You're signed in as a different account. Sign out and sign back in as{' '}
-                    <strong>{effectiveAccountRequest.email}</strong>, then return to Stripe to
+                    <strong>{effectiveAccountRequest?.email}</strong>, then return to Stripe to
                     restart the request.
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
