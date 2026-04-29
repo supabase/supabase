@@ -3,7 +3,12 @@ import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortabl
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { forwardRef, memo, Ref, useCallback, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
-import DataGrid, { CalculatedColumn, CopyEvent, DataGridHandle } from 'react-data-grid'
+import DataGrid, {
+  CalculatedColumn,
+  CellClickArgs,
+  CellMouseEvent,
+  DataGridHandle,
+} from 'react-data-grid'
 import { Button, cn, DropdownMenu, DropdownMenuTrigger } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ref as valtioRef } from 'valtio'
@@ -16,8 +21,6 @@ import { GridError } from './GridError'
 import { RowContextMenuContent } from '../menu/RowContextMenu'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
-import { writeTextToClipboard } from '@/components/grid/utils/clipboard'
-import { formatClipboardValue } from '@/components/grid/utils/common'
 import { formatForeignKeys } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -251,21 +254,12 @@ export const Grid = memo(
         event.currentTarget.focus()
       }, [])
 
-      const handleCellCopy = useCallback(({ sourceRow, sourceColumnKey }: CopyEvent<SupaRow>) => {
-        const value = formatClipboardValue(sourceRow[sourceColumnKey] ?? '')
-        void writeTextToClipboard(value)
-      }, [])
-
       const handleCellContextMenu = useCallback(
-        (
-          args: {
-            row: SupaRow
-            column: CalculatedColumn<SupaRow, unknown>
-          },
-          event: React.MouseEvent<HTMLElement>
-        ) => {
+        (args: CellClickArgs<SupaRow, unknown>, event: CellMouseEvent) => {
           event.preventDefault()
           event.currentTarget.focus()
+          args.selectCell()
+          event.preventGridDefault()
 
           const rowIdx = rows.findIndex(
             (candidate) => candidate === args.row || candidate.idx === args.row.idx
@@ -431,7 +425,6 @@ export const Grid = memo(
                   onRowsChange={onRowsChange}
                   onSelectedCellChange={onSelectedCellChange}
                   onSelectedRowsChange={onSelectedRowsChange}
-                  onCopy={handleCellCopy}
                   onCellClick={handleCellClick}
                   onCellContextMenu={handleCellContextMenu}
                   onCellDoubleClick={(props) => {

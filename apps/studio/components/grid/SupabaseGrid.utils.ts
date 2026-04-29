@@ -12,6 +12,8 @@ import {
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import type { Sort, SupaColumn, SupaRow, SupaTable } from './types'
+import { writeTextToClipboard } from './utils/clipboard'
+import { formatClipboardValue } from './utils/common'
 import { isBoolColumn } from './utils/types'
 import type { Filter, SavedState } from '@/components/grid/types'
 import { Entity, isTableLike } from '@/data/table-editor/table-editor-types'
@@ -281,6 +283,17 @@ export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
   const { mode, column, row, rowIdx } = args
   if (mode !== 'SELECT') return
   const key = event.key.toLowerCase()
+
+  if (key === 'c' && (event.metaKey || event.ctrlKey)) {
+    if (window.getSelection()?.isCollapsed === false) return
+
+    const value = formatClipboardValue(row[column.key] ?? '')
+    event.preventDefault()
+    event.preventGridDefault()
+    void writeTextToClipboard(value)
+    return
+  }
+
   // Let registered shortcuts win over rdg's "type a key to enter edit mode" default.
   if (eventMatchesAnyShortcut(event.nativeEvent, tableEditorRegistry)) {
     event.preventGridDefault()

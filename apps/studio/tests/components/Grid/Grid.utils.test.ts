@@ -79,7 +79,20 @@ describe('SupabaseGrid.utils: formatFilterURLParams', () => {
 })
 
 describe('SupabaseGrid.utils: handleCellKeyDown', () => {
-  test('should ignore copy key handling and allow browser copy flow', () => {
+  beforeEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  test('should copy the selected cell value when Meta+C is pressed', () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('navigator', {
+      clipboard: { writeText },
+    })
+
     const args = {
       mode: 'SELECT',
       column: { key: 'name' },
@@ -94,9 +107,15 @@ describe('SupabaseGrid.utils: handleCellKeyDown', () => {
       ctrlKey: false,
       altKey: false,
       nativeEvent: new KeyboardEvent('keydown', { key: 'C', metaKey: true }),
+      preventDefault: vi.fn(),
+      preventGridDefault: vi.fn(),
     } as unknown as Parameters<typeof handleCellKeyDown>[1]
 
     handleCellKeyDown(args, event)
+
+    expect(writeText).toHaveBeenCalledWith('hello from safari')
+    expect(event.preventDefault).toHaveBeenCalled()
+    expect(event.preventGridDefault).toHaveBeenCalled()
   })
 })
 
