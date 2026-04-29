@@ -505,12 +505,15 @@ try {
         .replace(/\n/g, ' ')
     const mdRows = visibleEntries.map((entry) => {
       const date = dayjs(entry.sortDate).isValid() ? dayjs(entry.sortDate).format('YYYY-MM-DD') : ''
-      const labels = (entry.labels ?? []).join(',')
-      return `- ${date} | #${entry.number} | ${escapeMd(labels)} | ${escapeMd(entry.title)} | /changelog/${entry.number}.md`
+      const labels = (entry.labels ?? []).join(', ')
+      return `| ${date} | ${entry.number} | ${escapeMd(labels)} | ${escapeMd(entry.title)} | [/changelog/${entry.number}.md](https://supabase.com/changelog/${entry.number}.md) |`
     })
-    const changelogMd = `<!-- All paths in the last column are relative to https://supabase.com -->
-<!-- Each row: date | #number | labels (comma-separated slugs) | title | path -->
+    const changelogMd = `# Supabase Changelog
 
+All paths are relative to \`https://supabase.com\`.
+
+| Date | # | Labels | Title | Path |
+| --- | --- | --- | --- | --- |
 ${mdRows.join('\n')}
 `
     const changelogMdPath = path.join(__dirname, '../public/changelog.md')
@@ -527,17 +530,18 @@ ${mdRows.join('\n')}
       const titleLine = String(entry.title ?? '')
         .replace(/\n/g, ' ')
         .trim()
-      const labelsLine = (entry.labels ?? []).join(', ')
+      const labelsYaml = (entry.labels ?? []).map((l) => `  - ${l}`).join('\n')
       const pageUrl = `https://supabase.com/changelog/${entry.number}`
-      const entryMd = `# ${titleLine}
-
-- number: ${entry.number}
-- published: ${published}
-- discussion: ${entry.url}
-- labels: ${labelsLine || '—'}
-- page: ${pageUrl}
-
+      const entryMd = `---
+number: ${entry.number}
+published: ${published}
+discussion: ${entry.url}
+labels:
+${labelsYaml || '  []'}
+page: ${pageUrl}
 ---
+
+# ${titleLine}
 
 ${entry.body ?? ''}
 `
