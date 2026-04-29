@@ -1,5 +1,7 @@
 import dayjs from 'dayjs'
-import { Copy, Trash, UserIcon } from 'lucide-react'
+import { SqlEditor, TableEditor } from 'icons'
+import { Copy, ExternalLink, Trash, UserIcon } from 'lucide-react'
+import Link from 'next/link'
 import { Column, useRowSelection } from 'react-data-grid'
 import {
   Checkbox,
@@ -253,6 +255,7 @@ export function getAvatarUrl(user: User): string | undefined {
 }
 
 export const formatUserColumns = ({
+  ref = '_',
   specificFilterColumn,
   columns,
   config,
@@ -260,7 +263,9 @@ export const formatUserColumns = ({
   visibleColumns = [],
   setSortByValue,
   onSelectDeleteUser,
+  onSelectImpersonateUser,
 }: {
+  ref?: string
   specificFilterColumn: string
   columns: UsersTableColumn[]
   config: ColumnConfiguration[]
@@ -268,6 +273,7 @@ export const formatUserColumns = ({
   visibleColumns?: string[]
   setSortByValue: (val: string) => void
   onSelectDeleteUser: (user: User) => void
+  onSelectImpersonateUser: (user: User) => void
 }) => {
   const columnOrder = config.map((c) => c.id) ?? columns.map((c) => c.id)
 
@@ -402,7 +408,36 @@ export const formatUserColumns = ({
                 <Copy size={12} />
                 <span>Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}</span>
               </ContextMenuItem_Shadcn_>
+
               <ContextMenuSeparator_Shadcn_ />
+
+              <Link href={`/project/${ref}/editor`}>
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onFocusCapture={(e) => e.stopPropagation()}
+                  onSelect={() => {
+                    if (user) onSelectImpersonateUser(user)
+                  }}
+                >
+                  <TableEditor size={12} />
+                  <span>View data as user</span>
+                </ContextMenuItem_Shadcn_>
+              </Link>
+              <Link href={`/project/${ref}/sql`}>
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onFocusCapture={(e) => e.stopPropagation()}
+                  onSelect={() => {
+                    if (user) onSelectImpersonateUser(user)
+                  }}
+                >
+                  <SqlEditor size={12} />
+                  <span>Run SQL as user</span>
+                </ContextMenuItem_Shadcn_>
+              </Link>
+
+              <ContextMenuSeparator_Shadcn_ />
+
               <ContextMenuItem_Shadcn_
                 className="gap-x-2"
                 onFocusCapture={(e) => e.stopPropagation()}

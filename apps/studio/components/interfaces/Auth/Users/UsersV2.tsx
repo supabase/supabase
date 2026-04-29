@@ -38,6 +38,7 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { ref } from 'valtio'
 
 import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
@@ -74,6 +75,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from '@/lib/helpers'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -95,6 +97,8 @@ export const UsersV2 = () => {
     isError: isProjectError,
   } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
+
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
   const { mutate: sendEvent } = useSendEventMutation()
@@ -356,6 +360,16 @@ export const UsersV2 = () => {
     setSortByValue(value)
   }
 
+  const onSelectImpersonateUser = async (user: User) => {
+    await roleImpersonationState.setRole({
+      type: 'postgrest',
+      role: 'authenticated',
+      userType: 'native',
+      user,
+      aal: 'aal1',
+    })
+  }
+
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
     xScroll.current = event.currentTarget.scrollLeft
@@ -439,6 +453,7 @@ export const UsersV2 = () => {
         (isErrorStorage && (errorStorage as Error).message.includes('data is undefined')))
     ) {
       const columns = formatUserColumns({
+        ref: projectRef,
         specificFilterColumn,
         columns: userTableColumns,
         config: columnConfiguration ?? [],
@@ -446,6 +461,7 @@ export const UsersV2 = () => {
         visibleColumns: selectedColumns,
         setSortByValue: updateSortByValue,
         onSelectDeleteUser: setSelectedUserToDelete,
+        onSelectImpersonateUser,
       })
       setColumns(columns)
       if (columns.length < userTableColumns.length) {
@@ -678,6 +694,7 @@ export const UsersV2 = () => {
                     }
 
                     const updatedColumns = formatUserColumns({
+                      ref: projectRef,
                       specificFilterColumn,
                       columns: userTableColumns,
                       config: updatedConfig,
@@ -685,6 +702,7 @@ export const UsersV2 = () => {
                       visibleColumns: value,
                       setSortByValue: updateSortByValue,
                       onSelectDeleteUser: setSelectedUserToDelete,
+                      onSelectImpersonateUser,
                     })
 
                     setSelectedColumns(value)

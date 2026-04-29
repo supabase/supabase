@@ -8,6 +8,7 @@ import type { User } from '@/data/auth/users-infinite-query'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 export interface RoleImpersonationPopoverProps {
+  header?: string
   serviceRoleLabel?: string
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   align?: 'center' | 'start' | 'end'
@@ -15,6 +16,7 @@ export interface RoleImpersonationPopoverProps {
 }
 
 export const RoleImpersonationPopover = ({
+  header,
   serviceRoleLabel,
   variant = 'regular',
   align = 'end',
@@ -60,6 +62,7 @@ export const RoleImpersonationPopover = ({
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 overflow-hidden w-min" side="bottom" align={align}>
         <RoleImpersonationSelector
+          header={header}
           serviceRoleLabel={serviceRoleLabel}
           disallowAuthenticatedOption={disallowAuthenticatedOption}
         />

@@ -289,8 +289,8 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                         className={
                           activeSecondaryEditor === 'variables' &&
                           editorToolsResize.hiddenElement !== 'second'
-                            ? 'active text-sm'
-                            : 'text-sm'
+                            ? 'active !text-sm'
+                            : '!text-sm'
                         }
                         onClick={handleToolsTabClick}
                         data-name="variables"
@@ -303,8 +303,8 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                         className={
                           activeSecondaryEditor === 'headers' &&
                           editorToolsResize.hiddenElement !== 'second'
-                            ? 'active text-sm'
-                            : 'text-sm'
+                            ? 'active !text-sm'
+                            : '!text-sm'
                         }
                         onClick={handleToolsTabClick}
                         data-name="headers"
@@ -318,8 +318,8 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                           className={
                             activeSecondaryEditor === 'role-impersonation' &&
                             editorToolsResize.hiddenElement !== 'second'
-                              ? 'active text-sm'
-                              : 'text-sm'
+                              ? 'active !text-sm'
+                              : '!text-sm'
                           }
                           onClick={handleToolsTabClick}
                           data-name="role-impersonation"
@@ -357,7 +357,10 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
 
                   <div ref={editorToolsResize.secondRef}>
                     <section
-                      className="graphiql-editor-tool text-sm"
+                      className={cn(
+                        'graphiql-editor-tool !text-sm',
+                        activeSecondaryEditor === 'role-impersonation' ? '!p-0' : '!pt-0'
+                      )}
                       aria-label={activeSecondaryEditor === 'variables' ? 'Variables' : 'Headers'}
                     >
                       <VariableEditor
@@ -370,11 +373,11 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                       {canReadJWTSecret && (
                         <div
                           className={cn(
-                            'graphiql-editor px-1',
-                            activeSecondaryEditor !== 'role-impersonation' && 'hidden'
+                            'graphiql-editor',
+                            activeSecondaryEditor !== 'role-impersonation' ? 'px-1 hidden' : ''
                           )}
                         >
-                          <RoleImpersonationSelector padded={false} />
+                          <RoleImpersonationSelector />
                         </div>
                       )}
                     </section>
