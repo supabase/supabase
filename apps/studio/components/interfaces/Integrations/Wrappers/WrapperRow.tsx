@@ -64,7 +64,7 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
 
           return (
             <div key={table.id} className="flex items-center">
-              <Badge className="bg-surface-300 bg-opacity-100 gap-2 font-mono text-[0.75rem] h-6 text-foreground rounded-r-none">
+              <Badge className="bg-surface-300/100 gap-2 font-mono text-[0.75rem] h-6 text-foreground rounded-r-none">
                 <div className="relative w-3 h-3 flex items-center justify-center">
                   {integration.icon({ className: 'p-0' })}
                 </div>

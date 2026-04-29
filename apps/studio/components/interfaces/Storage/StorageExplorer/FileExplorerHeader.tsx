@@ -24,7 +24,6 @@ import {
 } from 'react'
 import {
   Button,
-  cn,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -229,7 +228,6 @@ export const FileExplorerHeader = ({
     addNewFolderPlaceholder,
     clearOpenedFolders,
     setSelectedFilePreview,
-    selectedBucket,
   } = useStorageExplorerStateSnapshot()
   const {
     view,

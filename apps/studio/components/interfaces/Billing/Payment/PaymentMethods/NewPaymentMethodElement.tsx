@@ -18,7 +18,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   Command_Shadcn_ as Command,
   CommandEmpty_Shadcn_ as CommandEmpty,
@@ -337,7 +337,7 @@ export const NewPaymentMethodElement = forwardRef(
 
         {fullyLoaded && (
           <div className="flex items-center space-x-2 py-4">
-            <Checkbox_Shadcn_
+            <Checkbox
               id="business"
               checked={purchasingAsBusiness}
               onCheckedChange={() => setPurchasingAsBusiness(!purchasingAsBusiness)}
@@ -372,7 +372,7 @@ export const NewPaymentMethodElement = forwardRef(
               <FormField
                 name="tax_id_name"
                 control={form.control}
-                render={({ field }) => (
+                render={() => (
                   <FormItemLayout hideMessage layout="vertical">
                     <Popover open={showTaxIDsPopover} onOpenChange={setShowTaxIDsPopover}>
                       <PopoverTrigger asChild>

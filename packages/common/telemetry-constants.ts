@@ -2764,6 +2764,22 @@ export interface AiExternalToolClickedEvent {
 }
 
 /**
+ * User clicked a CTA in the project security gate.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ProjectSecurityCtaClickedEvent {
+  action: 'project_security_cta_clicked'
+  properties: {
+    type: 'ask_assistant' | 'copy_prompt' | 'skip_to_home' | 'view_policies'
+    schema?: string
+    tableName?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User opened the request upgrade modal (for users without billing permissions).
  *
  * @group Events
@@ -3371,6 +3387,7 @@ export type TelemetryEvent =
   | AiPromptCopiedEvent
   | AiAssistantDropdownButtonClickedEvent
   | AiExternalToolClickedEvent
+  | ProjectSecurityCtaClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | DashboardErrorCreatedEvent

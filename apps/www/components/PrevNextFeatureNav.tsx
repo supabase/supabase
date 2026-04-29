@@ -1,7 +1,8 @@
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { features, type FeatureType } from '~/data/features'
+import { ArrowLeft, ArrowRight, List } from 'lucide-react'
 import Link, { LinkProps } from 'next/link'
 import { useRouter } from 'next/router'
-import { ArrowLeft, ArrowRight, List } from 'lucide-react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import {
   cn,
   DropdownMenu,
@@ -13,8 +14,6 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import { type FeatureType, features } from '~/data/features'
-
 interface Props {
   className?: string
   wrapperClassName?: string
@@ -25,7 +24,7 @@ interface Props {
 
 const buttonClassName =
   'relative z-10 flex items-center gap-1 px-2 pointer-events-auto overflow-hidden !h-[30px] !min-w-[30px] !max-w-[30px] py-1 justify-center rounded-full border bg-default hover:bg-surface-100 hover:text-foreground hover:border-foreground-lighter transition-all'
-const iconClassName = 'className="w-4 h-4 flex-shrink-0'
+const iconClassName = 'className="w-4 h-4 shrink-0'
 
 const PrevNextFeatureNav: React.FC<Props> = ({
   className,
@@ -78,7 +77,7 @@ const PrevNextFeatureNav: React.FC<Props> = ({
                 as="/features"
                 className="group/link flex items-center gap-2 px-2 py-1.5 w-full hover:text-foreground"
               >
-                <span className="truncate flex-grow">All Features</span>
+                <span className="truncate grow">All Features</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="mb-0" />
@@ -97,7 +96,7 @@ const PrevNextFeatureNav: React.FC<Props> = ({
                       className="group/link flex items-center gap-2 px-2 py-1.5 w-full hover:text-foreground"
                     >
                       <feature.icon className="w-3 h-3 text-foreground-lighter group-hover:text-foreground transition-colors" />
-                      <span className="line-clamp-1 flex-grow">{feature.title}</span>
+                      <span className="line-clamp-1 grow">{feature.title}</span>
                     </Link>
                   </DropdownMenuItem>
                 ))}

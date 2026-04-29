@@ -67,13 +67,13 @@ export const ReportBlockContainer = ({
       </Tooltip>
       <div
         className={cn(
-          'relative flex flex-col flex-grow w-full',
+          'relative flex flex-col grow w-full',
           hasChildren && 'border-t overflow-hidden'
         )}
       >
         <div
           className={cn(
-            'flex flex-col flex-grow items-center overflow-hidden',
+            'flex flex-col grow items-center overflow-hidden',
             loading && 'pointer-events-none'
           )}
         >

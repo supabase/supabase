@@ -43,21 +43,21 @@ export function CourseHero({ title, subtitle, description, instructors }: Course
       {/* Course metadata */}
       <div className="flex flex-wrap items-center justify-center gap-6 mt-10 text-sm">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center shrink-0">
             <BookA className="w-5 h-5 text-brand-500" />
           </div>
           <span className="font-medium text-muted-foreground">5 Chapters</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center shrink-0">
             <Clock className="w-5 h-5 text-brand-500" />
           </div>
           <span className="font-medium text-muted-foreground">~1 hour</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center shrink-0">
             <GraduationCap className="w-5 h-5 text-brand-500" />
           </div>
           <span className="font-medium text-muted-foreground">Beginner</span>

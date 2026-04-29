@@ -3,19 +3,19 @@
 }
 
 .sbui-alert-container--danger {
-  @apply bg-red-600 bg-opacity-10 text-red-600;
+  @apply bg-red-600/10 text-red-600;
 }
 
 .sbui-alert-container--warning {
-  @apply bg-yellow-600 bg-opacity-10 text-yellow-600;
+  @apply bg-yellow-600/10 text-yellow-600;
 }
 
 .sbui-alert-container--info {
-  @apply bg-blue-600 bg-opacity-10 text-blue-600;
+  @apply bg-blue-600/10 text-blue-600;
 }
 
 .sbui-alert-container--success {
-  @apply bg-green-600 bg-opacity-10 text-green-600;
+  @apply bg-green-600/10 text-green-600;
 } */
 
 /* .sbui-alert-title {
@@ -47,17 +47,17 @@
 }
 
 .sbui-close-button--success {
-  @apply text-green-500 hover:bg-green-600 hover:bg-opacity-10;
+  @apply text-green-500 hover:bg-green-600 hover:bg-green-600/10;
 }
 
 .sbui-close-button--danger {
-  @apply text-red-500 hover:bg-red-600 hover:bg-opacity-10;
+  @apply text-red-500 hover:bg-red-600 hover:bg-red-600/10;
 }
 
 .sbui-close-button--warning {
-  @apply text-yellow-500 hover:bg-yellow-600 hover:bg-opacity-10;
+  @apply text-yellow-500 hover:bg-yellow-600 hover:bg-yellow-600/10;
 }
 
 .sbui-close-button--info {
-  @apply text-blue-500 hover:bg-blue-600 hover:bg-opacity-10;
+  @apply text-blue-500 hover:bg-blue-600 hover:bg-blue-600/10;
 } */

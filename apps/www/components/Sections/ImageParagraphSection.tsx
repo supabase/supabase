@@ -27,12 +27,12 @@ const ImageLeftSection: FC<Props> = (props) => {
         props.className
       )}
     >
-      <div className="w-full max-w-md h-full object-cover flex-grow bg-200 shadow-lg border rounded-lg overflow-hidden image-container">
+      <div className="w-full max-w-md h-full object-cover grow bg-200 shadow-lg border rounded-lg overflow-hidden image-container">
         {props.image}
       </div>
       <div
         className={cn(
-          'flex order-first md:order-last flex-grow flex-col gap-2 max-w-md paragraph-container',
+          'flex order-first md:order-last grow flex-col gap-2 max-w-md paragraph-container',
           props.reverse && 'md:order-first'
         )}
       >

@@ -36,7 +36,7 @@ import {
   createDraft,
   draftFromRule,
   getAssignableJitRoleOptions,
-  getInvalidCidrs,
+  getInvalidIpRangeRows,
   mapJitMembersToUserRules,
   serializeDraftRolesForGrantMutation,
 } from './JitDbAccess.utils'
@@ -57,14 +57,13 @@ const grantSchema = z.object({
   expiryMode: z.custom<JitExpiryMode>(),
   hasExpiry: z.boolean(),
   expiry: z.string(),
-  hasIpRestriction: z.boolean(),
-  ipRanges: z.string(),
+  ipRanges: z.array(z.object({ value: z.string() })),
 })
 
 function createJitRuleSchema(mode: SheetMode, membersWithRules: Set<string>) {
   return z
     .object({
-      memberId: z.string().min(1, 'Select a member for this JIT access rule.'),
+      memberId: z.string().min(1, 'Select a member for this temporary access rule.'),
       grants: z.array(grantSchema),
     })
     .superRefine((data, ctx) => {
@@ -73,12 +72,12 @@ function createJitRuleSchema(mode: SheetMode, membersWithRules: Set<string>) {
           code: z.ZodIssueCode.custom,
           path: ['memberId'],
           message:
-            'This member already has a JIT access rule. Edit their existing rule from the list.',
+            'This member already has a temporary access rule. Edit their existing rule from the list.',
         })
       }
 
-      const enabledGrants = data.grants.filter((g) => g.enabled)
-      if (enabledGrants.length === 0) {
+      const enabledGrantCount = data.grants.filter((g) => g.enabled).length
+      if (enabledGrantCount === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['grants'],
@@ -87,19 +86,22 @@ function createJitRuleSchema(mode: SheetMode, membersWithRules: Set<string>) {
         return
       }
 
-      for (const grant of enabledGrants) {
-        const invalidCidrs = getInvalidCidrs(grant.ipRanges)
-        if (invalidCidrs.length > 0) {
-          const preview = invalidCidrs.slice(0, 3).join(', ')
-          const overflow = invalidCidrs.length > 3
+      data.grants.forEach((grant, grantIndex) => {
+        if (!grant.enabled) return
+
+        const invalidCidrs = new Set(getInvalidIpRangeRows(grant.ipRanges))
+
+        grant.ipRanges.forEach((ipRange, ipRangeIndex) => {
+          const value = ipRange.value.trim()
+          if (value.length === 0 || !invalidCidrs.has(value)) return
+
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            path: ['grants'],
-            message: `Invalid CIDR range${invalidCidrs.length > 1 ? 's' : ''} for role "${grant.roleId}": ${preview}${overflow ? ', ...' : ''}`,
+            path: ['grants', grantIndex, 'ipRanges', ipRangeIndex, 'value'],
+            message: 'Please enter a valid CIDR range',
           })
-          break
-        }
-      }
+        })
+      })
     })
 }
 
@@ -225,10 +227,10 @@ export function JitDbAccessRuleSheet({
         >
           <SheetHeader>
             <SheetTitle>
-              {mode === 'edit' ? 'Edit JIT access rule' : 'New JIT access rule'}
+              {mode === 'edit' ? 'Edit temporary access rule' : 'New temporary access rule'}
             </SheetTitle>
             <SheetDescription className="sr-only">
-              Configure which database roles a user can request with JIT access.
+              Configure which database roles a user can request with temporary access.
             </SheetDescription>
           </SheetHeader>
 
@@ -272,8 +274,8 @@ export function JitDbAccessRuleSheet({
 
                       {mode === 'add' && availableMembersForAddCount === 0 && (
                         <p className="mt-2 text-foreground-lighter">
-                          All project members already have JIT access rules. Edit an existing rule
-                          from the table above.
+                          All project members already have temporary access rules. Edit an existing
+                          rule from the table above.
                         </p>
                       )}
                     </FormItemLayout>
@@ -311,6 +313,8 @@ export function JitDbAccessRuleSheet({
                           {grants.map((grant, index) => (
                             <div key={grant.roleId} className={index > 0 ? 'border-t' : ''}>
                               <JitDbAccessRoleGrantFields
+                                control={form.control}
+                                grantIndex={index}
                                 role={{ id: grant.roleId, label: grant.roleId }}
                                 grant={grant}
                                 onChange={(next) => updateGrant(grant.roleId, () => next)}

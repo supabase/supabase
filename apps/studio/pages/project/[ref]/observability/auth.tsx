@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
@@ -87,7 +86,6 @@ const AuthUsage = () => {
     end: selectedDateRange?.period_end?.date,
   })
 
-  const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   const [monitoringStatusCodeFilter, setMonitoringStatusCodeFilter] = useQueryState(
@@ -175,7 +173,7 @@ const AuthUsage = () => {
       id: 'api-gateway-logs',
       label: 'Open in API Gateway Logs',
       icon: <LogsIcon size={12} />,
-      onSelect: ({ start, end, clear, chartId }) => {
+      onSelect: ({ start, end, chartId }) => {
         let url = `/project/${ref}/logs/edge-logs?its=${start}&ite=${end}`
 
         if (chartId?.includes('errors')) {
@@ -191,7 +189,7 @@ const AuthUsage = () => {
       id: 'auth-logs',
       label: 'Open in Auth Logs',
       icon: <LogsIcon size={12} />,
-      onSelect: ({ start, end, clear }) => {
+      onSelect: ({ start, end }) => {
         const url = `/project/${ref}/logs/auth-logs?its=${start}&ite=${end}`
         router.push(url)
       },

@@ -1,7 +1,7 @@
 import { useHotkeySequence } from '@tanstack/react-hotkeys'
 import { Fragment, useCallback } from 'react'
 import { KeyboardShortcut } from 'ui'
-import { useRegisterCommands } from 'ui-patterns/CommandMenu'
+import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import { SHORTCUT_DEFINITIONS, type ShortcutId } from './registry'
 import type { ShortcutOptions } from './types'
@@ -75,7 +75,11 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
   const enabledInCommandMenu = enabled && (options?.registerInCommandMenu ?? false)
   const depsInCommandMenu = [enabled, def.label]
   const callbackRef = useLatest(callback)
-  const stableAction = useCallback(() => callbackRef.current(), [callbackRef])
+  const setCommandMenuOpen = useSetCommandMenuOpen()
+  const stableAction = useCallback(() => {
+    setCommandMenuOpen(false)
+    callbackRef.current()
+  }, [callbackRef, setCommandMenuOpen])
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.SHORTCUTS,
@@ -99,6 +103,7 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
     {
       enabled: enabledInCommandMenu,
       deps: depsInCommandMenu,
+      sectionMeta: { priority: 1 },
     }
   )
 }

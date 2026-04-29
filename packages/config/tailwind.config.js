@@ -87,7 +87,6 @@ function kebabToNested(obj) {
  * Main theme config
  */
 const uiConfig = ui({
-  mode: 'JIT',
   darkMode: ['class', '[data-theme*="dark"]'],
   theme: {
     /**

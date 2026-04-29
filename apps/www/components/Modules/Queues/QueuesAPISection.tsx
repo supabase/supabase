@@ -49,7 +49,7 @@ const QueuesAPISection: FC<Props> = (props) => {
           <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
         )}
       </div>
-      <div className="w-full flex-grow rounded-lg max-w-lg">
+      <div className="w-full grow rounded-lg max-w-lg">
         <CodeWindow
           code={codeSnippet}
           lang="js"

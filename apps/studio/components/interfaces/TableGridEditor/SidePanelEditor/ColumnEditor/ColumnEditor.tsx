@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   DialogSectionSeparator,
   Sheet,
@@ -244,7 +244,7 @@ export const ColumnEditor = ({
           </SheetTitle>
         </SheetHeader>
 
-        <SheetSection className="overflow-auto flex-grow p-0">
+        <SheetSection className="overflow-auto grow p-0">
           <FormSection
             header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}
           >
@@ -344,7 +344,7 @@ export const ColumnEditor = ({
                       id="isIdentity"
                       description="Automatically assign a sequential unique number to the column"
                     >
-                      <Checkbox_Shadcn_
+                      <Checkbox
                         id="isIdentity"
                         checked={columnFields.isIdentity}
                         onCheckedChange={() => {
@@ -363,7 +363,7 @@ export const ColumnEditor = ({
                       label="Define as Array"
                       description="Allow column to be defined as variable-length multidimensional arrays"
                     >
-                      <Checkbox_Shadcn_
+                      <Checkbox
                         id="isArray"
                         checked={columnFields.isArray}
                         onCheckedChange={() => {

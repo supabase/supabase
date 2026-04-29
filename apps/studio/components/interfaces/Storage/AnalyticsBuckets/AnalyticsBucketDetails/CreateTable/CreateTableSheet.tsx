@@ -146,7 +146,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
               <SheetTitle>Create a new table</SheetTitle>
             </SheetHeader>
 
-            <SheetSection className="overflow-auto flex-grow p-0">
+            <SheetSection className="overflow-auto grow p-0">
               <div className="flex flex-col gap-y-4 py-4 px-5">
                 <FormField
                   name="namespace"

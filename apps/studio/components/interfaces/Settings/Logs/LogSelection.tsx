@@ -87,8 +87,8 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
   }
 
   return (
-    <div className="relative flex h-full flex-grow flex-col overflow-y-scroll bg-surface-100 border-t">
-      <div className="relative flex-grow flex flex-col h-full">
+    <div className="relative flex h-full grow flex-col overflow-y-scroll bg-surface-100 border-t">
+      <div className="relative grow flex flex-col h-full">
         <Tabs_Shadcn_ defaultValue="details" className="flex flex-col h-full">
           <TabsList_Shadcn_ className="px-2 pt-2 relative">
             <TabsTrigger_Shadcn_ className="px-3" value="details">

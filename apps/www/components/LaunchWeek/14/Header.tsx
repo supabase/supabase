@@ -1,6 +1,6 @@
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import { ReactNode, useEffect, useState } from 'react'
 import { cn } from 'ui'
-import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 
 export const TicketHeader = ({ children, hidden }: { children: ReactNode; hidden?: boolean }) => {
   if (hidden) return null
@@ -29,15 +29,15 @@ const SingleTick = ({ className }: { className?: string }) => {
 export const TicketHeaderClaim = () => {
   return (
     <div className="inline-flex justify-start items-center gap-8 w-full order-1 col-span-2 lg:col-auto lg:order-2">
-      <div className="hidden gap-4 flex-wrap w-full h-2.5 overflow-hidden justify-end flex-shrink flex-1 md:flex">
+      <div className="hidden gap-4 flex-wrap w-full h-2.5 overflow-hidden justify-end shrink flex-1 md:flex">
         {Array.from({ length: 7 }).map((_, i) => (
           <SingleTick key={i} />
         ))}
       </div>
-      <div className="text-start md:text-center justify-center text-neutral-500 text-sm font-normal uppercase [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)] lg:text-nowrap flex-grow max-w-[220px] md:max-w-none">
+      <div className="text-start md:text-center justify-center text-neutral-500 text-sm font-normal uppercase [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)] lg:text-nowrap grow max-w-[220px] md:max-w-none">
         Launch Week is coming. Stay tuned!
       </div>
-      <div className="hidden gap-4 flex-wrap w-full h-2.5 overflow-hidden flex-shrink flex-1 md:flex">
+      <div className="hidden gap-4 flex-wrap w-full h-2.5 overflow-hidden shrink flex-1 md:flex">
         {Array.from({ length: 7 }).map((_, i) => (
           <SingleTick key={i} />
         ))}

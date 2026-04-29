@@ -33,7 +33,7 @@
 
     &.rdg-row--focused .rdg-cell,
     &.rdg-row--focused .rdg-cell span {
-      @apply text-foreground !important;
+      @apply !text-foreground;
     }
   }
 }
@@ -48,7 +48,7 @@
 
   .rdg-cell,
   .rdg-cell span {
-    @apply text-foreground-light font-normal !important;
+    @apply !text-foreground-light !font-normal;
     overflow: visible;
     text-overflow: clip;
   }
@@ -73,7 +73,7 @@
 
     &.rdg-row--focused .rdg-cell,
     &.rdg-row--focused .rdg-cell span {
-      @apply text-foreground-light font-semibold !important;
+      @apply !text-foreground-light !font-semibold;
     }
   }
 }

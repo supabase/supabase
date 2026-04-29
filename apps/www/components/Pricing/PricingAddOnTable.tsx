@@ -49,7 +49,7 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
                 <span className="bg-foreground text-background rounded-md p-2 shadow-sm transition-transform duration-500 group-hover:scale-105 group-hover:shadow">
                   {icon}
                 </span>
-                <span className="flex-shrink-0">
+                <span className="shrink-0">
                   See <strong className="font-medium">{pricing.title}</strong> add-on plans
                 </span>
               </div>

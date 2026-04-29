@@ -178,7 +178,7 @@ const AddRestrictionModal = ({
                 )}
               />
             </div>
-            <div className="flex-grow">
+            <div className="grow">
               <FormField
                 control={form.control}
                 name="cidrBlockSize"

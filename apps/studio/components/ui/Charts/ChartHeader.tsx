@@ -233,7 +233,7 @@ export const ChartHeader = ({
   return (
     <div
       className={cn(
-        'flex-grow flex justify-between items-start min-h-16',
+        'grow flex justify-between items-start min-h-16',
         hideHighlightArea && 'hidden'
       )}
     >

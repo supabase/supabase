@@ -15,7 +15,7 @@ SignInPartnerPage.getLayout = (page) => (
     className={cn(
       'mx-auto max-w-7xl px-8 sm:px-12 lg:px-16 !gap-y-0',
       '[&>div:first-child]:absolute [&>div:first-child]:!px-0',
-      '[&>div:last-child]:flex-grow [&>div:last-child>main]:!px-0'
+      '[&>div:last-child]:grow [&>div:last-child>main]:!px-0'
     )}
   >
     {page}
