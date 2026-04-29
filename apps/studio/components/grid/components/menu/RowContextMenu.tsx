@@ -8,7 +8,8 @@ import {
 } from 'ui'
 
 import { useTableRowOperations } from '../../hooks/useTableRowOperations'
-import { formatClipboardValue, writeTextToClipboard } from '../../utils/common'
+import { writeTextToClipboard } from '../../utils/clipboard'
+import { formatClipboardValue } from '../../utils/common'
 import { buildFilterFromCellValue, isComplexValue } from '../header/filter/FilterPopoverNew.utils'
 import type { SupaRow } from '@/components/grid/types'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'

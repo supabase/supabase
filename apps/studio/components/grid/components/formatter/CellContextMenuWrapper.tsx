@@ -8,7 +8,8 @@ import {
   ContextMenuTrigger_Shadcn_,
 } from 'ui'
 
-import { formatClipboardValue, writeTextToClipboard } from '../../utils/common'
+import { writeTextToClipboard } from '../../utils/clipboard'
+import { formatClipboardValue } from '../../utils/common'
 
 /**
  * [Joshen] RowRenderer should be using this so that we can deprecate `react-contextify`

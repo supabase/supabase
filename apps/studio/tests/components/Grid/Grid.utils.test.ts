@@ -5,7 +5,7 @@ import {
   formatSortURLParams,
   handleCellKeyDown,
 } from '@/components/grid/SupabaseGrid.utils'
-import { writeTextToClipboard } from '@/components/grid/utils/common'
+import { writeTextToClipboard } from '@/components/grid/utils/clipboard'
 
 // Sort URL syntax: `column:order`
 describe('SupabaseGrid.utils: formatSortURLParams', () => {
