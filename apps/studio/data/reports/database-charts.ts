@@ -1,3 +1,6 @@
+import { COMPUTE_MAX_IOPS } from 'shared-data'
+
+import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { compactNumberFormatter } from '@/components/ui/Charts/Charts.utils'
 import { ReportAttributes } from '@/components/ui/Charts/ComposedChart.utils'
 import { DiskAttributesData } from '@/data/config/disk-attributes-query'
@@ -15,12 +18,20 @@ export const getReportAttributesV2: (
   isSpendCapEnabled?: boolean
 ) => ReportAttributes[] = (
   entitledFeatures,
-  _project,
+  project,
   diskConfig,
   maxConnections,
   pgBouncerMaxConnections,
   isSpendCapEnabled
 ) => {
+  const provisionedDiskIops = diskConfig?.attributes?.iops
+  const computeIopsLimit =
+    COMPUTE_MAX_IOPS[mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)]
+  const effectiveMaxIops =
+    typeof provisionedDiskIops === 'number' && typeof computeIopsLimit === 'number'
+      ? Math.min(provisionedDiskIops, computeIopsLimit)
+      : provisionedDiskIops
+
   return [
     {
       id: 'ram-usage',
@@ -190,9 +201,9 @@ export const getReportAttributesV2: (
           attribute: 'disk_iops_max',
           provider: 'reference-line',
           label: 'Max IOPS',
-          value: diskConfig?.attributes?.iops,
+          value: effectiveMaxIops,
           tooltip:
-            'Maximum IOPS (Input/Output Operations Per Second) for your current compute size',
+            'Effective maximum IOPS for your current compute and disk configuration. Equal to the lower of the compute IOPS limit and the provisioned disk IOPS',
           isMaxValue: true,
         },
       ],
