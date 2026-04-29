@@ -8,14 +8,14 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
-import { LogDetailsPanel } from '@/components/interfaces/AuditLogs/LogDetailsPanel'
+import { filterByProjects, sortAuditLogs } from './AuditLogs.utils'
+import { V2LogDetailsPanel } from '@/components/interfaces/AuditLogs/V2LogDetailsPanel'
 import Table from '@/components/to-be-cleaned/Table'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
-import type { AuditLog } from '@/data/organizations/organization-audit-logs-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useProfileAuditLogsQuery } from '@/data/profile/profile-audit-logs-query'
+import { useProfileAuditLogsQuery, type V2AuditLog } from '@/data/profile/profile-audit-logs-query'
 import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 
 export const AuditLogs = () => {
@@ -30,9 +30,9 @@ export const AuditLogs = () => {
     to: currentTime.toISOString(),
   })
 
-  const [selectedLog, setSelectedLog] = useState<AuditLog>()
+  const [selectedLog, setSelectedLog] = useState<V2AuditLog>()
   const [filters, setFilters] = useState<{ projects: string[] }>({
-    projects: [], // project_ref[]
+    projects: [],
   })
 
   const {
@@ -69,21 +69,7 @@ export const AuditLogs = () => {
   )
 
   const logs = data?.result ?? []
-  const sortedLogs = logs
-    ?.sort((a, b) =>
-      dateSortDesc
-        ? Number(new Date(b.occurred_at)) - Number(new Date(a.occurred_at))
-        : Number(new Date(a.occurred_at)) - Number(new Date(b.occurred_at))
-    )
-    ?.filter((log) => {
-      if (filters.projects.length > 0) {
-        return filters.projects.includes(
-          log.target.metadata.project_ref || log.target.metadata.ref || ''
-        )
-      } else {
-        return log
-      }
-    })
+  const sortedLogs = filterByProjects(sortAuditLogs(logs, dateSortDesc), filters.projects)
 
   // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
   // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
@@ -230,55 +216,55 @@ export const AuditLogs = () => {
                   ]}
                   body={
                     sortedLogs?.map((log) => {
-                      const logProjectRef =
-                        log.target.metadata.project_ref || log.target.metadata.ref
-                      const logOrgSlug = log.target.metadata.org_slug || log.target.metadata.slug
-
-                      const project = projects?.find((project) => project.ref === logProjectRef)
-                      const organization = organizations?.find((org) => org.slug === logOrgSlug)
-
-                      const hasStatusCode = log.action.metadata[0]?.status !== undefined
+                      const project = projects?.find((p) => p.ref === log.project_ref)
+                      const organization = organizations?.find(
+                        (org) => org.slug === log.organization_slug
+                      )
+                      const isoTimestamp = dayjs.unix(log.timestamp).toISOString()
 
                       return (
                         <Table.tr
-                          key={log.occurred_at}
+                          key={log.timestamp}
                           onClick={() => setSelectedLog(log)}
                           className="cursor-pointer hover:!bg-alternative transition duration-100"
                         >
                           <Table.td className="max-w-[250px]">
                             <div className="flex items-center space-x-2">
-                              {hasStatusCode && (
-                                <p className="bg-surface-200 rounded px-1 flex items-center justify-center text-xs font-mono border">
-                                  {log.action.metadata[0].status}
-                                </p>
-                              )}
+                              <p className="bg-surface-200 rounded px-1 flex items-center justify-center text-xs font-mono border">
+                                {log.action.status}
+                              </p>
+                              <p className="text-foreground-light text-xs font-mono">
+                                {log.action.method}
+                              </p>
                               <p className="truncate" title={log.action.name}>
                                 {log.action.name}
                               </p>
                             </div>
                           </Table.td>
                           <Table.td>
-                            <p
-                              className="text-foreground-light max-w-[230px] truncate"
-                              title={project?.name ?? organization?.name ?? '-'}
-                            >
-                              {project?.name
-                                ? 'Project: '
-                                : organization?.name
-                                  ? 'Organization: '
-                                  : null}
-                              {project?.name ?? organization?.name ?? '-'}
-                            </p>
-                            <p
-                              className="text-foreground-light text-xs mt-0.5 truncate"
-                              title={logProjectRef ?? logOrgSlug ?? ''}
-                            >
-                              {logProjectRef ? 'Ref: ' : logOrgSlug ? 'Slug: ' : null}
-                              {logProjectRef ?? logOrgSlug}
-                            </p>
+                            {project || organization ? (
+                              <>
+                                <p
+                                  className="text-foreground-light max-w-[230px] truncate"
+                                  title={project?.name ?? organization?.name}
+                                >
+                                  {project ? 'Project: ' : 'Organization: '}
+                                  {project?.name ?? organization?.name}
+                                </p>
+                                <p className="text-foreground-light text-xs mt-0.5 truncate">
+                                  {log.project_ref
+                                    ? `Ref: ${log.project_ref}`
+                                    : `Slug: ${log.organization_slug}`}
+                                </p>
+                              </>
+                            ) : (
+                              <p className="text-foreground-light text-sm">
+                                {log.project_ref ?? log.organization_slug ?? '-'}
+                              </p>
+                            )}
                           </Table.td>
                           <Table.td>
-                            <TimestampInfo className="text-sm" utcTimestamp={log.occurred_at} />
+                            <TimestampInfo className="text-sm" utcTimestamp={isoTimestamp} />
                           </Table.td>
                           <Table.td align="right">
                             <Button type="default">View details</Button>
@@ -294,7 +280,7 @@ export const AuditLogs = () => {
         )}
       </div>
 
-      <LogDetailsPanel selectedLog={selectedLog} onClose={() => setSelectedLog(undefined)} />
+      <V2LogDetailsPanel selectedLog={selectedLog} onClose={() => setSelectedLog(undefined)} />
     </>
   )
 }

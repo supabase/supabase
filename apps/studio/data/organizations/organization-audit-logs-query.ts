@@ -2,40 +2,13 @@ import { useQuery } from '@tanstack/react-query'
 
 import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
+import { V2AuditLog } from '@/data/profile/profile-audit-logs-query'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type AuditLog = {
-  action: {
-    metadata: {
-      method?: string
-      route?: string
-      status?: number
-    }[]
-    name: string
-  }
-  actor: {
-    id: string
-    type: 'user' | string
-    metadata: {
-      email?: string
-      ip?: string
-      tokenType?: string
-    }[]
-  }
-  target: {
-    description: string
-    metadata: {
-      org_slug?: string
-      project_ref?: string | null
-      ref?: string | null
-      slug?: string | null
-    }
-  }
-  occurred_at: string
-}
+export type { V2AuditLog as AuditLog }
 
 export type OrganizationAuditLogsResponse = {
-  result: AuditLog[]
+  result: V2AuditLog[]
   retention_period: number
 }
 
@@ -52,7 +25,7 @@ export async function getOrganizationAuditLogs(
   if (!slug) throw new Error('slug is required')
 
   const { data, error } = await get('/platform/organizations/{slug}/audit', {
-    params: { path: { slug }, query: { iso_timestamp_start, iso_timestamp_end } },
+    params: { path: { slug }, query: { iso_timestamp_start, iso_timestamp_end, format: 'v2' } },
     signal,
   })
 
