@@ -15,6 +15,7 @@
   @apply text-grid;
   @apply border-secondary border-r border-b;
   @apply text-foreground;
+  padding-inline: 0.5rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -138,12 +139,6 @@
 
 .rdg-header-row .rdg-cell p {
   @apply text-typography-body-light [[data-theme*=dark]_&]:text-typography-body-dark;
-}
-.rdg-header-row .rdg-cell .react-contextmenu-wrapper {
-  @apply flex h-full items-center px-2 transition duration-100 ease-in-out;
-}
-.rdg-header-row .rdg-cell .react-contextmenu-wrapper:hover {
-  @apply bg-surface-200;
 }
 .rdg-header-row .rdg-checkbox {
   @apply bg-surface-200 border-default rounded-xs border;
