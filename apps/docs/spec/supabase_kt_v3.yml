@@ -2911,7 +2911,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val supabase = createSupabaseClient(supabaseUrl = "https://xyzcompany.supabase.co'", supabaseKey = "your-publishable-key") { ... }
+          val supabase = createSupabaseClient(supabaseUrl = "https://xyzcompany.supabase.co", supabaseKey = "your-publishable-key") { ... }
           val auth = supabase.auth
           ```
   - id: sign-up
