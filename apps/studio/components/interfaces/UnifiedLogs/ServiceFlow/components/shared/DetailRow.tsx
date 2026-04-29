@@ -15,6 +15,7 @@ interface DetailRowProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches ServiceFlow types convention
   table?: Table<any>
   isLoading?: boolean
+  wrap?: boolean
 }
 
 export const DetailRow = ({
@@ -25,6 +26,7 @@ export const DetailRow = ({
   filterFields,
   table,
   isLoading,
+  wrap,
 }: DetailRowProps) => {
   const isEmpty = value === null || value === undefined || value === ''
 
@@ -39,14 +41,19 @@ export const DetailRow = ({
     filterValue ?? (typeof value === 'string' || typeof value === 'number' ? value : undefined)
 
   const labelEl = (
-    <span className="flex min-w-0 items-center gap-2 truncate text-xs uppercase tracking-wide text-foreground-lighter">
+    <span
+      className={cn(
+        'flex items-center gap-2 text-xs uppercase tracking-wide text-foreground-lighter',
+        wrap ? 'shrink-0' : 'min-w-0 truncate'
+      )}
+    >
       <span
         aria-hidden
         className="select-none font-mono text-foreground-muted translate-y-0.5 ml-4"
       >
         └
       </span>
-      <span className="truncate font-mono">{label}</span>
+      <span className={cn('font-mono', !wrap && 'truncate')}>{label}</span>
     </span>
   )
 
@@ -57,7 +64,8 @@ export const DetailRow = ({
   ) : typeof value === 'string' || typeof value === 'number' ? (
     <span
       className={cn(
-        'truncate text-right font-mono text-xs text-foreground',
+        'font-mono text-xs text-foreground',
+        wrap ? 'break-all text-left' : 'truncate text-right',
         isFilterable && 'group-hover:underline'
       )}
     >
@@ -67,9 +75,14 @@ export const DetailRow = ({
     value
   )
 
-  const rowClass = 'flex h-9 items-center justify-between gap-3 px-4'
+  const rowClass = cn(
+    'flex items-start justify-between gap-3 px-4',
+    wrap ? 'min-h-9 py-2' : 'h-9 items-center'
+  )
 
-  if (isFilterable && resolvedFilterValue !== undefined) {
+  const isStringValue = typeof value === 'string' || typeof value === 'number'
+
+  if (isFilterable && resolvedFilterValue !== undefined && isStringValue) {
     return (
       <DataTableSheetRowAction
         fieldValue={filterId!}
@@ -87,7 +100,19 @@ export const DetailRow = ({
   return (
     <div className={rowClass}>
       {labelEl}
-      {valueEl}
+      {isFilterable && resolvedFilterValue !== undefined && !isStringValue ? (
+        <DataTableSheetRowAction
+          fieldValue={filterId!}
+          filterFields={filterFields!}
+          value={resolvedFilterValue}
+          table={table!}
+          className="group"
+        >
+          <span className="[&_div]:group-hover:text-foreground">{valueEl}</span>
+        </DataTableSheetRowAction>
+      ) : (
+        valueEl
+      )}
     </div>
   )
 }

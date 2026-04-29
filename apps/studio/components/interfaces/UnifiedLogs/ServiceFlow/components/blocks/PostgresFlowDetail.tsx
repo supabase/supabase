@@ -1,5 +1,5 @@
 import { Table } from '@tanstack/react-table'
-import { ChevronRight, Clock, Database } from 'lucide-react'
+import { Cable, Clock, Database } from 'lucide-react'
 import { memo, ReactNode } from 'react'
 
 import { ColumnSchema } from '../../../UnifiedLogs.schema'
@@ -66,6 +66,7 @@ const FieldDetailRow = ({
       filterFields={filterFields}
       table={table}
       isLoading={showSkeleton}
+      wrap={config.wrap}
     />
   )
 }
@@ -108,7 +109,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
         />
       ))}
 
-      <DetailSectionHeader title="Connection & Session Details" icon={ChevronRight} />
+      <DetailSectionHeader title="Connection & Session Details" icon={Cable} />
 
       {postgresDetailsFields.map((field) => (
         <FieldDetailRow

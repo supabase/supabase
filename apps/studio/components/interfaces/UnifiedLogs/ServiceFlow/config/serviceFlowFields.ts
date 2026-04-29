@@ -656,6 +656,12 @@ export const storageDetailsFields: BlockFieldConfig[] = [
 // Primary Postgres Fields (Always Visible)
 export const postgresPrimaryFields: BlockFieldConfig[] = [
   {
+    id: 'event_message',
+    label: 'Message',
+    getValue: (data, enrichedData) => enrichedData?.event_message || data?.event_message,
+    wrap: true,
+  },
+  {
     id: 'status',
     label: 'Status',
     getValue: (data, enrichedData) => enrichedData?.status || data?.status,
