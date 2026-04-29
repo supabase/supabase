@@ -281,7 +281,7 @@ importers:
         specifier: ^8.2.2
         version: 8.2.2
       config:
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../packages/config
       mdast-util-toc:
         specifier: ^6.1.1

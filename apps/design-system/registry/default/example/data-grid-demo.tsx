@@ -1,8 +1,5 @@
 import { useState } from 'react'
 import DataGrid, { Column, useRowSelection } from 'react-data-grid'
-
-import 'react-data-grid/lib/styles.css'
-
 import { Checkbox, cn } from 'ui'
 
 type User = {

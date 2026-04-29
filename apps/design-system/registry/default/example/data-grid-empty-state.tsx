@@ -1,8 +1,5 @@
 import { Users } from 'lucide-react'
 import DataGrid, { Column } from 'react-data-grid'
-
-import 'react-data-grid/lib/styles.css'
-
 import { cn } from 'ui'
 
 /**

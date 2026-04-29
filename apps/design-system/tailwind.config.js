@@ -5,6 +5,7 @@ module.exports = config({
     './app/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
     './registry/**/*.{js,ts,jsx,tsx}',
+    './content/**/*.mdx',
     // purge styles from grid library
     //
     './../../packages/ui/src/**/*.{tsx,ts,js}',
