@@ -7,7 +7,6 @@ import {
   Checkbox,
   Input,
   Label_Shadcn_ as Label,
-  Label_Shadcn_,
   Separator,
   Switch,
   Tabs_Shadcn_ as Tabs,
@@ -157,9 +156,7 @@ export default function ProjectPage() {
                   checked={enableRls}
                   onCheckedChange={(checked) => setEnableRls(checked)}
                 />
-                <Label_Shadcn_ htmlFor="enable-rls">
-                  Enable RLS by default on new tables
-                </Label_Shadcn_>
+                <Label htmlFor="enable-rls">Enable RLS by default on new tables</Label>
               </div>
 
               <div className="flex items-center gap-3">
