@@ -24,6 +24,7 @@ export async function copyMarkdownFromUrl(
       text = await res.text()
     } else {
       text = options?.fallbackHtml?.() ?? ''
+      if (!text) return false
     }
     await navigator.clipboard.writeText(text)
     return true

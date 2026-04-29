@@ -551,7 +551,7 @@ ${entry.body ?? ''}
         'utf8'
       )
     }
-    console.log(`✅ Generated public/changelog/*.md (${visibleEntries.length} files)`)
+    console.log(`✅ Generated changelog/*.md (${visibleEntries.length} files)`)
   }
 } catch (error) {
   console.warn('Error generating changelog RSS:', error)
