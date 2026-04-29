@@ -42,11 +42,25 @@ async function getReferenceContent(library: string, version: string | undefined)
   return { meta, content } as { content: string; meta: GuideFrontmatter }
 }
 
-async function getReferenceSections(library: string, version: string | undefined) {
+interface ReferenceData {
+  name: string
+  icon: string
+  menuTitle: string
+  title: string
+  subtitle: string
+  referenceLink: string
+  referenceLinkLabel: string
+  versions: string[]
+  version: string
+  isLatestVersion: boolean
+  sections: AbbrevApiReferenceSection[]
+}
+
+async function getReferenceData(library: string, version: string | undefined) {
   const libKey = getLibKey(library, version)
-  const filePath = join(REFERENCE_DIRECTORY, libKey, 'sections.json')
+  const filePath = join(REFERENCE_DIRECTORY, libKey, 'data.json')
   const fileContent = await fs.readFile(filePath, 'utf-8')
-  return JSON.parse(fileContent) as AbbrevApiReferenceSection[]
+  return JSON.parse(fileContent) as ReferenceData
 }
 
 function getLibKey(library: string, version: string | undefined) {
@@ -76,18 +90,20 @@ const params = {
 }
 
 async function ReferencePage() {
-  const { library, version } = params
-  const libKey = `${library}${version ? `-${version}` : ''}` as LibKey
-  const { name, icon, currentVersion, isLatestVersion } = libs[libKey]
-  const sections = await getReferenceSections(library, version)
-  const { meta, content } = await getReferenceContent(library, version)
+  const { library, version: versionParam } = params
+  const { sections, name, icon, version, isLatestVersion, versions } = await getReferenceData(
+    library,
+    versionParam
+  )
+  const { meta, content } = await getReferenceContent(library, versionParam)
 
   return (
     <ReferencePageLayout
       name={name}
       icon={icon}
       library={library}
-      version={currentVersion}
+      version={version}
+      versions={versions}
       isLatestVersion={isLatestVersion}
       sections={sections}
       meta={meta}

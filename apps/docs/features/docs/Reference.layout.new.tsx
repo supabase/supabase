@@ -9,6 +9,7 @@ interface ReferencePageLayoutProps {
   icon: string
   library: string
   version: string
+  versions: string[]
   isLatestVersion: boolean
   sections: AbbrevApiReferenceSection[]
   meta: GuideFrontmatter
@@ -20,6 +21,7 @@ export function ReferencePageLayout({
   icon,
   library,
   version,
+  versions,
   isLatestVersion,
   sections,
   meta,
@@ -33,6 +35,7 @@ export function ReferencePageLayout({
           icon={icon}
           library={library}
           version={version}
+          versions={versions}
           isLatestVersion={isLatestVersion}
           sections={sections}
         />

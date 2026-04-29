@@ -1,24 +1,25 @@
-import { isFeatureEnabled } from 'common'
 import { type PropsWithChildren } from 'react'
-
-import { cn } from 'ui'
+import Link from 'next/link'
+import {
+  Badge,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from 'ui'
 
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
-import RefVersionDropdown from '~/components/RefVersionDropdown'
-import { getReferenceSections } from '~/features/docs/Reference.generated.singleton'
-import {
-  RefLink,
-  ReferenceNavigationScrollHandler,
-} from '~/features/docs/Reference.navigation.client'
 import { type AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
+import { ChevronDown } from 'lucide-react'
 
 interface ReferenceNavigationProps {
-  // libraryId: string
   name: string
   icon: string
-  // menuData: { icon?: string }
   library: string
   version: string
+  versions: string[]
   isLatestVersion: boolean
   sections: AbbrevApiReferenceSection[]
 }
@@ -26,9 +27,9 @@ interface ReferenceNavigationProps {
 export async function ReferenceNavigation({
   name,
   icon,
-  // libPath,
   library,
   version,
+  versions,
   isLatestVersion,
   sections,
 }: ReferenceNavigationProps) {
@@ -39,17 +40,17 @@ export async function ReferenceNavigation({
       <div className="flex items-center gap-3">
         {icon && <MenuIconPicker icon={icon} width={21} height={21} />}
         <span className="text-base text-brand-600">{name}</span>
-        {/* <RefVersionDropdown library={libPath} currentVersion={version} /> */}
+        <ReferenceVersionDropdown library={library} currentVersion={version} versions={versions} />
       </div>
       <ul className="flex flex-col gap-2">
         {sections?.map((section, index) =>
           section.type === 'category' ? (
-            <li key={section.id ?? String(index)}>
+            <li key={`${section.slug}-${String(index)}`}>
               <RefCategory basePath={basePath} section={section} />
             </li>
           ) : (
-            <li key={section.id ?? String(index)} className={topLvlRefNavItemStyles}>
-              <RefLink basePath={basePath} section={section} />
+            <li key={section.slug} className="leading-5">
+              <ReferenceLink section={section} />
             </li>
           )
         )}
@@ -58,7 +59,17 @@ export async function ReferenceNavigation({
   )
 }
 
-const topLvlRefNavItemStyles = 'leading-5'
+function ReferenceLink({ section }: { section: AbbrevApiReferenceSection }) {
+  if (!('title' in section) || !section.slug) return null
+  return (
+    <a
+      href={`#${section.slug}`}
+      className="text-sm text-foreground-lighter hover:text-foreground transition-colors"
+    >
+      {section.title}
+    </a>
+  )
+}
 
 function RefCategory({
   basePath,
@@ -72,11 +83,17 @@ function RefCategory({
   return (
     <>
       <Divider />
-      {'title' in section && <SideMenuTitle className="py-2">{section.title}</SideMenuTitle>}
+      {'title' in section && section.slug ? (
+        <a href={`${basePath}#${section.slug}`}>
+          <SideMenuTitle className="py-2">{section.title}</SideMenuTitle>
+        </a>
+      ) : (
+        'title' in section && <SideMenuTitle className="py-2">{section.title}</SideMenuTitle>
+      )}
       <ul className="space-y-2">
-        {section.items?.map((item) => (
-          <li key={item.id} className={topLvlRefNavItemStyles}>
-            <RefLink basePath={basePath} section={item} />
+        {section.items?.map((item, index) => (
+          <li key={`${item.slug}-${String(index)}`} className="leading-5">
+            <ReferenceLink section={item} />
           </li>
         ))}
       </ul>
@@ -98,5 +115,60 @@ function SideMenuTitle({ children, className }: PropsWithChildren<{ className?: 
     >
       {children}
     </div>
+  )
+}
+
+const ReferenceVersionDropdown = ({
+  library,
+  currentVersion,
+  versions,
+}: {
+  library: string
+  currentVersion: string
+  versions: string[]
+}) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <div
+          className="
+          group
+          justify-between
+          bg-control
+          border
+          hover:border-control
+          hover:bg-overlay-hover
+          border-control px-2 h-[32px] rounded
+          font-mono
+          flex items-center gap-1 text-foreground-muted text-xs group-hover:text-foreground transition
+          "
+        >
+          <span className="text-foreground text-sm group-hover:text-foreground transition">
+            {currentVersion}.0
+          </span>
+          <ChevronDown size={14} strokeWidth={2} />
+        </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" side="bottom" className="w-48">
+        <DropdownMenuLabel className="text-xs">Stable releases</DropdownMenuLabel>
+        {versions.map((version, index) => (
+          <DropdownMenuItem key={version}>
+            <Link
+              className="w-full justify-between items-center flex"
+              href={
+                version === versions[0]
+                  ? `/reference/${library}/`
+                  : `/reference/${library}/${version}`
+              }
+            >
+              <span className={`${currentVersion === version ? 'font-bold' : ''}`}>
+                Version {version}.0
+              </span>
+              {index === 0 && <Badge>Latest</Badge>}
+            </Link>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

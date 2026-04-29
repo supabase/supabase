@@ -53,21 +53,75 @@ function toSlug(name: string): string {
 }
 
 // ---------------------------------------------------------------------------
+// Partial helpers
+// ---------------------------------------------------------------------------
+
+/** Extracts h2 heading text from markdown content. */
+function scanPartialH2s(content: string): string[] {
+  return content.split('\n').flatMap((line) => {
+    const m = line.match(/^##\s+(.+)$/)
+    return m ? [m[1].trim()] : []
+  })
+}
+
+/**
+ * Replaces `## Heading` lines in a partial with <Heading> JSX so they get
+ * proper anchors. prefix is prepended to the slug (e.g. the category slug).
+ */
+function processPartialForMdx(content: string, prefix?: string): string {
+  return content.replace(/^##\s+(.+)$/gm, (_, text) => {
+    const t = text.trim()
+    const slug = prefix ? `${prefix}-${toSlug(t)}` : toSlug(t)
+    return `<Heading tag="h2" customAnchor="${slug}">${t}</Heading>`
+  })
+}
+
+// ---------------------------------------------------------------------------
 // Sections builder
 // ---------------------------------------------------------------------------
 
-function buildSections(categories: SpecCategory[]): object[] {
-  return categories.map(({ category, definitions }) => ({
-    id: toSlug(category),
-    type: 'category',
-    title: category,
-    items: definitions.map((def) => ({
-      id: def.name,
-      type: 'function',
-      title: def.name,
-      slug: def.name,
-    })),
-  }))
+function buildSections(categories: SpecCategory[], specDir: string): object[] {
+  // Introduction partial h2s become top-level nav items
+  const introPath = join(specDir, 'introduction.partial.mdx')
+  const introItems = existsSync(introPath)
+    ? scanPartialH2s(readFileSync(introPath, 'utf-8')).map((h2) => ({
+        id: toSlug(h2),
+        slug: toSlug(h2),
+        type: 'markdown',
+        title: h2,
+      }))
+    : []
+
+  const categoryItems = categories.map(({ category, definitions }) => {
+    const catSlug = toSlug(category)
+    const partialPath = join(specDir, `${catSlug}.partial.mdx`)
+    const partialH2Items = existsSync(partialPath)
+      ? scanPartialH2s(readFileSync(partialPath, 'utf-8')).map((h2) => ({
+          id: `${catSlug}-${toSlug(h2)}`,
+          slug: `${catSlug}-${toSlug(h2)}`,
+          type: 'markdown',
+          title: h2,
+        }))
+      : []
+
+    return {
+      id: catSlug,
+      slug: catSlug,
+      type: 'category',
+      title: category,
+      items: [
+        ...partialH2Items,
+        ...definitions.map((def) => ({
+          id: `${catSlug}-${toSlug(def.name)}`,
+          slug: `${catSlug}-${toSlug(def.name)}`,
+          type: 'function',
+          title: def.name,
+        })),
+      ],
+    }
+  })
+
+  return [...introItems, ...categoryItems]
 }
 
 // ---------------------------------------------------------------------------
@@ -154,29 +208,31 @@ function generateMdx(categories: SpecCategory[], config: SpecConfig, specDir: st
   // Insert optional introduction partial immediately after frontmatter
   const introParthialPath = join(specDir, 'introduction.partial.mdx')
   if (existsSync(introParthialPath)) {
-    lines.push(readFileSync(introParthialPath, 'utf-8').trimEnd(), '')
+    lines.push(processPartialForMdx(readFileSync(introParthialPath, 'utf-8').trimEnd()), '')
   }
 
   for (let i = 0; i < categories.length; i++) {
     const { category, definitions } = categories[i]
+    const catSlug = toSlug(category)
 
     if (i > 0) {
       lines.push('', '<hr />', '')
     }
 
-    lines.push(`## ${category}`, '')
+    lines.push(`<Heading tag="h2" customAnchor="${catSlug}">${category}</Heading>`, '')
 
     // Insert optional partial: <specDir>/<category-slug>.partial.mdx
-    const partialPath = join(specDir, `${toSlug(category)}.partial.mdx`)
+    const partialPath = join(specDir, `${catSlug}.partial.mdx`)
     if (existsSync(partialPath)) {
-      lines.push(readFileSync(partialPath, 'utf-8').trimEnd(), '')
+      lines.push(processPartialForMdx(readFileSync(partialPath, 'utf-8').trimEnd(), catSlug), '')
     }
 
     for (let j = 0; j < definitions.length; j++) {
       const def = definitions[j]
       const isLastInCategory = j === definitions.length - 1
+      const defSlug = `${catSlug}-${toSlug(def.name)}`
 
-      lines.push(`### ${def.name}`, '')
+      lines.push(`<Heading tag="h3" customAnchor="${defSlug}">${def.name}</Heading>`, '')
 
       if (def.description) {
         lines.push(escapeMdxProse(def.description), '')
@@ -237,13 +293,13 @@ for (const specDir of specFolders) {
   const mdxPath = join(outDir, 'index.mdx')
   writeFileSync(mdxPath, mdx)
 
-  // Write sections
-  const sections = buildSections(categories)
-  const sectionsPath = join(outDir, 'sections.json')
-  writeFileSync(sectionsPath, JSON.stringify(sections, null, 2))
+  // Write data.json: sections + config merged into one file
+  const data = { ...config, sections: buildSections(categories, specDir) }
+  const dataPath = join(outDir, 'data.json')
+  writeFileSync(dataPath, JSON.stringify(data, null, 2))
 
   console.log(`[${rel}] MDX → ${mdxPath}`)
-  console.log(`[${rel}] sections → ${sectionsPath}`)
+  console.log(`[${rel}] data → ${dataPath}`)
   console.log(
     `[${rel}] ${categories.length} categories, ${categories.flatMap((c) => c.definitions).length} definitions`
   )

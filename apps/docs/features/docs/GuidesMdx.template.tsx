@@ -62,7 +62,7 @@ type GuideTemplateProps =
 
 const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideTemplateProps) => {
   const hideToc = meta?.hideToc || meta?.hide_table_of_contents
-  console.log('GuideMDX.template.tsx', meta)
+
   return (
     <TocAnchorsProvider>
       <div className={'grid grid-cols-12 relative gap-4'}>

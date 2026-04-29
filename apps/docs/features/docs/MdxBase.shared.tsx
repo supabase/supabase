@@ -115,6 +115,7 @@ const components = {
   /**
    * Components for new rerence page rendering pipeline.
    */
+  Heading,
   RefDefinitionParams,
   RefDefinitionReturnType,
   CollapsibleDetails,
