@@ -8,9 +8,7 @@ import { DataTableSheetRowAction } from '@/components/ui/DataTable/DataTableShee
 interface DetailRowProps {
   label: string
   value: ReactNode
-  /** When provided, the row becomes a click target that opens filter actions for this column. */
   filterId?: string
-  /** Raw string used as the filter value when the row is filterable. Falls back to `value` if it's a primitive. */
   filterValue?: string | number
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches ServiceFlow types convention
   filterFields?: DataTableFilterField<any>[]
@@ -42,21 +40,21 @@ export const DetailRow = ({
 
   const labelEl = (
     <span className="flex min-w-0 items-center gap-2 truncate text-xs uppercase tracking-wide text-foreground-lighter">
-      <span aria-hidden className="select-none font-mono text-foreground-muted">
+      <span aria-hidden className="select-none font-mono text-foreground-muted translate-y-0.5">
         └
       </span>
-      <span className="truncate">{label}</span>
+      <span className="truncate font-mono">{label}</span>
     </span>
   )
 
   const valueEl = isLoading ? (
     <Skeleton className="h-4 w-24" />
   ) : isEmpty ? (
-    <span className="font-mono text-sm text-foreground-muted">—</span>
+    <span className="font-mono text-xs text-foreground-muted">—</span>
   ) : typeof value === 'string' || typeof value === 'number' ? (
     <span
       className={cn(
-        'truncate text-right font-mono text-sm text-foreground',
+        'truncate text-right font-mono text-xs text-foreground',
         isFilterable && 'group-hover:underline'
       )}
     >

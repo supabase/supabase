@@ -203,7 +203,7 @@ export function ServiceFlowPanel({
                 </TabsContent>
               )}
 
-              <TabsContent value="raw-json" className="mt-0 grow overflow-auto">
+              <TabsContent value="raw-json" className="mt-0 grow overflow-auto bg-surface-100/50">
                 {isLoading && shouldShowServiceFlow && (
                   <div className="flex items-center gap-3 border-b border-border bg-surface-100 p-3 text-foreground-light">
                     <Skeleton className="h-4 w-4 animate-pulse rounded-full" />
@@ -228,7 +228,7 @@ export function ServiceFlowPanel({
                 <CodeBlock
                   language="json"
                   hideCopy
-                  wrapperClassName="!overflow-visible"
+                  wrapperClassName="!overflow-visible bg-surface-100/50 [&_pre]:!bg-surface-100/50"
                   className="rounded-none border-none [&_code]:!leading-tight [&_pre]:!leading-tight"
                 >
                   {JSON.stringify(formattedJsonData, null, 2)}
