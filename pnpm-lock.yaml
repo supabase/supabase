@@ -2098,9 +2098,6 @@ importers:
       react-use:
         specifier: ^17.4.0
         version: 17.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      tailwindcss:
-        specifier: ^4.2.4
-        version: 4.2.4
       valtio:
         specifier: 'catalog:'
         version: 1.12.0(@types/react@18.3.3)(react@18.3.1)
@@ -2213,7 +2210,7 @@ importers:
         specifier: ^0.9.13
         version: 0.9.13(next@16.2.3(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)
       tailwindcss:
-        specifier: 4.2.4
+        specifier: 'catalog:'
         version: 4.2.4
       tsconfig:
         specifier: workspace:*
@@ -2447,7 +2444,7 @@ importers:
         specifier: ^1.13.2
         version: 1.14.0
       tailwindcss:
-        specifier: 4.2.4
+        specifier: 'catalog:'
         version: 4.2.4
       vaul:
         specifier: ^0.9.9
