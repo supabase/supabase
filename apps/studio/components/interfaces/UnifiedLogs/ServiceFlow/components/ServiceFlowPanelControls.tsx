@@ -1,0 +1,108 @@
+import { ChevronDown, ChevronUp, X } from 'lucide-react'
+import { useCallback, useEffect, useMemo } from 'react'
+import { Button, Separator } from 'ui'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { Kbd } from '@/components/ui/DataTable/primitives/Kbd'
+import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
+
+export const ServiceFlowPanelControls = () => {
+  const { table, rowSelection, isLoading } = useDataTable()
+
+  const selectedRowKey = Object.keys(rowSelection)?.[0]
+
+  const selectedRowData = useMemo(() => {
+    if (isLoading && !selectedRowKey) return
+    return table.getCoreRowModel().flatRows.find((row) => row.id === selectedRowKey)
+  }, [selectedRowKey, isLoading, table])
+
+  const index = table.getCoreRowModel().flatRows.findIndex((row) => row.id === selectedRowData?.id)
+
+  const nextId = useMemo(
+    () => table.getCoreRowModel().flatRows[index + 1]?.id,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [index, isLoading, table]
+  )
+
+  const prevId = useMemo(
+    () => table.getCoreRowModel().flatRows[index - 1]?.id,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [index, isLoading, table]
+  )
+
+  const onPrev = useCallback(() => {
+    if (prevId) table.setRowSelection({ [prevId]: true })
+  }, [prevId, table])
+
+  const onNext = useCallback(() => {
+    if (nextId) table.setRowSelection({ [nextId]: true })
+  }, [nextId, table])
+
+  const onClose = useCallback(() => {
+    table.resetRowSelection()
+  }, [table])
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (!selectedRowKey) return
+
+      // Prevent dropdown menu navigation from triggering row navigation
+      const activeElement = document.activeElement
+      const isMenuActive = activeElement?.closest('[role="menu"]')
+      if (isMenuActive) return
+
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        onPrev()
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        onNext()
+      }
+    }
+
+    document.addEventListener('keydown', down)
+    return () => document.removeEventListener('keydown', down)
+  }, [selectedRowKey, onNext, onPrev])
+
+  return (
+    <div className="flex h-7 items-center gap-1">
+      <ButtonTooltip
+        size="tiny"
+        type="text"
+        disabled={!prevId}
+        onClick={onPrev}
+        className="px-1"
+        icon={<ChevronUp />}
+        tooltip={{
+          content: {
+            text: (
+              <p>
+                Previous <Kbd>↑</Kbd>
+              </p>
+            ),
+          },
+        }}
+      />
+      <ButtonTooltip
+        size="tiny"
+        type="text"
+        disabled={!nextId}
+        onClick={onNext}
+        className="px-1"
+        icon={<ChevronDown />}
+        tooltip={{
+          content: {
+            text: (
+              <p>
+                Next <Kbd>↓</Kbd>
+              </p>
+            ),
+          },
+        }}
+      />
+      <Separator orientation="vertical" className="mx-1 h-4" />
+      <Button size="tiny" type="text" onClick={onClose} className="px-1" icon={<X />} />
+    </div>
+  )
+}

@@ -12,6 +12,7 @@ import {
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
+import { PostgresFlowDetail } from './ServiceFlow/components/blocks/PostgresFlowDetail'
 import { MemoizedRequestStartedBlock } from './ServiceFlow/components/blocks/RequestStartedBlock'
 import { MemoizedResponseCompletedBlock } from './ServiceFlow/components/blocks/ResponseCompletedBlock'
 import {
@@ -22,7 +23,7 @@ import {
   MemoizedPostgRESTBlock,
   MemoizedStorageBlock,
 } from './ServiceFlow/components/ServiceBlocks'
-import { ServiceFlowHeader } from './ServiceFlow/components/ServiceFlowHeader'
+import { ServiceFlowPanelControls } from './ServiceFlow/components/ServiceFlowPanelControls'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
@@ -45,7 +46,7 @@ export function ServiceFlowPanel({
 }: ServiceFlowPanelProps) {
   const { table, filterFields } = useDataTable()
   const { ref: projectRef } = useParams()
-  const [activeTab, setActiveTab] = useState('service-flow')
+  const [activeTab, setActiveTab] = useState('overview')
 
   const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
 
@@ -94,140 +95,127 @@ export function ServiceFlowPanel({
           maxSize={400}
           className={cn('bg-dash-sidebar border-t')}
         >
-          <div className="h-full overflow-auto">
-            {/* Service Flow Header with navigation */}
-            <ServiceFlowHeader
-              selectedRow={selectedRow}
-              enrichedData={serviceFlowData?.result?.[0]}
-            />
-
-            <div className="relative">
-              <Tabs
-                defaultValue="service-flow"
-                value={activeTab}
-                onValueChange={setActiveTab}
-                className="w-full h-full flex flex-col pt-2"
-              >
-                <TabsList className="flex gap-3 px-5">
+          <div className="flex h-full flex-col overflow-hidden">
+            <Tabs
+              defaultValue={shouldShowServiceFlow ? 'overview' : 'raw-json'}
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="flex h-full w-full flex-col"
+            >
+              <div className="flex items-center justify-between px-4">
+                <TabsList className="flex h-auto gap-x-4 rounded-none !border-none">
                   {shouldShowServiceFlow && (
-                    <TabsTrigger value="service-flow">Overview</TabsTrigger>
+                    <TabsTrigger
+                      value="overview"
+                      className="border-b-[1px] py-3 font-mono text-xs uppercase"
+                    >
+                      Overview
+                    </TabsTrigger>
                   )}
-                  <TabsTrigger value="raw-json">Raw JSON</TabsTrigger>
+                  <TabsTrigger
+                    value="raw-json"
+                    className="border-b-[1px] py-3 font-mono text-xs uppercase"
+                  >
+                    Raw JSON
+                  </TabsTrigger>
                 </TabsList>
+                <ServiceFlowPanelControls />
+              </div>
 
-                {shouldShowServiceFlow && (
-                  <TabsContent value="service-flow">
+              {shouldShowServiceFlow && (
+                <TabsContent value="overview" className="mt-0 grow overflow-auto">
+                  {error ? (
+                    <div className="py-8 text-center text-destructive">
+                      Error: {error.toString()}
+                    </div>
+                  ) : serviceFlowType === 'postgres' ? (
+                    <PostgresFlowDetail
+                      data={selectedRow}
+                      enrichedData={serviceFlowData?.result?.[0]}
+                      isLoading={isLoading}
+                      filterFields={filterFields}
+                      table={table}
+                    />
+                  ) : (
                     <div className="p-4">
-                      {error ? (
-                        <div className="text-center py-8 text-destructive">
-                          Error: {error.toString()}
-                        </div>
+                      <MemoizedRequestStartedBlock data={selectedRow} />
+
+                      <MemoizedNetworkBlock
+                        data={selectedRow}
+                        enrichedData={serviceFlowData?.result?.[0]}
+                        isLoading={isLoading}
+                        filterFields={filterFields}
+                        table={table}
+                      />
+
+                      {serviceFlowType === 'auth' ? (
+                        <MemoizedGoTrueBlock
+                          data={selectedRow}
+                          enrichedData={serviceFlowData?.result?.[0]}
+                          isLoading={isLoading}
+                          filterFields={filterFields}
+                          table={table}
+                        />
+                      ) : serviceFlowType === 'edge-function' ? (
+                        <MemoizedEdgeFunctionBlock
+                          data={selectedRow}
+                          enrichedData={serviceFlowData?.result?.[0]}
+                          isLoading={isLoading}
+                          filterFields={filterFields}
+                          table={table}
+                        />
+                      ) : serviceFlowType === 'storage' ? (
+                        <MemoizedStorageBlock
+                          data={selectedRow}
+                          enrichedData={serviceFlowData?.result?.[0]}
+                          isLoading={isLoading}
+                          filterFields={filterFields}
+                          table={table}
+                        />
                       ) : (
                         <>
-                          {serviceFlowType === 'postgres' ? (
-                            // Postgres flows: Connection Started -> Postgres -> Response
-                            <>
-                              <MemoizedRequestStartedBlock data={selectedRow} />
+                          <MemoizedPostgRESTBlock
+                            data={selectedRow}
+                            enrichedData={serviceFlowData?.result?.[0]}
+                            isLoading={isLoading}
+                            filterFields={filterFields}
+                            table={table}
+                          />
 
-                              <MemoizedPostgresBlock
-                                data={selectedRow}
-                                enrichedData={serviceFlowData?.result?.[0]}
-                                isLoading={isLoading}
-                                isLast={false}
-                                filterFields={filterFields}
-                                table={table}
-                              />
-
-                              <MemoizedResponseCompletedBlock
-                                data={selectedRow}
-                                enrichedData={serviceFlowData?.result?.[0]}
-                              />
-                            </>
-                          ) : (
-                            // HTTP-based flows: Request Started -> Network -> Service -> Response
-                            <>
-                              <MemoizedRequestStartedBlock data={selectedRow} />
-
-                              <MemoizedNetworkBlock
-                                data={selectedRow}
-                                enrichedData={serviceFlowData?.result?.[0]}
-                                isLoading={isLoading}
-                                filterFields={filterFields}
-                                table={table}
-                              />
-
-                              {serviceFlowType === 'auth' ? (
-                                <MemoizedGoTrueBlock
-                                  data={selectedRow}
-                                  enrichedData={serviceFlowData?.result?.[0]}
-                                  isLoading={isLoading}
-                                  filterFields={filterFields}
-                                  table={table}
-                                />
-                              ) : serviceFlowType === 'edge-function' ? (
-                                <MemoizedEdgeFunctionBlock
-                                  data={selectedRow}
-                                  enrichedData={serviceFlowData?.result?.[0]}
-                                  isLoading={isLoading}
-                                  filterFields={filterFields}
-                                  table={table}
-                                />
-                              ) : serviceFlowType === 'storage' ? (
-                                <MemoizedStorageBlock
-                                  data={selectedRow}
-                                  enrichedData={serviceFlowData?.result?.[0]}
-                                  isLoading={isLoading}
-                                  filterFields={filterFields}
-                                  table={table}
-                                />
-                              ) : (
-                                <>
-                                  <MemoizedPostgRESTBlock
-                                    data={selectedRow}
-                                    enrichedData={serviceFlowData?.result?.[0]}
-                                    isLoading={isLoading}
-                                    filterFields={filterFields}
-                                    table={table}
-                                  />
-
-                                  <MemoizedPostgresBlock
-                                    data={selectedRow}
-                                    enrichedData={serviceFlowData?.result?.[0]}
-                                    isLoading={isLoading}
-                                    filterFields={filterFields}
-                                    table={table}
-                                  />
-                                </>
-                              )}
-
-                              <MemoizedResponseCompletedBlock
-                                data={selectedRow}
-                                enrichedData={serviceFlowData?.result?.[0]}
-                              />
-                            </>
-                          )}
+                          <MemoizedPostgresBlock
+                            data={selectedRow}
+                            enrichedData={serviceFlowData?.result?.[0]}
+                            isLoading={isLoading}
+                            filterFields={filterFields}
+                            table={table}
+                          />
                         </>
                       )}
-                    </div>
-                  </TabsContent>
-                )}
 
-                <TabsContent value="raw-json" className="grow overflow-auto">
-                  {isLoading && shouldShowServiceFlow && (
-                    <div className="flex items-center gap-3 text-foreground-light p-3 bg-surface-100 border-b border-border">
-                      <Skeleton className="h-4 w-4 rounded-full animate-pulse" />
-                      <span className="text-sm">Enriching log...</span>
+                      <MemoizedResponseCompletedBlock
+                        data={selectedRow}
+                        enrichedData={serviceFlowData?.result?.[0]}
+                      />
                     </div>
                   )}
-                  <CodeBlock
-                    language="json"
-                    className="max-h-[800px] overflow-auto border-none rounded-none [&_pre]:!leading-tight [&_code]:!leading-tight"
-                  >
-                    {JSON.stringify(formattedJsonData, null, 2)}
-                  </CodeBlock>
                 </TabsContent>
-              </Tabs>
-            </div>
+              )}
+
+              <TabsContent value="raw-json" className="mt-0 grow overflow-auto">
+                {isLoading && shouldShowServiceFlow && (
+                  <div className="flex items-center gap-3 border-b border-border bg-surface-100 p-3 text-foreground-light">
+                    <Skeleton className="h-4 w-4 animate-pulse rounded-full" />
+                    <span className="text-sm">Enriching log...</span>
+                  </div>
+                )}
+                <CodeBlock
+                  language="json"
+                  className="max-h-[800px] overflow-auto rounded-none border-none [&_code]:!leading-tight [&_pre]:!leading-tight"
+                >
+                  {JSON.stringify(formattedJsonData, null, 2)}
+                </CodeBlock>
+              </TabsContent>
+            </Tabs>
           </div>
         </ResizablePanel>
       </>
