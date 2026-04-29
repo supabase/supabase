@@ -10,8 +10,8 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -129,13 +129,13 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
   const selectedRepository = repositories.find((repo) => repo.id === currentRepositoryId)
 
   return (
-    <FormField_Shadcn_
+    <FormField
       control={form.control}
       name={name}
       render={({ field }) => (
         <FormItemLayout label={label} layout={layout} description={description}>
           {gitHubAuthorization === null ? (
-            <FormControl_Shadcn_>
+            <FormControl>
               <Button
                 type="default"
                 size="small"
@@ -149,11 +149,11 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
               >
                 Connect GitHub
               </Button>
-            </FormControl_Shadcn_>
+            </FormControl>
           ) : (
             <Popover_Shadcn_ open={isRepoSelectorOpen} onOpenChange={setIsRepoSelectorOpen}>
               <PopoverTrigger_Shadcn_ asChild>
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Button
                     type="default"
                     htmlType="button"
@@ -171,7 +171,7 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                       selectedRepositoryName ||
                       (isLoading ? 'Loading GitHub repositories...' : placeholder)}
                   </Button>
-                </FormControl_Shadcn_>
+                </FormControl>
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_
                 className="p-0"
