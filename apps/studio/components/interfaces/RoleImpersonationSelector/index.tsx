@@ -102,7 +102,7 @@ export const RoleImpersonationSelector = ({
                   (isAuthenticatedOptionFullySelected || 'partially')
                 }
                 onSelectedChange={onSelectedChange}
-                description="Logged in"
+                description="Specific logged in user"
                 icon={<AuthenticatedIcon isSelected={selectedOption === 'authenticated'} />}
               />
             )}
@@ -113,7 +113,8 @@ export const RoleImpersonationSelector = ({
           <div>
             <p className="text-sm">Full admin access</p>
             <p className="text-foreground-light text-sm">
-              Role has admin privileges and will bypass Row Level Security (RLS) policies.
+              The <code className="text-code-inline">postgres</code> role, which bypasses all Row
+              Level Security (RLS) policies.
             </p>
           </div>
         )}
@@ -122,7 +123,8 @@ export const RoleImpersonationSelector = ({
           <div>
             <p className="text-sm">For unauthenticated access</p>
             <p className="text-foreground-light text-sm">
-              Role which the API (PostgREST) will use when a user is not logged in.
+              The <code className="text-code-inline">anon</code> role, which the API (PostgREST)
+              uses when a user is not logged in.
               <br />
               Row Level Security (RLS) policies apply.
             </p>
@@ -133,7 +135,8 @@ export const RoleImpersonationSelector = ({
           <div>
             <p className="text-sm">For authenticated access</p>
             <p className="text-foreground-light text-sm">
-              Role which the API (PostgREST) will use when a user is logged in.
+              The <code className="text-code-inline">authenticated</code> role, which the API
+              (PostgREST) uses when a user is logged in.
               <br />
               Row Level Security (RLS) policies apply.
             </p>
