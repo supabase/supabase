@@ -34,6 +34,11 @@ export function middleware(request: NextRequest) {
     if (MD_PAGES.has(slug)) {
       return NextResponse.rewrite(new URL(`/api-v2/md/${slug}`, request.nextUrl))
     }
+    // Individual changelog entries (/changelog/<number>) are served as static
+    // .md files from public/; rewrite directly to the static path.
+    if (slug === 'changelog' || /^changelog\/\d+$/.test(slug)) {
+      return NextResponse.rewrite(new URL(`/${slug}.md`, request.nextUrl))
+    }
   }
 
   const response = NextResponse.next()

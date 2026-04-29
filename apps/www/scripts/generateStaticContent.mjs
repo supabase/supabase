@@ -8,6 +8,55 @@ import advancedFormat from 'dayjs/plugin/advancedFormat.js'
 import utc from 'dayjs/plugin/utc.js'
 import matter from 'gray-matter'
 
+/**
+ * Plain `node` does not read `.env` / `.env.local` (Next.js loads those when you run `next`).
+ * Minimal parser: no extra dependency; `.env` first, then `.env.local` overrides.
+ */
+function loadLocalEnvFiles(rootDir) {
+  const parseValue = (raw) => {
+    const val = raw.trim()
+    if (val.startsWith('"') && val.endsWith('"')) {
+      return val.slice(1, -1).replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\')
+    }
+    if (val.startsWith("'") && val.endsWith("'")) {
+      return val.slice(1, -1).replace(/\\n/g, '\n').replace(/\\'/g, "'").replace(/\\\\/g, '\\')
+    }
+    return val
+  }
+
+  const applyLine = (line, override) => {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) return
+    const eq = trimmed.indexOf('=')
+    if (eq === -1) return
+    const key = trimmed
+      .slice(0, eq)
+      .trim()
+      .replace(/^export\s+/i, '')
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) return
+    const value = parseValue(trimmed.slice(eq + 1))
+    if (override || process.env[key] === undefined) {
+      process.env[key] = value
+    }
+  }
+
+  for (const name of ['.env', '.env.local']) {
+    try {
+      const fp = path.join(rootDir, name)
+      const raw = fsSync.readFileSync(fp, 'utf8')
+      const override = name === '.env.local'
+      for (const line of raw.split(/\r?\n/)) {
+        applyLine(line, override)
+      }
+    } catch {
+      /* file missing */
+    }
+  }
+}
+
+const wwwRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
+loadLocalEnvFiles(wwwRoot)
+
 dayjs.extend(utc)
 dayjs.extend(advancedFormat)
 
@@ -261,9 +310,9 @@ await fs.writeFile(
   'utf8'
 )
 
-console.log(`✅ Generated static content with ${latestBlogPosts.length} blog posts`)
+console.log(`✅ Generated static content with ${latestBlogPosts.length} latest blog posts`)
 
-// Generate RSS feed
+// Generate blog and changelog RSS feed
 try {
   const allBlogPosts = await getAllBlogPosts()
 
@@ -324,7 +373,186 @@ try {
   // Write RSS feed to public directory
   const rssPath = path.join(__dirname, '../public/rss.xml')
   await fs.writeFile(rssPath, rss.trim(), 'utf8')
-  console.log(`✅ Generated RSS feed with ${allBlogPosts.length} blog posts`)
+  console.log(`✅ Generated RSS feed with ${allBlogPosts.length} entries`)
 } catch (error) {
   console.warn('Error generating RSS feed:', error)
+}
+
+// Changelog RSS → public/changelog-rss.xml (same GitHub App + category as lib/changelog-github.ts)
+try {
+  const appId = process.env.GITHUB_CHANGELOG_APP_ID
+  const installationId = process.env.GITHUB_CHANGELOG_APP_INSTALLATION_ID
+  const privateKey = process.env.GITHUB_CHANGELOG_APP_PRIVATE_KEY
+
+  if (!appId || !installationId || !privateKey) {
+    console.warn('Skipping changelog RSS: missing GITHUB_CHANGELOG_APP_* env vars')
+  } else {
+    const { createAppAuth } = await import('@octokit/auth-app')
+    const { Octokit } = await import('@octokit/core')
+    const { paginateGraphql } = await import('@octokit/plugin-paginate-graphql')
+
+    const { generateChangelogRssXml, generateChangelogTagRssXml, labelToFileSlug } =
+      await import('../lib/changelog-rss.mjs')
+    const rewritesPath = path.join(__dirname, 'data/changelog-deleted-discussions.json')
+    const rewrites = JSON.parse(await fs.readFile(rewritesPath, 'utf8'))
+    const discussionDisplayDate = (item) => {
+      const dateRewrite = rewrites.find(
+        (r) => item.title && r.title && item.title.includes(r.title)
+      )
+      return dateRewrite ? dateRewrite.createdAt : item.createdAt
+    }
+
+    const CHANGELOG_CATEGORY_ID = 'DIC_kwDODMpXOc4CAFUr'
+
+    const changelogQuery = `
+    query changelogDiscussionMetadata($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
+      repository(owner: $owner, name: $repo) {
+        discussions(
+          first: 100
+          after: $cursor
+          categoryId: $categoryId
+          orderBy: { field: CREATED_AT, direction: DESC }
+        ) {
+          nodes {
+            number
+            title
+            body
+            createdAt
+            url
+            labels(first: 25) {
+              nodes {
+                name
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    }
+  `
+
+    const ExtendedOctokit = Octokit.plugin(paginateGraphql)
+    const octokit = new ExtendedOctokit({
+      authStrategy: createAppAuth,
+      auth: {
+        appId,
+        installationId,
+        privateKey: privateKey.replace(/\\n/g, '\n'),
+      },
+    })
+
+    const collected = []
+    let cursor = null
+    let hasNextPage = true
+    while (hasNextPage) {
+      const {
+        repository: {
+          discussions: { nodes, pageInfo },
+        },
+      } = await octokit.graphql(changelogQuery, {
+        owner: 'supabase',
+        repo: 'supabase',
+        categoryId: CHANGELOG_CATEGORY_ID,
+        cursor,
+      })
+      collected.push(...nodes)
+      hasNextPage = pageInfo.hasNextPage
+      cursor = pageInfo.endCursor
+    }
+
+    const entries = collected.map((item) => ({
+      number: item.number,
+      title: item.title,
+      url: item.url,
+      sortDate: discussionDisplayDate({ title: item.title, createdAt: item.createdAt }),
+      labels: (item.labels?.nodes ?? []).map((l) => l.name.toLowerCase()),
+      body: item.body ?? '',
+    }))
+
+    const changelogXml = generateChangelogRssXml(entries)
+    const changelogRssPath = path.join(__dirname, '../public/changelog-rss.xml')
+    await fs.writeFile(changelogRssPath, changelogXml.trim(), 'utf8')
+    const visibleCount = entries.filter((e) => !e.title.includes('[d]')).length
+    console.log(`✅ Generated changelog RSS with ${visibleCount} entries`)
+
+    // Per-tag feeds → public/changelog-rss/<label-slug>.xml
+    const productTagsPath = path.join(__dirname, '../data/changelog-product-tags.json')
+    const productTags = JSON.parse(await fs.readFile(productTagsPath, 'utf8'))
+    const tagFeedsDir = path.join(__dirname, '../public/changelog-rss')
+    await fs.mkdir(tagFeedsDir, { recursive: true })
+    const tagResults = await Promise.allSettled(
+      productTags.map(async ({ slug, label }) => {
+        const fileSlug = labelToFileSlug(label)
+        const tagXml = generateChangelogTagRssXml(entries, {
+          githubLabelSlug: slug,
+          displayLabel: label,
+        })
+        await fs.writeFile(path.join(tagFeedsDir, `${fileSlug}.xml`), tagXml.trim(), 'utf8')
+      })
+    )
+    const succeeded = tagResults.filter((r) => r.status === 'fulfilled').length
+    console.log(`✅ Generated ${succeeded}/${productTags.length} per-tag changelog RSS feeds`)
+
+    // LLM-friendly changelog markdown index (RSS remains canonical syndication format).
+    const visibleEntries = entries.filter((entry) => !entry.title.includes('[d]'))
+    const escapeMd = (value) =>
+      String(value ?? '')
+        .replace(/\\/g, '\\\\')
+        .replace(/\|/g, '\\|')
+        .replace(/\n/g, ' ')
+    const mdRows = visibleEntries.map((entry) => {
+      const date = dayjs(entry.sortDate).isValid() ? dayjs(entry.sortDate).format('YYYY-MM-DD') : ''
+      const labels = (entry.labels ?? []).join(', ')
+      return `| ${date} | ${entry.number} | ${escapeMd(labels)} | ${escapeMd(entry.title)} | [/changelog/${entry.number}.md](https://supabase.com/changelog/${entry.number}.md) |`
+    })
+    const changelogMd = `# Supabase Changelog
+
+All paths are relative to \`https://supabase.com\`.
+
+| Date | # | Labels | Title | Path |
+| --- | --- | --- | --- | --- |
+${mdRows.join('\n')}
+`
+    const changelogMdPath = path.join(__dirname, '../public/changelog.md')
+    await fs.writeFile(changelogMdPath, changelogMd.trim() + '\n', 'utf8')
+    console.log(`✅ Generated changelog.md (${visibleEntries.length} entries)`)
+
+    // One markdown file per entry → /changelog/<number>.md (same content shape as the web page body).
+    const changelogEntryMdDir = path.join(__dirname, '../public/changelog')
+    await fs.mkdir(changelogEntryMdDir, { recursive: true })
+    for (const entry of visibleEntries) {
+      const published = dayjs(entry.sortDate).isValid()
+        ? dayjs(entry.sortDate).format('YYYY-MM-DD')
+        : ''
+      const titleLine = String(entry.title ?? '')
+        .replace(/\n/g, ' ')
+        .trim()
+      const labelsYaml = (entry.labels ?? []).map((l) => `  - ${l}`).join('\n')
+      const pageUrl = `https://supabase.com/changelog/${entry.number}`
+      const entryMd = `---
+number: ${entry.number}
+published: ${published}
+discussion: ${entry.url}
+labels:
+${labelsYaml || '  []'}
+page: ${pageUrl}
+---
+
+# ${titleLine}
+
+${entry.body ?? ''}
+`
+      await fs.writeFile(
+        path.join(changelogEntryMdDir, `${entry.number}.md`),
+        entryMd.trim() + '\n',
+        'utf8'
+      )
+    }
+    console.log(`✅ Generated changelog/*.md (${visibleEntries.length} files)`)
+  }
+} catch (error) {
+  console.warn('Error generating changelog RSS:', error)
 }
