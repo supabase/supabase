@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { EllipsisVertical, Pencil, RotateCw, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
@@ -50,6 +50,7 @@ import {
   shouldHandleEndpointNotFound,
 } from './PlatformWebhooksPage.utils'
 import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
@@ -316,6 +317,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       <PlatformWebhooksHeader
         hasSelectedEndpoint={!!selectedEndpoint}
         headerTitle={headerTitle}
+        featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS}
         headerDescription={headerDescription}
         endpointStatus={
           selectedEndpoint ? (selectedEndpoint.enabled ? 'enabled' : 'disabled') : undefined
