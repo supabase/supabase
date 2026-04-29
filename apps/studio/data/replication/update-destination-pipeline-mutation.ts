@@ -109,7 +109,7 @@ async function updateDestinationPipeline(
         metadata_schema: metadataSchema,
         expire_snapshots_older_than: expireSnapshotsOlderThan,
       },
-    } as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+    } as unknown as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
   } else {
     throw new Error('Invalid destination config: must specify bigQuery, iceberg, or ducklake')
   }

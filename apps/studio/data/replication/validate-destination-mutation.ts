@@ -88,7 +88,7 @@ async function validateDestination(
         metadata_schema: metadataSchema,
         expire_snapshots_older_than: expireSnapshotsOlderThan,
       },
-    } as components['schemas']['ValidateReplicationDestinationBody']['config']
+    } as unknown as components['schemas']['ValidateReplicationDestinationBody']['config']
   } else {
     throw new Error('Invalid destination config: must specify bigQuery, iceberg, or ducklake')
   }

@@ -189,9 +189,13 @@ export const DestinationForm = ({
     const config = destinationData?.config
     const isBigQueryConfig = config && 'big_query' in config
     const isIcebergConfig = config && 'iceberg' in config
-    const ducklakeConfig =
+    const ducklakeConfigValue =
       config && 'ducklake' in (config as Record<string, unknown>)
-        ? (config as { ducklake: DucklakeApiConfig }).ducklake
+        ? (config as Record<string, unknown>).ducklake
+        : undefined
+    const ducklakeConfig =
+      ducklakeConfigValue && typeof ducklakeConfigValue === 'object'
+        ? (ducklakeConfigValue as DucklakeApiConfig)
         : undefined
 
     return {

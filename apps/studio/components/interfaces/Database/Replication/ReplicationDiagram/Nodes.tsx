@@ -21,7 +21,7 @@ export const NODE_WIDTH = 480
 
 const destinationIconByType: Record<
   ReplicationDestinationType,
-  ComponentType<{ className?: string; size?: number }>
+  ComponentType<{ className?: string; size?: string | number }>
 > = {
   BigQuery,
   'Analytics Bucket': AnalyticsBucket,
