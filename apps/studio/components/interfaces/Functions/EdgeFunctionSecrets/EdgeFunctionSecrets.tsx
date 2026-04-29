@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Search } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -40,17 +40,28 @@ export const EdgeFunctionSecrets = () => {
     isError,
   } = useSecretsQuery({ projectRef: projectRef }, { enabled: canReadSecrets })
 
+  const customSecrets = useMemo(
+    () => data.filter((secret) => !isInternalEdgeFunctionSecret(secret.name)),
+    [data]
+  )
+
   const [selectedIdToEdit, setSelectedIdToEdit] = useQueryState(
     'edit',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
-  const selectedSecretToEdit = data.find((secret) => secret.name === selectedIdToEdit)
+  const selectedSecretToEdit = useMemo(
+    () => customSecrets.find((secret) => secret.name === selectedIdToEdit),
+    [customSecrets, selectedIdToEdit]
+  )
 
   const [selectedIdToDelete, setSelectedIdToDelete] = useQueryState(
     'delete',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
-  const selectedSecretToDelete = data.find((secret) => secret.name === selectedIdToDelete)
+  const selectedSecretToDelete = useMemo(
+    () => customSecrets.find((secret) => secret.name === selectedIdToDelete),
+    [customSecrets, selectedIdToDelete]
+  )
 
   const {
     mutate: deleteSecret,
@@ -63,13 +74,11 @@ export const EdgeFunctionSecrets = () => {
     },
   })
 
-  const customSecrets = data.filter((secret) => !isInternalEdgeFunctionSecret(secret.name))
-  const filteredCustomSecrets =
-    searchString.length > 0
-      ? customSecrets.filter((secret) =>
-          secret.name.toLowerCase().includes(searchString.toLowerCase())
-        )
-      : customSecrets
+  const filteredCustomSecrets = useMemo(() => {
+    if (searchString.length === 0) return customSecrets
+    const search = searchString.toLowerCase()
+    return customSecrets.filter((secret) => secret.name.toLowerCase().includes(search))
+  }, [customSecrets, searchString])
 
   const headers = [
     <TableHead key="secret-name">Name</TableHead>,
