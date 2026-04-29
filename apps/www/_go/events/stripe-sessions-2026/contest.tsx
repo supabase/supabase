@@ -68,7 +68,7 @@ stripe projects env --sync`}</code>
             </Link>
           </div>
 
-          <p className="text-foreground-light text-sm">
+          <p className="text-foreground-light text-sm w-full">
             Both options must be completed by Monday, May 11, 2026 at 12:00 PM PST.
           </p>
 
