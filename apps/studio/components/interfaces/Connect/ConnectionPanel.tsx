@@ -220,7 +220,7 @@ export const ConnectionPanel = ({
 
           {type === 'session' && (
             <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
-              <div className="flex w-6 h-6 rounded items-center justify-center gap-2 flex-shrink-0 bg-surface-100">
+              <div className="flex w-6 h-6 rounded items-center justify-center gap-2 shrink-0 bg-surface-100">
                 <WarningIcon />
               </div>
               <div className="flex flex-col">

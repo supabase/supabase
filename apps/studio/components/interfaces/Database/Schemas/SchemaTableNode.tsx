@@ -96,7 +96,7 @@ export const TableNode = ({
               itemHeight
             )}
           >
-            <div className="min-w-0 flex flex-shrink gap-x-1 items-center">
+            <div className="min-w-0 flex shrink gap-x-1 items-center">
               <Table2 strokeWidth={1} size={12} className="text-light" />
               <span className="whitespace-nowrap overflow-hidden text-ellipsis" title={data.name}>
                 {data.name}
@@ -105,7 +105,7 @@ export const TableNode = ({
             {
               // Hide the actions while downloading the schema as png/svg
               !schemaGraphContext.isDownloading ? (
-                <div className="flex flex-shrink-0 items-center gap-2">
+                <div className="flex shrink-0 items-center gap-2">
                   {data.description && (
                     <Tooltip>
                       <TooltipTrigger asChild className="cursor-default ">
@@ -248,27 +248,27 @@ export const TableNode = ({
                     strokeWidth={1}
                     className={cn(
                       // 'sb-grid-column-header__inner__primary-key'
-                      'flex-shrink-0',
+                      'shrink-0',
                       'text-light'
                     )}
                   />
                 )}
                 {column.isNullable && (
-                  <DiamondIcon size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
+                  <DiamondIcon size={8} strokeWidth={1} className="shrink-0 text-light" />
                 )}
                 {!column.isNullable && (
                   <DiamondIcon
                     size={8}
                     strokeWidth={1}
                     fill="currentColor"
-                    className="flex-shrink-0 text-light"
+                    className="shrink-0 text-light"
                   />
                 )}
                 {column.isUnique && (
-                  <Fingerprint size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
+                  <Fingerprint size={8} strokeWidth={1} className="shrink-0 text-light" />
                 )}
                 {column.isIdentity && (
-                  <Hash size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
+                  <Hash size={8} strokeWidth={1} className="shrink-0 text-light" />
                 )}
               </div>
               <div className="flex w-full justify-between min-w-0">
@@ -284,7 +284,7 @@ export const TableNode = ({
                 >
                   {column.name}
                 </span>
-                <span className="flex-shrink-0 pl-2 pr-1 inline-flex justify-end font-mono text-lighter text-[0.4rem] group-hover:hidden">
+                <span className="shrink-0 pl-2 pr-1 inline-flex justify-end font-mono text-lighter text-[0.4rem] group-hover:hidden">
                   {column.format}
                 </span>
               </div>

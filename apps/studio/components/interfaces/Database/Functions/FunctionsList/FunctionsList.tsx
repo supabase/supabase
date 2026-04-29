@@ -278,7 +278,7 @@ export const FunctionsList = () => {
                   <ButtonTooltip
                     disabled={!canCreateFunctions}
                     onClick={() => createFunction()}
-                    className="flex-grow"
+                    className="grow"
                     tooltip={{
                       content: {
                         side: 'bottom',

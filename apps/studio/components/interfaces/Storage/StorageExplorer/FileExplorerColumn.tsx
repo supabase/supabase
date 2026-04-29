@@ -143,16 +143,6 @@ export const FileExplorerColumn = ({
     }
   }
 
-  const SelectAllCheckbox = () => (
-    <Checkbox
-      label=""
-      className="-mt-0.5"
-      checked={columnFiles.length !== 0 && selectedFilesFromColumn.length === columnFiles.length}
-      disabled={columnFiles.length === 0}
-      onChange={() => onSelectAllItemsInColumn(index)}
-    />
-  )
-
   const getItemKey = useCallback(
     (index: number) => {
       const item = columnItems[index]
@@ -198,7 +188,7 @@ export const FileExplorerColumn = ({
           className={cn(
             fullWidth ? 'w-full' : 'w-64 border-r border-overlay',
             view === STORAGE_VIEWS.LIST && 'h-full',
-            'hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto'
+            'hide-scrollbar relative flex shrink-0 flex-col overflow-auto'
           )}
           onDragOver={onDragOver}
           onDrop={onDrop}
@@ -218,10 +208,24 @@ export const FileExplorerColumn = ({
             >
               {columnFiles.length > 0 ? (
                 <>
-                  <SelectAllCheckbox />
-                  <p className="text-sm text-foreground-light">
-                    Select all {columnFiles.length} files
-                  </p>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="checkbox-select-all"
+                      className="-mt-0.5"
+                      checked={
+                        columnFiles.length !== 0 &&
+                        selectedFilesFromColumn.length === columnFiles.length
+                      }
+                      disabled={columnFiles.length === 0}
+                      onCheckedChange={() => onSelectAllItemsInColumn(index)}
+                    />
+                    <label
+                      htmlFor="checkbox-select-all"
+                      className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Select all {columnFiles.length} files
+                    </label>
+                  </div>
                 </>
               ) : (
                 <p className="text-sm text-foreground-light">No files available for selection</p>
@@ -233,7 +237,24 @@ export const FileExplorerColumn = ({
           {view === STORAGE_VIEWS.LIST && (
             <div className="sticky top-0 py-2 z-10 flex min-w-min items-center border-b border-overlay bg-surface-100 px-2.5">
               <div className="flex w-[40%] min-w-[250px] items-center">
-                <SelectAllCheckbox />
+                <div className="relative w-[30px]" onClick={(event) => event.stopPropagation()}>
+                  <Checkbox
+                    id="checkbox-select-all"
+                    className="-mt-0.5"
+                    checked={
+                      columnFiles.length !== 0 &&
+                      selectedFilesFromColumn.length === columnFiles.length
+                    }
+                    disabled={columnFiles.length === 0}
+                    onCheckedChange={() => onSelectAllItemsInColumn(index)}
+                  />
+                  <label
+                    htmlFor="checkbox-select-all"
+                    className="sr-only text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Select all {columnFiles.length} files
+                  </label>
+                </div>
                 <p className="text-sm">Name</p>
               </div>
               <p className="w-[11%] min-w-[100px] text-sm">Size</p>
@@ -248,7 +269,7 @@ export const FileExplorerColumn = ({
             <div
               className={`
                 ${fullWidth ? 'w-full' : 'w-64 border-r border-default'}
-                px-2 py-1 my-1 flex flex-shrink-0 flex-col space-y-2 overflow-auto
+                px-2 py-1 my-1 flex shrink-0 flex-col space-y-2 overflow-auto
               `}
             >
               <ShimmeringLoader />

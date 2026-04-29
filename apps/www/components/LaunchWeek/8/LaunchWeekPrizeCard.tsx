@@ -1,6 +1,6 @@
+import { motion } from 'framer-motion'
 import Image from 'next/image'
 import React from 'react'
-import { motion } from 'framer-motion'
 import { cn } from 'ui'
 
 type animateFromType = 'left' | 'right' | 'up' | 'down' | 'opacityOnly'
@@ -51,7 +51,7 @@ export default function LaunchWeekPrizeCard({
       <div className="relative h-full flex flex-col bg-[#030A0C] rounded-lg overflow-hidden">
         <div
           className={[
-            "relative w-full flex-grow before:content[' '] before:absolute before:inset-0 before:z-10 before:bg-gradient-to-t before:from-[#030A0C] before:via-transparent",
+            "relative w-full grow before:content[' '] before:absolute before:inset-0 before:z-10 before:bg-gradient-to-t before:from-[#030A0C] before:via-transparent",
             imageWrapperClassName && imageWrapperClassName,
           ].join(' ')}
         >

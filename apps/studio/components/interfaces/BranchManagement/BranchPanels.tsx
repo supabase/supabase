@@ -87,7 +87,6 @@ export const BranchRow = ({
     : null
   const isDeletionPending = willBeDeletedIn !== null && willBeDeletedIn < 0
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
-  const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
   const navigateUrl = rowLink ?? `/project/${branch.project_ref}`
 

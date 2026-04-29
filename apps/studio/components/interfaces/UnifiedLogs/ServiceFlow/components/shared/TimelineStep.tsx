@@ -8,7 +8,13 @@ import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableCo
 type IconComponent = LucideIcon | React.ComponentType<any>
 
 // Reusable styled icon component
-export const StyledIcon = ({ icon: Icon, title }: { icon: IconComponent; title: string }) => (
+export const StyledIcon = ({
+  icon: Icon,
+  title: _title,
+}: {
+  icon: IconComponent
+  title: string
+}) => (
   <div className="flex items-center gap-2 bg-surface-300 rounded p-0.5 border justify-center border-foreground-muted">
     <Icon className="w-4 h-4 text-foreground-lighter" strokeWidth={1} />
   </div>

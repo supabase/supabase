@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { Copy, Trash, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
 import {
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
@@ -323,7 +323,7 @@ export const formatUserColumns = ({
         if (col.id === 'img') {
           return (
             <div className="flex items-center justify-center gap-x-2">
-              <Checkbox_Shadcn_
+              <Checkbox
                 checked={isRowSelected}
                 onClick={(e) => {
                   e.stopPropagation()

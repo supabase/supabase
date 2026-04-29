@@ -1,6 +1,6 @@
 .storage-container {
   .sbui-space-col {
-    @apply flex-grow;
+    @apply grow;
     #files {
       @apply h-full;
     }

@@ -264,11 +264,11 @@ export const CreateOrUpdateOAuthAppSheet = ({
               </SheetTitle>
             </div>
           </SheetHeader>
-          <SheetSection className="overflow-auto flex-grow px-0">
+          <SheetSection className="overflow-auto grow px-0">
             <Form {...form}>
               <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)} id={FORM_ID}>
                 <div className="px-5 flex items-start justify-between gap-4">
-                  <div className="flex-grow space-y-4">
+                  <div className="grow space-y-4">
                     <FormField
                       control={form.control}
                       name="name"

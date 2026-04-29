@@ -109,7 +109,6 @@ interface HandlePageTelemetryOptions {
 }
 
 function handlePageTelemetry({
-  apiUrl: API_URL,
   pathname,
   featureFlags,
   slug,
@@ -229,13 +228,13 @@ function handlePageTelemetry({
 }
 
 export function handlePageLeaveTelemetry(
-  API_URL: string,
+  _API_URL: string,
   pathname: string,
-  featureFlags?: {
+  _featureFlags?: {
     [key: string]: unknown
   },
-  slug?: string,
-  ref?: string
+  _slug?: string,
+  _ref?: string
 ) {
   if (typeof window !== 'undefined') {
     const pageData = getSharedTelemetryData(pathname)

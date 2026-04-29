@@ -150,6 +150,56 @@ from match_documents(
 
 In this scenario, you'll likely use a Postgres client library to establish a direct connection from your application to the database. It's best practice to parameterize your arguments before executing the query.
 
+### Filtering vector search by metadata
+
+In real applications you usually want to combine the similarity search with a filter on another column, for example only matching documents in a given category, owned by a specific user, or carrying matching metadata in a `jsonb` column. The recommended pattern is to push the filter into the SQL function so the planner can combine it with the vector predicate. Chaining `.eq()` after `rpc()` is applied by PostgREST as an outer filter on the function's result, _after_ the function has already executed its similarity ranking and `limit` — so the vector planner can't use it, and selective filters can leave you with fewer than `match_count` rows.
+
+Assuming you've added a `category text` column to `documents`, you can extend the cosine variant of `match_documents` with a typed filter parameter:
+
+```sql
+-- Match documents in a given category using cosine distance (<=>)
+create or replace function match_documents (
+  query_embedding extensions.vector(512),
+  match_threshold float,
+  match_count int,
+  filter_category text
+)
+returns setof documents
+language sql
+as $$
+  select *
+  from documents
+  where documents.category = filter_category
+    and documents.embedding <=> query_embedding < 1 - match_threshold
+  order by documents.embedding <=> query_embedding asc
+  limit least(match_count, 200);
+$$;
+```
+
+If you store side data in a `jsonb metadata` column instead of dedicated columns, the same pattern works with the `@>` containment operator:
+
+```sql
+where documents.metadata @> filter_metadata
+  and documents.embedding <=> query_embedding < 1 - match_threshold
+```
+
+Call the filtered function from your application by passing the extra parameter:
+
+```tsx
+const { data: documents } = await supabase.rpc('match_documents', {
+  query_embedding: embedding,
+  match_threshold: 0.78,
+  match_count: 10,
+  filter_category: 'blog',
+})
+```
+
+<Admonition type="note">
+
+When the filter is selective enough that the post-filter result set falls below `match_count`, an HNSW index can return fewer rows than expected. From `pgvector` 0.8.0, the planner supports iterative index scans that re-enter the index to gather more candidates. See [Filtering with HNSW indexes](/docs/guides/ai/vector-indexes/hnsw-indexes#filtering-with-hnsw-indexes) for details.
+
+</Admonition>
+
 ## Next steps
 
 As your database scales, you will need an index on your vector columns to maintain fast query speeds. See [Vector indexes](/docs/guides/ai/vector-indexes) for an in-depth guide on the different types of indexes and how they work.

@@ -133,7 +133,7 @@ export const CreateWrapperSheet = ({
   }
 
   const { mutateAsync: createFDW, isPending: isCreatingWrapper } = useFDWCreateMutation({
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success(`Successfully created ${wrapperMeta?.label} foreign data wrapper`)
 
       const { tables } = getValues()
@@ -221,7 +221,7 @@ export const CreateWrapperSheet = ({
             <SheetHeader>
               <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
             </SheetHeader>
-            <SheetSection className="flex-grow overflow-y-auto">
+            <SheetSection className="grow overflow-y-auto">
               <PageSection>
                 <PageSectionMeta>
                   <PageSectionSummary>

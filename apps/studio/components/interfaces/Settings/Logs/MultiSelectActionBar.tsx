@@ -1,5 +1,4 @@
 import { Check, ChevronDown, Copy, X as XIcon } from 'lucide-react'
-import { useMemo } from 'react'
 import {
   Button,
   DropdownMenu,

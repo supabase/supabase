@@ -245,7 +245,7 @@ export const InviteMemberButton = () => {
           type="primary"
           disabled={!canInviteMembers}
           icon={<UserPlus size={14} />}
-          className="pointer-events-auto flex-grow md:flex-grow-0"
+          className="pointer-events-auto grow md:grow-0"
           onClick={() => setIsOpen(true)}
           tooltip={{
             content: {

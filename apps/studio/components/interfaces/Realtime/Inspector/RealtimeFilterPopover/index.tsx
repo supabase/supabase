@@ -204,7 +204,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                   <p className="w-[60px] flex justify-end text-sm">AND</p>
                   <Input
                     size="tiny"
-                    className="flex-grow"
+                    className="grow"
                     placeholder="body=eq.hey"
                     value={tempConfig.filter}
                     onChange={(v) => setTempConfig({ ...tempConfig, filter: v.target.value })}

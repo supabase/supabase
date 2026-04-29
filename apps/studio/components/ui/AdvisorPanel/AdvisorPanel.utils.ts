@@ -176,7 +176,10 @@ export const getLintEntityString = (lint: Lint | null): string | undefined => {
   }
 
   if (lint.metadata.schema && lint.metadata.name) {
-    return `${lint.metadata.schema}.${lint.metadata.name}`
+    const extendedMetadata = lint.metadata as typeof lint.metadata & { arguments?: string }
+    const args =
+      typeof extendedMetadata.arguments === 'string' ? extendedMetadata.arguments : undefined
+    return `${lint.metadata.schema}.${lint.metadata.name}${args !== undefined ? `(${args})` : ''}`
   }
 
   return undefined
