@@ -1,11 +1,11 @@
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import {
   formatFilterURLParams,
   formatSortURLParams,
   handleCellKeyDown,
-  handleSelectedCellCopy,
 } from '@/components/grid/SupabaseGrid.utils'
+import { writeTextToClipboard } from '@/components/grid/utils/common'
 
 // Sort URL syntax: `column:order`
 describe('SupabaseGrid.utils: formatSortURLParams', () => {
@@ -100,30 +100,23 @@ describe('SupabaseGrid.utils: handleCellKeyDown', () => {
   })
 })
 
-describe('SupabaseGrid.utils: handleSelectedCellCopy', () => {
+describe('Grid clipboard utils', () => {
   beforeEach(() => {
-    vi.restoreAllMocks()
+    vi.unstubAllGlobals()
   })
 
-  test('should set clipboard data for the selected cell', () => {
-    vi.spyOn(window, 'getSelection').mockReturnValue({
-      isCollapsed: true,
-    } as Selection)
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
 
-    const setData = vi.fn()
-    const preventDefault = vi.fn()
+  test('should write text directly to the clipboard', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
 
-    handleSelectedCellCopy({
-      event: {
-        clipboardData: { setData } as unknown as DataTransfer,
-        preventDefault,
-      },
-      selectedCellPosition: { idx: 0, rowIdx: 0 },
-      gridColumns: [{ key: 'name' }],
-      rows: [{ name: 'hello from safari' }] as any,
+    vi.stubGlobal('navigator', {
+      clipboard: { writeText },
     })
 
-    expect(setData).toHaveBeenCalledWith('text/plain', 'hello from safari')
-    expect(preventDefault).toHaveBeenCalled()
+    await expect(writeTextToClipboard('hello from safari')).resolves.toBe(true)
+    expect(writeText).toHaveBeenCalledWith('hello from safari')
   })
 })

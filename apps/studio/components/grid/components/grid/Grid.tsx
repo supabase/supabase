@@ -3,7 +3,7 @@ import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortabl
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { forwardRef, memo, Ref, useCallback, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
-import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
+import DataGrid, { CalculatedColumn, CopyEvent, DataGridHandle } from 'react-data-grid'
 import { Button, cn, DropdownMenu, DropdownMenuTrigger } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ref as valtioRef } from 'valtio'
@@ -15,7 +15,8 @@ import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import { RowContextMenuContent } from '../menu/RowContextMenu'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
-import { handleCellKeyDown, handleSelectedCellCopy } from '@/components/grid/SupabaseGrid.utils'
+import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
+import { formatClipboardValue, writeTextToClipboard } from '@/components/grid/utils/common'
 import { formatForeignKeys } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -249,6 +250,11 @@ export const Grid = memo(
         event.currentTarget.focus()
       }, [])
 
+      const handleCellCopy = useCallback(({ sourceRow, sourceColumnKey }: CopyEvent<SupaRow>) => {
+        const value = formatClipboardValue(sourceRow[sourceColumnKey] ?? '')
+        void writeTextToClipboard(value)
+      }, [])
+
       const handleCellContextMenu = useCallback(
         (
           args: {
@@ -280,14 +286,6 @@ export const Grid = memo(
           onDragOver={onDragOver}
           onDragLeave={onDragOver}
           onDrop={onFileDrop}
-          onCopyCapture={(event) =>
-            handleSelectedCellCopy({
-              event: event.nativeEvent,
-              selectedCellPosition: snap.selectedCellPosition,
-              gridColumns: snap.gridColumns,
-              rows: rows ?? [],
-            })
-          }
         >
           {/* Render no rows fallback outside of the DataGrid */}
           {(rows ?? []).length === 0 && (
@@ -432,6 +430,7 @@ export const Grid = memo(
                   onRowsChange={onRowsChange}
                   onSelectedCellChange={onSelectedCellChange}
                   onSelectedRowsChange={onSelectedRowsChange}
+                  onCopy={handleCellCopy}
                   onCellClick={handleCellClick}
                   onCellContextMenu={handleCellContextMenu}
                   onCellDoubleClick={(props) => {

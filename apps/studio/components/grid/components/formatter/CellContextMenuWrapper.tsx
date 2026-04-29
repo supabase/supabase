@@ -6,10 +6,9 @@ import {
   ContextMenu_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuTrigger_Shadcn_,
-  copyToClipboard,
 } from 'ui'
 
-import { formatClipboardValue } from '../../utils/common'
+import { formatClipboardValue, writeTextToClipboard } from '../../utils/common'
 
 /**
  * [Joshen] RowRenderer should be using this so that we can deprecate `react-contextify`
@@ -21,8 +20,10 @@ export const CellContextMenuWrapper = ({
 }: PropsWithChildren<{ value: string | number | boolean | object | null }>) => {
   const onCopyCellContent = () => {
     const text = formatClipboardValue(value)
-    copyToClipboard(text)
-    toast.success('Copied cell value to clipboard')
+    void writeTextToClipboard(text).then((isCopied) => {
+      if (isCopied) toast.success('Copied cell value to clipboard')
+      else toast.error('Failed to copy cell value')
+    })
   }
 
   return (

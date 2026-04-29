@@ -12,7 +12,6 @@ import {
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import type { Sort, SupaColumn, SupaRow, SupaTable } from './types'
-import { formatClipboardValue } from './utils/common'
 import { isBoolColumn } from './utils/types'
 import type { Filter, SavedState } from '@/components/grid/types'
 import { Entity, isTableLike } from '@/data/table-editor/table-editor-types'
@@ -311,29 +310,4 @@ export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
   const updatedRows = [...context.rows]
   updatedRows[rowIdx] = { ...row, [column.key]: nextValue }
   context.onRowsChange(updatedRows, { indexes: [rowIdx], column })
-}
-
-export function handleSelectedCellCopy<TRow extends SupaRow = SupaRow>({
-  event,
-  selectedCellPosition,
-  gridColumns,
-  rows,
-}: {
-  event: Pick<ClipboardEvent, 'clipboardData' | 'preventDefault'>
-  selectedCellPosition: { idx: number; rowIdx: number } | null
-  gridColumns: Pick<CalculatedColumn<TRow, unknown>, 'key'>[]
-  rows: TRow[]
-}) {
-  if (!selectedCellPosition) return
-
-  const selectedText = window.getSelection()
-  if (selectedText?.isCollapsed === false) return
-
-  const column = gridColumns[selectedCellPosition.idx]
-  const row = rows[selectedCellPosition.rowIdx]
-  if (!column || !row) return
-
-  const value = formatClipboardValue(row[column.key] ?? '')
-  event.clipboardData?.setData('text/plain', value)
-  event.preventDefault()
 }
