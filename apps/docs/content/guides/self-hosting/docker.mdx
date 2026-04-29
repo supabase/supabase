@@ -184,8 +184,6 @@ The generated secrets and password are written to the `.env` file. The ones you 
 - `SUPABASE_SECRET_KEY`: secret API key for server-side use. Never expose this in client code
 - `SUPABASE_PUBLIC_URL`: base URL you pass as `supabaseUrl` to the client libraries
 
-If you are still using the [legacy API keys](#configuring-legacy-api-keys), look for `ANON_KEY` and `SERVICE_ROLE_KEY` instead of the new publishable and secret API keys above.
-
 ### Studio authentication
 
 Access to Studio (Dashboard) is protected with **HTTP basic authentication**.
@@ -395,22 +393,6 @@ sh utils/db-passwd.sh
 ```
 
 The script generates a new password, updates all database roles, and modifies your `.env` file. After running it, restart the services with `docker compose up -d --force-recreate`.
-
-### Configuring legacy API keys
-
-Use the key generator below to obtain and configure the following secure keys in `.env`:
-
-- `JWT_SECRET`: Used by Auth, PostgREST, and other services to sign and verify JWTs.
-- `ANON_KEY`: Client-side API key with limited permissions (`anon` role). Use this in your frontend applications.
-- `SERVICE_ROLE_KEY`: Server-side API key with full database access (`service_role` role). **Never expose this in client code.**
-
-<JwtGeneratorSimple />
-
-1. Copy the generated value and update `JWT_SECRET` in the `.env` file. Do not share this secret publicly or commit it to version control.
-2. Copy the generated value and update `ANON_KEY` in the `.env` file.
-3. Copy the generated value and update `SERVICE_ROLE_KEY` in the `.env` file.
-
-The generated keys expire in 5 years. You can verify them at [jwt.io](https://jwt.io) using the saved value of `JWT_SECRET`.
 
 ### Configuring secrets
 
