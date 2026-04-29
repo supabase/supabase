@@ -1,3 +1,4 @@
+import { isError, isError } from 'node:util'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import Head from 'next/head'
@@ -79,9 +80,9 @@ const StripeProjectsLoginPage = () => {
 
   const {
     data: accountRequest,
-    isPending,
-    isSuccess,
-    isError,
+    isPending: isQueryPending,
+    isSuccess: isQuerySuccess,
+    isError: isQueryError,
     error,
   } = useQuery({
     ...accountRequestQueryOptions({ arId: ar_id }),
@@ -90,8 +91,8 @@ const StripeProjectsLoginPage = () => {
 
   const {
     mutate: confirmAccountRequest,
-    isPending: isConfirming,
-    isSuccess: isConfirmed,
+    isPending: isConfirmationPending,
+    isSuccess: isConfirmationSuccess,
   } = useConfirmAccountRequestMutation()
 
   useEffect(() => {
@@ -113,7 +114,7 @@ const StripeProjectsLoginPage = () => {
       }, 1200)
       return
     }
-    if (!ar_id || isConfirming) return
+    if (!ar_id || isConfirmationPending) return
     confirmAccountRequest({ arId: ar_id })
   }
 
@@ -121,11 +122,11 @@ const StripeProjectsLoginPage = () => {
   const effectiveAccountRequest = isMockMode
     ? MOCK_RESPONSES[mockParam as MockState]
     : accountRequest
-  const effectiveIsPending = isMockMode ? false : isPending
-  const effectiveIsSuccess = isMockMode ? mockParam !== 'success' : isSuccess
-  const effectiveIsConfirmed = isMockMode ? mockParam === 'success' || mockConfirmed : isConfirmed
-  const effectiveIsConfirming = isMockMode ? mockConfirming : isConfirming
-  const effectiveIsError = isMockMode ? false : isError
+  const isPending = isMockMode ? false : isQueryPending
+  const isSuccess = isMockMode ? mockParam !== 'success' : isQuerySuccess
+  const isConfirmed = isMockMode ? mockParam === 'success' || mockConfirmed : isConfirmationSuccess
+  const isConfirming = isMockMode ? mockConfirming : isConfirmationPending
+  const isError = isMockMode ? false : isQueryError
 
   const linkedOrg = effectiveAccountRequest?.linked_organization
   const emailMatches = effectiveAccountRequest?.email_matches ?? false
@@ -144,12 +145,12 @@ const StripeProjectsLoginPage = () => {
         </div>
       )}
       <div className="flex flex-col items-center min-h-[500px] max-w-[400px] mx-auto">
-        {effectiveIsConfirming ? (
+        {isConfirming ? (
           <>
             <LogoLoader />
             <p className="pt-4 text-foreground-light">{loadingText}</p>
           </>
-        ) : effectiveIsConfirmed ? (
+        ) : isConfirmed ? (
           <>
             <StripeIcon />
             <h2 className="py-2 text-lg font-medium">{successTitle}</h2>
@@ -158,9 +159,9 @@ const StripeProjectsLoginPage = () => {
               You can close this window.
             </p>
           </>
-        ) : effectiveIsPending ? (
+        ) : isPending ? (
           <LogoLoader />
-        ) : effectiveIsSuccess ? (
+        ) : isSuccess ? (
           <>
             <StripeIcon />
             <h2 className="py-2 text-lg font-medium text-balance">
@@ -201,7 +202,7 @@ const StripeProjectsLoginPage = () => {
                   <Button
                     size="small"
                     type="primary"
-                    disabled={effectiveIsConfirming}
+                    disabled={isConfirming}
                     onClick={handleApprove}
                   >
                     Authorize Stripe Projects
@@ -211,18 +212,13 @@ const StripeProjectsLoginPage = () => {
             ) : (
               // No linked org — a new one will be created
               <div className="py-6">
-                <Button
-                  size="small"
-                  type="primary"
-                  disabled={effectiveIsConfirming}
-                  onClick={handleApprove}
-                >
+                <Button size="small" type="primary" disabled={isConfirming} onClick={handleApprove}>
                   Authorize Stripe Projects
                 </Button>
               </div>
             )}
           </>
-        ) : effectiveIsError ? (
+        ) : isError ? (
           <>
             <h2 className="py-2 text-lg font-medium text-destructive">Error</h2>
             <p className="text-foreground-light">{error?.message}</p>
