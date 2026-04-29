@@ -65,7 +65,7 @@ const LintDetail = ({ lint, projectRef, onAskAssistant, onAfterAction }: LintDet
       </Markdown>
 
       <h3 className="text-sm mb-2">Resolve</h3>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <AiAssistantDropdown
           label="Ask Assistant"
           buildPrompt={buildPromptForCopy}
