@@ -12,7 +12,10 @@ import useLatest from '@/hooks/misc/useLatest'
 const hotkeyToKeys = (hotkey: string): string[] =>
   hotkey.split('+').map((part) => (part === 'Mod' ? 'Meta' : part))
 
-const orderShortcutCommands = (commands: Array<{ id: string }>, commandsToInsert: Array<{ id: string }>) => {
+const orderShortcutCommands = (
+  commands: Array<{ id: string }>,
+  commandsToInsert: Array<{ id: string }>
+) => {
   const mergedCommands = [...commands, ...commandsToInsert]
 
   return mergedCommands.sort((a, b) => {

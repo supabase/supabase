@@ -1,6 +1,6 @@
 import { render, renderHook } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ICommand } from 'ui-patterns/CommandMenu/api/types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from './registry'
 import { useShortcut } from './useShortcut'
