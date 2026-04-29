@@ -35,7 +35,7 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
       <TableCell>
         <Tooltip>
           <TooltipTrigger
-            onClick={(e) => {
+            onClick={() => {
               copyToClipboard(secret.name)
               toast.success(`Copied ${secret.name}`)
             }}

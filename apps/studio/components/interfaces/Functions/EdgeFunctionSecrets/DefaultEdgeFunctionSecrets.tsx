@@ -47,7 +47,7 @@ const SecretRow = ({ secret }: { secret: DefaultEdgeFunctionSecret }) => {
         <div className="flex items-center gap-x-2 py-1">
           <Tooltip>
             <TooltipTrigger
-              onClick={(e) => {
+              onClick={() => {
                 copyToClipboard(secret.name)
                 toast.success(`Copied ${secret.name}`)
               }}
