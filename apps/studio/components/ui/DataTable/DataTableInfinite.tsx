@@ -153,7 +153,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                     disabled={isFetching}
                     onClick={() => fetchNextPage()}
                     size="small"
-                    type="outline"
+                    type="default"
                     icon={
                       isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null
                     }
