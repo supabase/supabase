@@ -19,10 +19,7 @@ interface WebhookPayload {
   old_record: null | Notification
 }
 
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_SECRET_KEY')!
-)
+const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SECRET_KEY')!)
 
 Deno.serve(async (req) => {
   const payload: WebhookPayload = await req.json()

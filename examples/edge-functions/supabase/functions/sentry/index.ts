@@ -7,10 +7,7 @@ console.log('Hello from the Sentry Functions Challenge!')
 import { createClient } from 'npm:supabase-js@2'
 import * as Sentry from 'https://deno.land/x/sentry@7.102.0/index.mjs'
 
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_SECRET_KEY')!
-)
+const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SECRET_KEY')!)
 
 Sentry.init({
   dsn: Deno.env.get('SENTRY_DSN'),
