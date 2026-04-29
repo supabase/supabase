@@ -28,12 +28,12 @@ function buildItemsXml(sorted) {
       const canonicalUrl = e.number ? `https://supabase.com/changelog/${e.number}` : e.url
       const encodedCanonical = xmlEncodeRss(canonicalUrl)
       const pubDate = formatRssPubDate(e.sortDate)
-      return `<item>
-  <guid isPermaLink="true">${encodedCanonical}</guid>
-  <title>${encodedTitle}</title>
-  <link>${encodedCanonical}</link>
-  <pubDate>${pubDate}</pubDate>
-</item>`
+      return `      <item>
+        <guid isPermaLink="true">${encodedCanonical}</guid>
+        <title>${encodedTitle}</title>
+        <link>${encodedCanonical}</link>
+        <pubDate>${pubDate}</pubDate>
+      </item>`
     })
     .join('\n')
 }
@@ -70,9 +70,9 @@ export function generateChangelogRssXml(entries) {
       <language>en</language>
       <lastBuildDate>${lastBuildDate}</lastBuildDate>
       <atom:link href="https://supabase.com/changelog-rss.xml" rel="self" type="application/rss+xml"/>
-      ${buildItemsXml(sorted)}
-    </channel>
-  </rss>
+${buildItemsXml(sorted)}
+  </channel>
+</rss>
 `
 }
 
@@ -108,8 +108,8 @@ export function generateChangelogTagRssXml(allEntries, tag) {
       <language>en</language>
       <lastBuildDate>${lastBuildDate}</lastBuildDate>
       <atom:link href="${feedUrl}" rel="self" type="application/rss+xml"/>
-      ${buildItemsXml(sorted)}
-    </channel>
-  </rss>
+${buildItemsXml(sorted)}
+  </channel>
+</rss>
 `
 }
