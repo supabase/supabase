@@ -44,74 +44,96 @@ const defaultDark: { [name: string]: string } = {
  * - append "#theme-sandbox" to the url
  * - select "Apply Theme" to apply preset (localStorage will keep track of changes so you don't lose new values)
  * - select "Reset localStorage" and refresh page to restart
+ *
+ * Hooks are called unconditionally so the server and client agree on hook
+ * count — guarding the work inside `useEffect` keeps SSR clean and avoids
+ * BAILOUT_TO_CLIENT_SIDE_RENDERING on preview deploys (FE-3079).
  */
-export const useThemeSandbox = (): any => {
-  const isWindowUndefined = typeof window === 'undefined'
-  if (isWindowUndefined || IS_PROD) return null
-  const hash = window.location.hash
-  const defaultConfig = defaultDark // use dark default tokens
-  // const defaultConfig = defaultLight // use light default tokens
-  const localPreset = localStorage.getItem('theme-sandbox')
-  const isSandbox = hash.includes('#theme-sandbox') || localPreset !== null
-  const [themeConfig, setThemeConfig] = useState(
-    localPreset ? JSON.parse(localPreset) : defaultConfig
-  )
-  const styles = document.querySelector(':root') as any
-
-  const handleSetThemeConfig = (name: string, value: any) => {
-    updateCSSVariables()
-    setThemeConfig((prevConfig: any) => ({ ...prevConfig, [name]: value }))
-  }
-
-  const updateCSSVariables = () => {
-    Object.entries(themeConfig).map(([key, value]) => styles.style.setProperty(key, value))
-    localStorage.setItem('theme-sandbox', JSON.stringify(themeConfig))
-  }
-
-  const init = async () => {
-    if (!isSandbox) return
-    const dat = await import('dat.gui')
-    const gui = new dat.GUI()
-
-    gui.width = 500
-
-    Object.entries(defaultConfig).map(([key, _value]) => {
-      if (!themeConfig[key]) return localStorage.removeItem('theme-sandbox')
-      const folderName = key.split('-')[2]
-      const folder = gui.__folders[folderName] ?? gui.addFolder(folderName)
-
-      return folder
-        .add(themeConfig, key)
-        .name(key)
-        .onChange((newValue) => {
-          handleSetThemeConfig(key, newValue)
-        })
-    })
-
-    var obj = {
-      'Apply Theme': function () {
-        updateCSSVariables()
-      },
-      'Exit Sandbox': function () {
-        gui.destroy()
-      },
-      'Reset localStorage': function () {
-        localStorage.removeItem('theme-sandbox')
-        setThemeConfig(defaultConfig)
-      },
-    }
-
-    gui.add(obj, 'Apply Theme')
-    gui.add(obj, 'Reset localStorage')
-    gui.add(obj, 'Exit Sandbox')
-    gui.load
-  }
+export const useThemeSandbox = (): null => {
+  const [, setThemeConfig] = useState<{ [name: string]: string }>(defaultDark)
 
   useEffect(() => {
-    init()
+    if (IS_PROD || typeof window === 'undefined') return
+
+    const hash = window.location.hash
+    const localPreset = localStorage.getItem('theme-sandbox')
+    const isSandbox = hash.includes('#theme-sandbox') || localPreset !== null
+
+    let currentConfig: { [name: string]: string } = defaultDark
+    if (localPreset) {
+      try {
+        currentConfig = JSON.parse(localPreset)
+        setThemeConfig(currentConfig)
+      } catch {
+        // ignore malformed preset
+      }
+    }
+
+    if (!isSandbox) return
+
+    const styles = document.querySelector(':root') as HTMLElement | null
+
+    const updateCSSVariables = () => {
+      Object.entries(currentConfig).forEach(([key, value]) => {
+        styles?.style.setProperty(key, value)
+      })
+      localStorage.setItem('theme-sandbox', JSON.stringify(currentConfig))
+    }
+
+    const handleSetThemeConfig = (name: string, value: string) => {
+      currentConfig = { ...currentConfig, [name]: value }
+      updateCSSVariables()
+      setThemeConfig(currentConfig)
+    }
+
+    let gui: any
+    let cancelled = false
+
+    ;(async () => {
+      const dat = await import('dat.gui')
+      if (cancelled) return
+
+      gui = new dat.GUI()
+      gui.width = 500
+
+      Object.entries(defaultDark).forEach(([key]) => {
+        if (!currentConfig[key]) {
+          localStorage.removeItem('theme-sandbox')
+          return
+        }
+        const folderName = key.split('-')[2]
+        const folder = gui.__folders[folderName] ?? gui.addFolder(folderName)
+
+        folder
+          .add(currentConfig, key)
+          .name(key)
+          .onChange((newValue: string) => {
+            handleSetThemeConfig(key, newValue)
+          })
+      })
+
+      const obj = {
+        'Apply Theme': () => updateCSSVariables(),
+        'Exit Sandbox': () => gui?.destroy(),
+        'Reset localStorage': () => {
+          localStorage.removeItem('theme-sandbox')
+          currentConfig = defaultDark
+          setThemeConfig(defaultDark)
+        },
+      }
+
+      gui.add(obj, 'Apply Theme')
+      gui.add(obj, 'Reset localStorage')
+      gui.add(obj, 'Exit Sandbox')
+    })()
+
+    return () => {
+      cancelled = true
+      gui?.destroy()
+    }
   }, [])
 
-  return { themeConfig, handleSetThemeConfig, isSandbox }
+  return null
 }
 
 export default useThemeSandbox
