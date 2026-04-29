@@ -219,7 +219,7 @@ function generateMdx(categories: SpecCategory[], config: SpecConfig, specDir: st
       lines.push('', '<hr />', '')
     }
 
-    lines.push(`<Heading tag="h2" customAnchor="${catSlug}">${category}</Heading>`, '')
+    lines.push(`<Heading tag="h2" customAnchor="${catSlug}">${category.trim()}</Heading>`, '')
 
     // Insert optional partial: <specDir>/<category-slug>.partial.mdx
     const partialPath = join(specDir, `${catSlug}.partial.mdx`)
