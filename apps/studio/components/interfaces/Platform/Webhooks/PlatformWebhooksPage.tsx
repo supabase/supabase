@@ -50,7 +50,6 @@ import {
   shouldHandleEndpointNotFound,
 } from './PlatformWebhooksPage.utils'
 import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
