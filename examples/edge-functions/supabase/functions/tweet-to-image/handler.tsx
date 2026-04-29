@@ -68,7 +68,7 @@ export async function handler(req: Request) {
       // Supabase API URL - env var exported by default when deployed.
       Deno.env.get('SUPABASE_URL') ?? '',
       // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SECRET_KEY') ?? ''
     )
 
     // Upload image to storage.

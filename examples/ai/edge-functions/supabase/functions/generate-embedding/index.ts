@@ -14,7 +14,7 @@ interface WebhookPayload {
 
 const supabase = createClient<Database>(
   Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  Deno.env.get('SUPABASE_SECRET_KEY')!
 )
 
 const model = new Supabase.ai.Session('gte-small')

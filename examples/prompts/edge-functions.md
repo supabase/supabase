@@ -20,7 +20,7 @@ You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **h
 8. Following environment variables (ie. secrets) are pre-populated in both local and hosted Supabase environments. Users don't need to manually set them:
    - SUPABASE_URL
    - SUPABASE_PUBLISHABLE_KEY
-   - SUPABASE_SERVICE_ROLE_KEY
+   - SUPABASE_SECRET_KEY
    - SUPABASE_DB_URL
 9. To set other environment variables (ie. secrets) users can put them in a env file and run the `supabase secrets set --env-file path/to/env-file`
 10. A single Edge Function can handle multiple routes. It is recommended to use a library like Express or Hono to handle the routes as it's easier for developer to understand and maintain. Each route must be prefixed with `/function-name` so they are routed correctly.

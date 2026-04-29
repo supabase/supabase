@@ -26,6 +26,6 @@ Deno.serve((req) => {
   const { method, headers } = req
   // Add Auth header
   const modHeaders = new Headers(headers)
-  modHeaders.append('authorization', `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!}`)
+  modHeaders.append('authorization', `Bearer ${Deno.env.get('SUPABASE_SECRET_KEY')!}`)
   return fetch(url, { method, headers: modHeaders })
 })

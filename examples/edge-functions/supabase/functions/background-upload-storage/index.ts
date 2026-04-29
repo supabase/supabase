@@ -5,7 +5,7 @@ const client = new OpenAI({ apiKey: Deno.env.get('OPENAI_API_KEY')! })
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  Deno.env.get('SUPABASE_SECRET_KEY')!
 )
 
 type StorageFileApi = ReturnType<typeof supabase.storage.from>

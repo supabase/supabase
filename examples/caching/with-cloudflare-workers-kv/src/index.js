@@ -34,11 +34,9 @@ router.get('/articles', async (request, { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY
   return json(data)
 })
 
-router.get(
-  '/articles/:id',
-  async (request, { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, ARTICLES }) => {
-    const { id } = request.params
-    const cachedArticle = await readFrom(ARTICLES, `/articles/${id}`)
+router.get('/articles/:id', async (request, { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, ARTICLES }) => {
+  const { id } = request.params
+  const cachedArticle = await readFrom(ARTICLES, `/articles/${id}`)
 
     if (cachedArticle) {
       console.log('sending the cache')
@@ -55,7 +53,17 @@ router.get(
 
     return json(data)
   }
-)
+
+  console.log('fetching fresh article')
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+
+  const { data } = await supabase.from('articles').select('*').match({ id }).single()
+
+  await writeTo(ARTICLES, `/articles/${id}`, data)
+
+  return json(data)
+})
 
 router.post(
   '/revalidate',
