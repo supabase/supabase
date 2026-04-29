@@ -221,13 +221,16 @@ export function applyPriorDecisionToSDK(
     }
 
     // priorDecision.kind === 'decisions'. Only suppress the banner if the
-    // stored decisions cover every non-essential service the SDK currently
-    // knows about. If the ruleset has grown since the user's ucData/
-    // uc_settings was written, force a re-prompt rather than silently
+    // stored decisions cover every non-essential, non-hidden service the SDK
+    // currently knows about. If the ruleset has grown since the user's
+    // ucData/uc_settings was written, force a re-prompt rather than silently
     // defaulting the new service. Essentials are skipped because the SDK
-    // forces them on regardless of user decision.
+    // forces them on regardless of user decision; hidden services are skipped
+    // because they don't appear in the Privacy Settings UI, so the user
+    // cannot have a stored decision for them and the SDK manages their state
+    // independently.
     const currentNonEssentialIds = UC.getServicesBaseInfo()
-      .filter((s) => !s.isEssential)
+      .filter((s) => !s.isEssential && !s.isHidden)
       .map((s) => s.id)
     const coveredIds = new Set(priorDecision.decisions.map((d) => d.serviceId))
     const allCovered = currentNonEssentialIds.every((id) => coveredIds.has(id))

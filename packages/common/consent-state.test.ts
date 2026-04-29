@@ -311,7 +311,7 @@ describe('detectPriorConsent', () => {
 })
 
 describe('applyPriorDecisionToSDK', () => {
-  type MockService = { id: string; isEssential: boolean }
+  type MockService = { id: string; isEssential: boolean; isHidden?: boolean }
 
   const makeMockUC = (
     opts: {
@@ -401,6 +401,29 @@ describe('applyPriorDecisionToSDK', () => {
       services: [
         { id: 'essential_new', isEssential: true }, // not in decisions, but essential
         { id: 'tracking1', isEssential: false },
+      ],
+    })
+
+    applyPriorDecisionToSDK(
+      UC as never,
+      { initialLayer: 0 },
+      { kind: 'decisions', decisions: [{ serviceId: 'tracking1', status: false }] }
+    )
+
+    expect(UC.updateServices).toHaveBeenCalledOnce()
+    expect(consentState.showConsentToast).toBe(false)
+  })
+
+  // Hidden services are managed independently by the SDK and don't appear
+  // in the user's Privacy Settings UI, so the user cannot have stored a
+  // decision for them. Like essentials, they must be excluded from the
+  // coverage check — otherwise a ruleset containing any hidden non-essential
+  // service would force every returning user to re-prompt forever.
+  it('decisions with uncovered hidden non-essential: still restores (hidden services ignored in coverage check)', () => {
+    const UC = makeMockUC({
+      services: [
+        { id: 'tracking1', isEssential: false, isHidden: false },
+        { id: 'tracking_hidden', isEssential: false, isHidden: true }, // not in decisions, but hidden
       ],
     })
 
