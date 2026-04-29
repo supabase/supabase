@@ -601,6 +601,16 @@ const nextConfig = {
   },
   transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'api-types', 'icons'],
   serverExternalPackages: ['libpg-query'],
+  webpack(config, { isServer }) {
+    if (!isServer) {
+      config.experiments = { ...config.experiments, asyncWebAssembly: true }
+      config.output = {
+        ...config.output,
+        webassemblyModuleFilename: 'static/wasm/[modulehash].wasm',
+      }
+    }
+    return config
+  },
   turbopack: {
     rules: {
       '*.md': {

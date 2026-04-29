@@ -73,6 +73,13 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
           url: `${baseUrl}/policies`,
           items: [],
         },
+        {
+          name: 'RLS Playground',
+          key: 'rls-playground',
+          url: `${baseUrl}/rls-playground`,
+          items: [],
+          label: 'Beta',
+        },
         ...(isPlatform
           ? [
               ...(features.signInProviders
