@@ -9,6 +9,7 @@ import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableCo
 
 export interface BlockSection {
   title: string
+  icon?: LucideIcon
   fields: BlockFieldConfig[]
   collapsible?: boolean
 }
@@ -101,7 +102,7 @@ export function createBlock(config: BlockConfig) {
           const blockSection = section as BlockSection
           return (
             <span key={blockSection.title} className="contents">
-              <DetailSectionHeader title={blockSection.title} />
+              <DetailSectionHeader title={blockSection.title} icon={blockSection.icon} />
               {blockSection.fields.map((field) => (
                 <FieldRow
                   key={field.id}

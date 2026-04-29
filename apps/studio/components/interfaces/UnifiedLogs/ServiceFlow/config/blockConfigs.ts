@@ -1,4 +1,16 @@
-import { Globe, HardDrive, Lock, Server, Zap } from 'lucide-react'
+import {
+  Cable,
+  Code,
+  Globe,
+  HardDrive,
+  Lock,
+  MonitorDot,
+  PackageOpen,
+  ReceiptText,
+  Server,
+  ShieldCheck,
+  Zap,
+} from 'lucide-react'
 
 import { BlockConfig } from '../components/shared/Block'
 import {
@@ -35,8 +47,8 @@ export const postgrestBlockConfig: BlockConfig = {
   sections: [
     {
       title: 'Response Details',
+      icon: ReceiptText,
       fields: postgrestResponseFields,
-      collapsible: true,
     },
   ],
 }
@@ -64,13 +76,13 @@ export const networkBlockConfig: BlockConfig = {
     },
     {
       title: 'Authorization',
+      icon: ShieldCheck,
       fields: authorizationFields,
-      collapsible: true,
     },
     {
       title: 'Tech Details',
+      icon: MonitorDot,
       fields: techDetailsFields,
-      collapsible: true,
     },
   ],
 }
@@ -82,8 +94,8 @@ export const edgeFunctionBlockConfig: BlockConfig = {
   sections: [
     {
       title: 'Function Details',
+      icon: Code,
       fields: edgeFunctionDetailsFields,
-      collapsible: true,
     },
   ],
 }
@@ -95,8 +107,8 @@ export const storageBlockConfig: BlockConfig = {
   sections: [
     {
       title: 'Storage Details',
+      icon: PackageOpen,
       fields: storageDetailsFields,
-      collapsible: true,
     },
   ],
 }
@@ -107,8 +119,8 @@ export const postgresBlockConfig: BlockConfig = {
   sections: [
     {
       title: 'Connection & Session Details',
+      icon: Cable,
       fields: postgresDetailsFields,
-      collapsible: true,
     },
   ],
 }
