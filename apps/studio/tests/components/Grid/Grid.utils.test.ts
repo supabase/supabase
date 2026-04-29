@@ -1,5 +1,17 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
+const { toastError, toastSuccess } = vi.hoisted(() => ({
+  toastError: vi.fn(),
+  toastSuccess: vi.fn(),
+}))
+
+vi.mock('sonner', () => ({
+  toast: {
+    error: toastError,
+    success: toastSuccess,
+  },
+}))
+
 import {
   formatFilterURLParams,
   formatSortURLParams,
@@ -80,6 +92,8 @@ describe('SupabaseGrid.utils: formatFilterURLParams', () => {
 
 describe('SupabaseGrid.utils: handleCellKeyDown', () => {
   beforeEach(() => {
+    toastError.mockReset()
+    toastSuccess.mockReset()
     vi.unstubAllGlobals()
   })
 
@@ -87,7 +101,7 @@ describe('SupabaseGrid.utils: handleCellKeyDown', () => {
     vi.unstubAllGlobals()
   })
 
-  test('should copy the selected cell value when Meta+C is pressed', () => {
+  test('should copy the selected cell value when Meta+C is pressed', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     vi.stubGlobal('navigator', {
       clipboard: { writeText },
@@ -116,6 +130,9 @@ describe('SupabaseGrid.utils: handleCellKeyDown', () => {
     expect(writeText).toHaveBeenCalledWith('hello from safari')
     expect(event.preventDefault).toHaveBeenCalled()
     expect(event.preventGridDefault).toHaveBeenCalled()
+    await vi.waitFor(() => {
+      expect(toastSuccess).toHaveBeenCalledWith('Copied cell value to clipboard')
+    })
   })
 })
 

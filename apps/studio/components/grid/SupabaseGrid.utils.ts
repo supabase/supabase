@@ -9,6 +9,7 @@ import {
   CellKeyDownArgs,
   RowsChangeData,
 } from 'react-data-grid'
+import { toast } from 'sonner'
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import type { Sort, SupaColumn, SupaRow, SupaTable } from './types'
@@ -290,7 +291,10 @@ export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
     const value = formatClipboardValue(row[column.key] ?? '')
     event.preventDefault()
     event.preventGridDefault()
-    void writeTextToClipboard(value)
+    void writeTextToClipboard(value).then((isCopied) => {
+      if (isCopied) toast.success('Copied cell value to clipboard')
+      else toast.error('Failed to copy cell value')
+    })
     return
   }
 
