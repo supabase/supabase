@@ -28,7 +28,7 @@ import {
   SheetContent,
   SheetFooter,
   SheetSection,
-  Toggle,
+  Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
@@ -288,12 +288,20 @@ export const CreateFunction = ({
                 <>
                   <SheetSection className={focusedEditor ? 'hidden' : ''}>
                     <div className="space-y-8 rounded bg-studio py-4 px-6 border border-overlay">
-                      <Toggle
-                        onChange={() => setAdvancedSettingsShown(!advancedSettingsShown)}
-                        label="Show advanced settings"
-                        checked={advancedSettingsShown}
-                        labelOptional="These are settings that might be familiar for Postgres developers"
-                      />
+                      <FormItem className="flex flex-row items-center justify-between">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Show advanced settings</FormLabel>
+                          <FormDescription>
+                            These are settings that might be familiar for Postgres developers
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={advancedSettingsShown}
+                            onCheckedChange={(checked) => setAdvancedSettingsShown(checked)}
+                          />
+                        </FormControl>
+                      </FormItem>
                     </div>
                   </SheetSection>
                   {advancedSettingsShown && (

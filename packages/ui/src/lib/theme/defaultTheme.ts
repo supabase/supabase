@@ -498,60 +498,6 @@ export default {
   },
 
   /*
-   *  Toggle
-   */
-
-  toggle: {
-    base: `
-      p-0 relative
-      inline-flex shrink-0
-      border-2 border-transparent
-      rounded-full
-      cursor-pointer
-      transition-colors ease-in-out duration-200
-      ${defaults.focus}
-      focus:!ring-border
-      bg-foreground-muted/40
-
-      hover:bg-foreground-muted/60
-    `,
-    active: `
-      !bg-brand
-      !hover:bg-brand
-    `,
-    handle_container: {
-      tiny: 'h-4 w-7',
-      small: 'h-6 w-11',
-      medium: 'h-6 w-11',
-      large: 'h-7 w-12',
-      xlarge: 'h-7 w-12',
-    },
-    handle: {
-      base: `
-        inline-block h-5 w-5
-        rounded-full
-        bg-white
-        shadow ring-0
-        transition
-        ease-in-out duration-200
-      `,
-      tiny: '!h-3 !w-3',
-      small: '!h-5 !w-5',
-      medium: '!h-5 !w-5',
-      large: '!h-6 !w-6',
-      xlarge: '!h-6 !w-6',
-    },
-    handle_active: {
-      tiny: ' translate-x-3 dark:bg-white',
-      small: 'translate-x-5 dark:bg-white',
-      medium: 'translate-x-5 dark:bg-white',
-      large: 'translate-x-5 dark:bg-white',
-      xlarge: 'translate-x-5 dark:bg-white',
-    },
-    disabled: 'opacity-75 cursor-not-allowed',
-  },
-
-  /*
    *  Form Layout
    */
 
