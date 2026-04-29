@@ -64,6 +64,7 @@ async function generate() {
       if (route === '/partners/integrations/[slug]') return null
       if (route === '/launch-week/ticket-image') return null
       if (route === '/launch-week/tickets/[username]') return null
+      if (route === '/changelog/[number]') return null
 
       /**
        * Blog based urls
