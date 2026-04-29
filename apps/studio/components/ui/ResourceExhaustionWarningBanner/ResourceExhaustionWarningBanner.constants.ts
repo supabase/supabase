@@ -13,6 +13,9 @@ interface ResourceWarningMessage {
     critical: { title?: string; description?: string }
   }
   docsUrl?: string
+  // In-app destination for inspecting the metric (e.g. observability charts).
+  // [ref] is replaced with the current project ref at render time.
+  metricsHref?: string
   buttonText?: string
   aiPrompt?: string
   metric: string | null
@@ -75,6 +78,7 @@ export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
       },
     },
     docsUrl: `${DOCS_URL}/guides/troubleshooting/exhaust-disk-io`,
+    metricsHref: '/project/[ref]/observability/database',
     buttonText: 'Upgrade compute',
     aiPrompt:
       'My database is running out of Disk IO budget. Can you query pg_stat_statements to find the top queries by shared blocks read and written, identify which are causing the most disk I/O, and suggest specific optimizations to reduce disk usage?',

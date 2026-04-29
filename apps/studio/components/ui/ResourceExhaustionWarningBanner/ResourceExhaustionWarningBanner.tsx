@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AlertTriangle, BookOpen, ChevronDown, Sparkles, Wrench } from 'lucide-react'
+import { AlertTriangle, BookOpen, ChartLine, ChevronDown, Sparkles, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
@@ -88,6 +88,13 @@ export const ResourceExhaustionWarningBanner = () => {
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.docsUrl
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.docsUrl
+
+  const metricsHref =
+    activeWarnings.length > 1
+      ? undefined
+      : RESOURCE_WARNING_MESSAGES[
+          activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES
+        ]?.metricsHref?.replace('[ref]', ref ?? 'default')
 
   const metric =
     activeWarnings.length > 1
@@ -232,6 +239,14 @@ export const ResourceExhaustionWarningBanner = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {metricsHref !== undefined && (
+                <DropdownMenuItem asChild>
+                  <Link href={metricsHref} className="flex items-center gap-x-2 cursor-pointer">
+                    <ChartLine size={14} />
+                    View metrics
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem asChild>
                 <a
                   href={learnMoreUrl}
