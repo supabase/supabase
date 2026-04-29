@@ -126,6 +126,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
       <DetailSectionHeader
         title="Operation result"
         icon={Clock}
+        topDivider
         summary={
           severity ? (
             <span className="font-mono text-sm uppercase text-foreground">{severity}</span>

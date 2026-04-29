@@ -49,7 +49,7 @@ export const DetailRow = ({
     >
       <span
         aria-hidden
-        className="select-none font-mono text-foreground-muted translate-y-0.5 ml-4"
+        className="select-none font-mono text-foreground-muted translate-y-0.5 ml-5"
       >
         └
       </span>

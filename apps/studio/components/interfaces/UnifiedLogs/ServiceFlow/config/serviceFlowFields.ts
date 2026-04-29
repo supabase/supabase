@@ -703,10 +703,7 @@ export const postgresDetailsFields: BlockFieldConfig[] = [
   {
     id: 'session_id',
     label: 'Session ID',
-    getValue: (data, enrichedData) => {
-      const sessionId = enrichedData?.session_id || data?.session_id
-      return sessionId ? `${sessionId.substring(0, 12)}...` : null
-    },
+    getValue: (data, enrichedData) => enrichedData?.session_id || data?.session_id,
     requiresEnrichedData: true,
   },
   {
