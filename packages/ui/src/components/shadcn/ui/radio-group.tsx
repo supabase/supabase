@@ -73,7 +73,7 @@ const RadioGroupLargeItem = React.forwardRef<
               className={cn(
                 'absolute',
                 'w-[10px] h-[10px]',
-                'left-[1px] top-[1px]',
+                'left-px top-px',
                 'border border-background-surface-300',
                 'rounded-full',
                 'data-[state=checked]:border-background-surface-300',

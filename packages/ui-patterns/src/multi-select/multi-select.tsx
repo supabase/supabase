@@ -340,7 +340,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             )}
             <span
               className={cn(
-                'text-foreground-muted whitespace-nowrap leading-[1.375rem] ml-1 opacity-0 transition-opacity hidden',
+                'text-foreground-muted whitespace-nowrap leading-5.5 ml-1 opacity-0 transition-opacity hidden',
                 !IS_INLINE_MODE &&
                   (persistLabel || values.length === 0) &&
                   'opacity-100 visible inline'

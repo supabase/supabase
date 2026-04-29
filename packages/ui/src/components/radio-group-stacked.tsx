@@ -48,7 +48,7 @@ const RadioGroupStackedItem = React.forwardRef<
         // Enabled/hover states
         'enabled:cursor-pointer enabled:hover:bg-surface-300 enabled:hover:border-foreground-muted',
         // Z-index for interactions
-        'hover:z-[1] focus-visible:z-[1] data-[state=checked]:z-[1]',
+        'hover:z-1 focus-visible:z-1 data-[state=checked]:z-1',
         // Checked state
         'data-[state=checked]:ring-1 data-[state=checked]:ring-border',
         'data-[state=checked]:bg-surface-300 data-[state=checked]:border-foreground-muted',
@@ -82,7 +82,7 @@ const RadioGroupStackedItem = React.forwardRef<
             htmlFor={props.value}
             className={cn(
               // Base styles
-              'block -mt-[0.15rem] text-sm text-left text-light',
+              'block mt-[-0.15rem] text-sm text-left text-light',
               // Transitions
               'transition-colors',
               // States

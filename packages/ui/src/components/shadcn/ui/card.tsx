@@ -21,7 +21,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
     <div
       ref={ref}
       className={cn(
-        'flex flex-col space-y-1.5 py-4 px-[var(--card-padding-x)] border-b',
+        'flex flex-col space-y-1.5 py-4 px-(--card-padding-x) border-b',
         className
       )}
       {...props}
@@ -49,7 +49,7 @@ const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('py-4 px-[var(--card-padding-x)] border-b last:border-none', className)}
+      className={cn('py-4 px-(--card-padding-x) border-b last:border-none', className)}
       {...props}
     />
   )
@@ -60,7 +60,7 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('flex items-center py-4 px-[var(--card-padding-x)]', className)}
+      className={cn('flex items-center py-4 px-(--card-padding-x)', className)}
       {...props}
     />
   )

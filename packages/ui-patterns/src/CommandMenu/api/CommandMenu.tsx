@@ -58,7 +58,7 @@ const CommandWrapper = forwardRef<
       ref={ref}
       className={cn(
         'h-full w-full flex flex-col overflow-hidden',
-        '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
+        '**:[[cmdk-group]]:px-2 **:[[cmdk-group]]:bg-transparent! **:[[cmdk-group-heading]]:bg-transparent! **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger **:[[cmdk-input]]:h-12',
         '[&_[cmdk-item]_svg]:h-5',
         '[&_[cmdk-item]_svg]:w-5',
         '[&_[cmdk-item]_svg]:stroke-1',
@@ -266,7 +266,7 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
         className={cn(
           'relative flex flex-col my-0 mx-auto rounded-t-lg',
           'h-[85dvh] mt-[15vh] md:max-h-[500px] md:mt-0 left-0 bottom-0 md:bottom-auto',
-          '!animate-in !slide-in-from-bottom-[85%] !duration-300',
+          '!animate-in !slide-in-from-bottom-[85%] duration-300!',
           'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
           // Remove defaults set from primitive component
           '!slide-in-from-left-[0%] :!slide-in-from-top-[0%]',

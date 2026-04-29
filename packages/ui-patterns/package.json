@@ -846,7 +846,7 @@
     "api-types": "workspace:*",
     "config": "workspace:*",
     "next-router-mock": "^0.9.13",
-    "tailwindcss": "catalog:",
+    "tailwindcss": "^4.2.4",
     "tsx": "catalog:",
     "typescript": "catalog:",
     "unified": "^11.0.5",

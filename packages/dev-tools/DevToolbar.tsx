@@ -385,16 +385,16 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                 aria-hidden="true"
                 className="shrink-0 mr-4"
               />
-              <TabsList className="flex gap-x-4 rounded-none !border-none h-auto">
+              <TabsList className="flex gap-x-4 rounded-none border-none! h-auto">
                 <TabsTrigger
                   value="events"
-                  className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                  className="text-xs py-3 border-b font-mono uppercase"
                 >
                   Events ({filteredEvents.length})
                 </TabsTrigger>
                 <TabsTrigger
                   value="flags"
-                  className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                  className="text-xs py-3 border-b font-mono uppercase"
                 >
                   Flags {totalOverrideCount > 0 && `(${totalOverrideCount})`}
                 </TabsTrigger>
@@ -402,7 +402,7 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                   <TabsTrigger
                     key={tab.id}
                     value={tab.id}
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                    className="text-xs py-3 border-b font-mono uppercase"
                   >
                     {tab.label}
                   </TabsTrigger>
