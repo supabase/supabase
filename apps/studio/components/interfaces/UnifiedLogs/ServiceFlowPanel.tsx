@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Check, Copy } from 'lucide-react'
+import { Check, Clock, Copy } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -15,8 +15,6 @@ import {
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { PostgresFlowDetail } from './ServiceFlow/components/blocks/PostgresFlowDetail'
-import { MemoizedRequestStartedBlock } from './ServiceFlow/components/blocks/RequestStartedBlock'
-import { MemoizedResponseCompletedBlock } from './ServiceFlow/components/blocks/ResponseCompletedBlock'
 import {
   MemoizedEdgeFunctionBlock,
   MemoizedGoTrueBlock,
@@ -26,6 +24,7 @@ import {
   MemoizedStorageBlock,
 } from './ServiceFlow/components/ServiceBlocks'
 import { ServiceFlowPanelControls } from './ServiceFlow/components/ServiceFlowPanelControls'
+import { DetailSectionHeader } from './ServiceFlow/components/shared/DetailSection'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
@@ -50,6 +49,13 @@ export function ServiceFlowPanel({
   const { ref: projectRef } = useParams()
   const [activeTab, setActiveTab] = useState('overview')
   const [jsonCopied, setJsonCopied] = useState(false)
+
+  const timestampMs = selectedRow?.timestamp
+    ? selectedRow.timestamp / 1000
+    : selectedRow?.date
+      ? selectedRow.date.getTime()
+      : null
+  const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 
   const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
 
@@ -139,8 +145,12 @@ export function ServiceFlowPanel({
                       table={table}
                     />
                   ) : (
-                    <div className="p-4">
-                      <MemoizedRequestStartedBlock data={selectedRow} />
+                    <div className="[&>*:nth-child(even)]:bg-surface-100/50">
+                      <DetailSectionHeader
+                        title="Request started"
+                        icon={Clock}
+                        summary={formattedTime ?? undefined}
+                      />
 
                       <MemoizedNetworkBlock
                         data={selectedRow}
@@ -193,11 +203,6 @@ export function ServiceFlowPanel({
                           />
                         </>
                       )}
-
-                      <MemoizedResponseCompletedBlock
-                        data={selectedRow}
-                        enrichedData={serviceFlowData?.result?.[0]}
-                      />
                     </div>
                   )}
                 </TabsContent>

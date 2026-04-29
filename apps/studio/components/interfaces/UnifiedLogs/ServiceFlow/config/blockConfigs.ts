@@ -1,3 +1,5 @@
+import { Globe, HardDrive, Lock, Server, Zap } from 'lucide-react'
+
 import { BlockConfig } from '../components/shared/Block'
 import {
   apiKeyAdditionalFields,
@@ -22,11 +24,13 @@ import {
 
 export const authBlockConfig: BlockConfig = {
   title: 'Authentication',
+  icon: Lock,
   primaryFields: authPrimaryFields,
 }
 
 export const postgrestBlockConfig: BlockConfig = {
   title: 'Data API',
+  icon: Server,
   primaryFields: postgrestPrimaryFields,
   sections: [
     {
@@ -39,6 +43,7 @@ export const postgrestBlockConfig: BlockConfig = {
 
 export const networkBlockConfig: BlockConfig = {
   title: 'Network',
+  icon: Globe,
   primaryFields: networkPrimaryFields,
   sections: [
     {
@@ -72,6 +77,7 @@ export const networkBlockConfig: BlockConfig = {
 
 export const edgeFunctionBlockConfig: BlockConfig = {
   title: 'Edge Function',
+  icon: Zap,
   primaryFields: edgeFunctionPrimaryFields,
   sections: [
     {
@@ -84,6 +90,7 @@ export const edgeFunctionBlockConfig: BlockConfig = {
 
 export const storageBlockConfig: BlockConfig = {
   title: 'Storage',
+  icon: HardDrive,
   primaryFields: storagePrimaryFields,
   sections: [
     {
