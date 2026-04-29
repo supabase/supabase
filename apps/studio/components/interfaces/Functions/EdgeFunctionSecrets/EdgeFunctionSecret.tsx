@@ -1,7 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Edit2, MoreVertical, Trash } from 'lucide-react'
+import { toast } from 'sonner'
 import {
   Button,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -9,6 +11,9 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 
@@ -28,14 +33,23 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
   return (
     <TableRow>
       <TableCell>
-        <p className="truncate py-2">{secret.name}</p>
+        <Tooltip>
+          <TooltipTrigger
+            onClick={(e) => {
+              copyToClipboard(secret.name)
+              toast.success(`Copied ${secret.name}`)
+            }}
+          >
+            <p className="truncate py-1">
+              <code className="text-code-inline">{secret.name}</code>
+            </p>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Click to copy</TooltipContent>
+        </Tooltip>
       </TableCell>
       <TableCell>
-        <p
-          className="font-mono text-sm max-w-96 truncate text-foreground-light"
-          title={secret.value}
-        >
-          {secret.value}
+        <p className="max-w-96 truncate" title={secret.value}>
+          <code className="text-code-inline !text-foreground-light">{secret.value}</code>
         </p>
       </TableCell>
       <TableCell>

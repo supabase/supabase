@@ -6,10 +6,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import AddNewSecretForm from './AddNewSecretForm'
+import { AddNewSecretForm } from './AddNewSecretForm'
 import { DefaultEdgeFunctionSecrets } from './DefaultEdgeFunctionSecrets'
 import {
   getVisibleDefaultEdgeFunctionSecrets,
@@ -17,9 +17,10 @@ import {
 } from './DefaultEdgeFunctionSecrets.utils'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
 import { EditSecretSheet } from './EditSecretSheet'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useSecretsDeleteMutation } from '@/data/secrets/secrets-delete-mutation'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -142,7 +143,7 @@ export const EdgeFunctionSecrets = () => {
                   <div className="space-y-1">
                     <h3 className="text-foreground text-base">Custom secrets</h3>
                     <p className="text-sm text-foreground-light">
-                      Secrets you have defined for this project.
+                      Secrets you have defined for this project
                     </p>
                   </div>
                   <Input
@@ -195,15 +196,14 @@ export const EdgeFunctionSecrets = () => {
               </section>
 
               <section className="space-y-4">
-                <div className="space-y-1">
-                  <h3 className="text-foreground text-base">Default secrets</h3>
-                  <p className="text-sm text-foreground-light">
-                    Reserved secrets available in every project. Read more about{' '}
-                    <InlineLink href={`${DOCS_URL}/guides/functions/secrets#default-secrets`}>
-                      default secrets
-                    </InlineLink>
-                    .
-                  </p>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                  <div className="space-y-1">
+                    <h3 className="text-foreground text-base">Default secrets</h3>
+                    <p className="text-sm text-foreground-light">
+                      Reserved secrets available in every project
+                    </p>
+                  </div>
+                  <DocsButton href={`${DOCS_URL}/guides/functions/secrets#default-secrets`} />
                 </div>
                 <DefaultEdgeFunctionSecrets secrets={visibleDefaultSecrets} />
               </section>

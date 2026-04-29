@@ -1,4 +1,18 @@
-import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { toast } from 'sonner'
+import {
+  Badge,
+  Card,
+  copyToClipboard,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import type { DefaultEdgeFunctionSecret } from './DefaultEdgeFunctionSecrets.utils'
 
@@ -18,20 +32,39 @@ export const DefaultEdgeFunctionSecrets = ({ secrets }: DefaultEdgeFunctionSecre
         </TableHeader>
         <TableBody>
           {secrets.map((secret) => (
-            <TableRow key={secret.name}>
-              <TableCell>
-                <div className="flex items-center gap-x-2 py-2">
-                  <p className="truncate">{secret.name}</p>
-                  {secret.isDeprecated && <Badge variant="warning">Deprecated</Badge>}
-                </div>
-              </TableCell>
-              <TableCell>
-                <p className="text-sm text-foreground-light">{secret.description}</p>
-              </TableCell>
-            </TableRow>
+            <SecretRow key={secret.name} secret={secret} />
           ))}
         </TableBody>
       </Table>
     </Card>
+  )
+}
+
+const SecretRow = ({ secret }: { secret: DefaultEdgeFunctionSecret }) => {
+  return (
+    <TableRow key={secret.name}>
+      <TableCell>
+        <div className="flex items-center gap-x-2 py-1">
+          <Tooltip>
+            <TooltipTrigger
+              onClick={(e) => {
+                copyToClipboard(secret.name)
+                toast.success(`Copied ${secret.name}`)
+              }}
+            >
+              <p className="truncate">
+                <code className="text-code-inline">{secret.name}</code>
+              </p>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Click to copy</TooltipContent>
+          </Tooltip>
+
+          {secret.isDeprecated && <Badge variant="warning">Deprecated</Badge>}
+        </div>
+      </TableCell>
+      <TableCell>
+        <p className="text-sm text-foreground-light">{secret.description}</p>
+      </TableCell>
+    </TableRow>
   )
 }
