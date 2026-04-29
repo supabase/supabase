@@ -487,8 +487,9 @@ resources:
                                     principals:
                                       - any: true
                             # Enable local access (danger zone!)
-                            # 1. Comment out the `rbac` block above.
-                            # 2. Uncomment and adjust the `rbac` block below.
+                            # 1. Comment out the 'rbac' block above.
+                            # 2. Uncomment and adjust the 'rbac' block below.
+                            # 3. Add or adjust your local IPs in 'principals'.
                             #rbac:
                             #  rules:
                             #    action: ALLOW
