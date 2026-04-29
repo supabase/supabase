@@ -13,12 +13,17 @@ import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 type RowContextMenuContentProps = {
   row: SupaRow
+  selectedCellPosition?: { idx: number; rowIdx: number } | null
 }
 
-export const RowContextMenuContent = ({ row }: RowContextMenuContentProps) => {
+export const RowContextMenuContent = ({
+  row,
+  selectedCellPosition,
+}: RowContextMenuContentProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
   const { deleteRows } = useTableRowOperations()
+  const activeCellPosition = selectedCellPosition ?? snap.selectedCellPosition
 
   const onDeleteRow = useCallback(() => {
     if (!row) {
@@ -33,15 +38,15 @@ export const RowContextMenuContent = ({ row }: RowContextMenuContentProps) => {
   }, [row, tableEditorSnap])
 
   const onCopyCellContent = useCallback(() => {
-    if (!snap.selectedCellPosition) return
+    if (!activeCellPosition) return
 
-    const columnKey = snap.gridColumns[snap.selectedCellPosition.idx as number].key
+    const columnKey = snap.gridColumns[activeCellPosition.idx as number].key
     const value = row[columnKey]
     const text = formatClipboardValue(value)
 
     copyToClipboard(text)
     toast.success('Copied cell value to clipboard')
-  }, [row, snap.gridColumns, snap.selectedCellPosition])
+  }, [activeCellPosition, row, snap.gridColumns])
 
   const onCopyRowContent = useCallback(() => {
     copyToClipboard(JSON.stringify(row))
@@ -49,13 +54,13 @@ export const RowContextMenuContent = ({ row }: RowContextMenuContentProps) => {
   }, [row])
 
   const getRowAndColumn = useCallback(() => {
-    if (!snap.selectedCellPosition) return null
+    if (!activeCellPosition) return null
 
-    const column = snap.gridColumns[snap.selectedCellPosition.idx as number]
+    const column = snap.gridColumns[activeCellPosition.idx as number]
     if (!row || !column) return null
 
     return { row, column }
-  }, [row, snap.selectedCellPosition, snap.gridColumns])
+  }, [activeCellPosition, row, snap.gridColumns])
 
   const onFilterByValue = useCallback(() => {
     const result = getRowAndColumn()

@@ -1,6 +1,18 @@
-import { describe, expect, test } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { formatFilterURLParams, formatSortURLParams } from '@/components/grid/SupabaseGrid.utils'
+import {
+  formatFilterURLParams,
+  formatSortURLParams,
+  handleCellKeyDown,
+} from '@/components/grid/SupabaseGrid.utils'
+
+const { copyToClipboard } = vi.hoisted(() => ({
+  copyToClipboard: vi.fn(),
+}))
+
+vi.mock('ui', () => ({
+  copyToClipboard,
+}))
 
 // Sort URL syntax: `column:order`
 describe('SupabaseGrid.utils: formatSortURLParams', () => {
@@ -70,5 +82,33 @@ describe('SupabaseGrid.utils: formatFilterURLParams', () => {
       operator: '~~*',
       value: '',
     })
+  })
+})
+
+describe('SupabaseGrid.utils: handleCellKeyDown', () => {
+  beforeEach(() => {
+    copyToClipboard.mockReset()
+  })
+
+  test('should copy the selected cell value when Meta+C is pressed', () => {
+    const args = {
+      mode: 'SELECT',
+      column: { key: 'name' },
+      row: { name: 'hello from safari' },
+      rowIdx: 0,
+      selectCell: vi.fn(),
+    } as unknown as Parameters<typeof handleCellKeyDown>[0]
+
+    const event = {
+      key: 'C',
+      metaKey: true,
+      ctrlKey: false,
+      altKey: false,
+      nativeEvent: new KeyboardEvent('keydown', { key: 'C', metaKey: true }),
+    } as unknown as Parameters<typeof handleCellKeyDown>[1]
+
+    handleCellKeyDown(args, event)
+
+    expect(copyToClipboard).toHaveBeenCalledWith('hello from safari')
   })
 })

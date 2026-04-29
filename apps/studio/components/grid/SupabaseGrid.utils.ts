@@ -283,8 +283,9 @@ export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
 ) => {
   const { mode, column, row, rowIdx } = args
   if (mode !== 'SELECT') return
+  const key = event.key.toLowerCase()
 
-  if (event.code === 'KeyC' && (event.metaKey || event.ctrlKey)) {
+  if (key === 'c' && (event.metaKey || event.ctrlKey)) {
     const cellValue = row[column.key] ?? ''
     const value = formatClipboardValue(cellValue)
     copyToClipboard(value)
@@ -298,7 +299,6 @@ export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
   // Toggle boolean cells with T/F when no modifier keys are pressed.
   if (context === undefined) return
 
-  const key = event.key.toLowerCase()
   if (event.altKey || event.ctrlKey || event.metaKey || (key !== 't' && key !== 'f')) return
 
   const supaColumn = context.columns.find((c) => c.name === column.key)
