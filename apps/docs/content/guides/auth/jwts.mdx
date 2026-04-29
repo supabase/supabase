@@ -67,7 +67,7 @@ A [digital signature](https://en.wikipedia.org/wiki/Digital_signature) using a [
 Supabase creates JWTs in these cases for you:
 
 1. When using Supabase Auth, an access token (JWT) is created for each user while they remain signed in. These are short lived, so they are continuously issued as your user interacts with Supabase APIs.
-2. On-the-fly when using publishable or secret API keys. Each API key is transformed into a short-lived JWT that is then used to authorize access to your data. Accessing these short-lived tokens is generally not possible.
+2. **On-the-fly when using publishable or secret API keys**. Each API key is transformed into a short-lived JWT that is then used to authorize access to your data. Accessing these short-lived tokens is generally not possible.
 
 In addition to creating JWTs, Supabase can also accept JWTs from other authentication servers via the [Third-Party Auth](/docs/guides/auth/third-party/overview) feature or ones that have been minted externally via an imported [JWT Signing Key](/docs/guides/auth/signing-keys).
 
