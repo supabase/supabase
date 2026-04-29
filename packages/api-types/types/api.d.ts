@@ -3144,21 +3144,6 @@ export interface components {
         }[]
       }[]
     }
-    JitStateResponse:
-      | {
-          appliedSuccessfully?: boolean
-          /** @enum {string} */
-          state: 'enabled' | 'disabled'
-        }
-      | {
-          /** @enum {string} */
-          state: 'unavailable'
-          /** @enum {string} */
-          unavailableReason:
-            | 'manual_migration_required'
-            | 'postgres_upgrade_required'
-            | 'temporarily_unavailable'
-        }
     LegacyApiKeysResponse: {
       enabled: boolean
     }
@@ -11212,7 +11197,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitStateResponse']
+          'application/json': components['schemas']['JitAccessResponse']
         }
       }
       /** @description Unauthorized */
@@ -11266,7 +11251,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitStateResponse']
+          'application/json': components['schemas']['JitAccessResponse']
         }
       }
       /** @description Unauthorized */
