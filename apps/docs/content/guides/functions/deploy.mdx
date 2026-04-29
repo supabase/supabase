@@ -80,7 +80,7 @@ You can now invoke your Edge Function using one of the project's `PUBLISHABLE_KE
 
 ```bash name=cURL
 curl --request POST 'https://<project_id>.supabase.co/functions/v1/hello-world' \
-  --header 'Authorization: Bearer PUBLISHABLE_KEY' \
+  --header 'apikey: PUBLISHABLE_KEY' \
   --header 'Content-Type: application/json' \
   --data '{ "name":"Functions" }'
 ```
