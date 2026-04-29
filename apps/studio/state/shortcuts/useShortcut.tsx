@@ -3,7 +3,7 @@ import { Fragment, useCallback } from 'react'
 import { KeyboardShortcut } from 'ui'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
-import { SHORTCUT_DEFINITIONS, type ShortcutId } from './registry'
+import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS, type ShortcutId } from './registry'
 import type { ShortcutOptions } from './types'
 import { useIsShortcutEnabled } from './useIsShortcutEnabled'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
@@ -11,6 +11,16 @@ import useLatest from '@/hooks/misc/useLatest'
 
 const hotkeyToKeys = (hotkey: string): string[] =>
   hotkey.split('+').map((part) => (part === 'Mod' ? 'Meta' : part))
+
+const orderShortcutCommands = (commands: Array<{ id: string }>, commandsToInsert: Array<{ id: string }>) => {
+  const mergedCommands = [...commands, ...commandsToInsert]
+
+  return mergedCommands.sort((a, b) => {
+    if (a.id === SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE) return 1
+    if (b.id === SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE) return -1
+    return 0
+  })
+}
 
 /**
  * Subscribe to a registered keyboard shortcut.
@@ -103,6 +113,7 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
     {
       enabled: enabledInCommandMenu,
       deps: depsInCommandMenu,
+      orderCommands: orderShortcutCommands,
       sectionMeta: { priority: 1 },
     }
   )
