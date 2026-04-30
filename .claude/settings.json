@@ -1,4 +1,10 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(node -e \":*)",
+      "Bash(grep -rn \"guides-md\\\\|api/md\\\\|copyAsMarkdown\\\\|copy-as-markdown\\\\|CopyAsMarkdown\" /Users/jeremias/supabase/supabase/apps/docs/ --include=*.ts --include=*.tsx -l)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -22,11 +28,6 @@
           }
         ]
       }
-    ]
-  },
-  "permissions": {
-    "allow": [
-      "Bash(node -e \":*)"
     ]
   }
 }

@@ -1,8 +1,7 @@
-import { isbot } from 'isbot'
-import { NextResponse, type NextRequest } from 'next/server'
-
 import { clientSdkIds } from '~/content/navigation.references'
 import { BASE_PATH } from '~/lib/constants'
+import { isbot } from 'isbot'
+import { NextResponse, type NextRequest } from 'next/server'
 
 const REFERENCE_PATH = `${BASE_PATH ?? ''}/reference`
 
@@ -11,14 +10,23 @@ const GUIDES_PATH = `${BASE_PATH ?? ''}/guides`
 export function middleware(request: NextRequest) {
   const url = new URL(request.url)
 
+  // nomd=1 is set by the /api/md route when a markdown file is not found,
+  // so the middleware skips interception and the normal HTML page is served.
   const requestsMarkdown =
-    request.headers.get('Accept')?.includes('text/markdown') || url.pathname.endsWith('.md')
+    !url.searchParams.has('nomd') &&
+    (request.headers.get('Accept')?.includes('text/markdown') || url.pathname.endsWith('.md'))
 
-  // Serve pre-generated .md files before the [[...slug]] page route can intercept them
-  if (url.pathname.startsWith(GUIDES_PATH + '/') && requestsMarkdown) {
-    const slug = url.pathname.replace(`${GUIDES_PATH}/`, '').replace(/\.md$/, '')
+  // Serve pre-generated .md files for guides and reference routes.
+  // The slug is the full path relative to BASE_PATH (e.g. guides/foo or reference/javascript).
+  if (
+    (url.pathname.startsWith(GUIDES_PATH + '/') ||
+      url.pathname.startsWith(REFERENCE_PATH + '/') ||
+      url.pathname === REFERENCE_PATH) &&
+    requestsMarkdown
+  ) {
+    const slug = url.pathname.replace(`${BASE_PATH ?? ''}/`, '').replace(/\.md$/, '')
     const rewriteUrl = new URL(url)
-    rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/guides-md/${slug}`
+    rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/md/${slug}`
     return NextResponse.rewrite(rewriteUrl)
   }
 
