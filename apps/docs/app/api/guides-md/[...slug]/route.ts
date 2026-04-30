@@ -1,6 +1,6 @@
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
-import { BASE_PATH } from '~/lib/constants'
+import { BASE_PATH, IS_PRODUCTION, PROD_URL } from '~/lib/constants'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request, { params }: { params: Promise<{ slug: string[] }> }) {
@@ -25,11 +25,21 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
   }
 }
 
-async function notFoundResponse(request: Request, slug: string[]) {
-  const { origin } = new URL(request.url)
-  const baseUrl = `${origin}${BASE_PATH}`
+/**
+ * Resolves the docs base URL from trusted sources only.
+ * Avoids host-header-driven SSRF from request origin.
+ */
+function resolveDocsBaseUrl() {
+  if (IS_PRODUCTION) return PROD_URL
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}${BASE_PATH}`
+  if (process.env.NEXT_PUBLIC_SITE_URL) return `${process.env.NEXT_PUBLIC_SITE_URL}${BASE_PATH}`
+  return undefined
+}
+
+async function notFoundResponse(_request: Request, slug: string[]) {
+  const baseUrl = resolveDocsBaseUrl()
   const query = slug.join(' ').replace(/[_-]/g, ' ')
-  const suggestions = await searchForSuggestions(baseUrl, query)
+  const suggestions = baseUrl ? await searchForSuggestions(baseUrl, query) : []
   const markdown = buildNotFoundMarkdown(slug, suggestions)
   return new NextResponse(markdown, {
     status: 404,
