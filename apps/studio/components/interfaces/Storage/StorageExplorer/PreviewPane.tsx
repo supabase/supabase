@@ -157,7 +157,7 @@ export const PreviewPane = () => {
       <div className="w-full space-y-6">
         {/* Preview Information */}
         <div className="space-y-1">
-          <h5 className="break-words text-base text-foreground">{file.name}</h5>
+          <h5 className="wrap-break-word text-base text-foreground">{file.name}</h5>
           {file.isCorrupted && (
             <div className="flex items-center space-x-2">
               <AlertCircle size={14} strokeWidth={2} className="text-foreground-light" />

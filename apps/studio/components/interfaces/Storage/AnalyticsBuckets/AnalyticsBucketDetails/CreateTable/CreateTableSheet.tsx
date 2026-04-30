@@ -235,12 +235,12 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                       </Button>
                     </div>
                     {columns.length === 0 ? (
-                      <div className="flex items-center justify-center rounded border border-strong border-dashed py-4 text-foreground-lighter text-sm">
+                      <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-4 text-foreground-lighter text-sm">
                         Add a column to your table
                       </div>
                     ) : (
                       <>
-                        <div className="grid grid-cols-[1fr,1fr,32px]">
+                        <div className="grid grid-cols-[1fr_1fr_32px]">
                           <p className="text-xs text-foreground-lighter">Name</p>
                           <p className="text-xs text-foreground-lighter">Type</p>
                         </div>
@@ -251,7 +251,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
 
                           return (
                             <Fragment key={`column-${idx}`}>
-                              <div className="grid grid-cols-[1fr,1fr,32px] gap-x-1">
+                              <div className="grid grid-cols-[1fr_1fr_32px] gap-x-1">
                                 <FormField
                                   control={form.control}
                                   name={`columns.${idx}.name`}

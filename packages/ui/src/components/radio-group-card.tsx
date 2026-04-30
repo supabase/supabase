@@ -37,8 +37,8 @@ const RadioGroupCardItem = React.forwardRef<
         'p-2',
         // 'hover:bg-selection',
         'hover:border-foreground-muted',
-        'hover:z-[1] focus-visible:z-[1]',
-        'data-[state=checked]:z-[1]',
+        'hover:z-1 focus-visible:z-1',
+        'data-[state=checked]:z-1',
         'data-[state=checked]:ring-2 data-[state=checked]:ring-border',
         'data-[state=checked]:bg-surface-300 dark:data-[state=checked]:bg-surface-300',
         'data-[state=checked]:border-foreground/50',
@@ -57,7 +57,7 @@ const RadioGroupCardItem = React.forwardRef<
                 group-focus:border-foreground-muted
                 group-hover:border-foreground-muted
                 ring-offset-background
-                group-focus:outline-none
+                group-focus:outline-hidden
                 group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2
                 group-disabled:cursor-not-allowed group-disabled:opacity-50
                 flex items-center justify-center

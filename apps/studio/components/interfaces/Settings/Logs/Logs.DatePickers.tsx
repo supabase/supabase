@@ -337,7 +337,7 @@ export const LogsDatePicker = ({
             placeholder="e.g. 2h, 30m, 7d"
             value={customValue}
             onChange={(e) => setCustomValue(e.target.value)}
-            className="mb-2 text-xs h-7 rounded-sm"
+            className="mb-2 text-xs h-7 rounded-xs"
           />
           <RadioGroup
             onValueChange={handleHelperChange}
@@ -348,7 +348,7 @@ export const LogsDatePicker = ({
               <Label
                 key={helper.text}
                 className={cn(
-                  '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs w-full',
+                  '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-xs text-xs w-full',
                   {
                     'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
                   }

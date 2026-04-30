@@ -249,15 +249,15 @@ const data: () => {
               magic links, OAuth (Google, GitHub, Twitter, etc.), SAML, SSO, and phone/SMS OTP.
             </>
           ),
-          className: '!border-l-0 sm:!border-l sm:!border-t-0',
-          image: <AuthVisual className="2xl:!-bottom-20" />,
+          className: 'border-l-0! sm:border-l! sm:border-t-0!',
+          image: <AuthVisual className="2xl:-bottom-20!" />,
         },
         {
           id: 'rbac',
           title: 'Role-Based Access Control',
           icon: 'M17.6874 22.888V20.3886C17.6874 17.5888 15.4178 15.3192 12.618 15.3192C9.8182 15.3192 7.54852 17.5888 7.54852 20.3886V22.888M21.5531 11.5235C21.8189 14.1669 20.9393 16.9038 18.9141 18.9289C18.5359 19.3072 18.1328 19.6455 17.7101 19.9438M20.8038 8.70448C20.3598 7.71036 19.7299 6.77911 18.9141 5.96334C15.3338 2.38299 9.52889 2.38299 5.94855 5.96334C4.17501 7.73687 3.28 10.0562 3.26352 12.3807M24.0875 13.1161L23.2046 12.2332C22.3264 11.355 20.9026 11.355 20.0244 12.2332L19.1415 13.1161M0.875198 10.9503L1.75809 11.8331C2.63629 12.7113 4.06012 12.7113 4.93832 11.8331L5.82121 10.9503M7.49904 20.4919C5.77226 19.4557 4.37848 17.8555 3.62143 15.8584M15.6799 12.1942C15.6799 13.9201 14.2808 15.3192 12.5549 15.3192C10.829 15.3192 9.42993 13.9201 9.42993 12.1942C9.42993 10.4683 10.829 9.06917 12.5549 9.06917C14.2808 9.06917 15.6799 10.4683 15.6799 12.1942Z',
           subheading: <>Secure your data properly.</>,
-          className: '!border-l-0',
+          className: 'border-l-0!',
           image: (
             <Image
               draggable={false}
@@ -284,7 +284,7 @@ const data: () => {
               applications.
             </>
           ),
-          className: '!border-l-0 sm:!border-l',
+          className: 'border-l-0! sm:border-l!',
           image: (
             <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
           ),
@@ -299,7 +299,7 @@ const data: () => {
               managing files, images, and videos.
             </>
           ),
-          className: '!border-l-0 lg:!border-l',
+          className: 'border-l-0! lg:border-l!',
           image: (
             <Image
               draggable={false}
@@ -329,7 +329,7 @@ const data: () => {
               deployed globally for low-latency execution.
             </>
           ),
-          className: '!border-l-0 sm:!border-l lg:!border-l-0',
+          className: 'border-l-0! sm:border-l! lg:border-l-0!',
           image: <FunctionsVisual className="" />,
         },
         {
@@ -342,7 +342,7 @@ const data: () => {
               for AI/ML applications, enabling fast semantic search and embedding storage.
             </>
           ),
-          className: '!border-l-0 lg:!border-l',
+          className: 'border-l-0! lg:border-l!',
           image: (
             <Image
               draggable={false}
@@ -386,7 +386,7 @@ const data: () => {
     },
     developerExperience: {
       id: 'developer-experience',
-      className: '[&_h2]:!max-w-sm',
+      className: '[&_h2]:max-w-sm!',
       title: (
         <>
           <span className="text-foreground">Build faster</span> with Supabase
@@ -575,7 +575,7 @@ const data: () => {
             <RealtimeLogs
               isActive={false}
               isInView={true}
-              className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:!bg-[linear-gradient(to_top,hsl(var(--background-default))_0%,transparent_100%)]"
+              className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:bg-[linear-gradient(to_top,hsl(var(--background-default))_0%,transparent_100%)]!"
             />
           ),
         },

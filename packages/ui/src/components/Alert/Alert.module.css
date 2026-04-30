@@ -43,7 +43,7 @@
 }
 
 .sbui-close-button {
-  @apply cursor-pointer inline-flex transition ease-in-out duration-200 bg-transparent border-transparent rounded-md p-1.5 focus:outline-none;
+  @apply cursor-pointer inline-flex transition ease-in-out duration-200 bg-transparent border-transparent rounded-md p-1.5 focus:outline-hidden;
 }
 
 .sbui-close-button--success {

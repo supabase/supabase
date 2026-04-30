@@ -96,7 +96,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
               <div className="flex gap-2.5 items-center">
                 <IconPresence
                   size="xlarge"
-                  className="bg-foreground rounded text-background-muted"
+                  className="bg-foreground rounded-sm text-background-muted"
                 />
                 <label htmlFor="toggle-presence" className="text-sm">
                   Presence
@@ -120,7 +120,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
               <div className="flex gap-2.5 items-center">
                 <IconBroadcast
                   size="xlarge"
-                  className="bg-foreground rounded text-background-muted"
+                  className="bg-foreground rounded-sm text-background-muted"
                 />
                 <label htmlFor="toggle-broadcast" className="text-sm">
                   Broadcast
@@ -145,7 +145,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                 <IconDatabaseChanges
                   size="xlarge"
                   className={cn(
-                    'rounded text-background-muted',
+                    'rounded-sm text-background-muted',
                     config.enableDbChanges ? 'bg-foreground' : 'bg-foreground-lighter'
                   )}
                 />

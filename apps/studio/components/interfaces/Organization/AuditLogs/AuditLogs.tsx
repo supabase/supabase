@@ -244,7 +244,7 @@ export const AuditLogs = () => {
                   />
                   {isSuccess && (
                     <>
-                      <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
+                      <div className="h-[20px] border-r border-strong ml-4! mr-2!" />
                       <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
                     </>
                   )}
@@ -287,13 +287,13 @@ export const AuditLogs = () => {
             {isSuccess && (
               <>
                 {logs.length === 0 ? (
-                  <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
+                  <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
                     <p className="prose text-sm">
                       Your organization does not have any audit logs available yet
                     </p>
                   </div>
                 ) : logs.length > 0 && sortedLogs.length === 0 ? (
-                  <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
+                  <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
                     <p className="prose text-sm">
                       No audit logs found based on the filters applied
                     </p>
@@ -373,7 +373,7 @@ export const AuditLogs = () => {
                           <Table.tr
                             key={log.occurred_at}
                             onClick={() => setSelectedLog(log)}
-                            className="cursor-pointer hover:!bg-alternative transition duration-100"
+                            className="cursor-pointer hover:bg-alternative! transition duration-100"
                           >
                             <Table.td>
                               <div className="flex items-center space-x-4">
@@ -391,7 +391,7 @@ export const AuditLogs = () => {
                             <Table.td className="max-w-[250px]">
                               <div className="flex items-center space-x-2">
                                 {hasStatusCode && (
-                                  <p className="bg-surface-200 rounded px-1 flex items-center justify-center text-xs font-mono border">
+                                  <p className="bg-surface-200 rounded-sm px-1 flex items-center justify-center text-xs font-mono border">
                                     {log.action.metadata[0].status}
                                   </p>
                                 )}

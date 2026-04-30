@@ -439,7 +439,7 @@ export default function FormPatternsPageLayout() {
                                   {uploadedFiles.map((file, idx) => (
                                     <div
                                       key={`${file.name}-${idx}`}
-                                      className="flex items-center justify-between gap-2 p-2 bg rounded border"
+                                      className="flex items-center justify-between gap-2 p-2 bg rounded-sm border"
                                     >
                                       <span className="text-sm text-foreground-light truncate flex-1">
                                         {file.name}

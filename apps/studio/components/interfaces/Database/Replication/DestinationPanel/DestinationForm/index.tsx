@@ -603,7 +603,7 @@ export const DestinationForm = ({
         )}
       </SheetSection>
 
-      <SheetFooter className="!justify-between">
+      <SheetFooter className="justify-between!">
         <AnimatePresence mode="wait">
           {isValidating || isSaving ? (
             <motion.div

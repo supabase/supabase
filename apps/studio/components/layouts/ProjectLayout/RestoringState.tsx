@@ -160,7 +160,7 @@ export const RestoringState = () => {
                           </SupportLink>
                         </Button>
                       }
-                      className="!mt-5"
+                      className="mt-5!"
                     />
                   )}
                 </div>

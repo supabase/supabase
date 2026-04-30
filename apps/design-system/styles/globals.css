@@ -1,11 +1,13 @@
+@import 'tailwindcss';
+
 @import './../../../packages/ui/build/css/source/global.css';
 @import './../../../packages/ui/build/css/themes/dark.css';
 @import './../../../packages/ui/build/css/themes/classic-dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@config '../tailwind.config.js';
+
+@import 'config/typography.css';
 
 @layer base {
   :root {
@@ -67,4 +69,8 @@
   .container {
     @apply px-4;
   }
+}
+
+.rdg-cell {
+  padding-inline: 0.5rem;
 }

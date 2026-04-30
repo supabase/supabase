@@ -84,7 +84,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
         <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
           {usedSizeTotal.toFixed(2)}
           <span>GB used of </span>
-          <span className="text-foreground font-semibold -mt-[2px]">
+          <span className="text-foreground font-semibold mt-[-2px]">
             <MotionNumber value={newTotalSize} style={{ lineHeight: 0.8 }} className="font-mono" />
           </span>{' '}
           GB
@@ -93,7 +93,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
       <div className="relative">
         <div
           className={cn(
-            'h-[35px] relative border rounded-sm w-full transition overflow-visible',
+            'h-[35px] relative border rounded-xs w-full transition overflow-visible',
             showNewSize ? 'bg-selection border border-brand' : 'bg-surface-300'
           )}
         >
@@ -105,7 +105,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
               exit={{ rotateY: -90, zIndex: 2 }}
               transition={{ duration: 0.3 }}
               style={{ transformOrigin: 'left center', backfaceVisibility: 'hidden' }}
-              className="absolute inset-0 rounded-sm overflow-hidden"
+              className="absolute inset-0 rounded-xs overflow-hidden"
             >
               <div className="h-full flex">
                 <div
@@ -175,15 +175,15 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.1 }}
-              className="absolute h-8 w-full -mx-[2px]"
+              className="absolute h-8 w-full mx-[-2px]"
             >
               <div
-                className="absolute top-0 -left-0 h-full flex items-center transition-all duration-500 ease-in-out"
+                className="absolute top-0 left-0 h-full flex items-center transition-all duration-500 ease-in-out"
                 style={{ left: `${showNewSize ? newResizePercentage : resizePercentage}%` }}
               >
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded text-xs text-foreground-light whitespace-nowrap flex items-center gap-x-1">
+                    <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded-sm text-xs text-foreground-light whitespace-nowrap flex items-center gap-x-1">
                       Autoscaling <Info size={12} />
                     </div>
                   </TooltipTrigger>

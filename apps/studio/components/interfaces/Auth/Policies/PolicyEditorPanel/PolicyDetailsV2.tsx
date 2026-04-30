@@ -29,7 +29,13 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
 } from 'ui'
-import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
 
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
@@ -298,18 +304,43 @@ export const PolicyDetailsV2 = ({
             name="roles"
             render={({ field }) => (
               <FormItem className="col-span-12 flex flex-col gap-y-1">
-                <FormLabel>
+                <FormLabel htmlFor="roles">
                   Target Roles <code className="text-code-inline">to</code> clause
                 </FormLabel>
                 <FormControl>
-                  <MultiSelectV2
+                  <MultiSelector
+                    onValuesChange={(roles) => field.onChange(roles.join(', '))}
                     disabled={!canUpdatePolicies}
-                    options={formattedRoles}
-                    value={field.value.length === 0 ? [] : field.value?.split(', ')}
-                    placeholder="Defaults to all (public) roles if none selected"
-                    searchPlaceholder="Search for a role"
-                    onChange={(roles) => form.setValue('roles', roles.join(', '))}
-                  />
+                    values={field.value.length === 0 ? [] : field.value?.split(', ')}
+                    size="small"
+                  >
+                    <MultiSelectorTrigger
+                      id="roles"
+                      mode="inline-combobox"
+                      label={
+                        field.value.length === 0
+                          ? 'Defaults to all (public) roles if none selected'
+                          : 'Search for a role'
+                      }
+                      badgeLimit="wrap"
+                      showIcon={false}
+                      deletableBadge
+                      className="w-full"
+                    />
+                    <MultiSelectorContent>
+                      <MultiSelectorList>
+                        {formattedRoles.map((role) => (
+                          <MultiSelectorItem
+                            key={role.id}
+                            value={role.value}
+                            disabled={role.disabled}
+                          >
+                            {role.name}
+                          </MultiSelectorItem>
+                        ))}
+                      </MultiSelectorList>
+                    </MultiSelectorContent>
+                  </MultiSelector>
                 </FormControl>
                 <FormMessage />
               </FormItem>

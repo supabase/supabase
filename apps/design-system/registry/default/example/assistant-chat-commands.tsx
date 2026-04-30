@@ -46,7 +46,7 @@ export default function AssistantChatCommands() {
         />
       </AssistantCommandsPopover>
       <p className="text-xs mt-3 text-foreground-lighter">
-        Press <span className="bg-surface-300 px-[3px] py-[2px] border rounded">/</span> to open
+        Press <span className="bg-surface-300 px-[3px] py-[2px] border rounded-sm">/</span> to open
         commands
       </p>
     </div>

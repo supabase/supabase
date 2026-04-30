@@ -154,7 +154,7 @@ function Feedback({ className }: { className?: string }) {
         >
           <Button
             type="outline"
-            rounded
+            rounded-sm
             className={cn(
               'px-1 w-7 h-7',
               'text-foreground-light',
@@ -162,7 +162,7 @@ function Feedback({ className }: { className?: string }) {
               'motion-reduce:[transition-duration:150ms,1ms,300ms]',
               '[transition-timing-function:cubic-bezier(.76,0,.23,1)]',
               !isNo && 'hover:text-warning hover:border-warning-500',
-              isNo && `bg-warning text-warning-200 !border-warning disabled:opacity-100`,
+              isNo && `bg-warning text-warning-200 border-warning! disabled:opacity-100`,
               !showNo && 'opacity-0 invisible'
             )}
             onClick={() => handleVote('no')}
@@ -173,7 +173,7 @@ function Feedback({ className }: { className?: string }) {
           </Button>
           <Button
             type="outline"
-            rounded
+            rounded-sm
             className={cn(
               'px-1 w-7 h-7',
               'text-foreground-light',
@@ -182,7 +182,7 @@ function Feedback({ className }: { className?: string }) {
               '[transition-timing-function:cubic-bezier(.76,0,.23,1)]',
               !isYes && 'hover:text-brand-600 hover:border-brand-500',
               isYes &&
-                'bg-brand text-brand-200 !border-brand disabled:opacity-100 -translate-x-[calc(100%+var(--container-inline-flex-gap,0.5rem))]',
+                'bg-brand text-brand-200 border-brand! disabled:opacity-100 -translate-x-[calc(100%+var(--container-inline-flex-gap,0.5rem))]',
               !showYes && 'opacity-0 invisible'
             )}
             onClick={() => handleVote('yes')}
@@ -205,8 +205,8 @@ function Feedback({ className }: { className?: string }) {
             '[transition-delay:200ms,0ms]',
             '[transition-timing-function:cubic-bezier(.76,0,.23,1)]',
             'motion-reduce:[transition-duration:150ms,1ms]',
-            '!ease-out',
-            state.type === StateType.Followup && 'opacity-100 visible -translate-x-0'
+            'ease-out!',
+            state.type === StateType.Followup && 'opacity-100 visible translate-x-0'
           )}
         >
           {state.type === StateType.Followup && (
