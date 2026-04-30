@@ -1,4 +1,5 @@
 {
+  "language": "typescript",
   "menuTitle": "Javascript",
   "icon": "reference-javascript",
   "title": "JavaScript Client library",

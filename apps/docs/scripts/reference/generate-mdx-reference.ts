@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'fs'
 import { join, dirname, relative } from 'path'
 import { fileURLToPath } from 'url'
-import { processSpec, type SpecCategory, type SpecConfig } from './process-tsdoc.js'
+import type { SpecCategory, SpecConfig } from './types.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -194,10 +194,10 @@ function generateMdx(categories: SpecCategory[], config: SpecConfig, specDir: st
   const frontmatter = [
     '---',
     `title: ${fmVal(config.title ?? 'Reference')}`,
-    ...(config.subtitle ? [`subtitle: ${fmVal(config.subtitle)}`] : []),
-    ...(config.referenceLink ? [`referenceLink: ${fmVal(config.referenceLink)}`] : []),
+    ...(config.subtitle ? [`subtitle: ${fmVal(config.subtitle as string)}`] : []),
+    ...(config.referenceLink ? [`referenceLink: ${fmVal(config.referenceLink as string)}`] : []),
     ...(config.referenceLinkLabel
-      ? [`referenceLinkLabel: ${fmVal(config.referenceLinkLabel)}`]
+      ? [`referenceLinkLabel: ${fmVal(config.referenceLinkLabel as string)}`]
       : []),
     '---',
     '',
@@ -268,8 +268,8 @@ function generateMdx(categories: SpecCategory[], config: SpecConfig, specDir: st
 // Main: discover and process all spec folders
 // ---------------------------------------------------------------------------
 
-const specRefDir = join(__dirname, '../spec/reference')
-const contentRefDir = join(__dirname, '../content/reference')
+const specRefDir = join(__dirname, '../../spec/reference')
+const contentRefDir = join(__dirname, '../../content/reference')
 
 const specFolders = findSpecFolders(specRefDir)
 
@@ -281,7 +281,31 @@ if (specFolders.length === 0) {
 for (const specDir of specFolders) {
   exampleCounter = 0 // reset per spec so IDs don't bleed across files
 
-  const { categories, config } = processSpec(specDir)
+  // Read config to determine the language processor to use
+  let rawConfig: SpecConfig = {}
+  try {
+    rawConfig = JSON.parse(readFileSync(join(specDir, 'config.json'), 'utf-8'))
+  } catch {
+    // config.json is optional
+  }
+
+  const language = (rawConfig.language as string) ?? 'typescript'
+  // Support both compiled (.js) and tsx-run (.ts) environments
+  const processorPathJs = join(__dirname, `languages/${language}.js`)
+  const processorPathTs = join(__dirname, `languages/${language}.ts`)
+  const processorPath = existsSync(processorPathJs) ? processorPathJs : processorPathTs
+
+  if (!existsSync(processorPath)) {
+    const rel = relative(specRefDir, specDir)
+    console.error(
+      `[${rel}] No language processor found for "${language}" (expected ${processorPathJs})`
+    )
+    continue
+  }
+
+  // Dynamic import so each language can have its own processing logic
+  const processor = await import(processorPath)
+  const { categories, config } = processor.processSpec(specDir)
 
   // Mirror the folder path: spec/reference/<rel> → content/reference/<rel>
   const rel = relative(specRefDir, specDir)
@@ -301,6 +325,6 @@ for (const specDir of specFolders) {
   console.log(`[${rel}] MDX → ${mdxPath}`)
   console.log(`[${rel}] data → ${dataPath}`)
   console.log(
-    `[${rel}] ${categories.length} categories, ${categories.flatMap((c) => c.definitions).length} definitions`
+    `[${rel}] ${categories.length} categories, ${categories.flatMap((c: SpecCategory) => c.definitions).length} definitions`
   )
 }

@@ -1,5 +1,18 @@
+/**
+ * Language processor for TypeDoc JSON output (TypeScript/JavaScript SDKs).
+ *
+ * Reads all *.json files (except config.json) from the spec folder, processes
+ * TypeDoc declarations, and returns structured categories with definitions.
+ */
+
 import { readFileSync, readdirSync } from 'fs'
 import { join } from 'path'
+import type {
+  IgnoreDefinition,
+  OverrideDefinition,
+  SpecCategory,
+  SpecConfig,
+} from '../types.js'
 
 type ContentItem = { kind: string; text: string }
 type BlockTag = { tag: string; name?: string; content?: ContentItem[] }
@@ -9,7 +22,7 @@ function contentToMd(items: ContentItem[] = []): string {
     .map((c) => c.text)
     .join('')
     .trim()
-  // Normalize line breaks: \n\n (paragraph break) → \n, lone \n → nothing.
+  // Normalize line breaks: \n\n (paragraph break) → \n, lone \n → space.
   // TypeDoc summaries often contain single newlines as soft wraps with no
   // semantic meaning, and double newlines as intended paragraph separators.
   // Protect paragraph breaks first so the lone-newline pass doesn't touch them.
@@ -107,9 +120,16 @@ function serializeType(
           }
         }
       }
-      // Fallback: store as named reference
+      // Fallback: named reference. Strip unresolved type arguments that are
+      // bare type parameters (e.g. FunctionsResponseSuccess<T> → drop <T>).
       const r: any = { kind: 'reference', name: t.name }
-      if (t.typeArguments?.length) r.typeArguments = t.typeArguments.map(st)
+      if (t.typeArguments?.length) {
+        const args = t.typeArguments.map(st)
+        const allTypeParams = args.every(
+          (a: any) => a && typeof a === 'object' && a.kind === 'typeParam'
+        )
+        if (!allTypeParams) r.typeArguments = args
+      }
       return r
     }
     case 'reflection': {
@@ -203,18 +223,36 @@ function collectDeclarations(node: any): any[] {
   return out
 }
 
-export interface SpecConfig {
-  title?: string
-  subtitle?: string
-  referenceLink?: string
-  referenceLinkLabel?: string
-  ignoreDefinitions?: string[]
-  categoryOrder?: string[]
-}
+function applyDefinitionOverrides(
+  category: string,
+  definitions: any[],
+  overrideMap: Map<string, OverrideDefinition>
+): any[] {
+  // Apply name overrides and split into ordered/unordered
+  const tagged = definitions.map((def) => {
+    const ov = overrideMap.get(`${category}|${def.name}`)
+    if (!ov) return { def, order: undefined as number | undefined }
+    return { def: { ...def, ...(ov.name ? { name: ov.name } : {}) }, order: ov.order }
+  })
 
-export interface SpecCategory {
-  category: string
-  definitions: any[]
+  const ordered = tagged
+    .filter((x) => x.order !== undefined)
+    .sort((a, b) => (a.order as number) - (b.order as number))
+  const unordered = tagged.filter((x) => x.order === undefined).map((x) => x.def)
+
+  // Place ordered items at their 0-based positions; fill gaps with unordered items
+  const orderedByPos = new Map(ordered.map((x) => [x.order as number, x.def]))
+  const out: any[] = []
+  let ui = 0
+  for (let i = 0; i < tagged.length; i++) {
+    if (orderedByPos.has(i)) {
+      out.push(orderedByPos.get(i))
+    } else if (ui < unordered.length) {
+      out.push(unordered[ui++])
+    }
+  }
+  while (ui < unordered.length) out.push(unordered[ui++])
+  return out
 }
 
 export function processSpec(specDir: string): { categories: SpecCategory[]; config: SpecConfig } {
@@ -227,8 +265,20 @@ export function processSpec(specDir: string): { categories: SpecCategory[]; conf
     }
   })()
 
-  const ignoredNames = new Set(config.ignoreDefinitions ?? [])
-  const categoryOrder = config.categoryOrder ?? []
+  // Build Sets/Maps keyed by "category|name" for O(1) lookup.
+  // Supports both string[] (global ignore) and { category, definition }[] (scoped ignore).
+  const ignoredKeys = new Set(
+    (config.ignoreDefinitions ?? []).flatMap((e: any) =>
+      typeof e === 'string' ? [`*|${e}`] : [`${e.category}|${e.definition}`]
+    )
+  )
+  const overrideMap = new Map(
+    (config.overrideDefinitions as OverrideDefinition[] ?? []).map((e) => [
+      `${e.category}|${e.definition}`,
+      e,
+    ])
+  )
+  const categoryOrder: string[] = (config.categoryOrder as string[]) ?? []
 
   // Discover all JSON source files in the spec folder, excluding config.json
   const sourceFiles = readdirSync(specDir)
@@ -252,7 +302,7 @@ export function processSpec(specDir: string): { categories: SpecCategory[]; conf
     if (!categoryTag) continue // skip internal declarations with no category
     const category = (categoryTag.content?.[0]?.text ?? '').split('\n')[0].trim()
 
-    if (ignoredNames.has(decl.name)) continue
+    if (ignoredKeys.has(`*|${decl.name}`) || ignoredKeys.has(`${category}|${decl.name}`)) continue
 
     if (!categoryMap.has(category)) categoryMap.set(category, [])
 
@@ -275,7 +325,10 @@ export function processSpec(specDir: string): { categories: SpecCategory[]; conf
   }
 
   const categories = Array.from(categoryMap.entries())
-    .map(([category, definitions]) => ({ category, definitions }))
+    .map(([category, definitions]) => ({
+      category,
+      definitions: applyDefinitionOverrides(category, definitions, overrideMap),
+    }))
     .sort((a, b) => {
       const ai = categoryOrder.indexOf(a.category)
       const bi = categoryOrder.indexOf(b.category)
