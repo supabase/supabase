@@ -181,7 +181,7 @@ export const GraphqlExposureCallout = ({ projectRef }: { projectRef: string }) =
           These warnings are triggered by GraphQL exposing your table schemas. If you're not using
           GraphQL, disable it from the{' '}
           <InlineLink href={`/project/${projectRef}/database/extensions`}>
-            Database integration page
+            Database extensions page
           </InlineLink>
           .
         </p>
