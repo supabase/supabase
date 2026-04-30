@@ -28,14 +28,6 @@ export default function BlogPostClient(props: BlogPostPageProps) {
   return (
     <>
       <BlogPostAnchorEffect />
-      <BlogPostRenderer
-        blog={props.blog as ProcessedBlogData}
-        blogMetaData={blogMetaData as ProcessedBlogData}
-        isDraftMode={props.isDraftMode}
-        prevPost={props.prevPost}
-        nextPost={props.nextPost}
-        authors={blogAuthors}
-      />
     </>
   )
 }
