@@ -28,7 +28,7 @@ interface PluginClient {
   docsUrl?: string
 }
 
-const AGENT_PLUGINS: PluginClient[] = [
+const PLUGIN_CLIENTS: PluginClient[] = [
   {
     key: 'claude-code',
     label: 'Claude Code',
@@ -59,22 +59,6 @@ const AGENT_PLUGINS: PluginClient[] = [
     docsUrl: 'https://geminicli.com/docs/extensions/',
   },
 ]
-
-const CONNECTORS: PluginClient[] = [
-  {
-    key: 'claude-ai',
-    label: 'Claude.ai',
-    icon: 'claude',
-  },
-  {
-    key: 'chatgpt',
-    label: 'ChatGPT',
-    icon: 'openai',
-    hasDistinctDarkIcon: true,
-  },
-]
-
-const ALL_CLIENTS = [...AGENT_PLUGINS, ...CONNECTORS]
 
 function ClientDropdown({
   theme,
@@ -125,40 +109,8 @@ function ClientDropdown({
           <CommandInput_Shadcn_ placeholder="Search..." />
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_ heading="Agent Plugins">
-              {AGENT_PLUGINS.map((client) => (
-                <CommandItem_Shadcn_
-                  key={client.key}
-                  value={client.key}
-                  onSelect={() => {
-                    onClientChange(client.key)
-                    setOpen(false)
-                  }}
-                  className="flex gap-2 items-center"
-                >
-                  {client.icon ? (
-                    <ConnectionIcon
-                      connection={client.icon}
-                      theme={theme}
-                      hasDistinctDarkIcon={client.hasDistinctDarkIcon}
-                    />
-                  ) : (
-                    <Bot size={12} aria-hidden />
-                  )}
-                  {client.label}
-                  <Check
-                    size={15}
-                    aria-label={client.key === selectedClient.key ? 'selected' : undefined}
-                    className={cn(
-                      'ml-auto',
-                      client.key === selectedClient.key ? 'opacity-100' : 'opacity-0'
-                    )}
-                  />
-                </CommandItem_Shadcn_>
-              ))}
-            </CommandGroup_Shadcn_>
-            <CommandGroup_Shadcn_ heading="Connectors">
-              {CONNECTORS.map((client) => (
+            <CommandGroup_Shadcn_>
+              {PLUGIN_CLIENTS.map((client) => (
                 <CommandItem_Shadcn_
                   key={client.key}
                   value={client.key}
@@ -293,54 +245,16 @@ function PluginInstructions({ client }: { client: PluginClient }) {
     )
   }
 
-  if (client.key === 'claude-ai') {
-    return (
-      <div className="space-y-3">
-        <p className="text-sm text-foreground-light">
-          Connect Supabase to Claude.ai to access your projects directly in the Claude.ai interface.
-        </p>
-        <Button size="small" type="default" asChild iconRight={<ExternalLink size={12} />}>
-          <a
-            href="https://claude.ai/directory/11ca66fc-1e98-49d5-ab9b-7cb4672a8f10"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Connect Supabase to Claude.ai
-          </a>
-        </Button>
-      </div>
-    )
-  }
-
-  if (client.key === 'chatgpt') {
-    return (
-      <div className="space-y-3">
-        <p className="text-sm text-foreground-light">
-          Connect Supabase to ChatGPT to access your projects directly in the ChatGPT interface.
-        </p>
-        <Button size="small" type="default" asChild iconRight={<ExternalLink size={12} />}>
-          <a
-            href="https://chatgpt.com/apps/supabase/asdk_app_69d3e5ee6a708191baa733f7b8931995"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Connect Supabase to ChatGPT
-          </a>
-        </Button>
-      </div>
-    )
-  }
-
   return null
 }
 
 export function AgentPluginsPanel() {
-  const [selectedClientKey, setSelectedClientKey] = useState(ALL_CLIENTS[0].key)
+  const [selectedClientKey, setSelectedClientKey] = useState(PLUGIN_CLIENTS[0].key)
   const { resolvedTheme } = useTheme()
 
   const theme = (resolvedTheme as 'light' | 'dark') ?? 'light'
-  const selectedClient = ALL_CLIENTS.find((c) => c.key === selectedClientKey) ?? ALL_CLIENTS[0]
-  const isConnector = CONNECTORS.some((c) => c.key === selectedClientKey)
+  const selectedClient =
+    PLUGIN_CLIENTS.find((c) => c.key === selectedClientKey) ?? PLUGIN_CLIENTS[0]
 
   return (
     <div className="not-prose">
@@ -352,32 +266,30 @@ export function AgentPluginsPanel() {
       <div className="mt-4 rounded-lg border border-muted p-4">
         <PluginInstructions client={selectedClient} />
       </div>
-      {!isConnector && (
-        <div className="mt-2 flex gap-4">
-          {selectedClient.docsUrl && (
-            <a
-              href={selectedClient.docsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs text-foreground-lighter hover:text-foreground-light transition-colors"
-            >
-              <ExternalLink size={10} />
-              {selectedClient.label} plugin docs
-            </a>
-          )}
-          {selectedClient.repoUrl && (
-            <a
-              href={selectedClient.repoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs text-foreground-lighter hover:text-foreground-light transition-colors"
-            >
-              <ExternalLink size={10} />
-              Plugin repository
-            </a>
-          )}
-        </div>
-      )}
+      <div className="mt-2 flex gap-4">
+        {selectedClient.docsUrl && (
+          <a
+            href={selectedClient.docsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 text-xs text-foreground-lighter hover:text-foreground-light transition-colors"
+          >
+            <ExternalLink size={10} />
+            {selectedClient.label} plugin docs
+          </a>
+        )}
+        {selectedClient.repoUrl && (
+          <a
+            href={selectedClient.repoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 text-xs text-foreground-lighter hover:text-foreground-light transition-colors"
+          >
+            <ExternalLink size={10} />
+            Plugin repository
+          </a>
+        )}
+      </div>
     </div>
   )
 }

@@ -554,6 +554,47 @@ export const MCP_CLIENTS: McpClient[] = [
       </>
     ),
   },
+  {
+    key: 'claude-ai',
+    label: 'Claude.ai',
+    icon: 'claude',
+    primaryInstructions: (_config, _onCopy) => (
+      <div className="space-y-2">
+        <p className="text-xs text-foreground-light">
+          Connect Supabase to Claude.ai to access your projects directly in the Claude.ai interface.
+        </p>
+        <a
+          href="https://claude.ai/directory/11ca66fc-1e98-49d5-ab9b-7cb4672a8f10"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs text-brand-link hover:underline"
+        >
+          Connect Supabase to Claude.ai
+        </a>
+      </div>
+    ),
+  },
+  {
+    key: 'chatgpt',
+    label: 'ChatGPT',
+    icon: 'openai',
+    hasDistinctDarkIcon: true,
+    primaryInstructions: (_config, _onCopy) => (
+      <div className="space-y-2">
+        <p className="text-xs text-foreground-light">
+          Connect Supabase to ChatGPT to access your projects directly in the ChatGPT interface.
+        </p>
+        <a
+          href="https://chatgpt.com/apps/supabase/asdk_app_69d3e5ee6a708191baa733f7b8931995"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs text-brand-link hover:underline"
+        >
+          Connect Supabase to ChatGPT
+        </a>
+      </div>
+    ),
+  },
 ]
 
 export const DEFAULT_MCP_URL_PLATFORM = 'http://localhost:8080/mcp'
