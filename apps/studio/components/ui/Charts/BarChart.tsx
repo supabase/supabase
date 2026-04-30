@@ -173,7 +173,7 @@ function BarChart<D extends Datum = Datum>({
           <Tooltip
             content={(_props) =>
               syncId && isHovered && isCurrentChart && hoveredIndex !== null ? (
-                <div className="bg-black/90 text-white p-2 rounded text-xs">
+                <div className="bg-black/90 text-white p-2 rounded-sm text-xs">
                   <div className="font-medium">
                     {dayjs(data[hoveredIndex]?.[xAxisKey]).format(customDateFormat)}
                   </div>

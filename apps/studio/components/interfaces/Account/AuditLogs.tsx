@@ -179,11 +179,11 @@ export const AuditLogs = () => {
             {isSuccess && (
               <>
                 {logs.length === 0 ? (
-                  <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
+                  <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
                     <p className="prose text-sm">You do not have any audit logs available yet</p>
                   </div>
                 ) : logs.length > 0 && sortedLogs.length === 0 ? (
-                  <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
+                  <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
                     <p className="prose text-sm">
                       No audit logs found based on the filters applied
                     </p>
@@ -237,11 +237,11 @@ export const AuditLogs = () => {
                             <Table.tr
                               key={log.request_id}
                               onClick={() => setSelectedLog(log)}
-                              className="cursor-pointer hover:!bg-alternative transition duration-100"
+                              className="cursor-pointer hover:bg-alternative! transition duration-100"
                             >
                               <Table.td className="max-w-[250px]">
                                 <div className="flex items-center space-x-2">
-                                  <p className="bg-surface-200 rounded px-1 flex items-center justify-center text-xs font-mono border">
+                                  <p className="bg-surface-200 rounded-sm px-1 flex items-center justify-center text-xs font-mono border">
                                     {log.action.status}
                                   </p>
                                   <p className="text-foreground-light text-xs font-mono">
@@ -253,26 +253,28 @@ export const AuditLogs = () => {
                                 </div>
                               </Table.td>
                               <Table.td>
-                                {project || organization ? (
-                                  <>
-                                    <p
-                                      className="text-foreground-light max-w-[230px] truncate"
-                                      title={project?.name ?? organization?.name}
-                                    >
-                                      {project ? 'Project: ' : 'Organization: '}
-                                      {project?.name ?? organization?.name}
-                                    </p>
-                                    <p className="text-foreground-light text-xs mt-0.5 truncate">
-                                      {log.project_ref
-                                        ? `Ref: ${log.project_ref}`
-                                        : `Slug: ${log.organization_slug}`}
-                                    </p>
-                                  </>
-                                ) : (
-                                  <p className="text-foreground-light text-sm">
-                                    {log.project_ref ?? log.organization_slug ?? '-'}
-                                  </p>
-                                )}
+                                <p
+                                  className="text-foreground-light max-w-[230px] truncate"
+                                  title={project?.name ?? organization?.name ?? '-'}
+                                >
+                                  {project?.name
+                                    ? 'Project: '
+                                    : organization?.name
+                                      ? 'Organization: '
+                                      : null}
+                                  {project?.name ?? organization?.name ?? '-'}
+                                </p>
+                                <p
+                                  className="text-foreground-light text-xs mt-0.5 truncate"
+                                  title={log.project_ref ?? log.organization_slug ?? ''}
+                                >
+                                  {log.project_ref
+                                    ? 'Ref: '
+                                    : log.organization_slug
+                                      ? 'Slug: '
+                                      : null}
+                                  {log.project_ref ?? log.organization_slug}
+                                </p>
                               </Table.td>
                               <Table.td>
                                 <TimestampInfo className="text-sm" utcTimestamp={isoTimestamp} />

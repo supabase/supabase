@@ -51,7 +51,7 @@ export const RunQueryWarningModal = ({
         if (!open) onCancel()
       }}
     >
-      <DialogContent aria-describedby={undefined} className="p-0 gap-0 pb-5 !block" size="large">
+      <DialogContent aria-describedby={undefined} className="p-0 gap-0 pb-5 block!" size="large">
         <DialogHeader className={cn('border-b')} padding="small">
           <DialogTitle>
             {`Potential issue${issueCount > 1 ? 's' : ''} detected with your query`}

@@ -1,5 +1,11 @@
 import { sortBy } from 'lodash'
-import MultiSelect from 'ui-patterns/MultiSelectDeprecated'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { SYSTEM_ROLES } from '@/components/interfaces/Database/Roles/Roles.constants'
@@ -51,13 +57,28 @@ export const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRole
         {isLoading && <ShimmeringLoader className="py-4" />}
         {isError && <AlertError error={error as any} subject="Failed to retrieve database roles" />}
         {isSuccess && (
-          <MultiSelect
-            options={formattedRoles}
-            value={selectedRoles}
-            placeholder="Defaults to all (public) roles if none selected"
-            searchPlaceholder="Search for a role"
-            onChange={onUpdateSelectedRoles}
-          />
+          <MultiSelector values={selectedRoles} onValuesChange={onUpdateSelectedRoles}>
+            <MultiSelectorTrigger
+              mode="inline-combobox"
+              label={
+                selectedRoles.length === 0
+                  ? 'Defaults to all (public) roles if none selected'
+                  : 'Search for a role'
+              }
+              deletableBadge
+              badgeLimit="wrap"
+              showIcon={false}
+            />
+            <MultiSelectorContent>
+              <MultiSelectorList>
+                {formattedRoles.map((role) => (
+                  <MultiSelectorItem key={role.id} value={role.value} disabled={role.disabled}>
+                    {role.name}
+                  </MultiSelectorItem>
+                ))}
+              </MultiSelectorList>
+            </MultiSelectorContent>
+          </MultiSelector>
         )}
       </div>
     </div>

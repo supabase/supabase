@@ -46,7 +46,7 @@ export const KeyboardShortcut = ({ keys, variant = 'pill', className }: Keyboard
       className={cn(
         'inline-flex whitespace-nowrap shrink-0',
         variant === 'pill'
-          ? 'items-center text-[11px] leading-none -tracking-[0.05em] text-foreground-light bg-surface-200 dark:bg-surface-100 rounded px-[5px] py-[3px]'
+          ? 'items-center text-[11px] leading-none tracking-tighter text-foreground-light bg-surface-200 dark:bg-surface-100 rounded-sm px-[5px] py-[3px]'
           : 'items-baseline text-[11px] leading-[inherit] text-foreground/40',
         className
       )}

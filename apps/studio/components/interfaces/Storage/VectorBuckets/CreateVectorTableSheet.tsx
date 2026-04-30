@@ -379,7 +379,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                   </div>
                 ))}
               </div>
-              <div className="flex items-center justify-center rounded border border-strong border-dashed py-3">
+              <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
                 <Button type="default" size="tiny" onClick={() => append({ value: '' })}>
                   Add metadata key
                 </Button>

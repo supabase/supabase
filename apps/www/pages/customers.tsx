@@ -173,7 +173,7 @@ function CustomerStoriesPage(props: any) {
             </div>
             <div
               className={cn(
-                'absolute inset-0 h-[150px] sm:h-[300px] bg-background z-0 after:!bg-background',
+                'absolute inset-0 h-[150px] sm:h-[300px] bg-background z-0 after:bg-background!',
                 styles['bg-visual']
               )}
             />

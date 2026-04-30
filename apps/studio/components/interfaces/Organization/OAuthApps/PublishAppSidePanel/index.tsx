@@ -255,7 +255,7 @@ export const PublishAppSidePanel = ({
                     {iconUrl !== undefined ? (
                       <div
                         className={cn(
-                          'shadow transition group relative',
+                          'shadow-sm transition group relative',
                           'bg-center bg-cover bg-no-repeat',
                           'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center'
                         )}
@@ -427,7 +427,7 @@ export const PublishAppSidePanel = ({
           <Modal
             hideFooter
             showCloseButton={false}
-            className="!max-w-[600px]"
+            className="max-w-[600px]!"
             visible={showPreview}
             onCancel={() => setShowPreview(false)}
           >
@@ -447,7 +447,7 @@ export const PublishAppSidePanel = ({
               />
               <div className="pt-4 space-y-2">
                 <p className="prose text-sm">Select an organization to grant API access to</p>
-                <div className="border border-control text-foreground-light rounded px-4 py-2 text-sm bg-surface-200">
+                <div className="border border-control text-foreground-light rounded-sm px-4 py-2 text-sm bg-surface-200">
                   Organizations that you have access to will be listed here
                 </div>
               </div>

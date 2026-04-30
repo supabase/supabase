@@ -20,7 +20,7 @@ export const ActionCard = (card: {
     >
       <div className={`relative flex items-start gap-3`}>
         {card.isBeta && (
-          <Badge className="absolute -right-5 -top-5 bg-surface-300/100 text-xs text-foreground">
+          <Badge className="absolute -right-5 -top-5 bg-surface-300 text-xs text-foreground">
             Coming soon
           </Badge>
         )}

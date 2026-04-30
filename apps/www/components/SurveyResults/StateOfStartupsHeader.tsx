@@ -90,7 +90,7 @@ export function StateOfStartupsHeader({ showProgressBars = true }: StateOfStartu
 
   return (
     <header className="mt-16 md:mt-32">
-      <div className="max-w-[60rem] ml-8 md:mx-auto">
+      <div className="max-w-240 ml-8 md:mx-auto">
         <div className="flex flex-col gap-0.5 md:gap-1">
           <h1 className="sr-only">State of Startups 2025</h1>
           <TextBlock

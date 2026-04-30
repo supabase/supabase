@@ -43,8 +43,8 @@ const QueuesAPISection: FC<Props> = (props) => {
     >
       <div className="flex flex-col gap-2 max-w-md">
         <span className="label">{props.label}</span>
-        <h2 className="h2 !m-0">{props.heading}</h2>
-        <p className="p !text-foreground-lighter">{props.subheading}</p>
+        <h2 className="h2 m-0!">{props.heading}</h2>
+        <p className="p text-foreground-lighter!">{props.subheading}</p>
         {props.cta && (
           <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
         )}
@@ -54,8 +54,8 @@ const QueuesAPISection: FC<Props> = (props) => {
           code={codeSnippet}
           lang="js"
           className="
-              h-full xl:!text-lg
-              [&_.synthax-highlighter]:!pb-8
+              h-full xl:text-lg!
+              [&_.synthax-highlighter]:pb-8!
               [&_.synthax-highlighter]:xl:min-h-[240px]
             "
         />

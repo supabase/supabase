@@ -1,10 +1,20 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
 @import './../../../packages/ui/build/css/source/global.css';
 @import './../../../packages/ui/build/css/themes/dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
+
+@config '../tailwind.config.js';
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: hsl(var(--border-default, currentColor));
+  }
+}
 
 @layer utilities {
   .run {
@@ -110,15 +120,15 @@ h6:not(.overwrite) {
 }
 
 .heading-gradient {
-  @apply text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-foreground to-foreground/70;
+  @apply text-[#F4FFFA00] bg-clip-text bg-linear-to-b from-foreground to-foreground/70;
 }
 
 .heading-gradient-brand {
-  @apply text-[#3ECF8E00] bg-clip-text bg-gradient-to-b from-brand to-brand/80;
+  @apply text-[#3ECF8E00] bg-clip-text bg-linear-to-b from-brand to-brand/80;
 }
 
 .toc-animate {
-  @apply !translate-x-1 !text-brand;
+  @apply translate-x-1! text-brand!;
 }
 
 .prose-toc a {
@@ -256,7 +266,7 @@ table {
 }
 
 .sbui-typography a {
-  @apply break-words;
+  @apply wrap-break-word;
 }
 
 /*
@@ -273,7 +283,7 @@ table {
 }
 .next-image--dynamic-fill.wide,
 video.wide {
-  @apply sm:my-0 sm:max-w-none sm:-mx-8 sm:w-[calc(100%_+_4rem)];
+  @apply sm:my-0 sm:max-w-none sm:-mx-8 sm:w-[calc(100%+4rem)];
 }
 @media (min-width: 560px) {
   .next-image--dynamic-fill.wide,
@@ -371,7 +381,7 @@ launch week
 }
 
 .video-container.no-border {
-  @apply !border-none;
+  @apply border-none!;
 }
 
 .video-container iframe {
@@ -673,15 +683,15 @@ launch week
   }
 
   .gradient-text-pink-500 {
-    @apply text-transparent bg-clip-text bg-gradient-to-br from-[#c867ee] to-[#f6a4f3];
+    @apply text-transparent bg-clip-text bg-linear-to-br from-[#c867ee] to-[#f6a4f3];
   }
 
   .gradient-text-purple-500 {
-    @apply text-transparent bg-clip-text bg-gradient-to-br from-[#902DFB] to-[#D87BF5];
+    @apply text-transparent bg-clip-text bg-linear-to-br from-[#902DFB] to-[#D87BF5];
   }
 
   .gradient-text-purple-800 {
-    @apply text-transparent bg-clip-text bg-gradient-to-br from-[#5900EA] to-[#A242E5];
+    @apply text-transparent bg-clip-text bg-linear-to-br from-[#5900EA] to-[#A242E5];
   }
 
   .gradient-text-gold-500 {
@@ -731,7 +741,7 @@ launch week
   transition-timing-function: cubic-bezier(0.24, 0.25, 0.05, 1) !important;
 }
 [data-rmiz-modal-overlay='visible'] {
-  @apply !bg-background;
+  @apply bg-background!;
   opacity: 0.8;
 }
 [data-rmiz-modal-img] {

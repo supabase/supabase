@@ -34,7 +34,7 @@ export const TicketHeaderClaim = () => {
           <SingleTick key={i} />
         ))}
       </div>
-      <div className="text-start md:text-center justify-center text-neutral-500 text-sm font-normal uppercase [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)] lg:text-nowrap grow max-w-[220px] md:max-w-none">
+      <div className="text-start md:text-center justify-center text-neutral-500 text-sm font-normal uppercase [text-shadow:0px_0px_4px_rgb(255_255_255/0.25)] lg:text-nowrap grow max-w-[220px] md:max-w-none">
         Launch Week is coming. Stay tuned!
       </div>
       <div className="hidden gap-4 flex-wrap w-full h-2.5 overflow-hidden shrink flex-1 md:flex">
@@ -119,11 +119,11 @@ export const TicketHeaderDate = () => {
 
   return (
     <div className="flex-1 order-3 lg:order-3">
-      <div className="text-end text-neutral-500 text-sm font-normal uppercase [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)]">
+      <div className="text-end text-neutral-500 text-sm font-normal uppercase [text-shadow:0px_0px_4px_rgb(255_255_255/0.25)]">
         {time}
       </div>
 
-      <div className="text-end text-neutral-500 text-xs font-normal uppercase [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)] text-nowrap">
+      <div className="text-end text-neutral-500 text-xs font-normal uppercase [text-shadow:0px_0px_4px_rgb(255_255_255/0.25)] text-nowrap">
         LOCAL TIME
       </div>
     </div>

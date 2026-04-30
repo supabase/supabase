@@ -320,6 +320,11 @@ const uiConfig = {
             margin: '0',
           },
       })
+      addBase({
+        'input[type=number]': {
+          '-moz-appearance': 'textfield',
+        },
+      })
       // [Ivan] Not sure if it's used.
       addComponents({
         ".dropdown-content[data-state='open']": {
