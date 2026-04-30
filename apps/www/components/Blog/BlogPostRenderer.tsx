@@ -246,7 +246,10 @@ const BlogPostRenderer = ({
                       {isLivePreview ? (
                         <ReactMarkdown>{livePreviewContent}</ReactMarkdown>
                       ) : (
-                        <div></div>
+                        <MDXRemote
+                          {...(blog.content as MDXRemoteSerializeResult)}
+                          components={mdxComponents('blog')}
+                        />
                       )}
                     </div>
                   </article>
