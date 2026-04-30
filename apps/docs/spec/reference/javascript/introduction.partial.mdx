@@ -6,10 +6,10 @@ You can install `@supabase/supabase-js` via the terminal.
 
 <Tabs size="small" type="underlined" defaultActiveId="npm" queryGroup="platform">
   <TabPanel id="npm" label="npm">
-    ```sh Terminal npm install @supabase/supabase-js ```
+    ```sh npm install @supabase/supabase-js ```
   </TabPanel>
   <TabPanel id="yarn" label="Yarn">
-    ```sh Terminal yarn add @supabase/supabase-js ```
+    ```sh yarn add @supabase/supabase-js ```
   </TabPanel>
   <TabPanel id="pnpm" label="pnpm">
     ```sh Terminal pnpm add @supabase/supabase-js ```
@@ -40,6 +40,783 @@ You can use `supabase-js` in the Deno runtime via [JSR](https://jsr.io/@supabase
 ```ts
 import { createClient } from 'npm:@supabase/supabase-js@2'
 ```
+
+---
+
+## Initializing
+
+Create a new client for use in the browser.
+
+<RefDefinitionParams
+  parameters={[
+    {
+      name: 'supabaseUrl',
+      description:
+        'The unique Supabase URL which is supplied when you create a new project in your project dashboard.',
+      type: 'string',
+    },
+    {
+      name: 'supabaseKey',
+      description:
+        'The unique Supabase Key which is supplied when you create a new project in your project dashboard.',
+      type: 'string',
+    },
+    {
+      name: 'options',
+      optional: true,
+      type: {
+        kind: 'object',
+        properties: [
+          {
+            name: 'accessToken',
+            optional: true,
+            description:
+              'Optional function for using a third-party authentication system with Supabase. The function should return an access token or ID token (JWT) by obtaining it from the third-party auth SDK. Note that this function may be called concurrently and many times. Use memoization and locking techniques if this is not supported by the SDKs.\nWhen set, the `auth` namespace of the Supabase client cannot be used. Create another client if you wish to use Supabase Auth and third-party authentications concurrently in the same application.',
+            type: { kind: 'object', properties: [] },
+          },
+          {
+            name: 'auth',
+            optional: true,
+            type: {
+              kind: 'object',
+              properties: [
+                {
+                  name: 'autoRefreshToken',
+                  optional: true,
+                  description:
+                    'Automatically refreshes the token for logged-in users. Defaults to true.',
+                  type: 'boolean',
+                },
+                {
+                  name: 'debug',
+                  optional: true,
+                  description:
+                    'If debug messages for authentication client are emitted. Can be used to inspect the behavior of the library.',
+                  type: {
+                    kind: 'indexedAccess',
+                    objectType: { kind: 'reference', name: 'SupabaseAuthClientOptions' },
+                    indexType: null,
+                  },
+                },
+                {
+                  name: 'detectSessionInUrl',
+                  optional: true,
+                  description:
+                    'Detect a session from the URL. Used for OAuth login callbacks. Defaults to true.\nCan be set to a function to provide custom logic for determining if a URL contains a Supabase auth callback. The function receives the current URL and parsed parameters, and should return true if the URL should be processed as a Supabase auth callback.\nThis is useful when your app uses other OAuth providers (e.g., Facebook Login) that also return access_token in the URL fragment, which would otherwise be incorrectly intercepted by Supabase Auth.',
+                  type: { kind: 'union', types: ['boolean', { kind: 'object', properties: [] }] },
+                },
+                {
+                  name: 'flowType',
+                  optional: true,
+                  description:
+                    'OAuth flow to use - defaults to implicit flow. PKCE is recommended for mobile and server-side applications.',
+                  type: {
+                    kind: 'indexedAccess',
+                    objectType: { kind: 'reference', name: 'SupabaseAuthClientOptions' },
+                    indexType: null,
+                  },
+                },
+                {
+                  name: 'lock',
+                  optional: true,
+                  description:
+                    'Provide your own locking mechanism based on the environment. By default no locking is done at this time.',
+                  type: {
+                    kind: 'indexedAccess',
+                    objectType: { kind: 'reference', name: 'SupabaseAuthClientOptions' },
+                    indexType: null,
+                  },
+                },
+                {
+                  name: 'persistSession',
+                  optional: true,
+                  description:
+                    'Whether to persist a logged-in session to storage. Defaults to true.',
+                  type: 'boolean',
+                },
+                {
+                  name: 'storage',
+                  optional: true,
+                  description: 'A storage provider. Used to store the logged-in session.',
+                  type: {
+                    kind: 'indexedAccess',
+                    objectType: { kind: 'reference', name: 'SupabaseAuthClientOptions' },
+                    indexType: null,
+                  },
+                },
+                {
+                  name: 'storageKey',
+                  optional: true,
+                  description: 'Optional key name used for storing tokens in local storage.',
+                  type: 'string',
+                },
+                {
+                  name: 'throwOnError',
+                  optional: true,
+                  description:
+                    'If there is an error with the query, throwOnError will reject the promise by throwing the error instead of returning it as part of a successful response.',
+                  type: {
+                    kind: 'indexedAccess',
+                    objectType: { kind: 'reference', name: 'SupabaseAuthClientOptions' },
+                    indexType: null,
+                  },
+                },
+                {
+                  name: 'userStorage',
+                  optional: true,
+                  description:
+                    'A storage provider to store the user profile separately from the session. Useful when you need to store the session information in cookies, without bloating the data with the redundant user object.',
+                  type: {
+                    kind: 'indexedAccess',
+                    objectType: { kind: 'reference', name: 'SupabaseAuthClientOptions' },
+                    indexType: null,
+                  },
+                },
+              ],
+            },
+          },
+          {
+            name: 'db',
+            optional: true,
+            description:
+              'The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to `public`.',
+            type: {
+              kind: 'object',
+              properties: [
+                { name: 'schema', optional: true, type: { kind: 'typeParam', name: 'SchemaName' } },
+                {
+                  name: 'timeout',
+                  optional: true,
+                  description:
+                    'Optional timeout in milliseconds for PostgREST requests. When set, requests will automatically abort after this duration to prevent indefinite hangs.',
+                  type: 'number',
+                },
+                {
+                  name: 'urlLengthLimit',
+                  optional: true,
+                  description:
+                    'Maximum URL length in characters before warnings/errors are triggered. Defaults to 8000 characters. Used to provide helpful hints when URLs exceed server limits.',
+                  type: 'number',
+                },
+              ],
+            },
+          },
+          {
+            name: 'global',
+            optional: true,
+            type: {
+              kind: 'object',
+              properties: [
+                {
+                  name: 'fetch',
+                  optional: true,
+                  description: 'A custom `fetch` implementation.',
+                  type: { kind: 'reference', name: 'Fetch' },
+                },
+                {
+                  name: 'headers',
+                  optional: true,
+                  description: 'Optional headers for initializing the client.',
+                  type: { kind: 'reference', name: 'Record', typeArguments: ['string', 'string'] },
+                },
+              ],
+            },
+          },
+          {
+            name: 'realtime',
+            optional: true,
+            description: 'Options passed to the realtime-js instance',
+            type: {
+              kind: 'object',
+              properties: [
+                { name: 'accessToken', optional: true, type: { kind: 'object', properties: [] } },
+                {
+                  name: 'decode',
+                  optional: true,
+                  type: { kind: 'reference', name: 'Decode', typeArguments: ['void'] },
+                },
+                {
+                  name: 'encode',
+                  optional: true,
+                  type: { kind: 'reference', name: 'Encode', typeArguments: ['void'] },
+                },
+                { name: 'fetch', optional: true, type: { kind: 'reference', name: 'Fetch' } },
+                { name: 'headers', optional: true, type: { kind: 'object', properties: [] } },
+                {
+                  name: 'heartbeatCallback',
+                  optional: true,
+                  type: { kind: 'object', properties: [] },
+                },
+                { name: 'heartbeatIntervalMs', optional: true, type: 'number' },
+                {
+                  name: 'log_level',
+                  optional: true,
+                  type: { kind: 'reference', name: 'LogLevel' },
+                },
+                { name: 'logger', optional: true, type: { kind: 'object', properties: [] } },
+                { name: 'logLevel', optional: true, type: { kind: 'reference', name: 'LogLevel' } },
+                { name: 'params', optional: true, type: { kind: 'object', properties: [] } },
+                {
+                  name: 'reconnectAfterMs',
+                  optional: true,
+                  type: { kind: 'object', properties: [] },
+                },
+                { name: 'timeout', optional: true, type: 'number' },
+                {
+                  name: 'transport',
+                  optional: true,
+                  type: {
+                    kind: 'object',
+                    name: 'WebSocketLikeConstructor',
+                    properties: [{ name: 'constructor', optional: false, type: null }],
+                  },
+                },
+                { name: 'vsn', optional: true, type: 'string' },
+                { name: 'worker', optional: true, type: 'boolean' },
+                { name: 'workerUrl', optional: true, type: 'string' },
+              ],
+              name: 'RealtimeClientOptions',
+            },
+          },
+          {
+            name: 'storage',
+            optional: true,
+            type: { kind: 'reference', name: 'StorageClientOptions' },
+          },
+        ],
+        name: 'SupabaseClientOptions',
+      },
+    },
+  ]}
+/>
+
+<RefDefinitionReturnType
+  returnType={{
+    kind: 'object',
+    name: 'SupabaseClient',
+    properties: [
+      { name: 'constructor', optional: false, type: null },
+      { name: 'accessToken', optional: true, type: { kind: 'object', properties: [] } },
+      {
+        name: 'auth',
+        optional: false,
+        description:
+          'Supabase Auth allows you to create and manage user sessions for access to data that is secured by access policies.',
+        type: { kind: 'reference', name: 'SupabaseAuthClient' },
+      },
+      { name: 'authUrl', optional: false, type: { kind: 'reference', name: 'URL' } },
+      { name: 'changedAccessToken', optional: true, type: 'string' },
+      { name: 'fetch', optional: true, type: { kind: 'object', properties: [] } },
+      { name: 'functionsUrl', optional: false, type: { kind: 'reference', name: 'URL' } },
+      {
+        name: 'headers',
+        optional: false,
+        type: { kind: 'reference', name: 'Record', typeArguments: ['string', 'string'] },
+      },
+      {
+        name: 'realtime',
+        optional: false,
+        type: {
+          kind: 'object',
+          name: 'RealtimeClient',
+          properties: [
+            { name: 'constructor', optional: false, type: null },
+            {
+              name: 'accessToken',
+              optional: false,
+              type: {
+                kind: 'union',
+                types: [
+                  { kind: 'literal', value: null },
+                  { kind: 'object', properties: [] },
+                ],
+              },
+            },
+            {
+              name: 'accessTokenValue',
+              optional: false,
+              type: { kind: 'union', types: [{ kind: 'literal', value: null }, 'string'] },
+            },
+            {
+              name: 'apiKey',
+              optional: false,
+              type: { kind: 'union', types: [{ kind: 'literal', value: null }, 'string'] },
+            },
+            {
+              name: 'channels',
+              optional: false,
+              type: {
+                kind: 'array',
+                elementType: {
+                  kind: 'object',
+                  name: 'RealtimeChannel',
+                  properties: [
+                    { name: 'constructor', optional: false, type: null },
+                    {
+                      name: 'bindings',
+                      optional: false,
+                      type: {
+                        kind: 'reference',
+                        name: 'Record',
+                        typeArguments: [
+                          'string',
+                          { kind: 'array', elementType: { kind: 'reference', name: 'Binding' } },
+                        ],
+                      },
+                    },
+                    { name: 'broadcastEndpointURL', optional: false, type: 'string' },
+                    {
+                      name: 'params',
+                      optional: false,
+                      type: {
+                        kind: 'object',
+                        properties: [
+                          {
+                            name: 'config',
+                            optional: false,
+                            type: {
+                              kind: 'object',
+                              properties: [
+                                {
+                                  name: 'broadcast',
+                                  optional: true,
+                                  description:
+                                    'self option enables client to receive message it broadcast ack option instructs server to acknowledge that broadcast message was received replay option instructs server to replay broadcast messages',
+                                  type: {
+                                    kind: 'object',
+                                    properties: [
+                                      { name: 'ack', optional: true, type: 'boolean' },
+                                      {
+                                        name: 'replay',
+                                        optional: true,
+                                        type: { kind: 'reference', name: 'ReplayOption' },
+                                      },
+                                      { name: 'self', optional: true, type: 'boolean' },
+                                    ],
+                                  },
+                                },
+                                {
+                                  name: 'presence',
+                                  optional: true,
+                                  description:
+                                    'key option is used to track presence payload across clients',
+                                  type: {
+                                    kind: 'object',
+                                    properties: [
+                                      { name: 'enabled', optional: true, type: 'boolean' },
+                                      { name: 'key', optional: true, type: 'string' },
+                                    ],
+                                  },
+                                },
+                                {
+                                  name: 'private',
+                                  optional: true,
+                                  description:
+                                    'defines if the channel is private or not and if RLS policies will be used to check data',
+                                  type: 'boolean',
+                                },
+                              ],
+                            },
+                          },
+                        ],
+                        name: 'RealtimeChannelOptions',
+                      },
+                    },
+                    {
+                      name: 'presence',
+                      optional: false,
+                      type: {
+                        kind: 'object',
+                        name: 'RealtimePresence',
+                        properties: [
+                          { name: 'constructor', optional: false, type: null },
+                          {
+                            name: 'channel',
+                            optional: false,
+                            type: { kind: 'reference', name: 'RealtimeChannel' },
+                          },
+                          { name: 'state', optional: false, type: null },
+                        ],
+                      },
+                    },
+                    { name: 'private', optional: false, type: 'boolean' },
+                    {
+                      name: 'socket',
+                      optional: false,
+                      type: { kind: 'reference', name: 'RealtimeClient' },
+                    },
+                    { name: 'subTopic', optional: false, type: 'string' },
+                    {
+                      name: 'topic',
+                      optional: false,
+                      description: 'Topic name can be any string.',
+                      type: 'string',
+                    },
+                    { name: 'joinedOnce', optional: false, type: null },
+                    { name: 'joinPush', optional: false, type: null },
+                    { name: 'rejoinTimer', optional: false, type: null },
+                    { name: 'state', optional: false, type: null },
+                    { name: 'timeout', optional: false, type: null },
+                    { name: 'copyBindings', optional: false, type: null },
+                    { name: 'httpSend', optional: false, type: null },
+                    { name: 'on', optional: false, type: null },
+                    { name: 'presenceState', optional: false, type: null },
+                    { name: 'send', optional: false, type: null },
+                    { name: 'subscribe', optional: false, type: null },
+                    { name: 'teardown', optional: false, type: null },
+                    { name: 'track', optional: false, type: null },
+                    { name: 'unsubscribe', optional: false, type: null },
+                    { name: 'untrack', optional: false, type: null },
+                    { name: 'updateJoinPayload', optional: false, type: null },
+                  ],
+                },
+              },
+            },
+            { name: 'fetch', optional: false, type: { kind: 'object', properties: [] } },
+            { name: 'headers', optional: true, type: { kind: 'object', properties: [] } },
+            { name: 'httpEndpoint', optional: false, type: 'string' },
+            { name: 'logLevel', optional: true, type: { kind: 'reference', name: 'LogLevel' } },
+            { name: 'params', optional: true, type: { kind: 'object', properties: [] } },
+            { name: 'ref', optional: false, type: 'number' },
+            {
+              name: 'serializer',
+              optional: false,
+              type: { kind: 'reference', name: 'Serializer' },
+            },
+            { name: 'worker', optional: true, type: 'boolean' },
+            { name: 'workerRef', optional: true, type: { kind: 'reference', name: 'Worker' } },
+            { name: 'workerUrl', optional: true, type: 'string' },
+            { name: 'decode', optional: false, type: null },
+            { name: 'encode', optional: false, type: null },
+            { name: 'endPoint', optional: false, type: null },
+            { name: 'heartbeatCallback', optional: false, type: null },
+            { name: 'heartbeatIntervalMs', optional: false, type: null },
+            { name: 'heartbeatTimer', optional: false, type: null },
+            { name: 'pendingHeartbeatRef', optional: false, type: null },
+            { name: 'reconnectAfterMs', optional: false, type: null },
+            { name: 'reconnectTimer', optional: false, type: null },
+            { name: 'sendBuffer', optional: false, type: null },
+            { name: 'stateChangeCallbacks', optional: false, type: null },
+            { name: 'timeout', optional: false, type: null },
+            { name: 'transport', optional: false, type: null },
+            { name: 'vsn', optional: false, type: null },
+            { name: 'channel', optional: false, type: null },
+            { name: 'connect', optional: false, type: null },
+            { name: 'connectionState', optional: false, type: null },
+            { name: 'disconnect', optional: false, type: null },
+            { name: 'endpointURL', optional: false, type: null },
+            { name: 'getChannels', optional: false, type: null },
+            { name: 'isConnected', optional: false, type: null },
+            { name: 'isConnecting', optional: false, type: null },
+            { name: 'isDisconnecting', optional: false, type: null },
+            { name: 'log', optional: false, type: null },
+            { name: 'onHeartbeat', optional: false, type: null },
+            { name: 'push', optional: false, type: null },
+            { name: 'removeAllChannels', optional: false, type: null },
+            { name: 'removeChannel', optional: false, type: null },
+            { name: 'sendHeartbeat', optional: false, type: null },
+            { name: 'setAuth', optional: false, type: null },
+          ],
+        },
+      },
+      { name: 'realtimeUrl', optional: false, type: { kind: 'reference', name: 'URL' } },
+      {
+        name: 'rest',
+        optional: false,
+        type: {
+          kind: 'reference',
+          name: 'PostgrestClient',
+          typeArguments: [
+            { kind: 'typeParam', name: 'Database' },
+            { kind: 'typeParam', name: 'ClientOptions' },
+            { kind: 'typeParam', name: 'SchemaName' },
+          ],
+        },
+      },
+      {
+        name: 'storage',
+        optional: false,
+        description:
+          'Supabase Storage allows you to manage user-generated content, such as photos or videos.',
+        type: { kind: 'reference', name: 'StorageClient' },
+      },
+      { name: 'storageKey', optional: false, type: 'string' },
+      { name: 'storageUrl', optional: false, type: { kind: 'reference', name: 'URL' } },
+      {
+        name: 'supabaseKey',
+        optional: false,
+        description:
+          'The unique Supabase Key which is supplied when you create a new project in your project dashboard.',
+        type: 'string',
+      },
+      {
+        name: 'supabaseUrl',
+        optional: false,
+        description:
+          'The unique Supabase URL which is supplied when you create a new project in your project dashboard.',
+        type: 'string',
+      },
+      { name: 'functions', optional: false, type: null },
+      { name: 'channel', optional: false, type: null },
+      {
+        name: 'from',
+        optional: false,
+        description: 'Perform a query on a table or a view.',
+        type: null,
+      },
+      { name: 'getChannels', optional: false, type: null },
+      { name: 'removeAllChannels', optional: false, type: null },
+      { name: 'removeChannel', optional: false, type: null },
+      { name: 'rpc', optional: false, type: null },
+      { name: 'schema', optional: false, type: null },
+    ],
+  }}
+/>
+
+<h3 className="mb-3 text-base text-foreground">Examples</h3>
+<Tabs
+  scrollable
+  type="rounded-pills"
+>
+
+  <TabPanel id="ex-411" label="Creating a client">
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key')
+```
+
+<div className="mt-4">
+  <CollapsibleDetails
+    title="Notes"
+    content={
+      'With custom schemas\nBy default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.\nGo to [Settings > API > Exposed schemas](/dashboard/project/_/settings/api) and add the schema which you want to expose to the API.\n\nNote: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.'
+    }
+  />
+</div>
+
+  </TabPanel>
+
+  <TabPanel id="ex-412" label="With a custom domain">
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+// Use a custom domain as the supabase URL
+const supabase = createClient('https://my-custom-domain.com', 'publishable-or-anon-key')
+```
+
+<div className="mt-4">
+  <CollapsibleDetails
+    title="Notes"
+    content={
+      'Custom fetch implementation\n`supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,\nbut an alternative `fetch` implementation can be provided as an option.\nThis is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).'
+    }
+  />
+</div>
+
+  </TabPanel>
+
+  <TabPanel id="ex-413" label="With additional parameters">
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+const options = {
+  db: {
+    schema: 'public',
+  },
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+  },
+  global: {
+    headers: { 'x-my-custom-header': 'my-app-name' },
+  },
+}
+const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', options)
+```
+
+<div className="mt-4">
+  <CollapsibleDetails
+    title="Notes"
+    content={
+      'React Native options with AsyncStorage\nFor React Native we recommend using `AsyncStorage` as the storage implementation for Supabase Auth.'
+    }
+  />
+</div>
+
+  </TabPanel>
+
+  <TabPanel id="ex-414" label="With custom schemas">
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {
+  // Provide a custom schema. Defaults to "public".
+  db: { schema: 'other_schema' },
+})
+```
+
+<div className="mt-4">
+  <CollapsibleDetails
+    title="Notes"
+    content={
+      'By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.\nGo to [Settings > API > Exposed schemas](/dashboard/project/_/settings/api) and add the schema which you want to expose to the API.\n\nNote: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.'
+    }
+  />
+</div>
+
+  </TabPanel>
+
+  <TabPanel id="ex-415" label="Custom fetch implementation">
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {
+  global: { fetch: fetch.bind(globalThis) },
+})
+```
+
+<div className="mt-4">
+  <CollapsibleDetails
+    title="Notes"
+    content={
+      '`supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,\nbut an alternative `fetch` implementation can be provided as an option.\nThis is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).'
+    }
+  />
+</div>
+
+  </TabPanel>
+
+  <TabPanel id="ex-416" label="React Native options with AsyncStorage">
+
+```ts
+import 'react-native-url-polyfill/auto'
+import { createClient } from '@supabase/supabase-js'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {
+  auth: {
+    storage: AsyncStorage,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+  },
+})
+```
+
+<div className="mt-4">
+  <CollapsibleDetails
+    title="Notes"
+    content={
+      'For React Native we recommend using `AsyncStorage` as the storage implementation for Supabase Auth.'
+    }
+  />
+</div>
+
+  </TabPanel>
+
+  <TabPanel id="ex-417" label="React Native options with Expo SecureStore">
+
+```ts
+import 'react-native-url-polyfill/auto'
+import { createClient } from '@supabase/supabase-js'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as SecureStore from 'expo-secure-store'
+import * as aesjs from 'aes-js'
+import 'react-native-get-random-values'
+
+// As Expo's SecureStore does not support values larger than 2048
+// bytes, an AES-256 key is generated and stored in SecureStore, while
+// it is used to encrypt/decrypt values stored in AsyncStorage.
+class LargeSecureStore {
+  private async _encrypt(key: string, value: string) {
+    const encryptionKey = crypto.getRandomValues(new Uint8Array(256 / 8))
+
+    const cipher = new aesjs.ModeOfOperation.ctr(encryptionKey, new aesjs.Counter(1))
+    const encryptedBytes = cipher.encrypt(aesjs.utils.utf8.toBytes(value))
+
+    await SecureStore.setItemAsync(key, aesjs.utils.hex.fromBytes(encryptionKey))
+
+    return aesjs.utils.hex.fromBytes(encryptedBytes)
+  }
+
+  private async _decrypt(key: string, value: string) {
+    const encryptionKeyHex = await SecureStore.getItemAsync(key)
+    if (!encryptionKeyHex) {
+      return encryptionKeyHex
+    }
+
+    const cipher = new aesjs.ModeOfOperation.ctr(
+      aesjs.utils.hex.toBytes(encryptionKeyHex),
+      new aesjs.Counter(1)
+    )
+    const decryptedBytes = cipher.decrypt(aesjs.utils.hex.toBytes(value))
+
+    return aesjs.utils.utf8.fromBytes(decryptedBytes)
+  }
+
+  async getItem(key: string) {
+    const encrypted = await AsyncStorage.getItem(key)
+    if (!encrypted) {
+      return encrypted
+    }
+
+    return await this._decrypt(key, encrypted)
+  }
+
+  async removeItem(key: string) {
+    await AsyncStorage.removeItem(key)
+    await SecureStore.deleteItemAsync(key)
+  }
+
+  async setItem(key: string, value: string) {
+    const encrypted = await this._encrypt(key, value)
+
+    await AsyncStorage.setItem(key, encrypted)
+  }
+}
+
+const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {
+  auth: {
+    storage: new LargeSecureStore(),
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+  },
+})
+```
+
+<div className="mt-4">
+  <CollapsibleDetails
+    title="Notes"
+    content={
+      "If you wish to encrypt the user's session information, you can use `aes-js` and store the encryption key in Expo SecureStore.\nThe `aes-js` library, a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode.\nA new 256-bit encryption key is generated using the `react-native-get-random-values` library.\nThis key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.\n\nPlease make sure that:\n- You keep the `expo-secure-store`, `aes-js` and `react-native-get-random-values` libraries up-to-date.\n- Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs.\n  E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.\n- Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities."
+    }
+  />
+</div>
+
+  </TabPanel>
+
+  <TabPanel id="ex-418" label="With a database query">
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+
+const { data } = await supabase.from('profiles').select('*')
+```
+
+  </TabPanel>
+
+</Tabs>
 
 ---
 
