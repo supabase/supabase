@@ -148,10 +148,7 @@ async function processFile(filePath: string): Promise<{ outPath: string; output:
 
 async function generate() {
   // Process guides and reference content, mirroring content/ → public/docs/
-  const files = await globby([
-    'content/guides/**/!(_)*.mdx',
-    'content/reference/**/!(_)*.mdx',
-  ])
+  const files = await globby(['content/guides/**/!(_)*.mdx', 'content/reference/**/!(_)*.mdx'])
 
   let warnings = 0
 

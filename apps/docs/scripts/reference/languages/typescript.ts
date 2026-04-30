@@ -7,12 +7,7 @@
 
 import { readFileSync, readdirSync } from 'fs'
 import { join } from 'path'
-import type {
-  IgnoreDefinition,
-  OverrideDefinition,
-  SpecCategory,
-  SpecConfig,
-} from '../types.js'
+import type { IgnoreDefinition, OverrideDefinition, SpecCategory, SpecConfig } from '../types.js'
 
 type ContentItem = { kind: string; text: string }
 type BlockTag = { tag: string; name?: string; content?: ContentItem[] }
@@ -273,7 +268,7 @@ export function processSpec(specDir: string): { categories: SpecCategory[]; conf
     )
   )
   const overrideMap = new Map(
-    (config.overrideDefinitions as OverrideDefinition[] ?? []).map((e) => [
+    ((config.overrideDefinitions as OverrideDefinition[]) ?? []).map((e) => [
       `${e.category}|${e.definition}`,
       e,
     ])
