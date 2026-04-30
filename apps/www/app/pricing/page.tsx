@@ -1,10 +1,16 @@
 import type { Metadata } from 'next'
+
 import PricingContent from './PricingContent'
 
 export const metadata: Metadata = {
   title: 'Pricing & Fees | Supabase',
   description:
     'Explore Supabase fees and pricing information. Find our competitive pricing Plans, with no hidden pricing. We have a generous Free Plan for those getting started, and Pay As You Go for those scaling up.',
+  alternates: {
+    types: {
+      'text/markdown': '/pricing.md',
+    },
+  },
   openGraph: {
     title: 'Pricing & Fees | Supabase',
     description:

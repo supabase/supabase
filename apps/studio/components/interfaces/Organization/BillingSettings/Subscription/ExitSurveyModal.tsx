@@ -118,7 +118,7 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
                       'pl-2 pr-3 text-center text-sm',
                       'shadow-sm transition-all duration-100',
                       active
-                        ? `bg-foreground text-background opacity-100 hover:bg-opacity-75`
+                        ? `bg-foreground text-background opacity-100 hover:bg-foreground/75`
                         : `bg-border-strong text-foreground opacity-75 hover:opacity-100`
                     )}
                   >

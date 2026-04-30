@@ -71,9 +71,12 @@ Push notifications are an important part of any mobile app. They allow you to se
       old_record: null | Notification
     }
 
+    const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
+
+    // If you want to use a different api key, change 'default' to your preferred key name
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      SUPABASE_SECRET_KEYS['default']
     )
 
     Deno.serve(async (req) => {
@@ -183,9 +186,12 @@ Push notifications are an important part of any mobile app. They allow you to se
       schema: 'public'
     }
 
+    const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
+
+    // If you want to use a different api key, change 'default' to your preferred key name
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      SUPABASE_SECRET_KEYS['default']
     )
 
     Deno.serve(async (req) => {

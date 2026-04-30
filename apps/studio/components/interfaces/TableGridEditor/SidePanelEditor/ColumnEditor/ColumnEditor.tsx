@@ -244,7 +244,7 @@ export const ColumnEditor = ({
           </SheetTitle>
         </SheetHeader>
 
-        <SheetSection className="overflow-auto flex-grow p-0">
+        <SheetSection className="overflow-auto grow p-0">
           <FormSection
             header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}
           >

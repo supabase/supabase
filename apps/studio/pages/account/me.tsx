@@ -175,7 +175,7 @@ const ProfileFieldLoadingRow = ({
     <div className="flex flex-col justify-center items-start md:items-end shrink-0 md:w-1/2 xl:w-2/5 md:min-w-100">
       <ShimmeringLoader className="h-8 w-full rounded-md py-0" />
     </div>
-    <div className="flex flex-col min-w-0 flex-grow">
+    <div className="flex flex-col min-w-0 grow">
       <ShimmeringLoader className={`${labelWidth} h-4 py-0`} />
       {descriptionWidth !== undefined && (
         <ShimmeringLoader className={`${descriptionWidth} mt-2 h-3 py-0`} />

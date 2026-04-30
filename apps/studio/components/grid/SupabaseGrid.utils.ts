@@ -3,16 +3,24 @@ import { compact } from 'lodash'
 import { useSearchParams } from 'next/navigation'
 import { parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo } from 'react'
-import { CalculatedColumn, CellKeyboardEvent } from 'react-data-grid'
+import {
+  CalculatedColumn,
+  CellKeyboardEvent,
+  CellKeyDownArgs,
+  RowsChangeData,
+} from 'react-data-grid'
 import { copyToClipboard } from 'ui'
 
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
-import type { Sort, SupaColumn, SupaTable } from './types'
+import type { Sort, SupaColumn, SupaRow, SupaTable } from './types'
 import { formatClipboardValue } from './utils/common'
+import { isBoolColumn } from './utils/types'
 import type { Filter, SavedState } from '@/components/grid/types'
 import { Entity, isTableLike } from '@/data/table-editor/table-editor-types'
 import { BASE_PATH } from '@/lib/constants'
+import { eventMatchesAnyShortcut } from '@/state/shortcuts/matchEvent'
+import { tableEditorRegistry } from '@/state/shortcuts/registry/table-editor'
 
 export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
   if (Array.isArray(sort)) {
@@ -264,18 +272,51 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
   }, [urlParams, table, projectRef])
 }
 
-export const handleCopyCell = (
-  {
-    mode,
-    column,
-    row,
-  }: { mode: 'SELECT' | 'EDIT'; column: CalculatedColumn<any, unknown>; row: any },
-  event: CellKeyboardEvent
+export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
+  args: CellKeyDownArgs<TRow, unknown>,
+  event: CellKeyboardEvent,
+  context?: {
+    rows: TRow[]
+    columns: SupaColumn[]
+    onRowsChange: (rows: TRow[], data: RowsChangeData<TRow, unknown>) => void
+  }
 ) => {
-  if (mode === 'SELECT' && event.code === 'KeyC' && (event.metaKey || event.ctrlKey)) {
-    const colKey = column.key
-    const cellValue = row[colKey] ?? ''
+  const { mode, column, row, rowIdx } = args
+  if (mode !== 'SELECT') return
+
+  if (event.code === 'KeyC' && (event.metaKey || event.ctrlKey)) {
+    const cellValue = row[column.key] ?? ''
     const value = formatClipboardValue(cellValue)
     copyToClipboard(value)
   }
+  // Let registered shortcuts win over rdg's "type a key to enter edit mode" default.
+  if (eventMatchesAnyShortcut(event.nativeEvent, tableEditorRegistry)) {
+    event.preventGridDefault()
+    return
+  }
+
+  // Toggle boolean cells with T/F when no modifier keys are pressed.
+  if (context === undefined) return
+
+  const key = event.key.toLowerCase()
+  if (event.altKey || event.ctrlKey || event.metaKey || (key !== 't' && key !== 'f')) return
+
+  const supaColumn = context.columns.find((c) => c.name === column.key)
+  if (
+    supaColumn === undefined ||
+    !isBoolColumn(supaColumn.dataType) ||
+    column.renderEditCell == null
+  ) {
+    return
+  }
+
+  event.preventDefault()
+  event.preventGridDefault()
+
+  const nextValue = key === 't'
+  if (row[column.key] === nextValue) return
+
+  const updatedRows = [...context.rows]
+  updatedRows[rowIdx] = { ...row, [column.key]: nextValue }
+  context.onRowsChange(updatedRows, { indexes: [rowIdx], column })
 }

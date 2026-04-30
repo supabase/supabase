@@ -256,7 +256,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                     className={cn('mt-1.5', provider.name === 'github' ? 'dark:invert' : '')}
                   />
                 )}
-                <div className="flex-grow mt-0.5">
+                <div className="grow mt-0.5">
                   <p className="capitalize">{providerName}</p>
                   <p className="text-xs text-foreground-light">
                     Signed in with a {providerName} account via{' '}

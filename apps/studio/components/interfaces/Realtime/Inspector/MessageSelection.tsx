@@ -24,9 +24,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   return (
-    <div
-      className={cn('relative flex h-full flex-grow flex-col border-l overflow-y-scroll bg-200')}
-    >
+    <div className={cn('relative flex h-full grow flex-col border-l overflow-y-scroll bg-200')}>
       <div
         className={cn(
           'absolute flex h-full w-full flex-col items-center justify-center gap-2 bg-200 text-center opacity-0 transition-all',
@@ -66,7 +64,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
           </div>
         </div>
       </div>
-      <div className="relative h-px flex-grow">
+      <div className="relative h-px grow">
         <div className="pt-4 flex flex-col gap-4">
           <div className="px-4 flex flex-row justify-between items-center">
             <div className="transition">

@@ -33,7 +33,7 @@ export function McpConfigurationOptions({
   return (
     <div className={cn('flex flex-col gap-4 lg:flex-row lg:gap-12 lg:items-baseline', className)}>
       {/* Readonly Mode */}
-      <div className="space-y-3 lg:flex-shrink-0">
+      <div className="space-y-3 lg:shrink-0">
         <div className="flex items-center gap-2">
           <Label htmlFor="readonly" className="text-sm">
             Read-only

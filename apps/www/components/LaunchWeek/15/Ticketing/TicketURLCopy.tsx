@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react'
 import { LW14_URL } from 'lib/constants'
 import { Check, Copy } from 'lucide-react'
-import { UserTicketData } from '../hooks/use-conf-data'
+import { useRef, useState } from 'react'
 import { cn } from 'ui'
+
+import { UserTicketData } from '../hooks/use-conf-data'
 
 export default function TicketURLCopy({
   user,
@@ -36,7 +37,7 @@ export default function TicketURLCopy({
       )}
     >
       <span className="truncate">{displayUrl}</span>
-      <div className="w-6 min-w-6 h-6 flex items-center justify-center flex-shrink-0 border border-strong rounded bg-muted hover:bg-selection hover:border-stronger">
+      <div className="w-6 min-w-6 h-6 flex items-center justify-center shrink-0 border border-strong rounded bg-muted hover:bg-selection hover:border-stronger">
         {copied ? <Check size={14} strokeWidth={3} /> : <Copy size={14} strokeWidth={1.5} />}
       </div>
     </button>

@@ -257,7 +257,7 @@ export const CreateIcebergWrapperSheet = ({
             <SheetHeader>
               <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
             </SheetHeader>
-            <SheetSection className="flex-grow overflow-y-auto">
+            <SheetSection className="grow overflow-y-auto">
               <PageSection>
                 <PageSectionMeta>
                   <PageSectionSummary>

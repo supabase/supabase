@@ -127,6 +127,15 @@ export const lintInfoMap: LintInfo[] = [
     category: 'security',
   },
   {
+    name: 'auth_allow_anonymous_sign_ins',
+    title: 'Anonymous Sign-Ins Allowed',
+    icon: <User className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/auth/providers`,
+    linkText: 'View settings',
+    docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins`,
+    category: 'security',
+  },
+  {
     name: 'rls_disabled_in_public',
     title: 'RLS Disabled in Public',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,

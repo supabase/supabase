@@ -117,7 +117,7 @@ export const ChartHighlightActions = ({
                 className="w-full flex items-center gap-1.5"
               >
                 {action.icon}
-                <span className="flex-grow text-left">{labelNode}</span>
+                <span className="grow text-left">{labelNode}</span>
                 {rightNode}
               </button>
             </DropdownMenuItem>
