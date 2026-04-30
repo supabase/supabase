@@ -3,15 +3,18 @@ import Link from 'next/link'
 import { useRouter } from 'next/compat/router'
 import { NextSeo } from 'next-seo'
 import { motion } from 'framer-motion'
-import { Search } from 'lucide-react'
+import { LayoutGrid, Search, Table2 } from 'lucide-react'
 import { debounce } from 'lib/helpers'
 
 import { Button, Checkbox, cn, Input } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
+import { FeaturesMatrix } from '~/components/FeaturesMatrix'
 
 import { features } from '~/data/features'
+
+type ViewMode = 'grid' | 'matrix'
 
 function FeaturesPage() {
   const router = useRouter()
@@ -22,6 +25,9 @@ function FeaturesPage() {
   const [showSelfHostedOnly, setShowSelfHostedOnly] = useState<boolean>(
     router?.query.selfHosted === 'true'
   )
+  const [viewMode, setViewMode] = useState<ViewMode>(
+    (router?.query.view as ViewMode) === 'matrix' ? 'matrix' : 'grid'
+  )
 
   const HAS_ACTIVE_FILTERS = selectedProducts.length || searchTerm.length || showSelfHostedOnly
 
@@ -30,7 +36,7 @@ function FeaturesPage() {
   // Debounced function to update URL params
   const updateQueryParamsDebounced = useCallback(
     debounce(() => updateQueryParams(), 300),
-    [searchTerm, selectedProducts, showSelfHostedOnly]
+    [searchTerm, selectedProducts, showSelfHostedOnly, viewMode]
   )
 
   const updateQueryParams = () => {
@@ -38,6 +44,7 @@ function FeaturesPage() {
     if (searchTerm) params.set('q', searchTerm)
     if (selectedProducts.length > 0) params.set('products', selectedProducts.join(','))
     if (showSelfHostedOnly) params.set('selfHosted', 'true')
+    if (viewMode === 'matrix') params.set('view', 'matrix')
 
     router?.replace({ pathname: '/features', query: params.toString() }, undefined, {
       shallow: true,
@@ -58,7 +65,9 @@ function FeaturesPage() {
     }
     const selfHostedParam = router?.query.selfHosted === 'true'
     if (selfHostedParam !== showSelfHostedOnly) setShowSelfHostedOnly(selfHostedParam)
-  }, [router?.query.q, router?.query.products, router?.query.selfHosted])
+    const viewParam = (router?.query.view as ViewMode) === 'matrix' ? 'matrix' : 'grid'
+    if (viewParam !== viewMode) setViewMode(viewParam)
+  }, [router?.query.q, router?.query.products, router?.query.selfHosted, router?.query.view])
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,8 +206,42 @@ function FeaturesPage() {
               </Button>
             </div>
           </div>
-          <div className="md:col-span-3 flex flex-col gap-4 md:gap-8">
-            {!filteredFeatures?.length ? (
+          <div className="md:col-span-3 flex flex-col gap-4 md:gap-6">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-foreground-muted text-xs">
+                {filteredFeatures.length} feature{filteredFeatures.length !== 1 ? 's' : ''}
+              </span>
+              <div className="flex items-center rounded-lg border border-muted overflow-hidden">
+                <button
+                  title="Grid view"
+                  onClick={() => setViewMode('grid')}
+                  className={cn(
+                    'flex items-center justify-center w-8 h-8 transition-colors',
+                    viewMode === 'grid'
+                      ? 'bg-surface-300 text-foreground'
+                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                  )}
+                >
+                  <LayoutGrid size={14} />
+                </button>
+                <button
+                  title="Matrix view"
+                  onClick={() => setViewMode('matrix')}
+                  className={cn(
+                    'flex items-center justify-center w-8 h-8 transition-colors border-l border-muted',
+                    viewMode === 'matrix'
+                      ? 'bg-surface-300 text-foreground'
+                      : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
+                  )}
+                >
+                  <Table2 size={14} />
+                </button>
+              </div>
+            </div>
+
+            {viewMode === 'matrix' ? (
+              <FeaturesMatrix features={filteredFeatures} />
+            ) : !filteredFeatures?.length ? (
               <p className="text-foreground-lighter text-sm">
                 No features found with these filters
               </p>
