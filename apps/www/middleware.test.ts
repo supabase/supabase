@@ -194,6 +194,21 @@ describe('www middleware', () => {
 
       expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/auth')
     })
+
+    it('tolerates OWS around the q parameter (per RFC 9110)', () => {
+      const req = makeRequest('/auth', { accept: 'text/html ; q = 1.0, text/markdown ; q = 0.5' })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBeNull()
+    })
+
+    it('ignores out-of-range q-values rather than treating them as preference', () => {
+      const req = makeRequest('/auth', { accept: 'text/html;q=2.0, text/markdown;q=1.0' })
+      const res = middleware(req)
+
+      // text/html's q=2.0 is invalid and falls back to default 1.0; tie -> markdown.
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/auth')
+    })
   })
 
   describe('406 Not Acceptable', () => {
@@ -228,6 +243,24 @@ describe('www middleware', () => {
 
       expect(res.status).not.toBe(406)
       expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/pricing')
+    })
+
+    it('returns 406 on changelog entries when Accept excludes every type', () => {
+      const req = makeRequest('/changelog/100', {
+        accept: 'application/x-content-negotiation-probe',
+      })
+      const res = middleware(req)
+
+      expect(res.status).toBe(406)
+    })
+
+    it('sets Cache-Control: no-store and Vary: Accept on 406 responses', () => {
+      const req = makeRequest('/pricing', { accept: 'application/x-content-negotiation-probe' })
+      const res = middleware(req)
+
+      expect(res.status).toBe(406)
+      expect(res.headers.get('Cache-Control')).toBe('no-store')
+      expect(res.headers.get('Vary')).toBe('Accept')
     })
   })
 

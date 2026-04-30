@@ -21,10 +21,13 @@ function parseAccept(header: string) {
     const [type, ...params] = part.trim().split(';')
     let q = 1
     for (const p of params) {
-      const [k, v] = p.trim().split('=')
+      // Tolerate whitespace around `=` per RFC 9110 OWS rules: `q = 0.5`.
+      const [k, v] = p.split('=').map((s) => s.trim())
       if (k === 'q') {
         const parsed = parseFloat(v ?? '')
-        if (Number.isFinite(parsed)) q = parsed
+        // Clamp to [0, 1] per RFC 9110 §12.4.2; out-of-range values are
+        // ignored rather than skewing the comparison.
+        if (Number.isFinite(parsed) && parsed >= 0 && parsed <= 1) q = parsed
       }
     }
     const t = type.trim()
@@ -62,17 +65,24 @@ export function middleware(request: NextRequest) {
   const isChangelogEntry = slug === 'changelog' || /^changelog\/\d+/.test(slug)
 
   // RFC 9110: when the client's Accept header excludes every type we can
-  // produce, return 406. Skip for LLM UAs (we always serve them markdown)
-  // and for clients with no Accept header (browser default fallback).
+  // produce, return 406. Applies to any path that has a markdown variant
+  // (MD_PAGES allowlist or numeric changelog entries). Skip for LLM UAs
+  // (we always serve them markdown) and for clients with no Accept header
+  // (browser default fallback).
   if (
-    isMdEligible &&
+    (isMdEligible || isChangelogEntry) &&
     !isLlmAgent &&
     accept !== null &&
     accept.markdown === 0 &&
     accept.html === 0 &&
     accept.any === 0
   ) {
-    return new NextResponse('Not Acceptable', { status: 406 })
+    // no-store guards against an edge cache pinning a probe response to the
+    // URL; Vary: Accept makes intent explicit even though we don't cache.
+    return new NextResponse('Not Acceptable', {
+      status: 406,
+      headers: { 'Cache-Control': 'no-store', Vary: 'Accept' },
+    })
   }
 
   // Serve markdown when the client either matches an LLM UA or expresses a
