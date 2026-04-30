@@ -29,8 +29,6 @@ Go to the Project Settings (the cog icon), open the API tab, and find your API U
 
 The `publishable` key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token.
 
-![Supabase Publishable Key](supabase_publishable_key.jpg?raw=true 'Supabase Publishable Key')
-
 ### 4. Pull this example git repository
 
 `git clone <<this repository url>> `

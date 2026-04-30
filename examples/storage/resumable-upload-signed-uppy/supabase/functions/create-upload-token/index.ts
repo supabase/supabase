@@ -1,9 +1,11 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'jsr:@supabase/supabase-js'
 
+const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
+
 Deno.serve(async (req) => {
   const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
-  const SUPABASE_SECRET_KEY = Deno.env.get('SUPABASE_SECRET_KEY') ?? ''
+  const SUPABASE_SECRET_KEY = Deno.env.get(SUPABASE_SECRET_KEYS['default']) ?? ''
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY)
 
