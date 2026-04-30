@@ -186,16 +186,61 @@ If editing or adding code, state your assumptions, ensure any code examples are 
 5. Prefer importing external dependencies via \`npm:\` or \`jsr:\`. Minimize imports from \`deno.land/x\`, \`esm.sh\`, or \`unpkg.com\`. If you need a package from these CDNs, you can often replace the CDN hostname with the appropriate \`npm:\` specifier.
 6. Node built-in APIs can be used by importing them with the \`node:\` specifier. For example, import Node's process as \`import process from "node:process";\`. Use Node APIs to fill in any gaps in Deno's APIs.
 7. Do **not** use \`import { serve } from "https://deno.land/std@0.168.0/http/server.ts";\`. Instead, use the built-in \`Deno.serve\`.
-8. The following environment variables (secrets) are automatically populated in both local and hosted Supabase environments. Users do not need to set them manually:
-    - SUPABASE_URL
-    - SUPABASE_ANON_KEY
-    - SUPABASE_SERVICE_ROLE_KEY
-    - SUPABASE_DB_URL
+8. The following environment variables are automatically populated in both local and hosted Supabase environments. Users do not need to set them manually. When reading any of these env vars, validate at startup with an explicit \`if (!x) throw new Error(...)\` check rather than \`!\` non-null assertions or \`??\` fallbacks:
+    - \`SUPABASE_URL\` — The API gateway for the Supabase project.
+    - \`SUPABASE_DB_URL\` — The direct PostgreSQL connection URL. Server-only; never expose to a browser.
+    - \`SUPABASE_PUBLISHABLE_KEYS\` — A JSON-encoded object of publishable API keys, keyed by the name configured for each key (values look like \`sb_publishable_...\`). Safe to use in a browser if RLS is enabled. Key names are project-specific and can be added or deleted, so do not assume any particular name exists. **Always ask the user which key name to use before emitting this code; never emit \`'<KEY_NAME>'\` verbatim.** Always parse before use and look up by name — do not pass the raw env-var string anywhere a key is expected:
+      \`\`\`ts
+      const raw = Deno.env.get('SUPABASE_PUBLISHABLE_KEYS');
+      if (!raw) throw new Error('SUPABASE_PUBLISHABLE_KEYS is required');
+      const publishableKeys = JSON.parse(raw);
+      // Ask the user which key name to use; do NOT emit '<KEY_NAME>' literally.
+      const publishableKey = publishableKeys['<KEY_NAME>'];
+      \`\`\`
+    - \`SUPABASE_SECRET_KEYS\` — Same shape as \`SUPABASE_PUBLISHABLE_KEYS\` (values look like \`sb_secret_...\`). Server-only; never expose to a browser. Same caveat about key names — they are not guaranteed.
+    - \`SUPABASE_JWKS\` — A JSON-encoded JWKS envelope (\`{ "keys": [...] }\`) of public keys for verifying asymmetric user JWTs. Parse it and pass the result to a JWKS library — see the *Verifying the request \`Authorization\` header* guideline below for the full pattern.
+    - \`SUPABASE_ANON_KEY\`, \`SUPABASE_SERVICE_ROLE_KEY\` — **Deprecated** legacy keys; do **not** use in new code. Migrate to \`SUPABASE_PUBLISHABLE_KEYS\` / \`SUPABASE_SECRET_KEYS\` issued through JWT Signing Keys.
+    - \`SB_REGION\` — The region the function was invoked in. Set per request.
+    - \`SB_EXECUTION_ID\` — A unique identifier for each function instance. Set per request.
+    - \`DENO_DEPLOYMENT_ID\` — The version of the function code. Set when the function is deployed.
 9. To set additional environment variables, users can specify them in an env file and execute \`supabase secrets set --env-file path/to/env-file\`.
-10. Each Edge Function can handle multiple routes. Using a routing library such as Express or Hono is recommended for maintainability; each route must be prefixed with \`/function-name\` for proper routing.
-11. File write operations are only permitted in the \`/tmp\` directory. Both Deno and Node File APIs may be used.
-12. Use the static method \`EdgeRuntime.waitUntil(promise)\` to execute long-running tasks in the background without blocking the response. Do **not** assume it is available on the request or execution context.
-13. Favor \`Deno.serve\` for creating Edge Functions where possible.
+10. Verifying the request \`Authorization\` header.
+
+    **\`SUPABASE_PUBLISHABLE_KEYS\` and \`SUPABASE_SECRET_KEYS\` are not JWTs — they ride in the \`apikey\` header, not \`Authorization\`. Never compare them to the \`Authorization\` value.**
+
+    The \`Authorization\` header value is a JWT. Whether it is asymmetric or symmetric depends on whether the project has rotated to JWT Signing Keys, not on the client's API-key format.
+
+    **If \`verify_jwt = false\` (configured per-function in \`supabase/config.toml\`), the platform performs no auth check before the handler runs. The handler is then fully responsible for authenticating the caller — without an explicit check inside the handler, anyone can invoke the function.**
+    - For **asymmetric** JWTs (project has rotated to JWT Signing Keys), verify with \`SUPABASE_JWKS\` and \`jose\`. Hoist the JWKS to module scope so it builds once per isolate, pin algorithms to prevent algorithm-confusion attacks, and validate the issuer:
+      \`\`\`ts
+      import { createLocalJWKSet, jwtVerify } from 'npm:jose@5';
+
+      const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+      const SUPABASE_JWKS = Deno.env.get('SUPABASE_JWKS');
+      if (!SUPABASE_URL) throw new Error('SUPABASE_URL is required');
+      if (!SUPABASE_JWKS) throw new Error('SUPABASE_JWKS is required');
+
+      const JWKS = createLocalJWKSet(JSON.parse(SUPABASE_JWKS));
+
+      Deno.serve(async (req) => {
+        // With \`verify_jwt = true\` (the default), the platform has already validated the JWT before the handler runs, so the header is guaranteed to be present.
+        const token = req.headers.get('Authorization')!.replace('Bearer ', '');
+
+        try {
+          const { payload } = await jwtVerify(token, JWKS, {
+            algorithms: ['ES256', 'RS256', 'EdDSA'],
+            issuer: \`\${SUPABASE_URL}/auth/v1\`,
+          });
+        } catch {
+          return new Response('Unauthorized', { status: 401 });
+        }
+      });
+      \`\`\`
+    - For **symmetric** JWTs (legacy HS256), the signing secret is not exposed to the function, so offline cryptographic verification is not possible. Recommend migrating to asymmetric signing keys; do not implement custom verification.
+11. Each Edge Function can handle multiple routes. Using a routing library such as Express or Hono is recommended for maintainability; each route must be prefixed with \`/function-name\` for proper routing.
+12. File write operations are only permitted in the \`/tmp\` directory. Both Deno and Node File APIs may be used.
+13. Use the static method \`EdgeRuntime.waitUntil(promise)\` to execute long-running tasks in the background without blocking the response. Do **not** assume it is available on the request or execution context.
+14. Favor \`Deno.serve\` for creating Edge Functions where possible.
 
 ## Example Templates
 
