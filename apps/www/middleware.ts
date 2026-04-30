@@ -9,33 +9,58 @@ import { MD_PAGES } from './app/api-v2/md/content.generated'
 // differs from the human HTML page would risk SEO and cloaking penalties.
 const LLM_USER_AGENT = /\bClaude-User\b|\bClaude-Web\b|\bChatGPT-User\b|\bPerplexityBot\b/i
 
-// Parse an HTTP Accept header into the highest q-value seen for each type
-// we can serve. Returns 0 for absent types. `text/*` contributes to both
-// html and markdown; `*/*` is tracked separately so we can detect "client
-// will accept anything" without it overriding an explicit type preference.
-function parseAccept(header: string) {
-  let html = 0
-  let markdown = 0
-  let any = 0
-  for (const part of header.toLowerCase().split(',')) {
-    const [type, ...params] = part.trim().split(';')
-    let q = 1
-    for (const p of params) {
-      // Tolerate whitespace around `=` per RFC 9110 OWS rules: `q = 0.5`.
-      const [k, v] = p.split('=').map((s) => s.trim())
-      if (k === 'q') {
-        const parsed = parseFloat(v ?? '')
-        // Clamp to [0, 1] per RFC 9110 §12.4.2; out-of-range values are
-        // ignored rather than skewing the comparison.
-        if (Number.isFinite(parsed) && parsed >= 0 && parsed <= 1) q = parsed
-      }
-    }
-    const t = type.trim()
-    if (t === 'text/markdown' || t === 'text/*') markdown = Math.max(markdown, q)
-    if (t === 'text/html' || t === 'text/*') html = Math.max(html, q)
-    if (t === '*/*') any = Math.max(any, q)
+// Media ranges (RFC 9110 §5.3.2) ordered from most to least specific. Only
+// the ranges below influence whether we serve markdown or HTML.
+const RANGES = ['text/markdown', 'text/html', 'text/*', '*/*'] as const
+type Range = (typeof RANGES)[number]
+
+function isRange(s: string): s is Range {
+  return (RANGES as readonly string[]).includes(s)
+}
+
+// Extract the q parameter (defaulting to 1) from a single Accept entry's
+// parameter list. Tolerates OWS around `=` per RFC 9110, and clamps to
+// [0, 1] per §12.4.2 — out-of-range values are ignored.
+function parseQ(params: string[]): number {
+  for (const p of params) {
+    const [k, v] = p.split('=').map((s) => s.trim())
+    if (k !== 'q') continue
+    const q = parseFloat(v ?? '')
+    if (Number.isFinite(q) && q >= 0 && q <= 1) return q
   }
-  return { html, markdown, any }
+  return 1
+}
+
+// Parse an Accept header into effective q-values for the two types we can
+// produce. Specificity precedence (RFC 9110 §12.5.1) means a more-specific
+// listed range wins over a broader wildcard, which preserves the difference
+// between "absent" and "explicitly q=0" — critical for the 406 path.
+//
+// `markdownExplicit` lets the caller bias tie-breaks: a bare `Accept: */*`
+// is "I don't care", not "give me markdown", so we only flip to markdown on
+// a tie when the client actually named a text type.
+function parseAccept(header: string) {
+  const seen = new Map<Range, number>()
+
+  for (const entry of header.toLowerCase().split(',')) {
+    const [rawType, ...params] = entry.trim().split(';')
+    const range = rawType.trim()
+    if (!isRange(range)) continue
+    seen.set(range, Math.max(seen.get(range) ?? -1, parseQ(params)))
+  }
+
+  return {
+    html: seen.get('text/html') ?? seen.get('text/*') ?? seen.get('*/*') ?? 0,
+    markdown: seen.get('text/markdown') ?? seen.get('text/*') ?? seen.get('*/*') ?? 0,
+    markdownExplicit: seen.has('text/markdown') || seen.has('text/*'),
+  }
+}
+
+function shouldServeMarkdown(accept: ReturnType<typeof parseAccept>): boolean {
+  if (accept.markdown === 0) return false
+  if (accept.markdown > accept.html) return true
+  // Equal q-value: only switch on an explicit markdown / text/* preference.
+  return accept.markdown === accept.html && accept.markdownExplicit
 }
 
 export function middleware(request: NextRequest) {
@@ -63,19 +88,19 @@ export function middleware(request: NextRequest) {
   const slug = (pathname === '/' ? 'homepage' : pathname.slice(1)).replace(/\/$/, '')
   const isMdEligible = MD_PAGES.has(slug)
   const isChangelogEntry = slug === 'changelog' || /^changelog\/\d+/.test(slug)
+  const hasMdVariant = isMdEligible || isChangelogEntry
 
   // RFC 9110: when the client's Accept header excludes every type we can
-  // produce, return 406. Applies to any path that has a markdown variant
-  // (MD_PAGES allowlist or numeric changelog entries). Skip for LLM UAs
-  // (we always serve them markdown) and for clients with no Accept header
-  // (browser default fallback).
+  // produce, return 406. After specificity resolution, html === 0 and
+  // markdown === 0 covers both "absent and uncovered by any wildcard" and
+  // "explicitly rejected with q=0". Skip for LLM UAs (we always serve them
+  // markdown) and for clients with no Accept header (browser default).
   if (
-    (isMdEligible || isChangelogEntry) &&
+    hasMdVariant &&
     !isLlmAgent &&
     accept !== null &&
     accept.markdown === 0 &&
-    accept.html === 0 &&
-    accept.any === 0
+    accept.html === 0
   ) {
     // no-store guards against an edge cache pinning a probe response to the
     // URL; Vary: Accept makes intent explicit even though we don't cache.
@@ -85,11 +110,7 @@ export function middleware(request: NextRequest) {
     })
   }
 
-  // Serve markdown when the client either matches an LLM UA or expresses a
-  // preference for text/markdown over text/html via q-values. Equal q ties
-  // resolve to markdown since the client explicitly listed it as an option.
-  const wantsMarkdown =
-    isLlmAgent || (accept !== null && accept.markdown > 0 && accept.markdown >= accept.html)
+  const wantsMarkdown = isLlmAgent || (accept !== null && shouldServeMarkdown(accept))
 
   if (wantsMarkdown) {
     if (isMdEligible) {
