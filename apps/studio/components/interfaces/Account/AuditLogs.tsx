@@ -9,7 +9,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { filterByProjects, sortAuditLogs } from './AuditLogs.utils'
-import { V2LogDetailsPanel } from '@/components/interfaces/AuditLogs/V2LogDetailsPanel'
+import { LogDetailsPanel } from '@/components/interfaces/AuditLogs/LogDetailsPanel'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import Table from '@/components/to-be-cleaned/Table'
 import AlertError from '@/components/ui/AlertError'
@@ -299,7 +299,7 @@ export const AuditLogs = () => {
         </ScaffoldSection>
       </ScaffoldContainer>
 
-      <V2LogDetailsPanel selectedLog={selectedLog} onClose={() => setSelectedLog(undefined)} />
+      <LogDetailsPanel selectedLog={selectedLog} onClose={() => setSelectedLog(undefined)} />
     </>
   )
 }

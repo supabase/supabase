@@ -8,12 +8,12 @@ import {
 } from '@/components/ui/Forms/FormSection'
 import { TIMESTAMP_MICROS_PER_MS, type V2AuditLog } from '@/data/profile/profile-audit-logs-query'
 
-interface V2LogDetailsPanelProps {
+interface LogDetailsPanelProps {
   selectedLog?: V2AuditLog
   onClose: () => void
 }
 
-export const V2LogDetailsPanel = ({ selectedLog, onClose }: V2LogDetailsPanelProps) => {
+export const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) => {
   const timestamp = selectedLog
     ? dayjs(selectedLog.timestamp / TIMESTAMP_MICROS_PER_MS).format('DD MMM YYYY, HH:mm:ss')
     : ''

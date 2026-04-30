@@ -16,7 +16,7 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { filterByProjects, filterByUsers, sortAuditLogs } from './AuditLogs.utils'
-import { V2LogDetailsPanel } from '@/components/interfaces/AuditLogs/V2LogDetailsPanel'
+import { LogDetailsPanel } from '@/components/interfaces/AuditLogs/LogDetailsPanel'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import Table from '@/components/to-be-cleaned/Table'
@@ -427,7 +427,7 @@ export const AuditLogs = () => {
         </ScaffoldSection>
       </ScaffoldContainer>
 
-      <V2LogDetailsPanel selectedLog={selectedLog} onClose={() => setSelectedLog(undefined)} />
+      <LogDetailsPanel selectedLog={selectedLog} onClose={() => setSelectedLog(undefined)} />
     </>
   )
 }
