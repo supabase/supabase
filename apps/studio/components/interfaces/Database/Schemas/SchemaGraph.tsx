@@ -15,6 +15,7 @@ import { Check, ChevronDown, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 import '@xyflow/react/dist/style.css'
 
@@ -208,6 +209,7 @@ export const SchemaGraph = () => {
     if (!tables) return
     copyToClipboard(tablesToSQL(tables))
     setCopied(true)
+    toast.success('Successfully copied as SQL')
   }
 
   const copyAsMarkdown = () => {
@@ -217,6 +219,7 @@ export const SchemaGraph = () => {
       .map((node) => node.data as TableNodeData)
     copyToClipboard(getSchemaAsMarkdown(selectedSchema, tableNodes))
     setCopied(true)
+    toast.success('Successfully copied as Markdown')
   }
 
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
