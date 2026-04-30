@@ -119,6 +119,8 @@ const Footer = (props: Props) => {
             <div className="flex space-x-5">
               <a
                 href="https://twitter.com/supabase"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Twitter</span>
@@ -127,6 +129,8 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://github.com/supabase"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">GitHub</span>
@@ -135,6 +139,8 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://discord.supabase.com/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Discord</span>
@@ -143,6 +149,8 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://youtube.com/c/supabase"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Youtube</span>
@@ -151,6 +159,8 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://www.tiktok.com/@supabase.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">TikTok</span>
@@ -159,6 +169,8 @@ const Footer = (props: Props) => {
 
               <a
                 href="https://www.instagram.com/supabasecom"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Instagram</span>
@@ -231,10 +243,12 @@ const Footer = (props: Props) => {
                         return (
                           <li key={`${segment.title}_link_${idx}`}>
                             {link.url ? (
-                              link.url.startsWith('https') ? (
-                                <a href={link.url}>{children}</a>
+                              /^https?:\/\//i.test(link.url) ? (
+                                <a href={link.url} target="_blank" rel="noopener noreferrer">
+                                  {children}
+                                </a>
                               ) : (
-                                <Link href={link.url}>{children}</Link>
+                                <a href={link.url}>{children}</a>
                               )
                             ) : (
                               Component && <Component>{children}</Component>
