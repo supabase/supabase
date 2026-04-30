@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
 import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
@@ -45,6 +44,7 @@ import {
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
+import { formatBytes } from '@/lib/helpers'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   chartId?: string
@@ -541,7 +541,7 @@ export function ComposedChart({
                   maxBarSize={24}
                 />
               ))
-            : visibleAttributes.map((attribute, i) => (
+            : visibleAttributes.map((attribute) => (
                 <Area
                   key={attribute.name}
                   type="linear"
@@ -664,13 +664,13 @@ export function ComposedChart({
             }}
           />
         </RechartComposedChart>
-        <ChartHighlightActions
-          chartHighlight={chartHighlight}
-          updateDateRange={updateDateRange}
-          actions={highlightActions}
-          chartId={chartId}
-        />
       </Container>
+      <ChartHighlightActions
+        chartHighlight={chartHighlight}
+        updateDateRange={updateDateRange}
+        actions={highlightActions}
+        chartId={chartId}
+      />
       {data && (
         <div
           className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs"
@@ -693,7 +693,6 @@ export function ComposedChart({
             onToggleAttribute={(attribute, options) => {
               setHiddenAttributes((prev) => {
                 if (options?.exclusive) {
-                  const next = new Set<string>()
                   // Hide every attribute except the selected one. If all but one are hidden, clicking again will reset to all visible.
                   const allNames = chartData.map((c) => c.name)
                   const allHiddenExcept = allNames.filter((n) => n !== attribute)

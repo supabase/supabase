@@ -1,4 +1,3 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Check, Copy, MousePointerClick, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
@@ -16,6 +15,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import type { LogData, QueryType } from './Logs.types'
 import { apiKey, role as extractRole, jwtAPIKey } from './Logs.utils'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -87,8 +87,8 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
   }
 
   return (
-    <div className="relative flex h-full flex-grow flex-col overflow-y-scroll bg-surface-100 border-t">
-      <div className="relative flex-grow flex flex-col h-full">
+    <div className="relative flex h-full grow flex-col overflow-y-scroll bg-surface-100 border-t">
+      <div className="relative grow flex flex-col h-full">
         <Tabs_Shadcn_ defaultValue="details" className="flex flex-col h-full">
           <TabsList_Shadcn_ className="px-2 pt-2 relative">
             <TabsTrigger_Shadcn_ className="px-3" value="details">
@@ -168,7 +168,7 @@ function LogDetailEmptyState({
           'flex w-full max-w-sm flex-col items-center justify-center gap-6 text-center transition-all delay-300 duration-500'
         )}
       >
-        <div className="relative flex h-4 w-32 items-center rounded border border-control px-2">
+        <div className="relative flex h-4 w-32 items-center rounded-sm border border-control px-2">
           <div className="h-0.5 w-2/3 rounded-full bg-surface-300"></div>
           <div className="absolute right-1 -bottom-4">
             <MousePointerClick size="24" strokeWidth={1} />

@@ -1,9 +1,9 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { UseCustomInfiniteQueryOptions } from 'types'
 import { Content, ContentType } from './content-query'
 import { contentKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { UseCustomInfiniteQueryOptions } from '@/types'
 
 interface GetContentVariables {
   projectRef?: string

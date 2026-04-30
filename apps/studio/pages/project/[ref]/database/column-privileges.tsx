@@ -1,38 +1,40 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { AlertCircle, XIcon } from 'lucide-react'
+import Link from 'next/link'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import {
   useFeaturePreviewModal,
   useIsColumnLevelPrivilegesEnabled,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   getDefaultColumnCheckedStates,
   getDefaultTableCheckedStates,
   useApplyPrivilegeOperations,
   usePrivilegesState,
-} from 'components/interfaces/Database/Privileges/Privileges.utils'
-import PrivilegesHead from 'components/interfaces/Database/Privileges/PrivilegesHead'
-import PrivilegesTable from 'components/interfaces/Database/Privileges/PrivilegesTable'
-import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { PgRole, useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
-import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { DOCS_URL } from 'lib/constants'
-import { AlertCircle, XIcon } from 'lucide-react'
-import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-import type { NextPageWithLayout } from 'types'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+} from '@/components/interfaces/Database/Privileges/Privileges.utils'
+import PrivilegesHead from '@/components/interfaces/Database/Privileges/PrivilegesHead'
+import PrivilegesTable from '@/components/interfaces/Database/Privileges/PrivilegesTable'
+import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
+import { PgRole, useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
+import { useColumnPrivilegesQuery } from '@/data/privileges/column-privileges-query'
+import { useTablePrivilegesQuery } from '@/data/privileges/table-privileges-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 
@@ -223,10 +225,15 @@ const PrivilegesPage: NextPageWithLayout = () => {
         <div className="col-span-12 flex flex-col pb-4 gap-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="mb-1 text-xl">Column-level privileges</h3>
-              <div className="text-sm text-lighter">
-                <p>Grant or revoke privileges on a column based on user role.</p>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-xl">Column-level privileges</h3>
+                {isEnabled && (
+                  <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS} />
+                )}
               </div>
+              <p className="text-sm text-lighter">
+                Grant or revoke privileges on a column based on user role.
+              </p>
             </div>
             <DocsButton href={`${DOCS_URL}/guides/auth/column-level-security`} />
           </div>
@@ -248,7 +255,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   <Button
                     type="outline"
                     aria-label="Dismiss"
-                    className="absolute top-2 right-2 p-1 !pl-1"
+                    className="absolute top-2 right-2 p-1 pl-1!"
                     onClick={() => {
                       setDiffWarningDismissed(true)
                     }}
@@ -278,7 +285,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   <Button
                     type="outline"
                     aria-label="Dismiss"
-                    className="absolute top-2 right-2 p-1 !pl-1"
+                    className="absolute top-2 right-2 p-1 pl-1!"
                     onClick={() => {
                       setSelectStarWarningDismissed(true)
                     }}
@@ -323,7 +330,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   />
                 </div>
               ) : (tables ?? []).length === 0 ? (
-                <div className="flex-grow flex flex-col items-center justify-center w-[600px] mx-auto">
+                <div className="grow flex flex-col items-center justify-center w-[600px] mx-auto">
                   <p className="text-center">There are no tables in the {selectedSchema} schema</p>
                   <p className="text-sm text-foreground-light text-center">
                     Once a table is available in the schema, you may manage it's column-level

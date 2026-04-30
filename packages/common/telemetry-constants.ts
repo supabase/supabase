@@ -283,15 +283,52 @@ export interface ProjectCreationRlsOptionExperimentExposedEvent {
 }
 
 /**
- * Existing project creation form was submitted and the project was created.
+ * Top-of-funnel event for the dataApiRevokeOnCreateDefault rollout. Fires once per
+ * mount after the flag resolves so cohort attribution is clean — pair with
+ * project_creation_simple_version_submitted to measure the flag's impact on
+ * project creation completion rate.
  *
  * @group Events
  * @source studio
- * @page new/{slug}
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface ProjectCreationDefaultPrivilegesExposedEvent {
+  action: 'project_creation_default_privileges_exposed'
+  properties: {
+    /** Where the checkbox was shown. */
+    surface: 'main' | 'vercel'
+    /**
+     * State of the "Enable Data API" toggle at exposure time. Main flow only —
+     * the Vercel surface has no such toggle, so this is omitted there.
+     */
+    dataApiEnabled?: boolean
+    /**
+     * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at exposure time.
+     * true = revoke cohort (checkbox defaulted to unchecked)
+     * false = control cohort (checkbox defaulted to checked)
+     */
+    dataApiRevokeOnCreateDefaultEnabled: boolean
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Project creation form was submitted and the project was created. Fires from both
+ * the main project creation wizard and the Vercel deploy-button flow — disambiguate
+ * by the `surface` property.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
  */
 export interface ProjectCreationSimpleVersionSubmittedEvent {
   action: 'project_creation_simple_version_submitted'
   properties: {
+    /**
+     * Which surface produced the submission. Omitted on events emitted before this
+     * property was introduced; treat absent as 'main' for backfill.
+     */
+    surface?: 'main' | 'vercel'
     /**
      * The instance size selected in the project creation form.
      */
@@ -323,13 +360,20 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     useOrioleDb?: boolean
     /**
-     * Whether the tableEditorApiAccessToggle PostHog flag was enabled for this user,
-     * meaning the project was created with default public schema grants revoked.
-     * true = user is in the staged rollout cohort (revoke SQL ran at creation)
-     * false = user is outside the rollout (default grants left intact)
+     * Raw checkbox state for "Automatically expose new tables and functions" at submission.
+     * true = default privileges are granted on new entities (current behaviour)
+     * false = revoke SQL ran; user must manually grant access per entity
+     */
+    dataApiDefaultPrivilegesGranted?: boolean
+    /**
+     * Whether the dataApiRevokeOnCreateDefault PostHog flag was enabled for this user.
+     * Controls only the default checkbox state of "Automatically expose new tables and functions"
+     * at project creation. Tracking it lets us correlate flag cohort with user choice.
+     * true = user is in the staged rollout cohort (checkbox defaulted to unchecked)
+     * false = user is outside the rollout (checkbox defaulted to checked)
      * omitted = PostHog flags had not loaded at the time of project creation
      */
-    tableEditorApiAccessToggleEnabled?: boolean
+    dataApiRevokeOnCreateDefaultEnabled?: boolean
   }
   groups: TelemetryGroups
 }
@@ -656,6 +700,18 @@ export interface SqlEditorResultCopyMarkdownClickedEvent {
  */
 export interface SqlEditorResultCopyJsonClickedEvent {
   action: 'sql_editor_result_copy_json_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the "Result copy CSV" button in the SQL editor
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorResultCopyCsvClickedEvent {
+  action: 'sql_editor_result_copy_csv_clicked'
   groups: TelemetryGroups
 }
 
@@ -2004,7 +2060,7 @@ export interface DocumentViewButtonClickedEvent {
     /**
      * The name of the document being viewed, e.g. TIA, SOC2, Standard Security Questionnaire
      */
-    documentName: 'TIA' | 'SOC2' | 'Standard Security Questionnaire'
+    documentName: 'TIA' | 'SOC2' | 'ISO27001' | 'Standard Security Questionnaire'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -2472,6 +2528,24 @@ export interface InlineEditorSettingClickedEvent {
 }
 
 /**
+ * User toggled the queue table operations setting in account preferences.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/account/preferences
+ */
+export interface QueueOperationsSettingClickedEvent {
+  action: 'queue_operations_setting_clicked'
+  properties: {
+    /**
+     * Whether the queue operations was enabled or disabled
+     */
+    enabled: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * User clicked the save destination button in add log drains sheet.
  *
  * @group Events
@@ -2537,7 +2611,7 @@ type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
 type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
 /**
- * User opened an advisor detail page to view a specific advisor (lint or notification).
+ * User opened an advisor detail page to view a specific advisor (lint, notification, or signal).
  * This tracks when users engage with advisor recommendations.
  *
  * @group Events
@@ -2554,7 +2628,7 @@ export interface AdvisorDetailOpenedEvent {
     /**
      * Source of the advisor
      */
-    advisorSource: 'lint' | 'notification'
+    advisorSource: 'lint' | 'notification' | 'signal'
     /**
      * Category of the advisor (SECURITY or PERFORMANCE)
      */
@@ -2631,6 +2705,7 @@ export type AiAssistantSource =
   | 'branch_review'
   | 'log_explorer'
   | 'error_code'
+  | 'advisor_signal_detail'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
@@ -2684,6 +2759,22 @@ export interface AiExternalToolClickedEvent {
      * Which external AI tool was selected
      */
     tool: 'chatgpt' | 'claude'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a CTA in the project security gate.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ProjectSecurityCtaClickedEvent {
+  action: 'project_security_cta_clicked'
+  properties: {
+    type: 'ask_assistant' | 'copy_prompt' | 'skip_to_home' | 'view_policies'
+    schema?: string
+    tableName?: string
   }
   groups: TelemetryGroups
 }
@@ -2931,6 +3022,44 @@ export interface LogExplorerQueryRunButtonClickedEvent {
 }
 
 /**
+ * User clicked an upgrade CTA inside the compute badge hover card.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ComputeBadgeUpgradeClickedEvent {
+  action: 'compute_badge_upgrade_clicked'
+  properties: {
+    computeSize: string
+    planId: string
+    upgradeType: 'pro_upgrade' | 'free_micro_upgrade' | 'compute_upgrade'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the free Micro upgrade banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FreeMicroUpgradeBannerDismissedEvent {
+  action: 'free_micro_upgrade_banner_dismissed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the CTA on the free Micro upgrade banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FreeMicroUpgradeBannerCtaClickedEvent {
+  action: 'free_micro_upgrade_banner_cta_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the Navigate action in the storage explorer header.
  *
  * @group Events
@@ -2955,6 +3084,126 @@ export interface StorageExplorerNavigateSubmittedEvent {
 }
 
 /**
+ * User clicked the Remove policy button on the public bucket SELECT policy warning.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StoragePublicBucketSelectPolicyRemovedEvent {
+  action: 'storage_public_bucket_select_policy_removed'
+  properties: {
+    /** The ID of the bucket whose SELECT policy was removed */
+    bucketId: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the public bucket SELECT policy warning banner.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent {
+  action: 'storage_public_bucket_select_policy_warning_dismiss_button_clicked'
+  properties: {
+    /** The ID of the bucket whose warning was dismissed */
+    bucketId: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when an access token is successfully created.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenCreatedEvent {
+  action: 'access_token_created'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+    expiryPreset: string
+    resourceAccess?: 'all-orgs' | 'selected-orgs' | 'selected-projects'
+    permissionCount?: number
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when an access token is successfully deleted.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenRemovedEvent {
+  action: 'access_token_removed'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "Upgrade to Pro" CTA in the dashboard header.
+ * GROWTH-615: always-visible upgrade button in dashboard header for free-plan users.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderUpgradeCtaClickedEvent {
+  action: 'header_upgrade_cta_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the primary CTA on a resource exhaustion warning banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ResourceExhaustionBannerUpgradeClickedEvent {
+  action: 'resource_exhaustion_banner_upgrade_clicked'
+  groups: TelemetryGroups
+  properties: {
+    warningTypes: string[]
+    destination: string
+  }
+}
+
+/**
+ * User clicked "Ask AI Assistant" on a resource exhaustion warning banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ResourceExhaustionBannerAiAssistantClickedEvent {
+  action: 'resource_exhaustion_banner_ai_assistant_clicked'
+  groups: TelemetryGroups
+  properties: {
+    warningTypes: string[]
+  }
+}
+
+/**
+ * User clicked a row in the Unified Logs interface.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface UnifiedLogsRowClickedEvent {
+  action: 'unified_logs_row_clicked'
+  properties: {
+    logType: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -2974,6 +3223,7 @@ export type TelemetryEvent =
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
   | ProjectCreationRlsOptionExperimentExposedEvent
+  | ProjectCreationDefaultPrivilegesExposedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | TableApiAccessToggleClickedEvent
@@ -2995,6 +3245,7 @@ export type TelemetryEvent =
   | SqlEditorResultDownloadCsvClickedEvent
   | SqlEditorResultCopyMarkdownClickedEvent
   | SqlEditorResultCopyJsonClickedEvent
+  | SqlEditorResultCopyCsvClickedEvent
   | AssistantPromptSubmittedEvent
   | AssistantDebugSubmittedEvent
   | AssistantSuggestionRunQueryClickedEvent
@@ -3030,6 +3281,8 @@ export type TelemetryEvent =
   | LogExplorerQueryRunButtonClickedEvent
   | StorageExplorerNavigateClickedEvent
   | StorageExplorerNavigateSubmittedEvent
+  | StoragePublicBucketSelectPolicyRemovedEvent
+  | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
@@ -3095,6 +3348,7 @@ export type TelemetryEvent =
   | CommandMenuSearchSubmittedEvent
   | CommandMenuCommandClickedEvent
   | InlineEditorSettingClickedEvent
+  | QueueOperationsSettingClickedEvent
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
   | LogDrainConfirmButtonSubmittedEvent
@@ -3104,6 +3358,7 @@ export type TelemetryEvent =
   | AiPromptCopiedEvent
   | AiAssistantDropdownButtonClickedEvent
   | AiExternalToolClickedEvent
+  | ProjectSecurityCtaClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | DashboardErrorCreatedEvent
@@ -3119,3 +3374,12 @@ export type TelemetryEvent =
   | OrgSubmenuOpenedEvent
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
+  | ComputeBadgeUpgradeClickedEvent
+  | FreeMicroUpgradeBannerDismissedEvent
+  | FreeMicroUpgradeBannerCtaClickedEvent
+  | HeaderUpgradeCtaClickedEvent
+  | AccessTokenCreatedEvent
+  | AccessTokenRemovedEvent
+  | ResourceExhaustionBannerUpgradeClickedEvent
+  | ResourceExhaustionBannerAiAssistantClickedEvent
+  | UnifiedLogsRowClickedEvent

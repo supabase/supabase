@@ -1,10 +1,11 @@
 import { useFlag, useParams } from 'common'
-import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import type { SidebarSection } from 'components/layouts/AccountLayout/AccountLayout.types'
-import { WithSidebar } from 'components/layouts/AccountLayout/WithSidebar'
-import { useCurrentPath } from 'hooks/misc/useCurrentPath'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { PropsWithChildren } from 'react'
+
+import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import type { SidebarSection } from '@/components/layouts/AccountLayout/AccountLayout.types'
+import { WithSidebar } from '@/components/layouts/AccountLayout/WithSidebar'
+import { useCurrentPath } from '@/hooks/misc/useCurrentPath'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface OrganizationSettingsMenuItemsProps {
   slug?: string
@@ -27,7 +28,7 @@ export const generateOrganizationSettingsMenuItems = ({
   showSsoSettings = true,
   showLegalDocuments = true,
   showPlatformWebhooks = true,
-  showPrivateApps = false,
+  showPrivateApps: _showPrivateApps = false,
 }: OrganizationSettingsMenuItemsProps) => [
   {
     key: 'general',
@@ -224,10 +225,9 @@ export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   return (
     <WithSidebar
       title="Organization Settings"
-      breadcrumbs={[]}
       sections={sections}
       header={
-        <div className="border-default flex min-h-[var(--header-height)] items-center border-b px-6">
+        <div className="border-default flex min-h-(--header-height) items-center border-b px-6">
           <h4 className="text-lg">Settings</h4>
         </div>
       }

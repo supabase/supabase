@@ -1,22 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { DOCS_URL } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
-import { TrashIcon } from 'lucide-react'
 import Link from 'next/link'
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
   Input_Shadcn_,
   RadioGroupCard,
   RadioGroupCardItem,
@@ -36,6 +31,7 @@ import {
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { z } from 'zod'
 
@@ -47,95 +43,176 @@ import {
   OTLP_PROTOCOLS,
 } from './LogDrains.constants'
 import {
+  getDefaultHeadersByType,
   getHeadersSectionDescription as getHeadersDescription,
-  validateNewHeader,
+  headerRecordToRows,
+  headerRowsToRecord,
+  logDrainHeaderEntriesSchema,
+  type LogDrainHeaderRow,
 } from './LogDrains.utils'
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
+import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 
 const FORM_ID = 'log-drain-destination-form'
 
+const headerRecordSchema = z.record(z.string(), z.string())
+
+const webhookFields = {
+  type: z.literal('webhook'),
+  url: httpEndpointUrlSchema({
+    requiredMessage: 'Endpoint URL is required',
+    invalidMessage: 'Endpoint URL must be a valid URL',
+    prefixMessage: 'Endpoint URL must start with http:// or https://',
+  }),
+  http: z.enum(['http1', 'http2']),
+  gzip: z.boolean(),
+}
+
+const webhookFormSchema = z.object({
+  ...webhookFields,
+  headerEntries: logDrainHeaderEntriesSchema.optional(),
+})
+
+const webhookSubmitSchema = z.object({
+  ...webhookFields,
+  headers: headerRecordSchema.optional(),
+})
+
+const datadogSchema = z.object({
+  type: z.literal('datadog'),
+  api_key: z.string().min(1, { message: 'API key is required' }),
+  region: z.string().min(1, { message: 'Region is required' }),
+})
+
+const lokiFields = {
+  type: z.literal('loki'),
+  url: httpEndpointUrlSchema({
+    requiredMessage: 'Loki URL is required',
+    invalidMessage: 'Loki URL must be a valid URL',
+    prefixMessage: 'Loki URL must start with http:// or https://',
+  }),
+  username: z.string().optional(),
+  password: z.string().optional(),
+}
+
+const lokiFormSchema = z.object({
+  ...lokiFields,
+  headerEntries: logDrainHeaderEntriesSchema.optional(),
+})
+
+const lokiSubmitSchema = z.object({
+  ...lokiFields,
+  headers: headerRecordSchema,
+})
+
+const elasticSchema = z.object({
+  type: z.literal('elastic'),
+})
+
+const postgresSchema = z.object({
+  type: z.literal('postgres'),
+})
+
+const bigquerySchema = z.object({
+  type: z.literal('bigquery'),
+})
+
+const clickhouseSchema = z.object({
+  type: z.literal('clickhouse'),
+})
+
+const s3Schema = z.object({
+  type: z.literal('s3'),
+  s3_bucket: z.string().min(1, { message: 'Bucket name is required' }),
+  storage_region: z.string().min(1, { message: 'Region is required' }),
+  access_key_id: z.string().min(1, { message: 'Access Key ID is required' }),
+  secret_access_key: z.string().min(1, { message: 'Secret Access Key is required' }),
+  batch_timeout: z.coerce
+    .number()
+    .int({ message: 'Batch timeout must be an integer' })
+    .min(1, { message: 'Batch timeout must be a positive integer' }),
+})
+
+const sentrySchema = z.object({
+  type: z.literal('sentry'),
+  dsn: z
+    .string()
+    .min(1, { message: 'Sentry DSN is required' })
+    .refine((dsn) => dsn.startsWith('https://'), 'Sentry DSN must start with https://'),
+})
+
+const axiomSchema = z.object({
+  type: z.literal('axiom'),
+  api_token: z.string().min(1, { message: 'API token is required' }),
+  dataset_name: z.string().min(1, { message: 'Dataset name is required' }),
+})
+
+const last9Schema = z.object({
+  type: z.literal('last9'),
+  region: z.string().min(1, { message: 'Region is required' }),
+  username: z.string().min(1, { message: 'Username is required' }),
+  password: z.string().min(1, { message: 'Password is required' }),
+})
+
+const otlpFields = {
+  type: z.literal('otlp'),
+  endpoint: httpEndpointUrlSchema({
+    requiredMessage: 'OTLP endpoint is required',
+    invalidMessage: 'OTLP endpoint must be a valid URL',
+    prefixMessage: 'OTLP endpoint must start with http:// or https://',
+  }),
+  protocol: z.string().optional().default('http/protobuf'),
+  gzip: z.boolean().optional().default(true),
+}
+
+const otlpFormSchema = z.object({
+  ...otlpFields,
+  headerEntries: logDrainHeaderEntriesSchema.optional(),
+})
+
+const otlpSubmitSchema = z.object({
+  ...otlpFields,
+  headers: headerRecordSchema.optional(),
+})
+
+const syslogSchema = z.object({
+  type: z.literal('syslog'),
+})
+
 const formUnion = z.discriminatedUnion('type', [
-  z.object({
-    type: z.literal('webhook'),
-    url: httpEndpointUrlSchema({
-      requiredMessage: 'Endpoint URL is required',
-      invalidMessage: 'Endpoint URL must be a valid URL',
-      prefixMessage: 'Endpoint URL must start with http:// or https://',
-    }),
-    http: z.enum(['http1', 'http2']),
-    gzip: z.boolean(),
-    headers: z.record(z.string(), z.string()).optional(),
-  }),
-  z.object({
-    type: z.literal('datadog'),
-    api_key: z.string().min(1, { message: 'API key is required' }),
-    region: z.string().min(1, { message: 'Region is required' }),
-  }),
-  z.object({
-    type: z.literal('loki'),
-    url: httpEndpointUrlSchema({
-      requiredMessage: 'Loki URL is required',
-      invalidMessage: 'Loki URL must be a valid URL',
-      prefixMessage: 'Loki URL must start with http:// or https://',
-    }),
-    headers: z.record(z.string(), z.string()),
-    username: z.string().optional(),
-    password: z.string().optional(),
-  }),
+  webhookFormSchema,
+  datadogSchema,
+  lokiFormSchema,
   // [Joshen] To fix API types, not supported in the UI
-  z.object({
-    type: z.literal('elastic'),
-  }),
-  z.object({
-    type: z.literal('postgres'),
-  }),
-  z.object({
-    type: z.literal('bigquery'),
-  }),
-  z.object({
-    type: z.literal('clickhouse'),
-  }),
-  z.object({
-    type: z.literal('s3'),
-    s3_bucket: z.string().min(1, { message: 'Bucket name is required' }),
-    storage_region: z.string().min(1, { message: 'Region is required' }),
-    access_key_id: z.string().min(1, { message: 'Access Key ID is required' }),
-    secret_access_key: z.string().min(1, { message: 'Secret Access Key is required' }),
-    batch_timeout: z.coerce
-      .number()
-      .int({ message: 'Batch timeout must be an integer' })
-      .min(1, { message: 'Batch timeout must be a positive integer' }),
-  }),
-  z.object({
-    type: z.literal('sentry'),
-    dsn: z
-      .string()
-      .min(1, { message: 'Sentry DSN is required' })
-      .refine((dsn) => dsn.startsWith('https://'), 'Sentry DSN must start with https://'),
-  }),
-  z.object({
-    type: z.literal('axiom'),
-    api_token: z.string().min(1, { message: 'API token is required' }),
-    dataset_name: z.string().min(1, { message: 'Dataset name is required' }),
-  }),
-  z.object({
-    type: z.literal('last9'),
-    region: z.string().min(1, { message: 'Region is required' }),
-    username: z.string().min(1, { message: 'Username is required' }),
-    password: z.string().min(1, { message: 'Password is required' }),
-  }),
-  z.object({
-    type: z.literal('otlp'),
-    endpoint: httpEndpointUrlSchema({
-      requiredMessage: 'OTLP endpoint is required',
-      invalidMessage: 'OTLP endpoint must be a valid URL',
-      prefixMessage: 'OTLP endpoint must start with http:// or https://',
-    }),
-    protocol: z.string().optional().default('http/protobuf'),
-    gzip: z.boolean().optional().default(true),
-    headers: z.record(z.string(), z.string()).optional(),
-  }),
-  z.object({ type: z.literal('syslog') }),
+  elasticSchema,
+  postgresSchema,
+  bigquerySchema,
+  clickhouseSchema,
+  s3Schema,
+  sentrySchema,
+  axiomSchema,
+  last9Schema,
+  otlpFormSchema,
+  syslogSchema,
+])
+
+const submitUnion = z.discriminatedUnion('type', [
+  webhookSubmitSchema,
+  datadogSchema,
+  lokiSubmitSchema,
+  elasticSchema,
+  postgresSchema,
+  bigquerySchema,
+  clickhouseSchema,
+  s3Schema,
+  sentrySchema,
+  axiomSchema,
+  last9Schema,
+  otlpSubmitSchema,
+  syslogSchema,
 ])
 
 const formSchema = z
@@ -146,6 +223,39 @@ const formSchema = z
     description: z.string().optional(),
   })
   .and(formUnion)
+
+const submitSchema = z
+  .object({
+    name: z.string().min(1, {
+      message: 'Destination name is required',
+    }),
+    description: z.string().optional(),
+  })
+  .and(submitUnion)
+
+type LogDrainDestinationFormValues = z.infer<typeof formSchema>
+type LogDrainDestinationSubmitValues = z.infer<typeof submitSchema>
+
+const HEADER_ENABLED_TYPES = ['webhook', 'loki', 'otlp'] as const
+
+function toSubmitValues(values: LogDrainDestinationFormValues): LogDrainDestinationSubmitValues {
+  if (!HEADER_ENABLED_TYPES.includes(values.type as (typeof HEADER_ENABLED_TYPES)[number])) {
+    return submitSchema.parse(values)
+  }
+
+  const { headerEntries = [], ...rest } = values as LogDrainDestinationFormValues & {
+    headerEntries?: LogDrainHeaderRow[]
+  }
+  const headers = headerRowsToRecord(headerEntries)
+  const transformedValues =
+    rest.type === 'loki'
+      ? { ...rest, headers }
+      : Object.keys(headers).length > 0
+        ? { ...rest, headers }
+        : rest
+
+  return submitSchema.parse(transformedValues)
+}
 
 function LogDrainFormItem({
   value,
@@ -163,14 +273,14 @@ function LogDrainFormItem({
   type?: string
 }) {
   return (
-    <FormField_Shadcn_
+    <FormField
       name={value}
       control={formControl}
       render={({ field }) => (
         <FormItemLayout layout="horizontal" label={label} description={description || ''}>
-          <FormControl_Shadcn_>
+          <FormControl>
             <Input_Shadcn_ type={type || 'text'} placeholder={placeholder} {...field} />
-          </FormControl_Shadcn_>
+          </FormControl>
         </FormItemLayout>
       )}
     />
@@ -191,7 +301,7 @@ export function LogDrainDestinationSheetForm({
   onOpenChange: (v: boolean) => void
   defaultValues?: DefaultValues
   isLoading?: boolean
-  onSubmit: (values: z.infer<typeof formSchema>) => void
+  onSubmit: (values: LogDrainDestinationSubmitValues) => void
   mode: 'create' | 'update'
 }) {
   // NOTE(kamil): This used to be `any` for a long long time, but after moving to Zod,
@@ -200,14 +310,9 @@ export function LogDrainDestinationSheetForm({
   // out of it, therefore for an ease of use now, we bail to `any` until the better time come.
   const defaultConfig = (defaultValues?.config || {}) as any
   const defaultType = defaultValues?.type || 'webhook'
-  const CREATE_DEFAULT_HEADERS_BY_TYPE: Partial<Record<LogDrainType, Record<string, string>>> = {
-    webhook: { 'Content-Type': 'application/json' },
-    otlp: { 'Content-Type': 'application/x-protobuf' },
-  }
-  const DEFAULT_HEADERS =
-    mode === 'create'
-      ? (CREATE_DEFAULT_HEADERS_BY_TYPE[defaultType] ?? {})
-      : defaultConfig?.headers || {}
+  const defaultHeaderEntries = headerRecordToRows(
+    mode === 'create' ? getDefaultHeadersByType(defaultType) : defaultConfig?.headers || {}
+  )
 
   const sentryEnabled = useFlag('SentryLogDrain')
   const s3Enabled = useFlag('S3logdrain')
@@ -220,10 +325,9 @@ export function LogDrainDestinationSheetForm({
     ref,
   })
 
-  const [newCustomHeader, setNewCustomHeader] = useState({ name: '', value: '' })
   const track = useTrack()
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<LogDrainDestinationFormValues>({
     resolver: zodResolver(formSchema),
     values: {
       name: defaultValues?.name || '',
@@ -231,7 +335,7 @@ export function LogDrainDestinationSheetForm({
       type: defaultType,
       http: defaultConfig?.http || 'http2',
       gzip: mode === 'create' ? true : defaultConfig?.gzip || false,
-      headers: DEFAULT_HEADERS,
+      headerEntries: defaultHeaderEntries,
       url: defaultConfig?.url || '',
       api_key: defaultConfig?.api_key || '',
       region: defaultConfig?.region || '',
@@ -250,32 +354,7 @@ export function LogDrainDestinationSheetForm({
     },
   })
 
-  const headers = form.watch('headers')
   const type = form.watch('type')
-
-  function removeHeader(key: string) {
-    const newHeaders = {
-      ...headers,
-    }
-    delete newHeaders[key]
-    form.setValue('headers', newHeaders)
-  }
-
-  function addHeader() {
-    const formHeaders = form.getValues('headers')
-    if (!formHeaders) return
-
-    const validation = validateNewHeader(formHeaders, newCustomHeader)
-    if (!validation.valid) {
-      toast.error(validation.error)
-      return
-    }
-
-    form.setValue('headers', { ...formHeaders, [newCustomHeader.name]: newCustomHeader.value })
-    setNewCustomHeader({ name: '', value: '' })
-  }
-
-  const hasHeaders = Object.keys(headers || {})?.length > 0
 
   useEffect(() => {
     if (mode === 'create' && !open) {
@@ -283,14 +362,16 @@ export function LogDrainDestinationSheetForm({
     }
   }, [mode, open, form])
 
+  useEffect(() => {
+    if (!open || mode !== 'create') return
+
+    form.setValue('headerEntries', headerRecordToRows(getDefaultHeadersByType(type)), {
+      shouldValidate: true,
+    })
+  }, [form, mode, open, type])
+
   return (
-    <Sheet
-      open={open}
-      onOpenChange={(v) => {
-        setNewCustomHeader({ name: '', value: '' })
-        onOpenChange(v)
-      }}
-    >
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         tabIndex={undefined}
         showClose={false}
@@ -300,8 +381,8 @@ export function LogDrainDestinationSheetForm({
         <SheetHeader>
           <SheetTitle>Add destination</SheetTitle>
         </SheetHeader>
-        <SheetSection className="!px-0 !pb-0">
-          <Form_Shadcn_ {...form}>
+        <SheetSection className="px-0! pb-0!">
+          <Form {...form}>
             <form
               id={FORM_ID}
               onSubmit={(e) => {
@@ -316,8 +397,10 @@ export function LogDrainDestinationSheetForm({
                   return
                 }
 
-                form.handleSubmit(onSubmit)(e)
-                track('log_drain_save_button_clicked', { destination: form.getValues('type') })
+                form.handleSubmit((values) => onSubmit(toSubmitValues(values)))(e)
+                track('log_drain_save_button_clicked', {
+                  destination: form.getValues('type'),
+                })
               }}
             >
               <div className="space-y-8 px-content">
@@ -381,49 +464,49 @@ export function LogDrainDestinationSheetForm({
                         formControl={form.control}
                         placeholder="https://example.com/log-drain"
                       />
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="http"
                         render={({ field }) => (
                           <FormItemLayout layout="horizontal" label="HTTP Version">
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <RadioGroupCard
                                 className="flex gap-2"
                                 onValueChange={field.onChange}
                                 value={field.value}
                               >
-                                <FormItem_Shadcn_ asChild>
-                                  <FormControl_Shadcn_>
+                                <FormItem asChild>
+                                  <FormControl>
                                     <RadioGroupCardItem value="http1" label="HTTP/1" />
-                                  </FormControl_Shadcn_>
-                                </FormItem_Shadcn_>
-                                <FormItem_Shadcn_ asChild>
-                                  <FormControl_Shadcn_>
+                                  </FormControl>
+                                </FormItem>
+                                <FormItem asChild>
+                                  <FormControl>
                                     <RadioGroupCardItem value="http2" label="HTTP/2" />
-                                  </FormControl_Shadcn_>
-                                </FormItem_Shadcn_>
+                                  </FormControl>
+                                </FormItem>
                               </RadioGroupCard>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
                     </div>
 
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="gzip"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="space-y-2 px-4">
+                        <FormItem className="space-y-2 px-4">
                           <div className="flex gap-2 items-center">
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch checked={field.value} onCheckedChange={field.onChange} />
-                            </FormControl_Shadcn_>
-                            <FormLabel_Shadcn_ className="text-base">Gzip</FormLabel_Shadcn_>
+                            </FormControl>
+                            <FormLabel className="text-base">Gzip</FormLabel>
                             <InfoTooltip align="start">
                               Gzip compresses logs before sending it to the destination.
                             </InfoTooltip>
                           </div>
-                        </FormItem_Shadcn_>
+                        </FormItem>
                       )}
                     />
                   </>
@@ -449,7 +532,7 @@ export function LogDrainDestinationSheetForm({
                         </>
                       }
                     />
-                    <FormField_Shadcn_
+                    <FormField
                       name="region"
                       control={form.control}
                       render={({ field }) => (
@@ -471,7 +554,7 @@ export function LogDrainDestinationSheetForm({
                             </p>
                           }
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                               <SelectTrigger_Shadcn_ className="col-span-3">
                                 <SelectValue_Shadcn_ placeholder="Select a region" />
@@ -487,7 +570,7 @@ export function LogDrainDestinationSheetForm({
                                 </SelectGroup_Shadcn_>
                               </SelectContent_Shadcn_>
                             </Select_Shadcn_>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -617,7 +700,7 @@ export function LogDrainDestinationSheetForm({
                         formControl={form.control}
                         description="The HTTP endpoint for OTLP log ingestion (typically ends with /v1/logs)"
                       />
-                      <FormField_Shadcn_
+                      <FormField
                         name="protocol"
                         control={form.control}
                         render={({ field }) => (
@@ -626,7 +709,7 @@ export function LogDrainDestinationSheetForm({
                             label="Protocol"
                             description="Only HTTP with Protocol Buffers is currently supported"
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                                 <SelectTrigger_Shadcn_ className="col-span-3">
                                   <SelectValue_Shadcn_ placeholder="Select protocol" />
@@ -642,36 +725,34 @@ export function LogDrainDestinationSheetForm({
                                   </SelectGroup_Shadcn_>
                                 </SelectContent_Shadcn_>
                               </Select_Shadcn_>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
                     </div>
 
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="gzip"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="space-y-2 px-4">
+                        <FormItem className="space-y-2 px-4">
                           <div className="flex gap-2 items-center">
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch checked={field.value} onCheckedChange={field.onChange} />
-                            </FormControl_Shadcn_>
-                            <FormLabel_Shadcn_ className="text-base">
-                              Gzip Compression
-                            </FormLabel_Shadcn_>
+                            </FormControl>
+                            <FormLabel className="text-base">Gzip Compression</FormLabel>
                             <InfoTooltip align="start">
                               Enable gzip compression for log data sent to the OTLP endpoint.
                             </InfoTooltip>
                           </div>
-                        </FormItem_Shadcn_>
+                        </FormItem>
                       )}
                     />
                   </>
                 )}
                 {type === 'last9' && (
                   <div className="grid gap-4 px-content">
-                    <FormField_Shadcn_
+                    <FormField
                       name="region"
                       control={form.control}
                       render={({ field }) => (
@@ -685,7 +766,7 @@ export function LogDrainDestinationSheetForm({
                             </p>
                           }
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                               <SelectTrigger_Shadcn_ className="col-span-3">
                                 <SelectValue_Shadcn_ placeholder="Select a region" />
@@ -701,7 +782,7 @@ export function LogDrainDestinationSheetForm({
                                 </SelectGroup_Shadcn_>
                               </SelectContent_Shadcn_>
                             </Select_Shadcn_>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -723,78 +804,37 @@ export function LogDrainDestinationSheetForm({
                     />
                   </div>
                 )}
-                <FormMessage_Shadcn_ />
+                {HEADER_ENABLED_TYPES.includes(type as (typeof HEADER_ENABLED_TYPES)[number]) && (
+                  <div className="px-content">
+                    <FormField
+                      control={form.control}
+                      name="headerEntries"
+                      render={({ fieldState }) => (
+                        <FormItemLayout
+                          layout="horizontal"
+                          label="Custom Headers"
+                          description={getHeadersDescription(type)}
+                          hideMessage={!fieldState.error?.message}
+                        >
+                          <KeyValueFieldArray
+                            control={form.control}
+                            name="headerEntries"
+                            keyFieldName="key"
+                            valueFieldName="value"
+                            createEmptyRow={() => ({ key: '', value: '' })}
+                            keyPlaceholder="Header name"
+                            valuePlaceholder="Header value"
+                            addLabel="Add a new header"
+                            removeLabel="Remove header"
+                          />
+                        </FormItemLayout>
+                      )}
+                    />
+                  </div>
+                )}
               </div>
             </form>
-          </Form_Shadcn_>
-
-          {/* This form needs to be outside the <Form_Shadcn_> */}
-          {(type === 'webhook' || type === 'loki' || type === 'otlp') && (
-            <>
-              <div className="border-t mt-4">
-                <div className="px-content pt-2 pb-3 border-b bg-background-alternative-200">
-                  <h2 className="text-sm">Custom Headers</h2>
-                  <p className="text-xs text-foreground-lighter">{getHeadersDescription(type)}</p>
-                </div>
-                <div className="divide-y">
-                  {hasHeaders &&
-                    Object.keys(headers || {})?.map((headerKey) => (
-                      <div
-                        className="flex text-sm px-content text-foreground items-center font-mono py-1.5 group"
-                        key={headerKey}
-                      >
-                        <div className="w-full">{headerKey}</div>
-                        <div className="w-full truncate" title={headers?.[headerKey]}>
-                          {headers?.[headerKey]}
-                        </div>
-                        <Button
-                          className="justify-self-end opacity-0 group-hover:opacity-100 w-7"
-                          type="text"
-                          title="Remove"
-                          icon={<TrashIcon />}
-                          onClick={() => removeHeader(headerKey)}
-                        ></Button>
-                      </div>
-                    ))}
-                </div>
-              </div>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  addHeader()
-                }}
-                className="flex border-t py-4 gap-4 items-center px-content"
-              >
-                <label className="sr-only" htmlFor="header-name">
-                  Header name
-                </label>
-                <Input_Shadcn_
-                  id="header-name"
-                  type="text"
-                  placeholder="x-header-name"
-                  value={newCustomHeader.name}
-                  onChange={(e) => setNewCustomHeader({ ...newCustomHeader, name: e.target.value })}
-                />
-                <label className="sr-only" htmlFor="header-value">
-                  Header value
-                </label>
-                <Input_Shadcn_
-                  id="header-value"
-                  type="text"
-                  placeholder="Header value"
-                  value={newCustomHeader.value}
-                  onChange={(e) =>
-                    setNewCustomHeader({ ...newCustomHeader, value: e.target.value })
-                  }
-                />
-
-                <Button htmlType="submit" type="outline">
-                  Add
-                </Button>
-              </form>
-            </>
-          )}
+          </Form>
         </SheetSection>
 
         <div className="mt-auto">
@@ -819,17 +859,20 @@ export function LogDrainDestinationSheetForm({
             </ul>
           </SheetSection>
 
-          <SheetFooter className="p-content !mt-0 !justify-between !flex-row w-full items-center">
-            <span className="text-sm text-foreground-light">
-              <span>See full pricing breakdown</span>{' '}
-              <Link
-                href={`${DOCS_URL}/guides/platform/manage-your-usage/log-drains`}
-                target="_blank"
-                className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all"
-              >
-                here
-              </Link>
-            </span>
+          <SheetFooter className="p-content mt-0! justify-between! flex-row! w-full items-center">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm text-foreground-light">
+                <span>See full pricing breakdown</span>{' '}
+                <Link
+                  href={`${DOCS_URL}/guides/platform/manage-your-usage/log-drains`}
+                  target="_blank"
+                  className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all"
+                >
+                  here
+                </Link>
+              </span>
+              <TaxDisclaimer />
+            </div>
             <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
               Save destination
             </Button>

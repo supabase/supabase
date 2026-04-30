@@ -3,27 +3,6 @@ import type { OptimizedSearchColumns } from '@supabase/pg-meta'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { AlertError } from 'components/ui/AlertError'
-import { APIDocsButton } from 'components/ui/APIDocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useIndexWorkerStatusQuery } from 'data/auth/index-worker-status-query'
-import { authKeys } from 'data/auth/keys'
-import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
-import { useUserIndexStatusesQuery } from 'data/auth/user-search-indexes-query'
-import { useUsersCountQuery } from 'data/auth/users-count-query'
-import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import {
   ExternalLinkIcon,
   InfoIcon,
@@ -75,7 +54,26 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FilterPopover } from '@/components/ui/FilterPopover'
+import { FormHeader } from '@/components/ui/Forms/FormHeader'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useIndexWorkerStatusQuery } from '@/data/auth/index-worker-status-query'
+import { authKeys } from '@/data/auth/keys'
+import { useUserDeleteMutation } from '@/data/auth/user-delete-mutation'
+import { useUserIndexStatusesQuery } from '@/data/auth/user-search-indexes-query'
+import { useUsersCountQuery } from '@/data/auth/users-count-query'
+import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
+import { cleanPointerEventsNoneOnBody, isAtBottom } from '@/lib/helpers'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -99,7 +97,6 @@ export const UsersV2 = () => {
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const {
@@ -488,7 +485,7 @@ export const UsersV2 = () => {
   return (
     <>
       <div className="h-full flex flex-col">
-        <FormHeader className="py-4 px-6 !mb-0 border-b" title="Users" />
+        <FormHeader className="py-4 px-6 mb-0! border-b" title="Users" />
 
         {showImprovedSearchOptIn && (
           <Alert_Shadcn_ className="rounded-none mb-0 border-0 relative">
@@ -595,7 +592,7 @@ export const UsersV2 = () => {
                       <SelectTrigger_Shadcn_
                         size="tiny"
                         className={cn(
-                          'w-[140px] !bg-transparent',
+                          'w-[140px] bg-transparent!',
                           filterUserType === 'all' && 'border-dashed'
                         )}
                       >
@@ -722,9 +719,6 @@ export const UsersV2 = () => {
               </div>
 
               <div className="flex items-center gap-x-2">
-                {isNewAPIDocsEnabled && (
-                  <APIDocsButton section={['user-management']} source="auth-users" />
-                )}
                 <ButtonTooltip
                   size="tiny"
                   icon={<RefreshCw />}
@@ -752,14 +746,14 @@ export const UsersV2 = () => {
         <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
         <ResizablePanelGroup
           orientation="horizontal"
-          className="relative flex flex-grow bg-alternative min-h-0"
+          className="relative flex grow bg-alternative min-h-0"
           autoSaveId="query-performance-layout-v1"
         >
           <ResizablePanel>
             <div className="flex flex-col w-full h-full">
               <DataGrid
                 ref={gridRef}
-                className="flex-grow border-t-0"
+                className="grow border-t-0"
                 rowHeight={44}
                 headerRowHeight={36}
                 columns={columns}
@@ -768,7 +762,7 @@ export const UsersV2 = () => {
                   const isSelected = row.id === selectedUser
                   return [
                     `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-                    '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                    '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
                     '[&>.rdg-cell:first-child>div]:ml-4',
                   ].join(' ')
                 }}

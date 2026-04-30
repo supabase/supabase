@@ -1,16 +1,4 @@
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
-import {
-  Header,
-  LoadingCardView,
-  NoOrganizationsState,
-} from 'components/interfaces/Home/ProjectList/EmptyStates'
-import { ProjectList } from 'components/interfaces/Home/ProjectList/ProjectList'
-import { HomePageActions } from 'components/interfaces/HomePageActions'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { withAuth } from 'hooks/misc/withAuth'
 import { AlertTriangleIcon } from 'lucide-react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -26,6 +14,19 @@ import {
   SelectValue_Shadcn_,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
+
+import {
+  Header,
+  LoadingCardView,
+  NoOrganizationsState,
+} from '@/components/interfaces/Home/ProjectList/EmptyStates'
+import { ProjectList } from '@/components/interfaces/Home/ProjectList/ProjectList'
+import { HomePageActions } from '@/components/interfaces/HomePageActions'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 // [Joshen] I'd say we don't do route validation here, this page will act more
 // like a proxy to the project specific pages, and we let those pages handle
@@ -84,8 +85,8 @@ const GenericProjectPage: NextPage = () => {
   return (
     <div className="h-screen flex flex-col">
       <Header />
-      <PageLayout className="flex-grow min-h-0" title="Select a project to continue">
-        <ScaffoldContainer className="flex-grow flex flex-col gap-y-4">
+      <PageLayout className="grow min-h-0" title="Select a project to continue">
+        <ScaffoldContainer className="grow flex flex-col gap-y-4">
           <ScaffoldSection isFullWidth className="py-0">
             <div className="flex items-center gap-x-2">
               {isLoadingOrganizations ? (

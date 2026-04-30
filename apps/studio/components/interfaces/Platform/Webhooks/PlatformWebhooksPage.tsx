@@ -1,7 +1,4 @@
-import { useParams } from 'common'
-import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { EllipsisVertical, Pencil, RotateCw, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
@@ -52,6 +49,9 @@ import {
   setPendingSigningSecretReveal,
   shouldHandleEndpointNotFound,
 } from './PlatformWebhooksPage.utils'
+import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const PANEL_VALUES = ['create', 'edit'] as const
 
@@ -316,6 +316,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       <PlatformWebhooksHeader
         hasSelectedEndpoint={!!selectedEndpoint}
         headerTitle={headerTitle}
+        featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS}
         headerDescription={headerDescription}
         endpointStatus={
           selectedEndpoint ? (selectedEndpoint.enabled ? 'enabled' : 'disabled') : undefined

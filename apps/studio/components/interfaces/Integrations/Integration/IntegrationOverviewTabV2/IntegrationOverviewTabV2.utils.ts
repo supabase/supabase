@@ -40,3 +40,8 @@ export const getEnableExtensionsSQL = ({
     .join('\n\n')
     .trim()
 }
+
+export const getExtensionDefaultSchema = (ext?: DatabaseExtension) => {
+  if (!ext) return null
+  return ext.name === 'pg_cron' ? 'pg_catalog' : ext.default_version_schema
+}

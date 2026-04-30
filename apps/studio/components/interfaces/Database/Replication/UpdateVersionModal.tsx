@@ -1,16 +1,6 @@
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
-import { Pipeline } from 'data/replication/pipelines-query'
-import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-helper'
-import { useUpdatePipelineVersionMutation } from 'data/replication/update-pipeline-version-mutation'
 import { ChevronDown } from 'lucide-react'
-import {
-  PipelineStatusRequestStatus,
-  usePipelineRequestStatus,
-} from 'state/replication-pipeline-request-status'
+import { toast } from 'sonner'
 import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
@@ -18,8 +8,18 @@ import {
   DialogSectionSeparator,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
+import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
+import { Pipeline } from '@/data/replication/pipelines-query'
+import { useRestartPipelineHelper } from '@/data/replication/restart-pipeline-helper'
+import { useUpdatePipelineVersionMutation } from '@/data/replication/update-pipeline-version-mutation'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
 
 interface UpdateVersionModalProps {
   visible: boolean
@@ -97,7 +97,7 @@ export const UpdateVersionModal = ({
       size="small"
       visible={visible}
       title="Update pipeline image"
-      className="!p-0"
+      className="p-0!"
       confirmLabel={confirmLabel ?? (isStopped ? 'Update image' : 'Update and restart')}
       confirmLabelLoading={confirmLabelLoading}
       onCancel={onClose}
@@ -119,7 +119,7 @@ export const UpdateVersionModal = ({
       <Collapsible_Shadcn_ className="px-5 py-3 group">
         <CollapsibleTrigger_Shadcn_ className="w-full flex items-center justify-between text-sm text-foreground-light">
           <p>View version update details</p>
-          <ChevronDown size={14} className="group-data-[state=open]:-rotate-180 transition" />
+          <ChevronDown size={14} className="group-data-open:-rotate-180 transition" />
         </CollapsibleTrigger_Shadcn_>
         <CollapsibleContent_Shadcn_>
           <div className="flex flex-col gap-y-2 mt-2 pb-2">

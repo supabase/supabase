@@ -102,7 +102,7 @@ export const ExposedFunctionSelector = ({
           size="small"
           disabled={disabled}
           type="default"
-          className="w-full [&>span]:w-full !pr-1 space-x-1"
+          className="w-full [&>span]:w-full pr-1! space-x-1"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >
           <div className="w-full flex gap-1">
@@ -184,7 +184,7 @@ export const ExposedFunctionSelector = ({
                           value={key}
                           className={cn(
                             'w-full',
-                            isSchemaExposed ? 'cursor-pointer' : 'opacity-50 !cursor-not-allowed'
+                            isSchemaExposed ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed!'
                           )}
                           onSelect={() => {
                             if (!isSchemaExposed) return

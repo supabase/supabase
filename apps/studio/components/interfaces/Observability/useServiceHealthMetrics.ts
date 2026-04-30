@@ -1,7 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import useTimeseriesUnixToIso from 'hooks/analytics/useTimeseriesUnixToIso'
 import { useMemo } from 'react'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
@@ -14,6 +11,9 @@ import {
   transformToBarChartData,
   type RawChartData,
 } from './useServiceHealthMetrics.utils'
+import { get } from '@/data/fetchers'
+import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
+import useTimeseriesUnixToIso from '@/hooks/analytics/useTimeseriesUnixToIso'
 
 export type ServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'postgrest'
 

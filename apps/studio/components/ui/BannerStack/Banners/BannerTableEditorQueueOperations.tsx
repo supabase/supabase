@@ -1,18 +1,17 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import Link from 'next/link'
 import { Badge, Button, Card, CardContent, CardHeader } from 'ui'
 
 import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
-import {
-  useFeaturePreviewModal,
-  useIsQueueOperationsEnabled,
-} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+
+const DASHBOARD_SETTINGS_URL = '/account/me#dashboard'
 
 export const BannerTableEditorQueueOperations = () => {
   const { ref } = useParams()
-  const { selectFeaturePreview } = useFeaturePreviewModal()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const { dismissBanner } = useBannerStack()
@@ -31,7 +30,7 @@ export const BannerTableEditorQueueOperations = () => {
       <div className="flex flex-col gap-y-4">
         <div className="flex flex-col gap-y-2 items-start">
           <Badge variant="success" className="-ml-0.5 uppercase inline-flex items-center mb-2">
-            Preview
+            New
           </Badge>
           <Card className="text-xs w-full">
             <CardHeader className="flex flex-row gap-2 px-2 py-2">
@@ -62,12 +61,10 @@ export const BannerTableEditorQueueOperations = () => {
             Batch multiple row edits and review them before saving to your database
           </p>
         </div>
-        <Button
-          type="default"
-          className="w-min"
-          onClick={() => selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS)}
-        >
-          {isQueueOperationsEnabled ? 'View' : 'Enable'} feature preview
+        <Button asChild type="default" className="w-min">
+          <Link href={DASHBOARD_SETTINGS_URL}>
+            {isQueueOperationsEnabled ? 'View' : 'Enable in'} preferences
+          </Link>
         </Button>
       </div>
     </BannerCard>

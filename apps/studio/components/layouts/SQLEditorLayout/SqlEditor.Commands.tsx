@@ -1,14 +1,6 @@
 import { type PostgresColumn } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
-import { useSqlSnippetsQuery, type SqlSnippet } from 'data/content/sql-snippets-query'
-import { usePrefetchTables, useTablesQuery, type TablesData } from 'data/tables/tables-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { useProfile } from 'lib/profile'
 import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef } from 'react'
@@ -36,6 +28,15 @@ import {
   useSetCommandMenuSize,
   useSetPage,
 } from 'ui-patterns/CommandMenu'
+
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
+import { useSqlSnippetsQuery, type SqlSnippet } from '@/data/content/sql-snippets-query'
+import { usePrefetchTables, useTablesQuery, type TablesData } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import { useProfile } from '@/lib/profile'
 
 export function useSqlEditorGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -196,15 +197,15 @@ function SnippetSelector({
   const isSQLSnippet = selectedSnippet?.type === 'sql'
 
   return (
-    <div className="w-full flex-grow min-h-0 grid gap-4 md:grid-cols-2">
+    <div className="w-full grow min-h-0 grid gap-4 md:grid-cols-2">
       <CommandList_Shadcn_
         className={cn(
-          '!h-full min-h-0 max-h-[unset] py-2 overflow-hidden',
-          '[&>[cmdk-list-sizer]]:h-full [&>[cmdk-list-sizer]]:flex [&>[cmdk-list-sizer]]:flex-col'
+          'h-full! min-h-0 max-h-[unset] py-2 overflow-hidden',
+          '*:[[cmdk-list-sizer]]:h-full *:[[cmdk-list-sizer]]:flex *:[[cmdk-list-sizer]]:flex-col'
         )}
       >
         {!!snippets && snippets.length > 0 && (
-          <CommandGroup_Shadcn_ className="flex-grow min-h-0 overflow-auto">
+          <CommandGroup_Shadcn_ className="grow min-h-0 overflow-auto">
             {snippets.map((snippet) => (
               <CommandItem_Shadcn_
                 key={snippet.id}
@@ -219,7 +220,7 @@ function SnippetSelector({
           </CommandGroup_Shadcn_>
         )}
         {canCreateNew && (
-          <div className="min-h-fit flex-grow-0">
+          <div className="min-h-fit grow-0">
             <hr className="mt-4 mb-2 mx-2" />
             <CommandGroup_Shadcn_ forceMount={true}>
               <CommandItem_Shadcn_
@@ -355,7 +356,7 @@ select ${
     !table.columns
       ? '*'
       : `
-${table.columns.map((column, index, array) => `\t${column.name}`).join(',\n')}`
+${table.columns.map((column) => `\t${column.name}`).join(',\n')}`
   }
 from ${formatTableIdentifier(table)}
 -- where

@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { handleError, put } from 'data/fetchers'
 import { toast } from 'sonner'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 import { jitDbAccessKeys } from './keys'
+import { handleError, put } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type JitDbAccessUpdateVariables = {
   projectRef: string
-  requestedConfig: { state: 'enabled' | 'disabled' | 'unavailable' }
+  requestedConfig: { state: 'enabled' | 'disabled' }
 }
 
 async function updateJitDbAccess({ projectRef, requestedConfig }: JitDbAccessUpdateVariables) {
@@ -44,7 +44,7 @@ export const useJitDbAccessUpdateMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to update just-in-time (JIT) database access: ${data.message}`)
+        toast.error(`Failed to update temporary access: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

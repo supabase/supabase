@@ -1,23 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { useForeignTablesQuery } from 'data/foreign-tables/foreign-tables-query'
-import { useMaterializedViewsQuery } from 'data/materialized-views/materialized-views-query'
-import { usePrefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useViewsQuery } from 'data/views/views-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { noop } from 'lodash'
 import { Check, Copy, Edit, Eye, Filter, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
@@ -27,7 +10,7 @@ import { useState } from 'react'
 import {
   Button,
   Card,
-  Checkbox_Shadcn_,
+  Checkbox,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -53,6 +36,23 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
+import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
+import SchemaSelector from '@/components/ui/SchemaSelector'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { useForeignTablesQuery } from '@/data/foreign-tables/foreign-tables-query'
+import { useMaterializedViewsQuery } from '@/data/materialized-views/materialized-views-query'
+import { usePrefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useViewsQuery } from '@/data/views/views-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
 interface TableListProps {
   onAddTable: () => void
@@ -210,7 +210,7 @@ export const TableList = ({
       <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
         <div className="flex gap-2 items-center">
           <SchemaSelector
-            className="flex-grow lg:flex-grow-0 w-[180px]"
+            className="grow lg:grow-0 w-[180px]"
             size="tiny"
             showError={false}
             selectedSchemaName={selectedSchema}
@@ -232,7 +232,7 @@ export const TableList = ({
                   {Object.entries(ENTITY_TYPE).map(([key, value]) => (
                     <div key={key} className="group flex items-center justify-between py-0.5">
                       <div className="flex items-center gap-x-2">
-                        <Checkbox_Shadcn_
+                        <Checkbox
                           id={key}
                           name={key}
                           checked={visibleTypes.includes(value)}
@@ -263,10 +263,10 @@ export const TableList = ({
             </PopoverContent_Shadcn_>
           </Popover_Shadcn_>
         </div>
-        <div className="flex flex-grow justify-between gap-2 items-center">
+        <div className="flex grow justify-between gap-2 items-center">
           <Input
             size="tiny"
-            className="flex-grow lg:flex-grow-0 w-52"
+            className="grow lg:grow-0 w-52"
             placeholder="Search for a table"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
@@ -306,7 +306,7 @@ export const TableList = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead key="icon" className="w-0 !px-0" />
+                  <TableHead key="icon" className="w-0 px-0!" />
                   <TableHead key="name" className="max-w-[160px] sm:max-w-[280px]">
                     Name
                   </TableHead>
@@ -367,7 +367,7 @@ export const TableList = ({
                   {entities.length > 0 &&
                     entities.map((x) => (
                       <TableRow key={x.id}>
-                        <TableCell className="w-0 !pl-5 !pr-1">
+                        <TableCell className="w-0 pl-5! pr-1!">
                           <Tooltip>
                             <TooltipTrigger asChild className="cursor-default">
                               <div className="flex w-4 justify-center">

@@ -37,6 +37,8 @@ const ProductIcon = dynamic(() => import('~/components/ProductIcon'))
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
 
+// When updating page content, also update public/llms/database.txt
+
 function Database() {
   // base path for images
   const { basePath } = useRouter()
@@ -279,7 +281,7 @@ function Database() {
 
               <div className="mt-4 flex gap-2">
                 <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
-                  <Link href="/docs/guides/database/etl">Read the docs</Link>
+                  <Link href="/docs/guides/database/replication">Read the docs</Link>
                 </Button>
                 <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
                   <Link href="/blog/supabase-etl">Read the blog post</Link>

@@ -19,21 +19,64 @@ Supabase currently provides SAML SSO for [Team and Enterprise Plan customers](/p
 
 ## Supported providers
 
-Supabase supports practically all identity providers that support the SAML 2.0 SSO protocol. We've prepared these guides for commonly used identity providers to help you get started. If you use a different provider, our support stands ready to support you.
+Supabase supports practically all identity providers (IdP) that support the SAML 2.0 SSO protocol. These guides cover commonly used identity providers to help you get started. If you use a different provider, contact support.
 
 - [Google Workspaces (formerly G Suite)](/docs/guides/platform/sso/gsuite)
 - [Azure Active Directory](/docs/guides/platform/sso/azure)
 - [Okta](/docs/guides/platform/sso/okta)
 
-Once configured, you can update your settings anytime via the [SSO tab](/dashboard/org/_/sso) under **Organization Settings**.
+Once configured, you can update your settings anytime from [the **SSO** section](/dashboard/org/_/sso) of the dashboard under **Organization Settings**.
 
-![SSO Example](/docs/img/sso-dashboard-enabled.png)
+![SSO Example](/docs/img/sso-dashboard-enabled-idp.png)
+
+<Admonition type="tip" label="Testing your SSO configuration">
+
+After configuring your SSO provider, thorough testing is essential. See our [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices) guide for:
+
+- Step-by-step testing instructions
+- Troubleshooting common issues
+- Security best practices
+- Pre-launch checklist
+
+</Admonition>
+
+## Choosing your login flow
+
+Supabase supports two SSO login flows: **IdP-initiated** and **SP-initiated**. You can enable one or both depending on your organization's needs.
+
+### IdP-initiated login (recommended)
+
+Users start their login from your identity provider (Okta, Azure AD, Google Workspace) by clicking an app tile or bookmark. This is the **simplest and most common configuration** - it requires no domain configuration and works automatically once SSO is enabled.
+
+**Best for:**
+
+- Organizations with established IdP workflows
+- Multiple SAML apps per domain (Dev, Staging, Prod)
+- Simplest user experience
+
+### SP-initiated login
+
+Users start their login at supabase.com by entering their email address, then are redirected to your identity provider. This flow requires configuring email domains to route users to the correct IdP.
+
+**Best for:**
+
+- Users who bookmark supabase.com directly
+- Organizations migrating from password authentication
+- Supporting domain-based automatic IdP routing
+
+### Need help choosing?
+
+- **Quick decision:** Start with IdP-initiated only (the default). It works for 90% of use cases.
+- **Detailed guidance:** See [Choosing the Right Login Flow](/docs/guides/platform/sso/choosing-login-flow) for scenario-based recommendations.
+- **Technical details:** Read [Understanding SSO Login Flows](/docs/guides/platform/sso/login-flows) for in-depth explanations.
 
 ## Key configuration options
 
-- **Multiple domains** - You can associate one or more email domains with your SSO provider. Users with email addresses matching these domains are eligible to sign in via SSO.
-- **Auto-join** - Optionally allow users with a matching domain to be added to your organization automatically when they first sign in, without an invitation.
-- **Default role for auto-joined users** - Choose the role (e.g., `Read-only`, `Developer`, `Administrator`, `Owner`) that automatically joined users receive. Refer to [access control](/docs/guides/platform/access-control) for more information about roles.
+- **Login flows** - Choose between IdP-initiated (users start from identity provider), SP-initiated (users start at supabase.com), or both. IdP-initiated is recommended for most organizations and requires no domain configuration. See [Choosing the Right Login Flow](/docs/guides/platform/sso/choosing-login-flow) for guidance.
+- **Email domains** - Required only if you enable SP-initiated login. You can associate one or more email domains with your SSO provider. Users with matching email addresses can sign in via SSO at supabase.com. Not required for IdP-initiated flow.
+- **Auto-join** - Optionally allow users with a matching domain to be added to your organization automatically when they sign in via SSO. Auto-join applies on every login, not just first signup, making it easy to test before enabling.
+- **Default role for auto-joined users** - Choose the role (e.g., `Read-only`, `Developer`, `Administrator`, `Owner`) that automatically joined users receive. We recommend using `Developer` as the default (principle of least privilege) and promoting users individually as needed. Refer to [access control](/docs/guides/platform/access-control) for more information about roles.
+- **Invitation types** - When inviting users to your organization, you can explicitly choose whether the invitation requires SSO authentication or allows non-SSO login (password/social). This enables mixed authentication organizations with both SSO and non-SSO users.
 
 ## How SSO works in Supabase
 
@@ -47,13 +90,25 @@ When SSO is enabled for an organization:
 
 ## Enabling SSO for an organization
 
-- Review the steps above to configure your setup.
-- Invite users to the organization and ensure they join with their SSO linked account.
-- If a user is already a member of the organization under a non SSO account, they will need to be removed and invited again for them to join under their SSO account.
+**Recommended workflow:**
 
-<Admonition type="note">
+1. Create or verify at least one non-SSO owner account exists (required for safety)
+2. Configure your SSO provider following one of our [provider-specific guides](#supported-providers)
+3. Start with auto-join **disabled** to test the configuration
+4. Test SSO login with your own account
+5. Once confirmed working, enable auto-join if desired
+6. Thoroughly test using our [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices) guide
+7. Invite users to the organization or let them auto-join on login
 
-**No automatic linking:** Each user account verified using a SSO identity provider will not be automatically linked to existing user accounts in the system. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO login with your project, there will be two `valid.email@supabase.io` user accounts in the system.
+<Admonition type="note" label="Account linking">
+
+If a user is already a member of the organization under a non-SSO account, they will need to be removed and invited again with an SSO-required invitation to join under their SSO account. SSO and non-SSO accounts with the same email are treated as separate accounts.
+
+</Admonition>
+
+<Admonition type="note" label="No automatic linking">
+
+Each user account verified using a SSO identity provider will not be automatically linked to existing user accounts in the system. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO login with your project, there will be two `valid.email@supabase.io` user accounts in the system.
 
 Users will need to ensure they are logged in with the correct account when accepting invites or accessing organizations/projects.
 
@@ -61,7 +116,19 @@ Users will need to ensure they are logged in with the correct account when accep
 
 ## Disabling SSO for an organization
 
-If you disable the SSO provider for an organization, **all SSO users will immediately be unable to sign in**. Before disabling SSO, ensure you have at least one non-SSO owner account to prevent being locked out.
+If you disable or delete the SSO provider for an organization, **all SSO users will immediately be unable to sign in**.
+
+<Admonition type="caution" label="Safety requirement">
+
+The system requires at least one non-SSO owner account before allowing SSO provider deletion. This prevents complete organization lockout. When you delete an SSO provider, all SSO members are automatically removed from the organization.
+
+Before disabling or deleting SSO:
+
+- Verify a non-SSO owner account exists and can log in
+- Communicate to affected users in advance
+- Consider whether disabling is better than deleting if the change is temporary
+
+</Admonition>
 
 ## Removing an individual SSO user's access
 
@@ -69,3 +136,25 @@ To revoke access for a specific SSO user without disabling the provider entirely
 
 - Remove or disable the user's account in your identity provider
 - Downgrade or remove their permissions for any organizations in Supabase.
+
+## Testing and best practices
+
+Before rolling out SSO to your organization, we strongly recommend thorough testing and following security best practices. Our comprehensive guide covers:
+
+- Step-by-step testing procedures for SSO login, auto-join, and invitations
+- Troubleshooting common issues (many of which previously required support intervention)
+- Security best practices including certificate monitoring and domain configuration
+- Operational guidance for making SSO changes safely
+- Pre-launch verification checklist
+
+Visit the [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices) guide for complete details.
+
+## Advanced scenarios
+
+Most organizations use a single SSO provider for all users. However, Supabase supports multiple SSO providers within an organization for advanced use cases such as:
+
+- Separate providers for development, staging, and production environments
+- Different providers for different teams or business units
+- Gradual migration from one identity provider to another
+
+If you need to configure multiple SSO providers, refer to the [Multiple SSO Providers](/docs/guides/platform/sso/multiple-providers) guide for detailed configuration steps, and contact your Supabase support representative if you need additional guidance.

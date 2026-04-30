@@ -1,7 +1,6 @@
 'use client'
 
 import { IS_PLATFORM } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import {
   Clock5,
   Code2,
@@ -39,6 +38,7 @@ import {
   getIntegrationRoute,
   useCreateCommandsConfig,
 } from './CreateCommands.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 
 const AiIconAnimation = dynamic(() => import('ui').then((mod) => mod.AiIconAnimation))
 const Badge = dynamic(() => import('ui').then((mod) => mod.Badge))
@@ -330,7 +330,7 @@ export function useCreateCommands(options?: CommandOptions) {
         const getIcon = () => {
           if (isWrapper) {
             return (
-              <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:!p-1 [&>svg]:!p-1">
+              <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:p-1! [&>svg]:p-1!">
                 {integration.icon()}
               </div>
             )

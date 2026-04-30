@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { jitDbAccessKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type JitDbAccessVariables = { projectRef?: string }
 
@@ -17,23 +17,7 @@ async function getJitDbAccessConfiguration(
     signal,
   })
 
-  // jit access might not be available on the project due to
-  // postgres version
-  if (error) {
-    const responseError = error as ResponseError
-    const isNotAvailableError =
-      responseError.code === 400 && responseError.message?.includes('unavailable')
-
-    if (isNotAvailableError) {
-      return {
-        appliedSuccessfully: false,
-        state: 'unavailable' as string,
-        isUnavailable: true,
-      } as const
-    } else {
-      handleError(error)
-    }
-  }
+  if (error) handleError(error)
   return data
 }
 

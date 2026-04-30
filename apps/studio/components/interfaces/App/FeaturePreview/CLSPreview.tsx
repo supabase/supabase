@@ -1,11 +1,11 @@
-import Image from 'next/image'
-
 import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
+import Image from 'next/image'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, WarningIcon } from 'ui'
+
+import { Markdown } from '@/components/interfaces/Markdown'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 
 export const CLSPreview = () => {
   const { ref } = useParams()
@@ -41,9 +41,9 @@ export const CLSPreview = () => {
         width={1860}
         height={970}
         alt="api-docs-side-panel-preview"
-        className="rounded border"
+        className="rounded-sm border"
       />
-      <div className="space-y-2 !mt-4">
+      <div className="space-y-2 mt-4!">
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>

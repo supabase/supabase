@@ -1,3 +1,4 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { noop } from 'lodash'
 import Link from 'next/link'
 import {
@@ -9,9 +10,8 @@ import {
 } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import type { Route } from 'components/ui/ui.types'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import type { Route } from '@/components/ui/ui.types'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   route: Route
@@ -28,9 +28,9 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
     const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
 
     const iconClasses = [
-      'absolute left-0 top-0 flex rounded h-10 w-10 items-center justify-center text-foreground-lighter', // Layout
+      'absolute left-0 top-0 flex rounded-sm h-10 w-10 items-center justify-center text-foreground-lighter', // Layout
       'group-hover/item:text-foreground-light',
-      isActive ? '!text-foreground [&_svg]:stroke-[1.5]' : '[&_svg]:stroke-[1]',
+      isActive ? 'text-foreground! [&_svg]:stroke-[1.5]' : '[&_svg]:stroke-1',
       'transition-all',
     ]
 
@@ -38,12 +38,12 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
       'relative',
       'h-10 w-full md:w-10 md:group-data-[state=expanded]:w-full',
       'transition-all duration-200',
-      'flex items-center rounded',
+      'flex items-center rounded-sm',
       'group-data-[state=collapsed]:justify-center',
       'group-data-[state=expanded]:-space-x-2',
       'hover:bg-surface-200',
       'group/item',
-      `${isActive && '!bg-selection shadow-sm'}`,
+      `${isActive && 'bg-selection! shadow-xs'}`,
     ]
 
     const LinkComponent = forwardRef<HTMLAnchorElement, ComponentPropsWithoutRef<typeof Link>>(

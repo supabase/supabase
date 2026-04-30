@@ -1,22 +1,12 @@
 // End of third-party imports
 
 import { useParams } from 'common'
-import CopyButton from 'components/ui/CopyButton'
-import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Check, ChevronsUpDown, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  cn,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-} from 'ui'
+import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_, FormControl, FormField } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
@@ -24,6 +14,9 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
+import CopyButton from '@/components/ui/CopyButton'
+import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface ProjectAndPlanProps {
   form: UseFormReturn<SupportFormValues>
@@ -72,12 +65,12 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
   const { projectRef: urlProjectRef } = useParams()
 
   return (
-    <FormField_Shadcn_
+    <FormField
       name="projectRef"
       control={form.control}
       render={({ field }) => (
         <FormItemLayout hideMessage layout="vertical" label="Which project is affected?">
-          <FormControl_Shadcn_>
+          <FormControl>
             <OrganizationProjectSelector
               key={orgSlug}
               sameWidthAsTrigger
@@ -130,7 +123,7 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                 </CommandGroup_Shadcn_>
               )}
             />
-          </FormControl_Shadcn_>
+          </FormControl>
         </FormItemLayout>
       )}
     />
@@ -156,7 +149,7 @@ function ProjectRefHighlighted({ projectRef }: ProjectRefHighlightedProps) {
         >
           <p className="text-sm transition text-foreground-lighter">
             Project ID:{' '}
-            <code className="text-code-inline !text-foreground-light">{projectRef}</code>
+            <code className="text-code-inline text-foreground-light!">{projectRef}</code>
           </p>
           <CopyButton
             iconOnly

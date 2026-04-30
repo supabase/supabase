@@ -1,11 +1,5 @@
 import { useParams } from 'common'
-import {
-  CronJobRun,
-  useCronJobRunsInfiniteQuery,
-} from 'data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
 import dayjs from 'dayjs'
-import { useInfiniteScroll } from 'hooks/misc/useInfiniteScroll'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { CircleCheck, CircleX, Loader } from 'lucide-react'
 import { useMemo } from 'react'
 import DataGrid, { Column, Row } from 'react-data-grid'
@@ -16,6 +10,12 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { calculateDuration, formatDate } from './CronJobs.utils'
 import CronJobsEmptyState from './CronJobsEmptyState'
+import {
+  CronJobRun,
+  useCronJobRunsInfiniteQuery,
+} from '@/data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
+import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const cronJobColumns = [
   {
@@ -119,7 +119,7 @@ const columns = cronJobColumns.map((col) => {
             col.id === 'runid' && 'ml-8'
           )}
         >
-          <p className="!text-foreground">{col.name}</p>
+          <p className="text-foreground!">{col.name}</p>
         </div>
       )
     },
@@ -183,7 +183,7 @@ export const PreviousRunsTab = () => {
     <div className="h-full flex flex-col">
       <LoadingLine loading={isFetching} />
       <DataGrid
-        className="flex-grow border-t-0"
+        className="grow border-t-0"
         rowHeight={44}
         headerRowHeight={36}
         onScroll={handleScroll}
@@ -192,7 +192,7 @@ export const PreviousRunsTab = () => {
         rowClass={() => {
           return cn(
             'cursor-pointer',
-            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
             '[&>.rdg-cell:first-child>div]:ml-8'
           )
         }}

@@ -1,6 +1,4 @@
 import { useFlag, useParams } from 'common'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -8,6 +6,8 @@ import { Admonition } from 'ui-patterns'
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { IntegrationOverviewTabV2 } from '../Integration/IntegrationOverviewTabV2'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const QueuesAdmonition = () => {
   const { ref } = useParams()
