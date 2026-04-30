@@ -1,18 +1,18 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from 'ui'
 
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { InlineLink } from 'components/ui/InlineLink'
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import { useDpaRequestMutation } from 'data/documents/dpa-request-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useProfile } from 'lib/profile'
-import { Button } from 'ui'
+} from '@/components/layouts/Scaffold'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useDpaRequestMutation } from '@/data/documents/dpa-request-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useProfile } from '@/lib/profile'
 
 export const DPA = () => {
   const { profile } = useProfile()
@@ -48,7 +48,7 @@ export const DPA = () => {
             <p>
               You can review a static PDF version of our latest DPA document{' '}
               <InlineLink
-                href="https://supabase.com/downloads/docs/Supabase+DPA+250805.pdf"
+                href="https://supabase.com/downloads/docs/Supabase+DPA+260317.pdf"
                 onClick={() =>
                   sendEvent({
                     action: 'dpa_pdf_opened',

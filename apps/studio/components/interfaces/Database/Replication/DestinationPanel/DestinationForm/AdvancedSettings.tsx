@@ -6,10 +6,12 @@ import {
   AccordionItem_Shadcn_,
   AccordionTrigger_Shadcn_,
   Badge,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  FormControl,
+  FormField,
+  FormInputGroupInput,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -45,9 +47,9 @@ export const AdvancedSettings = ({
               </span>
             </div>
           </AccordionTrigger_Shadcn_>
-          <AccordionContent_Shadcn_ className="!pb-0 pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
+          <AccordionContent_Shadcn_ className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
             {/* Batch wait time - applies to all destinations */}
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="maxFillMs"
               render={({ field }) => (
@@ -67,22 +69,25 @@ export const AdvancedSettings = ({
                     </>
                   }
                 >
-                  <FormControl_Shadcn_>
-                    <PrePostTab postTab="milliseconds">
-                      <Input_Shadcn_
+                  <FormControl>
+                    <InputGroup>
+                      <FormInputGroupInput
                         {...field}
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
                         placeholder="Default: 10000"
                       />
-                    </PrePostTab>
-                  </FormControl_Shadcn_>
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>milliseconds</InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="maxTableSyncWorkers"
               render={({ field }) => (
@@ -98,22 +103,25 @@ export const AdvancedSettings = ({
                     </>
                   }
                 >
-                  <FormControl_Shadcn_>
-                    <PrePostTab postTab="workers">
-                      <Input_Shadcn_
+                  <FormControl>
+                    <InputGroup>
+                      <FormInputGroupInput
                         {...field}
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
                         placeholder="Default: 4"
                       />
-                    </PrePostTab>
-                  </FormControl_Shadcn_>
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>workers</InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="maxCopyConnectionsPerTable"
               render={({ field }) => (
@@ -132,22 +140,25 @@ export const AdvancedSettings = ({
                     </>
                   }
                 >
-                  <FormControl_Shadcn_>
-                    <PrePostTab postTab="connections">
-                      <Input_Shadcn_
+                  <FormControl>
+                    <InputGroup>
+                      <FormInputGroupInput
                         {...field}
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
                         placeholder="Default: 2"
                       />
-                    </PrePostTab>
-                  </FormControl_Shadcn_>
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>connections</InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="invalidatedSlotBehavior"
               render={({ field }) => (
@@ -156,7 +167,7 @@ export const AdvancedSettings = ({
                   layout="horizontal"
                   description="Behavior when the replication slot is invalidated"
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Select_Shadcn_ value={field.value ?? 'error'} onValueChange={field.onChange}>
                       <SelectTrigger_Shadcn_ className="capitalize">
                         {field.value ?? 'error'}
@@ -176,14 +187,14 @@ export const AdvancedSettings = ({
                         </SelectItem_Shadcn_>
                       </SelectContent_Shadcn_>
                     </Select_Shadcn_>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
             {type === 'BigQuery' && (
               <>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="connectionPoolSize"
                   render={({ field }) => (
@@ -204,22 +215,25 @@ export const AdvancedSettings = ({
                         </>
                       }
                     >
-                      <FormControl_Shadcn_>
-                        <PrePostTab postTab="connections">
-                          <Input_Shadcn_
+                      <FormControl>
+                        <InputGroup>
+                          <FormInputGroupInput
                             {...field}
                             type="number"
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
                             placeholder="Default: 4"
                           />
-                        </PrePostTab>
-                      </FormControl_Shadcn_>
+                          <InputGroupAddon align="inline-end">
+                            <InputGroupText>connections</InputGroupText>
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
 
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="maxStalenessMins"
                   render={({ field }) => (
@@ -244,17 +258,20 @@ export const AdvancedSettings = ({
                         </>
                       }
                     >
-                      <FormControl_Shadcn_>
-                        <PrePostTab postTab="minutes">
-                          <Input_Shadcn_
+                      <FormControl>
+                        <InputGroup>
+                          <FormInputGroupInput
                             {...field}
                             type="number"
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
                             placeholder="Default: None (No staleness limit)"
                           />
-                        </PrePostTab>
-                      </FormControl_Shadcn_>
+                          <InputGroupAddon align="inline-end">
+                            <InputGroupText>minutes</InputGroupText>
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />

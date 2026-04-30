@@ -1,17 +1,17 @@
 'use client'
 
-import { Input } from '@ui/components/shadcn/ui/input'
+import { Input_Shadcn_ as Input } from 'ui'
 import { SearchIcon } from 'lucide-react'
 import { Badge } from 'ui'
 import { useEvents } from '~/app/events/context'
 
 const CATEGORIES_FILTERS = [
   { name: 'All', value: 'all' },
+  { name: 'Conference', value: 'conference' },
   { name: 'Meetup', value: 'meetup' },
   { name: 'Workshop', value: 'workshop' },
   { name: 'Hackathon', value: 'hackathon' },
   { name: 'Webinar', value: 'webinar' },
-  { name: 'On demand', value: 'on-demand' },
 ]
 
 export function EventGalleryFilters() {

@@ -6,8 +6,6 @@ import { releaseFileOnceCleanup, withFileOnceSetup } from '../utils/once-per-fil
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 
-const TEST_TABLE_NAME = 'pw_test_index_advisor'
-
 test.describe('Index Advisor', () => {
   test.beforeAll(async () => {
     await withFileOnceSetup(import.meta.url, async () => {
@@ -38,6 +36,7 @@ test.describe('Index Advisor', () => {
   })
 
   test('should show Index Advisor warnings in Query Performance', async ({ page, ref }) => {
+    const TEST_TABLE_NAME = 'pw_test_index_advisor'
     await using _ = await withSetupCleanup(
       async () => {
         await createTable(TEST_TABLE_NAME, 'name', [
@@ -69,5 +68,38 @@ test.describe('Index Advisor', () => {
     await expect(indexAdvisorButton, 'Index Advisor filter should be visible').toBeVisible({
       timeout: 30000,
     })
+  })
+
+  test('should show Index Advisor warnings in Table Editor', async ({ page, ref }) => {
+    const TEST_TABLE_NAME = 'pw_test_index_advisor_editor'
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createTable(TEST_TABLE_NAME, 'name', [
+          {
+            name: 'test',
+          },
+          {
+            name: 'demo',
+          },
+          {
+            name: 'test',
+          },
+        ])
+      },
+      async () => {
+        await dropTable(TEST_TABLE_NAME)
+      }
+    )
+
+    // Run query that need indexes
+    await query(`SELECT * FROM ${TEST_TABLE_NAME} WHERE name = 'test';`)
+
+    // Navigate to table editor page
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await page.getByLabel(`View ${TEST_TABLE_NAME}`).click()
+    await expect(page.getByText('demo')).toBeVisible()
+    await page.waitForLoadState('networkidle')
+    await page.getByRole('button', { name: `View name index suggestion`, exact: true }).click()
+    await expect(page.getByRole('dialog', { name: 'Index Recommendation' })).toBeVisible()
   })
 })

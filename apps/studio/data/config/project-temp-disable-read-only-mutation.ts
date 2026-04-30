@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import { usageKeys } from 'data/usage/keys'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { handleError, post } from '@/data/fetchers'
+import { usageKeys } from '@/data/usage/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type TempDisableReadOnlyModeVariables = {
   projectRef: string

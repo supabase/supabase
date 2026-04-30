@@ -52,7 +52,7 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
       animate={isInView ? animate : initial}
       className="will-change-transform h-full highlight-card"
     >
-      <Panel innerClassName="flex flex-col !bg-alternative" outerClassName="h-full">
+      <Panel innerClassName="flex flex-col bg-alternative!" outerClassName="h-full">
         {highlight.image && (
           <div className="relative w-full aspect-[1.35/1] mb-4">
             <div

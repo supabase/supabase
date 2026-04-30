@@ -1,18 +1,9 @@
+import { Handle, Node, NodeProps, Position } from '@xyflow/react'
 import { useParams } from 'common'
-import SparkBar from 'components/ui/SparkBar'
-import {
-  DatabaseInitEstimations,
-  ReplicaInitializationStatus,
-  useReadReplicasStatusesQuery,
-} from 'data/read-replicas/replicas-status-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import dayjs from 'dayjs'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH } from 'lib/constants'
 import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
-import { Handle, NodeProps, Position } from 'reactflow'
 import {
   Badge,
   Button,
@@ -30,46 +21,34 @@ import {
 import {
   ERROR_STATES,
   INIT_PROGRESS,
+  LoadBalancerData,
   NODE_SEP,
   NODE_WIDTH,
-  Region,
+  PrimaryNodeData,
   REPLICA_STATUS,
+  ReplicaNodeData,
 } from './InstanceConfiguration.constants'
 import { formatSeconds } from './InstanceConfiguration.utils'
+import { metricColor } from './InstanceNode.utils'
+import SparkBar from '@/components/ui/SparkBar'
+import {
+  DatabaseInitEstimations,
+  ReplicaInitializationStatus,
+  useReadReplicasStatusesQuery,
+} from '@/data/read-replicas/replicas-status-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
+import { useComputeMetrics } from '@/hooks/analytics/useComputeMetrics'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
-interface NodeData {
-  id: string
-  provider: string
-  region: Region
-  computeSize?: string
-  status: string
-  inserted_at: string
-}
-
-interface PrimaryNodeData extends NodeData {
-  numReplicas: number
-  numRegions: number
-  hasLoadBalancer: boolean
-}
-
-interface LoadBalancerData extends NodeData {
-  numDatabases: number
-}
-
-interface ReplicaNodeData extends NodeData {
-  onSelectRestartReplica: () => void
-  onSelectResizeReplica: () => void
-  onSelectDropReplica: () => void
-}
-
-export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
+export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) => {
   const { ref } = useParams()
   const { numDatabases } = data
 
   return (
     <>
-      <div className="flex flex-col rounded bg-surface-100 border border-default">
+      <div className="flex flex-col rounded-sm bg-surface-100 border border-default">
         <div
           className="flex items-start justify-between p-3 gap-x-4"
           style={{ width: NODE_WIDTH / 2 - 10 }}
@@ -105,13 +84,27 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
   )
 }
 
-export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
+export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
   // [Joshen] Just FYI Handles cannot be conditionally rendered
   const { region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
+  const { ref } = useParams()
 
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
   ])
+
+  const {
+    cpu,
+    disk,
+    memory,
+    connections,
+    isLoading: metricsLoading,
+    isError: metricsError,
+  } = useComputeMetrics({
+    projectRef: ref,
+  })
+
+  const observabilityUrl = `/project/${ref}/observability/database`
 
   return (
     <>
@@ -121,7 +114,7 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
         className={!hasLoadBalancer ? 'opacity-0' : ''}
         style={{ background: 'transparent' }}
       />
-      <div className="flex flex-col rounded bg-surface-100 border border-default">
+      <div className="flex flex-col rounded-sm bg-surface-100 border border-default">
         <div
           className="flex items-start justify-between p-3"
           style={{ width: NODE_WIDTH / 2 - 10 }}
@@ -148,7 +141,7 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
           </div>
           <img
             alt="region icon"
-            className="w-8 rounded-sm mt-0.5"
+            className="w-8 rounded-xs mt-0.5"
             src={`${BASE_PATH}/img/regions/${region.region}.svg`}
           />
         </div>
@@ -165,6 +158,43 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
             </p>
           </div>
         )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={observabilityUrl}
+              className="border-t px-3 py-2 hover:bg-surface-200 transition flex items-center gap-x-3 text-xs"
+            >
+              {metricsLoading ? (
+                <div className="h-3 w-44 rounded-sm bg-surface-300 animate-pulse" />
+              ) : metricsError ? (
+                <span className="text-foreground-lighter">Metrics unavailable</span>
+              ) : (
+                <>
+                  <span>
+                    CPU <span className={metricColor(cpu)}>{cpu.toFixed(0)}%</span>
+                  </span>
+                  <span className="text-foreground-lighter">·</span>
+                  <span>
+                    Disk <span className={metricColor(disk)}>{disk.toFixed(0)}%</span>
+                  </span>
+                  <span className="text-foreground-lighter">·</span>
+                  <span>
+                    RAM <span className={metricColor(memory)}>{memory.toFixed(0)}%</span>
+                  </span>
+                  {connections.max > 0 && (
+                    <>
+                      <span className="text-foreground-lighter">·</span>
+                      <span className="text-foreground-light">
+                        {connections.current}/{connections.max} conns
+                      </span>
+                    </>
+                  )}
+                </>
+              )}
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Go to Database Report</TooltipContent>
+        </Tooltip>
       </div>
       <Handle
         type="source"
@@ -176,7 +206,7 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
   )
 }
 
-export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
+export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
   const { ref } = useParams()
   const { id, region, computeSize, status, inserted_at } = data
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
@@ -226,7 +256,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
     <>
       <Handle type="target" position={Position.Top} style={{ background: 'transparent' }} />
       <div
-        className="flex justify-between items-start rounded bg-surface-100 border border-default p-3"
+        className="flex justify-between items-start rounded-sm bg-surface-100 border border-default p-3"
         style={{ width: NODE_WIDTH / 2 - 10 }}
       >
         <div className="flex gap-x-3">
@@ -303,7 +333,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                   <div className="w-56">
                     <SparkBar
                       labelBottom={INIT_PROGRESS[progress as keyof typeof INIT_PROGRESS]}
-                      labelBottomClass="text-xs !normal-nums text-foreground-light"
+                      labelBottomClass="text-xs normal-nums! text-foreground-light"
                       type="horizontal"
                       value={stagePercent * 100}
                       max={100}
@@ -374,13 +404,13 @@ export const RegionNode = ({ data }: any) => {
 
   return (
     <div
-      className="relative flex justify-between rounded bg-black/10 border border-default border-white/10 border-2 p-3"
+      className="relative flex justify-between rounded-sm bg-black/10 border border-default border-white/10 border-2 p-3"
       style={{ width: regionNodeWidth, height: 162 }}
     >
       <div className="absolute bottom-2 flex items-center justify-between gap-x-2">
         <img
           alt="region icon"
-          className="w-5 rounded-sm"
+          className="w-5 rounded-xs"
           src={`${BASE_PATH}/img/regions/${region.region}.svg`}
         />
         <p className="text-sm">{region.name}</p>

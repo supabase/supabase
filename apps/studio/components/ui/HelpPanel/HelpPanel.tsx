@@ -1,18 +1,18 @@
 import { IS_PLATFORM } from 'common'
-import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { X } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Button, cn, Separator } from 'ui'
 import styleHandler from 'ui/src/lib/theme/styleHandler'
 
 import { ASSISTANT_SUGGESTIONS } from './HelpPanel.constants'
 import { HelpSection } from './HelpSection'
+import type { SupportFormUrlKeys } from '@/components/interfaces/Support/SupportForm.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const HelpPanel = ({
   onClose,
@@ -31,7 +31,7 @@ export const HelpPanel = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex text-xs items-center justify-between pl-4 pr-3 h-[var(--header-height)] border-b">
+      <div className="flex text-xs items-center justify-between pl-4 pr-3 h-(--header-height) border-b">
         <span>Help & Support</span>
         <ButtonTooltip
           type="text"
@@ -65,7 +65,7 @@ export const HelpPanel = ({
         </div>
         <div className="px-4">
           <div
-            className="relative space-y-2 overflow-hidden rounded px-4 py-4 pb-12 shadow-md"
+            className="relative space-y-2 overflow-hidden rounded-sm px-4 py-4 pb-12 shadow-md"
             style={{ background: '#404EED' }}
           >
             <a

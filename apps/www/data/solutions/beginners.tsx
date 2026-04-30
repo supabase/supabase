@@ -1,16 +1,14 @@
 import { CubeIcon } from '@heroicons/react/outline'
+import { useBreakpoint } from 'common'
 import { Check, Sparkles, Timer } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { Button, cn, IconDiscord, Image } from 'ui'
+import { topTweets } from 'shared-data'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { Button, cn, IconDiscord } from 'ui'
+import { Image } from 'ui-patterns/Image'
 
-import { frameworks } from 'components/Hero/HeroFrameworks'
 import MainProducts from '../MainProducts'
-
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { TwitterSocialSectionProps } from 'components/TwitterSocialSection'
-import type { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
 import {
   FrameworkLink,
   getEditors,
@@ -18,11 +16,12 @@ import {
   type HeroSection,
   type Metadata,
 } from './solutions.utils'
-
-import { useBreakpoint } from 'common'
-import { useSendTelemetryEvent } from 'lib/telemetry'
-import { topTweets } from 'shared-data'
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import type { MPCSectionProps } from '@/components/Solutions/MPCSection'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import type { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
+import type { TwitterSocialSectionProps } from '@/components/TwitterSocialSection'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const ComputePricingCalculator = dynamic(
@@ -146,10 +145,10 @@ const data: () => {
         'Supabase includes everything you need to create the perfect app for your brand, business, or just for fun.',
       className: cn(
         '[&_div.grid]:sm:divide-x [&_div.grid]:divide-y',
-        '[&_div.grid>div:nth-child(2n+2)]:sm:!border-l-0',
-        '[&_div.grid>div:nth-child(2n+2)]:lg:!border-l',
-        '[&_div.grid>div:nth-child(3n+3)]:lg:!border-l-0',
-        '[&_div.grid>div:nth-child(2)]:lg:!border-t-0'
+        '[&_div.grid>div:nth-child(2n+2)]:sm:border-l-0!',
+        '[&_div.grid>div:nth-child(2n+2)]:lg:border-l!',
+        '[&_div.grid>div:nth-child(3n+3)]:lg:border-l-0!',
+        '[&_div.grid>div:nth-child(2)]:lg:border-t-0!'
       ),
       features: [
         {
@@ -278,7 +277,7 @@ const data: () => {
               more. Secure and trusted.
             </>
           ),
-          image: <AuthVisual className="2xl:!-bottom-20" />,
+          image: <AuthVisual className="2xl:-bottom-20!" />,
         },
         {
           id: 'storage',

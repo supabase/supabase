@@ -25,13 +25,14 @@ export const gettingStarted: SidebarNavGroup = {
 }
 
 export const aiEditorsRules: SidebarNavGroup = {
-  title: 'AI Editors Rules',
+  title: 'AI Skills',
   items: [
     {
-      title: 'Prompts',
-      href: '/docs/ai-editors-rules/prompts',
+      title: 'Skills',
+      href: '/docs/ai-editors-rules/skills',
       items: [],
-      commandItemLabel: 'AI Editors Rules',
+      new: true,
+      commandItemLabel: 'AI Skills',
     },
   ],
 }
@@ -87,6 +88,13 @@ export const componentPages: SidebarNavGroup = {
       href: '/docs/nextjs/realtime-cursor',
       items: [],
       commandItemLabel: 'Realtime Cursor',
+    },
+    {
+      title: 'Realtime Monaco',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/realtime-monaco',
+      items: [],
+      commandItemLabel: 'Realtime Monaco',
     },
     {
       title: 'Current User Avatar',

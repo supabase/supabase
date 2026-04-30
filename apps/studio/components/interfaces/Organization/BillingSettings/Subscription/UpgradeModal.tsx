@@ -1,12 +1,12 @@
+import { useParams } from 'common'
 import { includes, without } from 'lodash'
 import { useReducer, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useSendUpgradeFeedbackMutation } from 'data/feedback/upgrade-survey-send'
-import type { OrgSubscription } from 'data/subscriptions/types'
 import { Input, Modal } from 'ui'
+
 import { generateUpgradeReasons } from '../helpers'
+import { useSendUpgradeFeedbackMutation } from '@/data/feedback/upgrade-survey-send'
+import type { OrgSubscription } from '@/data/subscriptions/types'
 
 export interface UpgradeSurveyModalProps {
   visible: boolean
@@ -86,10 +86,10 @@ const UpgradeSurveyModal = ({
                     className={`
                       flex cursor-pointer items-center space-x-2 rounded-md py-1 
                       pl-2 pr-3 text-center text-sm
-                      shadow-sm transition-all duration-100
+                      shadow-xs transition-all duration-100
                       ${
                         active
-                          ? ` bg-foreground text-background opacity-100 hover:bg-opacity-75`
+                          ? ` bg-foreground text-background opacity-100 hover:bg-foreground/75`
                           : ` bg-border-strong text-foreground opacity-25 hover:opacity-50`
                       }
                   `}

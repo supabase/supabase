@@ -1,16 +1,14 @@
 import { useMemo } from 'react'
 
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-
 import {
   APP_ACCESS_ROLES,
   isKnownRole,
   ROLE_INFO,
   RoleGroup,
   SUPABASE_SYSTEM_ROLES,
-  type KnownRole,
 } from '../constants/roles'
+import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export type RoleWithDescription = {
   name: string

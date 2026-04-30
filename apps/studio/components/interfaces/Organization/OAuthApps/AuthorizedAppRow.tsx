@@ -1,9 +1,9 @@
 import { Trash } from 'lucide-react'
-
-import CopyButton from 'components/ui/CopyButton'
-import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
 import { Button, TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
+import CopyButton from '@/components/ui/CopyButton'
+import type { AuthorizedApp } from '@/data/oauth/authorized-apps-query'
 
 export interface AuthorizedAppRowProps {
   app: AuthorizedApp

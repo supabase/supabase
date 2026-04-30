@@ -1,4 +1,3 @@
-import 'react-native-url-polyfill/auto'
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
@@ -18,7 +17,9 @@ export default function App() {
     })
 
     supabase.auth.onAuthStateChange(async (_event, _session) => {
-      const { data: { claims } } = await supabase.auth.getClaims()
+      const {
+        data: { claims },
+      } = await supabase.auth.getClaims()
       if (claims) {
         setUserId(claims.sub)
         setEmail(claims.email)
@@ -29,9 +30,5 @@ export default function App() {
     })
   }, [])
 
-  return (
-    <View>
-      {userId ? <Account key={userId} userId={userId} email={email} /> : <Auth />}
-    </View>
-  )
+  return <View>{userId ? <Account key={userId} userId={userId} email={email} /> : <Auth />}</View>
 }

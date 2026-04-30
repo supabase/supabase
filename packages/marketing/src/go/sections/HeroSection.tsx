@@ -25,7 +25,7 @@ export default function HeroSection({
     >
       <div
         className={cn(
-          'max-w-[80rem] mx-auto px-8',
+          'max-w-7xl mx-auto px-8',
           hasMedia
             ? 'grid grid-cols-1 py-16 md:grid-cols-2 gap-10 md:gap-24 items-center md:py-32'
             : 'flex flex-col items-center py-16 gap-4 sm:gap-8 text-center text-balance py-24'

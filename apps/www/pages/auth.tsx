@@ -1,23 +1,23 @@
-import ApiExamples from 'data/products/auth/auth-api-examples'
-import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
+import { useBreakpoint } from 'common'
 import { ArrowUpRight, Briefcase, Eye, Link as IconLink, Shield } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import NextImage from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button, Image } from 'ui'
-import { useBreakpoint } from 'common'
-
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import ProductsNav from '~/components/Products/ProductsNav'
-import ProductHeader from '~/components/Sections/ProductHeader'
-import EventCallout from '~/components/EventCallout'
-
-import MainProducts from '~/data/MainProducts'
 import { PRODUCT_NAMES } from 'shared-data/products'
-import AuthProviders from '~/data/auth.json'
+import { Button } from 'ui'
+import { Image } from 'ui-patterns/Image'
+
+import EventCallout from '@/components/EventCallout'
+import DefaultLayout from '@/components/Layouts/Default'
+import SectionContainer from '@/components/Layouts/SectionContainer'
+import ProductsNav from '@/components/Products/ProductsNav'
+import ProductHeader from '@/components/Sections/ProductHeader'
+import AuthProviders from '@/data/auth.json'
+import MainProducts from '@/data/MainProducts'
+import ApiExamples from '@/data/products/auth/auth-api-examples'
+import AuthSqlRulesExamples from '@/data/products/auth/auth-sql-rules-examples'
 
 const SplitCodeBlockCarousel = dynamic(
   () => import('~/components/Carousels/SplitCodeBlockCarousel')
@@ -27,6 +27,8 @@ const CTABanner = dynamic(() => import('~/components/CTABanner'))
 const FeatureColumn = dynamic(() => import('~/components/FeatureColumn'))
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
+
+// When updating page content, also update public/llms/auth.txt
 
 function AuthPage() {
   const isMobile = useBreakpoint(768)
@@ -91,7 +93,7 @@ function AuthPage() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
-              <div className="mb-4 -mt-[1.9rem]">
+              <div className="mb-4 mt-[-1.9rem]">
                 <div className="grid grid-flow-col grid-rows-2 gap-2 xl:w-64">
                   <div className="flex w-fit items-center">
                     <svg

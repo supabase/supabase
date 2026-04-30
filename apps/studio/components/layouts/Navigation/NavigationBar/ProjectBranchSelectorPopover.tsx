@@ -1,6 +1,6 @@
-import { BranchDropdown } from 'components/layouts/AppLayout/BranchDropdown'
-import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationDropdown'
-import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
+import { BranchDropdown } from '@/components/layouts/AppLayout/BranchDropdown'
+import { OrganizationDropdown } from '@/components/layouts/AppLayout/OrganizationDropdown'
+import { ProjectDropdown } from '@/components/layouts/AppLayout/ProjectDropdown'
 
 const embeddedClassName = 'bg-transparent border-0 shadow-none min-h-0 flex-1'
 

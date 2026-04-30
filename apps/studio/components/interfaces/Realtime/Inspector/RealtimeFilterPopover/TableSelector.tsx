@@ -1,25 +1,25 @@
 import { debounce } from 'lodash'
 import { Check, Code, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
+
+import { useEntityTypesQuery } from '@/data/entity-types/entity-types-infinite-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface TableSelectorProps {
   className?: string
@@ -115,7 +115,7 @@ const TableSelector = ({
               )}
 
               {showError && isError && (
-                <Alert_Shadcn_ variant="warning" className="!px-3 !py-3 !border-0 rounded-none">
+                <Alert_Shadcn_ variant="warning" className="px-3! py-3! border-0! rounded-none">
                   <AlertTitle_Shadcn_ className="text-xs text-amber-900">
                     Failed to load tables
                   </AlertTitle_Shadcn_>

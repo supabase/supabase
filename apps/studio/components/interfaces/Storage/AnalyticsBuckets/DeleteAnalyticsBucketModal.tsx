@@ -1,10 +1,10 @@
+import { useParams } from 'common'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import { useAnalyticsBucketDeleteMutation } from 'data/storage/analytics-bucket-delete-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useAnalyticsBucketDeleteCleanUp } from './AnalyticsBucketDetails/useAnalyticsBucketAssociatedEntities'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useAnalyticsBucketDeleteMutation } from '@/data/storage/analytics-bucket-delete-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export interface DeleteAnalyticsBucketModalProps {
   visible: boolean

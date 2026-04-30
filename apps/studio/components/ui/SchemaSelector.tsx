@@ -1,7 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -23,6 +20,10 @@ import {
   Skeleton,
 } from 'ui'
 
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
 interface SchemaSelectorProps {
   className?: string
   disabled?: boolean
@@ -32,6 +33,7 @@ interface SchemaSelectorProps {
   placeholderLabel?: string
   supportSelectAll?: boolean
   excludedSchemas?: string[]
+  stopScrollPropagation?: boolean
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
   align?: 'start' | 'end'
@@ -46,6 +48,7 @@ export const SchemaSelector = ({
   placeholderLabel = 'Choose a schema...',
   supportSelectAll = false,
   excludedSchemas = [],
+  stopScrollPropagation = false,
   onSelectSchema,
   onSelectCreateSchema,
   align = 'start',
@@ -88,11 +91,11 @@ export const SchemaSelector = ({
       )}
 
       {showError && isSchemasError && (
-        <Alert_Shadcn_ variant="warning" className="!px-3 !py-3">
+        <Alert_Shadcn_ variant="warning" className="px-3! py-3!">
           <AlertTitle_Shadcn_ className="text-xs text-amber-900">
             Failed to load schemas
           </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_ className="text-xs mb-2 break-words">
+          <AlertDescription_Shadcn_ className="text-xs mb-2 wrap-break-word">
             Error: {(schemasError as any)?.message}
           </AlertDescription_Shadcn_>
           <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
@@ -109,7 +112,7 @@ export const SchemaSelector = ({
               disabled={disabled}
               type="default"
               data-testid="schema-selector"
-              className={`w-full [&>span]:w-full !pr-1 space-x-1`}
+              className={`w-full [&>span]:w-full pr-1! space-x-1`}
               iconRight={
                 <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
               }
@@ -136,7 +139,9 @@ export const SchemaSelector = ({
           >
             <Command_Shadcn_>
               <CommandInput_Shadcn_ className="text-xs" placeholder="Find schema..." />
-              <CommandList_Shadcn_>
+              <CommandList_Shadcn_
+                onWheel={stopScrollPropagation ? (event) => event.stopPropagation() : undefined}
+              >
                 <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
                 <CommandGroup_Shadcn_>
                   <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>

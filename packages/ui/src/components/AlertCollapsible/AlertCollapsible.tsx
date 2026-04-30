@@ -10,8 +10,7 @@ import { alertVariants } from '../shadcn/ui/alert'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../shadcn/ui/collapsible'
 
 export interface AlertCollapsibleProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>,
-    VariantProps<typeof alertVariants> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, VariantProps<typeof alertVariants> {
   trigger: React.ReactNode
   defaultOpen?: boolean
 }
@@ -35,7 +34,7 @@ const AlertCollapsible = React.forwardRef<HTMLDivElement, AlertCollapsibleProps>
             <Button
               type="outline"
               size="tiny"
-              className={cn('!px-0 w-[26px]', '[&[data-state=open]_svg]:rotate-180')}
+              className={cn('px-0! w-[26px]', '[&[data-state=open]_svg]:rotate-180')}
               aria-label="Toggle"
               icon={<ChevronDown className="transition-transform duration-200" />}
             />

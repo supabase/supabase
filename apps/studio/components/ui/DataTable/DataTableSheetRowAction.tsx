@@ -11,9 +11,6 @@ import {
   Search,
 } from 'lucide-react'
 import { ComponentPropsWithRef } from 'react'
-
-import { DataTableFilterField } from 'components/ui/DataTable/DataTable.types'
-import { useCopyToClipboard } from 'hooks/ui/useCopyToClipboard'
 import {
   cn,
   DropdownMenu,
@@ -24,8 +21,13 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-interface DataTableSheetRowActionProps<TData, TFields extends DataTableFilterField<TData>>
-  extends ComponentPropsWithRef<typeof DropdownMenuTrigger> {
+import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
+import { useCopyToClipboard } from '@/hooks/ui/useCopyToClipboard'
+
+interface DataTableSheetRowActionProps<
+  TData,
+  TFields extends DataTableFilterField<TData>,
+> extends ComponentPropsWithRef<typeof DropdownMenuTrigger> {
   fieldValue: TFields['value']
   filterFields: TFields[]
   value: string | number
@@ -150,7 +152,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
     <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(
-          'rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'rounded-md ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           'relative',
           className
         )}

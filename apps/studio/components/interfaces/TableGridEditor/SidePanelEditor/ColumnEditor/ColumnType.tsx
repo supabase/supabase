@@ -1,4 +1,3 @@
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { noop } from 'lodash'
 import {
   Calendar,
@@ -43,6 +42,7 @@ import {
   RECOMMENDED_ALTERNATIVE_DATA_TYPE,
 } from '../SidePanelEditor.constants'
 import type { PostgresDataTypeOption } from '../SidePanelEditor.types'
+import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
 
 interface ColumnTypeProps {
   value: string
@@ -200,7 +200,7 @@ const ColumnType = ({
               placeholder="Search types..."
               // [Joshen] Addresses style issues when this component is being used in the old Form component
               // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
-              className="!bg-transparent focus:!shadow-none focus:!ring-0 text-xs"
+              className="bg-transparent! focus:shadow-none! focus:ring-0! text-xs"
             />
             <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
 

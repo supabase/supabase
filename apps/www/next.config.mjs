@@ -79,6 +79,56 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: '/changelog-rss.xml',
+        headers: [
+          { key: 'Content-Type', value: 'application/rss+xml; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+        ],
+      },
+      {
+        source: '/changelog-rss/:slug.xml',
+        headers: [
+          { key: 'Content-Type', value: 'application/rss+xml; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+        ],
+      },
+      {
+        source: '/changelog/:slug.md',
+        headers: [
+          { key: 'Content-Type', value: 'text/markdown; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+          { key: 'Vary', value: 'Accept' },
+        ],
+      },
+      {
+        source: '/changelog.md',
+        headers: [
+          { key: 'Content-Type', value: 'text/markdown; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+          { key: 'Vary', value: 'Accept' },
+        ],
+      },
+      {
+        source: '/',
+        headers: [
+          {
+            key: 'Link',
+            value: '</.well-known/api-catalog>; rel="api-catalog"',
+          },
+        ],
+      },
+      {
+        source: '/.well-known/api-catalog',
+        headers: [
+          { key: 'content-type', value: 'application/linkset+json' },
+          { key: 'access-control-allow-origin', value: '*' },
+        ],
+      },
+      {
         source: '/.well-known/vercel/flags',
         headers: [
           {
@@ -118,6 +168,15 @@ const nextConfig = {
           {
             key: 'X-Robots-Tag',
             value: 'noindex',
+          },
+        ],
+      },
+      {
+        source: '/enterprise-terms',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
           },
         ],
       },

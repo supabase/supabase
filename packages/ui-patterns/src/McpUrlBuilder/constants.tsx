@@ -1,5 +1,7 @@
-import { CodeBlock } from 'ui/src/components/CodeBlock'
+import Image from 'next/image'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
+import antigravityAuthenticateScreenshot from './assets/antigravity-authenticate-screenshot.png'
 import type {
   AntigravityMcpConfig,
   ClaudeCodeMcpConfig,
@@ -190,7 +192,7 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           After adding the server, enable remote MCP client support by adding this to your{' '}
@@ -289,7 +291,7 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
-    alternateInstructions: (config, onCopy) => {
+    alternateInstructions: (_config, onCopy) => {
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">
@@ -336,10 +338,18 @@ export const MCP_CLIENTS: McpClient[] = [
           servers.
         </p>
         <p className="text-xs text-foreground-light">
-          If you run into authentication issues, open the command palette and run{' '}
-          <strong>Authentication: Remove Dynamic Authentication Providers</strong> to clear cached
-          OAuth credentials and re-authenticate.
+          If you run into authentication issues, open Agent Settings with <strong>Cmd+,</strong>{' '}
+          (Mac) or <strong>Ctrl+,</strong> (Windows/Linux), navigate to the{' '}
+          <strong>Customizations</strong> tab, and click the <strong>Authenticate</strong> button
+          next to the Supabase server.
         </p>
+        <Image
+          src={antigravityAuthenticateScreenshot}
+          alt="Antigravity MCP server settings showing the Authenticate button next to the Supabase server"
+          width={1316}
+          height={258}
+          className="rounded border border-muted w-full"
+        />
       </div>
     ),
   },
@@ -360,12 +370,12 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    primaryInstructions: (config, onCopy) => (
+    primaryInstructions: (_config, _onCopy) => (
       <p className="text-xs text-warning">
         Ensure you are running Windsurf version <code>0.1.37</code> or higher.
       </p>
     ),
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, _onCopy) => (
       <p className="text-xs text-foreground-light">
         Windsurf does not currently support remote MCP servers over HTTP transport. You need to use
         the mcp-remote package as a proxy.
@@ -422,7 +432,7 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, _onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           For more details, see{' '}
@@ -472,7 +482,7 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, _onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           Restart Factory or type <code>/mcp</code> within droid to complete OAuth authentication
@@ -501,7 +511,7 @@ export const MCP_CLIENTS: McpClient[] = [
         },
       }
     },
-    alternateInstructions: (config, onCopy) => (
+    alternateInstructions: (_config, onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           After adding the configuration, run the following command to authenticate:

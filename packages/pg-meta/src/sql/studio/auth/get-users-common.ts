@@ -1,7 +1,7 @@
 export function prefixToUUID(prefix: string, max: boolean) {
   const mapped = '00000000-0000-0000-0000-000000000000'
     .split('')
-    .map((c, i) => (c === '-' ? c : prefix[i] ?? c))
+    .map((c, i) => (c === '-' ? c : (prefix[i] ?? c)))
 
   if (prefix.length >= mapped.length) {
     return mapped.join('')
