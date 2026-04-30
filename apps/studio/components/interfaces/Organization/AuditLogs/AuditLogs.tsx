@@ -353,7 +353,7 @@ export const AuditLogs = () => {
 
                         return (
                           <Table.tr
-                            key={log.timestamp}
+                            key={log.request_id}
                             onClick={() => setSelectedLog(log)}
                             className="cursor-pointer hover:!bg-alternative transition duration-100"
                           >
