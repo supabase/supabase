@@ -92,7 +92,7 @@ function buildNotFoundMarkdown(slug: string[], suggestions: SearchSuggestion[]):
   const suggestionsMd =
     suggestions.length > 0
       ? `## You might be looking for...\n\n${suggestions
-          .map(({ title, href }) => `- [${title}](${href})`)
+          .map(({ title, href }) => `- [${title}](${href}.md)`)
           .join('\n')}\n`
       : ''
 
