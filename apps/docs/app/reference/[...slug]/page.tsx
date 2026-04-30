@@ -1,5 +1,3 @@
-import { notFound } from 'next/navigation'
-
 import { REFERENCES } from '~/content/navigation.references'
 import { ApiReferencePage } from '~/features/docs/Reference.apiPage'
 import { CliReferencePage } from '~/features/docs/Reference.cliPage'
@@ -11,6 +9,7 @@ import {
   parseReferencePath,
   redirectNonexistentReferenceSection,
 } from '~/features/docs/Reference.utils'
+import { notFound } from 'next/navigation'
 
 export const dynamicParams = false
 
@@ -56,5 +55,11 @@ export default async function ReferencePage(props: { params: Promise<{ slug: Arr
   }
 }
 
-export const generateStaticParams = generateReferenceStaticParams
+// Paths with dedicated pages are excluded so they don't conflict at build time.
+const DEDICATED_ROUTES = new Set(['javascript'])
+
+export async function generateStaticParams() {
+  const all = await generateReferenceStaticParams()
+  return all.filter((p) => !DEDICATED_ROUTES.has(p.slug[0]))
+}
 export const generateMetadata = generateReferenceMetadata
