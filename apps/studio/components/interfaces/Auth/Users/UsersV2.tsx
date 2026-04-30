@@ -460,7 +460,6 @@ export const UsersV2 = () => {
         (isErrorStorage && (errorStorage as Error).message.includes('data is undefined')))
     ) {
       const columns = formatUserColumns({
-        ref: projectRef,
         specificFilterColumn,
         columns: userTableColumns,
         config: columnConfiguration ?? [],
@@ -701,7 +700,6 @@ export const UsersV2 = () => {
                     }
 
                     const updatedColumns = formatUserColumns({
-                      ref: projectRef,
                       specificFilterColumn,
                       columns: userTableColumns,
                       config: updatedConfig,

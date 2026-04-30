@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import { SqlEditor, TableEditor } from 'icons'
 import { Copy, Trash, UserIcon } from 'lucide-react'
-import Link from 'next/link'
 import { Column, useRowSelection } from 'react-data-grid'
 import {
   Checkbox,
@@ -255,7 +254,6 @@ export function getAvatarUrl(user: User): string | undefined {
 }
 
 export const formatUserColumns = ({
-  ref = '_',
   specificFilterColumn,
   columns,
   config,
@@ -265,7 +263,6 @@ export const formatUserColumns = ({
   onSelectDeleteUser,
   onSelectImpersonateUser,
 }: {
-  ref?: string
   specificFilterColumn: string
   columns: UsersTableColumn[]
   config: ColumnConfiguration[]
