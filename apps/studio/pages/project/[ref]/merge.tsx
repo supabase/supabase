@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
 import { AlertTriangle, GitBranchIcon, GitMerge, MoreVertical, Shield, X } from 'lucide-react'
 import Link from 'next/link'
@@ -30,6 +30,7 @@ import { ProjectLayoutWithAuth } from '@/components/layouts/ProjectLayout'
 import { ScaffoldContainer } from '@/components/layouts/Scaffold'
 import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { useBranchDeleteMutation } from '@/data/branches/branch-delete-mutation'
 import { useBranchMergeMutation } from '@/data/branches/branch-merge-mutation'
 import { useBranchPushMutation } from '@/data/branches/branch-push-mutation'
@@ -446,6 +447,9 @@ const MergePage: NextPageWithLayout = () => {
   const pageTitle = () => (
     <div className="flex items-center gap-x-2">
       <span>Merge</span>
+      {pgDeltaDiffEnabled && (
+        <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF} />
+      )}
 
       <Link href={`/project/${ref}/editor`}>
         <Badge className="font-mono text-sm gap-1 px-2">

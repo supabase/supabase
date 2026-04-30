@@ -1,5 +1,5 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -44,6 +44,7 @@ import { JitDbAccessRulesTable } from './JitDbAccessRulesTable'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import AlertError from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useJitDbAccessMembersQuery } from '@/data/jit-db-access/jit-db-access-members-query'
@@ -290,7 +291,12 @@ export const JitDbAccessConfiguration = () => {
       <PageSection id="jit-db-access-configuration">
         <PageSectionMeta>
           <PageSectionSummary>
-            <PageSectionTitle>Temporary access</PageSectionTitle>
+            <PageSectionTitle>
+              <span className="flex items-center gap-2">
+                Temporary access
+                <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS} />
+              </span>
+            </PageSectionTitle>
           </PageSectionSummary>
           <DocsButton href={`${DOCS_URL}/guides/platform/temporary-access`} />
         </PageSectionMeta>
