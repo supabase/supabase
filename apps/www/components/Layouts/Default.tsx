@@ -1,9 +1,9 @@
 'use client'
 
 import Nav from 'components/Nav/index'
-import { useForceDeepDark } from 'lib/theme.utils'
 import dynamic from 'next/dynamic'
 import { cn } from 'ui'
+import { useForceDeepDark } from 'lib/theme.utils'
 
 const Footer = dynamic(() => import('components/Footer/index'))
 
@@ -31,7 +31,7 @@ const DefaultLayout = (props: Props) => {
   return (
     <>
       <Nav hideNavbar={hideHeader} stickyNavbar={stickyNavbar} />
-      <main className={cn('relative min-h-screen', className)}></main>
+      <main className={cn('relative min-h-screen', className)}>{children}</main>
       <Footer className={footerClassName} hideFooter={hideFooter} />
     </>
   )
