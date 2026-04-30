@@ -115,14 +115,16 @@ export const GraphqlExposureLintCTA = ({
         onCancel={() => setShowConfirmRevoke(false)}
         onConfirm={handleRevoke}
       >
-        <p className="text-sm text-foreground mb-6">
-          This change affects both schema visibility and data access for {audience.lower}.
-          Alternatively, you can{' '}
-          <InlineLink href={`/project/${projectRef}/database/extensions`}>
-            disable GraphQL
-          </InlineLink>{' '}
-          to remove schema visibility.
-        </p>
+        <div className="text-sm text-foreground mb-6">
+          <p>This change affects both schema visibility and data access for {audience.lower}.</p>
+          <p>
+            Alternatively, you can{' '}
+            <InlineLink href={`/project/${projectRef}/database/extensions`}>
+              disable GraphQL
+            </InlineLink>{' '}
+            to remove schema visibility.
+          </p>
+        </div>
 
         <div className="space-y-5">
           <div className="flex gap-3">

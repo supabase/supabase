@@ -3,7 +3,7 @@ import { noop } from 'lodash'
 import type { AdvisorItem } from './AdvisorPanel.types'
 import { AdvisorSignalDetail } from './AdvisorSignalDetail'
 import { NotificationDetail } from './NotificationDetail'
-import LintDetail from '@/components/interfaces/Linter/LintDetail'
+import { LintDetail } from '@/components/interfaces/Linter/LintDetail'
 import type { Lint } from '@/data/lint/lint-query'
 import type { Notification } from '@/data/notifications/notifications-v2-query'
 

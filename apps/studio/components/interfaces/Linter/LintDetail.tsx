@@ -21,7 +21,12 @@ interface LintDetailProps {
   onAfterAction?: () => void
 }
 
-const LintDetail = ({ lint, projectRef, onAskAssistant, onAfterAction }: LintDetailProps) => {
+export const LintDetail = ({
+  lint,
+  projectRef,
+  onAskAssistant,
+  onAfterAction,
+}: LintDetailProps) => {
   const track = useTrack()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
@@ -102,5 +107,3 @@ const LintDetail = ({ lint, projectRef, onAskAssistant, onAfterAction }: LintDet
     </div>
   )
 }
-
-export default LintDetail
