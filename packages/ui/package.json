@@ -17,7 +17,7 @@
   "dependencies": {
     "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/typography": "^0.5.19",
-    "class-variance-authority": "^0.6.1",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^1.2.1",
     "cmdk": "^1.1.1",
     "color": "^4.2.3",

@@ -1395,8 +1395,8 @@ importers:
         specifier: ^1.12.0
         version: 1.15.0
       class-variance-authority:
-        specifier: '*'
-        version: 0.6.1
+        specifier: ^0.7.1
+        version: 0.7.1
       cmdk:
         specifier: ^1.1.1
         version: 1.1.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2378,8 +2378,8 @@ importers:
         specifier: ^0.5.19
         version: 0.5.19(tailwindcss@4.2.4)
       class-variance-authority:
-        specifier: ^0.6.1
-        version: 0.6.1
+        specifier: ^0.7.1
+        version: 0.7.1
       clsx:
         specifier: ^1.2.1
         version: 1.2.1
@@ -2514,8 +2514,8 @@ importers:
         specifier: ^8.21.3
         version: 8.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       class-variance-authority:
-        specifier: ^0.6.0
-        version: 0.6.1
+        specifier: ^0.7.1
+        version: 0.7.1
       clsx:
         specifier: ^1.2.1
         version: 1.2.1
@@ -9667,9 +9667,6 @@ packages:
 
   cjs-module-lexer@1.4.1:
     resolution: {integrity: sha512-cuSVIHi9/9E/+821Qjdvngor+xpnlwnuwIyZOaLmHBVdXL+gP+I6QQB9VkO7RI77YIcTV+S1W9AreJ5eN63JBA==}
-
-  class-variance-authority@0.6.1:
-    resolution: {integrity: sha512-eurOEGc7YVx3majOrOb099PNKgO3KnKSApOprXI4BTq6bcfbqbQXPN2u+rPPmIJ2di23bMwhk0SxCCthBmszEQ==}
 
   class-variance-authority@0.7.1:
     resolution: {integrity: sha512-Ka+9Trutv7G8M6WT6SeiRWz792K5qEqIGEGzXKhAE6xOWAY6pPH8U+9IY3oCMv6kqTmLsv7Xh/2w2RigkePMsg==}
@@ -26540,10 +26537,6 @@ snapshots:
   citty@0.2.1: {}
 
   cjs-module-lexer@1.4.1: {}
-
-  class-variance-authority@0.6.1:
-    dependencies:
-      clsx: 1.2.1
 
   class-variance-authority@0.7.1:
     dependencies:
