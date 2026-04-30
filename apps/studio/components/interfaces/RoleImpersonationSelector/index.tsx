@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from 'ui'
+import { Badge, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
 import { AnonIcon, AuthenticatedIcon, ServiceRoleIcon } from './Icons'
 import { RoleImpersonationRadio } from './RoleImpersonationRadio'
@@ -111,7 +111,10 @@ export const RoleImpersonationSelector = ({
 
         {selectedOption === 'service_role' && (
           <div>
-            <p className="text-sm">Full admin access</p>
+            <p className="text-sm">
+              Full admin access
+              <Badge className="ml-2">Default</Badge>
+            </p>
             <p className="text-foreground-light text-sm">
               The <code className="text-code-inline">postgres</code> role, which bypasses all Row
               Level Security (RLS) policies.

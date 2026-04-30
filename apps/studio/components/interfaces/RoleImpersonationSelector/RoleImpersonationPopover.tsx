@@ -26,7 +26,7 @@ export const RoleImpersonationPopover = ({
 
   const [isOpen, setIsOpen] = useState(false)
 
-  const currentRole = state.role?.role ?? serviceRoleLabel ?? 'service role'
+  const currentRole = state.role?.role ?? serviceRoleLabel ?? 'postgres'
 
   return (
     <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
