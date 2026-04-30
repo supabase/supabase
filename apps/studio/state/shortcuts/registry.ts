@@ -1,3 +1,4 @@
+import { SQL_EDITOR_SHORTCUT_IDS, sqlEditorRegistry } from './registry/sql-editor'
 import { TABLE_EDITOR_SHORTCUT_IDS, tableEditorRegistry } from './registry/table-editor'
 import { ShortcutDefinition } from './types'
 
@@ -49,6 +50,9 @@ export const SHORTCUT_IDS = {
 
   // Table editor shortcuts
   ...TABLE_EDITOR_SHORTCUT_IDS,
+
+  // SQL editor shortcuts
+  ...SQL_EDITOR_SHORTCUT_IDS,
 } as const
 
 /**
@@ -297,4 +301,7 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
 
   // Table editor shortcut registration
   ...tableEditorRegistry,
+
+  // SQL editor shortcut registration
+  ...sqlEditorRegistry,
 }

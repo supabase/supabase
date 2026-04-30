@@ -41,6 +41,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
       'Read Replica',
       'BigQuery',
       'Analytics Bucket',
+      'DuckLake',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,

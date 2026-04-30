@@ -64,20 +64,6 @@ Or deploy individual Edge Functions by specifying the function name:
 supabase functions deploy hello-world
 ```
 
-### Deploying public functions
-
-By default, Edge Functions require a valid JWT in the authorization header. If you want to deploy Edge Functions without Authorization checks (commonly used for Stripe webhooks), you can pass the `--no-verify-jwt` flag:
-
-```bash
-supabase functions deploy hello-world --no-verify-jwt
-```
-
-<Admonition type="caution">
-
-Be careful when using this flag, as it will allow anyone to invoke your Edge Function without a valid JWT. The Supabase client libraries automatically handle authorization.
-
-</Admonition>
-
 ## Step 4: Verify successful deployment
 
 🎉 Your function is now live!
@@ -88,13 +74,13 @@ When the deployment is successful, your function is automatically distributed to
 
 ## Step 5: Test your live function
 
-You can now invoke your Edge Function using the project's `ANON_KEY`, which can be found in the [API settings](/dashboard/project/_/settings/api) of the Supabase Dashboard. You can invoke it from within your app:
+You can now invoke your Edge Function using one of the project's `PUBLISHABLE_KEYS`, which can be found in the [API settings](/dashboard/project/_/settings/api) of the Supabase Dashboard. You can invoke it from within your app:
 
 <$CodeTabs>
 
 ```bash name=cURL
 curl --request POST 'https://<project_id>.supabase.co/functions/v1/hello-world' \
-  --header 'Authorization: Bearer ANON_KEY' \
+  --header 'apikey: PUBLISHABLE_KEY' \
   --header 'Content-Type: application/json' \
   --data '{ "name":"Functions" }'
 ```
@@ -114,7 +100,7 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 
 <Admonition type="note">
 
-Note that the `SUPABASE_PUBLISHABLE_KEY` is different in development and production. To get your production anon key, you can find it in your Supabase dashboard under Settings > API.
+Note that the `SUPABASE_PUBLISHABLE_KEYS` is different in development and production. To get a publishable key, you can find it in your Supabase dashboard under Settings > API.
 
 </Admonition>
 

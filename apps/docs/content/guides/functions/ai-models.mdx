@@ -210,7 +210,7 @@ We are progressively rolling out support for the hosted solution. To sign up for
       ```bash
       curl --get "http://localhost:54321/functions/v1/ollama-test" \
       --data-urlencode "prompt=write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" \
-      -H "Authorization: $ANON_KEY"
+      -H "apikey: $PUBLISHABLE_KEY"
       ```
     </StepHikeCompact.Details>
   </StepHikeCompact.Step>
@@ -311,7 +311,7 @@ Since Llamafile provides an OpenAI API compatible server, you can either use it 
       ```bash
       curl --get "http://localhost:54321/functions/v1/llamafile-test" \
       --data-urlencode "prompt=write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" \
-      -H "Authorization: $ANON_KEY"
+      -H "apikey: $PUBLISHABLE_KEY"
       ```
     </StepHikeCompact.Details>
   </StepHikeCompact.Step>
@@ -420,7 +420,7 @@ Since Llamafile provides an OpenAI API compatible server, you can either use it 
       ```bash
       curl --get "http://localhost:54321/functions/v1/llamafile-test" \
       --data-urlencode "prompt=write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" \
-      -H "Authorization: $ANON_KEY"
+      -H "apikey: $PUBLISHABLE_KEY"
       ```
     </StepHikeCompact.Details>
   </StepHikeCompact.Step>
@@ -464,7 +464,7 @@ Once the function is working locally, it's time to deploy to production.
       ```bash
       curl --get "https://project-ref.supabase.co/functions/v1/ollama-test" \
       --data-urlencode "prompt=write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" \
-      -H "Authorization: $ANON_KEY"
+      -H "apikey: $PUBLISHABLE_KEY"
       ```
     </StepHikeCompact.Details>
   </StepHikeCompact.Step>
