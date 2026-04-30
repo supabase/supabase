@@ -12,7 +12,6 @@ import {
 import { WwwCommandMenu } from 'components/CommandMenu'
 import { DevToolbar, DevToolbarProvider } from 'dev-tools'
 import { API_URL } from 'lib/constants'
-import { Suspense } from 'react'
 import { themes, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsentToast } from 'ui-patterns/consent'
@@ -32,7 +31,7 @@ function Providers({ children }: { children: React.ReactNode }) {
               <CommandProvider>
                 <TelemetryTagManager />
                 <Toaster />
-                <Suspense fallback={null}>{children}</Suspense>
+                {children}
                 <WwwCommandMenu />
                 <PageTelemetry
                   API_URL={API_URL}
