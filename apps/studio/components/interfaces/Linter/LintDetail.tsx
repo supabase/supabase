@@ -69,6 +69,12 @@ export const LintDetail = ({
         {lint.description.replace(/\\`/g, '`')}
       </Markdown>
 
+      {isGraphqlExposureLint && (
+        <div className="mb-4">
+          <GraphqlExposureCallout projectRef={projectRef} />
+        </div>
+      )}
+
       <h3 className="text-sm mb-2">Resolve</h3>
       <div className="flex flex-wrap items-center gap-2">
         <AiAssistantDropdown
@@ -77,12 +83,14 @@ export const LintDetail = ({
           onOpenAssistant={handleAskAssistant}
           telemetrySource="lint_detail"
         />
+
         <LintCTA
           title={lint.name}
           projectRef={projectRef}
           metadata={lint.metadata}
           onAfterAction={onAfterAction}
         />
+
         <Button asChild type="text">
           <Link
             href={
@@ -99,11 +107,6 @@ export const LintDetail = ({
           </Link>
         </Button>
       </div>
-      {isGraphqlExposureLint && (
-        <div className="mt-4">
-          <GraphqlExposureCallout projectRef={projectRef} />
-        </div>
-      )}
     </div>
   )
 }
