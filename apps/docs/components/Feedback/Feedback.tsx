@@ -154,7 +154,7 @@ function Feedback({ className }: { className?: string }) {
         >
           <Button
             type="outline"
-            rounded-sm
+            rounded
             className={cn(
               'px-1 w-7 h-7',
               'text-foreground-light',
@@ -173,7 +173,7 @@ function Feedback({ className }: { className?: string }) {
           </Button>
           <Button
             type="outline"
-            rounded-sm
+            rounded
             className={cn(
               'px-1 w-7 h-7',
               'text-foreground-light',
