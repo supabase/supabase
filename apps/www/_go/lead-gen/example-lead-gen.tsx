@@ -273,13 +273,10 @@ alter table posts enable row level security;`,
         notion: {
           database_id: '3525004b775f8018ae80000c6e0920e7',
           columnMap: {
-            firstName: 'first_name',
-            lastName: 'last_name',
-            email: 'email',
-            interest: 'interest',
-          },
-          staticProperties: {
-            source: 'Example Ebook /go page',
+            firstName: 'First Name',
+            lastName: 'Last Name',
+            email: 'Company Email',
+            interest: 'What are you interested in?',
           },
         },
       },
