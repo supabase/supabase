@@ -65,7 +65,7 @@ export const DetailRow = ({
     <span
       className={cn(
         'font-mono text-xs text-foreground',
-        wrap ? 'break-all text-left' : 'truncate text-right',
+        wrap ? 'break-all text-right max-w-[calc(100%-12rem)]' : 'truncate text-right',
         isFilterable && 'group-hover:underline'
       )}
     >
