@@ -90,7 +90,7 @@ export const FilesBuckets = () => {
               <>
                 {hasNoApiKeys ? (
                   <Admonition type="warning" title="Project has no active API keys enabled">
-                    <p className="!leading-normal text-sm">
+                    <p className="leading-normal! text-sm">
                       The Dashboard relies on having active API keys on the project to function. If
                       you'd like to use Storage through the Dashboard, create a set of API keys{' '}
                       <InlineLink href={`/project/${ref}/settings/api-keys/new`}>here</InlineLink>.

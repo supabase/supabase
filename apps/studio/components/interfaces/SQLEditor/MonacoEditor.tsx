@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
@@ -72,6 +73,8 @@ const MonacoEditor = ({
     true
   )
   const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
+  const isCommandMenuHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
+  const setCommandMenuOpen = useSetCommandMenuOpen()
 
   // [Joshen] Lodash debounce doesn't seem to be working here, so opting to use useDebounce
   const [value, setValue] = useState('')
@@ -92,6 +95,12 @@ const MonacoEditor = ({
 
   const aiHotkeyEnabledRef = useRef(isAIAssistantHotkeyEnabled)
   aiHotkeyEnabledRef.current = isAIAssistantHotkeyEnabled
+
+  const commandMenuHotkeyEnabledRef = useRef(isCommandMenuHotkeyEnabled)
+  commandMenuHotkeyEnabledRef.current = isCommandMenuHotkeyEnabled
+
+  const setCommandMenuOpenRef = useRef(setCommandMenuOpen)
+  setCommandMenuOpenRef.current = setCommandMenuOpen
 
   const handleEditorOnMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
@@ -202,13 +211,22 @@ const MonacoEditor = ({
       editor.addAction({
         id: 'generate-sql',
         label: 'Generate SQL',
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyK],
         run: () => {
           const selectionParts = getEditorSelectionParts(editor)
           if (selectionParts) onPrompt(selectionParts)
         },
       })
     }
+
+    // Monaco claims Cmd+K as a chord prefix, which swallows the global command
+    // menu shortcut while the editor is focused. Intercept it here and open the
+    // command menu directly so it works the same inside and outside the editor.
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK, () => {
+      if (commandMenuHotkeyEnabledRef.current) {
+        setCommandMenuOpenRef.current(true)
+      }
+    })
 
     editor.onDidChangeCursorSelection(({ selection }) => {
       const noSelection =

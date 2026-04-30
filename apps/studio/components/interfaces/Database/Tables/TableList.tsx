@@ -306,7 +306,7 @@ export const TableList = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead key="icon" className="w-0 !px-0" />
+                  <TableHead key="icon" className="w-0 px-0!" />
                   <TableHead key="name" className="max-w-[160px] sm:max-w-[280px]">
                     Name
                   </TableHead>
@@ -367,7 +367,7 @@ export const TableList = ({
                   {entities.length > 0 &&
                     entities.map((x) => (
                       <TableRow key={x.id}>
-                        <TableCell className="w-0 !pl-5 !pr-1">
+                        <TableCell className="w-0 pl-5! pr-1!">
                           <Tooltip>
                             <TooltipTrigger asChild className="cursor-default">
                               <div className="flex w-4 justify-center">

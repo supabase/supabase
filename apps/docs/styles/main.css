@@ -1,10 +1,20 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
 @import './../../../packages/ui/build/css/source/global.css';
 @import './../../../packages/ui/build/css/themes/dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
+
+@config '../tailwind.config.cjs';
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: hsl(var(--border-default, currentColor));
+  }
+}
 
 @font-face {
   font-family: 'custom-font';
@@ -123,7 +133,7 @@ pre[class*='language-'] {
 
 .method-list-item-validation {
   code {
-    @apply text-xs bg-control rounded;
+    @apply text-xs bg-control rounded-sm;
     padding: 1px 6px;
   }
 }

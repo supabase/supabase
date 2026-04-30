@@ -75,7 +75,7 @@ function RealtimePage() {
           h1={[<span key={'authentication-h1'}>Build modern web and mobile applications</span>]}
           subheader={['Sync client state globally over WebSockets in Realtime']}
           image={[
-            <div className="bg-surface-100 border-default relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded border drop-shadow-md">
+            <div className="bg-surface-100 border-default relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded-sm border drop-shadow-md">
               <div
                 className={[
                   'border-brand-300 relative h-12 w-48 bg-brand',
@@ -126,8 +126,8 @@ function RealtimePage() {
                 </div>
                 <div className="mx-3 flex items-center">
                   <div className="border-foreground bg-tomato-900 relative -right-4 h-5 w-5 rounded-full border" />
-                  <div className="border-foreground bg-yellow-900 relative -right-2 z-[2] h-5 w-5 rounded-full border" />
-                  <div className="border-foreground bg-indigo-900 z-[3] h-5 w-5 rounded-full border" />
+                  <div className="border-foreground bg-yellow-900 relative -right-2 z-2 h-5 w-5 rounded-full border" />
+                  <div className="border-foreground bg-indigo-900 z-3 h-5 w-5 rounded-full border" />
                 </div>
               </div>
             </div>,
@@ -192,7 +192,7 @@ function RealtimePage() {
 
         <SingleQuote
           id="quote"
-          className="!pb-8 md:!pb-12"
+          className="pb-8! md:pb-12!"
           quote={{
             text: 'Supabase takes out the mental effort from our back-end infrastructure so we can focus on our customers needs.',
             author: 'Aaron Sullivan',
@@ -211,7 +211,7 @@ function RealtimePage() {
           }}
         />
 
-        <SectionContainer className="!pb-0 !mb-0">
+        <SectionContainer className="pb-0! mb-0!">
           <div className="mb-12 prose">
             <h3>What you can build with Realtime</h3>
             <p className="text-foreground-light mt-0">

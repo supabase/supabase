@@ -9,7 +9,7 @@ const ProductButton = (props: Article) => {
                 text-brand-600
                 hover:bg-surface-100 flex items-start gap-3 rounded-md border bg-transparent p-3 
                 px-6 transition
-                drop-shadow-sm"
+                drop-shadow-xs"
       >
         <div className="w-6">
           <SparklesIcon strokeWidth={1} />

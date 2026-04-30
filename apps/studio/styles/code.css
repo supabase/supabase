@@ -1,3 +1,5 @@
+@reference "./main.css";
+
 .Code {
   width: 100%;
 
@@ -96,7 +98,7 @@
       bottom 200ms ease-in-out;
 
     button {
-      @apply rounded text-xs;
+      @apply rounded-sm text-xs;
       background: rgb(1, 22, 39);
       border: 1px solid rgb(214, 222, 235);
       color: rgb(214, 222, 235);

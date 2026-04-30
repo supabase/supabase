@@ -134,7 +134,7 @@ export default function OptOutPage() {
       <OptOutLayout>
         <div>
           <span className="label">Opt out</span>
-          <h2 className="h4 !m-0">Receive an unexpected email from Supabase?</h2>
+          <h2 className="h4 m-0!">Receive an unexpected email from Supabase?</h2>
           <p className="text-foreground-light">Please report it here so we can investigate.</p>
         </div>
 

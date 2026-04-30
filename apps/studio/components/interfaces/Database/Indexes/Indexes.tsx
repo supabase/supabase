@@ -31,7 +31,7 @@ import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
-const Indexes = () => {
+export const Indexes = () => {
   const { data: project } = useSelectedProjectQuery()
   const { schema: urlSchema, table } = useParams()
 
@@ -132,7 +132,7 @@ const Indexes = () => {
           <div className="flex items-center gap-2 flex-wrap">
             {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
             {isErrorSchemas && (
-              <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
+              <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded-sm flex items-center space-x-2">
                 <AlertCircle strokeWidth={2} size={16} />
                 <p>Failed to load schemas</p>
               </div>
@@ -278,7 +278,8 @@ const Indexes = () => {
         visible={!!selectedIndexToDelete}
         title={
           <>
-            Confirm to delete index <code className="text-sm">{selectedIndexToDelete?.name}</code>
+            Confirm to delete index{' '}
+            <code className="text-code-inline">{selectedIndexToDelete?.name}</code>
           </>
         }
         confirmLabel="Confirm delete"
@@ -292,6 +293,7 @@ const Indexes = () => {
           description:
             'Deleting an index that is still in use will cause queries to slow down, and in some cases causing significant performance issues.',
         }}
+        className="pt-0"
       >
         <ul className="mt-4 space-y-5">
           <li className="flex gap-3">
@@ -311,5 +313,3 @@ const Indexes = () => {
     </>
   )
 }
-
-export default Indexes

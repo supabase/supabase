@@ -4,12 +4,15 @@ import type { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { KeyboardShortcut } from 'ui'
+import { useSetCommandMenuOpen } from 'ui-patterns'
 
 import { DiffEditor } from '../DiffEditor'
 import ResizableAIWidget from './ResizableAIWidget'
 import { getEditorSelectionParts } from './utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { constructHeaders } from '@/data/fetchers'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AIEditorProps {
@@ -65,8 +68,17 @@ export const AIEditor = ({
   const monacoRef = useRef<Monaco | null>(null)
   const closeActionDisposableRef = useRef<{ dispose: () => void } | null>(null)
 
+  const isCommandMenuHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
+  const setCommandMenuOpen = useSetCommandMenuOpen()
+
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
+
+  const commandMenuHotkeyEnabledRef = useRef(isCommandMenuHotkeyEnabled)
+  commandMenuHotkeyEnabledRef.current = isCommandMenuHotkeyEnabled
+
+  const setCommandMenuOpenRef = useRef(setCommandMenuOpen)
+  setCommandMenuOpenRef.current = setCommandMenuOpen
 
   const [currentValue, setCurrentValue] = useState(value || defaultValue)
   const [isDiffMode, setIsDiffMode] = useState(false)
@@ -251,12 +263,21 @@ export const AIEditor = ({
     editor.addAction({
       id: 'generate-ai',
       label: 'Generate with AI',
-      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyK],
       run: () => {
         const selectionParts = getEditorSelectionParts(editor)
         if (!selectionParts) return
         setPromptState({ isOpen: true, ...selectionParts })
       },
+    })
+
+    // Monaco claims Cmd+K as a chord prefix, which swallows the global command
+    // menu shortcut while the editor is focused. Intercept it here and open the
+    // command menu directly so it works the same inside and outside the editor.
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK, () => {
+      if (commandMenuHotkeyEnabledRef.current) {
+        setCommandMenuOpenRef.current(true)
+      }
     })
 
     if (autoFocus) {
@@ -435,7 +456,7 @@ export const AIEditor = ({
               >
                 Hit{' '}
                 <KeyboardShortcut
-                  keys={['Meta', 'k']}
+                  keys={['Meta', 'Shift', 'k']}
                   variant="inline"
                   className="text-xs text-foreground-lighter"
                 />{' '}

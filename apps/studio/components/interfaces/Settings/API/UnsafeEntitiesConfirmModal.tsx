@@ -154,7 +154,7 @@ const EntityList = ({ entities }: { entities: Array<ExposedEntity> }) => {
           <EntityListItem key={`${entity.schema}.${entity.name}`} entity={entity} />
         ))}
       </ul>
-      <CollapsibleContent className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+      <CollapsibleContent className="transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
         <ul className="list-disc pl-5 space-y-0.5">
           {hiddenEntities.map((entity) => (
             <EntityListItem key={`${entity.schema}.${entity.name}`} entity={entity} />

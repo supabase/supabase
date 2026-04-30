@@ -29,6 +29,7 @@ Ariuna K
 Arshdeep Singh
 Artur Zakirov
 Artyom Borissov
+Aziz Quadri
 Barco Fourie
 Beng Eu
 Benjamin Coenen
@@ -76,7 +77,6 @@ Divit D
 Douglas Hunley
 Dustin Keib
 Eduardo Gurgel
-Egor Romanov
 Eleftheria Trivyzaki
 Eliot Whalan
 Emmett Folger
@@ -105,6 +105,7 @@ Guilherme Souza
 Hannah Bowers
 Hardik Maheshwari
 Haritabh Gupta
+Harold Giménez
 Haydn Maley
 Hieu Pham
 Hunter Luckow
@@ -161,10 +162,10 @@ Lenny Urbanowski
 Leonardo Santiago
 Liam Cloud Hogan
 Lindsay Moss
-Long Hoang
 Lukas Bernert
 Łukasz Niemier
 Maksym Ionutsa
+Manuel Mendez
 Manan Gupta
 Marcus Weiner
 Margarita Sandomirskaia

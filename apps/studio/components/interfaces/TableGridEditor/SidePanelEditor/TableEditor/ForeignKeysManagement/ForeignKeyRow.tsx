@@ -71,7 +71,7 @@ export const ForeignKeyRow = ({
                   preProcessor={(code: any) =>
                     code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
                   }
-                  loader={<span className="block w-4 h-4 bg-[#133929] rounded-sm" />}
+                  loader={<span className="block w-4 h-4 bg-[#133929] rounded-xs" />}
                   cacheRequests={true}
                 />
               }

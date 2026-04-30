@@ -217,7 +217,7 @@ const SecondStep = ({
       {factor && (
         <div className="flex flex-col gap-y-4">
           <div className="flex justify-center py-6">
-            <div className="h-48 w-48 bg-white rounded">
+            <div className="h-48 w-48 bg-white rounded-sm">
               <img width={190} height={190} src={factor.totp.qr_code} alt={factor.totp.uri} />
             </div>
           </div>
