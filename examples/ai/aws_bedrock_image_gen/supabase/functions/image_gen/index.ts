@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
     const supabaseClient = createClient(
       // Supabase API URL - env var exported by default.
       Deno.env.get('SUPABASE_URL')!,
-      // Supabase API ANON KEY - env var exported by default.
+      // Supabase API SECRET KEY - env var exported by default.
       Deno.env.get('SUPABASE_SECRET_KEY')!
     )
 
