@@ -703,7 +703,7 @@ export default {
             border-brand
             group-hover:border-brand
           `,
-          rounded-sm: `rounded-md`,
+          rounded: `rounded-md`,
         },
         pills: {
           base: `px-3 py-1`,
