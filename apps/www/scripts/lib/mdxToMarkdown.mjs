@@ -1,16 +1,9 @@
 // @ts-check
 
+import { remark } from 'remark'
 import remarkGfm from 'remark-gfm'
 import remarkMdx from 'remark-mdx'
-import remarkParse from 'remark-parse'
-import remarkStringify from 'remark-stringify'
-import { unified } from 'unified'
 import { SKIP, visit } from 'unist-util-visit'
-
-// MDX comments survive parse as expression nodes that round-trip into output.
-function stripMdxComments(source) {
-  return source.replace(/\{\s*\/\*[\s\S]*?\*\/\s*\}/g, '')
-}
 
 function getJsxAttr(node, name) {
   const attr = (node.attributes ?? []).find((a) => a.type === 'mdxJsxAttribute' && a.name === name)
@@ -145,20 +138,17 @@ function transformMdxNodes() {
   }
 }
 
-const processor = unified()
-  .use(remarkParse)
-  .use(remarkMdx)
-  .use(remarkGfm)
-  .use(transformMdxNodes)
-  .use(remarkStringify, {
-    bullet: '-',
-    fences: true,
-    incrementListMarker: false,
-    rule: '-',
-  })
+// remark() is unified().use(remarkParse).use(remarkStringify); the stringify
+// options below are handed to remark-stringify via that bundled .use().
+const processor = remark().use(remarkMdx).use(remarkGfm).use(transformMdxNodes).data('settings', {
+  bullet: '-',
+  fences: true,
+  incrementListMarker: false,
+  rule: '-',
+})
 
 export async function mdxBodyToMarkdown(rawBody) {
-  const file = await processor.process(stripMdxComments(rawBody))
+  const file = await processor.process(rawBody)
   for (const msg of file.messages) console.warn(`  ⚠ ${msg.message}`)
   return String(file)
 }
