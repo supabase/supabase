@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -88,6 +89,7 @@ order by timestamp desc
 limit 100`
 
 export const UsersV2 = () => {
+  const router = useRouter()
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
   const {
@@ -359,7 +361,7 @@ export const UsersV2 = () => {
     setSortByValue(value)
   }
 
-  const onSelectImpersonateUser = async (user: User) => {
+  const onSelectImpersonateUser = async (user: User, destination: 'sql' | 'table-editor') => {
     await roleImpersonationState.setRole({
       type: 'postgrest',
       role: 'authenticated',
@@ -367,6 +369,12 @@ export const UsersV2 = () => {
       user,
       aal: 'aal1',
     })
+
+    if (destination === 'sql') {
+      router.push(`/project/${projectRef}/sql`)
+    } else {
+      router.push(`/project/${projectRef}/editor`)
+    }
   }
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {

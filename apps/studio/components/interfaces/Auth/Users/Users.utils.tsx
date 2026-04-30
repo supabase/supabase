@@ -273,7 +273,7 @@ export const formatUserColumns = ({
   visibleColumns?: string[]
   setSortByValue: (val: string) => void
   onSelectDeleteUser: (user: User) => void
-  onSelectImpersonateUser: (user: User) => void
+  onSelectImpersonateUser: (user: User, destination: 'sql' | 'table-editor') => Promise<void>
 }) => {
   const columnOrder = config.map((c) => c.id) ?? columns.map((c) => c.id)
 
@@ -411,30 +411,27 @@ export const formatUserColumns = ({
 
               <ContextMenuSeparator_Shadcn_ />
 
-              <Link href={`/project/${ref}/editor`}>
-                <ContextMenuItem_Shadcn_
-                  className="gap-x-2"
-                  onFocusCapture={(e) => e.stopPropagation()}
-                  onSelect={() => {
-                    if (user) onSelectImpersonateUser(user)
-                  }}
-                >
-                  <TableEditor size={12} />
-                  <span>View data as user</span>
-                </ContextMenuItem_Shadcn_>
-              </Link>
-              <Link href={`/project/${ref}/sql`}>
-                <ContextMenuItem_Shadcn_
-                  className="gap-x-2"
-                  onFocusCapture={(e) => e.stopPropagation()}
-                  onSelect={() => {
-                    if (user) onSelectImpersonateUser(user)
-                  }}
-                >
-                  <SqlEditor size={12} />
-                  <span>Run SQL as user</span>
-                </ContextMenuItem_Shadcn_>
-              </Link>
+              <ContextMenuItem_Shadcn_
+                className="gap-x-2"
+                onFocusCapture={(e) => e.stopPropagation()}
+                onSelect={() => {
+                  if (user) onSelectImpersonateUser(user, 'table-editor')
+                }}
+              >
+                <TableEditor size={12} />
+                <span>View data as user</span>
+              </ContextMenuItem_Shadcn_>
+
+              <ContextMenuItem_Shadcn_
+                className="gap-x-2"
+                onFocusCapture={(e) => e.stopPropagation()}
+                onSelect={() => {
+                  if (user) onSelectImpersonateUser(user, 'sql')
+                }}
+              >
+                <SqlEditor size={12} />
+                <span>Run SQL as user</span>
+              </ContextMenuItem_Shadcn_>
 
               <ContextMenuSeparator_Shadcn_ />
 
