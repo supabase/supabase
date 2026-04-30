@@ -15,12 +15,12 @@ import Table from '@/components/to-be-cleaned/Table'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
-import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import {
   TIMESTAMP_MICROS_PER_MS,
-  useProfileAuditLogsQuery,
   type V2AuditLog,
-} from '@/data/profile/profile-audit-logs-query'
+} from '@/data/organizations/organization-audit-logs-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProfileAuditLogsQuery } from '@/data/profile/profile-audit-logs-query'
 import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 
 export const AuditLogs = () => {

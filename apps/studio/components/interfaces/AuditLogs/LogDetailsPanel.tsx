@@ -6,7 +6,10 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
-import { TIMESTAMP_MICROS_PER_MS, type V2AuditLog } from '@/data/profile/profile-audit-logs-query'
+import {
+  TIMESTAMP_MICROS_PER_MS,
+  type V2AuditLog,
+} from '@/data/organizations/organization-audit-logs-query'
 
 interface LogDetailsPanelProps {
   selectedLog?: V2AuditLog

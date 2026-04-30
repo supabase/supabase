@@ -1,4 +1,4 @@
-import type { V2AuditLog } from '@/data/profile/profile-audit-logs-query'
+import type { V2AuditLog } from '@/data/organizations/organization-audit-logs-query'
 
 export function sortAuditLogs(logs: V2AuditLog[], descending: boolean): V2AuditLog[] {
   return [...logs].sort((a, b) =>

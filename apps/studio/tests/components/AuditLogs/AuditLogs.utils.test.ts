@@ -6,7 +6,10 @@ import {
   filterByUsers,
   sortAuditLogs,
 } from '@/components/interfaces/Organization/AuditLogs/AuditLogs.utils'
-import { TIMESTAMP_MICROS_PER_MS, type V2AuditLog } from '@/data/profile/profile-audit-logs-query'
+import {
+  TIMESTAMP_MICROS_PER_MS,
+  type V2AuditLog,
+} from '@/data/organizations/organization-audit-logs-query'
 
 // Timestamps are in microseconds (e.g. 1777471903844000 = April 2026)
 const TS_A = 1777471903844000

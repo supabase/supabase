@@ -28,11 +28,11 @@ import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import {
   AuditLog,
+  TIMESTAMP_MICROS_PER_MS,
   useOrganizationAuditLogsQuery,
 } from '@/data/organizations/organization-audit-logs-query'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { TIMESTAMP_MICROS_PER_MS } from '@/data/profile/profile-audit-logs-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
