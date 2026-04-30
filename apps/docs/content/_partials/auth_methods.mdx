@@ -2,8 +2,8 @@ The Supabase Auth SDK contains three different functions for authenticating user
 
 Summary of the methods
 
-- [`getSession`](/docs/reference/javascript/auth-getsession) is generally not secure and does not do the access token validation necessary for many use cases
-- [`getClaims`](/docs/reference/javascript/auth-getclaims) validates the token in storage either directly or by calling `getUser` solely for the purpose of checking the result; it doesn't actually use the response
+- Use [`getClaims`](/docs/reference/javascript/auth-getclaims) to protect pages and user data. It validates the token in storage either directly or by calling `getUser` solely for the purpose of checking the result. It doesn't actually use the response.
 - [`getUser`](/docs/reference/javascript/auth-getuser) makes a network call to the project's Auth instance to get the user record, which includes the most up-to-date information about the user at the cost of a network call.
+- [`getSession`](/docs/reference/javascript/auth-getsession) is generally not secure and does not do the access token validation necessary for many use case
 
 In summary, use `getClaims` when you don't need a fresh user record, `getUser` when you do, and there are some edge cases where you can use `getSession`.
