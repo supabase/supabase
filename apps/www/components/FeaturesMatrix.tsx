@@ -107,7 +107,7 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
 
   return (
     <div className="mt-0 w-full overflow-x-auto rounded-b-xl border border-muted">
-      <table className="w-full text-sm border-collapse table-fixed">
+      <table className="w-full text-sm border-collapse table-fixed mt-0">
         <colgroup>
           <col />
           <col className="hidden md:table-column w-44" />
