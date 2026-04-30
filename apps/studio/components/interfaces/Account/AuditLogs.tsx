@@ -10,6 +10,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { filterByProjects, sortAuditLogs } from './AuditLogs.utils'
 import { V2LogDetailsPanel } from '@/components/interfaces/AuditLogs/V2LogDetailsPanel'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import Table from '@/components/to-be-cleaned/Table'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -94,197 +95,203 @@ export const AuditLogs = () => {
 
   return (
     <>
-      <div className="space-y-4 flex flex-col pb-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <p className="text-xs prose">Filter by</p>
-            <FilterPopover
-              name="Projects"
-              options={projects ?? []}
-              labelKey="name"
-              valueKey="ref"
-              activeOptions={filters.projects}
-              onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
-              search={search}
-              setSearch={setSearch}
-              hasNextPage={hasNextPage}
-              isLoading={isLoadingProjects}
-              isFetching={isFetching}
-              isFetchingNextPage={isFetchingNextPage}
-              fetchNextPage={fetchNextPage}
-            />
-            <LogsDatePicker
-              hideWarnings
-              value={dateRange}
-              onSubmit={(value) => setDateRange(value)}
-              helpers={[
-                {
-                  text: 'Last 1 hour',
-                  calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
-                  calcTo: () => dayjs().toISOString(),
-                },
-                {
-                  text: 'Last 3 hours',
-                  calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
-                  calcTo: () => dayjs().toISOString(),
-                },
+      <ScaffoldContainer className="px-6 xl:px-10">
+        <ScaffoldSection isFullWidth>
+          <div className="space-y-4 flex flex-col">
+            <div className="flex flex-col md:flex-row md:items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <p className="text-xs prose">Filter by</p>
+                <FilterPopover
+                  name="Projects"
+                  options={projects ?? []}
+                  labelKey="name"
+                  valueKey="ref"
+                  activeOptions={filters.projects}
+                  onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
+                  search={search}
+                  setSearch={setSearch}
+                  hasNextPage={hasNextPage}
+                  isLoading={isLoadingProjects}
+                  isFetching={isFetching}
+                  isFetchingNextPage={isFetchingNextPage}
+                  fetchNextPage={fetchNextPage}
+                />
+                <LogsDatePicker
+                  hideWarnings
+                  value={dateRange}
+                  onSubmit={(value) => setDateRange(value)}
+                  helpers={[
+                    {
+                      text: 'Last 1 hour',
+                      calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
+                      calcTo: () => dayjs().toISOString(),
+                    },
+                    {
+                      text: 'Last 3 hours',
+                      calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
+                      calcTo: () => dayjs().toISOString(),
+                    },
 
-                {
-                  text: 'Last 6 hours',
-                  calcFrom: () => dayjs().subtract(6, 'hour').toISOString(),
-                  calcTo: () => dayjs().toISOString(),
-                },
-                {
-                  text: 'Last 12 hours',
-                  calcFrom: () => dayjs().subtract(12, 'hour').toISOString(),
-                  calcTo: () => dayjs().toISOString(),
-                },
-                {
-                  text: 'Last 24 hours',
-                  calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
-                  calcTo: () => dayjs().toISOString(),
-                },
-              ]}
-            />
+                    {
+                      text: 'Last 6 hours',
+                      calcFrom: () => dayjs().subtract(6, 'hour').toISOString(),
+                      calcTo: () => dayjs().toISOString(),
+                    },
+                    {
+                      text: 'Last 12 hours',
+                      calcFrom: () => dayjs().subtract(12, 'hour').toISOString(),
+                      calcTo: () => dayjs().toISOString(),
+                    },
+                    {
+                      text: 'Last 24 hours',
+                      calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
+                      calcTo: () => dayjs().toISOString(),
+                    },
+                  ]}
+                />
+                {isSuccess && (
+                  <>
+                    <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
+                    <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
+                  </>
+                )}
+              </div>
+              <Button
+                type="default"
+                disabled={isLoading || isRefetching}
+                icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
+                onClick={() => refetch()}
+              >
+                {isRefetching ? 'Refreshing' : 'Refresh'}
+              </Button>
+            </div>
+
+            {isLoading && (
+              <div className="space-y-2">
+                <ShimmeringLoader />
+                <ShimmeringLoader className="w-3/4" />
+                <ShimmeringLoader className="w-1/2" />
+              </div>
+            )}
+
+            {isError && <AlertError error={error} subject="Failed to retrieve audit logs" />}
+
             {isSuccess && (
               <>
-                <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
-                <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
+                {logs.length === 0 ? (
+                  <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
+                    <p className="prose text-sm">You do not have any audit logs available yet</p>
+                  </div>
+                ) : logs.length > 0 && sortedLogs.length === 0 ? (
+                  <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
+                    <p className="prose text-sm">
+                      No audit logs found based on the filters applied
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-hidden md:overflow-auto overflow-x-scroll">
+                    <Table
+                      head={[
+                        <Table.th key="action" className="py-2">
+                          Action
+                        </Table.th>,
+                        <Table.th key="target" className="py-2">
+                          Target
+                        </Table.th>,
+                        <Table.th key="date" className="py-2">
+                          <div className="flex items-center space-x-2">
+                            <p>Date</p>
+                            <ButtonTooltip
+                              type="text"
+                              className="px-1"
+                              icon={
+                                dateSortDesc ? (
+                                  <ArrowDown strokeWidth={1.5} size={14} />
+                                ) : (
+                                  <ArrowUp strokeWidth={1.5} size={14} />
+                                )
+                              }
+                              onClick={() => setDateSortDesc(!dateSortDesc)}
+                              tooltip={{
+                                content: {
+                                  side: 'bottom',
+                                  text: dateSortDesc ? 'Sort latest first' : 'Sort earliest first',
+                                },
+                              }}
+                            />
+                          </div>
+                        </Table.th>,
+                        <Table.th key="actions" className="py-2"></Table.th>,
+                      ]}
+                      body={
+                        sortedLogs?.map((log) => {
+                          const project = projects?.find((p) => p.ref === log.project_ref)
+                          const organization = organizations?.find(
+                            (org) => org.slug === log.organization_slug
+                          )
+                          const isoTimestamp = dayjs(
+                            log.timestamp / TIMESTAMP_MICROS_PER_MS
+                          ).toISOString()
+
+                          return (
+                            <Table.tr
+                              key={log.timestamp}
+                              onClick={() => setSelectedLog(log)}
+                              className="cursor-pointer hover:!bg-alternative transition duration-100"
+                            >
+                              <Table.td className="max-w-[250px]">
+                                <div className="flex items-center space-x-2">
+                                  <p className="bg-surface-200 rounded px-1 flex items-center justify-center text-xs font-mono border">
+                                    {log.action.status}
+                                  </p>
+                                  <p className="text-foreground-light text-xs font-mono">
+                                    {log.action.method}
+                                  </p>
+                                  <p className="truncate" title={log.action.name}>
+                                    {log.action.name}
+                                  </p>
+                                </div>
+                              </Table.td>
+                              <Table.td>
+                                {project || organization ? (
+                                  <>
+                                    <p
+                                      className="text-foreground-light max-w-[230px] truncate"
+                                      title={project?.name ?? organization?.name}
+                                    >
+                                      {project ? 'Project: ' : 'Organization: '}
+                                      {project?.name ?? organization?.name}
+                                    </p>
+                                    <p className="text-foreground-light text-xs mt-0.5 truncate">
+                                      {log.project_ref
+                                        ? `Ref: ${log.project_ref}`
+                                        : `Slug: ${log.organization_slug}`}
+                                    </p>
+                                  </>
+                                ) : (
+                                  <p className="text-foreground-light text-sm">
+                                    {log.project_ref ?? log.organization_slug ?? '-'}
+                                  </p>
+                                )}
+                              </Table.td>
+                              <Table.td>
+                                <TimestampInfo className="text-sm" utcTimestamp={isoTimestamp} />
+                              </Table.td>
+                              <Table.td align="right">
+                                <Button type="default">View details</Button>
+                              </Table.td>
+                            </Table.tr>
+                          )
+                        }) ?? []
+                      }
+                    />
+                  </div>
+                )}
               </>
             )}
           </div>
-          <Button
-            type="default"
-            disabled={isLoading || isRefetching}
-            icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
-            onClick={() => refetch()}
-          >
-            {isRefetching ? 'Refreshing' : 'Refresh'}
-          </Button>
-        </div>
-
-        {isLoading && (
-          <div className="space-y-2">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-            <ShimmeringLoader className="w-1/2" />
-          </div>
-        )}
-
-        {isError && <AlertError error={error} subject="Failed to retrieve audit logs" />}
-
-        {isSuccess && (
-          <>
-            {logs.length === 0 ? (
-              <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
-                <p className="prose text-sm">You do not have any audit logs available yet</p>
-              </div>
-            ) : logs.length > 0 && sortedLogs.length === 0 ? (
-              <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
-                <p className="prose text-sm">No audit logs found based on the filters applied</p>
-              </div>
-            ) : (
-              <div className="overflow-hidden md:overflow-auto overflow-x-scroll">
-                <Table
-                  head={[
-                    <Table.th key="action" className="py-2">
-                      Action
-                    </Table.th>,
-                    <Table.th key="target" className="py-2">
-                      Target
-                    </Table.th>,
-                    <Table.th key="date" className="py-2">
-                      <div className="flex items-center space-x-2">
-                        <p>Date</p>
-                        <ButtonTooltip
-                          type="text"
-                          className="px-1"
-                          icon={
-                            dateSortDesc ? (
-                              <ArrowDown strokeWidth={1.5} size={14} />
-                            ) : (
-                              <ArrowUp strokeWidth={1.5} size={14} />
-                            )
-                          }
-                          onClick={() => setDateSortDesc(!dateSortDesc)}
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text: dateSortDesc ? 'Sort latest first' : 'Sort earliest first',
-                            },
-                          }}
-                        />
-                      </div>
-                    </Table.th>,
-                    <Table.th key="actions" className="py-2"></Table.th>,
-                  ]}
-                  body={
-                    sortedLogs?.map((log) => {
-                      const project = projects?.find((p) => p.ref === log.project_ref)
-                      const organization = organizations?.find(
-                        (org) => org.slug === log.organization_slug
-                      )
-                      const isoTimestamp = dayjs(
-                        log.timestamp / TIMESTAMP_MICROS_PER_MS
-                      ).toISOString()
-
-                      return (
-                        <Table.tr
-                          key={log.timestamp}
-                          onClick={() => setSelectedLog(log)}
-                          className="cursor-pointer hover:!bg-alternative transition duration-100"
-                        >
-                          <Table.td className="max-w-[250px]">
-                            <div className="flex items-center space-x-2">
-                              <p className="bg-surface-200 rounded px-1 flex items-center justify-center text-xs font-mono border">
-                                {log.action.status}
-                              </p>
-                              <p className="text-foreground-light text-xs font-mono">
-                                {log.action.method}
-                              </p>
-                              <p className="truncate" title={log.action.name}>
-                                {log.action.name}
-                              </p>
-                            </div>
-                          </Table.td>
-                          <Table.td>
-                            {project || organization ? (
-                              <>
-                                <p
-                                  className="text-foreground-light max-w-[230px] truncate"
-                                  title={project?.name ?? organization?.name}
-                                >
-                                  {project ? 'Project: ' : 'Organization: '}
-                                  {project?.name ?? organization?.name}
-                                </p>
-                                <p className="text-foreground-light text-xs mt-0.5 truncate">
-                                  {log.project_ref
-                                    ? `Ref: ${log.project_ref}`
-                                    : `Slug: ${log.organization_slug}`}
-                                </p>
-                              </>
-                            ) : (
-                              <p className="text-foreground-light text-sm">
-                                {log.project_ref ?? log.organization_slug ?? '-'}
-                              </p>
-                            )}
-                          </Table.td>
-                          <Table.td>
-                            <TimestampInfo className="text-sm" utcTimestamp={isoTimestamp} />
-                          </Table.td>
-                          <Table.td align="right">
-                            <Button type="default">View details</Button>
-                          </Table.td>
-                        </Table.tr>
-                      )
-                    }) ?? []
-                  }
-                />
-              </div>
-            )}
-          </>
-        )}
-      </div>
+        </ScaffoldSection>
+      </ScaffoldContainer>
 
       <V2LogDetailsPanel selectedLog={selectedLog} onClose={() => setSelectedLog(undefined)} />
     </>
