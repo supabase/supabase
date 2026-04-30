@@ -21,8 +21,8 @@ catalog:
   radix-ui: ^1.4.3
   react: ^18.3.0
   react-dom: ^18.3.0
-  recharts: ^2.15.4
   tailwindcss: ^3.4.19
+  recharts: ^2.15.4
   tsx: 4.20.3
   typescript: ~6.0.0
   valtio: ^1.12.0
