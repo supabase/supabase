@@ -271,7 +271,7 @@ alter table posts enable row level security;`,
         //     'By submitting this form, I confirm that I have read and understood the Privacy Policy.',
         // },
         notion: {
-          database_id: '3525004b775f8018ae80000c6e0920e7',
+          database_id: '3525004b775f80419b2ac0245affad06',
           columnMap: {
             firstName: 'First Name',
             lastName: 'Last Name',
