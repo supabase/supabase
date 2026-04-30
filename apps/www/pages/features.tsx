@@ -1,18 +1,17 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/compat/router'
-import { NextSeo } from 'next-seo'
 import { motion } from 'framer-motion'
-import { LayoutGrid, Search, Table2 } from 'lucide-react'
 import { debounce } from 'lib/helpers'
-
+import { LayoutGrid, Search, Table2 } from 'lucide-react'
+import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/compat/router'
+import Link from 'next/link'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Button, Checkbox, cn, Input } from 'ui'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import Panel from '~/components/Panel'
-import { FeaturesMatrix } from '~/components/FeaturesMatrix'
 
-import { features } from '~/data/features'
+import { FeaturesMatrix } from '@/components/FeaturesMatrix'
+import DefaultLayout from '@/components/Layouts/Default'
+import SectionContainer from '@/components/Layouts/SectionContainer'
+import Panel from '@/components/Panel'
+import { features } from '@/data/features'
 
 type ViewMode = 'grid' | 'matrix'
 

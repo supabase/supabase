@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
-import Link from 'next/link'
-import { Check, Minus, ChevronUp, ChevronDown, ChevronsUpDown, ExternalLink } from 'lucide-react'
-import { Badge, cn } from 'ui'
 import type { FeatureType } from '~/data/features'
 import { PRODUCT_STAGES } from '~/data/features'
+import { Check, ChevronDown, ChevronsUpDown, ChevronUp, ExternalLink, Minus } from 'lucide-react'
+import Link from 'next/link'
+import React, { useState } from 'react'
+import { Badge, cn } from 'ui'
 
 type SortColumn = 'title' | 'stage' | 'selfHosted'
 type SortDirection = 'asc' | 'desc'
@@ -16,7 +16,9 @@ const STAGE_ORDER: Record<PRODUCT_STAGES, number> = {
   [PRODUCT_STAGES.GA]: 4,
 }
 
-function stageBadgeVariant(stage: PRODUCT_STAGES): 'default' | 'warning' | 'success' | 'destructive' {
+function stageBadgeVariant(
+  stage: PRODUCT_STAGES
+): 'default' | 'warning' | 'success' | 'destructive' {
   switch (stage) {
     case PRODUCT_STAGES.GA:
       return 'success'
@@ -61,7 +63,15 @@ function productLabel(product: string): string {
   return labels[product] ?? product
 }
 
-function SortIcon({ column, sortColumn, sortDirection }: { column: SortColumn; sortColumn: SortColumn; sortDirection: SortDirection }) {
+function SortIcon({
+  column,
+  sortColumn,
+  sortDirection,
+}: {
+  column: SortColumn
+  sortColumn: SortColumn
+  sortDirection: SortDirection
+}) {
   if (sortColumn !== column) return <ChevronsUpDown size={12} className="opacity-40" />
   return sortDirection === 'asc' ? <ChevronUp size={12} /> : <ChevronDown size={12} />
 }
@@ -107,7 +117,7 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
 
   return (
     <div className="mt-0 w-full overflow-x-auto rounded-b-xl border border-muted">
-      <table className="w-full text-sm border-collapse table-fixed">
+      <table className="w-full text-sm border-collapse table-fixed mt-0">
         <colgroup>
           <col />
           <col className="hidden md:table-column w-44" />
@@ -132,7 +142,11 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
             <th className={sortableThClass} onClick={() => handleSort('selfHosted')}>
               <span className="flex items-center gap-1.5">
                 Self-Hosted
-                <SortIcon column="selfHosted" sortColumn={sortColumn} sortDirection={sortDirection} />
+                <SortIcon
+                  column="selfHosted"
+                  sortColumn={sortColumn}
+                  sortDirection={sortDirection}
+                />
               </span>
             </th>
           </tr>
@@ -158,7 +172,9 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
                       <feature.icon className="w-3.5 h-3.5 text-foreground-light group-hover/row:text-foreground transition-colors" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <span className="font-medium text-sm leading-tight block">{feature.title}</span>
+                      <span className="font-medium text-sm leading-tight block">
+                        {feature.title}
+                      </span>
                       <span className="hidden sm:block text-foreground-lighter text-xs leading-tight truncate">
                         {feature.subtitle}
                       </span>
