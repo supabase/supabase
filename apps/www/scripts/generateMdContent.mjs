@@ -1,15 +1,9 @@
 // @ts-check
 
 /**
- * Scans content/md/ (static markdown) plus _blog/, _customers/, _events/ (MDX)
- * and emits a TypeScript module exporting MD_CONTENT (slug → rendered markdown)
- * and MD_PAGES (allowlist Set used by middleware and the rel=alternate hook).
- *
- * Static imports of the generated file make the content traceable by
- * @vercel/nft so it ends up in the serverless bundle without runtime fs.readFile.
- *
- * Drop a new .md file in content/md/ — or a new .mdx in any registered MDX
- * section — and the route handler picks it up on the next content:build.
+ * Scans content/md/ + _blog/ + _customers/ + _events/ and emits a TypeScript
+ * module exporting MD_CONTENT (slug → markdown) and MD_PAGES (allowlist Set).
+ * The static import keeps content traceable by @vercel/nft, no runtime fs reads.
  */
 
 import { promises as fs } from 'fs'
@@ -24,17 +18,13 @@ const wwwDir = path.join(__dirname, '..')
 const contentDir = path.join(wwwDir, 'content/md')
 const outputPath = path.join(wwwDir, 'app/api-v2/md/content.generated.ts')
 
-// Slug prefix length for date-prefixed filenames (YYYY-MM-DD-, optionally
-// followed by an extra '_' for events). Matches lib/posts.tsx FILENAME_SUBSTRING.
+// Matches lib/posts.tsx FILENAME_SUBSTRING — strips YYYY-MM-DD- (11 chars).
 const DATE_PREFIX = 11
 
-// 'pricing' is served dynamically via generatePricingContent() instead of
-// from a .md file; it still needs to be in MD_PAGES so middleware rewrites
-// /pricing.md to the API route.
+// Slugs handled by a dynamic generator in the route handler. Listed here so
+// MD_PAGES still includes them (middleware relies on the allowlist).
 const DYNAMIC_SLUGS = ['pricing']
 
-// MDX sections. Slug shape: `<urlPrefix>/<filename-slug>`.
-// urlPrefix matches the public URL path; the directory's leading '_' is dropped.
 const MDX_SECTIONS = [
   {
     dir: '_blog',
@@ -73,11 +63,12 @@ const MDX_SECTIONS = [
       'duration',
       'onDemand',
     ],
-    // Events with this flag are not built as HTML pages
-    // (lib/posts.tsx and pages/events/[slug].tsx skip them); mirror that.
     skipIf: (data) => data.disable_page_build === true,
   },
 ]
+
+// Reserved YAML literals that look like booleans/null when unquoted.
+const YAML_RESERVED_LITERAL = /^(true|false|yes|no|null|~)$/i
 
 async function collectMdFiles(dir, prefix = '') {
   const results = []
@@ -99,27 +90,19 @@ async function collectMdFiles(dir, prefix = '') {
   return results
 }
 
+// _events double-underscore filenames (`2024-08-30__launch-...`) produce slugs
+// with a leading underscore. The HTML page is at `/events/_launch-...`, so the
+// .md slug must keep the underscore to match.
 function deriveSlug(filename, stripDatePrefix) {
   const base = filename.replace(/\.mdx$/, '')
-  if (!stripDatePrefix) return base
-  // Strip YYYY-MM-DD prefix (11 chars). MUST match lib/posts.tsx exactly:
-  //   filename.replace('.mdx', '').substring(FILENAME_SUBSTRING /* 11 */)
-  // _events files use a double-underscore convention
-  // (e.g., 2024-08-30__launch-...) which produces a slug with a leading
-  // underscore (e.g., `_launch-...`). The HTML page lives at
-  // `/events/_launch-...`, so we KEEP the underscore — stripping it would
-  // produce a .md URL with no matching HTML page and orphan the
-  // rel=alternate link.
-  return base.substring(DATE_PREFIX)
+  return stripDatePrefix ? base.substring(DATE_PREFIX) : base
 }
 
-// YAML-quote a scalar string only when needed (reserved chars, leading
-// whitespace, or starts with `-`/`?`). For multi-line strings, fall back to
-// JSON.stringify which preserves \n as an escape — agents can still parse it.
 function yamlScalar(value) {
   if (typeof value !== 'string') return JSON.stringify(value)
   if (value.includes('\n')) return JSON.stringify(value)
-  const needsQuote = /[:#&*!|>'%@`{}[\]]/.test(value) || /^[\s\-?]/.test(value)
+  const needsQuote =
+    /[:#&*!|>'%@`{}[\]]/.test(value) || /^[\s\-?]/.test(value) || YAML_RESERVED_LITERAL.test(value)
   return needsQuote ? JSON.stringify(value) : value
 }
 
@@ -131,12 +114,8 @@ function renderFrontmatter(data, fields) {
     if (Array.isArray(value)) {
       lines.push(`${field}: ${JSON.stringify(value)}`)
     } else if (typeof value === 'object') {
-      // Reject nested-object fields rather than emit ad-hoc YAML. Section
-      // configs whitelist scalar/array/date fields only; if a future config
-      // adds a nested object, decide its serialization deliberately.
       throw new Error(
-        `renderFrontmatter: nested object for field "${field}" is not supported. ` +
-          `Add explicit handling or flatten upstream.`
+        `renderFrontmatter: nested object for "${field}" not supported. Add explicit handling.`
       )
     } else {
       lines.push(`${field}: ${yamlScalar(value)}`)
@@ -159,30 +138,27 @@ async function ingestMdxSection(section) {
   }
 
   const mdxFilenames = filenames.filter((f) => f.endsWith('.mdx'))
-
-  // Parse + serialize files in parallel; the unified processor is stateless
-  // between calls and the I/O dominates wall-clock at 405+ files.
   const results = await Promise.all(
     mdxFilenames.map(async (filename) => {
       const fullPath = path.join(dir, filename)
-      const raw = await fs.readFile(fullPath, 'utf-8')
-      const parsed = matter(raw)
-      const data = parsed.data ?? {}
+      try {
+        const raw = await fs.readFile(fullPath, 'utf-8')
+        const parsed = matter(raw)
+        const data = parsed.data ?? {}
+        if (section.skipIf?.(data)) return null
 
-      if (section.skipIf?.(data)) return null
-
-      const fileSlug = deriveSlug(filename, section.stripDatePrefix)
-      const slug = `${section.urlPrefix}/${fileSlug}`
-      const preamble = renderFrontmatter(data, section.frontmatterFields)
-      const body = await mdxBodyToMarkdown(parsed.content)
-      return { slug, content: preamble + body }
+        const slug = `${section.urlPrefix}/${deriveSlug(filename, section.stripDatePrefix)}`
+        const preamble = renderFrontmatter(data, section.frontmatterFields)
+        const body = await mdxBodyToMarkdown(parsed.content)
+        return { slug, content: preamble + body }
+      } catch (err) {
+        throw new Error(`${section.dir}/${filename}: ${err.message}`)
+      }
     })
   )
-
   return results.filter((entry) => entry !== null)
 }
 
-// homepage first (it's the site overview), then everything else alphabetical.
 function sortSlugs(a, b) {
   if (a === 'homepage') return -1
   if (b === 'homepage') return 1
@@ -197,11 +173,10 @@ if (staticSlugs.length === 0) {
 }
 
 const staticEntries = await Promise.all(
-  staticSlugs.map(async (slug) => {
-    const filePath = path.join(contentDir, `${slug}.md`)
-    const content = await fs.readFile(filePath, 'utf-8')
-    return { slug, content }
-  })
+  staticSlugs.map(async (slug) => ({
+    slug,
+    content: await fs.readFile(path.join(contentDir, `${slug}.md`), 'utf-8'),
+  }))
 )
 
 const mdxEntries = []
@@ -214,32 +189,25 @@ for (const section of MDX_SECTIONS) {
 
 const allEntries = [...staticEntries, ...mdxEntries]
 
-// A static file with the same slug as a dynamic generator would land in both
-// MD_CONTENT and the dynamic append path. Fail the build instead.
 const dynamicCollisions = staticSlugs.filter((s) => DYNAMIC_SLUGS.includes(s))
 if (dynamicCollisions.length > 0) {
   console.error(
-    `❌ Slug collision: [${dynamicCollisions.join(', ')}] is reserved for a dynamic generator. ` +
-      `Remove the corresponding file from content/md/ or update DYNAMIC_SLUGS.`
+    `❌ Slug collision: [${dynamicCollisions.join(', ')}] reserved for a dynamic generator.`
   )
   process.exit(1)
 }
 
-// A top-level static or dynamic slug equal to a section root (e.g.,
-// `content/md/blog.md`) would shadow the entire `blog/` namespace.
 const sectionRoots = MDX_SECTIONS.map((s) => s.urlPrefix)
 const sectionRootCollisions = [...staticSlugs, ...DYNAMIC_SLUGS].filter((s) =>
   sectionRoots.includes(s)
 )
 if (sectionRootCollisions.length > 0) {
   console.error(
-    `❌ Section-root collision: [${sectionRootCollisions.join(', ')}] would shadow an MDX section root.`
+    `❌ Section-root collision: [${sectionRootCollisions.join(', ')}] shadows an MDX section.`
   )
   process.exit(1)
 }
 
-// Two MDX files producing the same slug (e.g., date-prefix collision) would
-// silently drop one. Catch it.
 const seen = new Set()
 for (const entry of allEntries) {
   if (seen.has(entry.slug)) {
