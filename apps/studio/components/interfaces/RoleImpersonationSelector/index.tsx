@@ -12,13 +12,16 @@ export interface RoleImpersonationSelectorProps {
   padded?: boolean
   disallowAuthenticatedOption?: boolean
   title?: string
+  orientation?: 'horizontal' | 'vertical'
 }
 
 export const RoleImpersonationSelector = ({
   serviceRoleLabel,
   padded = true,
   disallowAuthenticatedOption = false,
+  orientation = 'horizontal',
 }: RoleImpersonationSelectorProps) => {
+  const isVertical = orientation === 'vertical'
   const state = useRoleImpersonationStateSnapshot()
 
   const [selectedOption, setSelectedOption] = useState<PostgrestRole | undefined>(() => {
@@ -68,13 +71,14 @@ export const RoleImpersonationSelector = ({
             e.preventDefault()
           }}
         >
-          <fieldset className="flex gap-3">
+          <fieldset className={cn('flex gap-3', isVertical && 'flex-col gap-2')}>
             <RoleImpersonationRadio
               value="service_role"
               isSelected={selectedOption === 'service_role'}
               onSelectedChange={onSelectedChange}
               label={serviceRoleLabel}
               icon={<ServiceRoleIcon isSelected={selectedOption === 'service_role'} />}
+              fullWidth={isVertical}
             />
 
             <RoleImpersonationRadio
@@ -82,6 +86,7 @@ export const RoleImpersonationSelector = ({
               isSelected={selectedOption === 'anon'}
               onSelectedChange={onSelectedChange}
               icon={<AnonIcon isSelected={selectedOption === 'anon'} />}
+              fullWidth={isVertical}
             />
 
             {!disallowAuthenticatedOption && (
@@ -93,6 +98,7 @@ export const RoleImpersonationSelector = ({
                 }
                 onSelectedChange={onSelectedChange}
                 icon={<AuthenticatedIcon isSelected={selectedOption === 'authenticated'} />}
+                fullWidth={isVertical}
               />
             )}
           </fieldset>
