@@ -165,7 +165,7 @@ const Footer = (props: Props) => {
                 <IconInstagram size={22} />
               </a>
             </div>
-            <div className="mt-8">
+            <div>
               {newsletterStatus === 'success' ? (
                 <div className="flex flex-col gap-1">
                   <p className="text-brand-link text-sm">Thanks for subscribing!</p>
