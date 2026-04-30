@@ -253,28 +253,32 @@ export const AuditLogs = () => {
                                 </div>
                               </Table.td>
                               <Table.td>
-                                <p
-                                  className="text-foreground-light max-w-[230px] truncate"
-                                  title={project?.name ?? organization?.name ?? '-'}
-                                >
-                                  {project?.name
-                                    ? 'Project: '
-                                    : organization?.name
-                                      ? 'Organization: '
-                                      : null}
-                                  {project?.name ?? organization?.name ?? '-'}
-                                </p>
-                                <p
-                                  className="text-foreground-light text-xs mt-0.5 truncate"
-                                  title={log.project_ref ?? log.organization_slug ?? ''}
-                                >
-                                  {log.project_ref
-                                    ? 'Ref: '
-                                    : log.organization_slug
-                                      ? 'Slug: '
-                                      : null}
-                                  {log.project_ref ?? log.organization_slug}
-                                </p>
+                                {project || organization ? (
+                                  <>
+                                    <p
+                                      className="text-foreground-light max-w-[230px] truncate"
+                                      title={project?.name ?? organization?.name}
+                                    >
+                                      {project?.name
+                                        ? 'Project: '
+                                        : organization?.name
+                                          ? 'Organization: '
+                                          : null}
+                                      {project?.name ?? organization?.name}
+                                    </p>
+                                    <p
+                                      className="text-foreground-light text-xs mt-0.5 truncate"
+                                      title={log.project_ref ?? log.organization_slug ?? ''}
+                                    >
+                                      {log.project_ref ? 'Ref: ' : 'Slug: '}
+                                      {log.project_ref ?? log.organization_slug}
+                                    </p>
+                                  </>
+                                ) : (
+                                  <p className="text-foreground-light text-sm">
+                                    {log.project_ref ?? log.organization_slug ?? '-'}
+                                  </p>
+                                )}
                               </Table.td>
                               <Table.td>
                                 <TimestampInfo className="text-sm" utcTimestamp={isoTimestamp} />
