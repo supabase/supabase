@@ -14,7 +14,9 @@ Sign up to Supabase - [app.supabase.io](https://app.supabase.io) and create a ne
 
 Go to the Project Settings (the cog icon), open the API tab, and find your API URL and `anon` key, you'll need these in the next step.
 
-The `anon` key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token.
+Go to the Project Settings (the cog icon), open the API tab, and find your API URL and `publishable` key, you'll need these in the next step.
+
+The `publishable` key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token.
 
 ![Supabase Publishable Key](supabase_publishable_key.jpg?raw=true 'Supabase Publishable Key')
 
