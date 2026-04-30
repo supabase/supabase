@@ -112,8 +112,8 @@ const StripeProjectsLoginPage = () => {
                 <Admonition type="warning" className="mt-4">
                   <p className="text-sm text-foreground-light">
                     You're signed in as a different account. Sign out and sign back in as{' '}
-                    <strong className="text-foreground">{accountRequest?.email}</strong>.
-                    Then return to Stripe to restart the request.
+                    <strong className="text-foreground">{accountRequest?.email}</strong>. Then
+                    return to Stripe to restart the request.
                   </p>
                 </Admonition>
                 <div className="py-6">
