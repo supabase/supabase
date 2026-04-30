@@ -77,7 +77,6 @@ Divit D
 Douglas Hunley
 Dustin Keib
 Eduardo Gurgel
-Egor Romanov
 Eleftheria Trivyzaki
 Eliot Whalan
 Emmett Folger
@@ -163,7 +162,6 @@ Lenny Urbanowski
 Leonardo Santiago
 Liam Cloud Hogan
 Lindsay Moss
-Long Hoang
 Lukas Bernert
 Łukasz Niemier
 Maksym Ionutsa
