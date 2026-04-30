@@ -3,6 +3,7 @@ import { expect } from '@playwright/test'
 import { env } from '../env.config.js'
 import { expectClipboardValue } from '../utils/clipboard.js'
 import { createTable, dropTable, query } from '../utils/db/index.js'
+import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import {
@@ -50,12 +51,19 @@ test.describe('Database', () => {
 );`,
       })
 
+      // dismiss the "copied as SQL" toast so it doesn't intercept clicks on
+      // the export button, which sits in the same top-right corner
+      await dismissToastsIfAny(page)
+
       // downloads schema diagram when export is triggered
       const downloadPromise = page.waitForEvent('download')
       await page.getByRole('button', { name: 'Export options' }).click()
       await page.getByRole('menuitem', { name: 'Download as PNG' }).click()
       const download = await downloadPromise
       expect(download.suggestedFilename()).toContain('.png')
+
+      // dismiss the "downloaded as PNG" toast for the same reason
+      await dismissToastsIfAny(page)
 
       // changing schema -> auth
       await page.getByTestId('schema-selector').click()
