@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { Check, Clock, Copy } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   copyToClipboard,
@@ -49,6 +49,13 @@ export function ServiceFlowPanel({
   const { ref: projectRef } = useParams()
   const [activeTab, setActiveTab] = useState('overview')
   const [jsonCopied, setJsonCopied] = useState(false)
+  const overviewScrollRef = useRef<HTMLDivElement>(null)
+  const jsonScrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    overviewScrollRef.current?.scrollTo({ top: 0 })
+    jsonScrollRef.current?.scrollTo({ top: 0 })
+  }, [selectedRowKey])
 
   const timestampMs = selectedRow?.timestamp
     ? selectedRow.timestamp / 1000
@@ -131,7 +138,11 @@ export function ServiceFlowPanel({
               </div>
 
               {shouldShowServiceFlow && (
-                <TabsContent value="overview" className="mt-0 grow overflow-auto py-2">
+                <TabsContent
+                  ref={overviewScrollRef}
+                  value="overview"
+                  className="mt-0 grow overflow-auto py-2"
+                >
                   {error ? (
                     <div className="py-8 text-center text-destructive">
                       Error: {error.toString()}
@@ -208,7 +219,11 @@ export function ServiceFlowPanel({
                 </TabsContent>
               )}
 
-              <TabsContent value="raw-json" className="mt-0 grow overflow-auto bg-surface-100/50">
+              <TabsContent
+                ref={jsonScrollRef}
+                value="raw-json"
+                className="mt-0 grow overflow-auto bg-surface-100/50"
+              >
                 {isLoading && shouldShowServiceFlow && (
                   <div className="flex items-center gap-3 border-b border-border bg-surface-100 p-3 text-foreground-light">
                     <Skeleton className="h-4 w-4 animate-pulse rounded-full" />
