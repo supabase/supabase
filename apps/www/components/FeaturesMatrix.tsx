@@ -106,7 +106,7 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
   const sortableThClass = cn(thClass, 'cursor-pointer select-none')
 
   return (
-    <div className="w-full overflow-auto rounded-xl border border-muted">
+    <div className="w-full overflow-auto rounded-b-xl border border-muted">
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="border-b border-muted bg-surface-100">
