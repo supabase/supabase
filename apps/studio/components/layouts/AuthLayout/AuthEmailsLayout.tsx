@@ -13,8 +13,12 @@ export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
 
   const navItems = [
     {
-      label: 'Templates',
+      label: 'Custom Templates',
       href: `/project/${ref}/auth/templates`,
+    },
+    {
+      label: 'Branding',
+      href: `/project/${ref}/auth/branding`,
     },
     {
       label: 'SMTP Settings',

@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ChevronRight, Paintbrush } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -28,7 +28,6 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
-import { EmailBrandingSheet } from './EmailBrandingSheet'
 import { slugifyTitle } from './EmailTemplates.utils'
 import AlertError from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -57,7 +56,6 @@ const NotificationsFormSchema = z.object({
 
 export const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
-  const [brandingSheetOpen, setBrandingSheetOpen] = useState(false)
 
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -134,79 +132,41 @@ export const EmailTemplates = () => {
       )}
       {isSuccess && (
         <>
+          {isTemplateEditBlocked && (
+            <PageSection>
+              <PageSectionContent>
+                <Admonition
+                  type="default"
+                  title="Custom template editing requires custom SMTP or a paid plan"
+                  description={
+                    <p>
+                      Free-tier projects using Supabase's shared email service cannot modify raw
+                      email template HTML. Set up custom SMTP or upgrade to unlock full template
+                      editing.{' '}
+                      <InlineLink
+                        href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}
+                      >
+                        Learn more
+                      </InlineLink>
+                    </p>
+                  }
+                  actions={
+                    <div className="flex gap-2">
+                      <Button asChild type="primary">
+                        <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
+                      </Button>
+                    </div>
+                  }
+                />
+              </PageSectionContent>
+            </PageSection>
+          )}
+
           <PageSection>
-            {builtInSMTP && !isTemplateEditBlocked && (
-              <Admonition
-                type="warning"
-                title="Set up custom SMTP"
-                description={
-                  <p>
-                    You're using the built-in email service. This service has rate limits and is not
-                    meant to be used for production apps.{' '}
-                    <InlineLink
-                      href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}
-                    >
-                      Learn more
-                    </InlineLink>{' '}
-                  </p>
-                }
-                layout="horizontal"
-                className="mb-4"
-                actions={
-                  <Button asChild type="default">
-                    <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
-                  </Button>
-                }
-              />
-            )}
-
-            {isTemplateEditBlocked && (
-              <Admonition
-                type="default"
-                title="Template editing requires custom SMTP or a paid plan"
-                description={
-                  <p>
-                    Free-tier projects use Supabase's shared email service and cannot modify raw
-                    email template HTML. You can customize your branding below, or set up custom
-                    SMTP to unlock full template editing.{' '}
-                    <InlineLink
-                      href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}
-                    >
-                      Learn more
-                    </InlineLink>
-                  </p>
-                }
-                layout="horizontal"
-                className="mb-4"
-                actions={
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    <Button
-                      type="primary"
-                      icon={<Paintbrush size={14} />}
-                      onClick={() => setBrandingSheetOpen(true)}
-                    >
-                      Customize branding
-                    </Button>
-                    <Button asChild type="default">
-                      <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
-                    </Button>
-                  </div>
-                }
-              />
-            )}
-
             <PageSectionMeta>
               <PageSectionSummary>
                 <PageSectionTitle>Authentication</PageSectionTitle>
               </PageSectionSummary>
-              <Button
-                type="default"
-                size="tiny"
-                icon={<Paintbrush size={14} />}
-                onClick={() => setBrandingSheetOpen(true)}
-              >
-                Customize branding
-              </Button>
             </PageSectionMeta>
             <PageSectionContent>
               <Card>
@@ -227,10 +187,7 @@ export const EmailTemplates = () => {
                             <p className="text-sm text-foreground-lighter">{template.purpose}</p>
                           )}
                         </div>
-
-                        <div className="flex items-center gap-4">
-                          <ChevronRight size={16} className="text-foreground-muted" />
-                        </div>
+                        <ChevronRight size={16} className="text-foreground-muted" />
                       </Link>
                     </CardContent>
                   )
@@ -322,11 +279,6 @@ export const EmailTemplates = () => {
               </Form_Shadcn_>
             </PageSectionContent>
           </PageSection>
-
-          <EmailBrandingSheet
-            visible={brandingSheetOpen}
-            onClose={() => setBrandingSheetOpen(false)}
-          />
         </>
       )}
     </>

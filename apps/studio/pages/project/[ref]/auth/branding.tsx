@@ -1,0 +1,48 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { GenericSkeletonLoader } from 'ui-patterns'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+
+import { EmailBrandingForm } from '@/components/interfaces/Auth/EmailTemplates/EmailBrandingForm'
+import { AuthEmailsLayout } from '@/components/layouts/AuthLayout/AuthEmailsLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import NoPermission from '@/components/ui/NoPermission'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import type { NextPageWithLayout } from '@/types'
+
+const BrandingPage: NextPageWithLayout = () => {
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
+
+  if (isPermissionsLoaded && !canReadAuthSettings) {
+    return <NoPermission isFullPage resourceText="access your project's email settings" />
+  }
+
+  return (
+    <PageContainer size="default" className="pb-16">
+      {!isPermissionsLoaded ? (
+        <PageSection>
+          <PageSectionContent>
+            <GenericSkeletonLoader />
+          </PageSectionContent>
+        </PageSection>
+      ) : (
+        <PageSection>
+          <PageSectionContent>
+            <EmailBrandingForm />
+          </PageSectionContent>
+        </PageSection>
+      )}
+    </PageContainer>
+  )
+}
+
+BrandingPage.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthEmailsLayout>{page}</AuthEmailsLayout>
+  </DefaultLayout>
+)
+
+export default BrandingPage

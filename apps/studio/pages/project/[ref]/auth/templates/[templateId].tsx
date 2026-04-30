@@ -1,10 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Paintbrush } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -46,7 +45,6 @@ import {
 import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/AuthTemplatesValidation'
-import { EmailBrandingSheet } from '@/components/interfaces/Auth/EmailTemplates/EmailBrandingSheet'
 import { slugifyTitle } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
 import { TemplateEditor } from '@/components/interfaces/Auth/EmailTemplates/TemplateEditor'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
@@ -69,7 +67,6 @@ const RedirectToTemplates = () => {
   const router = useRouter()
   const { templateId, ref } = router.query
   const { ref: projectRef } = useParams()
-  const [brandingSheetOpen, setBrandingSheetOpen] = useState(false)
 
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -99,31 +96,24 @@ const RedirectToTemplates = () => {
     },
   })
 
-  // Find template whose slug matches the URL slug
   const template =
     templateId && typeof templateId === 'string'
       ? TEMPLATES_SCHEMAS.find((template) => slugifyTitle(template.title) === templateId)
       : null
 
-  // Convert templateId slug to one lowercase word to match docs anchor tag
   const templateIdForDocs =
     typeof templateId === 'string' ? templateId.replace(/-/g, '').toLowerCase() : ''
 
-  // Determine if this is a security notification template
   const isSecurityTemplate = template?.misc?.emailTemplateType === 'security'
 
-  // Get the enabled key for security templates
   const templateEnabledKey = isSecurityTemplate
     ? (`MAILER_NOTIFICATIONS_${template.id?.replace('_NOTIFICATION', '')}_ENABLED` as string)
     : null
 
   const showConfigurationSection = isSecurityTemplate && templateEnabledKey
 
-  // Create form schema for security templates
   const TemplateFormSchema = templateEnabledKey
-    ? z.object({
-        [templateEnabledKey]: z.boolean(),
-      })
+    ? z.object({ [templateEnabledKey]: z.boolean() })
     : z.object({})
 
   const defaultValues = templateEnabledKey
@@ -157,11 +147,8 @@ const RedirectToTemplates = () => {
     return <NoPermission isFullPage resourceText="access your project's email settings" />
   }
 
-  if (!templateId) {
-    return null
-  }
+  if (!templateId) return null
 
-  // Show error if templateId is invalid or template is not found
   if (!template) {
     return (
       <div className="flex h-full w-full items-center justify-center">
@@ -169,7 +156,7 @@ const RedirectToTemplates = () => {
           className="max-w-md"
           type="default"
           title="Unable to find template"
-          description={`${templateId ? `The template "${templateId}"` : 'This template'} doesn’t seem to exist.`}
+          description={`${templateId ? `The template "${templateId}"` : 'This template'} doesn't seem to exist.`}
         >
           <Button asChild type="default" className="mt-2">
             <Link href={`/project/${ref}/auth/templates`}>Head back</Link>
@@ -180,43 +167,33 @@ const RedirectToTemplates = () => {
   }
 
   return (
-    <>
-      <PageHeader size="default">
-        <PageHeaderBreadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href={`/project/${ref}/auth/templates`}>Emails</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{template.title}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </PageHeaderBreadcrumb>
-        <PageHeaderMeta>
-          <PageHeaderSummary>
-            <PageHeaderTitle>{template.title}</PageHeaderTitle>
-            <PageHeaderDescription>
-              {template.purpose || 'Configure and customize email templates.'}
-            </PageHeaderDescription>
-          </PageHeaderSummary>
-          <PageHeaderAside>
-            <Button
-              type="default"
-              size="tiny"
-              icon={<Paintbrush size={14} />}
-              onClick={() => setBrandingSheetOpen(true)}
-            >
-              Customize branding
-            </Button>
-            <DocsButton
-              href={`${DOCS_URL}/guides/local-development/customizing-email-templates#${isSecurityTemplate ? 'security' : 'auth'}emailtemplate${templateIdForDocs}`}
-            />
-          </PageHeaderAside>
-        </PageHeaderMeta>
-      </PageHeader>
+    <PageHeader size="default">
+      <PageHeaderBreadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href={`/project/${ref}/auth/templates`}>Custom Templates</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{template.title}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </PageHeaderBreadcrumb>
+      <PageHeaderMeta>
+        <PageHeaderSummary>
+          <PageHeaderTitle>{template.title}</PageHeaderTitle>
+          <PageHeaderDescription>
+            {template.purpose || 'Configure and customize email templates.'}
+          </PageHeaderDescription>
+        </PageHeaderSummary>
+        <PageHeaderAside>
+          <DocsButton
+            href={`${DOCS_URL}/guides/local-development/customizing-email-templates#${isSecurityTemplate ? 'security' : 'auth'}emailtemplate${templateIdForDocs}`}
+          />
+        </PageHeaderAside>
+      </PageHeaderMeta>
       <PageContainer size="default" className="pb-16">
         {!isPermissionsLoaded || isLoadingConfig ? (
           <PageSection>
@@ -301,9 +278,7 @@ const RedirectToTemplates = () => {
           </>
         )}
       </PageContainer>
-
-      <EmailBrandingSheet visible={brandingSheetOpen} onClose={() => setBrandingSheetOpen(false)} />
-    </>
+    </PageHeader>
   )
 }
 
