@@ -111,58 +111,67 @@ function stripJsxTags(content: string): string {
   return content
 }
 
+async function processFile(filePath: string): Promise<{ outPath: string; output: string }> {
+  // Mirror content/ → public/docs/, preserving the full subdirectory structure
+  const outPath = filePath.replace(/^content\//, 'public/docs/').replace(/\.mdx$/, '.md')
+
+  let output: string
+  try {
+    const raw = await fs.promises.readFile(filePath, 'utf8')
+    const { content: rawContent, data } = matter(raw)
+
+    const withPartials = await inlinePartials(rawContent)
+    const withSteps = convertStepHike(withPartials)
+    const processed = stripJsxTags(withSteps)
+
+    const header = [
+      data.title ? `# ${data.title}` : '',
+      data.subtitle || data.description ? `\n${data.subtitle ?? data.description}` : '',
+    ]
+      .filter(Boolean)
+      .join('\n')
+
+    output = header ? `${header}\n\n${processed}` : processed
+  } catch (err) {
+    console.warn(
+      `[warn] Failed to process ${filePath}: ${err instanceof Error ? err.message : err}`
+    )
+    try {
+      output = await fs.promises.readFile(filePath, 'utf8')
+    } catch {
+      output = `<!-- failed to generate: ${filePath} -->`
+    }
+  }
+
+  return { outPath, output }
+}
+
 async function generate() {
-  const files = await globby(['content/guides/**/!(_)*.mdx'])
+  // Process guides and reference content, mirroring content/ → public/docs/
+  const files = await globby([
+    'content/guides/**/!(_)*.mdx',
+    'content/reference/**/!(_)*.mdx',
+  ])
+
   let warnings = 0
 
   await Promise.all(
     files.map(async (filePath) => {
-      const outPath = filePath
-        .replace(/^content\/guides\//, 'public/docs/guides/')
-        .replace(/\.mdx$/, '.md')
-
-      let output: string
-      try {
-        const raw = await fs.promises.readFile(filePath, 'utf8')
-        const { content: rawContent, data } = matter(raw)
-
-        const withPartials = await inlinePartials(rawContent)
-        const withSteps = convertStepHike(withPartials)
-        const processed = stripJsxTags(withSteps)
-
-        const header = [
-          data.title ? `# ${data.title}` : '',
-          data.subtitle || data.description ? `\n${data.subtitle ?? data.description}` : '',
-        ]
-          .filter(Boolean)
-          .join('\n')
-
-        output = header ? `${header}\n\n${processed}` : processed
-      } catch (err) {
-        warnings++
-        console.warn(
-          `[warn] Failed to process ${filePath}: ${err instanceof Error ? err.message : err}`
-        )
-        // Fall back to raw file content so the route still serves something
-        try {
-          output = await fs.promises.readFile(filePath, 'utf8')
-        } catch {
-          output = `<!-- failed to generate: ${filePath} -->`
-        }
-      }
-
-      // content/guides/ai/vector-columns.mdx → public/docs/guides/ai/vector-columns.md
-      // Placing under public/docs/ ensures the file is served at /docs/guides/...
-      // matching the exact URL of the rendered page.
+      const { outPath, output } = await processFile(filePath)
       await fs.promises.mkdir(path.dirname(outPath), { recursive: true })
       await fs.promises.writeFile(outPath, output)
     })
   )
 
+  const guidesCount = files.filter((f) => f.startsWith('content/guides/')).length
+  const referenceCount = files.filter((f) => f.startsWith('content/reference/')).length
   const summary = warnings ? ` (${warnings} with warnings)` : ''
-  console.log(`Generated ${files.length} markdown files under public/docs/guides/${summary}`)
+  console.log(
+    `Generated ${files.length} markdown files under public/docs/${summary} ` +
+      `(${guidesCount} guides, ${referenceCount} reference)`
+  )
 
-  // Create a tar.gz archive of the generated docs, served at /docs/docs.tar.gz.
+  // Create a tar.gz archive of all generated docs, served at /docs/docs.tar.gz.
   // Sorted entries, portable headers, and a fixed mtime keep the output deterministic.
   const archivePath = 'public/docs.tar.gz'
   const entries = (await globby(['**'], { cwd: 'public/docs' })).sort()
