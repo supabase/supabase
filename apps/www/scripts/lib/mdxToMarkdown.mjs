@@ -10,19 +10,6 @@ function getJsxAttr(node, name) {
   return typeof attr?.value === 'string' ? attr.value : ''
 }
 
-const KNOWN_COMPONENTS = new Set([
-  'Img',
-  'img',
-  'Admonition',
-  'Quote',
-  'BlogCollapsible',
-  'Link',
-  'a',
-  'Subtitle',
-  'Badge',
-  'Avatar',
-])
-
 function flattenChildText(nodes) {
   const parts = []
   for (const node of nodes) {
@@ -32,79 +19,58 @@ function flattenChildText(nodes) {
   return parts.join('')
 }
 
-function rewriteJsxNode(node) {
-  if (node.type !== 'mdxJsxFlowElement' && node.type !== 'mdxJsxTextElement') return null
+const text = (value) => ({ type: 'text', value })
+const para = (children) => ({ type: 'paragraph', children })
+const strong = (children) => ({ type: 'strong', children })
+const emph = (children) => ({ type: 'emphasis', children })
+const blockquote = (children) => ({ type: 'blockquote', children })
 
-  const name = node.name
+// Unknown JSX must not become a `paragraph` (block) inside an inline parent.
+function unwrap(node) {
   const children = node.children ?? []
+  if (node.type === 'mdxJsxTextElement') return text(flattenChildText(children))
+  return children.length > 0 ? para(children) : text('')
+}
 
-  if (name === 'Img' || name === 'img') {
+const REWRITES = {
+  Img: (node) => {
     const src = getJsxAttr(node, 'src')
-    if (!src) return { type: 'text', value: '' }
-    return { type: 'image', url: src, alt: getJsxAttr(node, 'alt'), title: null }
-  }
+    return src ? { type: 'image', url: src, alt: getJsxAttr(node, 'alt'), title: null } : text('')
+  },
+  img: (node) => REWRITES.Img(node),
 
-  if (name === 'Admonition') {
-    const variant = (getJsxAttr(node, 'type') || 'note').toUpperCase()
-    const heading = {
-      type: 'paragraph',
-      children: [{ type: 'strong', children: [{ type: 'text', value: variant }] }],
-    }
-    return { type: 'blockquote', children: [heading, ...children] }
-  }
+  Admonition: (node) => {
+    const label = (getJsxAttr(node, 'type') || 'note').toUpperCase()
+    return blockquote([para([strong([text(label)])]), ...(node.children ?? [])])
+  },
 
-  if (name === 'Quote') {
+  Quote: (node) => {
     const caption = getJsxAttr(node, 'caption')
-    const captionPara = caption
-      ? [
-          {
-            type: 'paragraph',
-            children: [{ type: 'emphasis', children: [{ type: 'text', value: `— ${caption}` }] }],
-          },
-        ]
-      : []
-    return { type: 'blockquote', children: [...children, ...captionPara] }
-  }
+    const attribution = caption ? [para([emph([text(`— ${caption}`)])])] : []
+    return blockquote([...(node.children ?? []), ...attribution])
+  },
 
-  if (name === 'BlogCollapsible') {
+  BlogCollapsible: (node) => {
     const title = getJsxAttr(node, 'title')
-    const titlePara = title
-      ? [
-          {
-            type: 'paragraph',
-            children: [{ type: 'strong', children: [{ type: 'text', value: title }] }],
-          },
-        ]
-      : []
-    return { type: 'blockquote', children: [...titlePara, ...children] }
-  }
+    const heading = title ? [para([strong([text(title)])])] : []
+    return blockquote([...heading, ...(node.children ?? [])])
+  },
 
-  if (name === 'Link' || name === 'a') {
+  Link: (node) => {
     const href = getJsxAttr(node, 'href')
-    if (!href) {
-      return node.type === 'mdxJsxTextElement'
-        ? { type: 'text', value: flattenChildText(children) }
-        : { type: 'paragraph', children }
-    }
-    return { type: 'link', url: href, title: null, children }
-  }
+    if (!href) return unwrap(node)
+    return { type: 'link', url: href, title: null, children: node.children ?? [] }
+  },
+  a: (node) => REWRITES.Link(node),
 
-  if (name === 'Subtitle' || name === 'Badge') {
-    return { type: 'strong', children }
-  }
+  Subtitle: (node) => strong(node.children ?? []),
+  Badge: (node) => strong(node.children ?? []),
 
-  if (name === 'Avatar') {
-    return node.type === 'mdxJsxTextElement'
-      ? { type: 'text', value: '' }
-      : { type: 'paragraph', children: [] }
-  }
+  Avatar: (node) => (node.type === 'mdxJsxTextElement' ? text('') : para([])),
+}
 
-  // Unknown component: a flow `paragraph` is invalid inside an inline parent,
-  // so for mdxJsxTextElement we flatten to text instead.
-  if (node.type === 'mdxJsxTextElement') {
-    return { type: 'text', value: flattenChildText(children) }
-  }
-  return children.length > 0 ? { type: 'paragraph', children } : { type: 'text', value: '' }
+function rewriteJsxNode(node) {
+  return REWRITES[node.name]?.(node) ?? unwrap(node)
 }
 
 function transformMdxNodes() {
@@ -124,13 +90,9 @@ function transformMdxNodes() {
 
       if (node.type !== 'mdxJsxFlowElement' && node.type !== 'mdxJsxTextElement') return
 
-      if (node.name && !KNOWN_COMPONENTS.has(node.name)) unknownNames.add(node.name)
-
-      const replacement = rewriteJsxNode(node)
-      if (replacement) {
-        parent.children[index] = replacement
-        return [SKIP, index]
-      }
+      if (node.name && !(node.name in REWRITES)) unknownNames.add(node.name)
+      parent.children[index] = rewriteJsxNode(node)
+      return [SKIP, index]
     })
     if (unknownNames.size > 0) {
       file.message(`Unknown JSX components stripped: ${[...unknownNames].sort().join(', ')}`)
@@ -138,8 +100,6 @@ function transformMdxNodes() {
   }
 }
 
-// remark() is unified().use(remarkParse).use(remarkStringify); the stringify
-// options below are handed to remark-stringify via that bundled .use().
 const processor = remark().use(remarkMdx).use(remarkGfm).use(transformMdxNodes).data('settings', {
   bullet: '-',
   fences: true,

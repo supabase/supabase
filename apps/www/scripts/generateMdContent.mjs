@@ -25,6 +25,16 @@ const DATE_PREFIX = 11
 // MD_PAGES still includes them (middleware relies on the allowlist).
 const DYNAMIC_SLUGS = ['pricing']
 
+function pickFields(data, fields) {
+  const picked = {}
+  for (const field of fields) {
+    const value = data[field]
+    if (value == null || value === '' || (Array.isArray(value) && value.length === 0)) continue
+    picked[field] = value
+  }
+  return picked
+}
+
 const MDX_SECTIONS = [
   {
     dir: '_blog',
@@ -67,9 +77,6 @@ const MDX_SECTIONS = [
   },
 ]
 
-// Reserved YAML literals that look like booleans/null when unquoted.
-const YAML_RESERVED_LITERAL = /^(true|false|yes|no|null|~)$/i
-
 async function collectMdFiles(dir, prefix = '') {
   const results = []
   let dirents
@@ -98,37 +105,6 @@ function deriveSlug(filename, stripDatePrefix) {
   return stripDatePrefix ? base.substring(DATE_PREFIX) : base
 }
 
-function yamlScalar(value) {
-  if (typeof value !== 'string') return JSON.stringify(value)
-  if (value.includes('\n')) return JSON.stringify(value)
-  const needsQuote =
-    /[:#&*!|>'%@`{}[\]]/.test(value) ||
-    /^[\s\-?]/.test(value) ||
-    YAML_RESERVED_LITERAL.test(value) ||
-    /^-?\d+(\.\d+)?$/.test(value)
-  return needsQuote ? JSON.stringify(value) : value
-}
-
-function renderFrontmatter(data, fields) {
-  const lines = []
-  for (const field of fields) {
-    const value = data[field]
-    if (value == null || value === '' || (Array.isArray(value) && value.length === 0)) continue
-    if (Array.isArray(value)) {
-      lines.push(`${field}: ${JSON.stringify(value)}`)
-    } else if (value instanceof Date) {
-      lines.push(`${field}: ${JSON.stringify(value.toISOString())}`)
-    } else if (typeof value === 'object') {
-      throw new Error(
-        `renderFrontmatter: nested object for "${field}" not supported. Add explicit handling.`
-      )
-    } else {
-      lines.push(`${field}: ${yamlScalar(value)}`)
-    }
-  }
-  return lines.length > 0 ? `---\n${lines.join('\n')}\n---\n\n` : ''
-}
-
 async function ingestMdxSection(section) {
   const dir = path.join(wwwDir, section.dir)
   let filenames
@@ -153,9 +129,9 @@ async function ingestMdxSection(section) {
         if (section.skipIf?.(data)) return null
 
         const slug = `${section.urlPrefix}/${deriveSlug(filename, section.stripDatePrefix)}`
-        const preamble = renderFrontmatter(data, section.frontmatterFields)
         const body = await mdxBodyToMarkdown(parsed.content)
-        return { slug, content: preamble + body }
+        const content = matter.stringify(body, pickFields(data, section.frontmatterFields))
+        return { slug, content }
       } catch (err) {
         throw new Error(`${section.dir}/${filename}: ${err.message}`, { cause: err })
       }
