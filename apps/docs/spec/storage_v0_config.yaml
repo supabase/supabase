@@ -29,7 +29,7 @@ parameters:
     required: true
     # default: '5432'
     description: |
-      A long-lived publishable JWT used for unauthenticated client requests against this Storage tenant.
+      A long-lived JWT with anonymous Postgres privileges.
 
   - id: 'SERVICE_KEY' # {string} A unique identifier for this param.
     title: 'SERVICE_KEY' # {string} Any name.
@@ -38,7 +38,7 @@ parameters:
     required: true
     # default: '5432'
     description: |
-      A long-lived secret JWT used to bypass Row Level Security on this Storage tenant. Never expose this key in client applications.
+      A long-lived JWT with Postgres privileges to bypass Row Level Security.
 
   - id: 'TENANT_ID' # {string} A unique identifier for this param.
     title: 'TENANT_ID' # {string} Any name.
