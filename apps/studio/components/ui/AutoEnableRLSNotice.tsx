@@ -1,13 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { useParams } from 'common/hooks'
-import { ShieldCheck } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { ShieldCheck, X } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
+  Card,
+  CardContent,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -20,8 +19,6 @@ import {
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
-import { BannerCard } from '../BannerCard'
-import { useBannerStack } from '../BannerStackProvider'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseEventTriggerCreateMutation } from '@/data/database-event-triggers/database-event-trigger-create-mutation'
@@ -31,14 +28,14 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
 
-export const BannerRlsEventTrigger = () => {
+export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
   const { ref } = useParams()
-  const { dismissBanner } = useBannerStack()
   const { data: project } = useSelectedProjectQuery()
   const projectRef = ref ?? project?.ref
 
-  const [hasCreated, setHasCreated] = useState(false)
-  const [, setIsDismissed] = useLocalStorageQuery(
+  // [Joshen] Changing the behaviour of this to not be dismissible, only minimized
+  // Given that its a security measure that we highly advise. Otherwise there's no way for users to revisit this
+  const [, setIsMinimized] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.RLS_EVENT_TRIGGER_BANNER_DISMISSED(projectRef ?? 'unknown'),
     false
   )
@@ -48,7 +45,6 @@ export const BannerRlsEventTrigger = () => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     })
-
   const hasDefaultTrigger = useMemo(
     () =>
       eventTriggers.some(
@@ -57,57 +53,43 @@ export const BannerRlsEventTrigger = () => {
     [eventTriggers]
   )
 
-  useEffect(() => {
-    if (hasDefaultTrigger) {
-      setHasCreated(true)
-    }
-  }, [hasDefaultTrigger])
+  if (!projectRef || isLoadingEventTriggers || hasDefaultTrigger) return null
 
-  if (!projectRef || isLoadingEventTriggers) return null
+  if (iconOnly) {
+    return <CreateEnsureRLSTriggerDialog iconOnly />
+  }
 
   return (
-    <BannerCard
-      onDismiss={() => {
-        setIsDismissed(true)
-        dismissBanner('rls-event-trigger-banner')
-      }}
-    >
-      <div className="flex flex-col gap-y-4">
-        <div className="flex flex-col gap-y-2 items-start">
-          <div
-            className={cn(
-              'p-2 rounded-lg bg-muted text-foreground-light',
-              hasCreated && 'bg-brand-200 dark:bg-brand-400 text-brand'
-            )}
-          >
-            <ShieldCheck size={16} />
+    <Card>
+      <CardContent className="flex items-center justify-between">
+        <div className="flex items-center gap-x-4">
+          <div className="rounded-lg bg-surface-300 text-foreground-light w-10 h-10 flex items-center justify-center">
+            <ShieldCheck size={18} />
+          </div>
+          <div className="text-sm">
+            <p>Auto-enable RLS for new tables</p>
+            <p className="text-foreground-lighter">
+              Create an event trigger that enables Row Level Security on all new tables
+            </p>
           </div>
         </div>
-        <div className="flex flex-col gap-y-1 mb-2">
-          <p className="text-sm font-medium">
-            {hasCreated ? 'RLS auto-enable trigger is active' : 'Auto-enable RLS for new tables'}
-          </p>
-          <p className="text-xs text-foreground-lighter text-balance">
-            {hasCreated
-              ? 'New tables will have Row Level Security enabled automatically.'
-              : 'Create an event trigger that enables Row Level Security on all new tables'}
-          </p>
+
+        <div className="flex items-center gap-x-2">
+          <CreateEnsureRLSTriggerDialog />
+          <ButtonTooltip
+            icon={<X />}
+            type="text"
+            className="w-7"
+            tooltip={{ content: { side: 'bottom', text: 'Minimize' } }}
+            onClick={() => setIsMinimized(true)}
+          />
         </div>
-        <div className="flex gap-2">
-          {hasCreated ? (
-            <Button asChild type="default" size="tiny">
-              <Link href={`/project/${projectRef}/database/triggers/event`}>View triggers</Link>
-            </Button>
-          ) : (
-            <CreateEnsureRLSTriggerDialog onCreateSuccess={() => setHasCreated(true)} />
-          )}
-        </div>
-      </div>
-    </BannerCard>
+      </CardContent>
+    </Card>
   )
 }
 
-const CreateEnsureRLSTriggerDialog = ({ onCreateSuccess }: { onCreateSuccess: () => void }) => {
+const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
   const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
 
@@ -124,7 +106,6 @@ const CreateEnsureRLSTriggerDialog = ({ onCreateSuccess }: { onCreateSuccess: ()
         toast.success(
           'Successfully set up database trigger to automatically enable RLS on all new tables'
         )
-        onCreateSuccess()
         setOpen(false)
       },
     })
@@ -142,21 +123,16 @@ const CreateEnsureRLSTriggerDialog = ({ onCreateSuccess }: { onCreateSuccess: ()
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <ButtonTooltip
-          type="primary"
-          size="tiny"
-          disabled={!canCreateTriggers}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: !canCreateTriggers
-                ? 'You need additional permissions to create triggers'
-                : undefined,
-            },
-          }}
-        >
-          Learn more
-        </ButtonTooltip>
+        {iconOnly ? (
+          <ButtonTooltip
+            type="default"
+            icon={<ShieldCheck />}
+            className="w-7"
+            tooltip={{ content: { side: 'bottom', text: 'Auto-enable RLS for new tables' } }}
+          />
+        ) : (
+          <Button type="primary">Learn more</Button>
+        )}
       </DialogTrigger>
       <DialogContent size="large">
         <DialogHeader>
@@ -186,9 +162,21 @@ const CreateEnsureRLSTriggerDialog = ({ onCreateSuccess }: { onCreateSuccess: ()
           <Button type="default" disabled={isCreating} onClick={() => setOpen(false)}>
             Close
           </Button>
-          <Button loading={isCreating} onClick={handleCreateTrigger}>
+          <ButtonTooltip
+            disabled={!canCreateTriggers}
+            loading={isCreating}
+            onClick={handleCreateTrigger}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canCreateTriggers
+                  ? 'You need additional permissions to create triggers'
+                  : undefined,
+              },
+            }}
+          >
             Create ensure_rls trigger
-          </Button>
+          </ButtonTooltip>
         </DialogFooter>
       </DialogContent>
     </Dialog>
