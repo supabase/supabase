@@ -106,8 +106,14 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
   const sortableThClass = cn(thClass, 'cursor-pointer select-none')
 
   return (
-    <div className="w-full overflow-auto rounded-b-xl border border-muted">
-      <table className="w-full text-sm border-collapse">
+    <div className="mt-0 w-full overflow-x-auto rounded-b-xl border border-muted">
+      <table className="w-full text-sm border-collapse table-fixed">
+        <colgroup>
+          <col />
+          <col className="hidden md:table-column w-44" />
+          <col className="w-28" />
+          <col className="w-28" />
+        </colgroup>
         <thead>
           <tr className="border-b border-muted bg-surface-100">
             <th className={sortableThClass} onClick={() => handleSort('title')}>
@@ -143,23 +149,23 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
                   i % 2 === 0 ? 'bg-background' : 'bg-surface-75'
                 )}
               >
-                <td className="px-3 py-3">
+                <td className="px-3 py-3 min-w-0">
                   <Link
                     href={`/features/${feature.slug}`}
-                    className="flex items-center gap-2.5 text-foreground hover:text-foreground-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter rounded"
+                    className="flex items-center gap-2 text-foreground hover:text-foreground-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter rounded min-w-0"
                   >
                     <div className="flex-shrink-0 w-7 h-7 rounded-md bg-surface-200 border border-muted flex items-center justify-center">
                       <feature.icon className="w-3.5 h-3.5 text-foreground-light group-hover/row:text-foreground transition-colors" />
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <span className="font-medium text-sm leading-tight truncate block">{feature.title}</span>
-                      <span className="text-foreground-lighter text-xs leading-tight truncate block max-w-[280px]">
+                      <span className="hidden sm:block text-foreground-lighter text-xs leading-tight truncate">
                         {feature.subtitle}
                       </span>
                     </div>
                     <ExternalLink
                       size={12}
-                      className="flex-shrink-0 opacity-0 group-hover/row:opacity-50 transition-opacity ml-auto"
+                      className="flex-shrink-0 opacity-0 group-hover/row:opacity-50 transition-opacity"
                     />
                   </Link>
                 </td>

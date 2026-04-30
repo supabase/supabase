@@ -206,7 +206,7 @@ function FeaturesPage() {
               </Button>
             </div>
           </div>
-          <div className="md:col-span-3 flex flex-col gap-4 md:gap-6">
+          <div className="md:col-span-3 min-w-0 flex flex-col gap-4 md:gap-6">
             <div className="flex items-center justify-between gap-2">
               <span className="text-foreground-muted text-xs">
                 {filteredFeatures.length} feature{filteredFeatures.length !== 1 ? 's' : ''}
