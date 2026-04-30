@@ -158,7 +158,7 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
                       <feature.icon className="w-3.5 h-3.5 text-foreground-light group-hover/row:text-foreground transition-colors" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <span className="font-medium text-sm leading-tight truncate block">{feature.title}</span>
+                      <span className="font-medium text-sm leading-tight block">{feature.title}</span>
                       <span className="hidden sm:block text-foreground-lighter text-xs leading-tight truncate">
                         {feature.subtitle}
                       </span>
