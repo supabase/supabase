@@ -9,6 +9,32 @@ import { MD_PAGES } from './app/api-v2/md/content.generated'
 // differs from the human HTML page would risk SEO and cloaking penalties.
 const LLM_USER_AGENT = /\bClaude-User\b|\bClaude-Web\b|\bChatGPT-User\b|\bPerplexityBot\b/i
 
+// Parse an HTTP Accept header into the highest q-value seen for each type
+// we can serve. Returns 0 for absent types. `text/*` contributes to both
+// html and markdown; `*/*` is tracked separately so we can detect "client
+// will accept anything" without it overriding an explicit type preference.
+function parseAccept(header: string) {
+  let html = 0
+  let markdown = 0
+  let any = 0
+  for (const part of header.toLowerCase().split(',')) {
+    const [type, ...params] = part.trim().split(';')
+    let q = 1
+    for (const p of params) {
+      const [k, v] = p.trim().split('=')
+      if (k === 'q') {
+        const parsed = parseFloat(v ?? '')
+        if (Number.isFinite(parsed)) q = parsed
+      }
+    }
+    const t = type.trim()
+    if (t === 'text/markdown' || t === 'text/*') markdown = Math.max(markdown, q)
+    if (t === 'text/html' || t === 'text/*') html = Math.max(html, q)
+    if (t === '*/*') any = Math.max(any, q)
+  }
+  return { html, markdown, any }
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -20,23 +46,48 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Serve markdown to known LLM clients (Accept header or UA match).
   // Cache-key safety: rewriting to /api-v2/md/<slug> partitions the response
   // by path, so no Vary: User-Agent is needed.
-  const accept = (request.headers.get('accept') ?? '').toLowerCase()
+  const acceptHeader = request.headers.get('accept') ?? ''
   // Cap UA length before regex test to bound CPU on the edge hot path.
   const userAgent = (request.headers.get('user-agent') ?? '').slice(0, 512)
-  if (accept.includes('text/markdown') || LLM_USER_AGENT.test(userAgent)) {
-    // Strip trailing slash so /auth/ and /auth resolve to the same allowlist entry.
-    // (NextURL's pathname setter preserves the trailing-slash style of the cloned
-    // origin, which would otherwise leak through to the rewrite target.)
-    const slug = (pathname === '/' ? 'homepage' : pathname.slice(1)).replace(/\/$/, '')
-    if (MD_PAGES.has(slug)) {
+  const isLlmAgent = LLM_USER_AGENT.test(userAgent)
+  const accept = acceptHeader ? parseAccept(acceptHeader) : null
+
+  // Strip trailing slash so /auth/ and /auth resolve to the same allowlist entry.
+  // (NextURL's pathname setter preserves the trailing-slash style of the cloned
+  // origin, which would otherwise leak through to the rewrite target.)
+  const slug = (pathname === '/' ? 'homepage' : pathname.slice(1)).replace(/\/$/, '')
+  const isMdEligible = MD_PAGES.has(slug)
+  const isChangelogEntry = slug === 'changelog' || /^changelog\/\d+/.test(slug)
+
+  // RFC 9110: when the client's Accept header excludes every type we can
+  // produce, return 406. Skip for LLM UAs (we always serve them markdown)
+  // and for clients with no Accept header (browser default fallback).
+  if (
+    isMdEligible &&
+    !isLlmAgent &&
+    accept !== null &&
+    accept.markdown === 0 &&
+    accept.html === 0 &&
+    accept.any === 0
+  ) {
+    return new NextResponse('Not Acceptable', { status: 406 })
+  }
+
+  // Serve markdown when the client either matches an LLM UA or expresses a
+  // preference for text/markdown over text/html via q-values. Equal q ties
+  // resolve to markdown since the client explicitly listed it as an option.
+  const wantsMarkdown =
+    isLlmAgent || (accept !== null && accept.markdown > 0 && accept.markdown >= accept.html)
+
+  if (wantsMarkdown) {
+    if (isMdEligible) {
       return NextResponse.rewrite(new URL(`/api-v2/md/${slug}`, request.nextUrl))
     }
     // Individual changelog entries are served as static .md files from public/;
     // rewrite directly to the static path. The slug always starts with the number.
-    if (slug === 'changelog' || /^changelog\/\d+/.test(slug)) {
+    if (isChangelogEntry) {
       return NextResponse.rewrite(new URL(`/${slug}.md`, request.nextUrl))
     }
   }
