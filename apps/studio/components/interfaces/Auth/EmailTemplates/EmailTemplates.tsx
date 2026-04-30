@@ -19,12 +19,18 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
-import { slugifyTitle } from './EmailTemplates.utils'
+import {
+  hasCustomEmailSender,
+  isCustomEmailTemplateEditingRestricted,
+  slugifyTitle,
+} from './EmailTemplates.utils'
 import AlertError from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 const notificationEnabledKeys = TEMPLATES_SCHEMAS.filter(
@@ -67,10 +73,14 @@ export const EmailTemplates = () => {
     },
   })
 
-  const builtInSMTP =
-    isSuccess &&
-    authConfig &&
-    (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: selectedProject } = useSelectedProjectQuery()
+  const usingBuiltInEmailSender = isSuccess && authConfig && !hasCustomEmailSender(authConfig)
+  const isTemplateEditBlocked = isCustomEmailTemplateEditingRestricted({
+    authConfig,
+    organization: selectedOrganization,
+    project: selectedProject,
+  })
 
   const defaultValues = notificationEnabledKeys.reduce(
     (acc, key) => {
@@ -115,8 +125,36 @@ export const EmailTemplates = () => {
       )}
       {isSuccess && (
         <>
+          {isTemplateEditBlocked && (
+            <PageSection>
+              <PageSectionContent>
+                <Admonition
+                  type="default"
+                  title="Custom templates require a custom email sender or a paid plan"
+                  description={
+                    <p>
+                      Free projects using Supabase's built-in email service can view the default
+                      email templates, but cannot edit their subject or HTML. Set up custom SMTP,
+                      configure a send-email hook, or upgrade to customise templates.{' '}
+                      <InlineLink
+                        href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}
+                      >
+                        Learn more
+                      </InlineLink>
+                    </p>
+                  }
+                  actions={
+                    <Button asChild type="default">
+                      <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
+                    </Button>
+                  }
+                />
+              </PageSectionContent>
+            </PageSection>
+          )}
+
           <PageSection>
-            {builtInSMTP && (
+            {usingBuiltInEmailSender && !isTemplateEditBlocked && (
               <Admonition
                 type="warning"
                 title="Set up custom SMTP"

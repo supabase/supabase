@@ -68,39 +68,39 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-      "mailer_subjects_confirmation": "Confirm your signup",
-      "mailer_templates_confirmation_content": "<h2>Confirm your signup</h2><p>Follow this link to confirm your user:</p><p><a href=\"{{ .ConfirmationURL }}\">Confirm your email</a></p>",
-      "mailer_subjects_magic_link": "Your Magic Link",
-      "mailer_templates_magic_link_content": "<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href=\"{{ .ConfirmationURL }}\">Log In</a></p>",
-      "mailer_subjects_recovery": "Rest Your Password",
-      "mailer_templates_recovery_content": "<h2>Reset Password</h2><p>Follow this link to reset the password for your user:</p><p><a href=\"{{ .ConfirmationURL }}\">Reset Password</a></p>",
+      "mailer_subjects_confirmation": "Confirm your email",
+      "mailer_templates_confirmation_content": "<h2>Confirm your email</h2><p>Confirm this email address to finish setting up your account.</p><p><a href=\"{{ .ConfirmationURL }}\">Confirm your email address</a></p>",
+      "mailer_subjects_magic_link": "Your sign-in link",
+      "mailer_templates_magic_link_content": "<h2>Sign in to your account</h2><p>Use this link to sign in to your account.</p><p><a href=\"{{ .ConfirmationURL }}\">Sign in</a></p>",
+      "mailer_subjects_recovery": "Reset your password",
+      "mailer_templates_recovery_content": "<h2>Reset password</h2><p>Use this link to choose a new password for your account.</p><p><a href=\"{{ .ConfirmationURL }}\">Reset password</a></p>",
       "mailer_subjects_invite": "You have been invited",
-      "mailer_templates_invite_content": "<h2>You have been invited</h2><p>You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:</p><p><a href=\"{{ .ConfirmationURL }}\">Accept the invite</a></p>",
+      "mailer_templates_invite_content": "<h2>You have been invited</h2><p>You have been invited to create an account.</p><p><a href=\"{{ .ConfirmationURL }}\">Accept invitation</a></p>",
       "mailer_subjects_reauthentication": "Confirm reauthentication",
-      "mailer_templates_reauthentication_content": "<h2>Confirm reauthentication</h2><p>Enter the code: {{token}}</p>",
-      "mailer_subjects_email_change": "Confirm email change",
-      "mailer_templates_email_change_content": "<h2>Confirm email change</h2><p>Follow this link to confirm the update of your email:</p><p><a href=\"{{ .ConfirmationURL }}\">Change email</a></p>",
+      "mailer_templates_reauthentication_content": "<h2>Confirm reauthentication</h2><p>Enter this code to continue: {{token}}</p>",
+      "mailer_subjects_email_change": "Confirm your new email",
+      "mailer_templates_email_change_content": "<h2>Confirm your new email</h2><p>Confirm changing the email address for your account.</p><p><a href=\"{{ .ConfirmationURL }}\">Confirm new email</a></p>",
       "mailer_notifications_password_changed_enabled": true,
-      "mailer_subjects_password_changed_notification": "Your password has been changed",
-      "mailer_templates_password_changed_notification_content": "<h2>Your password has been changed</h2>\n\n<p>This is a confirmation that the password for your account {{ .Email }} has just been changed.</p>\n<p>If you did not make this change, please contact support.</p>",
+      "mailer_subjects_password_changed_notification": "Your password was changed",
+      "mailer_templates_password_changed_notification_content": "<h2>Your password was changed</h2>\n\n<p>The password for your account {{ .Email }} was changed.</p>\n<p>If you did not make this change, contact support for your account.</p>",
       "mailer_notifications_email_changed_enabled": true,
-      "mailer_subjects_email_changed_notification": "Your email address has been changed",
-      "mailer_templates_email_changed_notification_content": "<h2>Your email address has been changed</h2>\n\n<p>The email address for your account has been changed from {{ .OldEmail }} to {{ .Email }}.</p>\n<p>If you did not make this change, please contact support.</p>",
+      "mailer_subjects_email_changed_notification": "Your email address was changed",
+      "mailer_templates_email_changed_notification_content": "<h2>Your email address was changed</h2>\n\n<p>The email address for your account was changed from {{ .OldEmail }} to {{ .Email }}.</p>\n<p>If you did not make this change, contact support for your account.</p>",
       "mailer_notifications_phone_changed_enabled": true,
-      "mailer_subjects_phone_changed_notification": "Your phone number has been changed",
-      "mailer_templates_phone_changed_notification_content": "<h2>Your phone number has been changed</h2>\n\n<p>The phone number for your account {{ .Email }} has been changed from {{ .OldPhone }} to {{ .Phone }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>",
+      "mailer_subjects_phone_changed_notification": "Your phone number was changed",
+      "mailer_templates_phone_changed_notification_content": "<h2>Your phone number was changed</h2>\n\n<p>The phone number for your account {{ .Email }} was changed from {{ .OldPhone }} to {{ .Phone }}.</p>\n<p>If you did not make this change, contact support for your account.</p>",
       "mailer_notifications_mfa_factor_enrolled_enabled": true,
-      "mailer_subjects_mfa_factor_enrolled_notification": "A new MFA factor has been enrolled",
-      "mailer_templates_mfa_factor_enrolled_notification_content": "<h2>A new MFA factor has been enrolled</h2>\n\n<p>A new factor ({{ .FactorType }}) has been enrolled for your account {{ .Email }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>",
+      "mailer_subjects_mfa_factor_enrolled_notification": "A new MFA factor was added",
+      "mailer_templates_mfa_factor_enrolled_notification_content": "<h2>A new MFA factor was added</h2>\n\n<p>A new {{ .FactorType }} MFA factor was added to your account {{ .Email }}.</p>\n<p>If you did not make this change, contact support for your account.</p>",
       "mailer_notifications_mfa_factor_unenrolled_enabled": true,
-      "mailer_subjects_mfa_factor_unenrolled_notification": "An MFA factor has been unenrolled",
-      "mailer_templates_mfa_factor_unenrolled_notification_content": "<h2>An MFA factor has been unenrolled</h2>\n\n<p>A factor ({{ .FactorType }}) has been unenrolled for your account {{ .Email }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>",
+      "mailer_subjects_mfa_factor_unenrolled_notification": "An MFA factor was removed",
+      "mailer_templates_mfa_factor_unenrolled_notification_content": "<h2>An MFA factor was removed</h2>\n\n<p>A {{ .FactorType }} MFA factor was removed from your account {{ .Email }}.</p>\n<p>If you did not make this change, contact support for your account.</p>",
       "mailer_notifications_identity_linked_enabled": true,
-      "mailer_subjects_identity_linked_notification": "A new identity has been linked",
-      "mailer_templates_identity_linked_notification_content": "<h2>A new identity has been linked</h2>\n\n<p>A new identity ({{ .Provider }}) has been linked to your account {{ .Email }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>",
+      "mailer_subjects_identity_linked_notification": "A new identity was linked",
+      "mailer_templates_identity_linked_notification_content": "<h2>A new identity was linked</h2>\n\n<p>A new {{ .Provider }} identity was linked to your account {{ .Email }}.</p>\n<p>If you did not make this change, contact support for your account.</p>",
       "mailer_notifications_identity_unlinked_enabled": true,
-      "mailer_subjects_identity_unlinked_notification": "An identity has been unlinked",
-      "mailer_templates_identity_unlinked_notification_content": "<h2>An identity has been unlinked</h2>\n\n<p>An identity ({{ .Provider }}) has been unlinked from your account {{ .Email }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>"
+      "mailer_subjects_identity_unlinked_notification": "An identity was unlinked",
+      "mailer_templates_identity_unlinked_notification_content": "<h2>An identity was unlinked</h2>\n\n<p>A {{ .Provider }} identity was unlinked from your account {{ .Email }}.</p>\n<p>If you did not make this change, contact support for your account.</p>"
   }'
 ```
 
@@ -122,7 +122,7 @@ To guard against this there are the options below:
 - Create your own custom email link to redirect the user to a page where they can enter with their email and token to login
 
 ```html
-<a href="{{ .SiteURL }}/confirm-signup">Confirm your signup</a>
+<a href="{{ .SiteURL }}/confirm-signup">Confirm your email</a>
 ```
 
 - Log them in by verifying the OTP token value with their email e.g. with [`supabase.auth.verifyOtp`](/docs/reference/javascript/auth-verifyotp) show below
@@ -137,7 +137,7 @@ const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'ema
 
 ```html
 <a href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}">
-  Confirm your signup
+  Confirm your email
 </a>
 ```
 

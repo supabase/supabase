@@ -23,8 +23,9 @@ content_path = "./supabase/templates/invite.html"
 ```html name=supabase/templates/invite.html
 <html>
   <body>
-    <h2>Confirm your signup</h2>
-    <p><a href="{{ .ConfirmationURL }}">Confirm your email</a></p>
+    <h2>Confirm your email</h2>
+    <p>Confirm this email address to finish setting up your account.</p>
+    <p><a href="{{ .ConfirmationURL }}">Confirm your email address</a></p>
   </body>
 </html>
 ```
@@ -38,17 +39,15 @@ content_path = "./supabase/templates/invite.html"
 ```toml name=supabase/config.toml
 [auth.email.notification.password_changed]
 enabled = true
-subject = "Your password has been changed"
+subject = "Your password was changed"
 content_path = "./templates/password_changed_notification.html"
 ```
 
 ```html name=templates/password_changed_notification.html
 <html>
   <body>
-    <p>
-      This is a confirmation that the password for your account {{ .Email }} has just been changed.
-    </p>
-    <p>If you did not make this change, please contact support.</p>
+    <p>The password for your account {{ .Email }} was changed.</p>
+    <p>If you did not make this change, contact support for your account.</p>
   </body>
 </html>
 ```
@@ -68,35 +67,35 @@ There are several authentication-related email templates which can be configured
 
 ### `auth.email.template.confirmation`
 
-**Default subject**: "Confirm Your Signup"
+**Default subject**: "Confirm your email"
 **When sent**: When a user signs up and needs to verify their email address
 **Purpose**: Ask users to confirm their email address after signing up
 **Content**: Contains a confirmation link to verify the user's email address
 
 ### `auth.email.template.recovery`
 
-**Default subject**: "Reset Your Password"
+**Default subject**: "Reset your password"
 **When sent**: When a user requests a password reset
 **Purpose**: Allow users to reset their password if they forget it
 **Content**: Contains a link to reset the user's password
 
 ### `auth.email.template.magic_link`
 
-**Default subject**: "Your Magic Link"
+**Default subject**: "Your sign-in link"
 **When sent**: When a user requests a magic link for passwordless authentication
 **Purpose**: Allow users to sign in via a one-time link sent to their email
 **Content**: Contains a secure link that automatically logs the user in when clicked
 
 ### `auth.email.template.email_change`
 
-**Default subject**: "Confirm Email Change"
+**Default subject**: "Confirm your new email"
 **When sent**: When a user requests to change their email address
 **Purpose**: Ask users to verify their new email address after changing it
 **Content**: Contains a confirmation link to verify the new email address
 
 ### `auth.email.template.reauthentication`
 
-**Default subject**: "Confirm Reauthentication"
+**Default subject**: "Confirm reauthentication"
 **When sent**: When a user needs to re-authenticate for sensitive operations
 **Purpose**: Ask users to re-authenticate before performing a sensitive action
 **Content**: Contains a 6-digit OTP code for verification
@@ -107,49 +106,49 @@ There are several security notification email templates which can be configured.
 
 ### `auth.email.notification.password_changed`
 
-**Default subject**: "Your password has been changed"
+**Default subject**: "Your password was changed"
 **When sent**: When a user's password is changed
 **Purpose**: Notify users when their password has changed
 **Content**: Confirms that the password for the account has been changed
 
 ### `auth.email.notification.email_changed`
 
-**Default subject**: "Your email address has been changed"
+**Default subject**: "Your email address was changed"
 **When sent**: When a user's email address is changed
 **Purpose**: Notify users when their email address has changed
 **Content**: Confirms the change from the old email to the new email address
 
 ### `auth.email.notification.phone_changed`
 
-**Default subject**: "Your phone number has been changed"
+**Default subject**: "Your phone number was changed"
 **When sent**: When a user's phone number is changed
 **Purpose**: Notify users when their phone number has changed
 **Content**: Confirms the change from the old phone number to the new phone number
 
 ### `auth.email.notification.mfa_factor_enrolled`
 
-**Default subject**: "A new MFA factor has been enrolled"
+**Default subject**: "A new MFA factor was added"
 **When sent**: When a new MFA factor is added to the user's account
 **Purpose**: Notify users when a new multi-factor authentication method has been added to their account
 **Content**: Confirms that a new MFA factor type has been enrolled
 
 ### `auth.email.notification.mfa_factor_unenrolled`
 
-**Default subject**: "An MFA factor has been unenrolled"
+**Default subject**: "An MFA factor was removed"
 **When sent**: When an MFA factor is removed from the user's account
 **Purpose**: Notify users when a multi-factor authentication method has been removed from their account
 **Content**: Confirms that an MFA factor type has been unenrolled
 
 ### `auth.email.notification.identity_linked`
 
-**Default subject**: "A new identity has been linked"
+**Default subject**: "A new identity was linked"
 **When sent**: When a new identity is linked to the account
 **Purpose**: Notify users when a new identity has been linked to their account
 **Content**: Confirms that a new identity has been linked
 
 ### `auth.email.notification.identity_unlinked`
 
-**Default subject**: "An identity has been unlinked"
+**Default subject**: "An identity was unlinked"
 **When sent**: When an identity has been unlinked from the account
 **Purpose**: Notify users when an identity has been unlinked from their account
 **Content**: Confirms that an identity has been unlinked
@@ -189,10 +188,10 @@ Contains a hashed version of the `Token`. This is useful for constructing your o
 **Usage**
 
 ```html
-<p>Follow this link to confirm your user:</p>
+<p>Confirm this email address to finish setting up your account.</p>
 <p>
   <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
-    >Confirm your email</a
+    >Confirm your email address</a
   >
 </p>
 ```
@@ -234,7 +233,7 @@ Contains the user's old email address. This is only available in the `email_chan
 **Usage**
 
 ```html
-<p>The email address for your account has been changed from {{ .OldEmail }} to {{ .Email }}.</p>
+<p>The email address for your account was changed from {{ .OldEmail }} to {{ .Email }}.</p>
 ```
 
 ### `Phone`
@@ -244,7 +243,7 @@ Contains the user's new phone number. This is only available in the `phone_chang
 **Usage**
 
 ```html
-<p>The phone number for your account has been changed from {{ .OldPhone }} to {{ .Phone }}.</p>
+<p>The phone number for your account was changed from {{ .OldPhone }} to {{ .Phone }}.</p>
 ```
 
 ### `OldPhone`
@@ -254,7 +253,7 @@ Contains the user's old phone number. This is only available in the `phone_chang
 **Usage**
 
 ```html
-<p>The phone number for your account has been changed from {{ .OldPhone }} to {{ .Phone }}.</p>
+<p>The phone number for your account was changed from {{ .OldPhone }} to {{ .Phone }}.</p>
 ```
 
 ### `Provider`
@@ -264,7 +263,7 @@ Contains the provider of the newly linked/unlinked identity. This is only availa
 **Usage**
 
 ```html
-<p>A new identity ({{ .Provider }}) has been linked to your account.</p>
+<p>A new {{ .Provider }} identity was linked to your account.</p>
 ```
 
 ### `FactorType`
@@ -274,7 +273,7 @@ Contains the type of the newly enrolled/unenrolled MFA factor. This is only avai
 **Usage**
 
 ```html
-<p>A new factor ({{ .FactorType }}) has been enrolled for your account.</p>
+<p>A new {{ .FactorType }} MFA factor was added to your account.</p>
 ```
 
 ## Deploying email templates

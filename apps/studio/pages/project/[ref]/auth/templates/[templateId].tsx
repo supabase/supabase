@@ -36,7 +36,10 @@ import {
 import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/AuthTemplatesValidation'
-import { slugifyTitle } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
+import {
+  isCustomEmailTemplateEditingRestricted,
+  slugifyTitle,
+} from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
 import { TemplateEditor } from '@/components/interfaces/Auth/EmailTemplates/TemplateEditor'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
@@ -45,6 +48,8 @@ import NoPermission from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
@@ -68,6 +73,13 @@ const RedirectToTemplates = () => {
   )
 
   const { data: authConfig, isPending: isLoadingConfig } = useAuthConfigQuery({ projectRef })
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: selectedProject } = useSelectedProjectQuery()
+  const isTemplateEditBlocked = isCustomEmailTemplateEditingRestricted({
+    authConfig,
+    organization: selectedOrganization,
+    project: selectedProject,
+  })
 
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
@@ -255,6 +267,23 @@ const RedirectToTemplates = () => {
               </PageSection>
             )}
 
+            {isTemplateEditBlocked && (
+              <PageSection>
+                <PageSectionContent>
+                  <Admonition
+                    type="default"
+                    title="Custom templates require a custom email sender or a paid plan"
+                    description="Free projects using Supabase's built-in email service can view this template, but cannot edit its subject or HTML. Set up custom SMTP, configure a send-email hook, or upgrade to customise templates."
+                    actions={
+                      <Button asChild type="default">
+                        <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
+                      </Button>
+                    }
+                  />
+                </PageSectionContent>
+              </PageSection>
+            )}
+
             <PageSection>
               {showConfigurationSection && (
                 <PageSectionMeta>
@@ -265,7 +294,7 @@ const RedirectToTemplates = () => {
               )}
               <PageSectionContent>
                 <Card>
-                  <TemplateEditor template={template} />
+                  <TemplateEditor template={template} isReadOnly={isTemplateEditBlocked} />
                 </Card>
               </PageSectionContent>
             </PageSection>

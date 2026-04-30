@@ -642,8 +642,8 @@ supabase functions deploy send-email --no-verify-jwt
 Your company is expanding to France and Spain. As part of expansion efforts, the company would like to deliver internationalized email templates to best support local users in their native language. Ensure that you have configured `POSTMARK_SERVER_TOKEN` and `SEND_EMAIL_HOOK_SECRET` in your `.env` file.
 
 ```javascript
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { readAll } from 'https://deno.land/std/io/read_all.ts'
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
 const postmarkEndpoint = 'https://api.postmarkapp.com/email'
 // Replace this with your email
@@ -653,13 +653,13 @@ const PROJECT_REF = '<your-project-ref>'
 // Email Subjects
 const subjects = {
   en: {
-    signup: 'Confirm Your Email',
-    recovery: 'Reset Your Password',
+    signup: 'Confirm your email',
+    recovery: 'Reset your password',
     invite: 'You have been invited',
-    magiclink: 'Your Magic Link',
-    email_change: 'Confirm Email Change',
-    email_change_new: 'Confirm New Email Address',
-    reauthentication: 'Confirm Reauthentication',
+    magiclink: 'Your sign-in link',
+    email_change: 'Confirm your new email',
+    email_change_new: 'Confirm new email address',
+    reauthentication: 'Confirm reauthentication',
   },
   es: {
     signup: 'Confirma tu correo electrónico',
@@ -684,13 +684,13 @@ const subjects = {
 // HTML Body
 const templates = {
   en: {
-    signup: `<h2>Confirm your email</h2><p>Follow this link to confirm your email:</p><p><a href="{{confirmation_url}}">Confirm your email address</a></p><p>Alternatively, enter the code: {{token}}</p>`,
-    recovery: `<h2>Reset password</h2><p>Follow this link to reset the password for your user:</p><p><a href="{{confirmation_url}}">Reset password</a></p><p>Alternatively, enter the code: {{token}}</p>`,
-    invite: `<h2>You have been invited</h2><p>You have been invited to create a user on {{site_url}}. Follow this link to accept the invite:</p><p><a href="{{confirmation_url}}">Accept the invite</a></p><p>Alternatively, enter the code: {{token}}</p>`,
-    magiclink: `<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href="{{confirmation_url}}">Log In</a></p><p>Alternatively, enter the code: {{token}}</p>`,
-    email_change: `<h2>Confirm email address change</h2><p>Follow this link to confirm the update of your email address from {{old_email}} to {{new_email}}:</p><p><a href="{{confirmation_url}}">Change email address</a></p><p>Alternatively, enter the codes: {{token}} and {{new_token}}</p>`,
-    email_change_new: `<h2>Confirm New Email Address</h2><p>Follow this link to confirm your new email address:</p><p><a href="{{confirmation_url}}">Confirm new email address</a></p><p>Alternatively, enter the code: {{new_token}}</p>`,
-    reauthentication: `<h2>Confirm reauthentication</h2><p>Enter the code: {{token}}</p>`,
+    signup: `<h2>Confirm your email</h2><p>Confirm this email address to finish setting up your account.</p><p><a href="{{confirmation_url}}">Confirm your email address</a></p><p>Alternatively, enter this code: {{token}}</p>`,
+    recovery: `<h2>Reset password</h2><p>Use this link to choose a new password for your account.</p><p><a href="{{confirmation_url}}">Reset password</a></p><p>Alternatively, enter this code: {{token}}</p>`,
+    invite: `<h2>You have been invited</h2><p>You have been invited to create an account.</p><p><a href="{{confirmation_url}}">Accept invitation</a></p><p>Alternatively, enter this code: {{token}}</p>`,
+    magiclink: `<h2>Sign in to your account</h2><p>Use this link to sign in to your account.</p><p><a href="{{confirmation_url}}">Sign in</a></p><p>Alternatively, enter this code: {{token}}</p>`,
+    email_change: `<h2>Confirm your new email</h2><p>Confirm changing the email address for your account from {{old_email}} to {{new_email}}.</p><p><a href="{{confirmation_url}}">Confirm new email</a></p><p>Alternatively, enter these codes: {{token}} and {{new_token}}</p>`,
+    email_change_new: `<h2>Confirm new email address</h2><p>Confirm this new email address for your account.</p><p><a href="{{confirmation_url}}">Confirm new email address</a></p><p>Alternatively, enter this code: {{new_token}}</p>`,
+    reauthentication: `<h2>Confirm reauthentication</h2><p>Enter this code to continue: {{token}}</p>`,
   },
   es: {
     signup: `<h2>Confirma tu correo electrónico</h2><p>Sigue este enlace para confirmar tu correo electrónico:</p><p><a href="{{confirmation_url}}">Confirma tu correo electrónico</a></p><p>Alternativamente, ingresa el código: {{token}}</p>`,
@@ -810,24 +810,24 @@ const FROM_EMAIL = 'myemail@gmail.com'
 
 // Email Subjects
 const subjects = {
-    signup: 'Confirm Your Email',
-    recovery: 'Reset Your Password',
+    signup: 'Confirm your email',
+    recovery: 'Reset your password',
     invite: 'You have been invited',
-    magiclink: 'Your Magic Link',
-    email_change: 'Confirm Email Change',
-    email_change_new: 'Confirm New Email Address',
-    reauthentication: 'Confirm Reauthentication'
+    magiclink: 'Your sign-in link',
+    email_change: 'Confirm your new email',
+    email_change_new: 'Confirm new email address',
+    reauthentication: 'Confirm reauthentication'
 };
 
 // HTML Body
 const templates = {
-    signup: `<h2>Confirm your email</h2><p>Follow this link to confirm your email:</p><p><a href="{{confirmation_url}}">Confirm your email address</a></p><p>Alternatively, enter the code: {{token}}</p>`,
-    recovery: `<h2>Reset password</h2><p>Follow this link to reset the password for your user:</p><p><a href="{{confirmation_url}}">Reset password</a></p><p>Alternatively, enter the code: {{token}}</p>`,
-    invite: `<h2>You have been invited</h2><p>You have been invited to create a user on {{site_url}}. Follow this link to accept the invite:</p><p><a href="{{confirmation_url}}">Accept the invite</a></p><p>Alternatively, enter the code: {{token}}</p>`,
-    magiclink: `<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href="{{confirmation_url}}">Log In</a></p><p>Alternatively, enter the code: {{token}}</p>`,
-    email_change: `<h2>Confirm email address change</h2><p>Follow this link to confirm the update of your email address from {{old_email}} to {{new_email}}:</p><p><a href="{{confirmation_url}}">Change email address</a></p><p>Alternatively, enter the codes: {{token}} and {{new_token}}</p>`,
-    email_change_new: `<h2>Confirm New Email Address</h2><p>Follow this link to confirm your new email address:</p><p><a href="{{confirmation_url}}">Confirm new email address</a></p><p>Alternatively, enter the code: {{new_token}}</p>`,
-    reauthentication: `<h2>Confirm reauthentication</h2><p>Enter the code: {{token}}</p>`
+    signup: `<h2>Confirm your email</h2><p>Confirm this email address to finish setting up your account.</p><p><a href="{{confirmation_url}}">Confirm your email address</a></p><p>Alternatively, enter this code: {{token}}</p>`,
+    recovery: `<h2>Reset password</h2><p>Use this link to choose a new password for your account.</p><p><a href="{{confirmation_url}}">Reset password</a></p><p>Alternatively, enter this code: {{token}}</p>`,
+    invite: `<h2>You have been invited</h2><p>You have been invited to create an account.</p><p><a href="{{confirmation_url}}">Accept invitation</a></p><p>Alternatively, enter this code: {{token}}</p>`,
+    magiclink: `<h2>Sign in to your account</h2><p>Use this link to sign in to your account.</p><p><a href="{{confirmation_url}}">Sign in</a></p><p>Alternatively, enter this code: {{token}}</p>`,
+    email_change: `<h2>Confirm your new email</h2><p>Confirm changing the email address for your account from {{old_email}} to {{new_email}}.</p><p><a href="{{confirmation_url}}">Confirm new email</a></p><p>Alternatively, enter these codes: {{token}} and {{new_token}}</p>`,
+    email_change_new: `<h2>Confirm new email address</h2><p>Confirm this new email address for your account.</p><p><a href="{{confirmation_url}}">Confirm new email address</a></p><p>Alternatively, enter this code: {{new_token}}</p>`,
+    reauthentication: `<h2>Confirm reauthentication</h2><p>Enter this code to continue: {{token}}</p>`
 };
 
 function generateConfirmationURL(email_data) {
