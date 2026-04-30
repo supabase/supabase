@@ -1,0 +1,159 @@
+---
+title: Use Supabase with Reflex
+subtitle: Learn how to create a Supabase project, add some sample data to your database, and query the data from a Reflex app.
+breadcrumb: Framework Quickstarts
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <$Partial path="quickstart_db_setup.mdx" />
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create a Reflex app">
+
+    Create a new directory for your Reflex app, initialize a project with `uv`, and add Reflex, the `supabase-py` client library, and `python-dotenv` as dependencies. The `uv add` command creates `pyproject.toml` and `uv.lock` so the environment is reproducible with `uv sync`.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash name=Terminal
+      mkdir my_app && cd my_app
+      uv init
+      uv add reflex supabase python-dotenv
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Initialize the Reflex app">
+
+      Initialize the Reflex app inside the project. When prompted for a template, press Enter to accept the default blank app.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash name=Terminal
+      uv run reflex init
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Create Environment Variables file">
+
+      Create a `.env` file in your project root and populate it with your Supabase connection variables:
+
+      <ProjectConfigVariables variable="url" />
+      <ProjectConfigVariables variable="publishable" />
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      <$CodeTabs>
+
+        ```text name=.env
+        SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+        SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+        ```
+
+      </$CodeTabs>
+
+      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "", "tab": "" }} />
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Query data from the app">
+
+      Open `my_app/my_app.py` and replace its contents with the following. The `State` class holds the data, the `load_instruments` event handler fetches it asynchronously from Supabase, and `on_load` triggers the handler when the page is opened.
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+
+      ```python name=my_app/my_app.py
+      import os
+      import reflex as rx
+      from supabase import acreate_client, AsyncClient
+      from dotenv import load_dotenv
+
+      load_dotenv()
+
+      _supabase: AsyncClient | None = None
+
+
+      async def get_supabase() -> AsyncClient:
+          global _supabase
+          if _supabase is None:
+              _supabase = await acreate_client(
+                  os.environ.get("SUPABASE_URL"),
+                  os.environ.get("SUPABASE_PUBLISHABLE_KEY"),
+              )
+          return _supabase
+
+
+      class State(rx.State):
+          instruments: list[dict] = []
+
+          async def load_instruments(self):
+              supabase = await get_supabase()
+              response = await supabase.table("instruments").select("*").execute()
+              self.instruments = response.data
+
+
+      def index() -> rx.Component:
+          return rx.container(
+              rx.heading("Instruments"),
+              rx.foreach(
+                  State.instruments,
+                  lambda instrument: rx.text(instrument["name"]),
+              ),
+          )
+
+
+      app = rx.App()
+      app.add_page(index, on_load=State.load_instruments)
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Start the app">
+
+      Run the Reflex development server, go to http://localhost:3000 in a browser, and you should see the list of instruments.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash name=Terminal
+      uv run reflex run
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+## Next steps
+
+- Set up [Auth](/guides/auth) for your app
+- [Insert more data](/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/guides/storage)
