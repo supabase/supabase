@@ -336,9 +336,10 @@ export const MCP_CLIENTS: McpClient[] = [
           servers.
         </p>
         <p className="text-xs text-foreground-light">
-          If you run into authentication issues, open the command palette and run{' '}
-          <strong>Authentication: Remove Dynamic Authentication Providers</strong> to clear cached
-          OAuth credentials and re-authenticate.
+          If you run into authentication issues, open Agent Settings with <strong>Cmd+,</strong>{' '}
+          (Mac) or <strong>Ctrl+,</strong> (Windows/Linux), navigate to the{' '}
+          <strong>Customizations</strong> tab, and click the <strong>Authenticate</strong> button
+          next to the Supabase server.
         </p>
       </div>
     ),
