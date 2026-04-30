@@ -139,7 +139,7 @@ const PreviewFilterPanel = ({
                   <ButtonTooltip
                     icon={<X />}
                     type="text"
-                    className="p-[1px] h-[20px]"
+                    className="p-px h-[20px]"
                     onClick={() => handleInputSearch('')}
                     tooltip={{ content: { side: 'bottom', text: 'Clear search' } }}
                   />

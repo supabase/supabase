@@ -246,9 +246,9 @@ export const ColumnEditor = ({
 
         <SheetSection className="overflow-auto grow p-0">
           <FormSection
-            header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}
+            header={<FormSectionLabel className="lg:col-span-4!">General</FormSectionLabel>}
           >
-            <FormSectionContent loading={false} className="lg:!col-span-8">
+            <FormSectionContent loading={false} className="lg:col-span-8!">
               <FormItemLayout
                 isReactForm={false}
                 id="name"
@@ -291,7 +291,7 @@ export const ColumnEditor = ({
           <FormSection
             header={
               <FormSectionLabel
-                className="lg:!col-span-4"
+                className="lg:col-span-4!"
                 description={
                   <div className="space-y-2">
                     <Button asChild type="default" icon={<Plus />}>
@@ -319,7 +319,7 @@ export const ColumnEditor = ({
               </FormSectionLabel>
             }
           >
-            <FormSectionContent loading={false} className="lg:!col-span-8">
+            <FormSectionContent loading={false} className="lg:col-span-8!">
               <ColumnType
                 showRecommendation
                 value={columnFields?.format ?? ''}
@@ -387,9 +387,9 @@ export const ColumnEditor = ({
           <SidePanel.Separator />
 
           <FormSection
-            header={<FormSectionLabel className="lg:!col-span-4">Foreign Keys</FormSectionLabel>}
+            header={<FormSectionLabel className="lg:col-span-4!">Foreign Keys</FormSectionLabel>}
           >
-            <FormSectionContent loading={false} className="lg:!col-span-8">
+            <FormSectionContent loading={false} className="lg:col-span-8!">
               <ColumnForeignKey
                 tableId={selectedTable.id}
                 column={columnFields}
@@ -408,9 +408,9 @@ export const ColumnEditor = ({
           </FormSection>
           <SidePanel.Separator />
           <FormSection
-            header={<FormSectionLabel className="lg:!col-span-4">Constraints</FormSectionLabel>}
+            header={<FormSectionLabel className="lg:col-span-4!">Constraints</FormSectionLabel>}
           >
-            <FormSectionContent loading={false} className="lg:!col-span-8">
+            <FormSectionContent loading={false} className="lg:col-span-8!">
               <FormItemLayout
                 isReactForm={false}
                 layout="flex"
@@ -494,7 +494,7 @@ export const ColumnEditor = ({
           </FormSection>
         </SheetSection>
 
-        <SheetFooter className="!justify-between [&>div]:p-0 [&>div]:border-t-0">
+        <SheetFooter className="justify-between! [&>div]:p-0 [&>div]:border-t-0">
           <ActionBar
             backButtonLabel="Cancel"
             applyButtonLabel="Save"

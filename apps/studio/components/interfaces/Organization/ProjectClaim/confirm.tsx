@@ -97,7 +97,7 @@ export const ProjectClaimConfirm = ({
 
             <div className="flex items-center justify-center w-28 relative">
               <div className="h-0.5 w-full border-2 border-dashed border-stronger" />
-              <div className="rounded-full border flex items-center justify-center h-10 w-full shadow-sm">
+              <div className="rounded-full border flex items-center justify-center h-10 w-full shadow-xs">
                 <ChevronsLeftRight className="text-muted-foreground" size={24} />
               </div>
               <div className="h-0.5 w-full border-2 border-dashed border-stronger z-10" />
@@ -183,14 +183,14 @@ export const ProjectClaimConfirm = ({
 
                 <ChevronRight
                   size={16}
-                  className="text-foreground-light transition-all group-data-[state=open]:rotate-90 w-20"
+                  className="text-foreground-light transition-all group-data-open:rotate-90 w-20"
                   strokeWidth={1}
                 />
               </CollapsibleTrigger_Shadcn_>
               <CollapsibleContent_Shadcn_
                 className={cn(
                   'flex flex-col gap-8 transition-all',
-                  'data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+                  'data-closed:animate-collapsible-up data-open:animate-collapsible-down'
                 )}
               >
                 <div>

@@ -200,7 +200,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
       title="Having trouble submitting the form?"
       description={
         <>
-          <p className="!mb-2.5">
+          <p className="mb-2.5!">
             Please email us directly. Include your project ID and as much information as possible.
           </p>
           <p className="flex items-center gap-x-1.5 flex-wrap">
@@ -210,7 +210,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
                 href={`mailto:support@supabase.com?subject=${encodeURIComponent('Support Request')}${hasProjectRef ? `${encodeURIComponent(' for Project ID: ')}${encodeURIComponent(projectRef)}` : ''}&body=${encodeURIComponent('Here is a detailed description of the problem I am experiencing and any other information that might be helpful...')}`}
                 className="hover:text-foreground transition-colors duration-100"
               >
-                <code className="text-code-inline !text-foreground-light underline decoration-foreground-lighter/50 hover:decoration-foreground-lighter/80 transition-colors duration-100">
+                <code className="text-code-inline text-foreground-light! underline decoration-foreground-lighter/50 hover:decoration-foreground-lighter/80 transition-colors duration-100">
                   support@supabase.com
                 </code>
               </a>
@@ -226,7 +226,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
             <p className="flex items-center gap-x-1.5 flex-wrap">
               Project ID:{' '}
               <span className="inline-flex items-center gap-x-1">
-                <code className="text-code-inline !text-foreground-light">{projectRef}</code>
+                <code className="text-code-inline text-foreground-light!">{projectRef}</code>
                 <CopyButton
                   iconOnly
                   type="text"
@@ -262,7 +262,7 @@ function SupportFormBody({
   return (
     <div
       className={cn(
-        'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md',
+        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md',
         `${isSuccess ? 'pt-8' : 'py-8'}`,
         'border-default'
       )}

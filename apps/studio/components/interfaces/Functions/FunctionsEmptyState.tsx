@@ -169,7 +169,7 @@ export const FunctionsEmptyState = () => {
         {templates.map((template) => (
           <ResourceItem
             key={template.name}
-            media={<Code strokeWidth={1.5} size={16} className="-translate-y-[9px]" />}
+            media={<Code strokeWidth={1.5} size={16} className="translate-y-[-9px]" />}
             onClick={() => {
               sendEvent({
                 action: 'edge_function_template_clicked',
@@ -325,7 +325,7 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
               <DialogTrigger asChild>
                 <ResourceItem
                   key={template.name}
-                  media={<Code strokeWidth={1.5} size={16} className="-translate-y-[9px]" />}
+                  media={<Code strokeWidth={1.5} size={16} className="translate-y-[-9px]" />}
                 >
                   <div>
                     <p>{template.name}</p>
@@ -339,7 +339,7 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
                   <DialogDescription>{template.description}</DialogDescription>
                 </DialogHeader>
                 <Separator />
-                <DialogSection className="!p-0">
+                <DialogSection className="p-0!">
                   <CodeBlock
                     language="ts"
                     hideLineNumbers={true}

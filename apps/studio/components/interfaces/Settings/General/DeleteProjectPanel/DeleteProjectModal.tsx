@@ -160,7 +160,7 @@ export const DeleteProjectModal = ({
                       key={option.value}
                       className={[
                         'flex cursor-pointer items-center space-x-2 rounded-md py-1',
-                        'pl-2 pr-3 text-center text-sm shadow-sm transition-all duration-100',
+                        'pl-2 pr-3 text-center text-sm shadow-xs transition-all duration-100',
                         `${
                           active
                             ? ` bg-foreground text-background opacity-100 hover:bg-foreground/75`
@@ -182,7 +182,9 @@ export const DeleteProjectModal = ({
                 })}
               </div>
               <div className="text-area-text-sm flex flex-col gap-y-2">
-                <label className="text-sm whitespace-pre-line break-words">{textareaLabel}</label>
+                <label className="text-sm whitespace-pre-line wrap-break-word">
+                  {textareaLabel}
+                </label>
                 <Input.TextArea
                   name="message"
                   rows={3}

@@ -99,7 +99,7 @@ export const TerminalInstructions = forwardRef<
     >
       <CollapsibleTrigger_Shadcn_ className="flex w-full justify-between" disabled={!closable}>
         <div className="flex items-center gap-x-3">
-          <div className="flex items-center justify-center w-8 h-8 p-2 border rounded bg-alternative">
+          <div className="flex items-center justify-center w-8 h-8 p-2 border rounded-sm bg-alternative">
             <Terminal strokeWidth={2} />
           </div>
           <h4>Create your first Edge Function via the CLI</h4>
@@ -114,7 +114,7 @@ export const TerminalInstructions = forwardRef<
           </div>
         )}
       </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ className="w-full transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+      <CollapsibleContent_Shadcn_ className="w-full transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
         <CommandRender commands={commands} className="my-4" />
         {tokens && tokens.length === 0 ? (
           <div className="py-4 space-y-3 border-t">

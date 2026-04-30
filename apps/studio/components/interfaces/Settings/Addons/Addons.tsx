@@ -140,7 +140,7 @@ export const Addons = () => {
 
   const listTopSpacing = isBranch ? 'mt-6' : undefined
   const resourceItemClassName =
-    'min-h-[128px] !border-b last:!border-b-0 [&>div:first-child]:hidden @lg:[&>div:first-child]:flex'
+    'min-h-[128px] border-b! last:border-b-0! [&>div:first-child]:hidden @lg:[&>div:first-child]:flex'
 
   let pitrAlert = null
 

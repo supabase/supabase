@@ -52,7 +52,7 @@ const NewFeatureCard = (props: CardProps) => (
       </div>
     </div>
     {props.image && (
-      <div className="hidden sm:flex lg:hidden xl:flex absolute object-bottom inset-0 left-auto items-center h-full aspect-[296/275]">
+      <div className="hidden sm:flex lg:hidden xl:flex absolute object-bottom inset-0 left-auto items-center h-full aspect-296/275">
         <Image
           src={props.image}
           alt={`database ${props.title}`}

@@ -140,7 +140,7 @@ export const OngoingQueriesPanel = () => {
                     language="sql"
                     className={cn(
                       'max-w-none max-h-52 w-full',
-                      '!bg-transparent !py-3 !px-3.5 prose dark:prose-dark',
+                      'bg-transparent! py-3! px-3.5! prose dark:prose-dark',
                       '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
                     )}
                   />
