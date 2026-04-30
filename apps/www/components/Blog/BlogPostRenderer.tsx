@@ -216,6 +216,86 @@ const BlogPostRenderer = ({
               </div>
               <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
                 {/* Content */}
+                <div className="col-span-12 lg:col-span-7 xl:col-span-7">
+                  <article>
+                    <div className={['prose prose-docs'].join(' ')}>
+                      {blogMetaData.youtubeHero ? (
+                        <iframe
+                          title="YouTube video player"
+                          className="w-full"
+                          width="700"
+                          height="350"
+                          src={blogMetaData.youtubeHero}
+                          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen={true}
+                        />
+                      ) : (
+                        imageUrl && (
+                          <div className="hidden md:block relative mb-8 w-full aspect-[1.91/1] overflow-auto rounded-lg border">
+                            <Image
+                              src={imageUrl}
+                              alt={blogMetaData.title}
+                              fill
+                              sizes={BLOG_POST_HERO_IMAGE_SIZES}
+                              className="object-cover m-0"
+                            />
+                          </div>
+                        )
+                      )}
+                      {/* Use ReactMarkdown for LivePreview mode, MDXRemote for normal mode */}
+                      {isLivePreview ? (
+                        <ReactMarkdown>{livePreviewContent}</ReactMarkdown>
+                      ) : (
+                        <MDXRemote
+                          {...(blog.content as MDXRemoteSerializeResult)}
+                          components={mdxComponents('blog')}
+                        />
+                      )}
+                    </div>
+                  </article>
+                  {isLaunchWeek7 && <BlogLinks />}
+                  {isLaunchWeekX && <LWXSummary />}
+                  {isGAWeek && <LW11Summary />}
+                  {isLaunchWeek12 && <LW12Summary />}
+                  {isLaunchWeek13 && <LW13Summary />}
+                  {isLaunchWeek14 && <LW14Summary />}
+                  {isLaunchWeek15 && <LW15Summary />}
+                  <div className="block lg:hidden py-8">
+                    <div className="text-foreground-lighter text-sm">Share this article</div>
+                    <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
+                  </div>
+                  <div className="grid gap-8 py-8 lg:grid-cols-1">
+                    <div>
+                      {prevPost && (
+                        <NextCard
+                          post={
+                            prevPost as unknown as {
+                              path: string
+                              title: string
+                              formattedDate: string
+                            }
+                          }
+                          label="Previous post"
+                        />
+                      )}
+                    </div>
+                    <div>
+                      {nextPost && (
+                        <NextCard
+                          post={
+                            nextPost as unknown as {
+                              path: string
+                              title: string
+                              formattedDate: string
+                            }
+                          }
+                          label="Next post"
+                          className="text-right"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
                 {/* Sidebar */}
                 <div className="relative col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
                   <div className="space-y-6">
