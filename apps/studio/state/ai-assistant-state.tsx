@@ -281,7 +281,7 @@ function createChatInstance(
         }
       }
     },
-    onFinish(result) {
+    onFinish(_result) {
       // Sync messages back to state
       const chatInstance = state.chatInstances[options.id]
       if (chatInstance) {

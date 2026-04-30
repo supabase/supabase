@@ -105,6 +105,7 @@ Guilherme Souza
 Hannah Bowers
 Hardik Maheshwari
 Haritabh Gupta
+Harold Giménez
 Haydn Maley
 Hieu Pham
 Hunter Luckow
@@ -165,6 +166,7 @@ Long Hoang
 Lukas Bernert
 Łukasz Niemier
 Maksym Ionutsa
+Manuel Mendez
 Manan Gupta
 Marcus Weiner
 Margarita Sandomirskaia
@@ -187,6 +189,7 @@ Nicolas Nosenzo
 Nyannyacha
 Oli R
 Pamela Chia
+Patricia Szasz
 Patrick Crane
 Paul Caselton
 Paul Cioanca
@@ -209,6 +212,7 @@ Roman Hernandez
 Ronan Lehane
 Rory Wilding
 Ryan Goulet
+Ryan Senior
 Ruan Maia
 Saba Pochkhua
 Sam Meech-Ward
@@ -248,6 +252,7 @@ Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
+Utkarash Singh
 Victor Farazdagi
 Wen Bo Xie
 Yorvi Arias

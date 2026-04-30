@@ -24,6 +24,7 @@ import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import AlertError from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { PgRole, useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useColumnPrivilegesQuery } from '@/data/privileges/column-privileges-query'
 import { useTablePrivilegesQuery } from '@/data/privileges/table-privileges-query'
@@ -224,10 +225,15 @@ const PrivilegesPage: NextPageWithLayout = () => {
         <div className="col-span-12 flex flex-col pb-4 gap-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="mb-1 text-xl">Column-level privileges</h3>
-              <div className="text-sm text-lighter">
-                <p>Grant or revoke privileges on a column based on user role.</p>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-xl">Column-level privileges</h3>
+                {isEnabled && (
+                  <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS} />
+                )}
               </div>
+              <p className="text-sm text-lighter">
+                Grant or revoke privileges on a column based on user role.
+              </p>
             </div>
             <DocsButton href={`${DOCS_URL}/guides/auth/column-level-security`} />
           </div>
@@ -324,7 +330,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   />
                 </div>
               ) : (tables ?? []).length === 0 ? (
-                <div className="flex-grow flex flex-col items-center justify-center w-[600px] mx-auto">
+                <div className="grow flex flex-col items-center justify-center w-[600px] mx-auto">
                   <p className="text-center">There are no tables in the {selectedSchema} schema</p>
                   <p className="text-sm text-foreground-light text-center">
                     Once a table is available in the schema, you may manage it's column-level

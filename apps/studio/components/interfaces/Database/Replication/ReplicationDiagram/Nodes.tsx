@@ -1,13 +1,14 @@
 import { Handle, Position } from '@xyflow/react'
 import { useParams } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
-import { PropsWithChildren, useMemo } from 'react'
+import { ComponentType, PropsWithChildren, useMemo } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { getStatusName } from '../Pipeline.utils'
 import { getStatusLabel } from '../ReadReplicas/ReadReplicas.utils'
 import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
+import { getReplicationDestinationType, type ReplicationDestinationType } from './Nodes.utils'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
@@ -17,6 +18,15 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
 
 export const NODE_WIDTH = 480
+
+const destinationIconByType: Record<
+  ReplicationDestinationType,
+  ComponentType<{ className?: string; size?: string | number }>
+> = {
+  BigQuery,
+  'Analytics Bucket': AnalyticsBucket,
+  DuckLake: Database,
+}
 
 const NodeContainer = ({ className, children }: PropsWithChildren<{ className?: string }>) => {
   return (
@@ -84,17 +94,12 @@ export const ReplicationNode = ({ id }: { id: string }) => {
   )
   const statusName = getStatusName(pipelineStatusData?.status)
 
-  const config = destination?.config ?? {}
-  const type =
-    'big_query' in config ? 'BigQuery' : 'iceberg' in config ? 'Analytics Bucket' : undefined
+  const type = getReplicationDestinationType(destination?.config)
+  const DestinationIcon = type ? destinationIconByType[type] : undefined
 
   return (
     <NodeContainer className="justify-start gap-x-3">
-      {type === 'BigQuery' ? (
-        <BigQuery size={20} className="text-foreground-light" />
-      ) : type === 'Analytics Bucket' ? (
-        <AnalyticsBucket size={20} className="text-foreground-light" />
-      ) : null}
+      {DestinationIcon ? <DestinationIcon size={20} className="text-foreground-light" /> : null}
       <div className="text-sm flex flex-col gap-y-0.5">
         <div className="flex items-center">
           <p>{type}</p>

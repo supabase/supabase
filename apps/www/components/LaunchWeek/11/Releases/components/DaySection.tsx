@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
+import { DayLink } from '.'
 import { ArrowRightIcon } from '@heroicons/react/outline'
-import { cn } from 'ui'
-import { Edit } from 'lucide-react'
 import { useBreakpoint } from 'common'
+import { Edit } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
+import { cn } from 'ui'
 
 import { WeekDayProps } from '../data'
-import { DayLink } from '.'
 
 const DaySection = ({ day, className }: { day: WeekDayProps; className?: string }) => {
   const isMobile = useBreakpoint(639)
@@ -67,7 +67,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
               cssGroup
             )}
           >
-            <div className="relative text-foreground-light p-4 sm:p-6 md:p-8 z-20 flex-grow flex flex-col items-start justify-between gap-2 w-full lg:w-1/2 text-left">
+            <div className="relative text-foreground-light p-4 sm:p-6 md:p-8 z-20 grow flex flex-col items-start justify-between gap-2 w-full lg:w-1/2 text-left">
               <div className="relative w-full flex items-center gap-2 text-sm translate-x-0 !ease-[cubic-bezier(.24,0,.22,.99)] duration-200 group-hover:-translate-x-6 transition-transform">
                 <Edit className="w-4 min-w-4 group-hover:opacity-0 transition-opacity" />
                 <span>Blog post</span>

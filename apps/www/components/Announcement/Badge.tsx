@@ -43,11 +43,9 @@ const AnnouncementBadge = ({
           gap-1.5
           text-left
           rounded-full
-          bg-opacity-20
           border
           border-background-surface-300
-          hover:border-foreground-muted
-          hover:border-opacity-30
+          hover:border-foreground-muted/30
           shadow-md
           overflow-hidden
           focus-visible:outline-none focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full

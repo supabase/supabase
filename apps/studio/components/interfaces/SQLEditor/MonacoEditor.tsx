@@ -28,6 +28,8 @@ export type MonacoEditorProps = {
   monacoRef: MutableRefObject<Monaco | null>
   autoFocus?: boolean
   executeQuery: () => void
+  executeExplainQuery: () => void
+  prettifyQuery: () => void
   onHasSelection: (value: boolean) => void
   onMount?: (editor: IStandaloneCodeEditor) => void
   onPrompt?: (value: {
@@ -49,6 +51,8 @@ const MonacoEditor = ({
   placeholder = '',
   className,
   executeQuery,
+  executeExplainQuery,
+  prettifyQuery,
   onHasSelection,
   onPrompt,
   onMount,
@@ -80,6 +84,12 @@ const MonacoEditor = ({
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
 
+  const executeExplainQueryRef = useRef(executeExplainQuery)
+  executeExplainQueryRef.current = executeExplainQuery
+
+  const prettifyQueryRef = useRef(prettifyQuery)
+  prettifyQueryRef.current = prettifyQuery
+
   const aiHotkeyEnabledRef = useRef(isAIAssistantHotkeyEnabled)
   aiHotkeyEnabledRef.current = isAIAssistantHotkeyEnabled
 
@@ -91,6 +101,29 @@ const MonacoEditor = ({
     if (model !== null) {
       monacoRef.current.editor.setModelMarkers(model, 'owner', [])
     }
+
+    // Blur the editor on Escape so users can hop out to the rest of the UI.
+    // The precondition defers to Monaco's own Escape consumers (suggest widget,
+    // find widget, parameter hints, snippet/rename mode, inline suggestions) and
+    // to selection/multi-cursor cancellation, so inline features keep working.
+    editor.addCommand(
+      monaco.KeyCode.Escape,
+      () => {
+        ;(document.activeElement as HTMLElement | null)?.blur()
+      },
+      [
+        'editorTextFocus',
+        '!editorHasSelection',
+        '!editorHasMultipleSelections',
+        '!suggestWidgetVisible',
+        '!findWidgetVisible',
+        '!parameterHintsVisible',
+        '!renameInputVisible',
+        '!inSnippetMode',
+        '!accessibilityHelpWidgetVisible',
+        '!inlineSuggestionVisible',
+      ].join(' && ')
+    )
 
     editor.addAction({
       id: 'run-query',
@@ -104,6 +137,17 @@ const MonacoEditor = ({
     })
 
     editor.addAction({
+      id: 'run-explain-query',
+      label: 'Run EXPLAIN ANALYZE',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 1,
+      run: () => {
+        executeExplainQueryRef.current()
+      },
+    })
+
+    editor.addAction({
       id: 'save-query',
       label: 'Save Query',
       keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyS],
@@ -111,6 +155,17 @@ const MonacoEditor = ({
       contextMenuOrder: 0,
       run: () => {
         if (snippet) snapV2.addNeedsSaving(snippet.snippet.id)
+      },
+    })
+
+    editor.addAction({
+      id: 'prettify-query',
+      label: 'Prettify SQL',
+      keybindings: [monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KeyF],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 2,
+      run: () => {
+        prettifyQueryRef.current()
       },
     })
 

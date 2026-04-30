@@ -1,8 +1,9 @@
+import Image from 'next/image'
+import Link from 'next/link'
 import React from 'react'
+
 import SectionContainer from '../../Layouts/SectionContainer'
 import { SmallCard } from '../8/Releases/components'
-import Link from 'next/link'
-import Image from 'next/image'
 
 const LW8CalloutsSection = () => {
   return (
@@ -14,7 +15,7 @@ const LW8CalloutsSection = () => {
             target="_blank"
             className="flex flex-row justify-between items-center w-full h-full gap-2"
           >
-            <div className="relative flex-shrink flex items-center p-2 w-2/3 lg:w-1/2 md:w-auto">
+            <div className="relative shrink flex items-center p-2 w-2/3 lg:w-1/2 md:w-auto">
               <div className="flex flex-col gap-1 sm:pl-4">
                 <span className="text-white">Twitter Spaces</span>
                 <span>Replay recordings</span>
@@ -36,7 +37,7 @@ const LW8CalloutsSection = () => {
             href="/blog/supabase-lw8-hackathon"
             className="flex flex-row justify-between items-center w-full h-full gap-2"
           >
-            <div className="relative flex-shrink flex items-center p-2 w-2/3 lg:w-1/2 md:w-auto">
+            <div className="relative shrink flex items-center p-2 w-2/3 lg:w-1/2 md:w-auto">
               <div className="flex flex-col gap-1 sm:pl-4">
                 <div className="flex items-center gap-3">
                   <span className="text-white">LW8 Hackathon Aug 4 – Aug 13</span>

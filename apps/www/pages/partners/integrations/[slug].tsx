@@ -110,7 +110,7 @@ function Partner({
                 layout="fixed"
                 width={56}
                 height={56}
-                className="bg-surface-200 flex-shrink-f0 h-14 w-14 rounded-full"
+                className="bg-surface-200 shrink-f0 h-14 w-14 rounded-full"
                 src={partner.logo}
                 alt={partner.title}
               />

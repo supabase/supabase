@@ -157,7 +157,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                         <>
                           <Check
                             className={cn(
-                              'mr-2 h-4 w-4 flex-shrink-0',
+                              'mr-2 h-4 w-4 shrink-0',
                               snap.activeChatId === id ? 'opacity-100' : 'opacity-0'
                             )}
                           />

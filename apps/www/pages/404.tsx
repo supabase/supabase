@@ -1,14 +1,12 @@
+import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
+import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import DefaultLayout from '../components/Layouts/Default'
-
-import { useTheme } from 'next-themes'
-
-import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
-import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
 const Error404 = () => {
   const [show404, setShow404] = useState<boolean>(false)
@@ -25,7 +23,7 @@ const Error404 = () => {
       <div className="relative mx-auto flex h-screen w-full flex-col items-center justify-center">
         <div className="absolute top-0 mx-auto w-full max-w-7xl px-8 pt-6 sm:px-6 lg:px-8">
           <nav className="relative flex items-center justify-between sm:h-10">
-            <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
+            <div className="flex shrink-0 grow items-center lg:grow-0">
               <div className="flex w-full items-center justify-between md:w-auto">
                 <a href="/">
                   <Image

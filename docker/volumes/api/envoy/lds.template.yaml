@@ -476,6 +476,7 @@ resources:
                           envoy.filters.http.rbac:
                             '@type': >-
                               type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            # Block access to /mcp by default
                             rbac:
                               rules:
                                 action: DENY
@@ -486,22 +487,23 @@ resources:
                                     principals:
                                       - any: true
                             # Enable local access (danger zone!)
-                            # 1. Replace the `rbac` block above with the one below.
-                            # 2. Adjust the IP ranges in `principals`.
-                            # rbac:
-                            #   rules:
-                            #     action: ALLOW
-                            #     policies:
-                            #       allow_local:
-                            #         permissions:
-                            #           - any: true
-                            #         principals:
-                            #           - direct_remote_ip:
-                            #               address_prefix: 127.0.0.1
-                            #               prefix_len: 32
-                            #           - direct_remote_ip:
-                            #               address_prefix: ::1
-                            #               prefix_len: 128
+                            # 1. Comment out the 'rbac' block above.
+                            # 2. Uncomment and adjust the 'rbac' block below.
+                            # 3. Add or adjust your local IPs in 'principals'.
+                            #rbac:
+                            #  rules:
+                            #    action: ALLOW
+                            #    policies:
+                            #      allow_local:
+                            #        permissions:
+                            #          - any: true
+                            #        principals:
+                            #          - direct_remote_ip:
+                            #              address_prefix: 127.0.0.1
+                            #              prefix_len: 32
+                            #          - direct_remote_ip:
+                            #              address_prefix: ::1
+                            #              prefix_len: 128
                              
                       - match:
                           prefix: /

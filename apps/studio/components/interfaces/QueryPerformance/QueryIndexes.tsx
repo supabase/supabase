@@ -81,7 +81,7 @@ export const QueryIndexes = ({
     query: selectedRow?.['query'],
   })
 
-  const { data: extensions, isPending: isLoadingExtensions } = useDatabaseExtensionsQuery({
+  const { isPending: isLoadingExtensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

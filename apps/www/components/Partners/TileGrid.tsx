@@ -27,7 +27,7 @@ export default function TileGrid({
           <h2 className="h2">Featured</h2>
           <div className="grid grid-cols-1 gap-5 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
             {featuredPartners?.map((p) => (
-              <Link key={p.slug} href={`/partners/${p.slug}`}>
+              <Link key={p.slug} href={`/partners/integrations/${p.slug}`}>
                 <div
                   className="
                 bg-surface-100
@@ -70,7 +70,7 @@ export default function TileGrid({
           {!hideCategories && <h2 className="h2">{category}</h2>}
           <div className="grid  grid-cols-1 gap-5 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
             {partnersByCategory[category].map((p) => (
-              <Link key={p.slug} href={`/partners/${p.slug}`}>
+              <Link key={p.slug} href={`/partners/integrations/${p.slug}`}>
                 <div
                   className="
                 bg-surface-100

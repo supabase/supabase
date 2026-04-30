@@ -99,3 +99,5 @@ export interface ShortcutDefinition {
    */
   showInSettings?: boolean
 }
+
+export type RegistryDefinations<T extends string> = Record<T, ShortcutDefinition>

@@ -372,7 +372,7 @@ export const LogsDatePicker = ({
 
         <div>
           <div className="flex p-2 gap-2 items-center">
-            <div className="flex flex-grow *:flex-grow gap-2 font-mono">
+            <div className="flex grow *:grow gap-2 font-mono">
               <TimeSplitInput
                 type="start"
                 startTime={startTime}
@@ -396,7 +396,7 @@ export const LogsDatePicker = ({
                 endDate={endDate}
               />
             </div>
-            <div className="flex-shrink">
+            <div className="shrink">
               <ButtonTooltip
                 tooltip={{
                   content: {

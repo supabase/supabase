@@ -34,7 +34,9 @@ curl -X POST https://api.supabase.com/v1/projects \
 
 When your project is up and running, go to the [**Table Editor**](/dashboard/project/_/editor) section of the Dashboard, create a new table and insert some data. Then in the [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard, expose the specific tables or functions you want to access. To automatically grant access for new tables and functions in `public`, enable **Default privileges for new entities**.
 
-Alternatively, you can run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new). This will create an `instruments` table with some sample data.
+Alternatively, you can run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new).
+
+This creates an `instruments` table with some sample data, sets a secure baseline by setting only the privileges each Postgres role needs, and adds [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default.
 
 </StepHikeCompact.Details>
 
@@ -46,30 +48,33 @@ Alternatively, you can run the following snippet in your project's [SQL Editor](
       id bigint primary key generated always as identity,
       name text not null
     );
-    -- Insert some sample data into the table
+
+    -- Insert sample data into the table
     insert into instruments (name)
     values
       ('violin'),
       ('viola'),
       ('cello');
 
-    alter table instruments enable row level security;
-
-    -- Enable read access for the Data API
+    -- Grant the privileges the role needs, which is read access
     grant select on public.instruments to anon;
+
+    -- Enable row level security for the table
+    alter table instruments enable row level security;
     ```
 
 </StepHikeCompact.Code>
 
 <StepHikeCompact.Details>
 
-Make the data in your table publicly readable by adding an RLS policy:
+Create an RLS policy to make the data in your table publicly readable:
 
 </StepHikeCompact.Details>
 
 <StepHikeCompact.Code>
 
     ```sql SQL_EDITOR
+    -- Create a policy to allow the anon role to read from the instruments table
     create policy "public can read instruments"
     on public.instruments
     for select to anon

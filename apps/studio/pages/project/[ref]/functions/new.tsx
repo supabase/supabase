@@ -42,7 +42,6 @@ import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndE
 import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'

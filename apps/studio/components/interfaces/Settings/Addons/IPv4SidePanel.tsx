@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { cn, RadioGroup_Shadcn_, RadioGroupLargeItem_Shadcn_, SidePanel } from 'ui'
+import { cn, RadioGroup, RadioGroupLargeItem, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
@@ -167,14 +167,14 @@ const IPv4SidePanel = () => {
 
           {isAws && (
             <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
-              <RadioGroup_Shadcn_
+              <RadioGroup
                 name="ipv4"
                 value={selectedOption}
                 onValueChange={setSelectedOption}
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
                 {ipv4Options.map((option) => (
-                  <RadioGroupLargeItem_Shadcn_
+                  <RadioGroupLargeItem
                     key={option.id}
                     value={option.value}
                     label=""
@@ -196,9 +196,9 @@ const IPv4SidePanel = () => {
                         {option.priceContent}
                       </div>
                     </div>
-                  </RadioGroupLargeItem_Shadcn_>
+                  </RadioGroupLargeItem>
                 ))}
-              </RadioGroup_Shadcn_>
+              </RadioGroup>
               <TaxDisclaimer className="mt-3" />
             </div>
           )}

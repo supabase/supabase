@@ -1304,6 +1304,10 @@ functions:
             isOptional: true
             type: string
             description: The nonce sent for reauthentication if the user's password is to be updated.
+          - name: current_password
+            isOptional: true
+            type: string
+            description: The user's current password. Required when changing the password to verify the user's identity.
           - name: password
             isOptional: true
             type: string
