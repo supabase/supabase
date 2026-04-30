@@ -7,16 +7,14 @@ import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ref as valtioRef } from 'valtio'
 
-import { useTableFilter } from '../../hooks/useTableFilter'
 import type { GridProps, SupaColumn, SupaRow } from '../../types'
 import { isPendingAddRow, isPendingDeleteRow } from '../../types'
 import { ColumnOverlayItem } from './ColumnOverlayItem'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import { RowContextMenuProvider, RowRenderer } from './RowRenderer'
-import { useTableFilterNew } from '@/components/grid/hooks/useTableFilterNew'
-import { handleCopyCell } from '@/components/grid/SupabaseGrid.utils'
-import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 import { formatForeignKeys } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -61,12 +59,9 @@ export const Grid = memo(
       },
       ref: Ref<DataGridHandle> | undefined
     ) => {
-      const newFilterBarEnabled = useIsTableFilterBarEnabled()
-
       const tableEditorSnap = useTableEditorStateSnapshot()
       const snap = useTableEditorTableStateSnapshot()
-      const { filters: oldFilters, clearFilters: clearOldFilters } = useTableFilter()
-      const { filters: newFilters, clearFilters: clearNewFilters } = useTableFilterNew()
+      const { filters, clearFilters } = useTableFilter()
 
       const { data: org } = useSelectedOrganizationQuery()
       const { data: project } = useSelectedProjectQuery()
@@ -149,20 +144,8 @@ export const Grid = memo(
       }
 
       const removeAllFilters = useCallback(() => {
-        if (newFilterBarEnabled) {
-          clearNewFilters()
-        } else {
-          clearOldFilters()
-        }
-      }, [clearOldFilters, clearNewFilters, newFilterBarEnabled])
-
-      const filters = useMemo(() => {
-        if (newFilterBarEnabled) {
-          return newFilters
-        } else {
-          return oldFilters
-        }
-      }, [newFilters, oldFilters, newFilterBarEnabled])
+        clearFilters()
+      }, [clearFilters])
 
       // Compute columns with cellClass for dirty cells
       // This needs to be computed at render time so it reacts to operation queue changes
@@ -225,7 +208,14 @@ export const Grid = memo(
         }
       }, [rowClass])
 
-      const sensors = useSensors(useSensor(PointerSensor))
+      const sensors = useSensors(
+        useSensor(PointerSensor, {
+          activationConstraint: {
+            delay: 150,
+            tolerance: 5,
+          },
+        })
+      )
       const [draggedColumn, setDraggedColumn] = useState<SupaColumn | undefined>(undefined)
 
       return (
@@ -241,7 +231,7 @@ export const Grid = memo(
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1] pointer-events-none'
+                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-1 pointer-events-none'
               )}
             >
               {isLoading && !isDisabled && (
@@ -356,7 +346,7 @@ export const Grid = memo(
               <RowContextMenuProvider>
                 <DataGrid
                   ref={ref}
-                  className={`${gridClass} flex-grow`}
+                  className={`${gridClass} grow`}
                   rowClass={computedRowClass}
                   columns={columnsWithDirtyCellClass}
                   rows={rows ?? []}
@@ -372,7 +362,13 @@ export const Grid = memo(
                       onRowDoubleClick(props.row, { name: props.column.name })
                     }
                   }}
-                  onCellKeyDown={handleCopyCell}
+                  onCellKeyDown={(args, event) =>
+                    handleCellKeyDown(args, event, {
+                      rows: rows ?? [],
+                      columns: snap.table.columns,
+                      onRowsChange,
+                    })
+                  }
                 />
               </RowContextMenuProvider>
               {/* The DragOverlay is necessary to avoid styling issues while dragging a column */}

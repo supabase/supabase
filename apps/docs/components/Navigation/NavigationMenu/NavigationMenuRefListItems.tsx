@@ -1,14 +1,15 @@
 'use client'
 
-import * as Accordion from '@radix-ui/react-accordion'
-import { ChevronUp } from 'lucide-react'
-import Image from 'next/legacy/image'
-import { Fragment, memo } from 'react'
-import { cn } from 'ui'
-import RevVersionDropdown from '~/components/RefVersionDropdown'
 import type { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
+import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { menuState, useMenuActiveRefId } from '~/hooks/useMenuState'
 import { BASE_PATH } from '~/lib/constants'
+import { ChevronUp } from 'lucide-react'
+import Image from 'next/legacy/image'
+import { Accordion } from 'radix-ui'
+import { Fragment, memo } from 'react'
+import { cn } from 'ui'
+
 import MenuIconPicker from './MenuIconPicker'
 import * as NavItems from './NavigationMenu.constants'
 import { deepFilterSections } from './NavigationMenu.utils'
@@ -77,7 +78,7 @@ const FunctionLink = memo(function FunctionLink({
         {active && !isSubItem && (
           <div
             aria-hidden="true"
-            className="absolute -left-[13px] top-0 bottom-0 w-[1px] bg-brand-600"
+            className="absolute left-[-13px] top-0 bottom-0 w-px bg-brand-600"
           ></div>
         )}
         {isParent && (

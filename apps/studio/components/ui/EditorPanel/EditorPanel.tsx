@@ -1,7 +1,7 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useParams } from 'common'
 import {
   AlertCircle,
   Book,
@@ -57,12 +57,13 @@ import { useContentQuery, type Content } from '@/data/content/content-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
 import { editorPanelState, useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
@@ -107,14 +108,8 @@ export const EditorPanel = () => {
     setActiveSnippet({ ...activeSnippet, name: newName })
     setIsEditingTitle(false)
   }
-  const [isInlineEditorHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.EDITOR_PANEL),
-    true
-  )
-  const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
-    true
-  )
+  const isInlineEditorHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.INLINE_EDITOR_TOGGLE)
+  const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
 
   const currentValue = value || ''
 
@@ -277,7 +272,7 @@ export const EditorPanel = () => {
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-[var(--header-height)]">
+      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-(--header-height)">
         {isEditingTitle ? (
           <input
             ref={titleInputRef}
@@ -288,7 +283,7 @@ export const EditorPanel = () => {
               if (e.key === 'Enter') commitRename()
               if (e.key === 'Escape') setIsEditingTitle(false)
             }}
-            className="text-xs bg-transparent border-b border-foreground-lighter outline-none w-48 py-0.5"
+            className="text-xs bg-transparent border-b border-foreground-lighter outline-hidden w-48 py-0.5"
             autoFocus
           />
         ) : (
@@ -499,6 +494,7 @@ export const EditorPanel = () => {
               projectRef: project?.ref,
               connectionString: project?.connectionString,
               orgSlug: org?.slug,
+              language: 'sql',
             }}
             initialPrompt={initialPrompt}
             options={{

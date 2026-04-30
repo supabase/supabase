@@ -45,7 +45,7 @@ function VectorPage() {
           ],
         }}
       />
-      <DefaultLayout className="!bg-alternative" stickyNavbar={false}>
+      <DefaultLayout className="bg-alternative!" stickyNavbar={false}>
         <ModulesNav activePage={PRODUCT_MODULES_NAMES.VECTOR} docsUrl={pageData.docsUrl} />
         <ProductModulesHeader {...pageData.heroSection} />
         <HighlightCards {...(pageData.highlightsSection as any)} />
@@ -56,11 +56,11 @@ function VectorPage() {
           <FeaturesSection {...pageData.featuresSection} />
         </div>
         <CustomerQuotesSection {...pageData.quotesSection} />
-        <div className="bg-gradient-to-t from-alternative to-transparent">
+        <div className="bg-linear-to-t from-alternative to-transparent">
           <EnterpriseCta />
         </div>
         <div className="bg-background">
-          <div className="w-full h-[1px] bg-gradient-to-r from-background-alternative via-border to-background-alternative" />
+          <div className="w-full h-px bg-linear-to-r from-background-alternative via-border to-background-alternative" />
           <ProductsCta currentProduct={PRODUCT_MODULES_SHORTNAMES.VECTOR} />
         </div>
       </DefaultLayout>

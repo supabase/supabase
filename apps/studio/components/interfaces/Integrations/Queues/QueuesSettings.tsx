@@ -4,14 +4,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  Switch,
-} from 'ui'
+import { Button, Form, FormControl, FormField, FormItem, Switch } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -193,15 +186,15 @@ export const QueuesSettings = () => {
           title="Settings"
           description="Manage your queues via any client library or Data APIs endpoints"
         />
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id="pgmq-postgrest" onSubmit={form.handleSubmit(onSubmit)}>
             <FormPanelContainer>
               <FormPanelContent className="px-8 py-8">
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="enable"
                   render={({ field }) => (
-                    <FormItem_Shadcn_ className="w-full">
+                    <FormItem className="w-full">
                       <FormItemLayout
                         className="w-full"
                         layout="flex"
@@ -239,7 +232,7 @@ export const QueuesSettings = () => {
                           </>
                         }
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             name="enable"
                             size="large"
@@ -249,7 +242,7 @@ export const QueuesSettings = () => {
                             checked={field.value}
                             onCheckedChange={(value) => field.onChange(value)}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                       {tablesWithoutRLS.length > 0 && (
                         <Admonition
@@ -257,7 +250,7 @@ export const QueuesSettings = () => {
                           title="Existing Queues must have RLS enabled first before exposing via PostgREST"
                           className="mt-2"
                         >
-                          <p className="!m-0">
+                          <p className="m-0!">
                             Please ensure that the following {tablesWithoutRLS.length} queue
                             {tablesWithoutRLS.length > 1 ? 's' : ''} have RLS enabled in order to
                             prevent anonymous access.
@@ -313,13 +306,15 @@ export const QueuesSettings = () => {
                           </p>
                         </Admonition>
                       )}
-                    </FormItem_Shadcn_>
+                    </FormItem>
                   )}
                 />
               </FormPanelContent>
 
               <FormPanelFooter className="flex px-8 py-4 flex items-center justify-between">
-                <DocsButton href="https://github.com/tembo-io/pgmq?tab=readme-ov-file#sql-examples" />
+                <DocsButton
+                  href={`${DOCS_URL}/guides/queues/quickstart#expose-queues-to-client-side-consumers`}
+                />
                 <div className="flex items-center gap-x-2">
                   <Button
                     type="default"
@@ -340,7 +335,7 @@ export const QueuesSettings = () => {
               </FormPanelFooter>
             </FormPanelContainer>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </div>
 
       <ConfirmationModal

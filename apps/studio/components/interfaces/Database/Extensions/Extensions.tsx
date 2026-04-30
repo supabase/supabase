@@ -100,7 +100,7 @@ export const Extensions = () => {
                     in the dashboard with sticky columns
                   */}
                   <TableHead key="enabled" className="px-0">
-                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l">
+                    <div className="bg-200! px-4 w-full h-full flex items-center border-l">
                       Enabled
                     </div>
                   </TableHead>
@@ -114,7 +114,7 @@ export const Extensions = () => {
                   <TableRow>
                     <TableCell colSpan={7}>
                       <NoSearchResults
-                        className="border-none !p-0 bg-transparent"
+                        className="border-none p-0! bg-transparent"
                         searchString={filterString}
                         onResetFilter={() => setFilterString('')}
                       />

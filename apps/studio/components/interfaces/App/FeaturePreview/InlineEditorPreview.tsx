@@ -10,7 +10,7 @@ export const InlineEditorPreview = () => {
         width={1296}
         height={900}
         alt="api-docs-side-panel-preview"
-        className="rounded border mb-4"
+        className="rounded-sm border mb-4"
       />
       <p className="text-sm text-foreground-light mb-4">
         Edit policies, functions, and triggers directly in the inline SQL editor. When you select

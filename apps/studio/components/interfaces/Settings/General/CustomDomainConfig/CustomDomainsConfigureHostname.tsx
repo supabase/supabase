@@ -9,9 +9,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -76,7 +76,7 @@ export const CustomDomainsConfigureHostname = () => {
   const isSubmitting = isCheckingRecord || isCreating
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onCreateCustomDomain)}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 gap-4">
@@ -85,7 +85,7 @@ export const CustomDomainsConfigureHostname = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="domain"
                 render={({ field }) => (
@@ -95,14 +95,14 @@ export const CustomDomainsConfigureHostname = () => {
                     description="Enter the subdomain you want to use."
                     className="[&>div]:md:w-1/2"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         {...field}
                         placeholder="subdomain.example.com"
                         disabled={!canConfigureCustomDomain || isSubmitting}
                         autoComplete="off"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -170,6 +170,6 @@ export const CustomDomainsConfigureHostname = () => {
           </p>
         )}
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

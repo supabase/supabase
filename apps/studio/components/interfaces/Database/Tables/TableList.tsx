@@ -10,7 +10,7 @@ import { useState } from 'react'
 import {
   Button,
   Card,
-  Checkbox_Shadcn_,
+  Checkbox,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -210,7 +210,7 @@ export const TableList = ({
       <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
         <div className="flex gap-2 items-center">
           <SchemaSelector
-            className="flex-grow lg:flex-grow-0 w-[180px]"
+            className="grow lg:grow-0 w-[180px]"
             size="tiny"
             showError={false}
             selectedSchemaName={selectedSchema}
@@ -232,7 +232,7 @@ export const TableList = ({
                   {Object.entries(ENTITY_TYPE).map(([key, value]) => (
                     <div key={key} className="group flex items-center justify-between py-0.5">
                       <div className="flex items-center gap-x-2">
-                        <Checkbox_Shadcn_
+                        <Checkbox
                           id={key}
                           name={key}
                           checked={visibleTypes.includes(value)}
@@ -263,10 +263,10 @@ export const TableList = ({
             </PopoverContent_Shadcn_>
           </Popover_Shadcn_>
         </div>
-        <div className="flex flex-grow justify-between gap-2 items-center">
+        <div className="flex grow justify-between gap-2 items-center">
           <Input
             size="tiny"
-            className="flex-grow lg:flex-grow-0 w-52"
+            className="grow lg:grow-0 w-52"
             placeholder="Search for a table"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
@@ -306,7 +306,7 @@ export const TableList = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead key="icon" className="w-0 !px-0" />
+                  <TableHead key="icon" className="w-0 px-0!" />
                   <TableHead key="name" className="max-w-[160px] sm:max-w-[280px]">
                     Name
                   </TableHead>
@@ -367,7 +367,7 @@ export const TableList = ({
                   {entities.length > 0 &&
                     entities.map((x) => (
                       <TableRow key={x.id}>
-                        <TableCell className="w-0 !pl-5 !pr-1">
+                        <TableCell className="w-0 pl-5! pr-1!">
                           <Tooltip>
                             <TooltipTrigger asChild className="cursor-default">
                               <div className="flex w-4 justify-center">

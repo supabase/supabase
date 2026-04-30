@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Edit2, MoreHorizontal, MoreVertical, Trash } from 'lucide-react'
+import { Edit2, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import {
   Button,

@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import {
   Badge,
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   DialogDescription,
   DialogFooter,
@@ -142,7 +142,7 @@ export function RotateKeyDialog({
               htmlFor="understands-standby"
               className="flex items-top gap-4 text-sm leading-none"
             >
-              <Checkbox_Shadcn_
+              <Checkbox
                 id="understands-standby"
                 className="mt-0.5"
                 checked={isStandbyUnderstood}
@@ -178,7 +178,7 @@ export function RotateKeyDialog({
               htmlFor="understands-previously-used"
               className="flex items-top gap-4 text-sm leading-none"
             >
-              <Checkbox_Shadcn_
+              <Checkbox
                 className="mt-0.5"
                 id="understands-previously-used"
                 checked={isPreviouslyUsedUnderstood}
@@ -215,7 +215,7 @@ export function RotateKeyDialog({
 
             {verifyJWTEdgeFunctions.length > 0 && (
               <Label_Shadcn_ htmlFor="edge-functions-verify-jwt" className="flex gap-4 text-sm">
-                <Checkbox_Shadcn_
+                <Checkbox
                   id="edge-functions-verify-jwt"
                   className="mt-0.5"
                   checked={isEdgeFunctionsVerifyJWTUnderstood}

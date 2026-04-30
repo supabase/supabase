@@ -47,12 +47,12 @@ export const SparkBar = ({
           </div>
         )}
         <div
-          className={`relative rounded h-1 overflow-hidden w-full border p-0 ${
+          className={`relative rounded-sm h-1 overflow-hidden w-full border p-0 ${
             bgClass ? bgClass : 'bg-surface-400'
           } ${borderClass ? borderClass : 'border-none'}`}
         >
           <div
-            className={`absolute rounded inset-x-0 bottom-0 h-1 ${barClass} transition-all`}
+            className={`absolute rounded-sm inset-x-0 bottom-0 h-1 ${barClass} transition-all`}
             style={{ width: widthCss }}
           ></div>
         </div>
@@ -65,7 +65,7 @@ export const SparkBar = ({
 
     return (
       <div
-        className={`relative rounded w-5 overflow-hidden border p-1 ${
+        className={`relative rounded-sm w-5 overflow-hidden border p-1 ${
           bgClass ? bgClass : 'bg-gray-400'
         } ${borderClass ? borderClass : 'border-none'}`}
         style={{ height: totalHeight }}

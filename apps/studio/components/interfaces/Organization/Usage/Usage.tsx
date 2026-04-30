@@ -120,7 +120,7 @@ export const Usage = () => {
           <ScaffoldTitle>Usage</ScaffoldTitle>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <div className="sticky top-0 border-b bg-sidebar z-[1]">
+      <div className="sticky top-0 border-b bg-sidebar z-1">
         <ScaffoldContainer>
           <div className="py-4 flex items-center space-x-4">
             {isLoadingSubscription || isLoadingPermissions ? (
@@ -153,7 +153,7 @@ export const Usage = () => {
                     loading={isLoadingSubscription}
                     currentBillingPeriodStart={subscription?.current_period_start}
                     currentBillingPeriodEnd={subscription?.current_period_end}
-                    className="!w-48"
+                    className="w-48!"
                   />
 
                   <OrganizationProjectSelector

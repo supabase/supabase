@@ -102,7 +102,7 @@ const DatabaseUsage = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: poolerConfig } = usePgbouncerConfigQuery({ projectRef: project?.ref })
+  usePgbouncerConfigQuery({ projectRef: project?.ref })
 
   // PGBouncer connections
   const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })

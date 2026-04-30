@@ -17,10 +17,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
   Input_Shadcn_,
 } from 'ui'
 
@@ -81,7 +81,7 @@ const appendRows = <
  * Rendering-only field array for text/text pairs.
  *
  * Consumers own validation in their resolver schema and can rely on the nested
- * `FormMessage_Shadcn_` instances here to display per-cell errors.
+ * `FormMessage` instances here to display per-cell errors.
  */
 export const KeyValueFieldArray = <
   TFieldValues extends FieldValues,
@@ -126,12 +126,12 @@ export const KeyValueFieldArray = <
       <div className={rowsClassName}>
         {typedFields.map((field, index) => (
           <div key={field.fieldId} className={cn('flex items-start space-x-2', rowClassName)}>
-            <FormField_Shadcn_
+            <FormField
               control={control}
               name={toFieldPath<TFieldValues>(`${name}.${index}.${keyFieldName}`)}
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex-1">
-                  <FormControl_Shadcn_>
+                <FormItem className="flex-1">
+                  <FormControl>
                     <Input_Shadcn_
                       {...field}
                       size={inputSize}
@@ -139,18 +139,18 @@ export const KeyValueFieldArray = <
                       placeholder={keyPlaceholder}
                       disabled={disabled}
                     />
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               control={control}
               name={toFieldPath<TFieldValues>(`${name}.${index}.${valueFieldName}`)}
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex-1">
-                  <FormControl_Shadcn_>
+                <FormItem className="flex-1">
+                  <FormControl>
                     <Input_Shadcn_
                       {...field}
                       size={inputSize}
@@ -158,9 +158,9 @@ export const KeyValueFieldArray = <
                       placeholder={valuePlaceholder}
                       disabled={disabled}
                     />
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 

@@ -111,15 +111,15 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
         <div
           className={cn(
             'absolute inset-0 h-full w-full bg-background/90 dark:bg-background/95 transition-all duration-300',
-            !showLaunchWeekNavMode && !isTransparent && '!opacity-100',
-            showLaunchWeekNavMode && '!bg-transparent dark:!bg-black',
-            isGAWeekSection && 'dark:!bg-alternative',
-            isTransparent && '!bg-transparent dark:!bg-transparent !opacity-100'
+            !showLaunchWeekNavMode && !isTransparent && 'opacity-100!',
+            showLaunchWeekNavMode && 'bg-transparent! dark:bg-black!',
+            isGAWeekSection && 'dark:bg-alternative!',
+            isTransparent && 'bg-transparent! dark:bg-transparent! opacity-100!'
           )}
         />
         <nav
           className={cn(
-            `relative z-40 border-default border-b backdrop-blur-sm transition-all duration-300`,
+            `relative z-40 border-default border-b backdrop-blur-xs transition-all duration-300`,
             showLaunchWeekNavMode && 'border-muted border-b bg-transparent',
             isTransparent && 'border-transparent backdrop-blur-none'
           )}
@@ -127,7 +127,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
           <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">
             <div className="flex items-center px-6 lg:px-0 flex-1 sm:items-stretch justify-between">
               <div className="flex items-center">
-                <div className="flex items-center flex-shrink-0">
+                <div className="flex items-center shrink-0">
                   <RightClickBrandLogo />
                 </div>
                 <NavigationMenu
@@ -142,7 +142,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           <NavigationMenuTrigger
                             className={cn(
                               buttonVariants({ type: 'text', size: 'small' }),
-                              '!bg-transparent hover:text-brand-link data-[state=open]:!text-brand-link data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground px-2 h-auto'
+                              'bg-transparent! hover:text-brand-link data-open:text-brand-link! data-radix-collection-item:focus-visible:ring-2 data-radix-collection-item:focus-visible:ring-foreground-lighter data-radix-collection-item:focus-visible:text-foreground px-2 h-auto'
                             )}
                           >
                             {menuItem.title}
@@ -165,7 +165,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                   </NavigationMenuList>
                 </NavigationMenu>
               </div>
-              <div className="flex items-center gap-2 opacity-0 animate-fade-in !scale-100 delay-300">
+              <div className="flex items-center gap-2 opacity-0 animate-fade-in scale-100! delay-300">
                 <div
                   className={cn(
                     'flex items-center gap-2 transition-opacity',

@@ -38,15 +38,19 @@ import {
   type PotentialIssues,
 } from './SQLEditor.types'
 import {
+  appendEnableRLSStatements,
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
   createSqlSnippetSkeletonV2,
+  filterTablesCoveredByEnsureRLSTrigger,
+  getCreateTablesMissingRLS,
+  hasActiveEnsureRLSTrigger,
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
 import { useAddDefinitions } from './useAddDefinitions'
-import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { UtilityPanel } from './UtilityPanel/UtilityPanel'
 import {
   isExplainQuery,
   isExplainSql,
@@ -56,6 +60,7 @@ import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/L
 import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from '@/components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
+import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
 import { constructHeaders, isValidConnString } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -77,6 +82,8 @@ import {
   isRoleImpersonationEnabled,
   useGetImpersonatedRoleState,
 } from '@/state/role-impersonation-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
@@ -140,6 +147,22 @@ export const SQLEditor = () => {
     })
   }, [])
 
+  useShortcut(SHORTCUT_IDS.SQL_EDITOR_FOCUS_EDITOR, refocusEditor, {
+    registerInCommandMenu: true,
+  })
+
+  const openNewSnippet = useCallback(() => {
+    if (!ref) return
+    // skip=true bypasses the "load last visited snippet" redirect on /sql/new.
+    // Without it, the effect in pages/project/[ref]/sql/[id].tsx bounces back
+    // to the previous snippet.
+    router.push(`/project/${ref}/sql/new?skip=true`)
+  }, [ref, router])
+
+  useShortcut(SHORTCUT_IDS.SQL_EDITOR_NEW_SNIPPET, openNewSnippet, {
+    registerInCommandMenu: true,
+  })
+
   const clearPendingRunRefocus = useCallback(() => {
     shouldRefocusAfterRunRef.current = false
   }, [])
@@ -173,6 +196,14 @@ export const SQLEditor = () => {
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
     {
       projectRef: ref,
+    },
+    { enabled: isValidConnString(project?.connectionString) }
+  )
+
+  const { data: eventTriggers } = useDatabaseEventTriggersQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
     },
     { enabled: isValidConnString(project?.connectionString) }
   )
@@ -297,8 +328,12 @@ export const SQLEditor = () => {
     }
   }, [id, isDiffOpen, project, snapV2])
 
+  useShortcut(SHORTCUT_IDS.SQL_EDITOR_FORMAT, prettifyQuery, {
+    registerInCommandMenu: true,
+  })
+
   const executeQuery = useCallback(
-    async (force: boolean = false) => {
+    async (force: boolean = false, sqlOverride?: string) => {
       if (isDiffOpen) {
         clearPendingRunRefocus()
         return
@@ -317,23 +352,32 @@ export const SQLEditor = () => {
       const selection = editor.getSelection()
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
-      const sql = snippet
+      const editorSql = snippet
         ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
         : selectedValue || editorRef.current?.getValue()
+      const sql = sqlOverride ?? editorSql
 
       const hasDestructiveOperations = checkDestructiveQuery(sql)
       const hasUpdateWithoutWhere = isUpdateWithoutWhere(sql)
       const hasAlterDatabasePreventConnection = checkAlterDatabaseConnection(sql)
+      const createTablesMissingRLS = filterTablesCoveredByEnsureRLSTrigger(
+        getCreateTablesMissingRLS(sql),
+        hasActiveEnsureRLSTrigger(eventTriggers)
+      )
 
       const queryHasIssues =
         !force &&
-        (hasDestructiveOperations || hasUpdateWithoutWhere || hasAlterDatabasePreventConnection)
+        (hasDestructiveOperations ||
+          hasUpdateWithoutWhere ||
+          hasAlterDatabasePreventConnection ||
+          createTablesMissingRLS.length > 0)
 
       if (queryHasIssues) {
         setPotentialIssues({
           hasDestructiveOperations,
           hasUpdateWithoutWhere,
           hasAlterDatabasePreventConnection,
+          createTablesMissingRLS,
         })
         return
       }
@@ -395,6 +439,7 @@ export const SQLEditor = () => {
       setAiTitle,
       databaseSelectorState.selectedDatabaseId,
       databases,
+      eventTriggers,
       limit,
     ]
   )
@@ -476,6 +521,10 @@ export const SQLEditor = () => {
     lineHighlights,
     snapV2,
   ])
+
+  useShortcut(SHORTCUT_IDS.SQL_EDITOR_EXPLAIN, executeExplainQuery, {
+    registerInCommandMenu: true,
+  })
 
   const handleNewQuery = useCallback(
     async (sql: string, name: string) => {
@@ -604,7 +653,7 @@ export const SQLEditor = () => {
 
   const complete = useCallback(
     async (
-      prompt: string,
+      _prompt: string,
       options?: {
         headers?: Record<string, string>
         body?: { completionMetadata?: any }
@@ -816,6 +865,21 @@ export const SQLEditor = () => {
           refocusEditor()
           void executeQuery(true)
         }}
+        onConfirmWithRLS={() => {
+          const tables = potentialIssues?.createTablesMissingRLS ?? []
+          if (tables.length === 0) return
+          const editor = editorRef.current
+          const selection = editor?.getSelection()
+          const selectedValue = selection
+            ? editor?.getModel()?.getValueInRange(selection)
+            : undefined
+          const baseSql = selectedValue || editor?.getValue() || ''
+          const rewrittenSql = appendEnableRLSStatements(baseSql, tables)
+          shouldRefocusAfterRunRef.current = true
+          setPotentialIssues(undefined)
+          refocusEditor()
+          void executeQuery(true, rewrittenSql)
+        }}
       />
 
       <div className="flex h-full">
@@ -825,7 +889,7 @@ export const SQLEditor = () => {
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
           <ResizablePanel defaultSize="50" maxSize="70">
-            <div className="flex-grow overflow-y-auto border-b h-full">
+            <div className="grow overflow-y-auto border-b h-full">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
                   <Loader2 className="animate-spin text-brand" />
@@ -873,7 +937,7 @@ export const SQLEditor = () => {
                       placeholder={
                         !promptState.isOpen && !editorRef.current?.getValue()
                           ? 'Hit ' +
-                            (os === 'macos' ? 'CMD+K' : `CTRL+K`) +
+                            (os === 'macos' ? 'CMD+SHIFT+K' : `CTRL+SHIFT+K`) +
                             ' to generate query or just start typing'
                           : ''
                       }
@@ -887,6 +951,8 @@ export const SQLEditor = () => {
                       editorRef={editorRef}
                       monacoRef={monacoRef}
                       executeQuery={executeQuery}
+                      executeExplainQuery={executeExplainQuery}
+                      prettifyQuery={prettifyQuery}
                       onHasSelection={setHasSelection}
                       onMount={onMount}
                       onPrompt={({

@@ -278,7 +278,7 @@ export default function TimezoneSelector({ value, onChange }: TimezoneSelectorPr
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Search timezones..."
-              className="w-full text-foreground text-sm placeholder:text-foreground-lighter/50 outline-none focus:ring-transparent focus:border-muted bg-muted rounded-md"
+              className="w-full text-foreground text-sm placeholder:text-foreground-lighter/50 outline-hidden focus:ring-transparent focus:border-muted bg-muted rounded-md"
               role="combobox"
               aria-expanded={open}
               aria-activedescendant={
@@ -317,7 +317,7 @@ export default function TimezoneSelector({ value, onChange }: TimezoneSelectorPr
                         )}
                       >
                         <span className="truncate">{zone.label}</span>
-                        <span className="text-xs text-foreground-lighter flex-shrink-0 ml-2">
+                        <span className="text-xs text-foreground-lighter shrink-0 ml-2">
                           {zone.offset}
                         </span>
                       </button>

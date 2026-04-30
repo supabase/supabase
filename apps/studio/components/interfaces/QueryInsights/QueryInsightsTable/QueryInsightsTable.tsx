@@ -333,7 +333,7 @@ export const QueryInsightsTable = ({
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <div className="overflow-x-auto flex-shrink-0 bg-surface-100 border-b">
+      <div className="overflow-x-auto shrink-0 bg-surface-100 border-b">
         <div className="flex items-center justify-between px-6 h-10 min-w-max">
           <div className="flex items-center gap-x-1.5">
             <TwoOptionToggle
@@ -365,28 +365,28 @@ export const QueryInsightsTable = ({
           <div className="flex items-center">
             {mode === 'triage' ? (
               <Tabs_Shadcn_ value={filter} onValueChange={(v) => setFilter(v as IssueFilter)}>
-                <TabsList_Shadcn_ className="flex gap-x-4 rounded-none !mt-0 pt-0 !border-none">
+                <TabsList_Shadcn_ className="flex gap-x-4 rounded-none mt-0! pt-0 border-none!">
                   <TabsTrigger_Shadcn_
                     value="all"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                    className="text-xs py-3 border-b font-mono uppercase"
                   >
                     All{triageItems.length > 0 && ` (${triageItems.length})`}
                   </TabsTrigger_Shadcn_>
                   <TabsTrigger_Shadcn_
                     value="error"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                    className="text-xs py-3 border-b font-mono uppercase"
                   >
                     Errors{errorCount > 0 && ` (${errorCount})`}
                   </TabsTrigger_Shadcn_>
                   <TabsTrigger_Shadcn_
                     value="index"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                    className="text-xs py-3 border-b font-mono uppercase"
                   >
                     Index{indexCount > 0 && ` (${indexCount})`}
                   </TabsTrigger_Shadcn_>
                   <TabsTrigger_Shadcn_
                     value="slow"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                    className="text-xs py-3 border-b font-mono uppercase"
                   >
                     Slow{slowCount > 0 && ` (${slowCount})`}
                   </TabsTrigger_Shadcn_>
@@ -452,7 +452,7 @@ export const QueryInsightsTable = ({
             <DataGrid
               ref={triageGridRef}
               style={{ height: '100%' }}
-              className="flex-1 flex-grow h-full"
+              className="flex-1 grow h-full"
               rowHeight={60}
               headerRowHeight={36}
               columns={triageColumns}
@@ -465,7 +465,7 @@ export const QueryInsightsTable = ({
                   `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : isCharted ? 'bg-surface-200 dark:bg-surface-200' : 'bg-200 hover:bg-surface-200'} cursor-pointer`,
                   '[&>div:first-child]:border-l-4 [&>div:first-child]:pl-5 [&>div:last-child]:pr-6',
                   `${isSelected || isCharted ? '[&>div:first-child]:border-l-foreground' : '[&>div:first-child]:border-l-transparent'}`,
-                  '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none [&>.rdg-cell]:py-3',
+                  '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none [&>.rdg-cell]:py-3',
                   '[&>.rdg-cell.column-prop_total_time]:relative',
                 ].join(' ')
               }}
@@ -508,7 +508,7 @@ export const QueryInsightsTable = ({
             <DataGrid
               ref={gridRef}
               style={{ height: '100%' }}
-              className={cn('flex-1 flex-grow h-full')}
+              className={cn('flex-1 grow h-full')}
               rowHeight={44}
               headerRowHeight={36}
               columns={columns}
@@ -521,7 +521,7 @@ export const QueryInsightsTable = ({
                   `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : isCharted ? 'bg-surface-200 dark:bg-surface-200' : 'bg-200 hover:bg-surface-200'} cursor-pointer`,
                   '[&>div:first-child]:border-l-4 [&>div:first-child]:pl-5 [&>div:last-child]:pr-6',
                   `${isSelected || isCharted ? '[&>div:first-child]:border-l-foreground' : '[&>div:first-child]:border-l-transparent'}`,
-                  '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none [&>.rdg-cell]:py-3',
+                  '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none [&>.rdg-cell]:py-3',
                   '[&>.rdg-cell.column-prop_total_time]:relative',
                 ].join(' ')
               }}

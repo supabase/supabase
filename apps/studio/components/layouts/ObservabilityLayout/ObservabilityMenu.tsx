@@ -164,7 +164,7 @@ const ObservabilityMenu = () => {
                         >
                           <Link
                             href={subItem.url}
-                            className="flex-grow h-7 flex justify-between items-center pl-3"
+                            className="grow h-7 flex justify-between items-center pl-3"
                           >
                             <span>{subItem.name}</span>
                           </Link>

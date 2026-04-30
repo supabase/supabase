@@ -71,7 +71,7 @@ const AWSReInvent2025: NextPage = () => {
 
         {/* Schedule Section */}
         <section id={data.scheduleSection.id} className="relative py-16 md:py-24">
-          <SectionContainer className="lg:!py-0">
+          <SectionContainer className="lg:py-0!">
             <div className="lg:text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-medium mb-4">
                 {data.scheduleSection.title}

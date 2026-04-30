@@ -1,5 +1,5 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -44,6 +44,7 @@ import { JitDbAccessRulesTable } from './JitDbAccessRulesTable'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import AlertError from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useJitDbAccessMembersQuery } from '@/data/jit-db-access/jit-db-access-members-query'
@@ -107,18 +108,18 @@ export const JitDbAccessConfiguration = () => {
         const nextEnabled = variables.requestedConfig.state === 'enabled'
 
         if (nextEnabled) {
-          toast.success('JIT access enabled')
+          toast.success('Temporary access enabled')
         } else {
           toast.success(
             activeRuleCount > 0
-              ? `JIT access disabled. ${activeRuleCount} configured member${activeRuleCount === 1 ? '' : 's'} can no longer request temporary database access.`
-              : 'JIT access disabled'
+              ? `Temporary access disabled. ${activeRuleCount} configured member${activeRuleCount === 1 ? '' : 's'} can no longer request temporary database access.`
+              : 'Temporary access disabled'
           )
         }
       },
       onError: (error) => {
         setEnabled(initialIsEnabled ?? false)
-        toast.error(`Failed to update just-in-time (JIT) database access: ${error.message}`)
+        toast.error(`Failed to update temporary access: ${error.message}`)
       },
     })
 
@@ -138,18 +139,13 @@ export const JitDbAccessConfiguration = () => {
   const isRulesLoading = isLoadingJitMembers || isLoadingProjectMembers
 
   const initialIsEnabled =
-    isSuccessConfiguration &&
-    !!jitDbAccessConfiguration &&
-    'appliedSuccessfully' in jitDbAccessConfiguration &&
-    jitDbAccessConfiguration.appliedSuccessfully &&
-    'state' in jitDbAccessConfiguration &&
-    (jitDbAccessConfiguration as { state: string }).state === 'enabled'
-
-  const hasAccessToJitDbAccess = !(
-    jitDbAccessConfiguration !== undefined &&
-    'isUnavailable' in jitDbAccessConfiguration &&
-    jitDbAccessConfiguration.isUnavailable
-  )
+    jitDbAccessConfiguration?.state === 'enabled'
+      ? jitDbAccessConfiguration?.appliedSuccessfully
+      : false
+  const isJitDbAccessUnavailable = jitDbAccessConfiguration?.state === 'unavailable'
+  const unavailableReason = isJitDbAccessUnavailable
+    ? jitDbAccessConfiguration.unavailableReason
+    : undefined
 
   const roleOptions = useMemo(() => getAssignableJitRoleOptions(databaseRoles), [databaseRoles])
 
@@ -214,7 +210,7 @@ export const JitDbAccessConfiguration = () => {
   }
 
   const handleJitToggleChange = (checked: boolean) => {
-    if (!hasAccessToJitDbAccess || !canUpdateJitDbAccess) return
+    if (isJitDbAccessUnavailable || !canUpdateJitDbAccess) return
 
     if (checked && !enabled) {
       if (activeRuleCount > 0) {
@@ -261,9 +257,28 @@ export const JitDbAccessConfiguration = () => {
 
   const showToggleFailedWarning =
     isSuccessConfiguration &&
-    !!jitDbAccessConfiguration &&
-    'appliedSuccessfully' in jitDbAccessConfiguration &&
+    jitDbAccessConfiguration?.state !== 'unavailable' &&
     !jitDbAccessConfiguration.appliedSuccessfully
+
+  const projectReference = ref ? (
+    <>
+      This project <code className="text-code-inline">{ref}</code>
+    </>
+  ) : (
+    'This project'
+  )
+  const unavailableTitle =
+    unavailableReason === 'postgres_upgrade_required'
+      ? 'Postgres upgrade required'
+      : unavailableReason === 'manual_migration_required'
+        ? 'Migration required'
+        : 'Temporary access unavailable'
+  const unavailableDescription =
+    unavailableReason === 'postgres_upgrade_required'
+      ? 'must be upgraded to Postgres 17 or later before temporary access can be enabled.'
+      : unavailableReason === 'manual_migration_required'
+        ? 'must be migrated before temporary access can be enabled. Contact support to migrate this project.'
+        : 'This feature is currently unavailable for this project. Contact support if you need help enabling it.'
 
   useEffect(() => {
     if (!isLoadingConfiguration && jitDbAccessConfiguration) {
@@ -276,45 +291,71 @@ export const JitDbAccessConfiguration = () => {
       <PageSection id="jit-db-access-configuration">
         <PageSectionMeta>
           <PageSectionSummary>
-            <PageSectionTitle>Just-in-Time (JIT)</PageSectionTitle>
+            <PageSectionTitle>
+              <span className="flex items-center gap-2">
+                Temporary access
+                <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS} />
+              </span>
+            </PageSectionTitle>
           </PageSectionSummary>
-          <DocsButton href={`${DOCS_URL}/guides/platform/just-in-time-database-access`} />
+          <DocsButton href={`${DOCS_URL}/guides/platform/temporary-access`} />
         </PageSectionMeta>
 
         <PageSectionContent className="space-y-4">
           {isErrorJitDbAccessConfiguration && (
             <AlertError
               projectRef={ref}
-              subject="Failed to retrieve JIT database access configuration"
+              subject="Failed to load temporary access"
               error={jitDbAccessConfigurationError as { message: string } | null}
+              showInstructions={false}
             />
           )}
 
-          {!isErrorJitDbAccessConfiguration && !hasAccessToJitDbAccess && (
+          {!isErrorJitDbAccessConfiguration && isJitDbAccessUnavailable && (
             <Admonition
               type="note"
               layout="responsive"
-              title="Postgres upgrade required"
-              description="Just-in-time access requires a newer Postgres version. Upgrade your project’s Postgres version to enable JIT access."
+              title={unavailableTitle}
+              description={
+                unavailableReason === 'temporarily_unavailable' ? (
+                  unavailableDescription
+                ) : (
+                  <>
+                    {projectReference} {unavailableDescription}
+                  </>
+                )
+              }
               actions={
-                ref ? (
+                unavailableReason === 'postgres_upgrade_required' && ref ? (
                   <Button type="default" asChild>
                     <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Postgres</Link>
                   </Button>
-                ) : undefined
+                ) : (
+                  <Button type="default" asChild>
+                    <SupportLink
+                      queryParams={{
+                        category: SupportCategories.PROBLEM,
+                        projectRef: ref,
+                        subject: unavailableTitle,
+                      }}
+                    >
+                      Contact support
+                    </SupportLink>
+                  </Button>
+                )
               }
             />
           )}
 
-          {!isErrorJitDbAccessConfiguration && hasAccessToJitDbAccess && (
+          {!isErrorJitDbAccessConfiguration && !isJitDbAccessUnavailable && (
             <Card>
               <CardContent className="space-y-4">
                 <FormLayout
                   layout="flex-row-reverse"
-                  label="Enable JIT access"
-                  description="Allow configured project members to request temporary database access."
+                  label="Allow temporary access"
+                  description="Let project members request temporary database access."
                 >
-                  <div className="flex w-fit flex-shrink-0 items-center justify-end gap-2">
+                  <div className="flex w-fit shrink-0 items-center justify-end gap-2">
                     {(isLoadingConfiguration || isUpdatingJitDbAccess) && (
                       <Loader2
                         className="animate-spin text-foreground-muted/50"
@@ -345,14 +386,14 @@ export const JitDbAccessConfiguration = () => {
                 <Admonition
                   type="warning"
                   layout="horizontal"
-                  title="JIT access update failed"
+                  title="Temporary access update didn’t apply"
                   description={
                     <>
-                      The change didn’t apply. Try turning JIT access on or off again, or{' '}
+                      The change didn’t apply. Try enabling or disabling temporary access again, or{' '}
                       <SupportLink
                         queryParams={{
                           category: SupportCategories.DASHBOARD_BUG,
-                          subject: 'JIT access was not updated successfully',
+                          subject: 'Temporary access was not updated successfully',
                         }}
                         className={InlineLinkClassName}
                       >
@@ -367,13 +408,14 @@ export const JitDbAccessConfiguration = () => {
             </Card>
           )}
 
-          {enabled && hasAccessToJitDbAccess && !isUpdatingJitDbAccess && (
+          {enabled && !isJitDbAccessUnavailable && !isUpdatingJitDbAccess && (
             <>
               {isErrorJitMembers && (
                 <AlertError
                   projectRef={ref}
-                  subject="Failed to retrieve JIT access rules"
+                  subject="Failed to load temporary access rules"
                   error={jitMembersError as { message: string } | null}
+                  showInstructions={false}
                 />
               )}
 
@@ -408,11 +450,11 @@ export const JitDbAccessConfiguration = () => {
       <AlertDialog open={showEnableJitDialog} onOpenChange={setShowEnableJitDialog}>
         <AlertDialogContent size="small">
           <AlertDialogHeader>
-            <AlertDialogTitle>JIT access will activate existing rules</AlertDialogTitle>
+            <AlertDialogTitle>This will activate existing rules</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="text-sm">
                 <p>
-                  Enabling JIT will allow {activeRuleCount} configured member
+                  Enabling temporary access will allow {activeRuleCount} pre-configured member
                   {activeRuleCount === 1 ? '' : 's'} to request temporary database access
                   immediately.
                 </p>
@@ -426,7 +468,7 @@ export const JitDbAccessConfiguration = () => {
               disabled={isUpdatingJitDbAccess}
               onClick={handleConfirmEnableJit}
             >
-              Enable JIT access
+              Enable temporary access
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

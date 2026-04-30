@@ -485,7 +485,7 @@ export const UsersV2 = () => {
   return (
     <>
       <div className="h-full flex flex-col">
-        <FormHeader className="py-4 px-6 !mb-0 border-b" title="Users" />
+        <FormHeader className="py-4 px-6 mb-0! border-b" title="Users" />
 
         {showImprovedSearchOptIn && (
           <Alert_Shadcn_ className="rounded-none mb-0 border-0 relative">
@@ -592,7 +592,7 @@ export const UsersV2 = () => {
                       <SelectTrigger_Shadcn_
                         size="tiny"
                         className={cn(
-                          'w-[140px] !bg-transparent',
+                          'w-[140px] bg-transparent!',
                           filterUserType === 'all' && 'border-dashed'
                         )}
                       >
@@ -746,14 +746,14 @@ export const UsersV2 = () => {
         <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
         <ResizablePanelGroup
           orientation="horizontal"
-          className="relative flex flex-grow bg-alternative min-h-0"
+          className="relative flex grow bg-alternative min-h-0"
           autoSaveId="query-performance-layout-v1"
         >
           <ResizablePanel>
             <div className="flex flex-col w-full h-full">
               <DataGrid
                 ref={gridRef}
-                className="flex-grow border-t-0"
+                className="grow border-t-0"
                 rowHeight={44}
                 headerRowHeight={36}
                 columns={columns}
@@ -762,7 +762,7 @@ export const UsersV2 = () => {
                   const isSelected = row.id === selectedUser
                   return [
                     `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-                    '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                    '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
                     '[&>.rdg-cell:first-child>div]:ml-4',
                   ].join(' ')
                 }}

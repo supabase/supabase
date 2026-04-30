@@ -95,7 +95,7 @@ const BlogPostRenderer = ({
     return (
       <Link href={`${post.path}`} as={`${post.path}`}>
         <div className={className ?? ''}>
-          <div className="hover:bg-control cursor-pointer rounded border p-6 transition">
+          <div className="hover:bg-control cursor-pointer rounded-sm border p-6 transition">
             <div className="space-y-4">
               <div>
                 <p className="text-foreground-lighter text-sm">{label}</p>

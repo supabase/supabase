@@ -44,7 +44,7 @@ const Content = ({ card }: { card: any }) => {
       >
         {card.image}
       </div>
-      <div className={cn('flex flex-col gap-1 p-4 xl:p-6 xl:!pt-0', isHoriz && 'xl:w-2/5')}>
+      <div className={cn('flex flex-col gap-1 p-4 xl:p-6 xl:pt-0!', isHoriz && 'xl:w-2/5')}>
         <h3 className="text-foreground">{card.label}</h3>
         <div className={cn('flex-1 flex flex-col justify-between gap-2', isHoriz && 'flex-auto')}>
           <p className="text-sm text-foreground-lighter">{card.paragraph}</p>
