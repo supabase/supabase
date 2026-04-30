@@ -5,6 +5,10 @@ import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
+// V2 audit log timestamps are returned in microseconds, not milliseconds.
+// Divide by this constant before passing to dayjs/Date to get a valid date.
+export const TIMESTAMP_MICROS_PER_MS = 1000
+
 export type V2AuditLog = {
   organization_slug?: string
   project_ref?: string

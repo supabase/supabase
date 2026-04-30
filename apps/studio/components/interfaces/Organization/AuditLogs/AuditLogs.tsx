@@ -32,6 +32,7 @@ import {
 } from '@/data/organizations/organization-audit-logs-query'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { TIMESTAMP_MICROS_PER_MS } from '@/data/profile/profile-audit-logs-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -407,7 +408,9 @@ export const AuditLogs = () => {
                               )}
                             </Table.td>
                             <Table.td>
-                              {dayjs.unix(log.timestamp).format('DD MMM YYYY, HH:mm:ss')}
+                              {dayjs(log.timestamp / TIMESTAMP_MICROS_PER_MS).format(
+                                'DD MMM YYYY, HH:mm:ss'
+                              )}
                             </Table.td>
                             <Table.td align="right">
                               <Button type="default">View details</Button>

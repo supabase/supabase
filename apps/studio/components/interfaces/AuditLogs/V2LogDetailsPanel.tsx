@@ -6,7 +6,10 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
-import type { V2AuditLog } from '@/data/profile/profile-audit-logs-query'
+import {
+  TIMESTAMP_MICROS_PER_MS,
+  type V2AuditLog,
+} from '@/data/profile/profile-audit-logs-query'
 
 interface V2LogDetailsPanelProps {
   selectedLog?: V2AuditLog
@@ -15,7 +18,9 @@ interface V2LogDetailsPanelProps {
 
 export const V2LogDetailsPanel = ({ selectedLog, onClose }: V2LogDetailsPanelProps) => {
   const timestamp = selectedLog
-    ? dayjs.unix(selectedLog.timestamp).format('DD MMM YYYY, HH:mm:ss')
+    ? dayjs(selectedLog.timestamp / TIMESTAMP_MICROS_PER_MS).format(
+        'DD MMM YYYY, HH:mm:ss'
+      )
     : ''
 
   return (
@@ -32,7 +37,11 @@ export const V2LogDetailsPanel = ({ selectedLog, onClose }: V2LogDetailsPanelPro
             readOnly
             size="small"
             label="Occurred at"
-            value={selectedLog ? dayjs.unix(selectedLog.timestamp).toISOString() : ''}
+            value={
+              selectedLog
+                ? dayjs(selectedLog.timestamp / TIMESTAMP_MICROS_PER_MS).toISOString()
+                : ''
+            }
             descriptionText={timestamp}
           />
           <Input readOnly size="small" label="Request ID" value={selectedLog?.request_id ?? ''} />

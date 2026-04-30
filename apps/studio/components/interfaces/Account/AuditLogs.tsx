@@ -15,7 +15,11 @@ import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useProfileAuditLogsQuery, type V2AuditLog } from '@/data/profile/profile-audit-logs-query'
+import {
+  TIMESTAMP_MICROS_PER_MS,
+  useProfileAuditLogsQuery,
+  type V2AuditLog,
+} from '@/data/profile/profile-audit-logs-query'
 import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 
 export const AuditLogs = () => {
@@ -220,7 +224,9 @@ export const AuditLogs = () => {
                       const organization = organizations?.find(
                         (org) => org.slug === log.organization_slug
                       )
-                      const isoTimestamp = dayjs.unix(log.timestamp).toISOString()
+                      const isoTimestamp = dayjs(
+                        log.timestamp / TIMESTAMP_MICROS_PER_MS
+                      ).toISOString()
 
                       return (
                         <Table.tr

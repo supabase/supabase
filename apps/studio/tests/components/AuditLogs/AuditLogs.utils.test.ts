@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { describe, expect, test } from 'vitest'
 
 import {
@@ -5,11 +6,19 @@ import {
   filterByUsers,
   sortAuditLogs,
 } from '@/components/interfaces/Organization/AuditLogs/AuditLogs.utils'
-import type { V2AuditLog } from '@/data/profile/profile-audit-logs-query'
+import {
+  TIMESTAMP_MICROS_PER_MS,
+  type V2AuditLog,
+} from '@/data/profile/profile-audit-logs-query'
+
+// Timestamps are in microseconds (e.g. 1777471903844000 = April 2026)
+const TS_A = 1777471903844000
+const TS_B = 1777471903845000
+const TS_C = 1777471903846000
 
 function makeLog(overrides: Partial<V2AuditLog> = {}): V2AuditLog {
   return {
-    timestamp: 1000,
+    timestamp: TS_A,
     request_id: 'req-1',
     action: { name: 'test', method: 'GET', route: '/api/test', status: 200 },
     actor: { token_type: 'bearer' },
@@ -17,17 +26,33 @@ function makeLog(overrides: Partial<V2AuditLog> = {}): V2AuditLog {
   }
 }
 
-const logA = makeLog({ timestamp: 1000, request_id: 'req-a', project_ref: 'proj-1' })
+const logA = makeLog({ timestamp: TS_A, request_id: 'req-a', project_ref: 'proj-1' })
 const logB = makeLog({
-  timestamp: 2000,
+  timestamp: TS_B,
   request_id: 'req-b',
   project_ref: 'proj-2',
   actor: { token_type: 'bearer', user_id: 'user-1' },
 })
 const logC = makeLog({
-  timestamp: 3000,
+  timestamp: TS_C,
   request_id: 'req-c',
   actor: { token_type: 'bearer', user_id: 'user-2' },
+})
+
+describe('timestamp conversion (microseconds → milliseconds)', () => {
+  test('dividing by 1000 produces a valid date', () => {
+    expect(dayjs(TS_A / TIMESTAMP_MICROS_PER_MS).isValid()).toBe(true)
+  })
+
+  test('produces the correct year', () => {
+    expect(dayjs(TS_A / TIMESTAMP_MICROS_PER_MS).year()).toBe(2026)
+  })
+
+  test('dayjs.unix on a microsecond value produces an invalid date', () => {
+    // Guard: confirms the bug we fixed — dayjs.unix() treats the value as seconds,
+    // overflowing JS Date's max and producing "Invalid Date"
+    expect(dayjs.unix(TS_A).isValid()).toBe(false)
+  })
 })
 
 describe('sortAuditLogs', () => {
