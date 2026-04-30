@@ -105,8 +105,8 @@ const PauseProjectButton = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Pause project?</AlertDialogTitle>
             <AlertDialogDescription>
-              This project will be unavailable while paused. Your data stays safe, and you can
-              resume it later from the dashboard while it remains within the restore window.
+              This project will be unavailable while paused. Paused projects can be resumed for 90
+              days. After that, backups remain available to download.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
