@@ -51,8 +51,9 @@ test.describe('Database', () => {
 );`,
       })
 
-      // dismiss the "copied as SQL" toast so it doesn't intercept clicks on
-      // the export button, which sits in the same top-right corner
+      // wait for the "copied as SQL" toast to render, then dismiss it so it
+      // doesn't intercept clicks on the export button below
+      await expect(page.getByText('Successfully copied as SQL')).toBeVisible({ timeout: 15000 })
       await dismissToastsIfAny(page)
 
       // downloads schema diagram when export is triggered
@@ -62,7 +63,9 @@ test.describe('Database', () => {
       const download = await downloadPromise
       expect(download.suggestedFilename()).toContain('.png')
 
-      // dismiss the "downloaded as PNG" toast for the same reason
+      // wait for the "downloaded as PNG" toast and dismiss it before the
+      // schema selector click for the same reason
+      await expect(page.getByText('Successfully downloaded as PNG')).toBeVisible({ timeout: 15000 })
       await dismissToastsIfAny(page)
 
       // changing schema -> auth
