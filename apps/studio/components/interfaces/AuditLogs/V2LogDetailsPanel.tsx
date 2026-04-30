@@ -17,6 +17,9 @@ export const V2LogDetailsPanel = ({ selectedLog, onClose }: V2LogDetailsPanelPro
   const timestamp = selectedLog
     ? dayjs(selectedLog.timestamp / TIMESTAMP_MICROS_PER_MS).format('DD MMM YYYY, HH:mm:ss')
     : ''
+  const timestampWithTz = selectedLog
+    ? dayjs(selectedLog.timestamp / TIMESTAMP_MICROS_PER_MS).format('DD MMM YYYY, HH:mm:ss (ZZ)')
+    : ''
 
   return (
     <SidePanel
@@ -37,7 +40,7 @@ export const V2LogDetailsPanel = ({ selectedLog, onClose }: V2LogDetailsPanelPro
                 ? dayjs(selectedLog.timestamp / TIMESTAMP_MICROS_PER_MS).toISOString()
                 : ''
             }
-            descriptionText={timestamp}
+            descriptionText={timestampWithTz}
           />
           <Input readOnly size="small" label="Request ID" value={selectedLog?.request_id ?? ''} />
           {selectedLog?.organization_slug && (
