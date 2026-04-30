@@ -332,7 +332,7 @@ export const OAuthAppsList = () => {
                     </TableHeadSort>
                   </TableHead>
                   <TableHead className="w-8 px-0">
-                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
+                    <div className="bg-200! px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -350,7 +350,7 @@ export const OAuthAppsList = () => {
                       <TableCell title={app.client_name}>
                         <Button
                           type="text"
-                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:!w-full"
+                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:w-full!"
                           onClick={() => setSelectedAppToEdit(app.client_id)}
                           title={app.client_name}
                         >

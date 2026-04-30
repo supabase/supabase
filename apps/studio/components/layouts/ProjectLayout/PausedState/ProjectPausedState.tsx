@@ -54,7 +54,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const isRestoreDisabled = isPauseStatusSuccess && !pauseStatus.can_restore
 
   return (
-    <Card className="w-full max-w-[40rem] mx-auto">
+    <Card className="w-full max-w-160 mx-auto">
       <CardContent>
         <PauseCircle size={48} strokeWidth={1} className="text-foreground-lighter shrink-0 mb-4" />
         <div className="flex-1">

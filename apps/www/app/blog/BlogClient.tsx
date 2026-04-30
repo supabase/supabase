@@ -18,7 +18,7 @@ function BlogListItemSkeleton() {
   return (
     <div className="flex flex-col lg:grid lg:grid-cols-10 xl:grid-cols-12 w-full py-2 sm:py-4 h-full border-b">
       <div className="flex w-full lg:col-span-8 xl:col-span-8">
-        <div className="h-6 bg-foreground-muted/20 rounded animate-pulse w-3/4" />
+        <div className="h-6 bg-foreground-muted/20 rounded-sm animate-pulse w-3/4" />
       </div>
       <div className="lg:col-span-2 xl:col-span-4 flex justify-start items-center lg:grid grid-cols-2 xl:grid-cols-3 gap-2 text-sm mt-2 lg:mt-0">
         <div className="hidden lg:flex items-center -space-x-2">
@@ -29,7 +29,7 @@ function BlogListItemSkeleton() {
           <div className="h-5 w-16 bg-foreground-muted/20 rounded-full animate-pulse" />
         </div>
         <div className="flex-1 lg:text-right">
-          <div className="h-4 w-24 bg-foreground-muted/20 rounded animate-pulse ml-auto" />
+          <div className="h-4 w-24 bg-foreground-muted/20 rounded-sm animate-pulse ml-auto" />
         </div>
       </div>
     </div>
@@ -41,15 +41,15 @@ function BlogGridItemSkeleton() {
     <div className="inline-block min-w-full p-2 sm:p-4 h-full">
       <div className="flex flex-col space-y-2">
         <div className="flex flex-col space-y-1">
-          <div className="relative mb-3 w-full aspect-[2/1] lg:aspect-[5/3] overflow-hidden rounded-lg border border-default bg-foreground-muted/20 animate-pulse" />
+          <div className="relative mb-3 w-full aspect-2/1 lg:aspect-5/3 overflow-hidden rounded-lg border border-default bg-foreground-muted/20 animate-pulse" />
           <div className="flex items-center space-x-1.5">
-            <div className="h-4 w-24 bg-foreground-muted/20 rounded animate-pulse" />
-            <div className="h-4 w-4 bg-foreground-muted/20 rounded animate-pulse" />
-            <div className="h-4 w-16 bg-foreground-muted/20 rounded animate-pulse" />
+            <div className="h-4 w-24 bg-foreground-muted/20 rounded-sm animate-pulse" />
+            <div className="h-4 w-4 bg-foreground-muted/20 rounded-sm animate-pulse" />
+            <div className="h-4 w-16 bg-foreground-muted/20 rounded-sm animate-pulse" />
           </div>
-          <div className="h-6 w-3/4 bg-foreground-muted/20 rounded animate-pulse mt-1" />
-          <div className="h-4 w-full bg-foreground-muted/20 rounded animate-pulse mt-1" />
-          <div className="h-4 w-2/3 bg-foreground-muted/20 rounded animate-pulse" />
+          <div className="h-6 w-3/4 bg-foreground-muted/20 rounded-sm animate-pulse mt-1" />
+          <div className="h-4 w-full bg-foreground-muted/20 rounded-sm animate-pulse mt-1" />
+          <div className="h-4 w-2/3 bg-foreground-muted/20 rounded-sm animate-pulse" />
         </div>
       </div>
     </div>

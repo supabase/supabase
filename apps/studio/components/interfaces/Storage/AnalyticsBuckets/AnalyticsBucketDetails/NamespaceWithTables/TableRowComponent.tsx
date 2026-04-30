@@ -418,7 +418,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
       {connectedForeignTables?.map((x) => (
         <TableRow key={x.id}>
           <TableCell className="pl-6">
-            <div className="flex items-center gap-x-2 rounded">
+            <div className="flex items-center gap-x-2 rounded-sm">
               <div className="w-4 h-5 rounded-bl-lg border-l-2 border-b-2 border-control -translate-y-2" />
               <div
                 className={cn(
@@ -466,7 +466,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
           <TableCell className="pl-6">
             <Tooltip>
               <TooltipTrigger>
-                <div className="flex items-center gap-x-2 rounded">
+                <div className="flex items-center gap-x-2 rounded-sm">
                   <div className="w-4 h-4 rounded-bl-lg border-l-2 border-b-2 border-control -translate-y-1.5" />
                   <div
                     className={cn(

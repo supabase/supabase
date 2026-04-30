@@ -22,10 +22,10 @@ export const UnifiedLogsPreview = () => {
         src={`${BASE_PATH}/img/previews/new-logs-preview.png`}
         width={1296}
         height={900}
-        className="rounded border mb-4"
+        className="rounded-sm border mb-4"
       />
 
-      <div className="space-y-2 !mt-4">
+      <div className="space-y-2 mt-4!">
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>

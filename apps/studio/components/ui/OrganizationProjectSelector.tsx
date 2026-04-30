@@ -238,7 +238,7 @@ export const OrganizationProjectSelector = ({
       <CommandList_Shadcn_
         className={
           embedded
-            ? 'flex-1 min-h-0 overflow-y-auto overflow-x-hidden !max-h-none'
+            ? 'flex-1 min-h-0 overflow-y-auto overflow-x-hidden max-h-none!'
             : 'max-h-none md:max-h-[300px] overflow-y-auto overflow-x-hidden'
         }
       >

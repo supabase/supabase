@@ -14,7 +14,7 @@ export default function LaunchWeekPrizeSection({
 
   return (
     <div id="lw8-prizes" className={['relative scroll-mt-[66px]', className].join(' ')}>
-      <div className="absolute z-0 w-full aspect-[1.75/1] top-0 items-center justify-center">
+      <div className="absolute z-0 w-full aspect-1.75/1 top-0 items-center justify-center">
         <Image
           src="/images/launchweek/8/swag-bg.png"
           alt="prizes background"
@@ -24,11 +24,11 @@ export default function LaunchWeekPrizeSection({
           quality={100}
         />
       </div>
-      <div className="!max-w-[100vw]">
-        <div className="w-full container mx-auto h-px bg-gradient-to-r from-transparent via-border-control to-transparent" />
+      <div className="max-w-[100vw]!">
+        <div className="w-full container mx-auto h-px bg-linear-to-r from-transparent via-border-control to-transparent" />
         <div className="text-center relative z-10 text-white">
-          <div className="max-w-[38rem] mx-auto flex flex-col items-center gap-4 px-4">
-            <div className="relative z-10 w-full h-[100px] md:h-[130px] rounded-sm flex mt-16 items-center justify-center">
+          <div className="max-w-152 mx-auto flex flex-col items-center gap-4 px-4">
+            <div className="relative z-10 w-full h-[100px] md:h-[130px] rounded-xs flex mt-16 items-center justify-center">
               <Image
                 src="/images/launchweek/8/swag-illustration.png"
                 alt="prizes"

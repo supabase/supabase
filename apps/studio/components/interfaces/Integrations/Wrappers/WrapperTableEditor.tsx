@@ -445,7 +445,7 @@ const TableForm = ({
                       badgeLimit="wrap"
                       showIcon={false}
                       deletableBadge
-                      className="w-full !min-w-lg"
+                      className="w-full min-w-lg!"
                     />
                     <MultiSelectorContent>
                       <MultiSelectorList>

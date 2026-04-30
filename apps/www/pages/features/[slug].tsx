@@ -99,7 +99,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
                 flex flex-col
                 gap-4 md:gap-8
                 text-foreground-light
-                !pt-10 !pb-4
+                pt-10! pb-4!
               "
             >
               <div className="relative h-full flex flex-col items-start gap-2 w-full max-w-2xl mx-auto">
@@ -125,7 +125,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
                     </Link>
                   ))}
                 </div>
-                <h1 className="h1 !m-0">{feature.title}</h1>
+                <h1 className="h1 m-0!">{feature.title}</h1>
                 <p>{feature.subtitle}</p>
               </div>
               <div
@@ -151,7 +151,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
                       <source src={feature.heroImage} type="video/mp4" />
                     </video>
                   ) : feature.heroImage.includes('.youtube') ? (
-                    <div className="video-container !rounded-none !border-none">
+                    <div className="video-container rounded-none! border-none!">
                       <iframe
                         className="w-full"
                         src={feature.heroImage}
@@ -194,7 +194,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
               </div>
             </SectionContainer>
           </header>
-          <SectionContainer className="!pt-0">
+          <SectionContainer className="pt-0!">
             <div className="prose w-full max-w-3xl mx-auto pb-4 mb-8 border-b flex flex-col md:flex-row gap-4 md:gap-8 flex-wrap justify-center text-sm text-foreground-lighter">
               <div className="flex gap-2 items-center">
                 <span>Stage:</span>

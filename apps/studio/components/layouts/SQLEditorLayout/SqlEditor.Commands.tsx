@@ -200,8 +200,8 @@ function SnippetSelector({
     <div className="w-full grow min-h-0 grid gap-4 md:grid-cols-2">
       <CommandList_Shadcn_
         className={cn(
-          '!h-full min-h-0 max-h-[unset] py-2 overflow-hidden',
-          '[&>[cmdk-list-sizer]]:h-full [&>[cmdk-list-sizer]]:flex [&>[cmdk-list-sizer]]:flex-col'
+          'h-full! min-h-0 max-h-[unset] py-2 overflow-hidden',
+          '*:[[cmdk-list-sizer]]:h-full *:[[cmdk-list-sizer]]:flex *:[[cmdk-list-sizer]]:flex-col'
         )}
       >
         {!!snippets && snippets.length > 0 && (

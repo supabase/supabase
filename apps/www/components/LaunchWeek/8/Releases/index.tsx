@@ -27,7 +27,7 @@ export default function LW8Releases() {
 
   return (
     <>
-      <SectionContainer className="!pt-0 !w-full !px-0 !max-w-none">
+      <SectionContainer className="pt-0! w-full! px-0! max-w-none!">
         <Accordion
           type="default"
           openBehaviour="multiple"

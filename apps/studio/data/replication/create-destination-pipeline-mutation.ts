@@ -13,6 +13,9 @@ export type DestinationConfig =
   | {
       iceberg: IcebergDestinationConfig
     }
+  | {
+      ducklake: DucklakeDestinationConfig
+    }
 
 export type BigQueryDestinationConfig = {
   projectId: string
@@ -30,6 +33,20 @@ export type IcebergDestinationConfig = {
   s3AccessKeyId: string
   s3SecretAccessKey: string
   s3Region: string
+}
+
+export type DucklakeDestinationConfig = {
+  catalogUrl: string
+  dataPath: string
+  poolSize?: number
+  s3AccessKeyId: string
+  s3SecretAccessKey: string
+  s3Region: string
+  s3Endpoint: string
+  s3UrlStyle?: 'path' | 'vhost'
+  s3UseSsl?: boolean
+  metadataSchema?: string
+  expireSnapshotsOlderThan?: string
 }
 
 export type BatchConfig = {
@@ -108,8 +125,38 @@ async function createDestinationPipeline(
         },
       },
     }
+  } else if ('ducklake' in destinationConfig) {
+    const {
+      catalogUrl,
+      dataPath,
+      poolSize,
+      s3AccessKeyId,
+      s3SecretAccessKey,
+      s3Region,
+      s3Endpoint,
+      s3UrlStyle,
+      s3UseSsl,
+      metadataSchema,
+      expireSnapshotsOlderThan,
+    } = destinationConfig.ducklake
+
+    destination_config = {
+      ducklake: {
+        catalog_url: catalogUrl,
+        data_path: dataPath,
+        pool_size: poolSize,
+        s3_access_key_id: s3AccessKeyId,
+        s3_secret_access_key: s3SecretAccessKey,
+        s3_region: s3Region,
+        s3_endpoint: s3Endpoint,
+        s3_url_style: s3UrlStyle,
+        s3_use_ssl: s3UseSsl,
+        metadata_schema: metadataSchema,
+        expire_snapshots_older_than: expireSnapshotsOlderThan,
+      },
+    } as unknown as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
   } else {
-    throw new Error('Invalid destination config: must specify either bigQuery or iceberg')
+    throw new Error('Invalid destination config: must specify bigQuery, iceberg, or ducklake')
   }
 
   const pipeline_config = {

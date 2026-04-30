@@ -125,7 +125,7 @@ const InstalledIntegrationsMenu = ({ page }: { page: string }) => {
     key: `integrations/${integration.id}`,
     url: `/project/${ref}/integrations/${integration.id}/overview`,
     icon: (
-      <div className="relative w-6 h-6 bg-white border rounded flex items-center justify-center">
+      <div className="relative w-6 h-6 bg-white border rounded-sm flex items-center justify-center">
         {integration.icon({ className: 'p-1' })}
       </div>
     ),

@@ -12,10 +12,6 @@
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules"
   },
-  "devDependencies": {
-    "tsconfig": "workspace:",
-    "typescript": "catalog:"
-  },
   "dependencies": {
     "@types/react": "catalog:",
     "react": "catalog:",
@@ -24,6 +20,12 @@
     "shiki": "^4.0.1",
     "ui": "workspace:*",
     "zod": "catalog:"
+  },
+  "devDependencies": {
+    "config": "workspace:*",
+    "tailwindcss": "^4.2.4",
+    "tsconfig": "workspace:",
+    "typescript": "catalog:"
   },
   "license": "MIT"
 }

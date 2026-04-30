@@ -403,7 +403,7 @@ export const CustomAuthProvidersList = () => {
                   </TableHead>
                   <TableHead>Enabled</TableHead>
                   <TableHead className="w-8 px-0">
-                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
+                    <div className="bg-200! px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -421,7 +421,7 @@ export const CustomAuthProvidersList = () => {
                       <TableCell className="flex" title={provider.name}>
                         <Button
                           type="text"
-                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:!w-full"
+                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:w-full!"
                           onClick={() => setSelectedProviderToEdit(provider.id)}
                           title={provider.name}
                         >

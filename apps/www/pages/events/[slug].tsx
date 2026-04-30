@@ -223,10 +223,10 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
       />
       <DefaultLayout>
         <div className="flex flex-col w-full bg-alternative border-b border-muted">
-          <SectionContainer className="!py-2 flex items-start">
+          <SectionContainer className="py-2! flex items-start">
             <Link
               href="/events"
-              className="text-foreground-lighter hover:text-foreground flex !m-0 !p-0 !leading-3 gap-1 cursor-pointer items-center text-sm transition"
+              className="text-foreground-lighter hover:text-foreground flex m-0! p-0! leading-3! gap-1 cursor-pointer items-center text-sm transition"
             >
               <ChevronLeft className="w-4 h-4" />
               All Events
@@ -257,7 +257,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 grid grid-cols-1 xl:grid-cols-2
                 gap-8
                 text-foreground-light
-                !py-10 md:!py-16
+                py-10! md:py-16!
               "
             >
               <div className="h-full flex flex-col justify-between">
@@ -308,7 +308,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 </div>
               </div>
               {!!event.thumb && (
-                <div className="relative w-full aspect-[5/3] lg:aspect-[3/2] overflow-hidden border shadow-lg rounded-lg z-10">
+                <div className="relative w-full aspect-5/3 lg:aspect-3/2 overflow-hidden border shadow-lg rounded-lg z-10">
                   <Image
                     src={{
                       dark: `/images/events/` + event.thumb,
@@ -321,8 +321,8 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     quality={100}
                     containerClassName="
                       h-full
-                      [&.next-image--dynamic-fill_img]:!h-full
-                      [&.next-image--dynamic-fill_img]:!object-cover
+                      [&.next-image--dynamic-fill_img]:h-full!
+                      [&.next-image--dynamic-fill_img]:object-cover!
                       "
                     alt={`${event.title} thumbnail`}
                   />
@@ -330,18 +330,18 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
               )}
             </SectionContainer>
           </header>
-          <SectionContainer className="grid lg:grid-cols-3 gap-12 !py-10 md:!py-16">
+          <SectionContainer className="grid lg:grid-cols-3 gap-12 py-10! md:py-16!">
             {event.company && (
               <div className="order-first lg:col-span-full flex items-center gap-4 md:gap-6 lg:mb-4">
-                <figure className="h-6 [&_.next-image--dynamic-fill_img]:!h-full">
+                <figure className="h-6 [&_.next-image--dynamic-fill_img]:h-full!">
                   <Image
                     src={{ dark: supabaseLogoWordmarkDark, light: supabaseLogoWordmarkLight }}
                     alt="Supabase Logo"
                     width={160}
                     height={30}
                     sizes="100%"
-                    className="!relative object-contain object-left"
-                    containerClassName="h-full object-contain object-left !rounded-none !border-none"
+                    className="relative! object-contain object-left"
+                    containerClassName="h-full object-contain object-left rounded-none! border-none!"
                     priority
                   />
                 </figure>
@@ -349,7 +349,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 <Link
                   href={event.company?.website_url ?? '#'}
                   target="_blank"
-                  className="h-5 aspect-[9/1] transition-opacity opacity-100 hover:opacity-90 [&_.next-image--dynamic-fill_img]:!h-full"
+                  className="h-5 aspect-9/1 transition-opacity opacity-100 hover:opacity-90 [&_.next-image--dynamic-fill_img]:h-full!"
                 >
                   <Image
                     src={{ dark: event.company?.logo, light: event.company?.logo_light }}
@@ -357,8 +357,8 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     width={160}
                     height={30}
                     sizes="100%"
-                    className="!relative object-contain object-left"
-                    containerClassName="h-full object-contain object-left !rounded-none !border-none"
+                    className="relative! object-contain object-left"
+                    containerClassName="h-full object-contain object-left rounded-none! border-none!"
                     priority
                   />
                 </Link>

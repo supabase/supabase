@@ -138,7 +138,7 @@ export const RolesList = () => {
             >
               All roles
             </button>
-            <div className="h-full w-[1px] border-r border-strong"></div>
+            <div className="h-full w-px border-r border-strong"></div>
             <button
               className={cn(
                 'text-xs w-[80px] h-full text-center rounded-r-full flex items-center justify-center transition',
