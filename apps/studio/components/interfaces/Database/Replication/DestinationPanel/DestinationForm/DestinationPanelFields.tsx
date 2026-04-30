@@ -93,6 +93,284 @@ export const BigQueryFields = ({ form }: { form: UseFormReturn<DestinationPanelS
   )
 }
 
+export const DuckLakeFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
+  const [showCatalogUrl, setShowCatalogUrl] = useState(false)
+  const [showSecretAccessKey, setShowSecretAccessKey] = useState(false)
+
+  return (
+    <div className="flex flex-col gap-y-6 p-5">
+      <p className="text-sm font-medium text-foreground">DuckLake settings</p>
+
+      <div className="flex flex-col gap-y-1">
+        <p className="text-sm font-medium text-foreground">Catalog</p>
+        <p className="text-sm text-foreground-light">
+          Configure the PostgreSQL-backed DuckLake catalog and the S3-compatible storage location
+          for replicated data.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-y-4">
+        <FormField
+          control={form.control}
+          name="ducklakeCatalogUrl"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Catalog URL"
+              description="A PostgreSQL connection string for the DuckLake catalog"
+            >
+              <FormControl>
+                <Input
+                  value={field.value ?? ''}
+                  type={showCatalogUrl ? 'text' : 'password'}
+                  placeholder="postgres://user:pass@host:5432/ducklake_catalog"
+                  onChange={(event) => field.onChange(event.target.value)}
+                  actions={
+                    <div className="flex items-center justify-center">
+                      <Button
+                        type="default"
+                        className="w-7"
+                        icon={showCatalogUrl ? <Eye /> : <EyeOff />}
+                        onClick={() => setShowCatalogUrl(!showCatalogUrl)}
+                      />
+                    </div>
+                  }
+                />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ducklakeDataPath"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Data path"
+              description="An S3 path where DuckLake data files will be written"
+            >
+              <FormControl>
+                <Input_Shadcn_
+                  {...field}
+                  placeholder="s3://bucket/path"
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ducklakePoolSize"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Pool size"
+              description="Optional number of concurrent DuckDB connections to use"
+            >
+              <FormControl>
+                <Input_Shadcn_
+                  type="number"
+                  min={1}
+                  max={6}
+                  value={field.value ?? ''}
+                  placeholder="Default: 4"
+                  onChange={(event) =>
+                    field.onChange(
+                      event.target.value === '' ? undefined : Number(event.target.value)
+                    )
+                  }
+                />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+      </div>
+
+      <div className="flex flex-col gap-y-1">
+        <p className="text-sm font-medium text-foreground">Object storage</p>
+        <p className="text-sm text-foreground-light">
+          Optional credentials and endpoint settings for S3-compatible storage providers.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-y-4">
+        <FormField
+          control={form.control}
+          name="ducklakeS3AccessKeyId"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="S3 Access Key ID"
+              description="Required access key ID for the object storage provider"
+            >
+              <FormControl>
+                <Input_Shadcn_ {...field} placeholder="my-access-key" value={field.value ?? ''} />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ducklakeS3SecretAccessKey"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="S3 Secret Access Key"
+              description="Required secret access key for the object storage provider"
+              className="relative"
+            >
+              <FormControl>
+                <Input_Shadcn_
+                  {...field}
+                  type={showSecretAccessKey ? 'text' : 'password'}
+                  placeholder="my-secret-key"
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+              <Button
+                type="default"
+                icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
+                className="w-7 absolute right-6 top-[4px]"
+                onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
+              />
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ducklakeS3Region"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="S3 Region"
+              description="Required region for the object storage provider"
+            >
+              <FormControl>
+                <Input_Shadcn_ {...field} placeholder="us-east-1" value={field.value ?? ''} />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ducklakeS3Endpoint"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="S3 Endpoint"
+              description="Required endpoint without the protocol scheme, for example `127.0.0.1:5000/s3`"
+            >
+              <FormControl>
+                <Input_Shadcn_
+                  {...field}
+                  placeholder="127.0.0.1:5000/s3"
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ducklakeS3UrlStyle"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="S3 URL style"
+              description="Choose `path` for MinIO/Supabase-style endpoints or `vhost` for AWS-style virtual host addressing"
+            >
+              <FormControl>
+                <Select_Shadcn_ value={field.value ?? 'path'} onValueChange={field.onChange}>
+                  <SelectTrigger_Shadcn_>{field.value ?? 'path'}</SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectItem_Shadcn_ value="path">path</SelectItem_Shadcn_>
+                    <SelectItem_Shadcn_ value="vhost">vhost</SelectItem_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ducklakeS3UseSsl"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Use SSL"
+              description="Whether to use SSL when connecting to the S3-compatible endpoint"
+            >
+              <FormControl>
+                <Select_Shadcn_
+                  value={field.value === false ? 'false' : 'true'}
+                  onValueChange={(value) => field.onChange(value === 'true')}
+                >
+                  <SelectTrigger_Shadcn_>
+                    {field.value === false ? 'false' : 'true'}
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectItem_Shadcn_ value="true">true</SelectItem_Shadcn_>
+                    <SelectItem_Shadcn_ value="false">false</SelectItem_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+      </div>
+
+      <div className="flex flex-col gap-y-1">
+        <p className="text-sm font-medium text-foreground">Maintenance</p>
+        <p className="text-sm text-foreground-light">
+          Optional settings for DuckLake metadata tables and snapshot cleanup.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-y-4">
+        <FormField
+          control={form.control}
+          name="ducklakeMetadataSchema"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Metadata schema"
+              description="Schema used for DuckLake metadata tables in PostgreSQL"
+            >
+              <FormControl>
+                <Input_Shadcn_ {...field} placeholder="ducklake" value={field.value ?? ''} />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ducklakeExpireSnapshotsOlderThan"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="Expire snapshots older than"
+              description="Optional snapshot retention interval, for example `7 days`"
+            >
+              <FormControl>
+                <Input_Shadcn_ {...field} placeholder="7 days" value={field.value ?? ''} />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+      </div>
+    </div>
+  )
+}
+
 /**
  * [Joshen] JFYI I'd foresee a possible UX friction point here regarding S3 access key IDs and secret access keys
  * - We'd allow users to select access key IDs via a dropdown here, but require a text input for secret access keys

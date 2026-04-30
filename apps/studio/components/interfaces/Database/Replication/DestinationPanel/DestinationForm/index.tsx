@@ -11,6 +11,7 @@ import * as z from 'zod'
 
 import {
   useIsETLBigQueryPrivateAlpha,
+  useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
 } from '../../useIsETLPrivateAlpha'
 import { DestinationType } from '../DestinationPanel.types'
@@ -20,9 +21,10 @@ import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.sche
 import {
   buildDestinationConfig,
   buildDestinationConfigForValidation,
+  getDucklakeValidationIssues,
 } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
-import { AnalyticsBucketFields, BigQueryFields } from './DestinationPanelFields'
+import { AnalyticsBucketFields, BigQueryFields, DuckLakeFields } from './DestinationPanelFields'
 import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PublicationSelection } from './PublicationSelection'
@@ -70,6 +72,20 @@ interface DestinationFormProps {
   onClose: () => void
 }
 
+type DucklakeApiConfig = {
+  catalog_url: string
+  data_path: string
+  pool_size?: number
+  s3_access_key_id?: string
+  s3_secret_access_key?: string
+  s3_region?: string
+  s3_endpoint?: string
+  s3_url_style?: 'path' | 'vhost'
+  s3_use_ssl?: boolean
+  metadata_schema?: string
+  expire_snapshots_older_than?: string
+}
+
 export const DestinationForm = ({
   selectedType,
   visible,
@@ -81,6 +97,7 @@ export const DestinationForm = ({
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
+  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const [isFormInteracting, setIsFormInteracting] = useState(false)
@@ -108,8 +125,9 @@ export const DestinationForm = ({
     if (etlEnableBigQuery) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
     if (etlEnableIceberg)
       destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
+    if (etlEnableDucklake) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
     return destinations
-  }, [etlEnableBigQuery, etlEnableIceberg])
+  }, [etlEnableBigQuery, etlEnableDucklake, etlEnableIceberg])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
@@ -171,6 +189,14 @@ export const DestinationForm = ({
     const config = destinationData?.config
     const isBigQueryConfig = config && 'big_query' in config
     const isIcebergConfig = config && 'iceberg' in config
+    const ducklakeConfigValue =
+      config && 'ducklake' in (config as Record<string, unknown>)
+        ? (config as Record<string, unknown>).ducklake
+        : undefined
+    const ducklakeConfig =
+      ducklakeConfigValue && typeof ducklakeConfigValue === 'object'
+        ? (ducklakeConfigValue as DucklakeApiConfig)
+        : undefined
 
     return {
       // Common fields
@@ -199,6 +225,18 @@ export const DestinationForm = ({
       s3SecretAccessKey: isIcebergConfig ? config.iceberg.supabase.s3_secret_access_key : '',
       s3Region:
         projectSettings?.region ?? (isIcebergConfig ? config.iceberg.supabase.s3_region : ''),
+      // DuckLake fields
+      ducklakeCatalogUrl: ducklakeConfig?.catalog_url ?? '',
+      ducklakeDataPath: ducklakeConfig?.data_path ?? '',
+      ducklakePoolSize: ducklakeConfig?.pool_size,
+      ducklakeS3AccessKeyId: ducklakeConfig?.s3_access_key_id ?? '',
+      ducklakeS3SecretAccessKey: ducklakeConfig?.s3_secret_access_key ?? '',
+      ducklakeS3Region: ducklakeConfig?.s3_region ?? '',
+      ducklakeS3Endpoint: ducklakeConfig?.s3_endpoint ?? '',
+      ducklakeS3UrlStyle: ducklakeConfig?.s3_url_style ?? 'path',
+      ducklakeS3UseSsl: ducklakeConfig?.s3_use_ssl ?? true,
+      ducklakeMetadataSchema: ducklakeConfig?.metadata_schema ?? 'ducklake',
+      ducklakeExpireSnapshotsOlderThan: ducklakeConfig?.expire_snapshots_older_than ?? '',
     }
   }, [destinationData, pipelineData, catalogToken, projectSettings])
 
@@ -244,6 +282,10 @@ export const DestinationForm = ({
           if (data.s3AccessKeyId !== 'create-new' && !data.s3SecretAccessKey?.length) {
             addRequiredFieldError('s3SecretAccessKey', 'S3 Secret Access Key is required')
           }
+        } else if (selectedType === 'DuckLake') {
+          getDucklakeValidationIssues(data).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
         }
       })
     ),
@@ -536,6 +578,8 @@ export const DestinationForm = ({
                   setIsFormInteracting={setIsFormInteracting}
                   onSelectNewBucket={() => setNewBucketSheetVisible(true)}
                 />
+              ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
+                <DuckLakeFields form={form} />
               ) : null}
 
               <DialogSectionSeparator />

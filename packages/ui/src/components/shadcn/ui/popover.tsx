@@ -10,7 +10,7 @@ const Popover = PopoverPrimitive.Root
 const PopoverTrigger = PopoverPrimitive.Trigger
 const PopoverAnchor = PopoverPrimitive.Anchor
 
-type PopoverContentProps = {
+export type PopoverContentProps = {
   align?: 'center' | 'start' | 'end'
   sideOffset?: number
   sameWidthAsTrigger?: boolean

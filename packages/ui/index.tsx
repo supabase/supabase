@@ -133,6 +133,7 @@ export {
   PopoverContent as PopoverContent_Shadcn_,
   PopoverAnchor as PopoverAnchor_Shadcn_,
   PopoverSeparator as PopoverSeparator_Shadcn_,
+  type PopoverContentProps as PopoverContentProps_Shadcn_,
 } from './src/components/shadcn/ui/popover'
 
 export {
