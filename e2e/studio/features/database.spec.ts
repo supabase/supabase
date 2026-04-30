@@ -51,10 +51,6 @@ test.describe('Database', () => {
 );`,
       })
 
-      // The "Successfully copied as SQL" toast renders in the same top-right
-      // corner as the export button — wait for the toast, dismiss it, then
-      // wait for it to leave the DOM (Sonner's exit animation lingers ~300ms
-      // with data-removed="true" and still intercepts pointer events).
       await expect(page.getByText('Successfully copied as SQL')).toBeVisible({ timeout: 15000 })
       await dismissToastsIfAny(page)
       await expect(page.locator('[data-sonner-toast]')).toHaveCount(0)
@@ -66,7 +62,6 @@ test.describe('Database', () => {
       const download = await downloadPromise
       expect(download.suggestedFilename()).toContain('.png')
 
-      // same dance for the "downloaded as PNG" toast before the schema selector
       await expect(page.getByText('Successfully downloaded as PNG')).toBeVisible({ timeout: 15000 })
       await dismissToastsIfAny(page)
       await expect(page.locator('[data-sonner-toast]')).toHaveCount(0)
