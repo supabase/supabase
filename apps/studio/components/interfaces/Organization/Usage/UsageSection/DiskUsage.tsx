@@ -189,7 +189,7 @@ export const DiskUsage = ({
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center h-6 gap-3">
                           <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-                            <span className="text-foreground font-semibold -mt-[2px]">
+                            <span className="text-foreground font-semibold mt-[-2px]">
                               <MotionNumber
                                 value={totalDiskUsage}
                                 style={{ lineHeight: 0.8 }}

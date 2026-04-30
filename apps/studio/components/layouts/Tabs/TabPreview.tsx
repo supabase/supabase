@@ -15,7 +15,7 @@ export const TabPreview = ({ tab }: { tab: string }) => {
       layoutId={tab}
       transition={{ duration: 0.045 }}
       animate={{ opacity: 0.7 }}
-      className="flex relative items-center gap-2 px-3 text-xs bg-dash-sidebar dark:bg-surface-100 shadow-lg rounded-sm h-10"
+      className="flex relative items-center gap-2 px-3 text-xs bg-dash-sidebar dark:bg-surface-100 shadow-lg rounded-xs h-10"
     >
       <EntityTypeIcon type={tabData.type} />
       <span>{tabData.label || 'Untitled'}</span>

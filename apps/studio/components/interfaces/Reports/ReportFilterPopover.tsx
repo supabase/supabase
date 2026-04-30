@@ -87,7 +87,7 @@ const FilterableInput = ({
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           className={cn('h-6 text-sm', defaultTheme.input.variants.standard, sizes.tiny)}
-          wrapperClassName="!p-0 !border !border-control rounded-md"
+          wrapperClassName="p-0! border! border-control! rounded-md"
           showSearchIcon={false}
         />
         <div

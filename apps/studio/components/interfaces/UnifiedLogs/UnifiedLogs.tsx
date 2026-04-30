@@ -400,7 +400,7 @@ export const UnifiedLogs = () => {
                     </p>
                   </TooltipContent>
                 </Tooltip>
-                <div className="order-first w-full min-w-0 sm:order-none sm:w-auto sm:flex-1 [&_[cmdk-input-wrapper]]:!px-3 [&_button]:!px-3 [&_button>span]:!h-[26px] [&_button>span]:!py-0 [&_input]:!h-[26px] [&_input]:!py-0">
+                <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 **:[[cmdk-input-wrapper]]:px-3! [&_button]:px-3! [&_button>span]:h-[26px]! [&_button>span]:py-0! [&_input]:h-[26px]! [&_input]:py-0!">
                   <DataTableFilterCommand
                     placeholder="Search logs..."
                     searchParamsParser={SEARCH_PARAMS_PARSER}
@@ -441,7 +441,7 @@ export const UnifiedLogs = () => {
                   isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
                 )}
               >
-                <div className="h-full [&>div]:h-full [&_thead_tr]:!bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))] [&_thead_th]:![border-top:none] [&_thead_th]:![border-bottom:none] [&_thead_th]:![box-shadow:inset_0_-1px_0_hsl(var(--border-default))] [&_thead_tr]:!border-b-0 [&_tbody_tr]:!border-b-0 [&_thead_tr:hover]:!bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))] [&_thead_th]:!text-foreground-lighter">
+                <div className="h-full [&>div]:h-full [&_thead_tr]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]! [&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]! [&_thead_th]:[box-shadow:inset_0_-1px_0_hsl(var(--border-default))]! [&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0! [&_thead_tr:hover]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]! [&_thead_th]:text-foreground-lighter!">
                   <DataTableInfinite
                     columns={UNIFIED_LOGS_COLUMNS}
                     totalRows={totalDBRowCount}

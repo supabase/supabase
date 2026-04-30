@@ -14,7 +14,7 @@ import { BASE_PATH } from '@/lib/constants'
 export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' | 'aws' }) => {
   return (
     <img
-      className="border rounded-lg shadow w-full sm:w-48 mt-6 border-body"
+      className="border rounded-lg shadow-sm w-full sm:w-48 mt-6 border-body"
       src={`${BASE_PATH}/img/integrations/covers/${title}-cover.png`}
       alt={`${title} cover`}
     />

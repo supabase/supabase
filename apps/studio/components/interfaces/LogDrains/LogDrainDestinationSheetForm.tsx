@@ -381,7 +381,7 @@ export function LogDrainDestinationSheetForm({
         <SheetHeader>
           <SheetTitle>Add destination</SheetTitle>
         </SheetHeader>
-        <SheetSection className="!px-0 !pb-0">
+        <SheetSection className="px-0! pb-0!">
           <Form {...form}>
             <form
               id={FORM_ID}
@@ -859,7 +859,7 @@ export function LogDrainDestinationSheetForm({
             </ul>
           </SheetSection>
 
-          <SheetFooter className="p-content !mt-0 !justify-between !flex-row w-full items-center">
+          <SheetFooter className="p-content mt-0! justify-between! flex-row! w-full items-center">
             <div className="flex flex-col gap-0.5">
               <span className="text-sm text-foreground-light">
                 <span>See full pricing breakdown</span>{' '}

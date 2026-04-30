@@ -90,7 +90,7 @@ const LinterDataGrid = ({
         return (
           <div className="flex items-center justify-between font-mono font-normal text-xs w-full">
             <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">{col.name}</p>
+              <p className="text-foreground!">{col.name}</p>
               {col.description && <p className="text-foreground-lighter">{col.description}</p>}
             </div>
           </div>
@@ -139,7 +139,7 @@ const LinterDataGrid = ({
             return [
               `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
               `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
-              '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+              '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
               '[&>.rdg-cell:first-child>div]:ml-4',
             ].join(' ')
           }}

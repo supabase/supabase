@@ -25,7 +25,7 @@ const PartnerLinkBox = ({
       className="
         hover:border-foreground-lighter
         bg-surface-100
-        group cursor-pointer rounded 
+        group cursor-pointer rounded-sm 
         border px-5 py-4 
         "
     >

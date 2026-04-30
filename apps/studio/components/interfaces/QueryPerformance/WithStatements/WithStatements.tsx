@@ -251,7 +251,7 @@ export const WithStatements = ({
           </p>
           <Button
             type="default"
-            className="!mt-3 w-min"
+            className="mt-3! w-min"
             onClick={() => setShowResetgPgStatStatements(true)}
           >
             Reset report

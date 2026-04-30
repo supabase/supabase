@@ -17,7 +17,7 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
   const { can: canUpdateAuthHook } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
 
   return (
-    <div className="bg-surface-100 border-default overflow-hidden border shadow px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
+    <div className="bg-surface-100 border-default overflow-hidden border shadow-sm px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
       <div className="">
         <Webhook size={21} strokeWidth="1" />
       </div>

@@ -142,7 +142,7 @@ export const ResetPasswordForm = () => {
 
         <div
           className={cn(
-            showConditions ? 'max-h-[500px]' : 'max-h-[0px]',
+            showConditions ? 'max-h-[500px]' : 'max-h-0',
             'transition-all duration-400 overflow-y-hidden'
           )}
         >
