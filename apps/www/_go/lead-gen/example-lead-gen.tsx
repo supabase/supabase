@@ -270,6 +270,18 @@ alter table posts enable row level security;`,
           consent:
             'By submitting this form, I confirm that I have read and understood the Privacy Policy.',
         },
+        notion: {
+          database_id: '3525004b775f8018ae80000c6e0920e7',
+          columnMap: {
+            firstName: 'first_name',
+            lastName: 'last_name',
+            email: 'email',
+            interest: 'interest',
+          },
+          staticProperties: {
+            source: 'Example Ebook /go page',
+          },
+        },
       },
     },
   ],
