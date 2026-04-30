@@ -111,7 +111,7 @@
     "api-types": "workspace:*",
     "postcss": "catalog:",
     "react-hook-form": "^7.71.2",
-    "tailwindcss": "4.2.4",
+    "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
     "unist-util-visit-parents": "5.1.3",
     "uuid": "^9.0.1",

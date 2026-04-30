@@ -57,10 +57,7 @@ const components = {
     />
   ),
   p: ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-    <p
-      className={cn('leading-7 not-first:mt-6 text-foreground-light', className)}
-      {...props}
-    />
+    <p className={cn('leading-7 not-first:mt-6 text-foreground-light', className)} {...props} />
   ),
   ul: ({ className, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
     <ul className={cn('my-6 ml-6 list-disc text-foreground-light', className)} {...props} />

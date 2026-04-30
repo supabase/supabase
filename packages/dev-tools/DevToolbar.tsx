@@ -386,16 +386,10 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                 className="shrink-0 mr-4"
               />
               <TabsList className="flex gap-x-4 rounded-none border-none! h-auto">
-                <TabsTrigger
-                  value="events"
-                  className="text-xs py-3 border-b font-mono uppercase"
-                >
+                <TabsTrigger value="events" className="text-xs py-3 border-b font-mono uppercase">
                   Events ({filteredEvents.length})
                 </TabsTrigger>
-                <TabsTrigger
-                  value="flags"
-                  className="text-xs py-3 border-b font-mono uppercase"
-                >
+                <TabsTrigger value="flags" className="text-xs py-3 border-b font-mono uppercase">
                   Flags {totalOverrideCount > 0 && `(${totalOverrideCount})`}
                 </TabsTrigger>
                 {extraTabs.map((tab) => (

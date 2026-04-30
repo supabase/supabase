@@ -138,10 +138,7 @@ function TroubleshootingFilterMobileCollapsed(props: TroubleshootingFilterProps)
         <CollapsibleTrigger className="group w-full pb-6 text-foreground-light">
           <div className="flex items-center justify-between gap-2">
             <span>Filters</span>
-            <ChevronDown
-              size={16}
-              className="group-data-open:rotate-180 transition-transform"
-            />
+            <ChevronDown size={16} className="group-data-open:rotate-180 transition-transform" />
           </div>
           {numberFiltersApplied > 0 && (
             <div className="group-data-open:hidden text-sm text-left">

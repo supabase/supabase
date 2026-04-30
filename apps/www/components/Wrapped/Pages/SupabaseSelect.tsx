@@ -202,10 +202,7 @@ function GalleryGrid() {
   }, [isInView, rotateSlot])
 
   return (
-    <div
-      ref={ref}
-      className="relative max-w-240 mx-auto border-x border-b p-3 w-[95%] md:w-full"
-    >
+    <div ref={ref} className="relative max-w-240 mx-auto border-x border-b p-3 w-[95%] md:w-full">
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-2 auto-rows-[200px]">
         {gallerySlots.map((slot, index) => (
           <RotatingImage

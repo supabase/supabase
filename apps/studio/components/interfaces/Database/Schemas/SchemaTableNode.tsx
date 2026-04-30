@@ -118,7 +118,10 @@ export const TableNode = ({
                   {!placeholder && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button type="text" className="px-0 w-[16px] h-[16px] rounded-sm nodrag nopan">
+                        <Button
+                          type="text"
+                          className="px-0 w-[16px] h-[16px] rounded-sm nodrag nopan"
+                        >
                           <MoreVertical size={10} />
                           <span className="sr-only">{data.name} actions</span>
                         </Button>

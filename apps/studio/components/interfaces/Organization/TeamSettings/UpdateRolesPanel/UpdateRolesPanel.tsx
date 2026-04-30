@@ -217,10 +217,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                           ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`
                           : `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`}
                       </span>
-                      <ChevronDown
-                        size={14}
-                        className="transition group-data-open:-rotate-180"
-                      />
+                      <ChevronDown size={14} className="transition group-data-open:-rotate-180" />
                     </CollapsibleTrigger_Shadcn_>
                     <CollapsibleContent_Shadcn_ className="text-foreground-light text-sm px-4">
                       <p>

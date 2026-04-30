@@ -90,7 +90,10 @@ function MessageActionsThumbsUp({
         />
       }
       onClick={onClick}
-      className={cn('p-1 rounded-sm transition-colors', disabled && 'opacity-50 pointer-events-none')}
+      className={cn(
+        'p-1 rounded-sm transition-colors',
+        disabled && 'opacity-50 pointer-events-none'
+      )}
       title="Good response"
       aria-label="Good response"
     />

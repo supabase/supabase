@@ -135,9 +135,7 @@ export const AdvancedConfiguration = ({
         />
       </CollapsibleTrigger_Shadcn_>
       <CollapsibleContent_Shadcn_
-        className={cn(
-          'pt-5 data-closed:animate-collapsible-up data-open:animate-collapsible-down'
-        )}
+        className={cn('pt-5 data-closed:animate-collapsible-up data-open:animate-collapsible-down')}
       >
         {content}
       </CollapsibleContent_Shadcn_>

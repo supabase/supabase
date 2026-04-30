@@ -11,9 +11,7 @@ export default function SingleColumnSection({ section }: { section: GoSingleColu
           <p className="text-foreground-light text-lg max-w-2xl">{section.description}</p>
         )}
       </div>
-      {section.children && (
-        <div className="max-w-7xl mx-auto mt-10 px-8">{section.children}</div>
-      )}
+      {section.children && <div className="max-w-7xl mx-auto mt-10 px-8">{section.children}</div>}
     </section>
   )
 }

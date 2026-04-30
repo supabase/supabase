@@ -136,10 +136,7 @@ export function CollapsibleDetails({ title, content }: { title: string; content:
           'transition-safe-all ease-out'
         )}
       >
-        <ChevronRight
-          size={12}
-          className="group-data-open:rotate-90 transition-transform"
-        />
+        <ChevronRight size={12} className="group-data-open:rotate-90 transition-transform" />
         {title}
       </CollapsibleTrigger_Shadcn_>
       <CollapsibleContent_Shadcn_
