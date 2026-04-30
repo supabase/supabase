@@ -75,7 +75,7 @@ export function Item({ children, icon, active, onClick, style }: ItemProps) {
   return (
     <li
       role="menuitem"
-      className={cn('outline-none', classes)}
+      className={cn('outline-hidden', classes)}
       style={style}
       onClick={onClick}
       aria-current={active ? 'page' : undefined}

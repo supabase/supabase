@@ -1,9 +1,13 @@
+@import 'tailwindcss';
+
 @import './../../../packages/ui/build/css/source/global.css';
 @import './../../../packages/ui/build/css/themes/dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 @import './../../../packages/ui/build/css/themes/classic-dark.css';
 
-@tailwind components;
+@import 'config/typography.css';
+
+@config '../tailwind.config.ts';
 
 :root {
   --chart-1: var(--brand-default);
@@ -43,6 +47,16 @@
   --sidebar-accent-foreground: var(--foreground-default);
   --sidebar-border: var(--border-default);
   --sidebar-ring: 217.2 91.2% 59.8%;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: hsl(var(--border-default, currentColor));
+  }
 }
 
 html,
@@ -89,7 +103,7 @@ input.form-control,
   @apply box-border;
   /* @apply  w-full ; */
   @apply rounded-md;
-  @apply shadow-sm;
+  @apply shadow-xs;
   @apply transition-all;
   @apply text-foreground;
   @apply border;
@@ -101,7 +115,7 @@ input.form-control,
   @apply bg-studio;
   @apply border-strong border;
 
-  @apply outline-none;
+  @apply outline-hidden;
   @apply focus:ring-2 focus:ring-current;
 }
 
@@ -154,12 +168,7 @@ input::placeholder {
 }
 
 .billing-input-fixed {
-  @apply w-full appearance-none rounded border bg-gray-700 py-2 px-3 leading-tight text-gray-300 shadow;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
+  @apply w-full appearance-none rounded-sm border bg-gray-700 py-2 px-3 leading-tight text-gray-300 shadow-sm;
 }
 
 .input-mono {
@@ -262,7 +271,7 @@ div[data-radix-portal]:not(.portal--toast) {
 
 /* to do: remove this CSS and do the same thing in a reusable tooltip component */
 [data-radix-popper-content-wrapper] {
-  @apply !z-50;
+  @apply z-50!;
 }
 
 .settings-container {
@@ -270,7 +279,7 @@ div[data-radix-portal]:not(.portal--toast) {
 }
 
 .react-grid-item.react-grid-placeholder {
-  @apply !bg-brand-500;
+  @apply bg-brand-500!;
 }
 
 .react-grid-item > .react-resizable-handle::after {
@@ -280,7 +289,7 @@ div[data-radix-portal]:not(.portal--toast) {
   bottom: 3px !important;
   width: 6px !important;
   height: 6px !important;
-  @apply !border-strong dark:!border-r-2 dark:!border-b-2 dark:!border-overlay;
+  @apply border-strong! dark:border-r-2! dark:border-b-2! dark:border-overlay!;
 }
 
 @keyframes typewriter {

@@ -29,6 +29,7 @@ Ariuna K
 Arshdeep Singh
 Artur Zakirov
 Artyom Borissov
+Aziz Quadri
 Barco Fourie
 Beng Eu
 Benjamin Coenen
@@ -105,6 +106,7 @@ Guilherme Souza
 Hannah Bowers
 Hardik Maheshwari
 Haritabh Gupta
+Harold Giménez
 Haydn Maley
 Hieu Pham
 Hunter Luckow
@@ -165,6 +167,7 @@ Long Hoang
 Lukas Bernert
 Łukasz Niemier
 Maksym Ionutsa
+Manuel Mendez
 Manan Gupta
 Marcus Weiner
 Margarita Sandomirskaia

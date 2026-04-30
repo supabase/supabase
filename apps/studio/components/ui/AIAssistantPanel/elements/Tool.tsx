@@ -21,7 +21,7 @@ export function Tool({ className, label, icon, children }: ToolProps) {
         'tool-item text-foreground-lighter flex items-center gap-2 py-2',
         '[&:not(.tool-item+.tool-item)]:mt-4 [&:not(:has(+.tool-item))]:mb-4',
         '[&:has(+.tool-item)]:border-b [&:has(+.tool-item)]:border-b-muted',
-        'first:!mt-0 last:mb-0',
+        'first:mt-0! last:mb-0',
         className
       )}
     >

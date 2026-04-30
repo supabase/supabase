@@ -80,7 +80,7 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
         sortable: false,
         width: columnWidth,
         minWidth: COLUMN_MIN_WIDTH,
-        headerCellClass: 'outline-none !shadow-none',
+        headerCellClass: 'outline-hidden shadow-none!',
         renderHeaderCell: () => (
           <div className="flex h-full items-center justify-center gap-x-2">
             {isPrimaryKey && (

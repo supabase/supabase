@@ -104,7 +104,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
               Loading edge functions...
             </Button>
           ) : (
-            <div className="px-4 py-4 border rounded bg-surface-300 border-strong flex items-center justify-between space-x-4">
+            <div className="px-4 py-4 border rounded-sm bg-surface-300 border-strong flex items-center justify-between space-x-4">
               <p className="text-sm">No edge functions created yet</p>
               <Button asChild>
                 <Link href={`/project/${ref}/functions`}>Create an edge function</Link>

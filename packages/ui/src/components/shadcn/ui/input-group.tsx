@@ -44,7 +44,7 @@ function InputGroup({
       data-slot="input-group"
       role="group"
       className={cn(
-        'group/input-group relative items-center outline-none transition-[color,box-shadow]',
+        'group/input-group relative items-center outline-hidden transition-[color,box-shadow]',
         'flex rounded-md border border-control bg-foreground/[.026] text-sm',
         'has-[>textarea]:h-auto',
 
@@ -56,7 +56,7 @@ function InputGroup({
         'has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3',
 
         // Focus state.
-        'has-[[data-slot=input-group-control]:focus-visible]:outline-none has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-background-control has-[[data-slot=input-group-control]:focus-visible]:ring-offset-2 has-[[data-slot=input-group-control]:focus-visible]:ring-offset-foreground-muted',
+        'has-[[data-slot=input-group-control]:focus-visible]:outline-hidden has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-background-control has-[[data-slot=input-group-control]:focus-visible]:ring-offset-2 has-[[data-slot=input-group-control]:focus-visible]:ring-offset-foreground-muted',
 
         // Error state.
         'has-[[data-slot][aria-invalid=true]]:bg-destructive-200 has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[[data-slot][aria-invalid=true]]:border-destructive-400 dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40',
@@ -167,8 +167,8 @@ function InputGroupInput({ className, ...props }: InputProps) {
         'flex-1 rounded-none border border-transparent -m-px bg-transparent shadow-none',
         'focus:border-transparent focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0',
         'read-only:border-transparent',
-        'aria-[invalid=true]:border-transparent aria-[invalid=true]:bg-transparent',
-        'aria-[invalid=true]:focus:border-transparent aria-[invalid=true]:focus-visible:border-transparent',
+        'aria-invalid:border-transparent aria-invalid:bg-transparent',
+        'aria-invalid:focus:border-transparent aria-invalid:focus-visible:border-transparent',
         className
       )}
       {...props}

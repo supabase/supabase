@@ -218,7 +218,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           {isReadOnly && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="border border-strong rounded bg-overlay-hover px-3 py-1 text-xs">
+                <div className="border border-strong rounded-sm bg-overlay-hover px-3 py-1 text-xs">
                   Viewing as read-only
                 </div>
               </TooltipTrigger>

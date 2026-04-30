@@ -46,13 +46,13 @@ export const SnippetRow: React.FC<SnippetRowProps> = ({
                 <Button
                   size="tiny"
                   type="text"
-                  className="!h-4 !w-4 rounded-full p-0"
+                  className="h-4! w-4! rounded-full p-0"
                   onClick={(e) => {
                     e.stopPropagation()
                     onRemoveSnippet(idx)
                   }}
                   aria-label={`Remove snippet ${idx + 1}`}
-                  icon={<X strokeWidth={1.5} className="!h-3 !w-3" />}
+                  icon={<X strokeWidth={1.5} className="h-3! w-3!" />}
                 />
               )}
             </div>
@@ -60,7 +60,7 @@ export const SnippetRow: React.FC<SnippetRowProps> = ({
           <HoverCardContent_Shadcn_ className="w-96 max-h-64 overflow-auto p-0">
             <CodeBlock
               hideLineNumbers
-              className="text-xs font-mono whitespace-pre-wrap break-words p-2 border-0"
+              className="text-xs font-mono whitespace-pre-wrap wrap-break-word p-2 border-0"
               language="sql"
             >
               {getSnippetContent(snippet)}

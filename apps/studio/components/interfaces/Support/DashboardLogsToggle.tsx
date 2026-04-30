@@ -49,7 +49,7 @@ export function DashboardLogsToggle({ form, sanitizedLog }: DashboardLogsToggleP
                 <CollapsibleTrigger_Shadcn_ className="group flex items-center gap-x-1 text-sm text-foreground-lighter hover:text-foreground transition">
                   <ChevronRight
                     size={14}
-                    className="transition-transform group-data-[state=open]:rotate-90"
+                    className="transition-transform group-data-open:rotate-90"
                   />
                   <span>Preview log</span>
                 </CollapsibleTrigger_Shadcn_>

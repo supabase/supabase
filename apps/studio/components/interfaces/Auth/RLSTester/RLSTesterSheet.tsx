@@ -85,7 +85,7 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
         </Button>
       </SheetTrigger>
 
-      <SheetContent className="!w-[600px] flex flex-col gap-y-0">
+      <SheetContent className="w-[600px]! flex flex-col gap-y-0">
         <SheetHeader>
           <SheetTitle>What data can my users see?</SheetTitle>
           <SheetDescription>
@@ -93,7 +93,7 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex-grow overflow-y-auto flex flex-col">
+        <div className="grow overflow-y-auto flex flex-col">
           <SheetSection className="px-0 py-0">
             <div className="flex flex-col p-5 pt-4 gap-y-4">
               <RoleSelector onSelectRole={setSelectedOption} />
