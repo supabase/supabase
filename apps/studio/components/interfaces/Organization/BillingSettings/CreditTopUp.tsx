@@ -426,13 +426,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                   loading={
                     form.formState.isSubmitting || executingTopUp || paymentConfirmationLoading
                   }
-                  disabled={
-                    form.formState.isSubmitting ||
-                    executingTopUp ||
-                    paymentConfirmationLoading ||
-                    isPreviewStale ||
-                    creditPreviewIsFetching
-                  }
+                  disabled={isPreviewStale || creditPreviewIsFetching}
                 >
                   Top Up
                 </Button>

@@ -321,7 +321,6 @@ export const SubscriptionPlanUpdateDialog = ({
     newPlanCost,
     taxFailed,
     customerBalance,
-    changeType,
     subscriptionPlanMeta?.name,
   ])
 
