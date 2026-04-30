@@ -41,8 +41,8 @@ function buildCrmConfig(crm: GoFormCrmConfig): CRMConfig {
   }
 
   if (crm.notion) {
-    const notionApiKey = process.env.NOTION_API_KEY
-    if (!notionApiKey) throw new Error('NOTION_API_KEY env var is not set')
+    const notionApiKey = process.env.NOTION_FORMS_API_KEY
+    if (!notionApiKey) throw new Error('NOTION_FORMS_API_KEY env var is not set')
     config.notion = { apiKey: notionApiKey }
   }
 
@@ -55,7 +55,7 @@ function buildCrmConfig(crm: GoFormCrmConfig): CRMConfig {
  * Credentials are read from environment variables:
  *   - HubSpot:     HUBSPOT_PORTAL_ID
  *   - Customer.io: CUSTOMERIO_SITE_ID, CUSTOMERIO_API_KEY
- *   - Notion:      NOTION_API_KEY
+ *   - Notion:      NOTION_FORMS_API_KEY
  *
  * Per-form config (formGuid, event name, database_id, field mappings) lives in the page definition.
  */

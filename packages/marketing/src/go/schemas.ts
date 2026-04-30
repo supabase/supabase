@@ -185,7 +185,7 @@ export const customerioFormConfigSchema = z.object({
 export const notionFormConfigSchema = z.object({
   /**
    * Notion database ID to create a page in. The integration token is read
-   * from the NOTION_API_KEY env var and must have write access to the database.
+   * from the NOTION_FORMS_API_KEY env var and must have write access to the database.
    */
   database_id: uuidLikeIdSchema,
   /**
