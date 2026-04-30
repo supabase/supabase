@@ -144,6 +144,7 @@ describe('docs middleware — /guides/* content negotiation', () => {
     const req = makeRequest('/docs/reference/javascript/introduction', {
       userAgent: 'Claude-User/1.0',
     })
-    expect(middleware(req).headers.get(REWRITE_HEADER)).not.toContain('/api/guides-md/')
+    const rewrite = middleware(req).headers.get(REWRITE_HEADER) ?? ''
+    expect(rewrite).not.toContain('/api/guides-md/')
   })
 })
