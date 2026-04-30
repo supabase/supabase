@@ -101,7 +101,9 @@ function rewriteJsxNode(node) {
   }
 
   if (name === 'Avatar') {
-    return { type: 'text', value: '' }
+    return node.type === 'mdxJsxTextElement'
+      ? { type: 'text', value: '' }
+      : { type: 'paragraph', children: [] }
   }
 
   // Unknown component: a flow `paragraph` is invalid inside an inline parent,
