@@ -120,20 +120,26 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                             </p>
                           </div>
 
-                          {plan.warning && (
+                          {isUpgradablePlan ? (
                             <div className="mt-4 flex flex-col gap-1">
-                              <span className="text-[13px] leading-4 inline-flex gap-1 items-center">
-                                {plan.warning}
+                              <span className="text-[13px] leading-4">
+                                First project included. Additional projects from $10/mo.
                               </span>
-                              {(plan.name === 'Pro' || plan.name === 'Team') && (
-                                <Link
-                                  href="#addon-compute"
-                                  className="hover:underline text-foreground-lighter text-[13px] m-0 p-0 leading-3"
-                                >
-                                  Need more compute?
-                                </Link>
-                              )}
+                              <Link
+                                href="#addon-compute"
+                                className="hover:underline text-foreground-lighter text-[13px] m-0 p-0 leading-3"
+                              >
+                                See how pricing scales
+                              </Link>
                             </div>
+                          ) : (
+                            plan.warning && (
+                              <div className="mt-4 flex flex-col gap-1">
+                                <span className="text-[13px] leading-4 inline-flex gap-1 items-center">
+                                  {plan.warning}
+                                </span>
+                              </div>
+                            )
                           )}
                         </div>
                       </div>

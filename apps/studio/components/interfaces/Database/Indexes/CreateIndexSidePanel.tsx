@@ -24,8 +24,13 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { MultiSelectOption } from 'ui-patterns/MultiSelectDeprecated'
-import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { INDEX_TYPES } from './Indexes.constants'
@@ -101,7 +106,7 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
   }
 
   const columns = tableColumns?.[0]?.columns ?? []
-  const columnOptions: MultiSelectOption[] = columns
+  const columnOptions = columns
     .filter((column): column is NonNullable<typeof column> => column !== null)
     .map((column) => ({
       id: column.attname,
@@ -328,16 +333,36 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
           </FormItemLayout>
 
           {selectedEntity && (
-            <FormItemLayout label="Select up to 32 columns" isReactForm={false}>
+            <FormItemLayout id="columns" label="Select up to 32 columns" isReactForm={false}>
               {isLoadingTableColumns && <ShimmeringLoader className="py-4" />}
               {isSuccessTableColumns && (
-                <MultiSelectV2
-                  options={columnOptions}
-                  placeholder="Choose which columns to create an index on"
-                  searchPlaceholder="Search for a column"
-                  value={selectedColumns}
-                  onChange={setSelectedColumns}
-                />
+                <MultiSelector values={selectedColumns} onValuesChange={setSelectedColumns}>
+                  <MultiSelectorTrigger
+                    id="columns"
+                    mode="inline-combobox"
+                    label={
+                      selectedColumns.length === 0
+                        ? 'Choose which columns to create an index on'
+                        : 'Search for a column'
+                    }
+                    deletableBadge
+                    badgeLimit="wrap"
+                    showIcon={false}
+                  />
+                  <MultiSelectorContent>
+                    <MultiSelectorList>
+                      {columnOptions.map((option) => (
+                        <MultiSelectorItem
+                          key={option.id}
+                          value={option.value}
+                          disabled={option.disabled}
+                        >
+                          {option.name}
+                        </MultiSelectorItem>
+                      ))}
+                    </MultiSelectorList>
+                  </MultiSelectorContent>
+                </MultiSelector>
               )}
             </FormItemLayout>
           )}

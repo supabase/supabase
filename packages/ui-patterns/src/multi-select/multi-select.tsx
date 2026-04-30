@@ -2,8 +2,17 @@
 
 import { cva, VariantProps } from 'class-variance-authority'
 import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
+// @ts-ignore Required to avoid TS error: The inferred type of MultiSelectorContent cannot be named without a reference to @radix-ui
+import type { Popover as PopoverPrimitive } from 'radix-ui'
 import React, { useEffect } from 'react'
-import { Badge, cn, Popover_Shadcn_ as Popover, PopoverAnchor_Shadcn_ as PopoverAnchor } from 'ui'
+import {
+  Badge,
+  cn,
+  Popover_Shadcn_ as Popover,
+  PopoverAnchor_Shadcn_ as PopoverAnchor,
+  PopoverContent_Shadcn_ as PopoverContent,
+  PopoverContentProps_Shadcn_ as PopoverContentProps,
+} from 'ui'
 import {
   Command,
   CommandEmpty,
@@ -11,7 +20,6 @@ import {
   CommandItem,
   CommandList,
 } from 'ui/src/components/shadcn/ui/command'
-import { PopoverContent } from 'ui/src/components/shadcn/ui/popover'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 
 interface MultiSelectContextProps {
@@ -286,7 +294,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           role="combobox"
           className={cn(
             'flex w-full min-w-[200px] min-h-[40px] items-center justify-between rounded-md border',
-            'border-alternative bg-foreground/[.026] px-3 py-2 text-sm',
+            'border-alternative bg-control px-3 py-2 text-sm',
             'ring-offset-background placeholder:text-muted-foreground',
             'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
             'disabled:cursor-not-allowed disabled:opacity-50',
@@ -462,11 +470,12 @@ const MultiSelectorInput = React.forwardRef<
 MultiSelectorInput.displayName = 'MultiSelectorInput'
 MultiSelector.Input = MultiSelectorInput
 
-const MultiSelectorContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, children }, ref) => {
+const MultiSelectorContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
+  ({ className, children, ...props }, ref) => {
     const { id } = useMultiSelect()
     return (
       <PopoverContent
+        align="start"
         ref={ref}
         className={cn(
           'bg-overlay shadow-md z-50 border border-overlay rounded-md p-0',
@@ -479,6 +488,8 @@ const MultiSelectorContent = React.forwardRef<HTMLDivElement, React.HTMLAttribut
             event.stopPropagation()
           }
         }}
+        sameWidthAsTrigger
+        {...props}
       >
         {children}
       </PopoverContent>
