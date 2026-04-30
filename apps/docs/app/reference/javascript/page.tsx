@@ -112,6 +112,4 @@ async function ReferencePage() {
   )
 }
 
-export const dynamic = 'force-static'
-
 export default ReferencePage
