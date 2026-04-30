@@ -302,7 +302,7 @@ export const SubscriptionPlanUpdateDialog = ({
     }
 
     // Prepend the plan cost row when there are adjustment items to show
-    if (changeType !== 'downgrade' && items.length > 0) {
+    if (items.length > 0) {
       items.unshift({
         type: 'amount',
         label: `${subscriptionPlanMeta?.name} Plan`,
