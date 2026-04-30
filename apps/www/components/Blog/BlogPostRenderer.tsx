@@ -243,14 +243,6 @@ const BlogPostRenderer = ({
                         )
                       )}
                       {/* Use ReactMarkdown for LivePreview mode, MDXRemote for normal mode */}
-                      {isLivePreview ? (
-                        <ReactMarkdown>{livePreviewContent}</ReactMarkdown>
-                      ) : (
-                        <MDXRemote
-                          {...(blog.content as MDXRemoteSerializeResult)}
-                          components={mdxComponents('blog')}
-                        />
-                      )}
                     </div>
                   </article>
                   {isLaunchWeek7 && <BlogLinks />}
