@@ -342,7 +342,7 @@ export function SurveyChart({
             <TwoOptionToggle
               options={['SQL', 'chart']}
               activeOption={view}
-              onClickOption={handleViewChange}
+              onClickOption={(value) => handleViewChange(value as 'sql' | 'chart')}
               borderOverride="border-overlay"
             />
           </div>
