@@ -6,7 +6,7 @@ import {
   ContextMenu_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuTrigger_Shadcn_,
-  writeTextToClipboard,
+  copyToClipboard,
 } from 'ui'
 
 import { formatClipboardValue } from '../../utils/common'
@@ -17,9 +17,8 @@ export const CellContextMenuWrapper = ({
 }: PropsWithChildren<{ value: string | number | boolean | object | null }>) => {
   const onCopyCellContent = () => {
     const text = formatClipboardValue(value)
-    void writeTextToClipboard(text).then((isCopied) => {
-      if (isCopied) toast.success('Copied cell value to clipboard')
-      else toast.error('Failed to copy cell value')
+    void copyToClipboard(text, () => {
+      toast.success('Copied cell value to clipboard')
     })
   }
 

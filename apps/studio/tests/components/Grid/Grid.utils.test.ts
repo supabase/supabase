@@ -1,4 +1,4 @@
-import { writeTextToClipboard } from 'ui'
+import { copyToClipboard } from 'ui'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import {
@@ -140,7 +140,7 @@ describe('SupabaseGrid.utils: handleCellKeyDown', () => {
   })
 })
 
-describe('Grid clipboard utils', () => {
+describe('shared clipboard util', () => {
   beforeEach(() => {
     vi.unstubAllGlobals()
     vi.spyOn(window.document, 'hasFocus').mockReturnValue(true)
@@ -151,14 +151,16 @@ describe('Grid clipboard utils', () => {
     vi.restoreAllMocks()
   })
 
-  test('should write text directly to the clipboard', async () => {
+  test('should invoke the callback after writing text to the clipboard', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
+    const onCopy = vi.fn()
 
     vi.stubGlobal('navigator', {
       clipboard: { writeText },
     })
 
-    await expect(writeTextToClipboard('hello from safari')).resolves.toBe(true)
+    await copyToClipboard('hello from safari', onCopy)
     expect(writeText).toHaveBeenCalledWith('hello from safari')
+    expect(onCopy).toHaveBeenCalled()
   })
 })

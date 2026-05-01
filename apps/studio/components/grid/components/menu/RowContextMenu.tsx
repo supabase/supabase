@@ -1,12 +1,7 @@
 import { Copy, Edit, ListFilter, Trash } from 'lucide-react'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
-import {
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  writeTextToClipboard,
-} from 'ui'
+import { copyToClipboard, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from 'ui'
 
 import { useTableRowOperations } from '../../hooks/useTableRowOperations'
 import { formatClipboardValue } from '../../utils/common'
@@ -50,16 +45,14 @@ export const RowContextMenuContent = ({
     const value = row[column.key]
     const text = formatClipboardValue(value)
 
-    void writeTextToClipboard(text).then((isCopied) => {
-      if (isCopied) toast.success('Copied cell value to clipboard')
-      else toast.error('Failed to copy cell value')
+    void copyToClipboard(text, () => {
+      toast.success('Copied cell value to clipboard')
     })
   }, [activeCellPosition, row, snap.gridColumns])
 
   const onCopyRowContent = useCallback(() => {
-    void writeTextToClipboard(JSON.stringify(row)).then((isCopied) => {
-      if (isCopied) toast.success('Copied row to clipboard')
-      else toast.error('Failed to copy row')
+    void copyToClipboard(JSON.stringify(row), () => {
+      toast.success('Copied row to clipboard')
     })
   }, [row])
 

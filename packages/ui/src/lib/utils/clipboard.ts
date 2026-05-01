@@ -12,7 +12,7 @@ type ClipboardText = string | Promise<string>
  *
  * Copied code from https://wolfgangrittner.dev/how-to-use-clipboard-api-in-firefox/
  */
-export const writeTextToClipboard = async (str: ClipboardText) => {
+const writeTextToClipboard = async (str: ClipboardText) => {
   const focused = window.document.hasFocus()
   if (!focused) return false
 
