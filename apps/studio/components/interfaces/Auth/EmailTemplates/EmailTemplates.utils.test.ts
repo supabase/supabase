@@ -74,6 +74,7 @@ describe('EmailTemplates.utils', () => {
       SMTP_SENDER_NAME: 'Example',
       SMTP_USER: 'smtp-user',
       SMTP_HOST: 'smtp.example.com',
+      SMTP_PASS: '******',
       SMTP_PORT: '587',
       SMTP_MAX_FREQUENCY: 60,
     }
@@ -86,6 +87,23 @@ describe('EmailTemplates.utils', () => {
         project: restrictedProject,
       })
     ).toBe(false)
+  })
+
+  it('restricts free projects when custom SMTP is incomplete', () => {
+    expect(
+      isCustomEmailTemplateEditingRestricted({
+        authConfig: {
+          SMTP_ADMIN_EMAIL: 'support@example.com',
+          SMTP_SENDER_NAME: 'Example',
+          SMTP_USER: 'smtp-user',
+          SMTP_HOST: 'smtp.example.com',
+          SMTP_PORT: '587',
+          SMTP_MAX_FREQUENCY: 60,
+        },
+        organization: freeOrganization,
+        project: restrictedProject,
+      })
+    ).toBe(true)
   })
 
   it('allows free projects with a configured send-email hook', () => {
