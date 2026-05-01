@@ -425,7 +425,7 @@ export const InviteMemberButton = () => {
                 )}
               />
             </DialogSection>
-            <DialogFooter className="!justify-between">
+            <DialogFooter className="justify-between!">
               <Button type="default" onClick={confirmOnClose}>
                 Cancel
               </Button>

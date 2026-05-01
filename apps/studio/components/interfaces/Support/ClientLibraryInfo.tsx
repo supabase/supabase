@@ -87,7 +87,7 @@ const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
           return (
             <div
               key={lib.name}
-              className="w-[230px] min-w-[230px] min-h-[128px] rounded border border-control bg-surface-100 space-y-3 px-4 py-3"
+              className="w-[230px] min-w-[230px] min-h-[128px] rounded-sm border border-control bg-surface-100 space-y-3 px-4 py-3"
             >
               <div className="space-y-1">
                 <p className="text-sm">{lib.name}</p>
@@ -107,7 +107,7 @@ const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
         })}
         <div
           className={cn(
-            'px-4 py-3 rounded border border-control bg-surface-100',
+            'px-4 py-3 rounded-sm border border-control bg-surface-100',
             'w-[230px] min-w-[230px] min-h-[128px] flex flex-col justify-between space-y-3'
           )}
         >

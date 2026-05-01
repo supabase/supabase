@@ -77,7 +77,7 @@ export const RowContextMenuContent = ({ row }: RowContextMenuContentProps) => {
   }, [getRowAndColumn])
 
   return (
-    <ContextMenuContent className="!min-w-36">
+    <ContextMenuContent className="min-w-36!">
       <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onCopyCellContent}>
         <Copy size={12} />
         <span className="text-xs">Copy cell</span>

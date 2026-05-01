@@ -188,7 +188,7 @@ export function AttachmentUploadDisplay({
             return (
               <div
                 key={url}
-                className="border relative h-14 w-14 rounded flex items-center justify-center"
+                className="border relative h-14 w-14 rounded-sm flex items-center justify-center"
               >
                 <Tooltip>
                   <TooltipTrigger className="cursor-default" onClick={(e) => e.preventDefault()}>
@@ -220,7 +220,7 @@ export function AttachmentUploadDisplay({
               <div
                 key={url}
                 style={{ backgroundImage: `url("${url}")` }}
-                className="relative h-14 w-14 rounded bg-cover bg-center bg-no-repeat"
+                className="relative h-14 w-14 rounded-sm bg-cover bg-center bg-no-repeat"
               >
                 <button
                   type="button"
@@ -242,7 +242,7 @@ export function AttachmentUploadDisplay({
             type="button"
             className={cn(
               'border border-stronger opacity-50 transition hover:opacity-100',
-              'group flex h-14 w-14 cursor-pointer items-center justify-center rounded'
+              'group flex h-14 w-14 cursor-pointer items-center justify-center rounded-sm'
             )}
             onClick={addFile}
           >

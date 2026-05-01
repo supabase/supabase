@@ -27,7 +27,7 @@ const AlertDialogOverlay = React.forwardRef<
   <AlertDialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'bg-black/40 backdrop-blur-sm',
+      'bg-black/40 backdrop-blur-xs',
       'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-closed:animate-overlay-hide py-8',
       !centered && 'flex flex-col flex-start pb-8 sm:pt-12 md:pt-20 lg:pt-32 xl:pt-40 px-5',
       className
@@ -39,7 +39,7 @@ AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName
 
 const AlertDialogContentVariants = cva(
   cn(
-    'relative z-50 w-full max-w-screen border shadow-md dark:shadow-sm',
+    'relative z-50 w-full max-w-screen border shadow-md dark:shadow-xs',
     'data-[state=open]:animate-in data-[state=closed]:animate-out',
     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
     'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%]',

@@ -121,7 +121,7 @@ const FilterError = ({ removeAllFilters }: { removeAllFilters: () => void }) => 
       className="pointer-events-auto"
       title="No results found — check your filter values"
     >
-      <p className="!mb-4">
+      <p className="mb-4!">
         One or more of your filters may have a value or operator that doesn't match the column's
         data type. Try updating or removing the filter.
       </p>
@@ -145,16 +145,16 @@ const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
       className="pointer-events-auto"
       title={`Sorting is not supporting on ${sorts.length > 1 ? 'one of the selected columns' : 'the selected column'}`}
     >
-      <p className="!mb-0">
+      <p className="mb-0!">
         Unable to retrieve results as sorting is not supported on{' '}
         {sorts.length > 1 ? 'one of the selected columns' : 'the selected column'} due to its data
         type. ({formattedInvalidDataType})
       </p>
-      <p className="!mb-2">
+      <p className="mb-2!">
         Remove any sorts on columns with the data type {formattedInvalidDataType} applying the sorts
         again.
       </p>
-      <p className="text-sm text-foreground-lighter prose max-w-full !mb-4">
+      <p className="text-sm text-foreground-lighter prose max-w-full mb-4!">
         Error: <code className="text-code-inline">{error.message}</code>
       </p>
 

@@ -84,7 +84,7 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children?: R
       <DialogTrigger asChild>
         <span
           className={cn(
-            '!m-0 text-foreground cursor-pointer transition',
+            'm-0! text-foreground cursor-pointer transition',
             'underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground-lighter'
           )}
         >
@@ -285,7 +285,7 @@ export const MarkdownPre = ({
           value={cleanContent}
           language={language as CodeBlockLang}
           className={cn(
-            'my-4 max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',
+            'my-4 max-h-96 max-w-none block border rounded-sm bg-transparent! py-3! px-3.5! prose dark:prose-dark text-foreground',
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
           )}
         />

@@ -2568,6 +2568,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "multi-select-in-dialog": {
+      name: "multi-select-in-dialog",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-in-dialog")),
+      source: "",
+      files: ["registry/default/example/multi-select-in-dialog.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "tree-view-demo": {
       name: "tree-view-demo",
       type: "components:example",

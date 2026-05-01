@@ -70,7 +70,7 @@ const Colors = ({
               onClick={() => handleCopy(x, i)}
             >
               <Example x={x} />
-              <span className="bg-surface-100 rounded-full border px-2 font-mono text-xs text-foreground-lighter group-data-[state=open]:text-foreground text-center">
+              <span className="bg-surface-100 rounded-full border px-2 font-mono text-xs text-foreground-lighter group-data-open:text-foreground text-center">
                 {copiedIndex === i ? 'Copied!' : x}
               </span>
             </GridItem>

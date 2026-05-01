@@ -40,7 +40,7 @@ const LocalDXImage = () => {
         >
           <div className="text-foreground-muted text-sm font-mono">$</div>
           <div className="text-foreground text-sm font-mono">supabase functions serve</div>
-          <div className="text-foreground rounded p-1.5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="text-foreground rounded-sm p-1.5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
             {copied ? (
               <span className="text-brand">
                 <Check className="w-3.5 h-3.5" />

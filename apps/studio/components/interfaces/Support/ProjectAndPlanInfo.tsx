@@ -149,7 +149,7 @@ function ProjectRefHighlighted({ projectRef }: ProjectRefHighlightedProps) {
         >
           <p className="text-sm transition text-foreground-lighter">
             Project ID:{' '}
-            <code className="text-code-inline !text-foreground-light">{projectRef}</code>
+            <code className="text-code-inline text-foreground-light!">{projectRef}</code>
           </p>
           <CopyButton
             iconOnly

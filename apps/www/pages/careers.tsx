@@ -125,15 +125,15 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
           </Button>
         </header>
 
-        <SectionContainer className="!pt-8">
+        <SectionContainer className="pt-8!">
           <div className="flex flex-wrap md:flex-nowrap -mt-6 md:mt-0 w-fit md:w-full mx-auto md:flex md:items-start justify-around lg:w-full lg:max-w-5xl">
             {career.company.map((company, i) => {
               return (
                 <div
                   key={i}
-                  className="border-t-[1px] mt-6 mx-2 md:mx-2 md:mt-0 md:border-0 border-brand w-[134px] md:max-w-none"
+                  className="border-t mt-6 mx-2 md:mx-2 md:mt-0 md:border-0 border-brand w-[134px] md:max-w-none"
                 >
-                  <div className="hidden md:block border-t-[1px] lg:border-t-2 border-brand w-[60px] lg:w-[100px]"></div>
+                  <div className="hidden md:block border-t lg:border-t-2 border-brand w-[60px] lg:w-[100px]"></div>
                   <h2 className="text-3xl lg:text-4xl pt-3 tracking-[-1px]">{company.number}</h2>
 
                   <div className="text-foreground-light text-sm lg:text-base">
@@ -145,16 +145,16 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
           </div>
         </SectionContainer>
 
-        <div className="py-[1.25px] bg-gradient-to-r from-background via-border to-background">
+        <div className="py-[1.25px] bg-linear-to-r from-background via-border to-background">
           <div className="bg-alternative text-clip">
-            <SectionContainer className="md:!pt-16 md:grid md:max-h-[500px] grid-cols-1 md:grid-cols-5 md:gap-8">
+            <SectionContainer className="md:pt-16! md:grid md:max-h-[500px] grid-cols-1 md:grid-cols-5 md:gap-8">
               <div
                 className="
                     relative md:col-span-2 aspect-square
                     w-[calc(100%+100px)] md:w-[calc(100%+450px)] xl:w-[calc(100%+200px)]
-                    -mb-[160px] md:mb-0
-                    -top-[160px] md:-top-[200px] xl:-top-[210px]
-                    -left-[100px] md:-left-[450px] xl:-left-[200px]
+                    mb-[-160px] md:mb-0
+                    top-[-160px] md:top-[-200px] xl:top-[-210px]
+                    left-[-100px] md:left-[-450px] xl:left-[-200px]
                   "
               >
                 <Globe />
@@ -195,7 +195,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                     </p>
                   </div>
                   <div className="md:w-full rounded-md mt-10 md:mt-36 lg:mt-40">
-                    <div className="relative w-full aspect-[148/125]">
+                    <div className="relative w-full aspect-148/125">
                       <Image
                         src="/images/career/team.jpeg"
                         alt="supabase team"
@@ -210,7 +210,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   </div>
                   <div className="grid justify-items-end">
                     <div className="w-full md:w-5/6 rounded-md mt-6">
-                      <div className="relative w-full aspect-[29/22]">
+                      <div className="relative w-full aspect-29/22">
                         <Image
                           src="/images/career/founders.jpeg"
                           alt="supabase founders"
@@ -227,7 +227,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                 </div>
                 <div className="mt-6 md:mt-0 w-full md:w-1/2">
                   <div className="w-full rounded-md">
-                    <div className="relative w-full aspect-[137/110]">
+                    <div className="relative w-full aspect-137/110">
                       <Image
                         src="/images/career/3.jpg"
                         alt="team photo"
@@ -242,7 +242,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   </div>
                   <div className="flex gap-6 mt-6">
                     <div className="w-full rounded-md">
-                      <div className="relative w-full aspect-[142/189]">
+                      <div className="relative w-full aspect-142/189">
                         <Image
                           src="/images/career/4.jpg"
                           alt="team photo"
@@ -256,7 +256,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                       </div>
                     </div>
                     <div className="w-full rounded-md">
-                      <div className="relative w-full aspect-[142/189]">
+                      <div className="relative w-full aspect-142/189">
                         <Image
                           src="/images/career/5.jpg"
                           alt="team photo"
@@ -271,7 +271,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                     </div>
                   </div>
                   <div className="w-full rounded-md mt-6">
-                    <div className="relative w-full aspect-[16/9]">
+                    <div className="relative w-full aspect-video">
                       <Image
                         src="/images/career/supateam.jpg"
                         alt="supabase company"
@@ -308,7 +308,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
               </div>
             </SectionContainer>
 
-            <SectionContainer className="!pb-0">
+            <SectionContainer className="pb-0!">
               <div className="text-center">
                 <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-1px]">
                   1,500+ Contributors building Supabase
@@ -327,7 +327,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                       className={`${
                         Styles[`contributors-${i}`]
                       } absolute w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full border-[1.5px] border-default z-10
-                          transition-all hover:scale-105 drop-shadow-sm hover:drop-shadow-md
+                          transition-all hover:scale-105 drop-shadow-xs hover:drop-shadow-md
                         `}
                       key={i}
                     >
@@ -349,22 +349,22 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   )
                 })}
                 <div
-                  className={`${Styles['contributors-bg-circle']} w-[100%] lg:w-[80%] left-[0%] lg:left-[10%] -bottom-[30%] xs:-bottom-[36%] sm:-bottom-[52%] md:-bottom-[64%] lg:-bottom-[80%] xl:-bottom-[100%]`}
+                  className={`${Styles['contributors-bg-circle']} w-full lg:w-[80%] left-[0%] lg:left-[10%] bottom-[-30%] xs:bottom-[-36%] sm:bottom-[-52%] md:bottom-[-64%] lg:bottom-[-80%] xl:-bottom-full`}
                 >
                   <div className="flex flex-col justify-between h-full bg-alternative rounded-full p-4"></div>
                 </div>
                 <div
-                  className={`${Styles['contributors-bg-circle']} w-[80%] lg:w-[60%] left-[10%] lg:left-[20%] -bottom-[25%] xs:-bottom-[30%] sm:-bottom-[44%] md:-bottom-[54%] lg:-bottom-[60%] xl:-bottom-[75%]`}
+                  className={`${Styles['contributors-bg-circle']} w-[80%] lg:w-[60%] left-[10%] lg:left-[20%] bottom-[-25%] xs:bottom-[-30%] sm:bottom-[-44%] md:bottom-[-54%] lg:bottom-[-60%] xl:bottom-[-75%]`}
                 >
                   <div className="flex flex-col justify-between h-full bg-alternative rounded-full p-4"></div>
                 </div>
                 <div
-                  className={`${Styles['contributors-bg-circle']} w-[60%] lg:w-[40%] left-[20%] lg:left-[30%] -bottom-[20%] xs:-bottom-[25%] sm:-bottom-[38%] md:-bottom-[44%] lg:-bottom-[40%] xl:-bottom-[50%]`}
+                  className={`${Styles['contributors-bg-circle']} w-[60%] lg:w-[40%] left-[20%] lg:left-[30%] bottom-[-20%] xs:bottom-[-25%] sm:bottom-[-38%] md:bottom-[-44%] lg:bottom-[-40%] xl:bottom-[-50%]`}
                 >
                   <div className="flex flex-col justify-between h-full bg-alternative rounded-full p-4"></div>
                 </div>
                 <div
-                  className={`${Styles['contributors-bg-circle']} w-[40%] lg:w-[20%] left-[30%] lg:left-[40%] -bottom-[15%] xs:-bottom-[19%] sm:-bottom-[30%] md:-bottom-[34%] lg:-bottom-[20%] xl:-bottom-[25%]`}
+                  className={`${Styles['contributors-bg-circle']} w-[40%] lg:w-[20%] left-[30%] lg:left-[40%] bottom-[-15%] xs:bottom-[-19%] sm:bottom-[-30%] md:bottom-[-34%] lg:bottom-[-20%] xl:bottom-[-25%]`}
                 >
                   <div className="flex flex-col justify-between h-full bg-alternative rounded-full p-4"></div>
                 </div>
@@ -456,7 +456,7 @@ const JobItem = ({ job }: { job: JobItemProps }) => {
       href={job.jobUrl}
       className="
         first-of-type:rounded-t-md last-of-type:rounded-b-md
-        cursor-pointer md:cursor-default bg-surface-75 border border-muted drop-shadow-sm p-4
+        cursor-pointer md:cursor-default bg-surface-75 border border-muted drop-shadow-xs p-4
         flex flex-col md:flex-row
         md:items-center
         transition hover:bg-surface-100

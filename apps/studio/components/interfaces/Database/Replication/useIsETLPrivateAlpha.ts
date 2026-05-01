@@ -31,9 +31,14 @@ export const useIsETLIcebergPrivateAlpha = () => {
   return useIsCurrentOrgInFlagList('etlEnableIcebergPrivateAlpha')
 }
 
+export const useIsETLDucklakePrivateAlpha = () => {
+  return useIsCurrentOrgInFlagList('etlEnableDucklakePrivateAlpha')
+}
+
 export const useIsETLPrivateAlpha = () => {
   const hasAccessToETLBigQuery = useIsCurrentOrgInFlagList('etlEnableBigQueryPrivateAlpha')
   const hasAccessToETLIceberg = useIsCurrentOrgInFlagList('etlEnableIcebergPrivateAlpha')
+  const hasAccessToETLDucklake = useIsCurrentOrgInFlagList('etlEnableDucklakePrivateAlpha')
 
-  return hasAccessToETLBigQuery || hasAccessToETLIceberg
+  return hasAccessToETLBigQuery || hasAccessToETLIceberg || hasAccessToETLDucklake
 }

@@ -12,11 +12,6 @@ export type JitStatusBadge = {
   variant: 'default' | 'success' | 'warning'
 }
 
-export type JitDbAccessUnavailableReason =
-  | 'postgres_upgrade_required'
-  | 'manual_migration_required'
-  | 'temporarily_unavailable'
-
 export type JitMemberOption = {
   id: string
   email: string
