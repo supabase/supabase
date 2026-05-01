@@ -1,3 +1,4 @@
+import { DATABASE_TABLES_SHORTCUT_IDS, databaseTablesRegistry } from './registry/database-tables'
 import {
   SCHEMA_VISUALIZER_SHORTCUT_IDS,
   schemaVisualizerRegistry,
@@ -60,6 +61,9 @@ export const SHORTCUT_IDS = {
 
   // Schema visualizer shortcuts
   ...SCHEMA_VISUALIZER_SHORTCUT_IDS,
+
+  // Database tables shortcuts
+  ...DATABASE_TABLES_SHORTCUT_IDS,
 } as const
 
 /**
@@ -314,4 +318,7 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
 
   // Schema visualizer shortcut registration
   ...schemaVisualizerRegistry,
+
+  // Database tables shortcut registration
+  ...databaseTablesRegistry,
 }
