@@ -1,3 +1,4 @@
+import { useStaticEffectEvent } from '~/hooks/useStaticEffectEvent'
 import { useRouter } from 'next/router'
 import { ComponentType, useEffect, useState } from 'react'
 import {
@@ -24,15 +25,19 @@ const LegalDocVersions = ({ versions }: Props) => {
   const latest = versions[0]
   const [activeId, setActiveId] = useState<string>(latest.id)
 
-  useEffect(() => {
-    if (!router.isReady) return
+  const syncActiveVersion = useStaticEffectEvent(() => {
     const fromQuery = typeof router.query.version === 'string' ? router.query.version : undefined
     if (fromQuery && versions.some((v) => v.id === fromQuery)) {
       setActiveId(fromQuery)
     } else {
       setActiveId(latest.id)
     }
-  }, [router.isReady, router.query.version, versions, latest.id])
+  })
+
+  useEffect(() => {
+    if (!router.isReady) return
+    syncActiveVersion()
+  }, [router.isReady, router.query.version, syncActiveVersion])
 
   const active = versions.find((v) => v.id === activeId) ?? latest
   const ActiveComponent = active.Component
