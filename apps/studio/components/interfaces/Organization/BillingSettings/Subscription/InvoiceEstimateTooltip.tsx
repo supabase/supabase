@@ -82,7 +82,7 @@ export const InvoiceEstimateTooltip = ({
 
                   const computeCreditsItem =
                     subscriptionPreview?.breakdown?.find((item) =>
-                      item.description.startsWith('Compute Credits')
+                      item.description?.startsWith('Compute Credits')
                     ) ?? null
 
                   const planItem = subscriptionPreview?.breakdown?.find((item) =>
