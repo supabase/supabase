@@ -916,10 +916,48 @@ resources:
                         return false
                       end
 
+                      local function is_admin_apikey(apikey)
+                        if apikey == nil or apikey == "" then
+                          return false
+                        end
+
+                        if SERVICE_ROLE_KEY ~= "" and apikey == SERVICE_ROLE_KEY then
+                          return true
+                        end
+
+                        if TRANSLATION_ENABLED and apikey == SERVICE_ROLE_KEY_ASYMMETRIC then
+                          return true
+                        end
+
+                        return false
+                      end
+
+                      local function is_rest_openapi_root(path)
+                        if path == nil or path == "" then
+                          return false
+                        end
+
+                        local query_start = string.find(path, "?", 1, true)
+                        local clean_path = path
+                        if query_start ~= nil then
+                          clean_path = string.sub(path, 1, query_start - 1)
+                        end
+
+                        return clean_path == "/rest/v1" or clean_path == "/rest/v1/"
+                      end
+
                       function envoy_on_request(request_handle)
                         local headers = request_handle:headers()
                         local route_name = request_handle:streamInfo():routeName()
                         if not is_protected_route(route_name) then
+                          return
+                        end
+
+                        if route_name == "rest-v1-protected" and not is_admin_apikey(headers:get("apikey")) and is_rest_openapi_root(headers:get(":path")) then
+                          request_handle:respond({
+                            [":status"] = "401",
+                            ["content-type"] = "text/plain",
+                          }, "Unauthorized")
                           return
                         end
 
