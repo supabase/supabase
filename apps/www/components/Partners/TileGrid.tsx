@@ -33,7 +33,7 @@ export default function TileGrid({
                 bg-surface-100
                 hover:bg-surface-200
                 group flex h-full w-full flex-col rounded-xl border px-6
-                py-6 shadow
+                py-6 shadow-sm
                 transition-all
                 hover:shadow-lg"
                 >
@@ -76,7 +76,7 @@ export default function TileGrid({
                 bg-surface-100
                 hover:bg-surface-200
                 group flex h-full w-full flex-col rounded-xl border px-6
-                py-6 shadow
+                py-6 shadow-sm
                 transition-all
                 hover:shadow-lg"
                 >

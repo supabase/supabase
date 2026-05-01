@@ -61,7 +61,7 @@ const ChangelogDetailPage = ({ title, url, created_at, slug, source, labels }: P
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10 mb-8 lg:mb-20">
           <div className="min-w-0 lg:col-span-8">
-            <article className="prose prose-docs max-w-none [overflow-wrap:break-word] [&>*:first-child:not(style):not(script)]:mt-0 [&>style:first-child+*]:mt-0 [&>script:first-child+*]:mt-0 [&>*:last-child:not(style):not(script)]:mb-0">
+            <article className="prose prose-docs max-w-none wrap-break-word [&>*:first-child:not(style):not(script)]:mt-0 [&>style:first-child+*]:mt-0 [&>script:first-child+*]:mt-0 [&>*:last-child:not(style):not(script)]:mb-0">
               <MDXRemote {...source} components={mdxComponents('blog')} />
             </article>
           </div>

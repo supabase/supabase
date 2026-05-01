@@ -63,11 +63,11 @@ const IPv4StatusIcon = ({ className, active }: { className?: string; active: boo
       </svg>
 
       {!active ? (
-        <div className="absolute -right-1.5 -top-1.5 bg-destructive rounded w-4 h-4 flex items-center justify-center">
+        <div className="absolute -right-1.5 -top-1.5 bg-destructive rounded-sm w-4 h-4 flex items-center justify-center">
           <X size={10} strokeWidth={4} className="text-white rounded-full" />
         </div>
       ) : (
-        <div className="absolute -right-1.5 -top-1.5 bg-brand-500 rounded w-4 h-4 flex items-center justify-center">
+        <div className="absolute -right-1.5 -top-1.5 bg-brand-500 rounded-sm w-4 h-4 flex items-center justify-center">
           <svg
             width="10"
             height="10"
@@ -170,12 +170,12 @@ export const ConnectionPanel = ({
                 )}
                 language={lang}
                 value={connectionString}
-                className="[&_code]:text-[12px] [&_code]:text-foreground [&_code]:!whitespace-normal"
+                className="[&_code]:text-[12px] [&_code]:text-foreground [&_code]:whitespace-normal!"
                 hideLineNumbers
                 onCopyCallback={onCopyCallback}
               />
               {notice && (
-                <div className="border px-4 py-1 w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-light">
+                <div className="border px-4 py-1 w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none border-light">
                   {notice?.map((text: string) => (
                     <p key={text} className="text-xs text-foreground-lighter">
                       {text}
@@ -220,7 +220,7 @@ export const ConnectionPanel = ({
 
           {type === 'session' && (
             <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
-              <div className="flex w-6 h-6 rounded items-center justify-center gap-2 shrink-0 bg-surface-100">
+              <div className="flex w-6 h-6 rounded-sm items-center justify-center gap-2 shrink-0 bg-surface-100">
                 <WarningIcon />
               </div>
               <div className="flex flex-col">
@@ -237,16 +237,16 @@ export const ConnectionPanel = ({
             <Collapsible_Shadcn_ className="group -space-y-px">
               <CollapsibleTrigger_Shadcn_
                 asChild
-                className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-muted"
+                className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none border-muted"
               >
                 <Button
                   type="default"
                   size="tiny"
-                  className="text-foreground-lighter !bg-dash-sidebar"
+                  className="text-foreground-lighter bg-dash-sidebar!"
                   icon={
                     <ChevronRight
                       className={cn(
-                        'group-data-[state=open]/collapse:rotate-90 text-foreground-muted transition-transform'
+                        'group-data-open/collapse:rotate-90 text-foreground-muted transition-transform'
                       )}
                     />
                   }

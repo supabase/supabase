@@ -60,7 +60,7 @@ export const SendMessageModal = ({
           <CodeEditor
             id="message-payload"
             language="json"
-            className="!mb-0 h-32 overflow-hidden rounded border"
+            className="mb-0! h-32 overflow-hidden rounded-sm border"
             onInputChange={(e: string | undefined) => setValues({ ...values, payload: e ?? '{}' })}
             options={{ wordWrap: 'off', contextmenu: false }}
             value={values.payload}

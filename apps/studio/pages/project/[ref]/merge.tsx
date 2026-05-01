@@ -445,7 +445,7 @@ const MergePage: NextPageWithLayout = () => {
   )
 
   const pageTitle = () => (
-    <div className="flex items-center gap-x-2">
+    <div className="flex items-center gap-x-4">
       <span>Merge</span>
       {pgDeltaDiffEnabled && (
         <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF} />

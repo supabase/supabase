@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 
 import BlogPostClient from './BlogPostClient'
-import { SITE_ORIGIN } from '@/lib/constants'
 import { getAbsoluteBlogSocialImage } from '@/lib/blog-images'
+import { SITE_ORIGIN } from '@/lib/constants'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '@/lib/posts'
 import type { Blog, BlogData, PostReturnType } from '@/types/post'
 
@@ -53,6 +53,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return {
       title: blogPost.title,
       description: blogPost.description,
+      alternates: {
+        types: {
+          'text/markdown': `/blog/${slug}.md`,
+        },
+      },
       openGraph: {
         title: blogPost.title,
         description: blogPost.description,

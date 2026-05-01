@@ -54,7 +54,7 @@ export const LayoutSidebar = ({
         maxSize={maxSize}
         className={cn(
           'border-l bg fixed z-40 right-0 top-0 bottom-0',
-          'h-[100dvh]',
+          'h-dvh',
           'md:absolute md:h-auto md:w-1/2',
           'lg:w-2/5',
           'xl:relative xl:border-l-0'

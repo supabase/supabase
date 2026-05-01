@@ -200,7 +200,7 @@ export const FileExplorerColumn = ({
           {view === STORAGE_VIEWS.COLUMNS && (
             <div
               className={cn(
-                'sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 [[data-theme*=dark]_&]:bg-table-header-dark',
+                'sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 in-data-[theme*=dark]:bg-table-header-dark',
                 haveSelectedItems ? 'h-10 py-3 opacity-100' : 'h-0 py-0 opacity-0',
                 'transition-all duration-200'
               )}
@@ -335,7 +335,7 @@ export const FileExplorerColumn = ({
 
           {/* List interface footer */}
           {view === STORAGE_VIEWS.LIST && (
-            <div className="shrink-0 rounded-b-md z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 [[data-theme*=dark]_&]:bg-panel-footer-dark w-full">
+            <div className="shrink-0 rounded-b-md z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 in-data-[theme*=dark]:bg-panel-footer-dark w-full">
               <p className="text-sm">
                 {formatBytes(columnItemsSize)} for {columnItems.length} items
               </p>

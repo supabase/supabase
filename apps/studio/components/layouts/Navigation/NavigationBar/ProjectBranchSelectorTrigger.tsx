@@ -29,11 +29,11 @@ export const ProjectBranchSelectorTrigger = forwardRef<
     return (
       <SidebarMenuButton
         size="lg"
-        className="group py-1 gap-1.5 w-full flex h-auto text-left data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground touch-manipulation"
+        className="group py-1 gap-1.5 w-full flex h-auto text-left data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground touch-manipulation"
         onClick={onClick}
         ref={ref}
       >
-        <div className="relative flex h-8 aspect-square shrink-0 items-center bg-background-muted group-hover:border-stronger justify-center rounded border border-strong text-xs">
+        <div className="relative flex h-8 aspect-square shrink-0 items-center bg-background-muted group-hover:border-stronger justify-center rounded-sm border border-strong text-xs">
           {selectedOrgInitial}
         </div>
         <div className="text-left grow min-w-0">
@@ -53,7 +53,7 @@ export const ProjectBranchSelectorTrigger = forwardRef<
 
         <ChevronsUpDown
           strokeWidth={1.5}
-          className="ml-auto text-foreground-lighter !w-4 !h-4 md:hidden md:group-hover:flex"
+          className="ml-auto text-foreground-lighter w-4! h-4! md:hidden md:group-hover:flex"
         />
       </SidebarMenuButton>
     )

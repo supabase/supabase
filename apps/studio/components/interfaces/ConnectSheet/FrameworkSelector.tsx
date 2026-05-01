@@ -59,7 +59,7 @@ export const FrameworkSelector = ({
         </PopoverTrigger_Shadcn_>
       </div>
       <PopoverContent_Shadcn_
-        className="p-0 w-[var(--radix-popover-trigger-width)] min-w-48"
+        className="p-0 w-radix-popover-trigger-width min-w-48"
         side="bottom"
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}

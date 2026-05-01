@@ -20,7 +20,7 @@ const TwoOptionToggle = ({
   ) => `absolute top-0 z-1 text-xs inline-flex h-full items-center justify-center font-medium
     ${
       isActive ? 'hover:text-foreground-light hover:text-foreground' : 'hover:text-foreground'
-    } hover:text-foreground focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue
+    } hover:text-foreground focus:z-10 focus:outline-hidden focus:border-blue-300 focus:ring-blue
     transition ease-in-out duration-150`
 
   return (
@@ -32,7 +32,7 @@ const TwoOptionToggle = ({
         style={{ width, translate: activeOption === options[1] ? '0px' : `${width - 2}px` }}
         aria-hidden="true"
         className={cn(
-          'z-0 inline-block rounded h-full bg-overlay-hover shadow transform',
+          'z-0 inline-block rounded-sm h-full bg-overlay-hover shadow-sm transform',
           'transition-all ease-in-out border border-strong'
         )}
       ></span>

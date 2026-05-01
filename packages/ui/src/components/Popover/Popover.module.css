@@ -1,8 +1,8 @@
 .sbui-popover__content {
   @apply bg-background p-0;
   @apply border;
-  @apply rounded;
-  @apply shadow;
+  @apply rounded-sm;
+  @apply shadow-sm;
   border-style: solid;
   border-width: 1px;
 }

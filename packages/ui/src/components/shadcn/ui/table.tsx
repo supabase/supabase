@@ -122,7 +122,7 @@ function TableHeadSort<TColumn extends string = string>({
           className={cn(
             baseIconClass,
             'transition-opacity opacity-80 md:opacity-40',
-            !isActive ? 'group-hover/table-head-sort:opacity-80' : '!opacity-0'
+            !isActive ? 'group-hover/table-head-sort:opacity-80' : 'opacity-0!'
           )}
         />
       </>
@@ -133,7 +133,7 @@ function TableHeadSort<TColumn extends string = string>({
     <button
       type="button"
       className={cn(
-        'group/table-head-sort heading-meta whitespace-nowrap flex items-center gap-1 cursor-pointer select-none !bg-transparent border-none p-0 w-full text-left',
+        'group/table-head-sort heading-meta whitespace-nowrap flex items-center gap-1 cursor-pointer select-none bg-transparent! border-none p-0 w-full text-left',
         className
       )}
       onClick={() => onSortChange(column)}
