@@ -943,7 +943,7 @@ resources:
                           clean_path = string.sub(path, 1, query_start - 1)
                         end
 
-                        return clean_path == "/rest/v1" or clean_path == "/rest/v1/"
+                        return clean_path == "/rest/v1/"
                       end
 
                       function envoy_on_request(request_handle)

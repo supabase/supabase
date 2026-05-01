@@ -154,7 +154,7 @@ services:
           access:
             - |
               local path = kong.request.get_path()
-              if path == "/rest/v1" or path == "/rest/v1/" then
+              if path == "/rest/v1/" then
                 local consumer = kong.client.get_consumer()
                 if not consumer or consumer.username ~= "service_role" then
                   return kong.response.exit(401, { message = "Secret API key required" })
