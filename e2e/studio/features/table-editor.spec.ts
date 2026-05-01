@@ -243,7 +243,7 @@ testRunner('table editor', () => {
 
     // insert row with enum value
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByText('Insert a new row into').click()
+    await page.getByText('Insert row').click()
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'value1' }).click()
     await page.getByTestId('action-bar-save-row').click()
@@ -252,7 +252,7 @@ testRunner('table editor', () => {
 
     // insert row with another enum value
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByText('Insert a new row into').click()
+    await page.getByText('Insert row').click()
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'value2' }).click()
     await page.getByTestId('action-bar-save-row').click()
