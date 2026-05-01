@@ -35,7 +35,7 @@ import {
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface ServiceFlowPanelProps {
-  selectedRow: ColumnSchema
+  selectedRow?: ColumnSchema
   selectedRowKey: string
   searchParameters: QuerySearchParamsType
 }
@@ -57,15 +57,6 @@ export function ServiceFlowPanel({
     jsonScrollRef.current?.scrollTo({ top: 0 })
   }, [selectedRowKey])
 
-  const timestampMs = selectedRow?.timestamp
-    ? selectedRow.timestamp / 1000
-    : selectedRow?.date
-      ? selectedRow.date.getTime()
-      : null
-  const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
-
-  const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
-
   const logType = selectedRow?.log_type
   const serviceFlowType: ServiceFlowType | undefined =
     logType === 'edge function' ? 'edge-function' : (logType as ServiceFlowType)
@@ -76,6 +67,8 @@ export function ServiceFlowPanel({
       setActiveTab('raw-json')
     }
   }, [shouldShowServiceFlow, activeTab])
+
+  const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
 
   // Query the logs API directly
   const {
@@ -94,6 +87,15 @@ export function ServiceFlowPanel({
     }
   )
 
+  if (!selectedRowKey || !selectedRow) return null
+
+  const timestampMs = selectedRow.timestamp
+    ? selectedRow.timestamp / 1000
+    : selectedRow.date
+      ? selectedRow.date.getTime()
+      : null
+  const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
+
   // Prepare JSON data for Raw JSON tab
   const jsonData =
     shouldShowServiceFlow && serviceFlowData?.result?.[0] ? serviceFlowData.result[0] : selectedRow
@@ -106,172 +108,160 @@ export function ServiceFlowPanel({
         }
       : jsonData
 
-  if (selectedRowKey) {
-    return (
-      <>
-        <ResizableHandle withHandle />
-        <ResizablePanel
-          id="log-sidepanel"
-          defaultSize={380}
-          minSize={300}
-          className="bg-dash-sidebar"
-        >
-          <div className="flex h-full flex-col overflow-hidden">
-            <Tabs
-              defaultValue={shouldShowServiceFlow ? 'overview' : 'raw-json'}
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="flex h-full w-full flex-col"
-            >
-              <div className="flex items-center justify-between px-4 border-b border-border">
-                <TabsList className="flex h-auto gap-x-4 rounded-none !border-none">
-                  {shouldShowServiceFlow && (
-                    <TabsTrigger
-                      value="overview"
-                      className="border-b-[1px] py-3 font-mono text-xs uppercase"
-                    >
-                      Overview
-                    </TabsTrigger>
-                  )}
+  return (
+    <>
+      <ResizableHandle withHandle />
+      <ResizablePanel
+        id="log-sidepanel"
+        defaultSize={380}
+        minSize={300}
+        className="bg-dash-sidebar"
+      >
+        <div className="flex h-full flex-col overflow-hidden">
+          <Tabs
+            defaultValue={shouldShowServiceFlow ? 'overview' : 'raw-json'}
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="flex h-full w-full flex-col"
+          >
+            <div className="flex items-center justify-between px-4 border-b border-border">
+              <TabsList className="flex h-auto gap-x-4 rounded-none !border-none">
+                {shouldShowServiceFlow && (
                   <TabsTrigger
-                    value="raw-json"
+                    value="overview"
                     className="border-b-[1px] py-3 font-mono text-xs uppercase"
                   >
-                    Raw JSON
+                    Overview
                   </TabsTrigger>
-                </TabsList>
-                <ServiceFlowPanelControls />
-              </div>
-
-              {shouldShowServiceFlow && (
-                <TabsContent
-                  ref={overviewScrollRef}
-                  value="overview"
-                  className="mt-0 grow overflow-auto py-2"
+                )}
+                <TabsTrigger
+                  value="raw-json"
+                  className="border-b-[1px] py-3 font-mono text-xs uppercase"
                 >
-                  {error ? (
-                    <div className="py-8 text-center text-destructive">
-                      Error: {error.toString()}
-                    </div>
-                  ) : serviceFlowType === 'postgres' ? (
-                    <PostgresFlowDetail
+                  Raw JSON
+                </TabsTrigger>
+              </TabsList>
+              <ServiceFlowPanelControls />
+            </div>
+
+            {shouldShowServiceFlow && (
+              <TabsContent
+                ref={overviewScrollRef}
+                value="overview"
+                className="mt-0 grow overflow-auto py-2"
+              >
+                {error ? (
+                  <div className="py-8 text-center text-destructive">Error: {error.toString()}</div>
+                ) : serviceFlowType === 'postgres' ? (
+                  <PostgresFlowDetail
+                    data={selectedRow}
+                    enrichedData={serviceFlowData?.result?.[0]}
+                    isLoading={isLoading}
+                    filterFields={filterFields}
+                    table={table}
+                  />
+                ) : (
+                  <div className="[&>*:nth-child(even)]:bg-surface-100/50">
+                    <DetailSectionHeader
+                      title="Request started"
+                      icon={Clock}
+                      summary={formattedTime ?? undefined}
+                    />
+
+                    <MemoizedNetworkBlock
                       data={selectedRow}
                       enrichedData={serviceFlowData?.result?.[0]}
                       isLoading={isLoading}
                       filterFields={filterFields}
                       table={table}
                     />
-                  ) : (
-                    <div className="[&>*:nth-child(even)]:bg-surface-100/50">
-                      <DetailSectionHeader
-                        title="Request started"
-                        icon={Clock}
-                        summary={formattedTime ?? undefined}
-                      />
 
-                      <MemoizedNetworkBlock
+                    {serviceFlowType === 'auth' ? (
+                      <MemoizedGoTrueBlock
                         data={selectedRow}
                         enrichedData={serviceFlowData?.result?.[0]}
                         isLoading={isLoading}
                         filterFields={filterFields}
                         table={table}
                       />
-
-                      {serviceFlowType === 'auth' ? (
-                        <MemoizedGoTrueBlock
+                    ) : serviceFlowType === 'edge-function' ? (
+                      <MemoizedEdgeFunctionBlock
+                        data={selectedRow}
+                        enrichedData={serviceFlowData?.result?.[0]}
+                        isLoading={isLoading}
+                        filterFields={filterFields}
+                        table={table}
+                      />
+                    ) : serviceFlowType === 'storage' ? (
+                      <MemoizedStorageBlock
+                        data={selectedRow}
+                        enrichedData={serviceFlowData?.result?.[0]}
+                        isLoading={isLoading}
+                        filterFields={filterFields}
+                        table={table}
+                      />
+                    ) : (
+                      <>
+                        <MemoizedPostgRESTBlock
                           data={selectedRow}
                           enrichedData={serviceFlowData?.result?.[0]}
                           isLoading={isLoading}
                           filterFields={filterFields}
                           table={table}
                         />
-                      ) : serviceFlowType === 'edge-function' ? (
-                        <MemoizedEdgeFunctionBlock
+
+                        <MemoizedPostgresBlock
                           data={selectedRow}
                           enrichedData={serviceFlowData?.result?.[0]}
                           isLoading={isLoading}
                           filterFields={filterFields}
                           table={table}
                         />
-                      ) : serviceFlowType === 'storage' ? (
-                        <MemoizedStorageBlock
-                          data={selectedRow}
-                          enrichedData={serviceFlowData?.result?.[0]}
-                          isLoading={isLoading}
-                          filterFields={filterFields}
-                          table={table}
-                        />
-                      ) : (
-                        <>
-                          <MemoizedPostgRESTBlock
-                            data={selectedRow}
-                            enrichedData={serviceFlowData?.result?.[0]}
-                            isLoading={isLoading}
-                            filterFields={filterFields}
-                            table={table}
-                          />
-
-                          <MemoizedPostgresBlock
-                            data={selectedRow}
-                            enrichedData={serviceFlowData?.result?.[0]}
-                            isLoading={isLoading}
-                            filterFields={filterFields}
-                            table={table}
-                          />
-                        </>
-                      )}
-                    </div>
-                  )}
-                  <CodeBlock
-                    language="json"
-                    className="max-h-[800px] overflow-auto border-none rounded-none [&_pre]:leading-tight! [&_code]:leading-tight!"
-                  >
-                    {JSON.stringify(formattedJsonData, null, 2)}
-                  </CodeBlock>
-                </TabsContent>
-              )}
-
-              <TabsContent
-                ref={jsonScrollRef}
-                value="raw-json"
-                className="mt-0 grow overflow-auto bg-surface-100/50"
-              >
-                {isLoading && shouldShowServiceFlow && (
-                  <div className="flex items-center gap-3 border-b border-border bg-surface-100 p-3 text-foreground-light">
-                    <Skeleton className="h-4 w-4 animate-pulse rounded-full" />
-                    <span className="text-sm">Enriching log...</span>
+                      </>
+                    )}
                   </div>
                 )}
-                <div className="sticky top-2 z-10 flex justify-end px-2 -mb-9 pointer-events-none">
-                  <Button
-                    size="tiny"
-                    type="default"
-                    className="pointer-events-auto px-1.5"
-                    icon={jsonCopied ? <Check size={12} /> : <Copy size={12} />}
-                    onClick={() => {
-                      copyToClipboard(JSON.stringify(formattedJsonData, null, 2))
-                      setJsonCopied(true)
-                      setTimeout(() => setJsonCopied(false), 1000)
-                    }}
-                  >
-                    {jsonCopied ? 'Copied' : ''}
-                  </Button>
-                </div>
-                <CodeBlock
-                  language="json"
-                  hideCopy
-                  wrapperClassName="!overflow-visible bg-surface-100/50 [&_pre]:!bg-surface-100/50"
-                  className="rounded-none border-none [&_code]:!leading-tight [&_pre]:!leading-tight"
-                >
-                  {JSON.stringify(formattedJsonData, null, 2)}
-                </CodeBlock>
               </TabsContent>
-            </Tabs>
-          </div>
-        </ResizablePanel>
-      </>
-    )
-  }
+            )}
 
-  return null
+            <TabsContent
+              ref={jsonScrollRef}
+              value="raw-json"
+              className="mt-0 grow overflow-auto bg-surface-100/50"
+            >
+              {isLoading && shouldShowServiceFlow && (
+                <div className="flex items-center gap-3 border-b border-border bg-surface-100 p-3 text-foreground-light">
+                  <Skeleton className="h-4 w-4 animate-pulse rounded-full" />
+                  <span className="text-sm">Enriching log...</span>
+                </div>
+              )}
+              <div className="sticky top-2 z-10 flex justify-end px-2 -mb-9 pointer-events-none">
+                <Button
+                  size="tiny"
+                  type="default"
+                  className="pointer-events-auto px-1.5"
+                  icon={jsonCopied ? <Check size={12} /> : <Copy size={12} />}
+                  onClick={() => {
+                    copyToClipboard(JSON.stringify(formattedJsonData, null, 2))
+                    setJsonCopied(true)
+                    setTimeout(() => setJsonCopied(false), 1000)
+                  }}
+                >
+                  {jsonCopied ? 'Copied' : ''}
+                </Button>
+              </div>
+              <CodeBlock
+                language="json"
+                hideCopy
+                wrapperClassName="!overflow-visible bg-surface-100/50 [&_pre]:!bg-surface-100/50"
+                className="rounded-none border-none [&_code]:!leading-tight [&_pre]:!leading-tight"
+              >
+                {JSON.stringify(formattedJsonData, null, 2)}
+              </CodeBlock>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </ResizablePanel>
+    </>
+  )
 }
