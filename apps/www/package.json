@@ -24,6 +24,7 @@
     "@codesandbox/sandpack-react": "^2.20.0",
     "@hcaptcha/react-hcaptcha": "^1.12.0",
     "@heroicons/react": "^1.0.6",
+    "@mdx-js/mdx": "^3.0.1",
     "@mdx-js/react": "^3.0.0",
     "@next/bundle-analyzer": "15.3.1",
     "@next/mdx": "15.3.1",
