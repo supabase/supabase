@@ -1,3 +1,7 @@
+import {
+  DATABASE_FUNCTIONS_SHORTCUT_IDS,
+  databaseFunctionsRegistry,
+} from './registry/database-functions'
 import { DATABASE_TABLES_SHORTCUT_IDS, databaseTablesRegistry } from './registry/database-tables'
 import {
   SCHEMA_VISUALIZER_SHORTCUT_IDS,
@@ -64,6 +68,9 @@ export const SHORTCUT_IDS = {
 
   // Database tables shortcuts
   ...DATABASE_TABLES_SHORTCUT_IDS,
+
+  // Database functions shortcuts
+  ...DATABASE_FUNCTIONS_SHORTCUT_IDS,
 } as const
 
 /**
@@ -321,4 +328,7 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
 
   // Database tables shortcut registration
   ...databaseTablesRegistry,
+
+  // Database functions shortcut registration
+  ...databaseFunctionsRegistry,
 }
