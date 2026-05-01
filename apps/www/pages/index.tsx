@@ -17,18 +17,15 @@ const CTABanner = dynamic(() => import('components/CTABanner/index'))
 
 // When updating page content, also update public/llms/homepage.txt
 
+const HOMEPAGE_JSON_LD = serializeJsonLd([organizationSchema(), websiteSchema()])
+
 const Index = () => {
   const content = getContent()
 
   return (
     <>
       <Head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: serializeJsonLd([organizationSchema(), websiteSchema()]),
-          }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: HOMEPAGE_JSON_LD }} />
       </Head>
       <Layout>
         <Hero />
