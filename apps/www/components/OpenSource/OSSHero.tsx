@@ -10,8 +10,8 @@ import styles from './hero.module.css'
 const OSSHero = () => (
   <>
     <div className="absolute z-[-4] flex flex-col top-0 left-0 w-full h-[500px] overflow-hidden pointer-events-none">
-      <div className="absolute bottom-0 z-[1] w-full h-4/5 bg-gradient-to-t from-background to-transparent" />
-      <div className="absolute top-0 z-[1] w-full h-2/5 bg-gradient-to-b from-background to-transparent" />
+      <div className="absolute bottom-0 z-1 w-full h-4/5 bg-linear-to-t from-background to-transparent" />
+      <div className="absolute top-0 z-1 w-full h-2/5 bg-linear-to-b from-background to-transparent" />
     </div>
     <div
       className={cn(
@@ -20,10 +20,10 @@ const OSSHero = () => (
       )}
     >
       <div
-        className="absolute select-none pointer-events-none inset-0 z-[3] blur-[100px] w-full h-full opacity-60"
+        className="absolute select-none pointer-events-none inset-0 z-3 blur-[100px] w-full h-full opacity-60"
         style={{ transform: 'translateZ(0px)' }}
       />
-      <div className="absolute bottom-0 z-[-2] w-full h-full bg-gradient-to-t from-background to-transparent" />
+      <div className="absolute bottom-0 z-[-2] w-full h-full bg-linear-to-t from-background to-transparent" />
       <HeroGrid />
     </div>
   </>
@@ -179,7 +179,7 @@ const HeroGrid = () => {
   )
 
   return (
-    <div className="relative -z-10 ![perspective:1200px] sm:![perspective:1200px] md:![perspective:1200px] lg:![perspective:1200px]">
+    <div className="relative -z-10 perspective-distant! sm:perspective-distant! md:perspective-distant! lg:perspective-distant!">
       <div
         style={{
           transform: 'rotateX(85deg)',

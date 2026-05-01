@@ -3,6 +3,7 @@ import { cn } from 'ui'
 
 export interface RoleImpersonationRadioProps<T extends string> {
   label?: string
+  description?: string
   value: T
   isSelected: boolean | 'partially'
   onSelectedChange: (value: T) => void
@@ -11,6 +12,7 @@ export interface RoleImpersonationRadioProps<T extends string> {
 
 export function RoleImpersonationRadio<T extends string>({
   label,
+  description,
   value,
   isSelected,
   onSelectedChange,
@@ -62,8 +64,10 @@ export function RoleImpersonationRadio<T extends string>({
           isSelected && 'text-foreground'
         )}
       >
-        {label ?? value} role
+        {label ?? value}
       </span>
+
+      {description && <p className="text-foreground-lighter text-xs">{description}</p>}
     </label>
   )
 }

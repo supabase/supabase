@@ -13,7 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
-import { useDebounce, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useDebounce, useParams } from 'common'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -52,6 +52,7 @@ import { LiveButton } from '@/components/ui/DataTable/LiveButton'
 import { Kbd } from '@/components/ui/DataTable/primitives/Kbd'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { TimelineChart } from '@/components/ui/DataTable/TimelineChart'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
@@ -399,7 +400,7 @@ export const UnifiedLogs = () => {
                     </p>
                   </TooltipContent>
                 </Tooltip>
-                <div className="order-first w-full min-w-0 sm:order-none sm:w-auto sm:flex-1 [&_[cmdk-input-wrapper]]:!px-3 [&_button]:!px-3 [&_button>span]:!h-[26px] [&_button>span]:!py-0 [&_input]:!h-[26px] [&_input]:!py-0">
+                <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 **:[[cmdk-input-wrapper]]:px-3! [&_button]:px-3! [&_button>span]:h-[26px]! [&_button>span]:py-0! [&_input]:h-[26px]! [&_input]:py-0!">
                   <DataTableFilterCommand
                     placeholder="Search logs..."
                     searchParamsParser={SEARCH_PARAMS_PARSER}
@@ -409,6 +410,7 @@ export const UnifiedLogs = () => {
                   <DataTableFilterControlsDrawer />
                 </div>
                 <div className="ml-auto flex items-center gap-2">
+                  <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS} />
                   <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />
                   <DataTableViewOptions />
                   <DownloadLogsButton searchParameters={searchParameters} />
@@ -439,7 +441,7 @@ export const UnifiedLogs = () => {
                   isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
                 )}
               >
-                <div className="h-full [&>div]:h-full [&_thead_tr]:!bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))] [&_thead_th]:![border-top:none] [&_thead_th]:![border-bottom:none] [&_thead_th]:![box-shadow:inset_0_-1px_0_hsl(var(--border-default))] [&_thead_tr]:!border-b-0 [&_tbody_tr]:!border-b-0 [&_thead_tr:hover]:!bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))] [&_thead_th]:!text-foreground-lighter">
+                <div className="h-full [&>div]:h-full [&_thead_tr]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]! [&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]! [&_thead_th]:[box-shadow:inset_0_-1px_0_hsl(var(--border-default))]! [&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0! [&_thead_tr:hover]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]! [&_thead_th]:text-foreground-lighter!">
                   <DataTableInfinite
                     columns={UNIFIED_LOGS_COLUMNS}
                     totalRows={totalDBRowCount}

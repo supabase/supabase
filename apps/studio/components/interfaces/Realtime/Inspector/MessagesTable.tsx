@@ -55,7 +55,10 @@ const NoResultAlert = ({
 
           <div className="mt-4 border bg-surface-100 border-border rounded-md justify-start items-center flex flex-col w-full">
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-              <IconBroadcast size="xlarge" className="text-background bg-foreground rounded w-6" />
+              <IconBroadcast
+                size="xlarge"
+                className="text-background bg-foreground rounded-sm w-6"
+              />
               <div className="grow flex-col flex">
                 <p className="text-foreground">Create a Broadcast message</p>
                 <p className="text-foreground-lighter text-xs">Send a message in the channel</p>
@@ -65,7 +68,10 @@ const NoResultAlert = ({
               </Button>
             </div>
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-              <IconPresence size="xlarge" className="text-background bg-foreground rounded w-6" />
+              <IconPresence
+                size="xlarge"
+                className="text-background bg-foreground rounded-sm w-6"
+              />
               <div className="grow flex-col flex">
                 <p className="text-foreground">Join from another browser tab</p>
                 <p className="text-foreground-lighter text-xs">
@@ -82,7 +88,7 @@ const NoResultAlert = ({
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
               <IconDatabaseChanges
                 size="xlarge"
-                className="text-background bg-foreground rounded w-6"
+                className="text-background bg-foreground rounded-sm w-6"
               />
               <div className="grow flex-col flex">
                 <p className="text-foreground">Listen to a table for changes</p>
@@ -179,7 +185,7 @@ const MessagesTable = ({
                   isEqual(row, focusedLog)
                     ? 'bg-scale-800 rdg-row--focused'
                     : 'bg-200 hover:bg-scale-300 cursor-pointer',
-                  isErrorLog(row) && '!bg-warning-300',
+                  isErrorLog(row) && 'bg-warning-300!',
                 ])
               }}
               rows={data}

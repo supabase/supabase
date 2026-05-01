@@ -476,7 +476,7 @@ export const GitHubIntegrationConnectionForm = ({
                             disabled={isLoadingGitHubRepos}
                             loading={isLoadingGitHubRepos}
                             icon={
-                              <div className="bg-black shadow rounded p-1 w-6 h-6 flex justify-center items-center">
+                              <div className="bg-black shadow-sm rounded-sm p-1 w-6 h-6 flex justify-center items-center">
                                 {GITHUB_ICON}
                               </div>
                             }
@@ -495,7 +495,7 @@ export const GitHubIntegrationConnectionForm = ({
                       <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom" align="start">
                         <Command_Shadcn_>
                           <CommandInput_Shadcn_ placeholder="Search repositories..." />
-                          <CommandList_Shadcn_ className="!max-h-[200px]">
+                          <CommandList_Shadcn_ className="max-h-[200px]!">
                             <CommandEmpty_Shadcn_>No repositories found.</CommandEmpty_Shadcn_>
                             {githubRepos.length > 0 ? (
                               <CommandGroup_Shadcn_>
@@ -513,7 +513,7 @@ export const GitHubIntegrationConnectionForm = ({
                                       )
                                     }}
                                   >
-                                    <div className="bg-black shadow rounded p-1 w-5 h-5 flex justify-center items-center">
+                                    <div className="bg-black shadow-sm rounded-sm p-1 w-5 h-5 flex justify-center items-center">
                                       {GITHUB_ICON}
                                     </div>
                                     <span className="truncate" title={repo.name}>

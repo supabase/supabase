@@ -937,7 +937,7 @@ export const SQLEditor = () => {
                       placeholder={
                         !promptState.isOpen && !editorRef.current?.getValue()
                           ? 'Hit ' +
-                            (os === 'macos' ? 'CMD+K' : `CTRL+K`) +
+                            (os === 'macos' ? 'CMD+SHIFT+K' : `CTRL+SHIFT+K`) +
                             ' to generate query or just start typing'
                           : ''
                       }

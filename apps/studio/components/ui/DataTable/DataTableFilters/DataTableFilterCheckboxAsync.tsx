@@ -50,7 +50,7 @@ export function DataTableFilterCheckboxAsync<TData>({
 
   if (!options?.length)
     return (
-      <div className="flex items-center justify-center px-2 py-4 text-center border border-border rounded">
+      <div className="flex items-center justify-center px-2 py-4 text-center border border-border rounded-sm">
         <p className="text-xs text-foreground-light">No options available</p>
       </div>
     )
@@ -60,13 +60,13 @@ export function DataTableFilterCheckboxAsync<TData>({
       <InputWithAddons
         placeholder="Search"
         leading={<Search size={14} className="text-foreground-lighter" />}
-        containerClassName="h-8 rounded"
+        containerClassName="h-8 rounded-sm"
         value={inputValue}
         trailing={isFetchingFacetCount ? <Loader2 size={12} className="animate-spin" /> : undefined}
         onChange={(e) => setInputValue(e.target.value)}
       />
 
-      <div className="max-h-[200px] overflow-y-auto rounded border border-border empty:border-none">
+      <div className="max-h-[200px] overflow-y-auto rounded-sm border border-border empty:border-none">
         {filterOptions.length === 0 ? (
           <div className="flex items-center justify-center px-2 py-3 text-center">
             <div className="space-y-0.5">
@@ -120,8 +120,8 @@ export function DataTableFilterCheckboxAsync<TData>({
                     type="button"
                     onClick={() => column?.setFilterValue([option.value])}
                     className={cn(
-                      'absolute inset-y-0 right-0 hidden font-normal text-muted-foreground backdrop-blur-sm hover:text-foreground group-hover:block',
-                      'rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                      'absolute inset-y-0 right-0 hidden font-normal text-muted-foreground backdrop-blur-xs hover:text-foreground group-hover:block',
+                      'rounded-md ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                     )}
                   >
                     <span className="px-2">only</span>

@@ -1,4 +1,3 @@
-import { BarChart2 } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, CardContent } from 'ui'
 import {
@@ -15,14 +14,11 @@ import RestartServerButton from './Infrastructure/RestartServerButton'
 import { ResumeProjectButton } from '@/components/interfaces/Project/ResumeProjectButton'
 import { useProjectPauseStatusQuery } from '@/data/projects/project-pause-status-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 
 export const Project = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const isBranch = Boolean(project?.parent_project_ref)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
   const { projectSettingsRestartProject } = useIsFeatureEnabled([
     'project_settings:restart_project',
@@ -109,41 +105,6 @@ export const Project = () => {
           </Card>
         </PageSectionContent>
       </PageSection>
-
-      {!isBranch && (
-        <PageSection>
-          <PageSectionMeta>
-            <PageSectionSummary>
-              <PageSectionTitle>Project usage</PageSectionTitle>
-            </PageSectionSummary>
-          </PageSectionMeta>
-          <PageSectionContent>
-            <Card>
-              <CardContent>
-                <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
-                  <div className="flex space-x-4">
-                    <BarChart2 strokeWidth={2} />
-                    <div>
-                      <p className="text-sm">Project usage statistics have moved</p>
-                      <p className="text-foreground-light text-sm">
-                        Project usage is now viewable within organization settings.
-                      </p>
-                    </div>
-                  </div>
-
-                  {!!organization && !!project && (
-                    <Button asChild type="default">
-                      <Link href={`/org/${organization.slug}/usage?projectRef=${project.ref}`}>
-                        View project usage
-                      </Link>
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </PageSectionContent>
-        </PageSection>
-      )}
     </>
   )
 }

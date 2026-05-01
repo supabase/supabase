@@ -138,12 +138,12 @@ export function MobileMenuContent({
       {viewLevel === 'section' && sectionLabel && (
         <div
           className={cn(
-            'shrink-0 flex items-center gap-2 border-b border-default px-3 min-h-[var(--header-height)]'
+            'shrink-0 flex items-center gap-2 border-b border-default px-3 min-h-(--header-height)'
           )}
         >
           <Button
             type="text"
-            className="!p-1 justify-start"
+            className="p-1! justify-start"
             icon={<ChevronLeft size={20} />}
             onClick={handleBackToTop}
             aria-label="Back to menu"

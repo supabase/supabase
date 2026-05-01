@@ -112,7 +112,7 @@ export const UsersSearch = ({
         <SelectTrigger_Shadcn_
           size="tiny"
           className={cn(
-            'w-[130px] !bg-transparent rounded-none -ml-[1px]',
+            'w-[130px] bg-transparent! rounded-none -ml-px',
             specificFilterColumn === 'freeform' && 'text-warning'
           )}
         >
@@ -156,7 +156,7 @@ export const UsersSearch = ({
 
       <Input
         size="tiny"
-        containerClassName="w-[245px] rounded-l-none -ml-[1px]"
+        containerClassName="w-[245px] rounded-l-none -ml-px"
         className={cn(
           'bg-transparent',
           searchInvalid ? 'text-red-900 dark:border-red-900' : '',

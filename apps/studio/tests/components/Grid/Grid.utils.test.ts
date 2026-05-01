@@ -1,3 +1,4 @@
+import { writeTextToClipboard } from 'ui'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import {
@@ -5,7 +6,6 @@ import {
   formatSortURLParams,
   handleCellKeyDown,
 } from '@/components/grid/SupabaseGrid.utils'
-import { writeTextToClipboard } from 'ui'
 
 const { toastError, toastSuccess } = vi.hoisted(() => ({
   toastError: vi.fn(),
@@ -129,7 +129,9 @@ describe('SupabaseGrid.utils: handleCellKeyDown', () => {
 
     handleCellKeyDown(args, event)
 
-    expect(writeText).toHaveBeenCalledWith('hello from safari')
+    await vi.waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith('hello from safari')
+    })
     expect(event.preventDefault).toHaveBeenCalled()
     expect(event.preventGridDefault).toHaveBeenCalled()
     await vi.waitFor(() => {

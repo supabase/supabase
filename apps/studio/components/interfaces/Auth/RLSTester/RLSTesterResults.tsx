@@ -62,7 +62,7 @@ export const RLSTesterResults = ({
         </TabsList_Shadcn_>
 
         {!!parseQueryResults && (
-          <div className="border rounded flex items-center justify-between px-3 py-1.5 mt-3">
+          <div className="border rounded-sm flex items-center justify-between px-3 py-1.5 mt-3">
             <div className="flex items-center gap-x-2">
               <p className="text-xs text-foreground-light">Ran as</p>
               {!parseQueryResults.role ? (
@@ -86,8 +86,8 @@ export const RLSTesterResults = ({
         <TabsContent_Shadcn_ value="policies" className="mt-0">
           {!isServiceRole &&
             (!!tableWithRLSEnabledButNoPolicies ? (
-              <Admonition showIcon={false} type="default" className="rounded mt-2">
-                <p className="!mb-0.5">This user has no access to any rows from this query</p>
+              <Admonition showIcon={false} type="default" className="rounded-sm mt-2">
+                <p className="mb-0.5!">This user has no access to any rows from this query</p>
                 <p className="text-foreground-light">
                   The table{' '}
                   <code className="text-code-inline">
@@ -95,13 +95,13 @@ export const RLSTesterResults = ({
                     {tableWithRLSEnabledButNoPolicies.table}
                   </code>{' '}
                   has RLS enabled but no policies set up for the{' '}
-                  <code className="text-code-inline !break-keep">{parseQueryResults.role}</code>{' '}
+                  <code className="text-code-inline break-keep!">{parseQueryResults.role}</code>{' '}
                   role.
                 </p>
               </Admonition>
             ) : tableWithRLSEnabledWithPolicyFalse ? (
-              <Admonition showIcon={false} type="default" className="rounded mt-2">
-                <p className="!mb-0.5">This user has no access to any rows from this query</p>
+              <Admonition showIcon={false} type="default" className="rounded-sm mt-2">
+                <p className="mb-0.5!">This user has no access to any rows from this query</p>
                 <p className="text-foreground-light">
                   The table{' '}
                   <code className="text-code-inline">
@@ -109,16 +109,16 @@ export const RLSTesterResults = ({
                     {tableWithRLSEnabledWithPolicyFalse.table}
                   </code>{' '}
                   has a policy that evaluates to
-                  <code className="text-code-inline !break-keep">false</code> for the{' '}
-                  <code className="text-code-inline !break-keep">{parseQueryResults.role}</code>{' '}
+                  <code className="text-code-inline break-keep!">false</code> for the{' '}
+                  <code className="text-code-inline break-keep!">{parseQueryResults.role}</code>{' '}
                   role.
                 </p>
               </Admonition>
             ) : null)}
 
           {isServiceRole && (
-            <Admonition showIcon={false} type="default" className="rounded mt-2">
-              <p className="!mb-0.5">
+            <Admonition showIcon={false} type="default" className="rounded-sm mt-2">
+              <p className="mb-0.5!">
                 The <code className="text-code-inline">postgres</code> role has access to all rows
                 for this query
               </p>
@@ -152,8 +152,8 @@ export const RLSTesterResults = ({
         <TabsContent_Shadcn_ value="data" className="mt-2">
           <div
             className={cn(
-              'flex-grow flex flex-col border overflow-hidden',
-              results.length === 0 ? 'rounded h-32' : 'rounded-t h-56'
+              'grow flex flex-col border overflow-hidden',
+              results.length === 0 ? 'rounded-sm h-32' : 'rounded-t h-56'
             )}
           >
             <Results rows={results} />

@@ -1,3 +1,5 @@
+@reference "./main.css";
+
 .sb-grid {
   @apply flex h-full flex-col;
 }
@@ -13,6 +15,7 @@
   @apply text-grid;
   @apply border-secondary border-r border-b;
   @apply text-foreground;
+  padding-inline: 0.5rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -137,14 +140,8 @@
 .rdg-header-row .rdg-cell p {
   @apply text-typography-body-light [[data-theme*=dark]_&]:text-typography-body-dark;
 }
-.rdg-header-row .rdg-cell .react-contextmenu-wrapper {
-  @apply flex h-full items-center px-2 transition duration-100 ease-in-out;
-}
-.rdg-header-row .rdg-cell .react-contextmenu-wrapper:hover {
-  @apply bg-surface-200;
-}
 .rdg-header-row .rdg-checkbox {
-  @apply bg-surface-200 border-default rounded-sm border;
+  @apply bg-surface-200 border-default rounded-xs border;
 }
 .rdg-header-row .rdg-checkbox-input:checked + .rdg-checkbox {
   @apply border-default border-4 bg-green-900;
@@ -233,10 +230,10 @@
   }
 
   [type='checkbox'] {
-    @apply cursor-pointer rounded border border-solid;
+    @apply cursor-pointer rounded-sm border border-solid;
 
     @apply text-foreground border-strong transition-all;
-    @apply hover:border-foreground focus:ring-0 focus:outline-none;
+    @apply hover:border-foreground focus:ring-0 focus:outline-hidden;
 
     @apply bg-control;
 
@@ -257,7 +254,7 @@
   @apply absolute top-0 inline-flex h-full items-center justify-center;
   @apply text-xs font-medium;
   @apply text-border-muted;
-  @apply active:bg-alternative hover:text-white focus:z-10 focus:outline-none;
+  @apply active:bg-alternative hover:text-white focus:z-10 focus:outline-hidden;
   @apply transition duration-150 ease-in-out;
   @apply cursor-pointer;
   z-index: 1;
@@ -276,7 +273,7 @@
 }
 
 .rdg__segmented-control__label {
-  @apply bg-overlay-hover border-control z-0 inline-block h-full transform rounded border shadow transition duration-200 ease-in-out;
+  @apply bg-overlay-hover border-control z-0 inline-block h-full transform rounded-sm border shadow-sm transition duration-200 ease-in-out;
 }
 
 .rdg__segmented-control__label--left {

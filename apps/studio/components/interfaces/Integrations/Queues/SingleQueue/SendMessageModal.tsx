@@ -122,7 +122,7 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
                       id="message-payload"
                       language="json"
                       autofocus={false}
-                      className="!mb-0 h-32 overflow-hidden rounded border"
+                      className="mb-0! h-32 overflow-hidden rounded-sm border"
                       onInputChange={(e: string | undefined) => field.onChange(e)}
                       options={{ wordWrap: 'off', contextmenu: false }}
                       value={field.value}

@@ -29,7 +29,11 @@ import { DestinationRow } from './DestinationRow'
 import { DisableExternalReplicationDialog } from './DisableExternalReplicationDialog'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
-import { useIsETLBigQueryPrivateAlpha, useIsETLIcebergPrivateAlpha } from './useIsETLPrivateAlpha'
+import {
+  useIsETLBigQueryPrivateAlpha,
+  useIsETLDucklakePrivateAlpha,
+  useIsETLIcebergPrivateAlpha,
+} from './useIsETLPrivateAlpha'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -47,6 +51,7 @@ export const Destinations = () => {
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
+  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const newDestinationDefaultType = infrastructureReadReplicas
@@ -55,7 +60,9 @@ export const Destinations = () => {
       ? 'BigQuery'
       : etlEnableIceberg
         ? 'Analytics Bucket'
-        : null
+        : etlEnableDucklake
+          ? 'DuckLake'
+          : null
 
   const prefetchedRef = useRef(false)
   const [filterString, setFilterString] = useState<string>('')
@@ -69,6 +76,7 @@ export const Destinations = () => {
       'Read Replica',
       'BigQuery',
       'Analytics Bucket',
+      'DuckLake',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,

@@ -35,6 +35,7 @@ import { BannerRlsEventTrigger } from '@/components/ui/BannerStack/Banners/Banne
 import { BannerRlsTester } from '@/components/ui/BannerStack/Banners/BannerRlsTester'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
@@ -297,7 +298,14 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
       <PageHeader size="large">
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>Policies</PageHeaderTitle>
+            <PageHeaderTitle>
+              <span className="flex items-center gap-2">
+                Policies
+                {rlsTesterEnabled && (
+                  <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER} />
+                )}
+              </span>
+            </PageHeaderTitle>
             <PageHeaderDescription>
               Manage Row Level Security policies for your tables
             </PageHeaderDescription>

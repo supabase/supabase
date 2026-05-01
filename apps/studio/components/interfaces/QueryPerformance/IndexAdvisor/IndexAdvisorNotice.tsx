@@ -32,7 +32,7 @@ export const IndexAdvisorNotice = () => {
             alt="Index Advisor"
             className="w-full h-full object-cover object-right dark:hidden"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-r from-background-alternative to-transparent" />
         </div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between px-2 py-1">
           <div className="flex flex-col gap-y-0.5">

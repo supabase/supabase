@@ -4,7 +4,13 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import type { UseFormReturn } from 'react-hook-form'
 import { FormControl, FormField } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
 
 import { SERVICE_OPTIONS, type ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
@@ -29,13 +35,31 @@ export function AffectedServicesSelector({ form, category }: AffectedServicesSel
       render={({ field }) => (
         <FormItemLayout hideMessage layout="vertical" label="Which services are affected?">
           <FormControl>
-            <MultiSelectV2
-              options={SERVICE_OPTIONS}
-              value={field.value.length === 0 ? [] : field.value?.split(', ')}
-              placeholder="No particular service"
-              searchPlaceholder="Search for a service"
-              onChange={(services) => form.setValue('affectedServices', services.join(', '))}
-            />
+            <MultiSelector
+              values={field.value.length === 0 ? [] : field.value?.split(', ')}
+              onValuesChange={(services) => field.onChange(services.join(', '))}
+            >
+              <MultiSelectorTrigger
+                mode="inline-combobox"
+                label={field.value.length === 0 ? 'No particular service' : 'Search for a service'}
+                deletableBadge
+                badgeLimit="wrap"
+                showIcon={false}
+              />
+              <MultiSelectorContent>
+                <MultiSelectorList>
+                  {SERVICE_OPTIONS.map((service) => (
+                    <MultiSelectorItem
+                      key={service.id}
+                      value={service.value}
+                      disabled={service.disabled}
+                    >
+                      {service.name}
+                    </MultiSelectorItem>
+                  ))}
+                </MultiSelectorList>
+              </MultiSelectorContent>
+            </MultiSelector>
           </FormControl>
         </FormItemLayout>
       )}

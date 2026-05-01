@@ -175,7 +175,7 @@ export const CreateVectorBucketDialog = ({
 
         <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col !p-0">
+            <DialogSection className="flex flex-col p-0!">
               <FormField
                 key="name"
                 name="name"

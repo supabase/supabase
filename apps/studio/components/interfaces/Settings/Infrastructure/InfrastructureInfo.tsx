@@ -88,7 +88,7 @@ export const InfrastructureInfo = () => {
               description="Read replicas is now managed under Replication in the Database section."
               actions={
                 <Button type="default" asChild>
-                  <Link href={`/project/${ref}/database/replication`} className="!no-underline">
+                  <Link href={`/project/${ref}/database/replication`} className="no-underline!">
                     Go to Replication
                   </Link>
                 </Button>

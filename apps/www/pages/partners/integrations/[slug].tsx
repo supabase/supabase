@@ -80,7 +80,7 @@ function Partner({
           visible
           onCancel={() => setFocusedImage(null)}
           size="xxlarge"
-          className="w-full outline-none"
+          className="w-full outline-hidden"
         >
           <Image
             layout="responsive"
@@ -119,10 +119,10 @@ function Partner({
             </div>
 
             <div
-              className="bg-gradient-to-t from-background-alternative to-background border-b p-6 [&_.swiper-container]:overflow-visible"
+              className="bg-linear-to-t from-background-alternative to-background border-b p-6 [&_.swiper-container]:overflow-visible"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
-              <SectionContainer className="!py-0 !px-3 lg:!px-12 xl:!p-0 mx-auto max-w-5xl">
+              <SectionContainer className="py-0! px-3! lg:px-12! xl:p-0! mx-auto max-w-5xl">
                 <Swiper
                   initialSlide={0}
                   spaceBetween={20}
@@ -196,7 +196,7 @@ function Partner({
               {!isNarrow && <PartnerDetails partner={partner} />}
             </div>
             {partner.call_to_action_link && (
-              <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
+              <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-xs max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl font-medium self-center">
                     Get started with {partner.title} and Supabase.
