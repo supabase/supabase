@@ -11,15 +11,18 @@ import {
 
 import { formatClipboardValue } from '../../utils/common'
 
+/**
+ * [Joshen] RowRenderer should be using this so that we can deprecate `react-contextify`
+ * We can probably extend this for all the other actions like edit, delete, etc
+ */
 export const CellContextMenuWrapper = ({
   value,
   children,
 }: PropsWithChildren<{ value: string | number | boolean | object | null }>) => {
   const onCopyCellContent = () => {
     const text = formatClipboardValue(value)
-    void copyToClipboard(text, () => {
-      toast.success('Copied cell value to clipboard')
-    })
+    copyToClipboard(text)
+    toast.success('Copied cell value to clipboard')
   }
 
   return (
