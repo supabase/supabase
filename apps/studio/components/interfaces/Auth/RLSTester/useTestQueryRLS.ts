@@ -11,9 +11,9 @@ import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import {
-  getImpersonatedUser,
   isRoleImpersonationEnabled,
   useGetImpersonatedRoleState,
+  useImpersonatedUser,
   useRoleImpersonationStateSnapshot,
 } from '@/state/role-impersonation-state'
 
@@ -35,6 +35,7 @@ export const useTestQueryRLS = () => {
 
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const impersonatedRoleState = getImpersonatedRoleState()
+  const user = useImpersonatedUser()
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -82,7 +83,6 @@ export const useTestQueryRLS = () => {
     onParseQuery: (results?: ParseQueryResults) => void
   }) => {
     if (!project) return console.error('Project is required')
-    const user = getImpersonatedUser(impersonatedRoleState)
 
     if (option === 'authenticated' && !user) {
       return toast('Select which user to test as before running the query')

@@ -5,7 +5,7 @@ import BlogFilters from 'components/Blog/BlogFilters'
 import BlogGridItem from 'components/Blog/BlogGridItem'
 import BlogListItem from 'components/Blog/BlogListItem'
 import { useInfiniteScrollWithFetch } from 'hooks/useInfiniteScroll'
-import { useCallback, useState } from 'react'
+import { Suspense, useCallback, useState } from 'react'
 import type PostTypes from 'types/post'
 import { cn } from 'ui'
 
@@ -162,7 +162,9 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
 
   return (
     <>
-      <BlogFilters onFilterChange={handleFilterChange} view={view} setView={setView} />
+      <Suspense fallback={null}>
+        <BlogFilters onFilterChange={handleFilterChange} view={view} setView={setView} />
+      </Suspense>
 
       <ol
         className={cn(
