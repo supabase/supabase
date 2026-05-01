@@ -59,6 +59,7 @@ export type IntegrationDefinition = {
   name: string
   status?: 'alpha' | 'beta'
   categories?: string[]
+  featured?: boolean
   icon: (props?: { className?: string; style?: Record<string, string | number> }) => ReactNode
   description: string | null
   content?: string | null

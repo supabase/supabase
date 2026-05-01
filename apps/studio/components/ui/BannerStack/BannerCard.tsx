@@ -1,5 +1,5 @@
 import { X } from 'lucide-react'
-import { Button, Card, CardContent, cn } from 'ui'
+import { Button, Card, CardContent, cn, type ButtonProps } from 'ui'
 
 import { BASE_PATH } from '@/lib/constants'
 
@@ -7,9 +7,15 @@ interface BannerCardProps {
   onDismiss?: () => void
   children: React.ReactNode
   className?: string
+  closeVariant?: ButtonProps['type']
 }
 
-export const BannerCard = ({ onDismiss, children, className }: BannerCardProps) => {
+export const BannerCard = ({
+  onDismiss,
+  children,
+  className,
+  closeVariant = 'text',
+}: BannerCardProps) => {
   return (
     <Card className={cn('relative overflow-hidden shadow-lg rounded-2xl', className)}>
       <div className="absolute -inset-16 z-0 opacity-100 pointer-events-none">
@@ -30,7 +36,7 @@ export const BannerCard = ({ onDismiss, children, className }: BannerCardProps) 
         {onDismiss && (
           <div className="absolute top-4 right-4 z-20">
             <Button
-              type="text"
+              type={closeVariant}
               size="tiny"
               htmlType="button"
               icon={<X size={16} strokeWidth={1.5} />}

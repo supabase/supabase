@@ -6,8 +6,8 @@ import { ProjectLayout } from '../ProjectLayout'
 import ObservabilityMenu from './ObservabilityMenu'
 import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { BannerIndexAdvisor } from '@/components/ui/BannerStack/Banners/BannerIndexAdvisor'
-import { BannerMetricsAPI } from '@/components/ui/BannerStack/Banners/BannerMetricsAPI'
-import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { FeatureMarketplaceItemBanner } from '@/components/ui/BannerStack/Banners/FeatureMarketplaceItemBanner'
+import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
@@ -26,8 +26,8 @@ const ObservabilityLayoutContent = ({
   const { addBanner, dismissBanner } = useBannerStack()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
-  const [isMetricsBannerDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.OBSERVABILITY_BANNER_DISMISSED(ref ?? ''),
+  const [isFeaturedMarketplaceItemBannerDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.FEATURED_MARKETPLACE_ITEM_BANNER_DISMISSED(ref ?? '', 'observability'),
     false
   )
 
@@ -37,17 +37,17 @@ const ObservabilityLayoutContent = ({
   )
 
   useEffect(() => {
-    if (!isMetricsBannerDismissed && IS_PLATFORM) {
+    if (!isFeaturedMarketplaceItemBannerDismissed && IS_PLATFORM) {
       addBanner({
-        id: 'metrics-api-banner',
+        id: BANNER_ID.FEATURED_MARKETPLACE_ITEM,
         isDismissed: false,
-        content: <BannerMetricsAPI />,
+        content: <FeatureMarketplaceItemBanner category="observability" />,
         priority: 1,
       })
     } else {
-      dismissBanner('metrics-api-banner')
+      dismissBanner(BANNER_ID.FEATURED_MARKETPLACE_ITEM)
     }
-  }, [isMetricsBannerDismissed, addBanner, dismissBanner])
+  }, [isFeaturedMarketplaceItemBannerDismissed, addBanner, dismissBanner])
 
   const prevPathnameRef = useRef(pathname)
 

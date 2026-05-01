@@ -1271,6 +1271,21 @@ export interface MetricsAPIBannerDismissButtonClickedEvent {
 }
 
 /**
+ * User clicks on a featured marketplace item banner in studio product pages.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface MarketplaceItemBannerClickedEvent {
+  action: 'marketplace_item_banner_clicked'
+  properties: {
+    category: string
+    integration_id?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * Index Advisor banner enable button clicked event.
  *
  * @group Events
@@ -3288,6 +3303,7 @@ export type TelemetryEvent =
   | ReportsDatabaseGrafanaBannerClickedEvent
   | MetricsAPIBannerCtaButtonClickedEvent
   | MetricsAPIBannerDismissButtonClickedEvent
+  | MarketplaceItemBannerClickedEvent
   | IndexAdvisorBannerEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorDialogEnableButtonClickedEvent

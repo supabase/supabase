@@ -1,6 +1,10 @@
+import { useQuery } from '@tanstack/react-query'
+import { IS_PLATFORM, useFeatureFlags, useFlag } from 'common'
 import { Search } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
+import { Skeleton } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -24,6 +28,7 @@ import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrati
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { marketplaceCategoriesQueryOptions } from '@/data/marketplace/integration-categories-query'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
@@ -37,7 +42,52 @@ const FEATURED_INTEGRATION_IMAGES: Record<string, string> = {
   stripe_sync_engine: 'img/integrations/covers/stripe-cover.png',
 }
 
+type PageContent = {
+  title: string
+  subtitle: string
+  secondaryActions?: ReactNode
+}
+
+const DEFAULT_PAGE_CONTENT: PageContent = {
+  title: 'Extend your database',
+  subtitle:
+    'Extensions and wrappers that add functionality to your database and connect to external services.',
+}
+
+const CATEGORY_PAGE_CONTENT = {
+  wrapper: {
+    title: 'Wrappers',
+    subtitle:
+      'Connect to external data sources and services by querying APIs, databases, and files as if they were Postgres tables.',
+    secondaryActions: (
+      <DocsButton href={`${DOCS_URL}/guides/database/extensions/wrappers/overview`} />
+    ),
+  },
+  postgres_extension: {
+    title: 'Postgres Modules',
+    subtitle: 'Extend your database with powerful Postgres extensions.',
+  },
+} satisfies Record<string, PageContent>
+
+function formatCategoryTitle(category: string) {
+  return category
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
+const PageHeaderContentSkeleton = () => (
+  <div className="flex flex-col gap-y-2">
+    <Skeleton className="h-8 w-48" />
+    <Skeleton className="h-4 w-full max-w-xl" />
+  </div>
+)
+
 const IntegrationsPage: NextPageWithLayout = () => {
+  const router = useRouter()
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
   const [selectedCategory] = useQueryState(
     'category',
     parseAsString.withDefault('all').withOptions({ clearOnDefault: true })
@@ -64,38 +114,53 @@ const IntegrationsPage: NextPageWithLayout = () => {
   const isLoading = isLoadingAvailableIntegrations || isLoadingInstalledIntegrations
   const isSuccess = isSuccessAvailableIntegrations && isSuccessInstalledIntegrations
 
+  const categoryFromUrl = useMemo(() => {
+    const queryString = router.asPath.split('?')[1]
+    if (!queryString) return null
+
+    return new URLSearchParams(queryString).get('category')
+  }, [router.asPath])
+  const resolvedSelectedCategory = router.isReady
+    ? (categoryFromUrl ?? selectedCategory)
+    : undefined
+  const integrationFilterCategory = resolvedSelectedCategory ?? 'all'
+
+  const { data: categories = [], isPending: isPendingCategories } = useQuery(
+    marketplaceCategoriesQueryOptions({ enabled: isMarketplaceEnabled })
+  )
+  const isLoadingSelectedCategory =
+    !resolvedSelectedCategory ||
+    (resolvedSelectedCategory !== 'all' &&
+      !(resolvedSelectedCategory in CATEGORY_PAGE_CONTENT) &&
+      (IS_PLATFORM ? !flagsLoaded || (isMarketplaceEnabled && isPendingCategories) : false))
+
   // Dynamic page content based on selected category
-  const pageContent = useMemo(() => {
-    switch (selectedCategory) {
-      case 'wrapper':
-        return {
-          title: 'Wrappers',
-          subtitle:
-            'Connect to external data sources and services by querying APIs, databases, and files as if they were Postgres tables.',
-          secondaryActions: (
-            <DocsButton href={`${DOCS_URL}/guides/database/extensions/wrappers/overview`} />
-          ),
-        }
-      case 'postgres_extension':
-        return {
-          title: 'Postgres Modules',
-          subtitle: 'Extend your database with powerful Postgres extensions.',
-        }
-      default:
-        return {
-          title: 'Extend your database',
-          subtitle:
-            'Extensions and wrappers that add functionality to your database and connect to external services.',
-        }
+  const pageContent = useMemo<PageContent>(() => {
+    if (!resolvedSelectedCategory || resolvedSelectedCategory === 'all') {
+      return DEFAULT_PAGE_CONTENT
     }
-  }, [selectedCategory])
+
+    if (resolvedSelectedCategory in CATEGORY_PAGE_CONTENT) {
+      return CATEGORY_PAGE_CONTENT[resolvedSelectedCategory as keyof typeof CATEGORY_PAGE_CONTENT]
+    }
+
+    const selectedMarketplaceCategory = categories.find(
+      (category) => category.slug === resolvedSelectedCategory
+    )
+
+    return {
+      title: selectedMarketplaceCategory?.name ?? formatCategoryTitle(resolvedSelectedCategory),
+      subtitle: selectedMarketplaceCategory?.description ?? DEFAULT_PAGE_CONTENT.subtitle,
+    }
+  }, [categories, resolvedSelectedCategory])
 
   const filteredAndSortedIntegrations = useMemo(() => {
     let filtered = availableIntegrations ?? []
 
-    if (selectedCategory !== 'all') {
+    if (integrationFilterCategory !== 'all') {
       filtered = filtered.filter(
-        (i) => i.type === selectedCategory || i.categories?.includes(selectedCategory)
+        (i) =>
+          i.type === integrationFilterCategory || i.categories?.includes(integrationFilterCategory)
       )
     }
 
@@ -113,10 +178,10 @@ const IntegrationsPage: NextPageWithLayout = () => {
 
       return a.name.localeCompare(b.name)
     })
-  }, [availableIntegrations, selectedCategory, search, installedIds])
+  }, [availableIntegrations, integrationFilterCategory, search, installedIds])
 
   const groupedIntegrations = useMemo(() => {
-    if (selectedCategory !== 'all' || search.length > 0) {
+    if (integrationFilterCategory !== 'all' || search.length > 0) {
       return null
     }
 
@@ -130,15 +195,21 @@ const IntegrationsPage: NextPageWithLayout = () => {
       featured,
       allIntegrations,
     }
-  }, [filteredAndSortedIntegrations, selectedCategory, search])
+  }, [filteredAndSortedIntegrations, integrationFilterCategory, search])
 
   return (
     <>
       <PageHeader size="large">
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>{pageContent.title}</PageHeaderTitle>
-            <PageHeaderDescription>{pageContent.subtitle}</PageHeaderDescription>
+            {isLoadingSelectedCategory ? (
+              <PageHeaderContentSkeleton />
+            ) : (
+              <>
+                <PageHeaderTitle>{pageContent.title}</PageHeaderTitle>
+                <PageHeaderDescription>{pageContent.subtitle}</PageHeaderDescription>
+              </>
+            )}
           </PageHeaderSummary>
           {pageContent.secondaryActions && (
             <PageHeaderAside>{pageContent.secondaryActions}</PageHeaderAside>
