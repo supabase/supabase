@@ -112,7 +112,7 @@ const Footer = (props: Props) => {
       </div>
       <SectionContainer className="py-8">
         <div className="xl:grid xl:grid-cols-7 xl:gap-4">
-          <div className="space-y-8 xl:col-span-2">
+          <div className="xl:col-span-2 flex flex-col gap-8">
             <Link href="#" as="/" className="w-40">
               <SupabaseWordmark className="w-40 h-[30px]" />
             </Link>
@@ -165,7 +165,7 @@ const Footer = (props: Props) => {
                 <IconInstagram size={22} />
               </a>
             </div>
-            <div className="mt-8">
+            <div>
               {newsletterStatus === 'success' ? (
                 <div className="flex flex-col gap-1">
                   <p className="text-brand-link text-sm">Thanks for subscribing!</p>

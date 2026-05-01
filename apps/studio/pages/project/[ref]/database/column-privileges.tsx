@@ -225,7 +225,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
         <div className="col-span-12 flex flex-col pb-4 gap-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-x-4 mb-1">
                 <h3 className="text-xl">Column-level privileges</h3>
                 {isEnabled && (
                   <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS} />

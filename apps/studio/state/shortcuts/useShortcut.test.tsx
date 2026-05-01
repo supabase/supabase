@@ -1,4 +1,5 @@
 import { render, renderHook } from '@testing-library/react'
+import type { ICommand } from 'ui-patterns/CommandMenu/api/types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from './registry'
@@ -41,7 +42,7 @@ const getLastRegisterCall = () => {
   return call as [
     string,
     Array<{ id: string; name: string; action: () => void; badge: () => any }>,
-    { enabled: boolean; deps: unknown[] },
+    { enabled: boolean; deps: unknown[]; orderCommands?: unknown },
   ]
 }
 
@@ -244,6 +245,32 @@ describe('useShortcut', () => {
       expect(options.deps).toEqual([
         true,
         SHORTCUT_DEFINITIONS[SHORTCUT_IDS.COMMAND_MENU_OPEN].label,
+      ])
+    })
+
+    it('orders "Show all keyboard shortcuts" last within the Shortcuts section', () => {
+      renderHook(() =>
+        useShortcut(SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE, vi.fn(), { registerInCommandMenu: true })
+      )
+
+      const [, commands, options] = getLastRegisterCall()
+      const orderCommands = options.orderCommands as (
+        existing: ICommand[],
+        commandsToInsert: ICommand[]
+      ) => ICommand[]
+
+      const ordered = orderCommands(
+        [
+          { id: SHORTCUT_IDS.TABLE_EDITOR_INSERT_ROW, name: 'Insert row', action: vi.fn() },
+          { id: SHORTCUT_IDS.TABLE_EDITOR_INSERT_COLUMN, name: 'Insert column', action: vi.fn() },
+        ],
+        commands
+      )
+
+      expect(ordered.map((command) => command.id)).toEqual([
+        SHORTCUT_IDS.TABLE_EDITOR_INSERT_ROW,
+        SHORTCUT_IDS.TABLE_EDITOR_INSERT_COLUMN,
+        SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE,
       ])
     })
 

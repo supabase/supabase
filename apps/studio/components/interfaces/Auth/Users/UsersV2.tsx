@@ -1,5 +1,5 @@
-import { USER_SEARCH_INDEXES } from '@supabase/pg-meta'
 import type { OptimizedSearchColumns } from '@supabase/pg-meta'
+import { USER_SEARCH_INDEXES } from '@supabase/pg-meta'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -74,6 +75,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from '@/lib/helpers'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -87,6 +89,7 @@ order by timestamp desc
 limit 100`
 
 export const UsersV2 = () => {
+  const router = useRouter()
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
   const {
@@ -95,6 +98,8 @@ export const UsersV2 = () => {
     isError: isProjectError,
   } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
+
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
   const { mutate: sendEvent } = useSendEventMutation()
@@ -356,6 +361,22 @@ export const UsersV2 = () => {
     setSortByValue(value)
   }
 
+  const onSelectImpersonateUser = async (user: User, destination: 'sql' | 'table-editor') => {
+    await roleImpersonationState.setRole({
+      type: 'postgrest',
+      role: 'authenticated',
+      userType: 'native',
+      user,
+      aal: 'aal1',
+    })
+
+    if (destination === 'sql') {
+      router.push(`/project/${projectRef}/sql`)
+    } else {
+      router.push(`/project/${projectRef}/editor`)
+    }
+  }
+
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
     xScroll.current = event.currentTarget.scrollLeft
@@ -446,6 +467,7 @@ export const UsersV2 = () => {
         visibleColumns: selectedColumns,
         setSortByValue: updateSortByValue,
         onSelectDeleteUser: setSelectedUserToDelete,
+        onSelectImpersonateUser,
       })
       setColumns(columns)
       if (columns.length < userTableColumns.length) {
@@ -685,6 +707,7 @@ export const UsersV2 = () => {
                       visibleColumns: value,
                       setSortByValue: updateSortByValue,
                       onSelectDeleteUser: setSelectedUserToDelete,
+                      onSelectImpersonateUser,
                     })
 
                     setSelectedColumns(value)
