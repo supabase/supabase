@@ -42,7 +42,9 @@ export function ProjectAndPlanInfo({
       <ProjectSelector form={form} orgSlug={orgSlug} projectRef={projectRef} />
       <ProjectRefHighlighted projectRef={projectRef} />
 
-      {!hasProjectSelected && <Admonition type="default" title="No project has been selected" />}
+      {!hasProjectSelected && (
+        <Admonition type="default" description="No project has been selected." />
+      )}
 
       {showPlanExpectationInfo &&
         orgSlug &&
