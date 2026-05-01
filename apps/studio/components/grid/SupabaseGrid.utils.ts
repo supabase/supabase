@@ -10,11 +10,11 @@ import {
   RowsChangeData,
 } from 'react-data-grid'
 import { toast } from 'sonner'
+import { writeTextToClipboard } from 'ui'
 
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import type { Sort, SupaColumn, SupaRow, SupaTable } from './types'
-import { writeTextToClipboard } from './utils/clipboard'
 import { formatClipboardValue } from './utils/common'
 import { isBoolColumn } from './utils/types'
 import type { Filter, SavedState } from '@/components/grid/types'

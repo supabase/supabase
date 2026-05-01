@@ -2,9 +2,13 @@ import { ContextMenuContent } from '@ui/components/shadcn/ui/context-menu'
 import { Copy } from 'lucide-react'
 import { PropsWithChildren } from 'react'
 import { toast } from 'sonner'
-import { ContextMenu_Shadcn_, ContextMenuItem_Shadcn_, ContextMenuTrigger_Shadcn_ } from 'ui'
+import {
+  ContextMenu_Shadcn_,
+  ContextMenuItem_Shadcn_,
+  ContextMenuTrigger_Shadcn_,
+  writeTextToClipboard,
+} from 'ui'
 
-import { writeTextToClipboard } from '../../utils/clipboard'
 import { formatClipboardValue } from '../../utils/common'
 
 export const CellContextMenuWrapper = ({

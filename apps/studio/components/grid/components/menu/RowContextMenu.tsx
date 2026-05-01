@@ -1,10 +1,14 @@
 import { Copy, Edit, ListFilter, Trash } from 'lucide-react'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
-import { DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from 'ui'
+import {
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  writeTextToClipboard,
+} from 'ui'
 
 import { useTableRowOperations } from '../../hooks/useTableRowOperations'
-import { writeTextToClipboard } from '../../utils/clipboard'
 import { formatClipboardValue } from '../../utils/common'
 import { buildFilterFromCellValue, isComplexValue } from '../header/filter/FilterPopoverNew.utils'
 import type { SupaRow } from '@/components/grid/types'

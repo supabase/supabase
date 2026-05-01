@@ -5,7 +5,7 @@ import {
   formatSortURLParams,
   handleCellKeyDown,
 } from '@/components/grid/SupabaseGrid.utils'
-import { writeTextToClipboard } from '@/components/grid/utils/clipboard'
+import { writeTextToClipboard } from 'ui'
 
 const { toastError, toastSuccess } = vi.hoisted(() => ({
   toastError: vi.fn(),
@@ -95,10 +95,12 @@ describe('SupabaseGrid.utils: handleCellKeyDown', () => {
     toastError.mockReset()
     toastSuccess.mockReset()
     vi.unstubAllGlobals()
+    vi.spyOn(window.document, 'hasFocus').mockReturnValue(true)
   })
 
   afterEach(() => {
     vi.unstubAllGlobals()
+    vi.restoreAllMocks()
   })
 
   test('should copy the selected cell value when Meta+C is pressed', async () => {
@@ -139,10 +141,12 @@ describe('SupabaseGrid.utils: handleCellKeyDown', () => {
 describe('Grid clipboard utils', () => {
   beforeEach(() => {
     vi.unstubAllGlobals()
+    vi.spyOn(window.document, 'hasFocus').mockReturnValue(true)
   })
 
   afterEach(() => {
     vi.unstubAllGlobals()
+    vi.restoreAllMocks()
   })
 
   test('should write text directly to the clipboard', async () => {
