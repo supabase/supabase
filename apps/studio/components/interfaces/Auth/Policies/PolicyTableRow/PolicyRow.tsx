@@ -107,7 +107,7 @@ export const PolicyRow = ({
               >
                 {displayedRoles.slice(2).map((role, i, arr) => (
                   <>
-                    <code key={role} className="text-code-inline !break-keep">
+                    <code key={role} className="text-code-inline break-keep!">
                       {role}
                     </code>
                     {i < arr.length - 1 && ', '}

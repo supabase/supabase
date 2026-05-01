@@ -171,7 +171,7 @@ const ComputePricingCalculator = ({
         >
           {activeInstances.map((activeInstance, index) => (
             <div
-              className="group w-full flex flex-col gap-3 p-3 bg-surface-200 rounded border"
+              className="group w-full flex flex-col gap-3 p-3 bg-surface-200 rounded-sm border"
               key={`instance-${index}`}
             >
               <div className="w-full flex justify-between items-center">
@@ -202,7 +202,7 @@ const ComputePricingCalculator = ({
                   step={1}
                   className={cn(
                     'w-full cursor-grab active:cursor-grabbing',
-                    !hasInteractedWithSlider && "[&_[data-slot='slider-thumb']]:animate-pulse"
+                    !hasInteractedWithSlider && "**:data-[slot='slider-thumb']:animate-pulse"
                   )}
                 />
               </div>
@@ -220,7 +220,7 @@ const ComputePricingCalculator = ({
                     <button
                       aria-label="Remove item"
                       title="Remove item"
-                      className="p-1 text-lighter hover:text-foreground rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="p-1 text-lighter hover:text-foreground rounded-sm opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={() => removeInstance(activeInstance.position)}
                     >
                       <Trash2 className="w-3 h-3" />

@@ -104,7 +104,7 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
       {selectedFile?.content ? (
         <CodeBlock
           wrapperClassName="w-full"
-          className="h-full max-w-none !w-full flex-1 font-mono text-xs rounded-none border-none"
+          className="h-full max-w-none w-full! flex-1 font-mono text-xs rounded-none border-none"
           language="ts"
         >
           {selectedFile?.content}

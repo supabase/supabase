@@ -44,7 +44,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                 key={`row-${plan.name}`}
                 className={cn(
                   'flex flex-col border xl:border-r-0 last:border-r bg-surface-75 rounded-xl xl:rounded-none first:rounded-l-xl last:rounded-r-xl',
-                  isProPlan && 'border-foreground-muted !border-2 !rounded-xl xl:-my-8',
+                  isProPlan && 'border-foreground-muted border-2! rounded-xl! xl:-my-8',
                   isTeamPlan && 'xl:border-l-0'
                 )}
               >

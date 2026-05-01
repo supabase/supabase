@@ -292,7 +292,7 @@ export const JitDbAccessConfiguration = () => {
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-x-4">
                 Temporary access
                 <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS} />
               </span>

@@ -27,7 +27,9 @@
     "@testing-library/user-event": "^14.0.0",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "config": "workspace:*",
     "next-router-mock": "^0.9.13",
+    "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
     "typescript": "catalog:",
     "vitest": "catalog:"

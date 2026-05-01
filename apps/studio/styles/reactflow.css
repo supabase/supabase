@@ -1,3 +1,5 @@
+@reference "./main.css";
+
 .instance-configuration {
   .react-flow__pane {
     @apply cursor-default;

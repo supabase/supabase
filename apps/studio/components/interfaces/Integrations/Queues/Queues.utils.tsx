@@ -23,7 +23,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       renderHeaderCell: () => {
         return (
           <div className={cn('flex items-center justify-between font-normal text-xs w-full ml-8')}>
-            <p className="!text-foreground">Name</p>
+            <p className="text-foreground!">Name</p>
           </div>
         )
       },
@@ -40,7 +40,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       renderHeaderCell: () => {
         return (
           <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
-            <p className="!text-foreground">Type</p>
+            <p className="text-foreground!">Type</p>
           </div>
         )
       },
@@ -57,7 +57,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       renderHeaderCell: () => {
         return (
           <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
-            <p className="!text-foreground">RLS enabled</p>
+            <p className="text-foreground!">RLS enabled</p>
           </div>
         )
       },
@@ -74,7 +74,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       renderHeaderCell: () => {
         return (
           <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
-            <p className="!text-foreground">Created at</p>
+            <p className="text-foreground!">Created at</p>
           </div>
         )
       },
@@ -91,7 +91,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       renderHeaderCell: () => {
         return (
           <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
-            <p className="!text-foreground">Size</p>
+            <p className="text-foreground!">Size</p>
           </div>
         )
       },

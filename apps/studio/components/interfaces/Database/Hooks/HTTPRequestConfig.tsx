@@ -40,7 +40,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
   return (
     <FormSection
       header={
-        <FormSectionLabel className="lg:!col-span-4">
+        <FormSectionLabel className="lg:col-span-4!">
           {functionType === 'http_request'
             ? 'HTTP Request'
             : functionType === 'supabase_function'
@@ -49,7 +49,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
         </FormSectionLabel>
       }
     >
-      <FormSectionContent loading={false} className="lg:!col-span-8">
+      <FormSectionContent loading={false} className="lg:col-span-8!">
         <FormField
           control={form.control}
           name="http_method"
@@ -90,7 +90,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
         ) : functionType === 'supabase_function' && edgeFunctions.length === 0 ? (
           <div className="space-y-1">
             <p className="text-sm text-foreground-light">Select which edge function to trigger</p>
-            <div className="px-4 py-4 border rounded bg-surface-300 border-strong flex items-center justify-between space-x-4">
+            <div className="px-4 py-4 border rounded-sm bg-surface-300 border-strong flex items-center justify-between space-x-4">
               <p className="text-sm">No edge functions created yet</p>
               <Button asChild>
                 <Link href={`/project/${ref}/functions`}>Create an edge function</Link>

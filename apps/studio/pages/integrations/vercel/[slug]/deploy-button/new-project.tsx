@@ -308,7 +308,7 @@ const CreateProject = () => {
                       <div className="flex gap-2">
                         <img
                           alt="region icon"
-                          className="w-5 rounded-sm"
+                          className="w-5 rounded-xs"
                           src={`${BASE_PATH}/img/regions/${Object.values(AWS_REGIONS)[i].code}.svg`}
                         />
                         <span>{label}</span>

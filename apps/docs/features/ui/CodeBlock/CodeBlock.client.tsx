@@ -48,7 +48,7 @@ export function AnnotatedSpan({
           style={token.htmlStyle}
           className={cn(
             isTouchDevice &&
-              'underline underline-offset-4 decoration-dashed [text-decoration-color:rgba(from_currentColor_r_g_b_/_0.5)]'
+              'underline underline-offset-4 decoration-dashed decoration-[rgba(from_currentColor_r_g_b/0.5)]'
           )}
         >
           {token.content}

@@ -12,7 +12,7 @@ function DraftModeBanner({ onDismiss }: DraftModeBannerProps) {
       <div className="max-w-2xl mx-auto py-2 px-4">
         <div className="flex items-center justify-between flex-wrap">
           <div className="w-0 flex-1 flex items-center">
-            <span className="flex p-2 rounded">
+            <span className="flex p-2 rounded-sm">
               <AlertTriangle className="h-5 w-5" aria-hidden="true" />
             </span>
             <p className="ml-2 truncate">

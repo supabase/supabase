@@ -127,7 +127,7 @@ const Migrations = () => {
                               <TableCell>{migration.version}</TableCell>
                               <TableCell
                                 className={cn(
-                                  (migration?.name ?? '').length === 0 && '!text-foreground-lighter'
+                                  (migration?.name ?? '').length === 0 && 'text-foreground-lighter!'
                                 )}
                               >
                                 {migration?.name ?? 'Name not available'}

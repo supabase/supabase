@@ -10,10 +10,10 @@ export const statusLabels: Record<JWTSigningKey['status'], string> = {
 }
 
 export const statusColors: Record<JWTSigningKey['status'], string> = {
-  standby: 'bg-surface-300/100 text-foreground border border-foreground-muted',
-  in_use: 'bg-brand-200/100 text-brand-600 border-brand-500',
+  standby: 'bg-surface-300 text-foreground border border-foreground-muted',
+  in_use: 'bg-brand-200 text-brand-600 border-brand-500',
   previously_used: 'bg-purple-300 dark:bg-purple-100 text-purple-1200 border-purple-800',
-  revoked: 'bg-destructive-200/100 text-destructive-600 border-destructive-500',
+  revoked: 'bg-destructive-200 text-destructive-600 border-destructive-500',
 }
 
 export const JWT_SECRET_UPDATE_ERROR_MESSAGES = {
