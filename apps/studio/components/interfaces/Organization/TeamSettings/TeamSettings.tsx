@@ -33,7 +33,7 @@ export const TeamSettings = () => {
 
   return (
     <ScaffoldContainer>
-      <ScaffoldSection isFullWidth className="!py-8 gap-y-8">
+      <ScaffoldSection isFullWidth className="py-8! gap-y-8">
         <ScaffoldTitle>Team</ScaffoldTitle>
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">

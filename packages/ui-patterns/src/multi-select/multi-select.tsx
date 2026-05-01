@@ -2,8 +2,17 @@
 
 import { cva, VariantProps } from 'class-variance-authority'
 import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
+// @ts-ignore Required to avoid TS error: The inferred type of MultiSelectorContent cannot be named without a reference to @radix-ui
+import type { Popover as PopoverPrimitive } from 'radix-ui'
 import React, { useEffect } from 'react'
-import { Badge, cn, Popover_Shadcn_ as Popover, PopoverAnchor_Shadcn_ as PopoverAnchor } from 'ui'
+import {
+  Badge,
+  cn,
+  Popover_Shadcn_ as Popover,
+  PopoverAnchor_Shadcn_ as PopoverAnchor,
+  PopoverContent_Shadcn_ as PopoverContent,
+  PopoverContentProps_Shadcn_ as PopoverContentProps,
+} from 'ui'
 import {
   Command,
   CommandEmpty,
@@ -11,7 +20,6 @@ import {
   CommandItem,
   CommandList,
 } from 'ui/src/components/shadcn/ui/command'
-import { PopoverContent } from 'ui/src/components/shadcn/ui/popover'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 
 interface MultiSelectContextProps {
@@ -36,7 +44,7 @@ const DROPDOWN_MAX_HEIGHT = 300
 const DROPDOWN_GAP = 8
 
 const commandItemClass = cn(
-  'relative text-foreground-lighter text-left px-2 py-1.5 rounded',
+  'relative text-foreground-lighter text-left px-2 py-1.5 rounded-sm',
   'hover:text-foreground hover:!bg-overlay-hover w-full flex items-center space-x-2',
   'peer-data-[value=true]:bg-overlay-hover peer-data-[value=true]:text-strong'
 )
@@ -250,7 +258,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
       }
     }, [values, badgeLimit])
 
-    const badgeClasses = 'rounded shrink-0 px-1.5'
+    const badgeClasses = 'rounded-sm shrink-0 px-1.5'
 
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
@@ -286,9 +294,9 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           role="combobox"
           className={cn(
             'flex w-full min-w-[200px] min-h-[40px] items-center justify-between rounded-md border',
-            'border-alternative bg-foreground/[.026] px-3 py-2 text-sm',
+            'border-alternative bg-control px-3 py-2 text-sm',
             'ring-offset-background placeholder:text-muted-foreground',
-            'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+            'focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2',
             'disabled:cursor-not-allowed disabled:opacity-50',
             'hover:border-primary transition-colors duration-200',
             className
@@ -332,7 +340,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             )}
             <span
               className={cn(
-                'text-foreground-muted whitespace-nowrap leading-[1.375rem] ml-1 opacity-0 transition-opacity hidden',
+                'text-foreground-muted whitespace-nowrap leading-5.5 ml-1 opacity-0 transition-opacity hidden',
                 !IS_INLINE_MODE &&
                   (persistLabel || values.length === 0) &&
                   'opacity-100 visible inline'
@@ -448,7 +456,7 @@ const MultiSelectorInput = React.forwardRef<
       wrapperClassName={wrapperClassName}
       className={cn(
         MultiSelectorInputVariants({ size }),
-        'text-sm bg-transparent h-full grow border-none outline-none placeholder:text-foreground-muted flex-1',
+        'text-sm bg-transparent h-full grow border-none outline-hidden placeholder:text-foreground-muted flex-1',
         activeIndex !== -1 && 'caret-transparent',
         className
       )}
@@ -462,11 +470,12 @@ const MultiSelectorInput = React.forwardRef<
 MultiSelectorInput.displayName = 'MultiSelectorInput'
 MultiSelector.Input = MultiSelectorInput
 
-const MultiSelectorContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, children }, ref) => {
+const MultiSelectorContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
+  ({ className, children, ...props }, ref) => {
     const { id } = useMultiSelect()
     return (
       <PopoverContent
+        align="start"
         ref={ref}
         className={cn(
           'bg-overlay shadow-md z-50 border border-overlay rounded-md p-0',
@@ -479,6 +488,8 @@ const MultiSelectorContent = React.forwardRef<HTMLDivElement, React.HTMLAttribut
             event.stopPropagation()
           }
         }}
+        sameWidthAsTrigger
+        {...props}
       >
         {children}
       </PopoverContent>
@@ -570,10 +581,10 @@ const MultiSelectorItem = React.forwardRef<
       <div
         className={cn(
           'flex items-center justify-center',
-          'peer h-4 w-4 shrink-0 rounded border border-control bg-control/25 ring-offset-background',
+          'peer h-4 w-4 shrink-0 rounded-sm border border-control bg-control/25 ring-offset-background',
           'transition-colors duration-150 ease-in-out',
           'hover:border-strong',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           'disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-foreground data-[state=checked]:text-background',
           isSelected ? 'bg-foreground text-background' : '[&_svg]:invisible'
         )}

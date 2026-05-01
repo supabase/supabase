@@ -6,7 +6,7 @@ export const ProviderCollapsibleClasses = [
   'hover:border-strong data-open:border-strong',
   'data-open:pb-px col-span-12 mx-auto',
   '-space-y-px overflow-hidden',
-  'border shadow',
+  'border shadow-sm',
   'transition',
   'first:rounded-tl',
   'first:rounded-tr',

@@ -133,7 +133,7 @@ const BillingEmail = () => {
                   </div>
                 }
               >
-                <FormSection className="!px-8">
+                <FormSection className="px-8!">
                   <FormSectionContent fullWidth loading={loadingBillingCustomer}>
                     <FormField
                       control={form.control}

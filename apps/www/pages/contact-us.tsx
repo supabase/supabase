@@ -16,7 +16,7 @@ const ContactSection = ({
   description: string | React.ReactNode
 }) => (
   <div className="">
-    <div className="border-t-[1px] border-brand-500 w-[32px] mb-1"></div>
+    <div className="border-t border-brand-500 w-[32px] mb-1"></div>
     <h2 className="text-xl md:text-2xl lg:text-3xl pt-1.5 lg:pt-3 tracking-[-1px] text-foreground">
       {title}
     </h2>
@@ -109,7 +109,7 @@ const ContactUs = ({}: Props) => {
               />
 
               <div className="">
-                <div className="border-t-[1px] border-brand-500 w-[32px] mb-1"></div>
+                <div className="border-t border-brand-500 w-[32px] mb-1"></div>
                 <h2 className="text-xl md:text-2xl lg:text-3xl pt-1.5 lg:pt-3 tracking-[-1px] text-foreground">
                   Grievance Officer
                 </h2>
