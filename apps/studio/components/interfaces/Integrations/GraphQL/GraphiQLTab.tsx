@@ -70,8 +70,8 @@ export const GraphiQLTab = () => {
     'field.jwt_secret'
   )
 
-  const plugins = useMemo<GraphiQLPlugin[] | undefined>(
-    () => (canReadJWTSecret ? [HISTORY_PLUGIN, ROLE_IMPERSONATION_PLUGIN] : undefined),
+  const plugins = useMemo<GraphiQLPlugin[]>(
+    () => (canReadJWTSecret ? [HISTORY_PLUGIN, ROLE_IMPERSONATION_PLUGIN] : [HISTORY_PLUGIN]),
     [canReadJWTSecret]
   )
 
