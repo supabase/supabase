@@ -32,6 +32,22 @@ export const isProjectInCustomEmailTemplateRestrictedCohort = (
   )
 }
 
+export const isCustomEmailTemplateRestrictionStatusKnown = ({
+  authConfig,
+  organization,
+  project,
+}: {
+  authConfig?: Partial<AuthConfig>
+  organization?: Organization
+  project?: Pick<Project, 'inserted_at'>
+}) => {
+  return (
+    authConfig !== undefined &&
+    organization?.plan.id !== undefined &&
+    Number.isFinite(Date.parse(project?.inserted_at ?? ''))
+  )
+}
+
 export const isCustomEmailTemplateEditingRestricted = ({
   authConfig,
   organization,

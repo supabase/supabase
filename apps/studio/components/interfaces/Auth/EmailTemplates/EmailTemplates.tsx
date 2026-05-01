@@ -19,9 +19,11 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
+import { CustomEmailTemplateRestrictionAdmonition } from './CustomEmailTemplateRestrictionAdmonition'
 import {
   hasCustomEmailSender,
   isCustomEmailTemplateEditingRestricted,
+  isCustomEmailTemplateRestrictionStatusKnown,
   slugifyTitle,
 } from './EmailTemplates.utils'
 import AlertError from '@/components/ui/AlertError'
@@ -76,11 +78,18 @@ export const EmailTemplates = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: selectedProject } = useSelectedProjectQuery()
   const usingBuiltInEmailSender = isSuccess && authConfig && !hasCustomEmailSender(authConfig)
-  const isTemplateEditBlocked = isCustomEmailTemplateEditingRestricted({
+  const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
     authConfig,
     organization: selectedOrganization,
     project: selectedProject,
   })
+  const isTemplateEditBlocked =
+    isTemplateRestrictionStatusKnown &&
+    isCustomEmailTemplateEditingRestricted({
+      authConfig,
+      organization: selectedOrganization,
+      project: selectedProject,
+    })
 
   const defaultValues = notificationEnabledKeys.reduce(
     (acc, key) => {
@@ -128,27 +137,7 @@ export const EmailTemplates = () => {
           {isTemplateEditBlocked && (
             <PageSection>
               <PageSectionContent>
-                <Admonition
-                  type="default"
-                  title="Custom templates require a custom email sender or a paid plan"
-                  description={
-                    <p>
-                      Free projects using Supabase's built-in email service can view the default
-                      email templates, but cannot edit their subject or HTML. Set up custom SMTP,
-                      configure a send-email hook, or upgrade to customise templates.{' '}
-                      <InlineLink
-                        href={`${DOCS_URL}/guides/platform/going-into-prod#auth-rate-limits`}
-                      >
-                        Learn more
-                      </InlineLink>
-                    </p>
-                  }
-                  actions={
-                    <Button asChild type="default">
-                      <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
-                    </Button>
-                  }
-                />
+                <CustomEmailTemplateRestrictionAdmonition projectRef={projectRef} />
               </PageSectionContent>
             </PageSection>
           )}

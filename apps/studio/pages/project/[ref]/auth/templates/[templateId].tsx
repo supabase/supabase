@@ -36,8 +36,10 @@ import {
 import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/AuthTemplatesValidation'
+import { CustomEmailTemplateRestrictionAdmonition } from '@/components/interfaces/Auth/EmailTemplates/CustomEmailTemplateRestrictionAdmonition'
 import {
   isCustomEmailTemplateEditingRestricted,
+  isCustomEmailTemplateRestrictionStatusKnown,
   slugifyTitle,
 } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
 import { TemplateEditor } from '@/components/interfaces/Auth/EmailTemplates/TemplateEditor'
@@ -75,11 +77,19 @@ const RedirectToTemplates = () => {
   const { data: authConfig, isPending: isLoadingConfig } = useAuthConfigQuery({ projectRef })
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: selectedProject } = useSelectedProjectQuery()
-  const isTemplateEditBlocked = isCustomEmailTemplateEditingRestricted({
+  const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
     authConfig,
     organization: selectedOrganization,
     project: selectedProject,
   })
+  const isTemplateEditBlocked =
+    isTemplateRestrictionStatusKnown &&
+    isCustomEmailTemplateEditingRestricted({
+      authConfig,
+      organization: selectedOrganization,
+      project: selectedProject,
+    })
+  const isTemplateEditorReadOnly = !isTemplateRestrictionStatusKnown || isTemplateEditBlocked
 
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
@@ -270,16 +280,7 @@ const RedirectToTemplates = () => {
             {isTemplateEditBlocked && (
               <PageSection>
                 <PageSectionContent>
-                  <Admonition
-                    type="default"
-                    title="Custom templates require a custom email sender or a paid plan"
-                    description="Free projects using Supabase's built-in email service can view this template, but cannot edit its subject or HTML. Set up custom SMTP, configure a send-email hook, or upgrade to customise templates."
-                    actions={
-                      <Button asChild type="default">
-                        <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
-                      </Button>
-                    }
-                  />
+                  <CustomEmailTemplateRestrictionAdmonition projectRef={projectRef} />
                 </PageSectionContent>
               </PageSection>
             )}
@@ -294,7 +295,7 @@ const RedirectToTemplates = () => {
               )}
               <PageSectionContent>
                 <Card>
-                  <TemplateEditor template={template} isReadOnly={isTemplateEditBlocked} />
+                  <TemplateEditor template={template} isReadOnly={isTemplateEditorReadOnly} />
                 </Card>
               </PageSectionContent>
             </PageSection>

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   hasCustomEmailSender,
   isCustomEmailTemplateEditingRestricted,
+  isCustomEmailTemplateRestrictionStatusKnown,
 } from './EmailTemplates.utils'
 import type { Project } from '@/data/projects/project-detail-query'
 import type { Organization } from '@/types'
@@ -13,6 +14,40 @@ const restrictedProject = { inserted_at: '2026-05-01T00:00:00.000Z' } as unknown
 const unrestrictedProject = { inserted_at: '2026-04-30T23:59:59.999Z' } as unknown as Project
 
 describe('EmailTemplates.utils', () => {
+  it('waits for auth config, organization plan, and project creation date before resolving restriction status', () => {
+    expect(
+      isCustomEmailTemplateRestrictionStatusKnown({
+        authConfig: {},
+        organization: freeOrganization,
+        project: restrictedProject,
+      })
+    ).toBe(true)
+
+    expect(
+      isCustomEmailTemplateRestrictionStatusKnown({
+        authConfig: undefined,
+        organization: freeOrganization,
+        project: restrictedProject,
+      })
+    ).toBe(false)
+
+    expect(
+      isCustomEmailTemplateRestrictionStatusKnown({
+        authConfig: {},
+        organization: undefined,
+        project: restrictedProject,
+      })
+    ).toBe(false)
+
+    expect(
+      isCustomEmailTemplateRestrictionStatusKnown({
+        authConfig: {},
+        organization: freeOrganization,
+        project: undefined,
+      })
+    ).toBe(false)
+  })
+
   it('restricts free projects that use the built-in email sender', () => {
     expect(
       isCustomEmailTemplateEditingRestricted({
