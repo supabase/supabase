@@ -12,9 +12,12 @@ type ClipboardText = string | Promise<string>
  *
  * Copied code from https://wolfgangrittner.dev/how-to-use-clipboard-api-in-firefox/
  */
-const writeTextToClipboard = async (str: ClipboardText) => {
+export const copyToClipboard = async (str: ClipboardText, callback = noop) => {
   const focused = window.document.hasFocus()
-  if (!focused) return false
+  if (!focused) {
+    toast.error('Unable to copy to clipboard')
+    return
+  }
 
   try {
     if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
@@ -37,9 +40,10 @@ const writeTextToClipboard = async (str: ClipboardText) => {
       // clipboard write call, adding a setTimeout with 0 delay seems to work.
       // Returning the promise to ensure the caller can await the clipboard
       // copy operation intuitively.
-      setTimeout(() => navigator.clipboard.write([text]).then(resolve).catch(reject), 0)
-      await promise
-      return true
+      setTimeout(() => {
+        navigator.clipboard.write([text]).then(callback).then(resolve).catch(reject)
+      }, 0)
+      return promise
     }
 
     // NOTE: Firefox has support for ClipboardItem and navigator.clipboard.write,
@@ -47,17 +51,8 @@ const writeTextToClipboard = async (str: ClipboardText) => {
     // Good news is that other than Safari, Firefox does not care about
     // Clipboard API being used async in a Promise.
     await Promise.resolve(str).then((text) => navigator.clipboard?.writeText(text))
-    return true
-  } catch {
-    return false
-  }
-}
-
-export const copyToClipboard = async (str: ClipboardText, callback = noop) => {
-  const isCopied = await writeTextToClipboard(str)
-  if (isCopied) {
     callback()
-  } else {
+  } catch {
     toast.error('Unable to copy to clipboard')
   }
 }
