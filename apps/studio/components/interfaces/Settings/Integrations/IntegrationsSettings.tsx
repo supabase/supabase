@@ -42,7 +42,7 @@ export const IntegrationSettings = () => {
             title="You are currently on a preview branch of your project"
           >
             To adjust your project's integration settings, you may return to your{' '}
-            <InlineLink href={`/project/${parentProject?.ref}/settings/general`}>
+            <InlineLink href={`/project/${parentProject?.ref}/settings/integrations`}>
               main branch
             </InlineLink>
             .

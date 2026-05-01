@@ -205,7 +205,7 @@ export const Addons = () => {
           >
             Updating add-ons here will only apply to this preview branch. To manage add-ons for your
             main branch, please visit the{' '}
-            <InlineLink href={`/project/${parentProject.ref}/settings/general`}>
+            <InlineLink href={`/project/${parentProject.ref}/settings/addons`}>
               main branch
             </InlineLink>
             .
