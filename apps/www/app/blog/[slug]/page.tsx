@@ -154,16 +154,17 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       isDraftMode: isDraft,
     }
 
-    const blogAuthors = resolveBlogAuthors((blogPost as BlogData).author)
+    const frontmatter = parsedContent.data
+    const blogAuthors = resolveBlogAuthors(frontmatter.author)
     const imageUrl =
-      getAbsoluteBlogSocialImage(blogPost as BlogData, SITE_ORIGIN) ??
+      getAbsoluteBlogSocialImage(frontmatter, SITE_ORIGIN) ??
       toAbsoluteBlogImageUrl(BLOG_PLACEHOLDER_IMAGE, SITE_ORIGIN)
     const blogJsonLd = blogPostingSchema({
       url: `${SITE_ORIGIN}/blog/${slug}`,
-      headline: (blogPost as BlogData).title,
-      description: (blogPost as BlogData).description,
+      headline: frontmatter.title,
+      description: frontmatter.description,
       image: imageUrl,
-      datePublished: (blogPost as BlogData).date,
+      datePublished: frontmatter.date,
       authors: blogAuthors.length > 0 ? blogAuthors : [{ name: 'Supabase' }],
     })
 
