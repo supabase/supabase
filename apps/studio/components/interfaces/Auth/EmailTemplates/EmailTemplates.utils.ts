@@ -4,6 +4,7 @@ import type { Project } from '@/data/projects/project-detail-query'
 import type { Organization } from '@/types'
 
 type AuthConfig = components['schemas']['GoTrueConfigResponse']
+type ProjectEmailTemplateRestrictionFields = Pick<Project, 'inserted_at' | 'subscription_tier'>
 const CUSTOM_EMAIL_TEMPLATES_RESTRICTED_PROJECT_CUTOFF = '2026-05-01T00:00:00.000Z'
 
 /**
@@ -22,7 +23,7 @@ export const hasCustomEmailSender = (config?: Partial<AuthConfig>) => {
 }
 
 export const isProjectInCustomEmailTemplateRestrictedCohort = (
-  project?: Pick<Project, 'inserted_at'>
+  project?: Pick<ProjectEmailTemplateRestrictionFields, 'inserted_at'>
 ) => {
   const projectInsertedAtMs = Date.parse(project?.inserted_at ?? '')
 
@@ -32,6 +33,12 @@ export const isProjectInCustomEmailTemplateRestrictedCohort = (
   )
 }
 
+export const isFreeProjectSubscription = (
+  project?: Pick<ProjectEmailTemplateRestrictionFields, 'subscription_tier'>
+) => {
+  return project?.subscription_tier === 'tier_free'
+}
+
 export const isCustomEmailTemplateRestrictionStatusKnown = ({
   authConfig,
   organization,
@@ -39,11 +46,11 @@ export const isCustomEmailTemplateRestrictionStatusKnown = ({
 }: {
   authConfig?: Partial<AuthConfig>
   organization?: Organization
-  project?: Pick<Project, 'inserted_at'>
+  project?: ProjectEmailTemplateRestrictionFields
 }) => {
   return (
     authConfig !== undefined &&
-    organization?.plan.id !== undefined &&
+    (project?.subscription_tier !== undefined || organization?.plan.id !== undefined) &&
     Number.isFinite(Date.parse(project?.inserted_at ?? ''))
   )
 }
@@ -55,10 +62,12 @@ export const isCustomEmailTemplateEditingRestricted = ({
 }: {
   authConfig?: Partial<AuthConfig>
   organization?: Organization
-  project?: Pick<Project, 'inserted_at'>
+  project?: ProjectEmailTemplateRestrictionFields
 }) => {
+  const isFreePlan = isFreeProjectSubscription(project) || organization?.plan.id === 'free'
+
   return (
-    organization?.plan.id === 'free' &&
+    isFreePlan &&
     isProjectInCustomEmailTemplateRestrictedCohort(project) &&
     !hasCustomEmailSender(authConfig)
   )
