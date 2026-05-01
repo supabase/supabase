@@ -175,7 +175,7 @@ export function ConnectConfigSection({
                 layout="horizontal"
                 label={field.label}
                 description={field.description}
-                className="[&>div>label>span]:!break-keep [&>div>label>span]:text-balance"
+                className="[&>div>label>span]:break-keep! [&>div>label>span]:text-balance"
               >
                 <Switch
                   id={field.id}

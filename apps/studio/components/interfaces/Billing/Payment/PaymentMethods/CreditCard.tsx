@@ -176,7 +176,7 @@ const CreditCard = ({
                 <DropdownMenuItemTooltip
                   key="delete-method"
                   disabled={!isRemovable}
-                  className="!pointer-events-auto"
+                  className="pointer-events-auto!"
                   onClick={() => setSelectedMethodToDelete?.(paymentMethod)}
                   tooltip={{
                     content: {

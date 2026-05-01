@@ -424,7 +424,7 @@ export default function FormPatternsSidePanel() {
                                 {uploadedFiles.map((file, idx) => (
                                   <div
                                     key={`${file.name}-${idx}`}
-                                    className="flex items-center justify-between gap-2 p-2 bg rounded border"
+                                    className="flex items-center justify-between gap-2 p-2 bg rounded-sm border"
                                   >
                                     <span className="text-sm text-foreground-light truncate flex-1">
                                       {file.name}
@@ -607,7 +607,7 @@ export default function FormPatternsSidePanel() {
                             badgeLimit="wrap"
                             showIcon={false}
                             deletableBadge
-                            className="w-full !min-w-lg"
+                            className="w-full min-w-lg!"
                           />
                           <MultiSelectorContent>
                             <MultiSelectorList>

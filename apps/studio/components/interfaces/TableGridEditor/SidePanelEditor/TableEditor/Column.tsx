@@ -269,7 +269,7 @@ export const Column = ({
             size="small"
             value={column.defaultValue ?? ''}
             disabled={column.format.includes('int') && column.isIdentity}
-            className={`rounded bg-surface-100 lg:gap-0 ${
+            className={`rounded-sm bg-surface-100 lg:gap-0 ${
               column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
             }`}
             suggestions={suggestions}

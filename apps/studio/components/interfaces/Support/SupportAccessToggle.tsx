@@ -53,12 +53,12 @@ export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
                 <Collapsible_Shadcn_ className="mt-2">
                   <CollapsibleTrigger_Shadcn_
                     className={
-                      'group flex items-center gap-x-1 group-data-[state=open]:text-foreground hover:text-foreground transition'
+                      'group flex items-center gap-x-1 group-data-open:text-foreground hover:text-foreground transition'
                     }
                   >
                     <ChevronRight
                       size={14}
-                      className="transition-all group-data-[state=open]:rotate-90 text-foreground-muted -ml-1"
+                      className="transition-all group-data-open:rotate-90 text-foreground-muted -ml-1"
                     />
                     <span className="text-sm">More information</span>
                   </CollapsibleTrigger_Shadcn_>

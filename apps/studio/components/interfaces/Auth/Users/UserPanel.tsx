@@ -81,19 +81,19 @@ export const UserPanel = () => {
               <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
                 <TabsTrigger_Shadcn_
                   value="overview"
-                  className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent shadow-none!"
                 >
                   Overview
                 </TabsTrigger_Shadcn_>
                 <TabsTrigger_Shadcn_
                   value="logs"
-                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
                 >
                   Logs
                 </TabsTrigger_Shadcn_>
                 <TabsTrigger_Shadcn_
                   value="raw"
-                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
+                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
                 >
                   Raw JSON
                 </TabsTrigger_Shadcn_>

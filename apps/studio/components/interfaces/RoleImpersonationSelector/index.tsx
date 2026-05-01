@@ -1,22 +1,24 @@
 import { useState } from 'react'
-import { cn, DropdownMenuSeparator } from 'ui'
+import { Badge, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
 import { AnonIcon, AuthenticatedIcon, ServiceRoleIcon } from './Icons'
 import { RoleImpersonationRadio } from './RoleImpersonationRadio'
 import { UserImpersonationSelector } from './UserImpersonationSelector'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { DOCS_URL } from '@/lib/constants'
 import { PostgrestRole } from '@/lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 export interface RoleImpersonationSelectorProps {
+  header?: string
   serviceRoleLabel?: string
-  padded?: boolean
   disallowAuthenticatedOption?: boolean
   title?: string
 }
 
 export const RoleImpersonationSelector = ({
-  serviceRoleLabel,
-  padded = true,
+  header = 'Impersonate a database role',
+  serviceRoleLabel = 'Postgres',
   disallowAuthenticatedOption = false,
 }: RoleImpersonationSelectorProps) => {
   const state = useRoleImpersonationStateSnapshot()
@@ -58,10 +60,14 @@ export const RoleImpersonationSelector = ({
   }
 
   return (
-    <>
-      <div className={cn('flex flex-col gap-3', padded ? 'p-5' : 'pb-5')}>
-        <p className="text-foreground text-base">Database role settings</p>
-
+    <Card className="border-none">
+      <CardHeader className="flex-row items-center justify-between py-3 space-y-0">
+        <CardTitle>{header}</CardTitle>
+        <DocsButton
+          href={`${DOCS_URL}/guides/database/postgres/row-level-security#authenticated-and-unauthenticated-roles`}
+        />
+      </CardHeader>
+      <CardContent className="flex flex-col gap-y-4">
         <form
           onSubmit={(e) => {
             // don't allow form submission
@@ -74,24 +80,29 @@ export const RoleImpersonationSelector = ({
               isSelected={selectedOption === 'service_role'}
               onSelectedChange={onSelectedChange}
               label={serviceRoleLabel}
+              description="Superuser"
               icon={<ServiceRoleIcon isSelected={selectedOption === 'service_role'} />}
             />
 
             <RoleImpersonationRadio
               value="anon"
+              label="Anonymous"
               isSelected={selectedOption === 'anon'}
               onSelectedChange={onSelectedChange}
+              description="Not logged in"
               icon={<AnonIcon isSelected={selectedOption === 'anon'} />}
             />
 
             {!disallowAuthenticatedOption && (
               <RoleImpersonationRadio
                 value="authenticated"
+                label="Authenticated"
                 isSelected={
                   selectedOption === 'authenticated' &&
                   (isAuthenticatedOptionFullySelected || 'partially')
                 }
                 onSelectedChange={onSelectedChange}
+                description="Specific logged in user"
                 icon={<AuthenticatedIcon isSelected={selectedOption === 'authenticated'} />}
               />
             )}
@@ -99,38 +110,48 @@ export const RoleImpersonationSelector = ({
         </form>
 
         {selectedOption === 'service_role' && (
-          <p className="text-foreground-light text-sm">
-            <span className="text-foreground">The default Postgres/superuser role</span>
-            <br />
-            This has admin privileges and will bypass Row Level Security (RLS) policies.
-          </p>
+          <div>
+            <p className="text-sm">
+              Full admin access
+              <Badge className="ml-2">Default</Badge>
+            </p>
+            <p className="text-foreground-light text-sm">
+              The <code className="text-code-inline">postgres</code> role, which bypasses all Row
+              Level Security (RLS) policies.
+            </p>
+          </div>
         )}
 
         {selectedOption === 'anon' && (
-          <p className="text-foreground-light text-sm">
-            <span className="text-foreground">For "anonymous access"</span>
-            <br />
-            This is the role which the API (PostgREST) will use when a user is not logged in. <br />
-            It will respect Row Level Security (RLS) policies.
-          </p>
+          <div>
+            <p className="text-sm">For unauthenticated access</p>
+            <p className="text-foreground-light text-sm">
+              The <code className="text-code-inline">anon</code> role, which the API (PostgREST)
+              uses when a user is not logged in.
+              <br />
+              Row Level Security (RLS) policies apply.
+            </p>
+          </div>
         )}
 
         {selectedOption === 'authenticated' && (
-          <p className="text-foreground-light text-sm">
-            <span className="text-foreground">For "authenticated access"</span>
-            <br />
-            This is the role which the API (PostgREST) will use when a user is logged in. <br />
-            It will respect Row Level Security (RLS) policies.
-          </p>
+          <div>
+            <p className="text-sm">For authenticated access</p>
+            <p className="text-foreground-light text-sm">
+              The <code className="text-code-inline">authenticated</code> role, which the API
+              (PostgREST) uses when a user is logged in.
+              <br />
+              Row Level Security (RLS) policies apply.
+            </p>
+          </div>
         )}
-      </div>
+      </CardContent>
 
       {selectedOption === 'authenticated' && (
-        <>
-          <DropdownMenuSeparator />
+        <CardContent className="p-0">
           <UserImpersonationSelector />
-        </>
+        </CardContent>
       )}
-    </>
+    </Card>
   )
 }

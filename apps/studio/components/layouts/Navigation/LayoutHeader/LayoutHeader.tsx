@@ -104,7 +104,7 @@ export const LayoutHeader = ({
           <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
             <Link
               href={backToDashboardURL}
-              className="flex items-center justify-center border-none !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px] text-foreground-lighter hover:text-foreground transition-colors"
+              className="flex items-center justify-center border-none bg-transparent! rounded-md min-w-[30px] w-[30px] h-[30px] text-foreground-lighter hover:text-foreground transition-colors"
             >
               <ChevronLeft strokeWidth={1.5} size={16} />
             </Link>

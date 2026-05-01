@@ -87,7 +87,7 @@ const DatabaseAdvisorDocs = async () => {
           .
         </Admonition>
       ) : (
-        <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:!m-0" queryGroup="lint">
+        <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:m-0!" queryGroup="lint">
           {lints.map((lint) => (
             <TabPanel
               key={lint.path}

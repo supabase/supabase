@@ -17,8 +17,8 @@
   "dependencies": {
     "@tailwindcss/forms": "^0.5.11",
     "@tailwindcss/typography": "^0.5.19",
-    "class-variance-authority": "^0.6.1",
-    "clsx": "^1.2.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "color": "^4.2.3",
     "date-fns": "^2.30.0",
@@ -38,7 +38,7 @@
     "react-resizable-panels": "^4.6.5",
     "recharts": "catalog:",
     "sonner": "^1.5.0",
-    "tailwind-merge": "^1.13.2",
+    "tailwind-merge": "^3.5.0",
     "tailwindcss": "catalog:",
     "vaul": "^0.9.9"
   },

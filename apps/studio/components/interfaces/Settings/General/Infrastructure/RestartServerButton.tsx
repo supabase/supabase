@@ -138,7 +138,7 @@ const RestartServerButton = () => {
               <DropdownMenuTrigger asChild>
                 <Button
                   type="default"
-                  className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-[1px]"
+                  className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px"
                   icon={<ChevronDown />}
                   disabled={!canRestartProject}
                 />

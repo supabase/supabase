@@ -202,7 +202,7 @@ const StackedBarChart: React.FC<Props> = ({
               borderColor: '#444444',
               fontSize: '12px',
             }}
-            wrapperClassName="bg-gray-600 rounded min-w-md"
+            wrapperClassName="bg-gray-600 rounded-sm min-w-md"
             active={!!syncId && syncTooltip && hoveredIndex !== null}
           />
         </BarChart>

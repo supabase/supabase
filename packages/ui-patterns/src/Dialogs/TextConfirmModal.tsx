@@ -138,7 +138,7 @@ export const TextConfirmModal = forwardRef<
           }
         }}
       >
-        <DialogContent ref={ref} className="p-0 gap-0 pb-5 !block" size={size}>
+        <DialogContent ref={ref} className="p-0 gap-0 pb-5 block!" size={size}>
           <DialogHeader className={cn('border-b')} padding={'small'}>
             <DialogTitle className="">{title}</DialogTitle>
           </DialogHeader>

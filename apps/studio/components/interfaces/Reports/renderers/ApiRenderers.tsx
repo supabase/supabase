@@ -38,6 +38,7 @@ import {
 import Table from '@/components/to-be-cleaned/Table'
 import AlertError from '@/components/ui/AlertError'
 import BarChart from '@/components/ui/Charts/BarChart'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
 import { BASE_PATH } from '@/lib/constants'
 import type { ResponseError } from '@/types'
@@ -172,8 +173,8 @@ export const TopApiRoutesRenderer = (
 ) => {
   const [showMore, setShowMore] = useState(false)
 
-  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200 !border-x-0 !rounded-none'
-  const cellClasses = '!text-xs !py-2 !border-x-0 !rounded-none align-middle'
+  const headerClasses = 'text-xs! py-2! p-0 font-bold bg-surface-200! border-x-0! rounded-none!'
+  const cellClasses = 'text-xs! py-2! border-x-0! rounded-none! align-middle'
 
   if (props.data.length === 0) return null
 
@@ -351,7 +352,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
   <Collapsible_Shadcn_>
     <CollapsibleTrigger_Shadcn_ asChild>
       <div className="flex gap-2 items-center">
-        <Button asChild type="text" className=" !py-0 !p-1" title="Show more route details">
+        <Button asChild type="text" className=" py-0! p-1!" title="Show more route details">
           <span>
             <ChevronRight
               size={14}
@@ -360,19 +361,13 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
           </span>
         </Button>
         <TextFormatter
-          className="w-10 h-4 text-center rounded bg-surface-300"
+          className="w-10 h-4 text-center rounded-sm bg-surface-300"
           value={datum.method}
         />
         {datum.status_code && (
-          <TextFormatter
-            className={`w-10 h-4 text-center rounded ${
-              datum.status_code >= 400
-                ? 'bg-orange-500'
-                : datum.status_code >= 300
-                  ? 'bg-yellow-500'
-                  : 'bg-green-500'
-            }`}
-            value={String(datum.status_code)}
+          <DataTableColumnStatusCode
+            value={datum.status_code}
+            level={String(Math.floor(datum.status_code / 100))}
           />
         )}
         <div className=" truncate max-w-sm lg:max-w-lg">
@@ -386,7 +381,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
     </CollapsibleTrigger_Shadcn_>
     <CollapsibleContent_Shadcn_ className="pt-2">
       {datum.search ? (
-        <pre className={`syntax-highlight overflow-auto rounded bg-surface-100 p-2 !text-xs`}>
+        <pre className={`syntax-highlight overflow-auto rounded-sm bg-surface-100 p-2 text-xs!`}>
           <div
             className="text-wrap"
             dangerouslySetInnerHTML={{
@@ -630,7 +625,7 @@ export const RequestsByCountryMapRenderer = (
       </ComposableMap>
       {hoverInfo.visible && (
         <div
-          className="pointer-events-none absolute z-10 rounded bg-surface-100 p-1.5 border border-surface-200 text-sm"
+          className="pointer-events-none absolute z-10 rounded-sm bg-surface-100 p-1.5 border border-surface-200 text-sm"
           style={{ left: hoverInfo.x, top: hoverInfo.y }}
         >
           <h3 className="text-foreground-lighter text-sm">{hoverInfo.title}</h3>

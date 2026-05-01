@@ -106,7 +106,10 @@ export function McpConfigurationDisplay({
                 ? 'Or add'
                 : 'Add'}{' '}
             this configuration to{' '}
-            <code className="px-1 py-0.5 bg-surface-200 rounded">{selectedClient.configFile}</code>:
+            <code className="px-1 py-0.5 bg-surface-200 rounded-sm">
+              {selectedClient.configFile}
+            </code>
+            :
           </div>
           <CodeBlock
             value={configValue}

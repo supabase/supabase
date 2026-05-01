@@ -93,7 +93,7 @@ function AuthPage() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
-              <div className="mb-4 -mt-[1.9rem]">
+              <div className="mb-4 mt-[-1.9rem]">
                 <div className="grid grid-flow-col grid-rows-2 gap-2 xl:w-64">
                   <div className="flex w-fit items-center">
                     <svg

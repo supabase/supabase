@@ -10,7 +10,7 @@ export const BranchingPostgresVersionNotice = () => {
   const snap = useAppStateSnapshot()
 
   return (
-    <Alert_Shadcn_ className="rounded-none px-7 py-6 [&>svg]:top-6 [&>svg]:left-6 !border-t-0 !border-l-0 !border-r-0">
+    <Alert_Shadcn_ className="rounded-none px-7 py-6 [&>svg]:top-6 [&>svg]:left-6 border-t-0! border-l-0! border-r-0!">
       <AlertCircleIcon />
       <AlertTitle_Shadcn_ className="text-base">
         Your project needs to be on Postgres 15 to enable branching

@@ -37,7 +37,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
             log ? 'mt-0 scale-95 opacity-0' : 'mt-8 scale-100 opacity-100'
           )}
         >
-          <div className="relative flex h-4 w-32 items-center rounded border border-default px-2">
+          <div className="relative flex h-4 w-32 items-center rounded-sm border border-default px-2">
             <div className="h-0.5 w-2/3 rounded-full bg-overlay-hover"></div>
             <div className="absolute right-1 -bottom-4">
               <svg
@@ -88,7 +88,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
               <X size={14} strokeWidth={2} className="text-scale-900" />
             </Button>
           </div>
-          <div className="h-px w-full bg-scale-600 rounded" />
+          <div className="h-px w-full bg-scale-600 rounded-sm" />
         </div>
         <div className="flex flex-col space-y-6 py-4">
           {log && <SelectedRealtimeMessagePanel log={log} />}

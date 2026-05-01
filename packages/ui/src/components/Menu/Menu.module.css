@@ -31,5 +31,5 @@
 }
 
 .sbui-menu__item--rounded {
-  @apply rounded;
+  @apply rounded-sm;
 }
