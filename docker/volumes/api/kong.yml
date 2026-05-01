@@ -157,7 +157,7 @@ services:
               if path == "/rest/v1" or path == "/rest/v1/" then
                 local consumer = kong.client.get_consumer()
                 if not consumer or consumer.username ~= "service_role" then
-                  return kong.response.exit(403, { message = "Secret API key required" })
+                  return kong.response.exit(401, { message = "Secret API key required" })
                 end
               end
       - name: acl

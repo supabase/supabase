@@ -186,7 +186,7 @@ fi
 
 echo ""
 echo "--- PostgREST ---"
-check "REST API route with anon key" "403" \
+check "REST API route with anon key" "401" \
     "$(http_status "$BASE_URL/rest/v1/" \
         -H "apikey: $ANON_KEY")"
 
