@@ -8,6 +8,7 @@ export interface RoleImpersonationRadioProps<T extends string> {
   isSelected: boolean | 'partially'
   onSelectedChange: (value: T) => void
   icon?: React.ReactNode
+  fullWidth?: boolean
 }
 
 export function RoleImpersonationRadio<T extends string>({
@@ -17,11 +18,13 @@ export function RoleImpersonationRadio<T extends string>({
   isSelected,
   onSelectedChange,
   icon,
+  fullWidth = false,
 }: RoleImpersonationRadioProps<T>) {
   return (
     <label
       className={cn(
-        'border border-default rounded-md bg-surface-200 hover:bg-overlay-hover hover:border-control px-4 py-3 w-44 cursor-pointer transition-colors',
+        'border border-default rounded-md bg-surface-200 hover:bg-overlay-hover hover:border-control px-4 py-3 cursor-pointer transition-colors',
+        fullWidth ? 'w-full' : 'w-44',
         isSelected && 'border-foreground-muted hover:border-foreground-muted bg-surface-300'
       )}
       tabIndex={0}

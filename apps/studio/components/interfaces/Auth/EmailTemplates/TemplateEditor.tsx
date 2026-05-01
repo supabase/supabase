@@ -25,7 +25,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SpamValidation } from './SpamValidation'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
-import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
@@ -279,7 +279,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                   width={60}
                   options={['preview', 'source']}
                   activeOption={activeView}
-                  onClickOption={(option: 'source' | 'preview') => setActiveView(option)}
+                  onClickOption={(option) => setActiveView(option as 'source' | 'preview')}
                   borderOverride="border-muted"
                 />
               </div>
