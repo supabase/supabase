@@ -204,6 +204,7 @@ export const UtilityActions = ({
           )}
           <RoleImpersonationPopover
             serviceRoleLabel="postgres"
+            header="Run SQL query as a role"
             variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
           />
           <SqlRunButton

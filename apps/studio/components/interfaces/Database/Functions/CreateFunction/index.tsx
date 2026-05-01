@@ -164,7 +164,7 @@ export const CreateFunction = ({
       <SheetContent
         showClose={false}
         size={'default'}
-        className={'p-0 flex flex-row gap-0 !min-w-screen lg:!min-w-[600px]'}
+        className={'p-0 flex flex-row gap-0 min-w-screen! lg:min-w-[600px]!'}
       >
         <div className="flex flex-col grow w-full">
           <CreateFunctionHeader selectedFunction={func?.name} isDuplicating={isDuplicating} />
@@ -247,7 +247,7 @@ export const CreateFunction = ({
                 <FormFieldArgs readonly={isEditing} />
               </SheetSection>
               <Separator className={focusedEditor ? 'hidden' : ''} />
-              <SheetSection className={`${focusedEditor ? 'h-full' : ''} !px-0`}>
+              <SheetSection className={`${focusedEditor ? 'h-full' : ''} px-0!`}>
                 <FormField
                   control={form.control}
                   name="definition"
@@ -287,7 +287,7 @@ export const CreateFunction = ({
               ) : (
                 <>
                   <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                    <div className="space-y-8 rounded bg-studio py-4 px-6 border border-overlay">
+                    <div className="space-y-8 rounded-sm bg-studio py-4 px-6 border border-overlay">
                       <FormItem className="flex flex-row items-center justify-between">
                         <div className="space-y-0.5">
                           <FormLabel className="text-base">Show advanced settings</FormLabel>

@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ScrollArea } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
@@ -17,11 +17,11 @@ interface ViewEntityAutofixSecurityModalProps {
   setIsAutofixViewSecurityModalOpen: (isAutofixViewSecurityModalOpen: boolean) => void
 }
 
-export default function ViewEntityAutofixSecurityModal({
+export const ViewEntityAutofixSecurityModal = ({
   table,
   isAutofixViewSecurityModalOpen,
   setIsAutofixViewSecurityModalOpen,
-}: ViewEntityAutofixSecurityModalProps) {
+}: ViewEntityAutofixSecurityModalProps) => {
   const { data: project } = useSelectedProjectQuery()
   const queryClient = useQueryClient()
   const {

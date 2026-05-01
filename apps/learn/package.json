@@ -43,8 +43,9 @@
     "@types/react": "catalog:",
     "config": "workspace:^",
     "mdast-util-toc": "^6.1.1",
+    "shiki": "^1.1.7",
+    "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
-    "tsx": "catalog:",
-    "shiki": "^1.1.7"
+    "tsx": "catalog:"
   }
 }

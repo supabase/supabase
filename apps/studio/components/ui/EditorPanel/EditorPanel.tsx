@@ -272,7 +272,7 @@ export const EditorPanel = () => {
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-[var(--header-height)]">
+      <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-(--header-height)">
         {isEditingTitle ? (
           <input
             ref={titleInputRef}
@@ -283,7 +283,7 @@ export const EditorPanel = () => {
               if (e.key === 'Enter') commitRename()
               if (e.key === 'Escape') setIsEditingTitle(false)
             }}
-            className="text-xs bg-transparent border-b border-foreground-lighter outline-none w-48 py-0.5"
+            className="text-xs bg-transparent border-b border-foreground-lighter outline-hidden w-48 py-0.5"
             autoFocus
           />
         ) : (

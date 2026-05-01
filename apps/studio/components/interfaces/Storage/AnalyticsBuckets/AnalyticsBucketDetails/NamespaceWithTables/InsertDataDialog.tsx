@@ -62,7 +62,7 @@ values (
 
         <DialogSectionSeparator />
 
-        <DialogSection className="!p-0">
+        <DialogSection className="p-0!">
           <CodeBlock
             hideLineNumbers
             wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3 [&>pre]:rounded-none [&>pre]:border-0')}

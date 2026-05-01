@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useCallback } from 'react'
 import { Button } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
@@ -22,7 +23,6 @@ import {
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
-import { useUrlState } from '@/hooks/ui/useUrlState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
@@ -48,7 +48,8 @@ export const TableGridEditor = ({
     table: selectedTable,
   })
 
-  const [{ view: selectedView = 'data' }] = useUrlState()
+  const [selectedView] = useQueryState('view', parseAsString.withDefault('data'))
+
   const { can: canEditTables } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
@@ -67,7 +68,7 @@ export const TableGridEditor = ({
         `/project/${projectRef}/editor/${table.id}${!!selectedSchema ? `?schema=${selectedSchema}` : ''}`
       )
     },
-    [projectRef, router]
+    [projectRef, router, selectedSchema]
   )
 
   const onTableDeleted = useCallback(async () => {
@@ -82,7 +83,7 @@ export const TableGridEditor = ({
         onClearDashboardHistory: () => setLastVisitedTable(undefined),
       })
     }
-  }, [router, selectedTable, tabs])
+  }, [router, selectedTable, setLastVisitedTable, tabs])
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
 

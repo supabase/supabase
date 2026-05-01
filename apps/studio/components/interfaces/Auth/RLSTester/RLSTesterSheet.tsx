@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { Code } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
@@ -32,6 +33,7 @@ import { RoleSelector } from './RoleSelector'
 import { UserSelector } from './UserSelector'
 import { useTestQueryRLS } from './useTestQueryRLS'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 interface RLSTesterSheetProps {
@@ -85,15 +87,18 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
         </Button>
       </SheetTrigger>
 
-      <SheetContent className="!w-[600px] flex flex-col gap-y-0">
+      <SheetContent className="w-[600px]! flex flex-col gap-y-0">
         <SheetHeader>
-          <SheetTitle>What data can my users see?</SheetTitle>
+          <SheetTitle className="flex items-center gap-x-4">
+            <span>What data can my users see?</span>
+            <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER} />
+          </SheetTitle>
           <SheetDescription>
             See what data a user is allowed to read based on your RLS policies
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex-grow overflow-y-auto flex flex-col">
+        <div className="grow overflow-y-auto flex flex-col">
           <SheetSection className="px-0 py-0">
             <div className="flex flex-col p-5 pt-4 gap-y-4">
               <RoleSelector onSelectRole={setSelectedOption} />

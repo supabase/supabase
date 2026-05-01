@@ -1,3 +1,4 @@
+@reference "./main.css";
 /* Brought over from platform to be cleaned if needed */
 
 /* Form panels */
@@ -72,7 +73,7 @@
 }
 
 .section-block {
-  @apply p-0 rounded bg-surface-100 border border-overlay;
+  @apply p-0 rounded-sm bg-surface-100 border border-overlay;
 }
 
 .section-block--header {
@@ -119,12 +120,12 @@
 }
 
 .table-container thead th:first-child {
-  @apply rounded rounded-r-none rounded-b-none;
+  @apply rounded-sm rounded-r-none rounded-b-none;
   @apply border-l;
 }
 
 .table-container thead th:last-child {
-  @apply pr-6 rounded rounded-l-none rounded-b-none;
+  @apply pr-6 rounded-sm rounded-l-none rounded-b-none;
   @apply border-r;
 }
 
@@ -153,11 +154,11 @@
 }
 
 .table-container tbody tr:last-child td:first-child {
-  @apply rounded rounded-r-none rounded-t-none;
+  @apply rounded-sm rounded-r-none rounded-t-none;
 }
 
 .table-container tbody tr:last-child td:last-child {
-  @apply rounded rounded-l-none rounded-t-none;
+  @apply rounded-sm rounded-l-none rounded-t-none;
 }
 
 .table-container--borderless thead th {

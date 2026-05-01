@@ -243,7 +243,7 @@ testRunner('table editor', () => {
 
     // insert row with enum value
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByText('Insert a new row into').click()
+    await page.getByText('Insert row').click()
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'value1' }).click()
     await page.getByTestId('action-bar-save-row').click()
@@ -252,7 +252,7 @@ testRunner('table editor', () => {
 
     // insert row with another enum value
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByText('Insert a new row into').click()
+    await page.getByText('Insert row').click()
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'value2' }).click()
     await page.getByTestId('action-bar-save-row').click()
@@ -290,7 +290,7 @@ testRunner('table editor', () => {
     // create 3 rows
     for (const value of ['789', '456', '123']) {
       await page.getByTestId('table-editor-insert-new-row').click()
-      await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+      await page.getByRole('menuitem', { name: 'Insert row' }).click()
       await page.getByTestId('pw_column-input').fill(value)
       const insertPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
         method: 'POST',
@@ -514,7 +514,7 @@ testRunner('table editor', () => {
 
     for (const value of ['789', '456', '123']) {
       await page.getByTestId('table-editor-insert-new-row').click()
-      await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+      await page.getByRole('menuitem', { name: 'Insert row' }).click()
       await page.getByTestId(`${colName}-input`).fill(value)
       const insertPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
         method: 'POST',
@@ -769,7 +769,7 @@ testRunner('table editor', () => {
 
     // Insert first row with value 'first_row_value'
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${colName}-input`).fill('first_row_value')
     const insertFirstPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
@@ -779,7 +779,7 @@ testRunner('table editor', () => {
 
     // Insert second row with value 'second_row_value'
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${colName}-input`).fill('second_row_value')
     const insertSecondPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
@@ -862,7 +862,7 @@ testRunner('table editor', () => {
 
     // Insert a row with TRUE value via side panel
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'TRUE' }).click()
     const insertTruePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
@@ -878,7 +878,7 @@ testRunner('table editor', () => {
 
     // Insert a row with FALSE value via side panel
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'FALSE' }).click()
     const insertFalsePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
@@ -983,7 +983,7 @@ testRunner('table editor', () => {
 
     // Insert a row with TRUE value
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'TRUE' }).click()
     const insertTruePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
@@ -999,7 +999,7 @@ testRunner('table editor', () => {
 
     // Insert a row with FALSE value
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'FALSE' }).click()
     const insertFalsePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
@@ -1354,7 +1354,7 @@ testRunner('table editor', () => {
       .toBe('229|229|t')
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId('name-input').fill('Dave')
     const insertPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
@@ -1433,7 +1433,7 @@ testRunner('table editor', () => {
       .toBe('229|229|t')
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId('name-input').fill('Dave')
     const insertPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
@@ -1472,7 +1472,7 @@ testRunner('table editor', () => {
 
     // Open side panel to insert a new row
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('immediate insert')
 
     // Wait for the POST mutation to complete when saving
@@ -1769,7 +1769,7 @@ testRunner('table editor', () => {
 
     // Open side panel to insert a new row
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
 
     // Open the field actions dropdown and set the text column to NULL
     await page.getByTestId(`${columnName}-field-actions`).click()

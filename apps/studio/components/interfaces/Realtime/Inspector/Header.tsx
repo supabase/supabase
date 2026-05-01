@@ -29,7 +29,7 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
   )
 
   return (
-    <div className="flex flex-row min-h-14 md:min-h-[var(--header-height)] gap-2.5 items-center px-4 border-b ">
+    <div className="flex flex-row min-h-14 md:min-h-(--header-height) gap-2.5 items-center px-4 border-b ">
       <div className="flex flex-row">
         <ChooseChannelPopover config={config} onChangeConfig={onChangeConfig} />
         <RealtimeTokensPopover config={config} onChangeConfig={onChangeConfig} />

@@ -188,7 +188,7 @@ export const EdgeFunctionDetails = () => {
                                     only by the legacy secret
                                   </em>{' '}
                                   in the{' '}
-                                  <code className="text-code-inline !break-keep">
+                                  <code className="text-code-inline break-keep!">
                                     Authorization
                                   </code>{' '}
                                   header. The <code className="text-code-inline">anon</code> key
@@ -281,8 +281,8 @@ export const EdgeFunctionDetails = () => {
                         value={code}
                         wrapperClassName="[&>div]:top-0 [&>div]:right-3 px-6"
                         className={cn(
-                          'p-0 text-xs !mt-0 border-none ',
-                          showKey ? '[&>code]:break-all' : '[&>code]:break-words'
+                          'p-0 text-xs mt-0! border-none ',
+                          showKey ? '[&>code]:break-all' : '[&>code]:wrap-break-word'
                         )}
                         language={tab.language}
                         wrapLines={false}
@@ -316,7 +316,7 @@ export const EdgeFunctionDetails = () => {
               </PageSectionSummary>
             </PageSectionMeta>
             <PageSectionContent>
-              <div className="rounded border bg-surface-100 px-6 py-4 drop-shadow-sm">
+              <div className="rounded-sm border bg-surface-100 px-6 py-4 drop-shadow-xs">
                 <div className="space-y-6">
                   <CommandRender
                     commands={[

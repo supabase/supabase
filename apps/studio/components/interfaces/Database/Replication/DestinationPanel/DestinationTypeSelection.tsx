@@ -67,7 +67,7 @@ export const DestinationTypeSelection = () => {
               ? 'grid-cols-3'
               : 'grid-cols-2',
           '[&>button:first-of-type]:rounded-none [&>button:last-of-type]:rounded-none',
-          '[&>button:first-of-type]:!rounded-l-lg [&>button:last-of-type]:!rounded-r-lg'
+          '[&>button:first-of-type]:rounded-l-lg! [&>button:last-of-type]:rounded-r-lg!'
         )}
       >
         {((!editMode && infrastructureReadReplicas) ||

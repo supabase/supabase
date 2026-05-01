@@ -150,7 +150,7 @@ const CustomDomainSidePanel = () => {
             page after enabling the add-on.
           </p>
 
-          <div className={cn('!mt-8 pb-4', !hasAccessToCustomDomain && 'opacity-75')}>
+          <div className={cn('mt-8! pb-4', !hasAccessToCustomDomain && 'opacity-75')}>
             <RadioGroupCard
               id="custom-domain"
               className="flex flex-wrap gap-3"
@@ -173,7 +173,7 @@ const CustomDomainSidePanel = () => {
                         <p className="text-foreground text-sm" translate="no">
                           $0
                         </p>
-                        <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                        <p className="text-foreground-light translate-y-px"> / month</p>
                       </div>
                     </div>
                   </div>
@@ -198,7 +198,7 @@ const CustomDomainSidePanel = () => {
                           <p className="text-foreground text-sm" translate="no">
                             {formatCurrency(option.price)}
                           </p>
-                          <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                          <p className="text-foreground-light translate-y-px"> / month</p>
                         </div>
                       </div>
                     </div>

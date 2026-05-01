@@ -1,7 +1,7 @@
 import '@code-hike/mdx/styles.css'
 import 'config/code-hike.css'
 import '../styles/index.css'
-import '../pages/launch-week/launchWeek.css'
+import './launch-week/launchWeek.css'
 
 import {
   AuthProvider,

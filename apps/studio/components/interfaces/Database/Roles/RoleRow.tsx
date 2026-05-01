@@ -103,17 +103,17 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         'data-open:border-strong',
         'data-open:pb-px col-span-12 mx-auto',
         '-space-y-px overflow-hidden',
-        'border border-t-0 first:border-t first:!mt-0 hover:border-t hover:-mt-[1px] shadow transition hover:z-50',
+        'border border-t-0 first:border-t first:mt-0! hover:border-t hover:-mt-px shadow-sm transition hover:z-50',
         'first:rounded-tl first:rounded-tr',
         'last:rounded-bl last:rounded-br'
       )}
     >
-      <div className={cn('flex items-center relative', !disabled && 'pr-[--card-padding-x]')}>
+      <div className={cn('flex items-center relative', !disabled && 'pr-(--card-padding-x)')}>
         <Collapsible.Trigger asChild>
           <button
             id={`collapsible-trigger-${role.id}`}
             type="button"
-            className="group flex w-full items-center justify-between rounded py-3 px-card text-foreground"
+            className="group flex w-full items-center justify-between rounded-sm py-3 px-card text-foreground"
             onClick={(event) => {
               event.preventDefault()
               event.stopPropagation()
