@@ -95,14 +95,6 @@ export const EnumeratedTypes = () => {
     { label: 'Search enumerated types' }
   )
 
-  useShortcut(
-    SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
-    () => {
-      setShowCreateTypePanel(true)
-    },
-    { enabled: !isSchemaLocked, label: 'Create new enumerated type' }
-  )
-
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
     setSearch('')
   })

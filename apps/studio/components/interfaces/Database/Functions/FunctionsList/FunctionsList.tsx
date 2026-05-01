@@ -141,14 +141,6 @@ export const FunctionsList = () => {
     { label: 'Search functions' }
   )
 
-  useShortcut(
-    SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
-    () => {
-      createFunction()
-    },
-    { enabled: canAddFunctions, label: 'Create new function' }
-  )
-
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
     setFilterString('')
     setReturnTypeFilter(null)

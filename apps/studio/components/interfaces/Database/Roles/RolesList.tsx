@@ -48,14 +48,6 @@ export const RolesList = () => {
     { label: 'Search roles' }
   )
 
-  useShortcut(
-    SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
-    () => {
-      setIsCreatingRole(true)
-    },
-    { enabled: canUpdateRoles, label: 'Add new role' }
-  )
-
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
     setFilterString('')
     setFilterType('all')

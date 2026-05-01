@@ -99,14 +99,6 @@ export const Indexes = () => {
     { label: 'Search indexes' }
   )
 
-  useShortcut(
-    SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
-    () => {
-      setShowCreateIndex(true)
-    },
-    { enabled: !isSchemaLocked && isSuccessSchemas, label: 'Create new index' }
-  )
-
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
     setSearch('')
   })
@@ -198,6 +190,7 @@ export const Indexes = () => {
                 id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
                 label="Create new index"
                 onTrigger={() => setShowCreateIndex(true)}
+                options={{ enabled: isSuccessSchemas }}
                 side="bottom"
               >
                 <Button

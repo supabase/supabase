@@ -158,14 +158,6 @@ export const EventTriggersList = () => {
     { label: 'Search event triggers' }
   )
 
-  useShortcut(
-    SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
-    () => {
-      createEventTrigger()
-    },
-    { enabled: canUpdateEventTriggers, label: 'Create new event trigger' }
-  )
-
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
     setFilterString('')
     setOwnerFilter(null)
