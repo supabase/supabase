@@ -16,9 +16,9 @@ export const alertVariants = cva(
         default:
           'bg-surface-200/25 border-default text-foreground [&>svg]:text-background [&>svg]:bg-foreground',
         destructive:
-          'bg-destructive-200 border-destructive-400 [&>svg]:text-destructive-200 [&>svg]:bg-destructive-600',
+          'bg-destructive-200 border-destructive-400 text-foreground [&>svg]:text-destructive-200 [&>svg]:bg-destructive-600',
         warning:
-          'bg-warning-200 border-warning-400 [&>svg]:text-warning-200 [&>svg]:bg-warning-600',
+          'bg-warning-200 border-warning-400 text-foreground [&>svg]:text-warning-200 [&>svg]:bg-warning-600',
       },
     },
     defaultVariants: {

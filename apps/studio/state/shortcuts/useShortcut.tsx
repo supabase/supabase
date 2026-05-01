@@ -70,6 +70,8 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
   const enabled = globallyEnabled && callerEnabled
   const timeout = options?.timeout ?? def.options?.timeout ?? undefined
   const ignoreInputs = options?.ignoreInputs ?? def.options?.ignoreInputs
+  const registerInCommandMenu =
+    options?.registerInCommandMenu ?? def.options?.registerInCommandMenu ?? false
 
   // Only include `ignoreInputs` when set. The library resolves it to a concrete
   // boolean at register time (false for Meta/Ctrl/Escape, true otherwise), but
@@ -83,7 +85,7 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
   })
 
   // Handle overrides for command menu
-  const enabledInCommandMenu = enabled && (options?.registerInCommandMenu ?? false)
+  const enabledInCommandMenu = enabled && registerInCommandMenu
   const depsInCommandMenu = [enabled, def.label]
   const callbackRef = useLatest(callback)
   const setCommandMenuOpen = useSetCommandMenuOpen()

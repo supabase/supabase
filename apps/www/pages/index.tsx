@@ -3,6 +3,7 @@ import Layout from '~/components/Layouts/Default'
 import Logos from '~/components/logos'
 import getContent from '~/data/home/content'
 import { organizationSchema, serializeJsonLd, websiteSchema } from '~/lib/json-ld'
+import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 
@@ -24,6 +25,7 @@ const Index = () => {
 
   return (
     <>
+      <NextSeo canonical="https://supabase.com/" />
       <Head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: HOMEPAGE_JSON_LD }} />
       </Head>

@@ -5,7 +5,7 @@
 @import './../../../packages/ui/build/css/themes/classic-dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
-@config '../tailwind.config.js';
+@config '../tailwind.config.cjs';
 
 @import 'config/typography.css';
 

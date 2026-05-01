@@ -289,10 +289,24 @@ export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
     const value = formatClipboardValue(cellValue)
     copyToClipboard(value)
   }
-  // Let registered shortcuts win over rdg's "type a key to enter edit mode" default.
+
+  // Let registered shortcuts win over rdg's "type a key to enter edit mode" default,
+  // unless a printable key enters edit mode.
   if (eventMatchesAnyShortcut(event.nativeEvent, tableEditorRegistry)) {
-    event.preventGridDefault()
-    return
+    if (
+      event.key.length === 1 &&
+      event.key !== ' ' &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.shiftKey &&
+      column.renderEditCell != null
+    ) {
+      event.stopPropagation()
+    } else {
+      event.preventGridDefault()
+      return
+    }
   }
 
   // Toggle boolean cells with T/F when no modifier keys are pressed.
