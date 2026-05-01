@@ -95,27 +95,25 @@ export const PublicationsList = () => {
 
   return (
     <>
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Input
-              size="tiny"
-              icon={<Search />}
-              className="w-48"
-              placeholder="Search for a publication"
-              value={filterString}
-              onChange={(e) => setFilterString(e.target.value)}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <Input
+            size="tiny"
+            icon={<Search />}
+            className="w-48"
+            placeholder="Search for a publication"
+            value={filterString}
+            onChange={(e) => setFilterString(e.target.value)}
+          />
+        </div>
+        {isPermissionsLoaded && !canUpdatePublications && (
+          <div className="w-[500px]">
+            <InformationBox
+              icon={<AlertCircle className="text-foreground-light" strokeWidth={2} />}
+              title="You need additional permissions to update database publications"
             />
           </div>
-          {isPermissionsLoaded && !canUpdatePublications && (
-            <div className="w-[500px]">
-              <InformationBox
-                icon={<AlertCircle className="text-foreground-light" strokeWidth={2} />}
-                title="You need additional permissions to update database publications"
-              />
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
       <div className="w-full overflow-hidden overflow-x-auto">

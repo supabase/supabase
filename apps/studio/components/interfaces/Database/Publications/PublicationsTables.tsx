@@ -53,27 +53,14 @@ export const PublicationsTables = () => {
     <>
       <div className="mb-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <ButtonTooltip
-              asChild
-              type="outline"
-              icon={<ChevronLeft />}
-              style={{ padding: '5px' }}
-              tooltip={{ content: { side: 'bottom', text: 'Go back to publications list' } }}
-            >
-              <Link href={`/project/${ref}/database/publications`} />
-            </ButtonTooltip>
-            <div>
-              <Input
-                size="tiny"
-                placeholder="Search for a table"
-                value={filterString}
-                onChange={(e) => setFilterString(e.target.value)}
-                icon={<Search />}
-                className="w-48"
-              />
-            </div>
-          </div>
+          <Input
+            size="tiny"
+            placeholder="Search for a table"
+            value={filterString}
+            onChange={(e) => setFilterString(e.target.value)}
+            icon={<Search />}
+            className="w-48"
+          />
           {!isLoadingPermissions && !canUpdatePublications && (
             <Admonition
               type="note"
