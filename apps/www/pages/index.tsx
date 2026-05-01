@@ -1,8 +1,10 @@
-import dynamic from 'next/dynamic'
-import getContent from '~/data/home/content'
-import Layout from '~/components/Layouts/Default'
 import Hero from '~/components/Hero/Hero'
+import Layout from '~/components/Layouts/Default'
 import Logos from '~/components/logos'
+import getContent from '~/data/home/content'
+import { organizationSchema, serializeJsonLd, websiteSchema } from '~/lib/json-ld'
+import dynamic from 'next/dynamic'
+import Head from 'next/head'
 
 const Products = dynamic(() => import('~/components/Products/index'))
 const HeroFrameworks = dynamic(() => import('~/components/Hero/HeroFrameworks'))
@@ -19,18 +21,28 @@ const Index = () => {
   const content = getContent()
 
   return (
-    <Layout>
-      <Hero />
-      <Logos />
-      <Products {...content.productsSection} />
-      <HeroFrameworks />
-      <CustomerStories />
-      <BuiltWithSupabase />
-      <DashboardFeatures {...content.dashboardFeatures} />
-      <TwitterSocialSection {...content.twitterSocialSection} />
-      <OpenSourceSection />
-      <CTABanner className="border-none" />
-    </Layout>
+    <>
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd([organizationSchema(), websiteSchema()]),
+          }}
+        />
+      </Head>
+      <Layout>
+        <Hero />
+        <Logos />
+        <Products {...content.productsSection} />
+        <HeroFrameworks />
+        <CustomerStories />
+        <BuiltWithSupabase />
+        <DashboardFeatures {...content.dashboardFeatures} />
+        <TwitterSocialSection {...content.twitterSocialSection} />
+        <OpenSourceSection />
+        <CTABanner className="border-none" />
+      </Layout>
+    </>
   )
 }
 
