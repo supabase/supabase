@@ -1,3 +1,5 @@
+@reference "../../../../styles/main.css";
+
 .root :global(.graphiql-sidebar) {
   @apply border-r border-default;
   overflow-x: hidden;
