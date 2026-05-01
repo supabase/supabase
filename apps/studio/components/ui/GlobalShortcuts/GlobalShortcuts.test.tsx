@@ -23,6 +23,10 @@ vi.mock('./ShortcutsReferenceSheet', () => ({
   ),
 }))
 
+vi.mock('./ShortcutChordHud', () => ({
+  ShortcutChordHud: () => <div data-testid="shortcut-chord-hud" />,
+}))
+
 describe('GlobalShortcuts', () => {
   beforeEach(() => {
     vi.clearAllMocks()

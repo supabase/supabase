@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
+import { ShortcutChordHud } from './ShortcutChordHud'
 import { ShortcutsReferenceSheet } from './ShortcutsReferenceSheet'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -20,5 +21,10 @@ export function GlobalShortcuts() {
     }
   )
 
-  return <ShortcutsReferenceSheet open={referenceOpen} onOpenChange={setReferenceOpen} />
+  return (
+    <>
+      <ShortcutChordHud />
+      <ShortcutsReferenceSheet open={referenceOpen} onOpenChange={setReferenceOpen} />
+    </>
+  )
 }
