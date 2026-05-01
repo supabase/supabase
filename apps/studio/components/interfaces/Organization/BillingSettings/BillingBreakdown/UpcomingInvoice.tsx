@@ -60,8 +60,11 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   // For non-platform customers, compute is broken down per project and contains a breakdown array
   const computeItems =
-    upcomingInvoice?.lines?.filter((item) => item.description?.toLowerCase().includes('compute')) ||
-    []
+    upcomingInvoice?.lines?.filter(
+      (item) =>
+        item.description?.toLowerCase().includes('compute') &&
+        !item.description.startsWith('Compute Credits')
+    ) || []
 
   const computeCreditsItem =
     upcomingInvoice?.lines?.find((item) => item.description.startsWith('Compute Credits')) ?? null
@@ -89,6 +92,9 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
           item.amount_before_discount > 0
       )
       .sort((a, b) => b.amount_before_discount - a.amount_before_discount) || []
+
+  const prepaidCreditsItem =
+    upcomingInvoice?.lines?.find((item) => item.item_name === 'Prepaid Credits') ?? null
 
   const hasTax =
     upcomingInvoice?.tax_status === 'calculated' && (upcomingInvoice?.tax?.tax_amount ?? 0) > 0
@@ -295,6 +301,18 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   </TableCell>
                 </TableRow>
 
+                {prepaidCreditsItem && (
+                  <TableRow>
+                    <TableCell className="py-2 px-0 flex items-center">
+                      <span className="mr-2">{prepaidCreditsItem.item_name}</span>
+                      <InfoTooltip>{prepaidCreditsItem.description}</InfoTooltip>
+                    </TableCell>
+                    <TableCell className="text-right py-2 px-0" translate="no">
+                      {formatCurrency(prepaidCreditsItem.amount) ?? '-'}
+                    </TableCell>
+                  </TableRow>
+                )}
+
                 {(!!upcomingInvoice.amount_projected || hasTax || taxFailed) && (
                   <TableRow>
                     <TableCell className="font-medium py-2 px-0 flex items-center">
@@ -431,7 +449,8 @@ function ComputeLineItem({
 
   const discountedComputeCosts = Math.max(
     0,
-    computeItems.reduce((prev, cur) => prev + (cur.amount ?? 0), 0) + (computeCredits?.amount ?? 0)
+    computeItems.reduce((prev, cur) => prev + (cur.amount ?? 0), 0) +
+      (computeCredits?.amount ?? 0)
   )
 
   if (!computeItems.length) return null
