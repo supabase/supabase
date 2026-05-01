@@ -4,10 +4,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { GlobalShortcuts } from './GlobalShortcuts'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
-const { mockSetCommandMenuOpen, mockUseShortcut } = vi.hoisted(() => ({
-  mockSetCommandMenuOpen: vi.fn(),
-  mockUseShortcut: vi.fn(),
-}))
+const { mockSetCommandMenuOpen, mockUseShortcut, mockUseIsShortcutChordHudEnabled } = vi.hoisted(
+  () => ({
+    mockSetCommandMenuOpen: vi.fn(),
+    mockUseShortcut: vi.fn(),
+    mockUseIsShortcutChordHudEnabled: vi.fn(() => true),
+  })
+)
 
 vi.mock('ui-patterns/CommandMenu', () => ({
   useSetCommandMenuOpen: () => mockSetCommandMenuOpen,
@@ -15,6 +18,10 @@ vi.mock('ui-patterns/CommandMenu', () => ({
 
 vi.mock('@/state/shortcuts/useShortcut', () => ({
   useShortcut: mockUseShortcut,
+}))
+
+vi.mock('@/components/interfaces/Account/Preferences/useDashboardSettings', () => ({
+  useIsShortcutChordHudEnabled: mockUseIsShortcutChordHudEnabled,
 }))
 
 vi.mock('./ShortcutsReferenceSheet', () => ({
@@ -30,6 +37,7 @@ vi.mock('./ShortcutChordHud', () => ({
 describe('GlobalShortcuts', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockUseIsShortcutChordHudEnabled.mockReturnValue(true)
   })
 
   it('registers the shortcuts reference action in the command palette', () => {
@@ -50,5 +58,19 @@ describe('GlobalShortcuts', () => {
 
     expect(mockSetCommandMenuOpen).toHaveBeenCalledWith(false)
     expect(screen.getByTestId('shortcuts-reference-sheet')).toHaveAttribute('data-open', 'true')
+  })
+
+  it('renders the chord HUD when the preference is enabled', () => {
+    render(<GlobalShortcuts />)
+
+    expect(screen.getByTestId('shortcut-chord-hud')).toBeInTheDocument()
+  })
+
+  it('does not mount the chord HUD when the preference is disabled', () => {
+    mockUseIsShortcutChordHudEnabled.mockReturnValue(false)
+
+    render(<GlobalShortcuts />)
+
+    expect(screen.queryByTestId('shortcut-chord-hud')).not.toBeInTheDocument()
   })
 })
