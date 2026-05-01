@@ -2546,6 +2546,24 @@ export interface QueueOperationsSettingClickedEvent {
 }
 
 /**
+ * User toggled the keyboard shortcut hint HUD setting in account preferences.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/account/preferences
+ */
+export interface ShortcutChordHudSettingClickedEvent {
+  action: 'shortcut_chord_hud_setting_clicked'
+  properties: {
+    /**
+     * Whether the keyboard shortcut hint HUD was enabled or disabled
+     */
+    enabled: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * User clicked the save destination button in add log drains sheet.
  *
  * @group Events
@@ -3349,6 +3367,7 @@ export type TelemetryEvent =
   | CommandMenuCommandClickedEvent
   | InlineEditorSettingClickedEvent
   | QueueOperationsSettingClickedEvent
+  | ShortcutChordHudSettingClickedEvent
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
   | LogDrainConfirmButtonSubmittedEvent

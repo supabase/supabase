@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { cn, KeyboardShortcut } from 'ui'
 
 import { getVisibleShortcutChord, isInputLikeElement } from './ShortcutChordHud.utils'
+import { useIsShortcutChordHudEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { useInterval } from '@/hooks/misc/useInterval'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 
@@ -23,6 +24,7 @@ interface RenderedShortcutChord {
 }
 
 export function ShortcutChordHud() {
+  const isEnabled = useIsShortcutChordHudEnabled()
   const { sequences } = useHotkeyRegistrations()
   const [, setTick] = useState(0)
   const [focusVersion, setFocusVersion] = useState(0)
@@ -167,7 +169,7 @@ export function ShortcutChordHud() {
 
   const displayedHud = targetHud ?? exitingHud
 
-  if (!displayedHud) {
+  if (!displayedHud || !isEnabled) {
     return null
   }
 

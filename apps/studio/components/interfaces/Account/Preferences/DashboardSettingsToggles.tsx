@@ -5,18 +5,24 @@ import { Card, Form } from 'ui'
 import * as z from 'zod'
 
 import { DashboardToggle } from './DashboardToggle'
-import { useIsInlineEditorSetting, useIsQueueOperationsSetting } from './useDashboardSettings'
+import {
+  useIsInlineEditorSetting,
+  useIsQueueOperationsSetting,
+  useIsShortcutChordHudSetting,
+} from './useDashboardSettings'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const DashboardSettingsSchema = z.object({
   inlineEditorEnabled: z.boolean(),
   queueOperationsEnabled: z.boolean(),
+  shortcutChordHudEnabled: z.boolean(),
 })
 
 export const DashboardSettingsToggles = () => {
   const { inlineEditorEnabled, setInlineEditorEnabled } = useIsInlineEditorSetting()
   const { isQueueOperationsEnabled, setIsQueueOperationsEnabled } = useIsQueueOperationsSetting()
+  const { isShortcutChordHudEnabled, setIsShortcutChordHudEnabled } = useIsShortcutChordHudSetting()
 
   const { data: org } = useSelectedOrganizationQuery()
 
@@ -27,6 +33,7 @@ export const DashboardSettingsToggles = () => {
     values: {
       inlineEditorEnabled: inlineEditorEnabled ?? false,
       queueOperationsEnabled: isQueueOperationsEnabled ?? false,
+      shortcutChordHudEnabled: isShortcutChordHudEnabled ?? true,
     },
   })
 
@@ -60,6 +67,21 @@ export const DashboardSettingsToggles = () => {
     )
   }
 
+  const handleShortcutChordHudToggle = (value: boolean) => {
+    setIsShortcutChordHudEnabled(value)
+    form.setValue('shortcutChordHudEnabled', value)
+
+    sendEvent({
+      action: 'shortcut_chord_hud_setting_clicked',
+      properties: { enabled: value },
+      groups: { organization: org?.slug },
+    })
+
+    toast(
+      `${value ? 'Keyboard shortcut hints will now appear while typing chords' : 'Keyboard shortcut hints are now hidden'}`
+    )
+  }
+
   return (
     <Form {...form}>
       <Card>
@@ -76,6 +98,13 @@ export const DashboardSettingsToggles = () => {
           label="Queue table operations"
           description="Review and batch table edits in Table Editor before saving them to your database."
           onToggle={handleQueueOperationsToggle}
+        />
+        <DashboardToggle
+          form={form}
+          name="shortcutChordHudEnabled"
+          label="Show keyboard shortcut hints"
+          description="Show an on-screen hint while typing multi-key keyboard shortcuts."
+          onToggle={handleShortcutChordHudToggle}
           isLast
         />
       </Card>

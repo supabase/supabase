@@ -26,6 +26,7 @@ export const test = base.extend<TestOptions>({
         `table-editor-queue-operations-banner-dismissed-${ref}`,
         JSON.stringify(true)
       )
+      localStorage.setItem('supabase-ui-shortcut-chord-hud', JSON.stringify(false))
     }, ref)
     await use(page)
   },

@@ -25,6 +25,17 @@ export const useIsQueueOperationsSetting = () => {
   }
 }
 
+export const useIsShortcutChordHudSetting = () => {
+  const [isShortcutChordHudEnabled, setIsShortcutChordHudEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.UI_SHORTCUT_CHORD_HUD,
+    true
+  )
+  return {
+    isShortcutChordHudEnabled: isShortcutChordHudEnabled ?? true,
+    setIsShortcutChordHudEnabled,
+  }
+}
+
 export const useIsInlineEditorEnabled = () => {
   const { inlineEditorEnabled } = useIsInlineEditorSetting()
   return inlineEditorEnabled ?? false
@@ -33,4 +44,9 @@ export const useIsInlineEditorEnabled = () => {
 export const useIsQueueOperationsEnabled = () => {
   const { isQueueOperationsEnabled } = useIsQueueOperationsSetting()
   return isQueueOperationsEnabled ?? false
+}
+
+export const useIsShortcutChordHudEnabled = () => {
+  const { isShortcutChordHudEnabled } = useIsShortcutChordHudSetting()
+  return isShortcutChordHudEnabled ?? true
 }

@@ -4,12 +4,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ShortcutChordHud } from './ShortcutChordHud'
 import type { ShortcutSequenceRegistration } from './ShortcutChordHud.utils'
 
-const { mockUseHotkeyRegistrations } = vi.hoisted(() => ({
+const { mockUseHotkeyRegistrations, mockUseIsShortcutChordHudEnabled } = vi.hoisted(() => ({
   mockUseHotkeyRegistrations: vi.fn(),
+  mockUseIsShortcutChordHudEnabled: vi.fn(() => true),
 }))
 
 vi.mock('@tanstack/react-hotkeys', () => ({
   useHotkeyRegistrations: mockUseHotkeyRegistrations,
+}))
+
+vi.mock('@/components/interfaces/Account/Preferences/useDashboardSettings', () => ({
+  useIsShortcutChordHudEnabled: mockUseIsShortcutChordHudEnabled,
 }))
 
 const makeSequence = (
@@ -30,10 +35,34 @@ describe('ShortcutChordHud', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-05-01T10:00:00.000Z'))
     mockUseHotkeyRegistrations.mockReturnValue({ hotkeys: [], sequences: [] })
+    mockUseIsShortcutChordHudEnabled.mockReturnValue(true)
   })
 
   it('stays hidden when no chord is in progress', () => {
     render(<ShortcutChordHud />)
+
+    expect(screen.queryByTestId('shortcut-chord-hud')).not.toBeInTheDocument()
+  })
+
+  it('stays hidden when the user has disabled the chord HUD preference', () => {
+    mockUseIsShortcutChordHudEnabled.mockReturnValue(false)
+    const now = Date.now()
+    mockUseHotkeyRegistrations.mockReturnValue({
+      hotkeys: [],
+      sequences: [
+        makeSequence({
+          id: 'nav.table',
+          sequence: ['G', 'T'],
+          matchedStepCount: 1,
+          partialMatchLastKeyTime: now - 200,
+        }),
+      ],
+    })
+
+    render(<ShortcutChordHud />)
+    act(() => {
+      vi.advanceTimersByTime(20)
+    })
 
     expect(screen.queryByTestId('shortcut-chord-hud')).not.toBeInTheDocument()
   })
