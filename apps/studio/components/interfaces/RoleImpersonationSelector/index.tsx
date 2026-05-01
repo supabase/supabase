@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Badge, Card, CardContent, CardHeader, CardTitle } from 'ui'
+import { Badge, Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 
 import { AnonIcon, AuthenticatedIcon, ServiceRoleIcon } from './Icons'
 import { RoleImpersonationRadio } from './RoleImpersonationRadio'

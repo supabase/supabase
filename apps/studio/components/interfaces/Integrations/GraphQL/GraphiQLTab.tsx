@@ -25,7 +25,7 @@ import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
 const ROLE_IMPERSONATION_PLUGIN: GraphiQLPlugin = {
   title: 'Role Impersonation',
   icon: () => <IconUser />,
-  content: () => <RoleImpersonationSelector padded={false} orientation="vertical" />,
+  content: () => <RoleImpersonationSelector orientation="vertical" />,
 }
 
 const MONACO_THEME = { dark: 'supabase-graphql-dark', light: 'supabase-graphql-light' }
