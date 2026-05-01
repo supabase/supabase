@@ -142,6 +142,18 @@ export const PublicationsList = () => {
                 </TableRow>
               )}
 
+              {!isLoading && publications.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <NoSearchResults
+                      searchString={filterString}
+                      onResetFilter={() => setFilterString('')}
+                      className="border-none !p-0"
+                    />
+                  </TableCell>
+                </TableRow>
+              )}
+
               {isSuccess &&
                 publications.map((x) => (
                   <TableRow key={x.name}>
@@ -201,14 +213,6 @@ export const PublicationsList = () => {
           </Table>
         </Card>
       </div>
-
-      {!isLoading && publications.length === 0 && (
-        <NoSearchResults
-          searchString={filterString}
-          onResetFilter={() => setFilterString('')}
-          className="rounded-t-none border-t-0"
-        />
-      )}
 
       <ConfirmationModal
         visible={toggleListenEventValue !== null}
