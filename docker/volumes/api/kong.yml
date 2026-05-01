@@ -149,6 +149,17 @@ services:
           replace:
             headers:
               - "Authorization: $LUA_AUTH_EXPR"
+      - name: post-function
+        config:
+          access:
+            - |
+              local path = kong.request.get_path()
+              if path == "/rest/v1" or path == "/rest/v1/" then
+                local consumer = kong.client.get_consumer()
+                if not consumer or consumer.username ~= "service_role" then
+                  return kong.response.exit(403, { message = "Secret API key required" })
+                end
+              end
       - name: acl
         config:
           hide_groups_header: true
