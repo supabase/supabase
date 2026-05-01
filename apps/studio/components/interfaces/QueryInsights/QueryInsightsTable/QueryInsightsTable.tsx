@@ -27,7 +27,7 @@ import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/Exp
 import { FilterPill } from '@/components/interfaces/QueryPerformance/components/FilterPill'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { FilterPopover } from '@/components/ui/FilterPopover'
-import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -341,7 +341,7 @@ export const QueryInsightsTable = ({
               options={['explorer', 'triage']}
               activeOption={mode}
               borderOverride="border"
-              onClickOption={setMode}
+              onClickOption={(mode) => setMode(mode as Mode)}
             />
             {appNameFilter.length > 0 ? (
               <FilterPill
