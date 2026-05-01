@@ -69,10 +69,7 @@ export const Addons = () => {
 
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const { data: selectedProject } = useSelectedProjectQuery()
-  const { data: parentProject } = useProjectDetailQuery({
-    ref: selectedProject?.parent_project_ref,
-  })
-  const isBranch = parentProject !== undefined
+  const isBranch = selectedProject?.parent_project_ref
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
@@ -205,7 +202,7 @@ export const Addons = () => {
           >
             Updating add-ons here will only apply to this preview branch. To manage add-ons for your
             main branch, please visit the{' '}
-            <InlineLink href={`/project/${parentProject.ref}/settings/addons`}>
+            <InlineLink href={`/project/${selectedProject.parent_project_ref}/settings/addons`}>
               main branch
             </InlineLink>
             .

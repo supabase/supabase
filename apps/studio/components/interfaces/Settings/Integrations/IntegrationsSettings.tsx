@@ -6,7 +6,6 @@ import { VercelSection } from './VercelIntegration/VercelSection'
 import { SidePanelVercelProjectLinker } from '@/components/interfaces/Organization/IntegrationSettings/SidePanelVercelProjectLinker'
 import { ScaffoldContainer, ScaffoldDivider } from '@/components/layouts/Scaffold'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
@@ -23,7 +22,6 @@ export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' 
 
 export const IntegrationSettings = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
   const isBranch = project?.parent_project_ref !== undefined
 
   const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
@@ -42,7 +40,7 @@ export const IntegrationSettings = () => {
             title="You are currently on a preview branch of your project"
           >
             To adjust your project's integration settings, you may return to your{' '}
-            <InlineLink href={`/project/${parentProject?.ref}/settings/integrations`}>
+            <InlineLink href={`/project/${project.parent_project_ref}/settings/integrations`}>
               main branch
             </InlineLink>
             .
