@@ -7,6 +7,7 @@ const SITE_ID = `${CANONICAL_ORIGIN}/#website`
 const ORG_SAMEAS = [
   'https://github.com/supabase',
   'https://twitter.com/supabase',
+  'https://www.linkedin.com/company/supabase',
   'https://youtube.com/c/supabase',
   'https://discord.supabase.com/',
   'https://www.tiktok.com/@supabase.com',
