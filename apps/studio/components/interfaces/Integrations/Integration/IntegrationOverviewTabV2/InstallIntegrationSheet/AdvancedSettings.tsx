@@ -59,7 +59,7 @@ export const AdvancedSettings = ({
           <AccordionTrigger_Shadcn_ className="font-normal gap-2 py-0 justify-between text-sm hover:no-underline">
             Advanced settings
           </AccordionTrigger_Shadcn_>
-          <AccordionContent_Shadcn_ className="!pb-0 pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
+          <AccordionContent_Shadcn_ className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
             <p className="text-foreground-light">
               Select which schemas to install the database extensions under
             </p>

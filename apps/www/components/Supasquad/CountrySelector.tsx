@@ -170,7 +170,7 @@ export function CountrySelector({
 }: CountrySelectorProps) {
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger className="w-full !bg-foreground/[.026]">
+      <SelectTrigger className="w-full bg-foreground/[.026]!">
         <SelectValue placeholder={placeholder}>
           {value && (
             <span className="flex items-center gap-2">

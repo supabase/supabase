@@ -231,7 +231,7 @@ export const Grid = memo(
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1] pointer-events-none'
+                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-1 pointer-events-none'
               )}
             >
               {isLoading && !isDisabled && (

@@ -429,7 +429,7 @@ export default function SqlToRest({
               {relevantFaqs.map((faq) => (
                 <Collapsible
                   key={faq.id}
-                  className="flex flex-col items-stretch justify-start bg-surface-100 rounded border border-default px-4"
+                  className="flex flex-col items-stretch justify-start bg-surface-100 rounded-sm border border-default px-4"
                 >
                   <Collapsible.Trigger asChild>
                     <button

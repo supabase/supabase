@@ -34,7 +34,7 @@ function ExampleCard(props: any) {
       <Panel outerClassName="h-full" innerClassName="bg-surface-75 group/panel" hasActiveOnHover>
         <div className="flex flex-col justify-between">
           {props.tags && (
-            <div className="relative w-full aspect-[3/1] bg flex items-center justify-center gap-4 overflow-hidden">
+            <div className="relative w-full aspect-3/1 bg flex items-center justify-center gap-4 overflow-hidden">
               {props.tags.map((tag: string) => {
                 const framework = frameworks.find((f) => f.name === tag)
                 if (!framework) return null
@@ -112,11 +112,11 @@ function ExampleCard(props: any) {
                 <Button
                   size="tiny"
                   type="text"
-                  className="group overflow-hidden text-foreground-lighter group-hover/panel:text-foreground !bg-transparent !p-0"
+                  className="group overflow-hidden text-foreground-lighter group-hover/panel:text-foreground bg-transparent! p-0!"
                   iconRight={
                     <div className="relative w-3.5 h-3.5 flex items-center justify-center">
                       <ArrowUpRight className="absolute w-3.5 h-3.5 inset-0 transition-transform duration-200 translate-x-0 translate-y-0 group-hover/panel:translate-x-6 group-hover/panel:-translate-y-6" />
-                      <ArrowUpRight className="absolute w-3.5 h-3.5 inset-0 transition-transform duration-200 -translate-x-6 translate-y-6 group-hover/panel:translate-x-0 group-hover/panel:-translate-y-0" />
+                      <ArrowUpRight className="absolute w-3.5 h-3.5 inset-0 transition-transform duration-200 -translate-x-6 translate-y-6 group-hover/panel:translate-x-0 group-hover/panel:translate-y-0" />
                     </div>
                   }
                 >

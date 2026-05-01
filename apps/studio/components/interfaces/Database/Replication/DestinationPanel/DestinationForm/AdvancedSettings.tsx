@@ -47,7 +47,7 @@ export const AdvancedSettings = ({
               </span>
             </div>
           </AccordionTrigger_Shadcn_>
-          <AccordionContent_Shadcn_ className="!pb-0 pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
+          <AccordionContent_Shadcn_ className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
             {/* Batch wait time - applies to all destinations */}
             <FormField
               control={form.control}

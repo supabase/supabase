@@ -123,7 +123,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
           <DocsButton
             abbrev={false}
             className="w-min mt-4"
-            href={`${DOCS_URL}/guides/database/hardening-data-api`}
+            href={`${DOCS_URL}/guides/api/using-custom-schemas`}
           />
         </DialogSection>
 

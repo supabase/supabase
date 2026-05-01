@@ -223,7 +223,7 @@ export function JitDbAccessRuleSheet({
         <SheetContent
           showClose={false}
           size="default"
-          className="flex h-full w-full max-w-full flex-col gap-0 sm:!w-[560px] sm:max-w-[560px]"
+          className="flex h-full w-full max-w-full flex-col gap-0 sm:w-[560px]! sm:max-w-[560px]"
         >
           <SheetHeader>
             <SheetTitle>

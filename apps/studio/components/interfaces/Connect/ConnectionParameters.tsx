@@ -27,12 +27,12 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
     <Collapsible_Shadcn_ open={isOpen} onOpenChange={setIsOpen} className="group -space-y-px">
       <CollapsibleTrigger_Shadcn_
         asChild
-        className="w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none data-[state=open]:border-light border-light px-3"
+        className="w-full justify-start rounded-t-none !last:rounded-b group-data-open:rounded-b-none data-[state=open]:border-light border-light px-3"
       >
         <Button
           type="default"
           size="tiny"
-          className="text-foreground-lighter !bg-dash-sidebar"
+          className="text-foreground-lighter bg-dash-sidebar!"
           icon={
             <ChevronRight
               className={cn(
@@ -64,7 +64,7 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
                   className={cn(
                     'text-foreground-lighter',
                     'ml-2 opacity-0 group-hover/param:opacity-100',
-                    'hover:text-foreground rounded-sm p-1',
+                    'hover:text-foreground rounded-xs p-1',
                     copiedMap[param.key] && 'opacity-100',
                     'transition-all'
                   )}

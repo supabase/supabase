@@ -56,8 +56,8 @@ export function EventList() {
         <div key={`group-${date}`} className="flex flex-col gap-y-2 relative">
           <div
             className={cn(
-              'absolute top-2 -left-[calc(48px+11px)] rounded-full size-1.5',
-              index === 0 ? 'bg-brand size-2 -left-[calc(48px+12px)]' : 'bg-foreground-muted'
+              'absolute top-2 left-[-59px] rounded-full size-1.5',
+              index === 0 ? 'bg-brand size-2 left-[-60px]' : 'bg-foreground-muted'
             )}
           />
 
@@ -108,7 +108,7 @@ export function EventList() {
                   </div>
 
                   <div className="flex gap-2 items-center text-sm text-foreground-light">
-                    <div className="size-5 rounded-full border bg-gradient-to-br from-background-surface-100 to-background-surface-200 relative">
+                    <div className="size-5 rounded-full border bg-linear-to-br from-background-surface-100 to-background-surface-200 relative">
                       {event.hosts[0]?.avatar_url && (
                         <img
                           src={event.hosts[0].avatar_url}
@@ -159,9 +159,9 @@ const EventListSkeleton = () => {
     <div className="flex flex-col gap-y-8">
       {[1, 2, 3].map((groupIdx) => (
         <div key={`skeleton-group-${groupIdx}`} className="flex flex-col gap-y-2 relative">
-          <div className="absolute top-2 -left-[calc(48px+11px)] rounded-full size-1.5 bg-foreground-muted" />
+          <div className="absolute top-2 left-[-59px] rounded-full size-1.5 bg-foreground-muted" />
 
-          <div className="h-6 bg-surface-200 rounded animate-pulse w-64" />
+          <div className="h-6 bg-surface-200 rounded-sm animate-pulse w-64" />
 
           <div className="flex flex-col gap-y-4">
             {[1, 2, 3, 4].map((eventIdx) => (
@@ -170,11 +170,11 @@ const EventListSkeleton = () => {
                 className="bg-surface-100 border rounded-md p-3 flex justify-between items-start"
               >
                 <div className="flex flex-col gap-2 flex-1">
-                  <div className="h-6 bg-surface-200 rounded animate-pulse w-3/4" />
+                  <div className="h-6 bg-surface-200 rounded-sm animate-pulse w-3/4" />
 
                   <div className="flex gap-2 items-center">
                     <div className="size-5 rounded-full bg-surface-200 animate-pulse" />
-                    <div className="h-4 bg-surface-200 rounded animate-pulse w-32" />
+                    <div className="h-4 bg-surface-200 rounded-sm animate-pulse w-32" />
                   </div>
                 </div>
 

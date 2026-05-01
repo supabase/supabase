@@ -329,8 +329,8 @@ export const ReplicationPipelineStatus = () => {
         {(isPipelineLoading || isStatusLoading) && (
           <div className="space-y-3">
             <div className="flex items-center gap-x-3">
-              <div className="h-6 w-40 rounded bg-surface-200" />
-              <div className="h-5 w-24 rounded bg-surface-200" />
+              <div className="h-6 w-40 rounded-sm bg-surface-200" />
+              <div className="h-5 w-24 rounded-sm bg-surface-200" />
             </div>
             <GenericSkeletonLoader />
           </div>
@@ -369,7 +369,7 @@ export const ReplicationPipelineStatus = () => {
                       reconciling with the overall pipeline.
                     </span>
                   </div>
-                  <div className="rounded border border-default/50 bg-surface-200/40">
+                  <div className="rounded-sm border border-default/50 bg-surface-200/40">
                     <ul className="divide-y divide-default/40">
                       {tablesWithLag.map((table) => (
                         <li key={`${table.table_id}-${table.table_name}`} className="px-3 py-2">
@@ -414,7 +414,7 @@ export const ReplicationPipelineStatus = () => {
                 <Button
                   size="tiny"
                   type="default"
-                  className="rounded-r-none hover:z-[2]"
+                  className="rounded-r-none hover:z-2"
                   icon={<RotateCcw />}
                   disabled={isAnyRestartInProgress || showDisabledState || isPipelineError}
                   loading={isAnyRestartInProgress}
@@ -430,7 +430,7 @@ export const ReplicationPipelineStatus = () => {
                     <Button
                       type="default"
                       icon={<ChevronDown />}
-                      className="w-7 rounded-l-none -ml-[1px]"
+                      className="w-7 rounded-l-none -ml-px"
                       disabled={showDisabledState || isPipelineError}
                     />
                   </DropdownMenuTrigger>

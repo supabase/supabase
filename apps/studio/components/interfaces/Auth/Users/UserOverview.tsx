@@ -213,12 +213,12 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           <RowData property="SSO" value={user.is_sso_user} />
         </div>
 
-        <div className={cn('flex flex-col !pt-0', PANEL_PADDING)}>
+        <div className={cn('flex flex-col pt-0!', PANEL_PADDING)}>
           <p>Provider Information</p>
           <p className="text-sm text-foreground-light">The user has the following providers</p>
         </div>
 
-        <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
+        <div className={cn('flex flex-col -space-y-1 pt-0!', PANEL_PADDING)}>
           {providers.map((provider) => {
             const providerMeta = PROVIDERS_SCHEMAS.find(
               (x) =>
@@ -378,7 +378,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           </p>
         </div>
 
-        <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
+        <div className={cn('flex flex-col -space-y-1 pt-0!', PANEL_PADDING)}>
           <RowAction
             title="Remove MFA factors"
             description="Removes all MFA factors associated with the user"

@@ -9,7 +9,7 @@ const color = require('./../ui/build/css/tw-extend/color')
  */
 let colorExtend = {}
 Object.values(color).map((x, i) => {
-  colorExtend[Object.keys(color)[i]] = `hsl(${x.cssVariable} / <alpha-value>)` // x.cssVariable
+  colorExtend[Object.keys(color)[i]] = `hsl(${x.cssVariable})` // x.cssVariable
 })
 
 // console.log('colorExtend', colorExtend)
@@ -19,7 +19,6 @@ Object.values(color).map((x, i) => {
 
 /**
  * Generates Tailwind colors for the theme
- * adds <alpha-value> as part of the hsl value
  */
 function generateTwColorClasses(globalKey, twAttributes) {
   let classes = {}
@@ -30,7 +29,7 @@ function generateTwColorClasses(globalKey, twAttributes) {
       const keySplit = attrKey.split('-').splice(1).join('-')
 
       let payload = {
-        [keySplit]: `hsl(${attr.cssVariable} / <alpha-value>)`,
+        [keySplit]: `hsl(${attr.cssVariable})`,
       }
 
       if (keySplit == 'DEFAULT') {
@@ -38,7 +37,7 @@ function generateTwColorClasses(globalKey, twAttributes) {
         // this allows for classes like `border-default` which is the same as `border`
         payload = {
           ...payload,
-          default: `hsl(${attr.cssVariable} / <alpha-value>)`,
+          default: `hsl(${attr.cssVariable})`,
         }
       }
 
@@ -102,7 +101,7 @@ const uiConfig = ui({
       /*
        * custom background re-maps
        */
-      studio: `hsl(var(--background-200)/ <alpha-value>)`,
+      studio: `hsl(var(--background-200))`,
     }),
     borderColor: (theme) => ({
       ...theme('colors'),
@@ -436,6 +435,13 @@ const uiConfig = ui({
     require('./tailwind-plugins/motion-safe-transition'),
     function ({ addVariant }) {
       addVariant('not-disabled', '&:not(:disabled)')
+    },
+    function ({ addUtilities }) {
+      // The bg class worked in Tailwind 3, but stopped working in TW 4. This is a custom utility to add it back in, as
+      // it's used in a lot of places across the codebase. We should deprecate it and use `bg-default` instead.
+      addUtilities({
+        '.bg': { backgroundColor: 'hsl(var(--background-default))' },
+      })
     },
   ],
 })

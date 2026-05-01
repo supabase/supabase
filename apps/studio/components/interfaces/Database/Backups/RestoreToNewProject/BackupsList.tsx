@@ -36,7 +36,7 @@ export const BackupsList = ({ onSelectRestore, disabled, hasAccess }: BackupsLis
                       displayAs="utc"
                       utcTimestamp={backup.inserted_at}
                       labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-                      className="text-left !text-sm font-mono tracking-tight"
+                      className="text-left text-sm! font-mono tracking-tight"
                     />
                   </div>
                   <div>

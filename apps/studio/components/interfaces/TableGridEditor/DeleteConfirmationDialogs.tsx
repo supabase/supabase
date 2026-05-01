@@ -264,7 +264,7 @@ const DeleteConfirmationDialogs = ({
         size="small"
         visible={snap.confirmationDialog?.type === 'table'}
         title={
-          <span className="break-words">{`Confirm deletion of table "${selectedTable?.name}"`}</span>
+          <span className="wrap-break-word">{`Confirm deletion of table "${selectedTable?.name}"`}</span>
         }
         confirmLabel="Delete"
         confirmLabelLoading="Deleting"
@@ -325,7 +325,7 @@ const DeleteConfirmationDialogs = ({
         size="small"
         visible={snap.confirmationDialog?.type === 'row'}
         title={
-          <p className="break-words">
+          <p className="wrap-break-word">
             <span>Confirm to delete the selected row</span>
             <span>{numRows > 1 && 's'}</span>
           </p>

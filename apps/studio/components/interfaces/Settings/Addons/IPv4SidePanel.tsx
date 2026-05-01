@@ -75,7 +75,7 @@ const IPv4SidePanel = () => {
       priceContent: (
         <>
           <p className="text-foreground text-sm">$0</p>
-          <p className="text-foreground-light translate-y-[1px] text-sm">/ month</p>
+          <p className="text-foreground-light translate-y-px text-sm">/ month</p>
         </>
       ),
       priceRowClassName: 'mt-2',
@@ -166,7 +166,7 @@ const IPv4SidePanel = () => {
           )}
 
           {isAws && (
-            <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
+            <div className={cn('mt-8! pb-4', !hasAccessToIPv4 && 'opacity-75')}>
               <RadioGroup
                 name="ipv4"
                 value={selectedOption}

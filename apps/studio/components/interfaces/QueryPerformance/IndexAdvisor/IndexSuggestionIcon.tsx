@@ -104,7 +104,7 @@ export const IndexSuggestionIcon = ({
             className={cn(
               'border-none rounded-none',
               'max-w-full',
-              '!py-0.5 !px-3.5 prose dark:prose-dark transition',
+              'py-0.5! px-3.5! prose dark:prose-dark transition',
               '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
             )}
           />

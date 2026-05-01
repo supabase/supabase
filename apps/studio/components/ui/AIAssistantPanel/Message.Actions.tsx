@@ -37,7 +37,7 @@ function MessageActionsEdit({ onClick, tooltip }: { onClick: () => void; tooltip
       type="text"
       icon={<Pencil size={14} strokeWidth={1.5} />}
       onClick={onClick}
-      className="text-foreground-light hover:text-foreground p-1 rounded"
+      className="text-foreground-light hover:text-foreground p-1 rounded-sm"
       aria-label={tooltip}
       tooltip={{
         content: {
@@ -57,7 +57,7 @@ function MessageActionsDelete({ onClick }: { onClick: () => void }) {
       icon={<Trash2 size={14} strokeWidth={1.5} />}
       tooltip={{ content: { side: 'bottom', text: 'Delete message' } }}
       onClick={onClick}
-      className="text-foreground-light hover:text-foreground p-1 rounded"
+      className="text-foreground-light hover:text-foreground p-1 rounded-sm"
       title="Delete message"
       aria-label="Delete message"
     />
@@ -90,7 +90,10 @@ function MessageActionsThumbsUp({
         />
       }
       onClick={onClick}
-      className={cn('p-1 rounded transition-colors', disabled && 'opacity-50 pointer-events-none')}
+      className={cn(
+        'p-1 rounded-sm transition-colors',
+        disabled && 'opacity-50 pointer-events-none'
+      )}
       title="Good response"
       aria-label="Good response"
     />
@@ -155,7 +158,7 @@ function MessageActionsThumbsDown({
           disabled={disabled}
           onClick={() => !disabled && setOpen(true)}
           className={cn(
-            'p-1 rounded transition-colors',
+            'p-1 rounded-sm transition-colors',
             disabled && 'opacity-50 pointer-events-none'
           )}
           title="Bad response"

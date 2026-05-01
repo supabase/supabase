@@ -24,8 +24,13 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { MultiSelectOption } from 'ui-patterns/MultiSelectDeprecated'
-import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
+import {
+  MultiSelector,
+  MultiSelectorContent,
+  MultiSelectorItem,
+  MultiSelectorList,
+  MultiSelectorTrigger,
+} from 'ui-patterns/multi-select'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { INDEX_TYPES } from './Indexes.constants'
@@ -101,7 +106,7 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
   }
 
   const columns = tableColumns?.[0]?.columns ?? []
-  const columnOptions: MultiSelectOption[] = columns
+  const columnOptions = columns
     .filter((column): column is NonNullable<typeof column> => column !== null)
     .map((column) => ({
       id: column.attname,
@@ -206,7 +211,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                     onValueChange={setSchemaSearchTerm}
                   />
                   <CommandList_Shadcn_
-                    className={cn((schemas ?? []).length > 7 && '!max-h-[210px] overflow-y-auto')}
+                    className={cn((schemas ?? []).length > 7 && 'max-h-[210px]! overflow-y-auto')}
                     onWheel={(event) => event.stopPropagation()}
                   >
                     <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
@@ -287,7 +292,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                     onValueChange={handleSearchChange}
                   />
                   <CommandList_Shadcn_
-                    className={cn(entityTypes.length > 7 && '!max-h-[210px] overflow-y-auto')}
+                    className={cn(entityTypes.length > 7 && 'max-h-[210px]! overflow-y-auto')}
                     onWheel={(event) => event.stopPropagation()}
                   >
                     <CommandEmpty_Shadcn_>
@@ -328,16 +333,36 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
           </FormItemLayout>
 
           {selectedEntity && (
-            <FormItemLayout label="Select up to 32 columns" isReactForm={false}>
+            <FormItemLayout id="columns" label="Select up to 32 columns" isReactForm={false}>
               {isLoadingTableColumns && <ShimmeringLoader className="py-4" />}
               {isSuccessTableColumns && (
-                <MultiSelectV2
-                  options={columnOptions}
-                  placeholder="Choose which columns to create an index on"
-                  searchPlaceholder="Search for a column"
-                  value={selectedColumns}
-                  onChange={setSelectedColumns}
-                />
+                <MultiSelector values={selectedColumns} onValuesChange={setSelectedColumns}>
+                  <MultiSelectorTrigger
+                    id="columns"
+                    mode="inline-combobox"
+                    label={
+                      selectedColumns.length === 0
+                        ? 'Choose which columns to create an index on'
+                        : 'Search for a column'
+                    }
+                    deletableBadge
+                    badgeLimit="wrap"
+                    showIcon={false}
+                  />
+                  <MultiSelectorContent>
+                    <MultiSelectorList>
+                      {columnOptions.map((option) => (
+                        <MultiSelectorItem
+                          key={option.id}
+                          value={option.value}
+                          disabled={option.disabled}
+                        >
+                          {option.name}
+                        </MultiSelectorItem>
+                      ))}
+                    </MultiSelectorList>
+                  </MultiSelectorContent>
+                </MultiSelector>
               )}
             </FormItemLayout>
           )}
@@ -371,7 +396,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                             <span>{index.name}</span>
                             {index.description.split('\n').map((x, idx) => (
                               <span
-                                className="text-foreground-lighter group-focus:text-foreground-light group-data-[state=checked]:text-foreground-light"
+                                className="text-foreground-lighter group-focus:text-foreground-light group-data-checked:text-foreground-light"
                                 key={`${index.value}-description-${idx}`}
                               >
                                 {x}
@@ -388,7 +413,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
               {isOrioleDb && (
                 <Admonition
                   type="default"
-                  className="!mt-2"
+                  className="mt-2!"
                   title="OrioleDB currently only supports the B-tree index type"
                   description="More index types may be supported when OrioleDB is no longer in preview"
                 >
@@ -414,7 +439,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 </Button>
               </div>
             </SidePanel.Content>
-            <div className="h-[200px] !mt-2">
+            <div className="h-[200px] mt-2!">
               <div className="relative h-full">
                 <CodeEditor
                   isReadOnly

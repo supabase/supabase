@@ -13,7 +13,7 @@ export function RLSDisableModalContent() {
       <div className="grid gap-1">
         <Alert
           variant="warning"
-          className="!px-4 !py-3"
+          className="px-4! py-3!"
           title="This table will be publicly readable and writable"
           withIcon
         >

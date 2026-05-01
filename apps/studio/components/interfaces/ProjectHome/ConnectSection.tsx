@@ -69,7 +69,7 @@ export const ConnectSection = () => {
             alt=""
             className="w-full h-full object-cover object-right dark:hidden"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-r from-background-alternative to-transparent" />
         </div>
 
         <CardContent className="relative z-10 p-0">
@@ -84,7 +84,7 @@ export const ConnectSection = () => {
                 onClick={() => handleActionClick(action)}
                 className={cn(
                   'group flex items-center gap-3 p-4 text-left transition-colors min-h-[72px] w-full',
-                  'hover:bg-surface-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
+                  'hover:bg-surface-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand',
                   'xl:min-h-32 xl:flex-col xl:justify-center xl:p-6 xl:text-center',
                   ((action.requiresActiveProject ?? true)
                     ? !isActiveHealthy

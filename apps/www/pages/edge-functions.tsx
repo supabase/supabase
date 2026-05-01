@@ -56,7 +56,7 @@ function EdgeFunctions() {
         />
         <SingleQuote
           id="quote"
-          className="!pb-8 md:!pb-12 [&_q]:max-w-2xl"
+          className="pb-8! md:pb-12! [&_q]:max-w-2xl"
           quote={{
             text: "Supabase gave us the flexibility and scalability needed at every growth stage. It's rare to find a tool that works just as well for startups as it does for large-scale operations.",
             author: 'Zeno Rocha',
@@ -75,7 +75,7 @@ function EdgeFunctions() {
           }}
         />
         <div className="overflow-hidden">
-          <SectionContainer className="flex flex-col gap-4 lg:gap-8 !pb-0" id="examples">
+          <SectionContainer className="flex flex-col gap-4 lg:gap-8 pb-0!" id="examples">
             <ExamplesCarousel {...pageData.examplesSection} />
           </SectionContainer>
         </div>
@@ -103,7 +103,7 @@ function EdgeFunctions() {
             <TimedAccordionSection tabs={pageData.integratesWithSupabase.useCases} />
           </SectionContainer>
         </div>
-        <ProductsCta currentProduct={PRODUCT_SHORTNAMES.FUNCTIONS} className="!pt-0 lg:!pt-16" />
+        <ProductsCta currentProduct={PRODUCT_SHORTNAMES.FUNCTIONS} className="pt-0! lg:pt-16!" />
       </DefaultLayout>
     </>
   )
