@@ -85,7 +85,7 @@ export const RowContextMenuContent = ({
   }, [getRowAndColumn])
 
   return (
-    <DropdownMenuContent className="w-36 min-w-36!">
+    <DropdownMenuContent align="start" side="right" sideOffset={0} className="w-36 min-w-36!">
       <DropdownMenuItem className="gap-x-2" onSelect={onCopyCellContent}>
         <Copy size={12} />
         <span className="text-xs">Copy cell</span>
