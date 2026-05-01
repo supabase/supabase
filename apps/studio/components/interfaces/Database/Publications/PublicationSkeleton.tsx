@@ -1,5 +1,4 @@
-import { useParams } from 'common'
-import { cn, Switch, TableCell, TableRow } from 'ui'
+import { Switch, TableCell, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface PublicationSkeletonProps {
