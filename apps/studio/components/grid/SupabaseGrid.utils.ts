@@ -299,6 +299,7 @@ export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
       !event.altKey &&
       !event.ctrlKey &&
       !event.metaKey &&
+      !event.shiftKey &&
       column.renderEditCell != null
     ) {
       event.stopPropagation()
