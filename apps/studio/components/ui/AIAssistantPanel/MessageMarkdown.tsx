@@ -272,8 +272,6 @@ export const MarkdownPre = ({
               xAxis: xAxis ?? '',
               yAxis: yAxis ?? '',
             }}
-            onError={() => {}}
-            showConfirmFooter={false}
             onChartConfigChange={(config) => {
               chartConfig.current = { ...config }
             }}

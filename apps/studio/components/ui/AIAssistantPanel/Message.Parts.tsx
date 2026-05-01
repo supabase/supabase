@@ -1,6 +1,9 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
+import { useQueryClient } from '@tanstack/react-query'
 import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type ToolUIPart } from 'ai'
+import { useParams } from 'common'
 import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
+import { useEffect } from 'react'
 import { cn } from 'ui'
 
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
@@ -13,6 +16,8 @@ import {
   parseExecuteSqlChartResult,
 } from './Message.utils'
 import { MessageMarkdown } from './MessageMarkdown'
+import { entityTypeKeys } from '@/data/entity-types/keys'
+import { lintKeys } from '@/data/lint/keys'
 
 function MessagePartText({ textPart }: { textPart: TextUIPart }) {
   const { id, isLoading, readOnly, isUserMessage, state } = useMessageInfoContext()
@@ -111,9 +116,20 @@ function MessagePartExecuteSql({
   isLastPart?: boolean
 }) {
   const { id, isLastMessage } = useMessageInfoContext()
-  const { addToolResult } = useMessageActionsContext()
+  const { addToolApprovalResponse } = useMessageActionsContext()
+  const queryClient = useQueryClient()
+  const { ref } = useParams()
 
   const { toolCallId, state, input, output } = toolPart
+
+  // Invalidate write-related queries once a write SQL result is available
+  useEffect(() => {
+    if (state !== 'output-available') return
+    const isWriteQuery = (input as any)?.isWriteQuery
+    if (!isWriteQuery || !ref) return
+    queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
+    queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(ref) })
+  }, [state, input, ref, queryClient])
 
   if (state === 'input-streaming') {
     return <ToolDisplayExecuteSqlLoading />
@@ -126,7 +142,11 @@ function MessagePartExecuteSql({
   const { data: chart, success } = parseExecuteSqlChartResult(input)
   if (!success) return null
 
-  if (state === 'input-available' || state === 'output-available') {
+  if (
+    state === 'approval-requested' ||
+    state === 'input-available' ||
+    state === 'output-available'
+  ) {
     return (
       <div className="w-auto overflow-x-hidden my-4 space-y-2">
         <DisplayBlockRenderer
@@ -144,21 +164,11 @@ function MessagePartExecuteSql({
           toolState={state}
           isLastPart={isLastPart}
           isLastMessage={isLastMessage}
-          onResults={(args: { messageId: string; results: unknown }) => {
-            const results = args.results as any[]
-
-            addToolResult?.({
-              tool: 'execute_sql',
-              toolCallId: String(toolCallId),
-              output: results,
-            })
+          onApprove={() => {
+            addToolApprovalResponse?.({ id: toolCallId, approved: true })
           }}
-          onError={({ errorText }) => {
-            addToolResult?.({
-              tool: 'execute_sql',
-              toolCallId: String(toolCallId),
-              output: `Error: ${errorText}`,
-            })
+          onDeny={() => {
+            addToolApprovalResponse?.({ id: toolCallId, approved: false })
           }}
         />
       </div>
@@ -168,11 +178,15 @@ function MessagePartExecuteSql({
   return null
 }
 
-const TOOL_DEPLOY_EDGE_FUNCTION_STATES_WITH_INPUT = new Set(['input-available', 'output-available'])
+const TOOL_DEPLOY_EDGE_FUNCTION_STATES_WITH_INPUT = new Set([
+  'approval-requested',
+  'input-available',
+  'output-available',
+])
 
 function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
   const { toolCallId, state, input, output } = toolPart
-  const { addToolResult } = useMessageActionsContext()
+  const { addToolApprovalResponse } = useMessageActionsContext()
 
   if (state === 'input-streaming') {
     return (
@@ -201,15 +215,10 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
       label={parsedInput.data.label}
       code={parsedInput.data.code}
       functionName={parsedInput.data.functionName}
-      showConfirmFooter={!output}
+      showApprovalFooter={state === 'approval-requested'}
       initialIsDeployed={isInitiallyDeployed}
-      onDeployed={(result) => {
-        addToolResult?.({
-          tool: 'deploy_edge_function',
-          toolCallId: String(toolCallId),
-          output: result,
-        })
-      }}
+      onApprove={() => addToolApprovalResponse?.({ id: toolCallId, approved: true })}
+      onDeny={() => addToolApprovalResponse?.({ id: toolCallId, approved: false })}
     />
   )
 }

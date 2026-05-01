@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useRef, useState, type DragEvent, type PropsWithChildren } from 'react'
@@ -8,10 +7,6 @@ import { DEFAULT_CHART_CONFIG, QueryBlock } from '../QueryBlock/QueryBlock'
 import { identifyQueryType } from './AIAssistant.utils'
 import { ConfirmFooter } from './ConfirmFooter'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import { entityTypeKeys } from '@/data/entity-types/keys'
-import { lintKeys } from '@/data/lint/keys'
-import { usePrimaryDatabase } from '@/data/read-replicas/replicas-query'
-import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useChangedSync } from '@/hooks/misc/useChanged'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -19,7 +14,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useProfile } from '@/lib/profile'
 
 interface DisplayBlockRendererProps {
-  messageId: string
+  messageId?: string
   toolCallId: string
   initialArgs: {
     sql: string
@@ -30,33 +25,32 @@ interface DisplayBlockRendererProps {
     yAxis?: string
   }
   initialResults?: unknown
-  onResults?: (args: { messageId: string; results: unknown }) => void
-  onError?: (args: { messageId: string; errorText: string }) => void
-  toolState?: 'input-streaming' | 'input-available' | 'output-available' | 'output-error'
+  onApprove?: () => void
+  onDeny?: () => void
+  toolState?:
+    | 'input-streaming'
+    | 'input-available'
+    | 'approval-requested'
+    | 'output-available'
+    | 'output-error'
   isLastPart?: boolean
   isLastMessage?: boolean
-  showConfirmFooter?: boolean
   onChartConfigChange?: (chartConfig: ChartConfig) => void
   onQueryRun?: (queryType: 'select' | 'mutation') => void
 }
 
 export const DisplayBlockRenderer = ({
-  messageId,
   toolCallId,
   initialArgs,
   initialResults,
-  onResults,
-  onError,
+  onApprove,
+  onDeny,
   toolState,
   isLastPart = false,
   isLastMessage = false,
-  showConfirmFooter = true,
   onChartConfigChange,
   onQueryRun,
 }: PropsWithChildren<DisplayBlockRendererProps>) => {
-  const queryClient = useQueryClient()
-
-  const savedInitialArgs = useRef(initialArgs)
   const savedInitialResults = useRef(initialResults)
   const savedInitialConfig = useRef<ChartConfig>({
     ...DEFAULT_CHART_CONFIG,
@@ -94,29 +88,13 @@ export const DisplayBlockRenderer = ({
   const isHomePage = router.pathname === '/project/[ref]'
   const isDraggableToReports = canCreateSQLSnippet && (isReportsPage || isHomePage)
   const label = initialArgs.label || 'SQL Results'
-  const [isWriteQuery, setIsWriteQuery] = useState<boolean>(initialArgs.isWriteQuery || false)
+  const isWriteQuery = initialArgs.isWriteQuery || false
   const sqlQuery = initialArgs.sql
-
-  const { database: primaryDatabase } = usePrimaryDatabase({ projectRef: ref })
-
-  const readOnlyConnectionString = primaryDatabase?.connection_string_read_only
-  const postgresConnectionString = primaryDatabase?.connectionString
-
-  const {
-    mutate: executeSql,
-    error: executeSqlError,
-    isPending: executeSqlLoading,
-  } = useExecuteSqlMutation({
-    onError: () => {
-      // Suppress toast because error message is displayed inline
-    },
-  })
 
   const toolCallIdChanged = useChangedSync(toolCallId)
   if (toolCallIdChanged) {
     setChartConfig(savedInitialConfig.current)
     onChartConfigChange?.(savedInitialConfig.current)
-    setIsWriteQuery(savedInitialArgs.current.isWriteQuery || false)
     setRows(Array.isArray(savedInitialResults.current) ? savedInitialResults.current : undefined)
   }
 
@@ -129,9 +107,7 @@ export const DisplayBlockRenderer = ({
 
   const handleRunQuery = (queryType: 'select' | 'mutation') => {
     if (!sqlQuery) return
-
     onQueryRun?.(queryType)
-
     sendEvent({
       action: 'assistant_suggestion_run_query_clicked',
       properties: {
@@ -143,60 +119,6 @@ export const DisplayBlockRenderer = ({
         organization: org?.slug ?? 'Unknown',
       },
     })
-  }
-
-  const runQuery = (queryType: 'select' | 'mutation') => {
-    if (!ref || !sqlQuery) return
-
-    const connectionString =
-      queryType === 'mutation'
-        ? postgresConnectionString
-        : (readOnlyConnectionString ?? postgresConnectionString)
-
-    if (!connectionString) {
-      const fallbackMessage = 'Unable to find a database connection to execute this query.'
-      onError?.({ messageId, errorText: fallbackMessage })
-      return
-    }
-
-    if (queryType === 'mutation') {
-      setIsWriteQuery(true)
-    }
-    executeSql(
-      { projectRef: ref, connectionString, sql: sqlQuery },
-      {
-        onSuccess: (data) => {
-          setRows(Array.isArray(data.result) ? data.result : undefined)
-          setIsWriteQuery(queryType === 'mutation' || initialArgs.isWriteQuery || false)
-          onResults?.({
-            messageId,
-            results: Array.isArray(data.result) ? data.result : undefined,
-          })
-          if (queryType === 'mutation') {
-            queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
-            queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(ref) })
-          }
-        },
-        onError: (error) => {
-          const lowerMessage = error.message.toLowerCase()
-          const isReadOnlyError =
-            lowerMessage.includes('read-only transaction') ||
-            lowerMessage.includes('permission denied') ||
-            lowerMessage.includes('must be owner')
-
-          if (queryType === 'select' && isReadOnlyError) {
-            setIsWriteQuery(true)
-          }
-
-          onError?.({ messageId, errorText: error.message })
-        },
-      }
-    )
-  }
-
-  const handleExecute = (queryType: 'select' | 'mutation') => {
-    handleRunQuery(queryType)
-    runQuery(queryType)
   }
 
   const handleUpdateChartConfig = ({
@@ -218,13 +140,7 @@ export const DisplayBlockRenderer = ({
     )
   }
 
-  const resolvedHasDecision = initialResults !== undefined || rows !== undefined
-  const shouldShowConfirmFooter =
-    showConfirmFooter &&
-    !resolvedHasDecision &&
-    toolState === 'input-available' &&
-    isLastPart &&
-    isLastMessage
+  const shouldShowConfirmFooter = toolState === 'approval-requested' && isLastPart && isLastMessage
 
   return (
     <div className="display-block w-auto overflow-x-hidden">
@@ -234,14 +150,12 @@ export const DisplayBlockRenderer = ({
           isWriteQuery={isWriteQuery}
           sql={sqlQuery}
           results={rows}
-          errorText={executeSqlError?.message}
           chartConfig={chartConfig}
-          onExecute={handleExecute}
+          onExecute={handleRunQuery}
           onUpdateChartConfig={handleUpdateChartConfig}
           draggable={isDraggableToReports}
           onDragStart={handleDragStart}
           disabled={shouldShowConfirmFooter}
-          isExecuting={executeSqlLoading}
         />
       </div>
       {shouldShowConfirmFooter && (
@@ -249,13 +163,11 @@ export const DisplayBlockRenderer = ({
           <ConfirmFooter
             message="Assistant wants to run this query"
             cancelLabel="Skip"
-            confirmLabel={executeSqlLoading ? 'Running...' : 'Run Query'}
-            isLoading={executeSqlLoading}
-            onCancel={async () => {
-              onResults?.({ messageId, results: 'User skipped running the query' })
-            }}
+            confirmLabel="Run Query"
+            onCancel={() => onDeny?.()}
             onConfirm={() => {
-              handleExecute(isWriteQuery ? 'mutation' : 'select')
+              handleRunQuery(isWriteQuery ? 'mutation' : 'select')
+              onApprove?.()
             }}
           />
         </div>

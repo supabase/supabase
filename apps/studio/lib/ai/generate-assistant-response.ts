@@ -73,7 +73,12 @@ export async function generateAssistantResponse({
         const cleanedParts = msg.parts
           .filter((part) => {
             if (isToolUIPart(part)) {
-              const invalidStates = ['input-streaming', 'input-available', 'output-error']
+              const invalidStates = [
+                'input-streaming',
+                'input-available',
+                'approval-requested',
+                'output-error',
+              ]
               return !invalidStates.includes(part.state)
             }
             return true
@@ -157,8 +162,46 @@ export async function generateAssistantResponse({
               }
             }
           }
+
+          // Skip output logging when ending on an approval boundary — Turn 1 has no
+          // result yet. Turn 2 (post-approval) will log the complete output instead.
+          const approvalPending = steps.some((step) =>
+            step.toolCalls.some(
+              (tc) =>
+                (tc.toolName === 'execute_sql' || tc.toolName === 'deploy_edge_function') &&
+                !step.toolResults.some((tr) => tr.toolCallId === tc.toolCallId)
+            )
+          )
+          if (approvalPending) {
+            span.end()
+            return
+          }
+
+          // For Turn 2, the approved tool execution happens before steps[] are recorded
+          // by the SDK. Recover those tool calls from the incoming message history so
+          // that eval scorers see the full picture.
+          const approvedToolNames: string[] = []
+          const approvedSqlQueries: string[] = []
+          for (const msg of rawMessages) {
+            if (msg.role !== 'assistant' || !msg.parts) continue
+            for (const part of msg.parts) {
+              if (!isToolUIPart(part)) continue
+              if (part.state !== 'approval-responded' && part.state !== 'output-available') continue
+              approvedToolNames.push(part.type.replace('tool-', ''))
+              if (part.type === 'tool-execute_sql') {
+                const sql = (part.input as any)?.sql
+                if (typeof sql === 'string') approvedSqlQueries.push(sql)
+              }
+            }
+          }
+
+          const baseOutput = buildAssistantEvalOutput(finishReason, steps)
           span.log({
-            output: buildAssistantEvalOutput(finishReason, steps) satisfies AssistantEvalOutput,
+            output: {
+              ...baseOutput,
+              toolNames: [...approvedToolNames, ...baseOutput.toolNames],
+              sqlQueries: [...approvedSqlQueries, ...baseOutput.sqlQueries],
+            } satisfies AssistantEvalOutput,
           })
           span.end()
         },
