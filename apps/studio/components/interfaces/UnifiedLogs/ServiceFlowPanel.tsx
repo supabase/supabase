@@ -71,6 +71,12 @@ export function ServiceFlowPanel({
     logType === 'edge function' ? 'edge-function' : (logType as ServiceFlowType)
   const shouldShowServiceFlow = !!serviceFlowType
 
+  useEffect(() => {
+    if (!shouldShowServiceFlow && activeTab === 'overview') {
+      setActiveTab('raw-json')
+    }
+  }, [shouldShowServiceFlow, activeTab])
+
   // Query the logs API directly
   const {
     data: serviceFlowData,

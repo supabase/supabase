@@ -46,10 +46,16 @@ export const ServiceFlowPanelControls = () => {
     const down = (e: KeyboardEvent) => {
       if (!selectedRowKey) return
 
-      // Prevent dropdown menu navigation from triggering row navigation
       const activeElement = document.activeElement
-      const isMenuActive = activeElement?.closest('[role="menu"]')
-      if (isMenuActive) return
+      if (activeElement?.closest('[role="menu"]')) return
+
+      const tag = activeElement?.tagName
+      const isEditable =
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        (activeElement as HTMLElement | null)?.isContentEditable ||
+        activeElement?.getAttribute('role') === 'textbox'
+      if (isEditable) return
 
       if (e.key === 'ArrowUp') {
         e.preventDefault()
