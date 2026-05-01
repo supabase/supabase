@@ -278,7 +278,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
             <Admonition
               type="default"
               className="rounded-none border-x-0 border-t-0"
-              title="Only relevant roles for managing queues via client libraries or PostgREST are shown here"
+              description="Only relevant roles for managing queues via client libraries or PostgREST are shown here."
             />
           )}
           <Table>

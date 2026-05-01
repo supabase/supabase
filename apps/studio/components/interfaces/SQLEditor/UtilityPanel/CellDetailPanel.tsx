@@ -4,7 +4,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from 'ui'
 
 import { Markdown } from '@/components/interfaces/Markdown'
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
-import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 
 interface CellDetailPanelProps {
   column: string
@@ -41,7 +41,7 @@ export const CellDetailPanel = ({ column, value, visible, onClose }: CellDetailP
                 options={['MD', 'view']}
                 activeOption={view}
                 borderOverride="border-muted"
-                onClickOption={setView}
+                onClickOption={(value) => setView(value as 'view' | 'md')}
               />
             )}
           </SheetTitle>

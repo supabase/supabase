@@ -1,43 +1,31 @@
 'use client'
 
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
+import ScrollProgress from 'components/ScrollProgress'
 import { getMenu } from 'data/nav'
 import { DevToolbarTrigger } from 'dev-tools'
 import { useSendTelemetryEvent } from 'lib/telemetry'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns'
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from 'ui/src/components/shadcn/ui/navigation-menu'
 
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
+import MenuItem from './MenuItem'
+import MobileMenu from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import useDropdownMenu from './useDropdownMenu'
-
-const MenuItem = dynamic(() => import('./MenuItem'))
-const MobileMenu = dynamic(() => import('./MobileMenu'))
-const NavigationMenu = dynamic(() =>
-  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenu)
-)
-const NavigationMenuContent = dynamic(() =>
-  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuContent)
-)
-const NavigationMenuItem = dynamic(() =>
-  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuItem)
-)
-const NavigationMenuLink = dynamic(() =>
-  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuLink)
-)
-const NavigationMenuList = dynamic(() =>
-  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuList)
-)
-const NavigationMenuTrigger = dynamic(() =>
-  import('ui/src/components/shadcn/ui/navigation-menu').then((mod) => mod.NavigationMenuTrigger)
-)
-const ScrollProgress = dynamic(() => import('components/ScrollProgress'))
 
 interface Props {
   hideNavbar: boolean

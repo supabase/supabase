@@ -185,12 +185,12 @@ export const UserImpersonationSelector = () => {
     <>
       <div className="px-5 py-3">
         <p className="text-foreground text-sm">
-          {displayName ? `Impersonating ${displayName}` : 'Impersonate a User'}
+          {displayName ? `Impersonating ${displayName}` : 'Impersonate a user'}
         </p>
-        <p className="text-sm text-foreground-light">
+        <p className="text-sm text-foreground-light mb-1">
           {!impersonatingUser && !isExternalAuthImpersonating
-            ? "Select a user to respect your database's Row-Level Security policies for that particular user."
-            : "Results will respect your database's Row-Level Security policies for this user."}
+            ? "Select a user to respect your database's RLS policies for that particular user."
+            : "Results will respect your database's RLS policies for this user."}
         </p>
 
         {impersonatingUser && (
@@ -460,7 +460,7 @@ const BaseImpersonatingRow = ({
       </div>
 
       <Button type="default" onClick={onClick} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop impersonating' : 'Impersonate'}
+        {isImpersonating ? 'Stop' : 'Impersonate'}
       </Button>
     </div>
   )
@@ -556,7 +556,7 @@ const UserRow = ({ user, onClick, isImpersonating = false, isLoading = false }: 
       </div>
 
       <Button type="default" onClick={() => onClick(user)} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop impersonating' : 'Impersonate'}
+        {isImpersonating ? 'Stop' : 'Impersonate'}
       </Button>
     </div>
   )
