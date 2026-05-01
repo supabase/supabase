@@ -132,20 +132,24 @@ export const FunctionsList = () => {
 
   const canAddFunctions = canCreateFunctions && !isSchemaLocked
 
-  useShortcut(SHORTCUT_IDS.DATABASE_FUNCTIONS_FOCUS_SEARCH, () => {
-    searchInputRef.current?.focus()
-    searchInputRef.current?.select()
-  })
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search functions' }
+  )
 
   useShortcut(
-    SHORTCUT_IDS.DATABASE_FUNCTIONS_NEW_FUNCTION,
+    SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
     () => {
       createFunction()
     },
-    { enabled: canAddFunctions }
+    { enabled: canAddFunctions, label: 'Create new function' }
   )
 
-  useShortcut(SHORTCUT_IDS.DATABASE_FUNCTIONS_RESET_FILTERS, () => {
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
     setFilterString('')
     setReturnTypeFilter(null)
     setSecurityFilter(null)
@@ -274,7 +278,7 @@ export const FunctionsList = () => {
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
             <div className="flex flex-col lg:flex-row lg:items-center gap-2">
               <Shortcut
-                id={SHORTCUT_IDS.DATABASE_FUNCTIONS_FOCUS_SCHEMA}
+                id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
                 onTrigger={() => setSchemaSelectorOpen(true)}
                 side="bottom"
                 tooltipOpen={schemaSelectorOpen ? false : undefined}
@@ -325,7 +329,8 @@ export const FunctionsList = () => {
                 <>
                   {canAddFunctions ? (
                     <Shortcut
-                      id={SHORTCUT_IDS.DATABASE_FUNCTIONS_NEW_FUNCTION}
+                      id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+                      label="Create new function"
                       onTrigger={() => createFunction()}
                       side="bottom"
                     >

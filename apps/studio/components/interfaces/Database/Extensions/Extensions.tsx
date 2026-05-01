@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { isNull, partition } from 'lodash'
 import { AlertCircle, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Card,
   Input,
@@ -23,11 +23,28 @@ import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const Extensions = () => {
   const { filter } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search extensions' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterString('')
+  })
 
   const { data = [], isPending: isLoading } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -63,10 +80,12 @@ export const Extensions = () => {
     <>
       <div className="mb-4">
         <Input
+          inputRef={searchInputRef}
           size="tiny"
           placeholder="Search for an extension"
           value={filterString}
           onChange={(e) => setFilterString(e.target.value)}
+          onKeyDown={onSearchInputEscape(filterString, setFilterString)}
           className="w-52"
           icon={<Search />}
         />

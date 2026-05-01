@@ -169,20 +169,24 @@ execute function function_name();`)
 
   const canAddTriggers = canCreateTriggers && !isSchemaLocked && hasTables
 
-  useShortcut(SHORTCUT_IDS.DATABASE_TRIGGERS_FOCUS_SEARCH, () => {
-    searchInputRef.current?.focus()
-    searchInputRef.current?.select()
-  })
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search triggers' }
+  )
 
   useShortcut(
-    SHORTCUT_IDS.DATABASE_TRIGGERS_NEW_TRIGGER,
+    SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
     () => {
       createTrigger()
     },
-    { enabled: canAddTriggers }
+    { enabled: canAddTriggers, label: 'Create new trigger' }
   )
 
-  useShortcut(SHORTCUT_IDS.DATABASE_TRIGGERS_RESET_FILTERS, () => {
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
     setFilterString('')
     setTablesFilter([])
   })
@@ -222,7 +226,7 @@ execute function function_name();`)
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
             <Shortcut
-              id={SHORTCUT_IDS.DATABASE_TRIGGERS_FOCUS_SCHEMA}
+              id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
               onTrigger={() => setSchemaSelectorOpen(true)}
               side="bottom"
               tooltipOpen={schemaSelectorOpen ? false : undefined}

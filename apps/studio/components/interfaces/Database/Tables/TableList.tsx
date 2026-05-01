@@ -195,12 +195,16 @@ export const TableList = ({
 
   const canAddTables = canUpdateTables && !isSchemaLocked
 
-  useShortcut(SHORTCUT_IDS.DATABASE_TABLES_FOCUS_SEARCH, () => {
-    searchInputRef.current?.focus()
-    searchInputRef.current?.select()
-  })
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search tables' }
+  )
 
-  useShortcut(SHORTCUT_IDS.DATABASE_TABLES_RESET_FILTERS, () => {
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
     setVisibleTypes(Object.values(ENTITY_TYPE))
     setFilterString('')
   })
@@ -228,7 +232,7 @@ export const TableList = ({
       <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
         <div className="flex gap-2 items-center">
           <Shortcut
-            id={SHORTCUT_IDS.DATABASE_TABLES_FOCUS_SCHEMA}
+            id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
             onTrigger={() => setSchemaSelectorOpen(true)}
             side="bottom"
             tooltipOpen={schemaSelectorOpen ? false : undefined}
@@ -305,7 +309,8 @@ export const TableList = ({
           {!isSchemaLocked &&
             (canAddTables ? (
               <Shortcut
-                id={SHORTCUT_IDS.DATABASE_TABLES_NEW_TABLE}
+                id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+                label="Create new table"
                 onTrigger={() => onAddTable()}
                 side="bottom"
               >

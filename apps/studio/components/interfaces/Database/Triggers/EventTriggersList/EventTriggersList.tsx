@@ -149,20 +149,24 @@ export const EventTriggersList = () => {
     return uniqueOwners.includes('postgres') ? uniqueOwners : ['postgres', ...uniqueOwners]
   }, [eventTriggers])
 
-  useShortcut(SHORTCUT_IDS.DATABASE_TRIGGERS_FOCUS_SEARCH, () => {
-    searchInputRef.current?.focus()
-    searchInputRef.current?.select()
-  })
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search event triggers' }
+  )
 
   useShortcut(
-    SHORTCUT_IDS.DATABASE_TRIGGERS_NEW_TRIGGER,
+    SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
     () => {
       createEventTrigger()
     },
-    { enabled: canUpdateEventTriggers }
+    { enabled: canUpdateEventTriggers, label: 'Create new event trigger' }
   )
 
-  useShortcut(SHORTCUT_IDS.DATABASE_TRIGGERS_RESET_FILTERS, () => {
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
     setFilterString('')
     setOwnerFilter(null)
   })
@@ -213,7 +217,8 @@ export const EventTriggersList = () => {
           <DocsButton href={`${DOCS_URL}/guides/database/postgres/event-triggers`} />
           {canUpdateEventTriggers ? (
             <Shortcut
-              id={SHORTCUT_IDS.DATABASE_TRIGGERS_NEW_TRIGGER}
+              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+              label="Create new event trigger"
               onTrigger={createEventTrigger}
               side="bottom"
             >
