@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Badge, Card, CardContent, CardHeader, CardTitle } from 'ui'
+import { Badge, Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 
 import { AnonIcon, AuthenticatedIcon, ServiceRoleIcon } from './Icons'
 import { RoleImpersonationRadio } from './RoleImpersonationRadio'
@@ -14,13 +14,16 @@ export interface RoleImpersonationSelectorProps {
   serviceRoleLabel?: string
   disallowAuthenticatedOption?: boolean
   title?: string
+  orientation?: 'horizontal' | 'vertical'
 }
 
 export const RoleImpersonationSelector = ({
   header = 'Impersonate a database role',
   serviceRoleLabel = 'Postgres',
   disallowAuthenticatedOption = false,
+  orientation = 'horizontal',
 }: RoleImpersonationSelectorProps) => {
+  const isVertical = orientation === 'vertical'
   const state = useRoleImpersonationStateSnapshot()
 
   const [selectedOption, setSelectedOption] = useState<PostgrestRole | undefined>(() => {
@@ -74,7 +77,7 @@ export const RoleImpersonationSelector = ({
             e.preventDefault()
           }}
         >
-          <fieldset className="flex gap-3">
+          <fieldset className={cn('flex gap-3', isVertical && 'flex-col gap-2')}>
             <RoleImpersonationRadio
               value="service_role"
               isSelected={selectedOption === 'service_role'}
@@ -82,6 +85,7 @@ export const RoleImpersonationSelector = ({
               label={serviceRoleLabel}
               description="Superuser"
               icon={<ServiceRoleIcon isSelected={selectedOption === 'service_role'} />}
+              fullWidth={isVertical}
             />
 
             <RoleImpersonationRadio
@@ -91,6 +95,7 @@ export const RoleImpersonationSelector = ({
               onSelectedChange={onSelectedChange}
               description="Not logged in"
               icon={<AnonIcon isSelected={selectedOption === 'anon'} />}
+              fullWidth={isVertical}
             />
 
             {!disallowAuthenticatedOption && (
@@ -104,6 +109,7 @@ export const RoleImpersonationSelector = ({
                 onSelectedChange={onSelectedChange}
                 description="Specific logged in user"
                 icon={<AuthenticatedIcon isSelected={selectedOption === 'authenticated'} />}
+                fullWidth={isVertical}
               />
             )}
           </fieldset>
