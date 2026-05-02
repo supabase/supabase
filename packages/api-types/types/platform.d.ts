@@ -1077,6 +1077,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/credits/balance': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the current credit balance */
+    get: operations['OrgCreditsController_getBalance']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/credits/preview': {
     parameters: {
       query?: never
@@ -4693,7 +4710,32 @@ export interface components {
       role_scoped_projects?: string[]
     }
     AuditLogsResponse: {
-      result: unknown[]
+      result: {
+        action: {
+          metadata?: {
+            [key: string]: unknown
+          }
+          method: string
+          name: string
+          route: string
+          status: number
+        }
+        actor: {
+          app_id?: string
+          app_name?: string
+          email?: string
+          ip?: string
+          oauth_app_id?: string
+          oauth_app_name?: string
+          token_hash?: string
+          token_type: string
+          user_id?: string
+        }
+        organization_slug?: string
+        project_ref?: string
+        request_id: string
+        timestamp: number
+      }[]
       retention_period: number
     }
     AuthBackupAdminLintResponse: {
@@ -5419,6 +5461,10 @@ export interface components {
         | '48xlarge_optimized_memory'
         | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
+      /** @description GitHub App installation ID. Must be provided together with github_repository_id to connect a GitHub repository during project creation. */
+      github_installation_id?: number
+      /** @description GitHub repository ID. Must be provided together with github_installation_id to connect a GitHub repository during project creation. */
+      github_repository_id?: number
       /** @description Whether to enable high availability for the project. */
       high_availability?: boolean
       name: string
@@ -5562,6 +5608,68 @@ export interface components {
               }
             }
           }
+        | {
+            ducklake: {
+              /**
+               * @description DuckLake catalog URL
+               * @example postgres://user:pass@localhost:5432/ducklake_catalog
+               */
+              catalog_url: string
+              /**
+               * @description DuckLake data path
+               * @example s3://<bucket-name>/
+               */
+              data_path: string
+              /**
+               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
+               * @example 7 days
+               */
+              expire_snapshots_older_than?: string
+              /**
+               * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+               * @default ducklake
+               * @example ducklake
+               */
+              metadata_schema?: string
+              /**
+               * @description Number of concurrent DuckDB connections.
+               * @example 4
+               */
+              pool_size?: number
+              /**
+               * @description S3-compatible storage access key ID
+               * @example my-access-key
+               */
+              s3_access_key_id: string
+              /**
+               * @description S3-compatible storage endpoint
+               * @example 127.0.0.1:5000/s3
+               */
+              s3_endpoint: string
+              /**
+               * @description S3-compatible storage region
+               * @example us-east-1
+               */
+              s3_region: string
+              /**
+               * @description S3-compatible storage secret access key
+               * @example my-secret-key
+               */
+              s3_secret_access_key: string
+              /**
+               * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+               * @example path
+               * @enum {string}
+               */
+              s3_url_style?: 'path' | 'vhost'
+              /**
+               * @description Whether to use SSL for S3-compatible storage
+               * @default true
+               * @example false
+               */
+              s3_use_ssl?: boolean
+            }
+          }
       /**
        * @description Destination name
        * @example bq-analytics
@@ -5636,6 +5744,68 @@ export interface components {
                  */
                 warehouse_name: string
               }
+            }
+          }
+        | {
+            ducklake: {
+              /**
+               * @description DuckLake catalog URL
+               * @example postgres://user:pass@localhost:5432/ducklake_catalog
+               */
+              catalog_url: string
+              /**
+               * @description DuckLake data path
+               * @example s3://<bucket-name>/
+               */
+              data_path: string
+              /**
+               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
+               * @example 7 days
+               */
+              expire_snapshots_older_than?: string
+              /**
+               * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+               * @default ducklake
+               * @example ducklake
+               */
+              metadata_schema?: string
+              /**
+               * @description Number of concurrent DuckDB connections.
+               * @example 4
+               */
+              pool_size?: number
+              /**
+               * @description S3-compatible storage access key ID
+               * @example my-access-key
+               */
+              s3_access_key_id: string
+              /**
+               * @description S3-compatible storage endpoint
+               * @example 127.0.0.1:5000/s3
+               */
+              s3_endpoint: string
+              /**
+               * @description S3-compatible storage region
+               * @example us-east-1
+               */
+              s3_region: string
+              /**
+               * @description S3-compatible storage secret access key
+               * @example my-secret-key
+               */
+              s3_secret_access_key: string
+              /**
+               * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+               * @example path
+               * @enum {string}
+               */
+              s3_url_style?: 'path' | 'vhost'
+              /**
+               * @description Whether to use SSL for S3-compatible storage
+               * @default true
+               * @example false
+               */
+              s3_use_ssl?: boolean
             }
           }
       /**
@@ -6017,6 +6187,10 @@ export interface components {
       organization_slug: string
       source: string
       teamId?: string
+    }
+    CreditBalanceResponse: {
+      billing_via_partner: boolean
+      total_balance_cents: number
     }
     CreditRedemptionRequest: {
       code: string
@@ -8090,7 +8264,7 @@ export interface components {
         has_address: boolean
         id: string
         is_default: boolean
-        shared_payment_token: {
+        shared_payment_token?: {
           expires_at: number | null
           is_expired: boolean
           last4: string
@@ -9066,6 +9240,68 @@ export interface components {
               }
             }
           }
+        | {
+            ducklake: {
+              /**
+               * @description DuckLake catalog URL
+               * @example postgres://user:pass@localhost:5432/ducklake_catalog
+               */
+              catalog_url: string
+              /**
+               * @description DuckLake data path
+               * @example s3://<bucket-name>/
+               */
+              data_path: string
+              /**
+               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
+               * @example 7 days
+               */
+              expire_snapshots_older_than?: string
+              /**
+               * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+               * @default ducklake
+               * @example ducklake
+               */
+              metadata_schema?: string
+              /**
+               * @description Number of concurrent DuckDB connections.
+               * @example 4
+               */
+              pool_size?: number
+              /**
+               * @description S3-compatible storage access key ID
+               * @example my-access-key
+               */
+              s3_access_key_id: string
+              /**
+               * @description S3-compatible storage endpoint
+               * @example 127.0.0.1:5000/s3
+               */
+              s3_endpoint: string
+              /**
+               * @description S3-compatible storage region
+               * @example us-east-1
+               */
+              s3_region: string
+              /**
+               * @description S3-compatible storage secret access key
+               * @example my-secret-key
+               */
+              s3_secret_access_key: string
+              /**
+               * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+               * @example path
+               * @enum {string}
+               */
+              s3_url_style?: 'path' | 'vhost'
+              /**
+               * @description Whether to use SSL for S3-compatible storage
+               * @default true
+               * @example false
+               */
+              s3_use_ssl?: boolean
+            }
+          }
       /**
        * @description Destination id
        * @example 2001
@@ -9152,6 +9388,68 @@ export interface components {
                    */
                   warehouse_name: string
                 }
+              }
+            }
+          | {
+              ducklake: {
+                /**
+                 * @description DuckLake catalog URL
+                 * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                 */
+                catalog_url: string
+                /**
+                 * @description DuckLake data path
+                 * @example s3://<bucket-name>/
+                 */
+                data_path: string
+                /**
+                 * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
+                 * @example 7 days
+                 */
+                expire_snapshots_older_than?: string
+                /**
+                 * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                 * @default ducklake
+                 * @example ducklake
+                 */
+                metadata_schema?: string
+                /**
+                 * @description Number of concurrent DuckDB connections.
+                 * @example 4
+                 */
+                pool_size?: number
+                /**
+                 * @description S3-compatible storage access key ID
+                 * @example my-access-key
+                 */
+                s3_access_key_id: string
+                /**
+                 * @description S3-compatible storage endpoint
+                 * @example 127.0.0.1:5000/s3
+                 */
+                s3_endpoint: string
+                /**
+                 * @description S3-compatible storage region
+                 * @example us-east-1
+                 */
+                s3_region: string
+                /**
+                 * @description S3-compatible storage secret access key
+                 * @example my-secret-key
+                 */
+                s3_secret_access_key: string
+                /**
+                 * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                 * @example path
+                 * @enum {string}
+                 */
+                s3_url_style?: 'path' | 'vhost'
+                /**
+                 * @description Whether to use SSL for S3-compatible storage
+                 * @default true
+                 * @example false
+                 */
+                s3_use_ssl?: boolean
               }
             }
         /**
@@ -9812,7 +10110,7 @@ export interface components {
     SignedUrlsResponse: {
       error: string | null
       path: string | null
-      signedUrl: string
+      signedUrl: string | null
     }
     SignUpBody: {
       /** Format: email */
@@ -10941,6 +11239,68 @@ export interface components {
               }
             }
           }
+        | {
+            ducklake: {
+              /**
+               * @description DuckLake catalog URL
+               * @example postgres://user:pass@localhost:5432/ducklake_catalog
+               */
+              catalog_url: string
+              /**
+               * @description DuckLake data path
+               * @example s3://<bucket-name>/
+               */
+              data_path: string
+              /**
+               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
+               * @example 7 days
+               */
+              expire_snapshots_older_than?: string
+              /**
+               * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+               * @default ducklake
+               * @example ducklake
+               */
+              metadata_schema?: string
+              /**
+               * @description Number of concurrent DuckDB connections.
+               * @example 4
+               */
+              pool_size?: number
+              /**
+               * @description S3-compatible storage access key ID
+               * @example my-access-key
+               */
+              s3_access_key_id: string
+              /**
+               * @description S3-compatible storage endpoint
+               * @example 127.0.0.1:5000/s3
+               */
+              s3_endpoint: string
+              /**
+               * @description S3-compatible storage region
+               * @example us-east-1
+               */
+              s3_region: string
+              /**
+               * @description S3-compatible storage secret access key
+               * @example my-secret-key
+               */
+              s3_secret_access_key: string
+              /**
+               * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+               * @example path
+               * @enum {string}
+               */
+              s3_url_style?: 'path' | 'vhost'
+              /**
+               * @description Whether to use SSL for S3-compatible storage
+               * @default true
+               * @example false
+               */
+              s3_use_ssl?: boolean
+            }
+          }
       /**
        * @description Destination name
        * @example bq-analytics
@@ -11015,6 +11375,68 @@ export interface components {
                  */
                 warehouse_name: string
               }
+            }
+          }
+        | {
+            ducklake: {
+              /**
+               * @description DuckLake catalog URL
+               * @example postgres://user:pass@localhost:5432/ducklake_catalog
+               */
+              catalog_url: string
+              /**
+               * @description DuckLake data path
+               * @example s3://<bucket-name>/
+               */
+              data_path: string
+              /**
+               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
+               * @example 7 days
+               */
+              expire_snapshots_older_than?: string
+              /**
+               * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+               * @default ducklake
+               * @example ducklake
+               */
+              metadata_schema?: string
+              /**
+               * @description Number of concurrent DuckDB connections.
+               * @example 4
+               */
+              pool_size?: number
+              /**
+               * @description S3-compatible storage access key ID
+               * @example my-access-key
+               */
+              s3_access_key_id: string
+              /**
+               * @description S3-compatible storage endpoint
+               * @example 127.0.0.1:5000/s3
+               */
+              s3_endpoint: string
+              /**
+               * @description S3-compatible storage region
+               * @example us-east-1
+               */
+              s3_region: string
+              /**
+               * @description S3-compatible storage secret access key
+               * @example my-secret-key
+               */
+              s3_secret_access_key: string
+              /**
+               * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+               * @example path
+               * @enum {string}
+               */
+              s3_url_style?: 'path' | 'vhost'
+              /**
+               * @description Whether to use SSL for S3-compatible storage
+               * @default true
+               * @example false
+               */
+              s3_use_ssl?: boolean
             }
           }
       /**
@@ -11321,7 +11743,32 @@ export interface components {
       visibility: 'user' | 'project' | 'org' | 'public'
     }
     UserAuditLogsResponse: {
-      result: unknown[]
+      result: {
+        action: {
+          metadata?: {
+            [key: string]: unknown
+          }
+          method: string
+          name: string
+          route: string
+          status: number
+        }
+        actor: {
+          app_id?: string
+          app_name?: string
+          email?: string
+          ip?: string
+          oauth_app_id?: string
+          oauth_app_name?: string
+          token_hash?: string
+          token_type: string
+          user_id?: string
+        }
+        organization_slug?: string
+        project_ref?: string
+        request_id: string
+        timestamp: number
+      }[]
       retention_period: number
     }
     UserBody: {
@@ -11477,6 +11924,68 @@ export interface components {
                  */
                 warehouse_name: string
               }
+            }
+          }
+        | {
+            ducklake: {
+              /**
+               * @description DuckLake catalog URL
+               * @example postgres://user:pass@localhost:5432/ducklake_catalog
+               */
+              catalog_url: string
+              /**
+               * @description DuckLake data path
+               * @example s3://<bucket-name>/
+               */
+              data_path: string
+              /**
+               * @description DuckLake snapshot retention interval (format: https://duckdb.org/docs/current/sql/data_types/interval)
+               * @example 7 days
+               */
+              expire_snapshots_older_than?: string
+              /**
+               * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+               * @default ducklake
+               * @example ducklake
+               */
+              metadata_schema?: string
+              /**
+               * @description Number of concurrent DuckDB connections.
+               * @example 4
+               */
+              pool_size?: number
+              /**
+               * @description S3-compatible storage access key ID
+               * @example my-access-key
+               */
+              s3_access_key_id: string
+              /**
+               * @description S3-compatible storage endpoint
+               * @example 127.0.0.1:5000/s3
+               */
+              s3_endpoint: string
+              /**
+               * @description S3-compatible storage region
+               * @example us-east-1
+               */
+              s3_region: string
+              /**
+               * @description S3-compatible storage secret access key
+               * @example my-secret-key
+               */
+              s3_secret_access_key: string
+              /**
+               * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+               * @example path
+               * @enum {string}
+               */
+              s3_url_style?: 'path' | 'vhost'
+              /**
+               * @description Whether to use SSL for S3-compatible storage
+               * @default true
+               * @example false
+               */
+              s3_use_ssl?: boolean
             }
           }
     }
@@ -14694,6 +15203,7 @@ export interface operations {
   OrgAuditLogsController_getAuditLogs: {
     parameters: {
       query: {
+        format?: 'legacy' | 'v2'
         /** @description End timestamp */
         iso_timestamp_end: string
         /** @description Start timestamp */
@@ -14793,6 +15303,49 @@ export interface operations {
       }
       /** @description Failed to determine available Postgres versions */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgCreditsController_getBalance: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreditBalanceResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
         headers: {
           [name: string]: unknown
         }
@@ -18873,6 +19426,7 @@ export interface operations {
   UserAuditLogsController_getAuditLogs: {
     parameters: {
       query: {
+        format?: 'legacy' | 'v2'
         /** @description End timestamp */
         iso_timestamp_end: string
         /** @description Start timestamp */
