@@ -449,8 +449,7 @@ function ComputeLineItem({
 
   const discountedComputeCosts = Math.max(
     0,
-    computeItems.reduce((prev, cur) => prev + (cur.amount ?? 0), 0) +
-      (computeCredits?.amount ?? 0)
+    computeItems.reduce((prev, cur) => prev + (cur.amount ?? 0), 0) + (computeCredits?.amount ?? 0)
   )
 
   if (!computeItems.length) return null
