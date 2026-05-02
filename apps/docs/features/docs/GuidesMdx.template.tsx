@@ -1,16 +1,16 @@
-import { ExternalLink } from 'lucide-react'
-import { type ReactNode } from 'react'
-import ReactMarkdown from 'react-markdown'
-
-import { cn } from 'ui'
-
 import Breadcrumbs from '~/components/Breadcrumbs'
 import GuidesSidebar from '~/components/GuidesSidebar'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
+import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
 import { type GuideFrontmatter } from '~/lib/docs'
+import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
+import { ExternalLink } from 'lucide-react'
+import { type ReactNode } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { cn } from 'ui'
 
 const EDIT_LINK_SYMBOL = Symbol('edit link')
 interface EditLink {
@@ -54,14 +54,27 @@ interface BaseGuideTemplateProps {
   children?: ReactNode
   editLink: EditLink
   mdxOptions?: SerializeOptions
+  pathname: `/${string}`
 }
 
 type GuideTemplateProps =
   | WithRequired<BaseGuideTemplateProps, 'children'>
   | WithRequired<BaseGuideTemplateProps, 'content'>
 
-const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideTemplateProps) => {
+const GuideTemplate = ({
+  meta,
+  content,
+  children,
+  editLink,
+  mdxOptions,
+  pathname,
+}: GuideTemplateProps) => {
   const hideToc = meta?.hideToc || meta?.hide_table_of_contents
+  const breadcrumbChain = resolveBreadcrumbs(pathname)
+  const breadcrumbJsonLd =
+    breadcrumbChain.length > 0
+      ? serializeJsonLd(breadcrumbListSchema({ pathname, chain: breadcrumbChain }))
+      : null
 
   return (
     <TocAnchorsProvider>
@@ -74,6 +87,12 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             'col-span-12 md:col-span-9'
           )}
         >
+          {breadcrumbJsonLd && (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }}
+            />
+          )}
           <Breadcrumbs className="mb-2" />
           <article
             // Used to get headings for the table of contents
