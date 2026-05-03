@@ -14,8 +14,12 @@ export default function getPgsqlCompletionProvider(monaco: any, pgInfoRef: RefOb
       try {
         // --- STRING LITERAL DETECTION ---
         // Get the text on the current line up to the cursor position
-        const lineContent = model.getLineContent(position.lineNumber);
-        const textUntilPosition = lineContent.substring(0, position.column - 1);
+        const textUntilPosition = model.getValueInRange({
+          startLineNumber: 1,
+          startColumn: 1,
+          endLineNumber: position.lineNumber,
+          endColumn: position.column,
+        });
 
         // Count unescaped single quotes to see if we are inside a string literal.
         // If the count is odd, the quote is currently open.
