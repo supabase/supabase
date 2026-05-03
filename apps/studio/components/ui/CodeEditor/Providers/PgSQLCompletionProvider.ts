@@ -12,6 +12,21 @@ export default function getPgsqlCompletionProvider(monaco: any, pgInfoRef: RefOb
     triggerCharacters: [' ', '.', '"'],
     provideCompletionItems: function (model: any, position: any, context: any) {
       try {
+        // --- STRING LITERAL DETECTION ---
+        // Get the text on the current line up to the cursor position
+        const lineContent = model.getLineContent(position.lineNumber);
+        const textUntilPosition = lineContent.substring(0, position.column - 1);
+
+        // Count unescaped single quotes to see if we are inside a string literal.
+        // If the count is odd, the quote is currently open.
+        const unescapedSingleQuotes = (textUntilPosition.match(/(^|[^\\])'/g) || []).length;
+        const isInsideString = unescapedSingleQuotes % 2 !== 0;
+
+        if (isInsideString) {
+          // Abort all autocomplete suggestions, as we are inside data, not code.
+          return { suggestions: [] };
+        }
+
         // position.column should minus 2 as it returns 2 for first char
         // position.lineNumber should minus 1
         let iterator = new BackwardIterator(model, position.column - 2, position.lineNumber - 1)

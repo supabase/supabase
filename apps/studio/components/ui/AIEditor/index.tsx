@@ -323,7 +323,7 @@ export const AIEditor = ({
     }
   }
 
-  const defaultOptions: monacoEditor.IStandaloneEditorConstructionOptions = {
+const defaultOptions: monacoEditor.IStandaloneEditorConstructionOptions = {
     tabSize: 2,
     fontSize: 13,
     readOnly,
@@ -333,6 +333,16 @@ export const AIEditor = ({
     folding: false,
     padding: { top: 4 },
     lineNumbersMinChars: 3,
+    // --- Prevent aggressive auto-replace ---
+    acceptSuggestionOnCommitCharacter: false,
+    acceptSuggestionOnEnter: 'smart',
+    wordBasedSuggestions: 'off', // Stops Monaco from recycling words in your document
+    quickSuggestions: {
+        other: true,
+        comments: false,
+        strings: false // Strictly disables popup suggestions inside strings
+    },
+    inlineSuggest: { enabled: false }, // Explicitly kills rogue "ghost text"
     ...options,
   }
 
