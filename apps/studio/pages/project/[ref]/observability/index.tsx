@@ -8,10 +8,12 @@ import { LogoLoader } from 'ui'
 import { ObservabilityOverview } from '@/components/interfaces/Observability/ObservabilityOverview'
 import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportModal'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { getObservabilityEntryRoute } from '@/components/layouts/ObservabilityLayout/ObservabilityAccess.utils'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import { useContentQuery } from '@/data/content/content-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { IS_PLATFORM } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
 import type { NextPageWithLayout } from '@/types'
 
@@ -45,7 +47,11 @@ export const UserReportPage: NextPageWithLayout = () => {
       .filter((x) => x.type === 'report')
       .sort((a, b) => a.name.localeCompare(b.name))
     if (reports.length >= 1) router.replace(`/project/${ref}/observability/${reports[0].id}`)
-    if (reports.length === 0) router.replace(`/project/${ref}/observability/api-overview`)
+    if (reports.length === 0) {
+      router.replace(
+        IS_PLATFORM ? `/project/${ref}/observability/api-overview` : getObservabilityEntryRoute(ref)
+      )
+    }
   }, [isSuccess, data, router, ref, showOverview, flagsLoaded])
 
   const { can: canCreateReport } = useAsyncCheckPermissions(

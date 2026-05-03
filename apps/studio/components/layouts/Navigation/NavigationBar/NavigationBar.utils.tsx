@@ -2,6 +2,10 @@ import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEdito
 import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
+import {
+  canAccessObservability,
+  getObservabilityEntryRoute,
+} from '@/components/layouts/ObservabilityLayout/ObservabilityAccess.utils'
 import type { Route } from '@/components/ui/ui.types'
 import { EditorIndexPageLink } from '@/data/prefetchers/project.$ref.editor'
 import type { Project } from '@/data/projects/project-detail-query'
@@ -163,6 +167,10 @@ export const generateOtherRoutes = (
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
   const logsEnabled = features?.showLogs ?? true
+  const observabilityEnabled = canAccessObservability({
+    isPlatform,
+    reportsAll: reportsEnabled,
+  })
   return [
     {
       key: 'advisors',
@@ -172,15 +180,16 @@ export const generateOtherRoutes = (
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
       shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
     },
-    // Observability is only available on the platform, not for self-hosted/CLI
-    ...(isPlatform && reportsEnabled
+    ...(observabilityEnabled
       ? [
           {
             key: 'observability',
             label: 'Observability',
             disabled: !isProjectActive,
             icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
+            link:
+              ref &&
+              (isProjectBuilding ? buildingUrl : getObservabilityEntryRoute(ref, { isPlatform })),
             shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY,
           },
         ]

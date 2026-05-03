@@ -3,6 +3,7 @@ import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
+import { canAccessObservability } from './ObservabilityAccess.utils'
 import ObservabilityMenu from './ObservabilityMenu'
 import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { BannerIndexAdvisor } from '@/components/ui/BannerStack/Banners/BannerIndexAdvisor'
@@ -82,7 +83,7 @@ const ObservabilityLayoutContent = ({
 
   const { reportsAll } = useIsFeatureEnabled(['reports:all'])
 
-  if (reportsAll) {
+  if (canAccessObservability({ reportsAll })) {
     return (
       <ProjectLayout
         product="Observability"
@@ -102,7 +103,7 @@ const ObservabilityLayout = (props: PropsWithChildren<ObservabilityLayoutProps>)
   const { ref } = useParams()
   const { reportsAll } = useIsFeatureEnabled(['reports:all'])
 
-  if (reportsAll) {
+  if (canAccessObservability({ reportsAll })) {
     return <ObservabilityLayoutContent {...props} />
   } else {
     return <UnknownInterface urlBack={`/project/${ref}`} />

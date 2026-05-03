@@ -129,15 +129,19 @@ describe('generateOtherRoutes', () => {
       isPlatform: false,
       showReports: true,
     })
-    expect(keys(routes)).not.toContain('observability')
+    expect(keys(routes)).toContain('observability')
+    const observabilityRoute = routes.find((r) => r.key === 'observability')
+    expect(observabilityRoute?.link).toBe(`/project/${REF}/observability/query-performance`)
   })
 
-  it('excludes observability in self-hosted mode when reports are disabled', () => {
+  it('includes observability in self-hosted mode when reports are disabled', () => {
     const routes = generateOtherRoutes(REF, activeProject, {
       isPlatform: false,
       showReports: false,
     })
-    expect(keys(routes)).not.toContain('observability')
+    expect(keys(routes)).toContain('observability')
+    const observabilityRoute = routes.find((r) => r.key === 'observability')
+    expect(observabilityRoute?.link).toBe(`/project/${REF}/observability/query-performance`)
   })
 
   it('does not include API Docs nav item', () => {
