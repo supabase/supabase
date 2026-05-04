@@ -75,29 +75,33 @@ function PluginInstructions({ client }: { client: PluginClient }) {
 
   if (client.key === 'codex') {
     return (
-      <div className="space-y-3">
-        <p className="text-sm text-foreground-light">
-          Install the Supabase plugin from the official OpenAI plugin marketplace:
-        </p>
-        <CodeBlock value="codex" language="bash" focusable={false} className="block" />
-        <p className="text-xs text-foreground-lighter">Inside Codex, type:</p>
-        <CodeBlock value="/plugins" language="bash" focusable={false} className="block" />
-        <p className="text-xs text-foreground-lighter">
-          The plugin browser groups plugins by marketplace. Open the Supabase plugin and select{' '}
-          <strong>Install</strong>.
-        </p>
-        <p className="text-xs text-foreground-lighter">
-          You can also install it directly from the{' '}
-          <a
-            href="https://developers.openai.com/codex/plugins#plugin-directory-in-the-codex-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-brand-link hover:underline"
-          >
-            Codex desktop app plugin directory
-          </a>
-          .
-        </p>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium">Desktop app</h4>
+          <p className="text-xs text-foreground-lighter">
+            Install the Supabase plugin directly from the{' '}
+            <a
+              href="https://developers.openai.com/codex/plugins#plugin-directory-in-the-codex-app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-link hover:underline"
+            >
+              Codex desktop app plugin directory
+            </a>
+            .
+          </p>
+        </div>
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium">CLI</h4>
+          <p className="text-xs text-foreground-lighter">Open the Codex CLI by running:</p>
+          <CodeBlock value="codex" language="bash" focusable={false} className="block" />
+          <p className="text-xs text-foreground-lighter">Inside Codex, type:</p>
+          <CodeBlock value="/plugins" language="bash" focusable={false} className="block" />
+          <p className="text-xs text-foreground-lighter">
+            The plugin browser groups plugins by marketplace. Open the Supabase plugin and select{' '}
+            <strong>Install</strong>.
+          </p>
+        </div>
       </div>
     )
   }
