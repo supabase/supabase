@@ -1,6 +1,14 @@
 'use client'
 
-import React, { createContext, useCallback, useContext, useEffect, useRef } from 'react'
+import React, {
+  createContext,
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from 'react'
 
 import { useFilterBarState, useOptionsCache } from './hooks'
 import {
@@ -92,7 +100,11 @@ export type FilterBarRootProps = {
 
 export type FilterBarVariant = 'default' | 'pill'
 
-export function FilterBarRoot({
+export type FilterBarHandle = {
+  focus: () => void
+}
+
+export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(function FilterBarRoot({
   children,
   filterProperties,
   filters,
@@ -104,7 +116,7 @@ export function FilterBarRoot({
   supportsOperators = false,
   variant = 'default',
   icon,
-}: FilterBarRootProps) {
+}: FilterBarRootProps, ref: React.Ref<FilterBarHandle>) {
   const rootRef = useRef<HTMLDivElement>(null)
 
   const {
@@ -357,6 +369,10 @@ export function FilterBarRoot({
     rootRef,
   }
 
+  useImperativeHandle(ref, () => ({
+    focus: () => handleGroupFreeformFocus([]),
+  }))
+
   return (
     <FilterBarContext.Provider value={contextValue}>
       <div ref={rootRef} data-filterbar-root className="h-full min-h-[32px] flex items-stretch">
@@ -364,4 +380,4 @@ export function FilterBarRoot({
       </div>
     </FilterBarContext.Provider>
   )
-}
+})
