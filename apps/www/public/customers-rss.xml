@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Fri, 19 Dec 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Mon, 04 May 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/cofounder</guid>
+  <title>Cofounder builds autonomous companies on Supabase</title>
+  <link>https://supabase.com/customers/cofounder</link>
+  <description>Cofounder gives every customer an entire engineering, sales, marketing, support, and product team made of agents. Supabase for Platforms gives Cofounder the database platform to run an entire software company on every customer&apos;s behalf, from day one.</description>
+  <pubDate>Mon, 04 May 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/hyper</guid>
   <title>Hyper builds AI marketing agents on Supabase</title>
   <link>https://supabase.com/customers/hyper</link>

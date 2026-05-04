@@ -1,8 +1,10 @@
+'use client'
+
+import days from '~/components/LaunchWeek/7/lw7_days'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import days from '~/components/LaunchWeek/7/lw7_days'
 
 const BlogLinks = () => {
   const activeDays = days.filter((day) => Date.parse(day.publishedAt) <= Date.now())

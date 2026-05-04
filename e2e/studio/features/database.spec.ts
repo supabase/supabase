@@ -3,6 +3,7 @@ import { expect } from '@playwright/test'
 import { env } from '../env.config.js'
 import { expectClipboardValue } from '../utils/clipboard.js'
 import { createTable, dropTable, query } from '../utils/db/index.js'
+import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import {
@@ -50,12 +51,20 @@ test.describe('Database', () => {
 );`,
       })
 
+      await expect(page.getByText('Successfully copied as SQL')).toBeVisible({ timeout: 15000 })
+      await dismissToastsIfAny(page)
+      await expect(page.locator('[data-sonner-toast]')).toHaveCount(0)
+
       // downloads schema diagram when export is triggered
       const downloadPromise = page.waitForEvent('download')
       await page.getByRole('button', { name: 'Export options' }).click()
       await page.getByRole('menuitem', { name: 'Download as PNG' }).click()
       const download = await downloadPromise
       expect(download.suggestedFilename()).toContain('.png')
+
+      await expect(page.getByText('Successfully downloaded as PNG')).toBeVisible({ timeout: 15000 })
+      await dismissToastsIfAny(page)
+      await expect(page.locator('[data-sonner-toast]')).toHaveCount(0)
 
       // changing schema -> auth
       await page.getByTestId('schema-selector').click()

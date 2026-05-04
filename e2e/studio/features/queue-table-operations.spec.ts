@@ -206,7 +206,7 @@ test.describe('Queue Table Operations', () => {
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('new row value')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -254,12 +254,12 @@ test.describe('Queue Table Operations', () => {
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('row one')
     await page.getByTestId('action-bar-save-row').click()
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('row two')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -305,12 +305,12 @@ test.describe('Queue Table Operations', () => {
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('keep this row')
     await page.getByTestId('action-bar-save-row').click()
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('remove this row')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -358,7 +358,7 @@ test.describe('Queue Table Operations', () => {
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('shortcut test')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -407,7 +407,7 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByRole('gridcell', { name: 'existing row' })).toBeVisible()
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('undo this row')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -449,12 +449,12 @@ test.describe('Queue Table Operations', () => {
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('first row')
     await page.getByTestId('action-bar-save-row').click()
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('second row')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -692,7 +692,7 @@ test.describe('Queue Table Operations', () => {
     await page.getByRole('menuitem', { name: 'Delete row' }).click()
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('new row')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -743,7 +743,7 @@ test.describe('Queue Table Operations', () => {
 
     // Add a new row
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('new row')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -804,7 +804,7 @@ test.describe('Queue Table Operations', () => {
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('pending in table 1')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -813,7 +813,7 @@ test.describe('Queue Table Operations', () => {
     await page.getByRole('button', { name: `View ${tableName2}`, exact: true }).click()
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('pending in table 2')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -864,7 +864,7 @@ test.describe('Queue Table Operations', () => {
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('only in table 1')
     await page.getByTestId('action-bar-save-row').click()
 
@@ -876,7 +876,7 @@ test.describe('Queue Table Operations', () => {
 
     // Add a row in table 2
     await page.getByTestId('table-editor-insert-new-row').click()
-    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('only in table 2')
     await page.getByTestId('action-bar-save-row').click()
 

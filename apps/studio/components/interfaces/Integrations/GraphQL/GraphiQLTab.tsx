@@ -1,18 +1,58 @@
-import '@graphiql/react/dist/style.css'
+import 'graphiql/style.css'
+import 'graphiql/setup-workers/webpack'
 
+import { useMonaco, type GraphiQLPlugin } from '@graphiql/react'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { GraphiQL, HISTORY_PLUGIN } from 'graphiql'
+import { User as IconUser } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
 
-import GraphiQL from '@/components/interfaces/GraphQL/GraphiQL'
+import styles from './graphiql.module.css'
+import { getTheme } from '@/components/interfaces/App/MonacoThemeProvider'
+import { RoleImpersonationSelector } from '@/components/interfaces/RoleImpersonationSelector'
 import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { API_URL, IS_PLATFORM } from '@/lib/constants'
 import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
 import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
+
+const ROLE_IMPERSONATION_PLUGIN: GraphiQLPlugin = {
+  title: 'Role Impersonation',
+  icon: () => <IconUser />,
+  content: () => <RoleImpersonationSelector orientation="vertical" />,
+}
+
+const MONACO_THEME = { dark: 'supabase-graphql-dark', light: 'supabase-graphql-light' }
+
+const GraphiQLMonacoTheme = ({ resolvedTheme }: { resolvedTheme: 'dark' | 'light' }) => {
+  const { monaco } = useMonaco()
+
+  useEffect(() => {
+    if (!monaco) return
+    const dark = getTheme('dark')
+    const light = getTheme('light')
+    monaco.editor.defineTheme(MONACO_THEME.dark, {
+      ...dark,
+      rules: [...dark.rules, { token: 'argument.identifier.gql', foreground: '908aff' }],
+    })
+    monaco.editor.defineTheme(MONACO_THEME.light, {
+      ...light,
+      rules: [...light.rules, { token: 'argument.identifier.gql', foreground: '6c69ce' }],
+      // Match the dashboard's bg-default in light mode so the editor doesn't read
+      // as a darker square against the surrounding UI.
+      colors: { ...light.colors, 'editor.background': '#fcfcfc' },
+    })
+    monaco.editor.setTheme(MONACO_THEME[resolvedTheme])
+  }, [monaco, resolvedTheme])
+
+  return null
+}
 
 export const GraphiQLTab = () => {
   const { resolvedTheme } = useTheme()
@@ -24,6 +64,16 @@ export const GraphiQLTab = () => {
   const jwtSecret = config?.jwt_secret
 
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
+
+  const { can: canReadJWTSecret } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'field.jwt_secret'
+  )
+
+  const plugins = useMemo<GraphiQLPlugin[]>(
+    () => (canReadJWTSecret ? [HISTORY_PLUGIN, ROLE_IMPERSONATION_PLUGIN] : [HISTORY_PLUGIN]),
+    [canReadJWTSecret]
+  )
 
   const fetcher = useMemo(() => {
     const fetcherFn = createGraphiQLFetcher({
@@ -72,5 +122,16 @@ export const GraphiQLTab = () => {
     return <LogoLoader />
   }
 
-  return <GraphiQL fetcher={fetcher} theme={currentTheme} />
+  return (
+    <>
+      <GraphiQLMonacoTheme resolvedTheme={currentTheme} />
+      <GraphiQL
+        fetcher={fetcher}
+        forcedTheme={currentTheme}
+        editorTheme={MONACO_THEME}
+        className={styles.root}
+        plugins={plugins}
+      />
+    </>
+  )
 }

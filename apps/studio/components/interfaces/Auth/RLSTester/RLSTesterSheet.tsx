@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { Code } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
@@ -38,6 +39,7 @@ import { UserSelector } from './UserSelector'
 import { UserSqlEditor } from './UserSqlEditor'
 import { useTestQueryRLS } from './useTestQueryRLS'
 import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 interface RLSTesterSheetProps {
@@ -118,7 +120,10 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
 
       <SheetContent className="w-[600px]! flex flex-col gap-y-0">
         <SheetHeader>
-          <SheetTitle>What data can my users see?</SheetTitle>
+          <SheetTitle className="flex items-center gap-x-4">
+            <span>What data can my users see?</span>
+            <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER} />
+          </SheetTitle>
           <SheetDescription>
             See what data a user is allowed to read based on your RLS policies
           </SheetDescription>

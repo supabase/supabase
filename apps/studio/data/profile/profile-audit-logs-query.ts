@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { profileKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { AuditLog } from '@/data/organizations/organization-audit-logs-query'
+import { V2AuditLog } from '@/data/organizations/organization-audit-logs-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -20,6 +20,7 @@ export async function getProfileAuditLogs(
       query: {
         iso_timestamp_start,
         iso_timestamp_end,
+        format: 'v2',
       },
     },
     signal,
@@ -31,7 +32,7 @@ export async function getProfileAuditLogs(
 
 export type ProfileAuditLogsError = ResponseError
 export type ProfileAuditLogsData = {
-  result: AuditLog[]
+  result: V2AuditLog[]
   retention_period: number
 }
 

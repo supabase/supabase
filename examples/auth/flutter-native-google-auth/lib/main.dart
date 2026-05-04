@@ -6,7 +6,7 @@ void main() async {
   /// TODO: update Supabase credentials with your own
   await Supabase.initialize(
     url: 'YOUR_SUPABASE_URL',
-    anonKey: 'YOUR_ANON_KEY',
+    publishableKey: 'YOUR_PUBLISHABLE_KEY',
   );
   runApp(const MyApp());
 }
