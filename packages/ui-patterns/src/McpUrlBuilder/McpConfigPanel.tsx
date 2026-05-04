@@ -8,7 +8,12 @@ import { InfoTooltip } from '../info-tooltip'
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
-import { FEATURE_GROUPS_NON_PLATFORM, FEATURE_GROUPS_PLATFORM, MCP_CLIENTS } from './constants'
+import {
+  FEATURE_GROUPS_NON_PLATFORM,
+  FEATURE_GROUPS_PLATFORM,
+  MCP_CLIENT_GROUPS,
+  MCP_CLIENTS,
+} from './constants'
 import type { McpClient, McpOnCopyCallback } from './types'
 import { getMcpUrl } from './utils/getMcpUrl'
 
@@ -105,6 +110,12 @@ export function McpConfigPanel({
         <ClientSelectDropdown
           label="Client"
           clients={MCP_CLIENTS}
+          groups={MCP_CLIENT_GROUPS.map((group) => ({
+            heading: group.heading,
+            clients: group.keys
+              .map((key) => MCP_CLIENTS.find((c) => c.key === key))
+              .filter(Boolean) as (typeof MCP_CLIENTS)[number][],
+          }))}
           selectedClient={selectedClient}
           onClientChange={handleClientChange}
           theme={theme}
