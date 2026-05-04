@@ -336,7 +336,6 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                   />
                   <Admonition
                     type="default"
-                    title="Email rendering may differ"
                     description="The preview shown here may differ slightly from how your email appears in the recipient’s email client."
                   />
                 </>
