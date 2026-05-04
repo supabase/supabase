@@ -44,7 +44,7 @@ export const ConnectButton = ({
         },
       }}
     >
-      {!iconOnly && <span>Connect</span>}
+      <span className={cn({ 'sr-only': !iconOnly })}>Connect</span>
     </ButtonTooltip>
   )
 }
