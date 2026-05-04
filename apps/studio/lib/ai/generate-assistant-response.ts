@@ -11,8 +11,7 @@ import {
 import { startSpan, traced, withCurrent, wrapAISDK, type Span } from 'braintrust'
 import { source } from 'common-tags'
 
-import { buildAssistantEvalOutput } from '@/evals/output'
-import type { AssistantEvalInput, AssistantEvalOutput } from '@/evals/scorer'
+import type { AssistantEvalInput } from '@/evals/scorer'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
 import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from '@/lib/ai/prompts'
@@ -148,7 +147,7 @@ export async function generateAssistantResponse({
       tools,
       ...(abortSignal && { abortSignal }),
       ...(span && {
-        onFinish: ({ steps, finishReason }) => {
+        onFinish: ({ steps }) => {
           for (const step of steps) {
             for (const toolCall of step.toolCalls) {
               if (toolCall.toolName === 'rename_chat') {
@@ -157,9 +156,6 @@ export async function generateAssistantResponse({
               }
             }
           }
-          span.log({
-            output: buildAssistantEvalOutput(finishReason, steps) satisfies AssistantEvalOutput,
-          })
           span.end()
         },
       }),

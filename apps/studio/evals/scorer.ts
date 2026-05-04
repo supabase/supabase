@@ -1,6 +1,6 @@
 import { FinishReason } from 'ai'
 import { LLMClassifierFromTemplate } from 'autoevals'
-import { EvalCase, EvalScorer } from 'braintrust'
+import { EvalCase, EvalScorer, SpanData, Trace } from 'braintrust'
 import { stripIndent } from 'common-tags'
 
 import { extractUrls } from '@/lib/helpers'
@@ -21,10 +21,6 @@ export type AssistantEvalInput = {
 
 export type AssistantEvalOutput = {
   finishReason: FinishReason
-  steps: Array<{ text: string; toolCalls: Array<{ toolName: string; input: unknown }> }>
-  toolNames: string[]
-  sqlQueries: string[]
-  docs: string[]
 }
 
 export type Expected = {
@@ -51,40 +47,72 @@ export type AssistantEvalCaseMetadata = {
 
 export type AssistantEvalCase = EvalCase<AssistantEvalInput, Expected, AssistantEvalCaseMetadata>
 
-/**
- * Serialize steps into a string representation including text and tool calls
- */
-function serializeSteps(steps: AssistantEvalOutput['steps']): string {
-  return steps
-    .map((step) => {
-      const toolCalls = step.toolCalls
-        ?.map((call) => JSON.stringify({ tool: call.toolName, input: call.input }))
-        .join('\n')
-      return toolCalls ? `${step.text}\n${toolCalls}` : step.text
-    })
-    .join('\n')
+// --- Trace helpers ---
+
+type ChatMessage = { role: string; content: unknown }
+
+function isChatMessage(msg: unknown): msg is ChatMessage {
+  return typeof msg === 'object' && msg !== null && 'role' in msg
 }
 
-/**
- * Extract only the text content from steps, filtering out empty text
- */
-function extractTextOnly(steps: AssistantEvalOutput['steps']): string {
-  return steps
-    .map((step) => step.text)
-    .filter((text) => text && text.trim().length > 0)
-    .join('\n')
+function extractMessageText(content: unknown): string {
+  if (typeof content === 'string') return content
+  if (Array.isArray(content)) {
+    return content
+      .filter(
+        (c): c is { type: 'text'; text: string } =>
+          typeof c === 'object' &&
+          c !== null &&
+          'type' in c &&
+          c.type === 'text' &&
+          'text' in c &&
+          typeof c.text === 'string'
+      )
+      .map((c) => c.text)
+      .join('\n')
+  }
+  return ''
 }
+
+async function getLastAssistantText(trace: Trace): Promise<string | null> {
+  const thread = await trace.getThread()
+  for (let i = thread.length - 1; i >= 0; i--) {
+    const msg = thread[i]
+    if (isChatMessage(msg) && msg.role === 'assistant') {
+      return extractMessageText(msg.content) || null
+    }
+  }
+  return null
+}
+
+async function getConversationContext(trace: Trace): Promise<string> {
+  const thread = await trace.getThread()
+  return thread
+    .filter(isChatMessage)
+    .filter((m) => m.role !== 'system')
+    .map((m) => `[${m.role}]\n${extractMessageText(m.content)}`)
+    .join('\n\n')
+}
+
+export async function getToolSpans(trace: Trace, toolName?: string): Promise<SpanData[]> {
+  const spans = await trace.getSpans({ spanType: ['tool'] })
+  if (!toolName) return spans
+  return spans.filter((s) => s.span_attributes?.name === toolName)
+}
+
+// --- Scorers ---
 
 export const toolUsageScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ output, expected }) => {
-  if (!expected.requiredTools) return null
+> = async ({ expected, trace }) => {
+  if (!expected.requiredTools || !trace) return null
 
-  const presentCount = expected.requiredTools.filter((tool) =>
-    output.toolNames.includes(tool)
-  ).length
+  const toolSpans = await getToolSpans(trace)
+  const toolNames = toolSpans.map((s) => s.span_attributes?.name).filter(Boolean)
+
+  const presentCount = expected.requiredTools.filter((tool) => toolNames.includes(tool)).length
   const totalCount = expected.requiredTools.length
   const ratio = totalCount === 0 ? 1 : presentCount / totalCount
 
@@ -98,27 +126,22 @@ export const knowledgeUsageScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ output, expected }) => {
-  if (!expected.requiredKnowledge) return null
+> = async ({ expected, trace }) => {
+  if (!expected.requiredKnowledge || !trace) return null
 
-  const loadedKnowledge = output.steps
-    .flatMap((step) => step.toolCalls)
-    .filter((call) => call.toolName === 'load_knowledge')
-    .flatMap((call) => {
-      const input = call.input
-      if (
-        typeof input !== 'object' ||
-        input === null ||
-        !('name' in input) ||
-        typeof input.name !== 'string'
-      )
-        return []
-      return [input.name]
-    })
+  const knowledgeSpans = await getToolSpans(trace, 'load_knowledge')
+  const loadedKnowledge = knowledgeSpans
+    .map((s) => s.input)
+    .filter(
+      (input): input is { name: string } =>
+        typeof input === 'object' &&
+        input !== null &&
+        'name' in input &&
+        typeof input.name === 'string'
+    )
+    .map((input) => input.name)
 
-  const presentCount = expected.requiredKnowledge.filter((knowledge) =>
-    loadedKnowledge.includes(knowledge)
-  ).length
+  const presentCount = expected.requiredKnowledge.filter((k) => loadedKnowledge.includes(k)).length
   const totalCount = expected.requiredKnowledge.length
   const ratio = totalCount === 0 ? 1 : presentCount / totalCount
 
@@ -150,11 +173,11 @@ export const concisenessScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ input, output }) => {
-  return await concisenessEvaluator({
-    input: input.prompt,
-    output: extractTextOnly(output.steps),
-  })
+> = async ({ input, trace }) => {
+  if (!trace) return null
+  const text = await getLastAssistantText(trace)
+  if (!text) return null
+  return await concisenessEvaluator({ input: input.prompt, output: text })
 }
 
 const completenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
@@ -178,21 +201,21 @@ export const completenessScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ input, output }) => {
-  return await completenessEvaluator({
-    input: input.prompt,
-    output: serializeSteps(output.steps),
-  })
+> = async ({ input, trace }) => {
+  if (!trace) return null
+  const text = await getLastAssistantText(trace)
+  if (!text) return null
+  return await completenessEvaluator({ input: input.prompt, output: text })
 }
 
 const goalCompletionEvaluator = LLMClassifierFromTemplate<{ input: string }>({
   name: 'Goal Completion',
   promptTemplate: stripIndent`
     Evaluate whether this response addresses what the user asked.
-    
+
     Input: {{input}}
     Output: {{output}}
-    
+
     Does the response address what the user asked?
     a) Fully addresses - completely answers the question or fulfills the request
     b) Partially addresses - addresses some aspects but misses key parts
@@ -207,24 +230,24 @@ export const goalCompletionScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ input, output }) => {
-  return await goalCompletionEvaluator({
-    input: input.prompt,
-    output: serializeSteps(output.steps),
-  })
+> = async ({ input, trace }) => {
+  if (!trace) return null
+  const conversation = await getConversationContext(trace)
+  if (!conversation) return null
+  return await goalCompletionEvaluator({ input: input.prompt, output: conversation })
 }
 
 const docsFaithfulnessEvaluator = LLMClassifierFromTemplate<{ docs: string }>({
   name: 'Docs Faithfulness',
   promptTemplate: stripIndent`
     Evaluate whether the assistant's response accurately reflects the information in the retrieved documentation.
-    
+
     Retrieved Documentation:
     {{docs}}
-    
+
     Assistant Response:
     {{output}}
-    
+
     Does the assistant's response accurately reflect the documentation without contradicting it or adding unsupported claims?
     a) Faithful - response accurately reflects the docs, no contradictions or unsupported claims
     b) Partially faithful - mostly accurate but has minor inaccuracies or unsupported details
@@ -239,17 +262,46 @@ export const docsFaithfulnessScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ output }) => {
-  // Skip scoring if no docs were retrieved
-  if (!output.docs || output.docs.length === 0) {
-    return null
+> = async ({ trace }) => {
+  if (!trace) return null
+
+  const docsSpans = await getToolSpans(trace, 'search_docs')
+  if (docsSpans.length === 0) return null
+
+  const docs: string[] = []
+  for (const span of docsSpans) {
+    const output = span.output
+    if (
+      typeof output !== 'object' ||
+      output === null ||
+      !('content' in output) ||
+      !Array.isArray(output.content)
+    )
+      continue
+    for (const item of output.content) {
+      if (
+        typeof item === 'object' &&
+        item !== null &&
+        'text' in item &&
+        typeof item.text === 'string'
+      ) {
+        try {
+          if (!JSON.parse(item.text)?.error) docs.push(item.text)
+        } catch {
+          docs.push(item.text)
+        }
+      }
+    }
   }
 
-  const docsText = output.docs.join('\n\n')
+  if (docs.length === 0) return null
+
+  const text = await getLastAssistantText(trace)
+  if (!text) return null
 
   return await docsFaithfulnessEvaluator({
-    docs: docsText,
-    output: extractTextOnly(output.steps),
+    docs: docs.join('\n\n'),
+    output: text,
   })
 }
 
@@ -260,17 +312,17 @@ const correctnessEvaluator = LLMClassifierFromTemplate<{ input: string; expected
 
     Question:
     {{input}}
-    
+
     Expected Answer:
     {{expected}}
-    
+
     Assistant Response:
     {{output}}
-    
+
     Is the assistant's response correct? The response can contain additional information beyond the expected answer, but it must:
     - Include the expected answer (or equivalent information)
     - Not contradict the expected answer
-    
+
     a) Correct - response includes the expected answer, no contradictions or omissions
     b) Partially correct - includes most of the expected answer but has minor omissions or contradictions
     c) Incorrect - contradicts or fails to provide the expected answer
@@ -284,16 +336,14 @@ export const correctnessScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ input, output, expected }) => {
-  // Skip scoring if no ground truth is provided
-  if (!expected.correctAnswer) {
-    return null
-  }
-
+> = async ({ input, expected, trace }) => {
+  if (!expected.correctAnswer || !trace) return null
+  const text = await getLastAssistantText(trace)
+  if (!text) return null
   return await correctnessEvaluator({
     input: input.prompt,
     expected: expected.correctAnswer,
-    output: extractTextOnly(output.steps),
+    output: text,
   })
 }
 
@@ -301,9 +351,12 @@ export const urlValidityScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ output }) => {
-  const responseText = extractTextOnly(output.steps)
-  const allUrls = extractUrls(responseText, { excludeCodeBlocks: true, excludeTemplates: true })
+> = async ({ trace }) => {
+  if (!trace) return null
+  const text = await getLastAssistantText(trace)
+  if (!text) return null
+
+  const allUrls = extractUrls(text, { excludeCodeBlocks: true, excludeTemplates: true })
   const urls = allUrls.filter((url) => {
     try {
       const { hostname } = new URL(url)
@@ -313,10 +366,7 @@ export const urlValidityScorer: EvalScorer<
     }
   })
 
-  // Skip if no URLs found
-  if (urls.length === 0) {
-    return null
-  }
+  if (urls.length === 0) return null
 
   const results = await Promise.all(
     urls.map(async (url) => {
@@ -336,14 +386,12 @@ export const urlValidityScorer: EvalScorer<
   const errors = results.flatMap((r) => (r.error ? [r.error] : []))
   const validUrls = results.filter((r) => r.valid).length
 
-  const metadata = {
-    urls,
-    errors: errors.length > 0 ? errors : undefined,
-  }
-
   return {
     name: 'URL Validity',
     score: validUrls / urls.length,
-    metadata,
+    metadata: {
+      urls,
+      errors: errors.length > 0 ? errors : undefined,
+    },
   }
 }
