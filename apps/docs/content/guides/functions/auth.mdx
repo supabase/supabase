@@ -171,7 +171,7 @@ See the [`@supabase/server` docs](https://github.com/supabase/server) for the fu
 
 </Admonition>
 
-### Authenticated user calls
+### Authenticated user calls [#authenticated-user-calls-with-server-sdk]
 
 `allow: 'user'` pairs with `verify_jwt = true`. The platform validates the JWT, and the SDK hands you `ctx.supabase` already scoped to the caller.
 
@@ -186,7 +186,7 @@ export default {
 }
 ```
 
-### Service-to-service calls
+### Service-to-service calls [#service-to-service-calls-with-server-sdk]
 
 `allow: 'secret:<name>'` validates the `apikey` header against the named secret key from your [dashboard](/dashboard/project/_/settings/api-keys) and gives you `ctx.supabaseAdmin` for privileged work. The `<name>` matches the name you gave the key. Keep `verify_jwt = false`.
 
@@ -209,11 +209,11 @@ Create a named secret key for each caller in the [**Settings > API keys**](/dash
 
 </Admonition>
 
-### Public functions
+### Public functions [#public-functions-with-server-sdk]
 
 The SDK adds nothing to a truly public function. Use the raw pattern from the previous section. If you need a Supabase client anyway, `allow: 'always'` with `verify_jwt = false` skips every check and treats every caller as anonymous.
 
-### External webhooks
+### External webhooks [#external-webhooks-with-server-sdk]
 
 Use `allow: 'always'` to skip the SDK's credential check, then verify the provider's signature inside the handler. Keep `verify_jwt = false`.
 
