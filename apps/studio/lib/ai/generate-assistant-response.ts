@@ -1,6 +1,7 @@
 import * as ai from 'ai'
 import {
   convertToModelMessages,
+  getToolName,
   isToolUIPart,
   stepCountIs,
   type LanguageModel,
@@ -15,6 +16,7 @@ import { buildAssistantEvalOutput } from '@/evals/output'
 import type { AssistantEvalInput, AssistantEvalOutput } from '@/evals/scorer'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
+import { getLastUserText, isApprovalContinuation } from '@/lib/ai/message-utils'
 import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from '@/lib/ai/prompts'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 
@@ -38,8 +40,6 @@ export async function generateAssistantResponse({
   requestedModel,
   abortSignal,
   onSpanCreated,
-  onSpanExported,
-  parentSpanContext,
 }: {
   messages: UIMessage[]
   model: LanguageModel
@@ -58,19 +58,13 @@ export async function generateAssistantResponse({
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
   onSpanCreated?: (spanId: string) => void
-  onSpanExported?: (ctx: string) => void
-  parentSpanContext?: string
 }) {
   const shouldTrace = allowTracing ?? IS_TRACING_ENABLED
 
   // Turn 2 (post-approval) is uniquely identifiable upfront: the assistant message
   // from Turn 1 will already have tool parts in 'approval-responded' state. All other
   // turns (Turn 1 itself, and normal turns) look identical at request time.
-  const isPostApprovalTurn = rawMessages.some(
-    (msg) =>
-      msg.role === 'assistant' &&
-      msg.parts?.some((part) => isToolUIPart(part) && part.state === 'approval-responded')
-  )
+  const isPostApprovalTurn = isApprovalContinuation(rawMessages)
 
   const run = async (span?: Span) => {
     // Only returns last 7 messages
@@ -195,22 +189,37 @@ export async function generateAssistantResponse({
           // that eval scorers see the full picture.
           const approvedToolNames: string[] = []
           const approvedSqlQueries: string[] = []
+          let approvedStepText = ''
           for (const msg of rawMessages) {
             if (msg.role !== 'assistant' || !msg.parts) continue
+            const hasApprovedTools = msg.parts.some(
+              (p) =>
+                isToolUIPart(p) &&
+                (p.state === 'approval-responded' || p.state === 'output-available')
+            )
+            if (!hasApprovedTools) continue
             for (const part of msg.parts) {
-              if (!isToolUIPart(part)) continue
-              if (part.state !== 'approval-responded' && part.state !== 'output-available') continue
-              approvedToolNames.push(part.type.replace('tool-', ''))
-              if (part.type === 'tool-execute_sql') {
-                const sql = (part.input as any)?.sql
-                if (typeof sql === 'string') approvedSqlQueries.push(sql)
+              if (part.type === 'text') {
+                approvedStepText += part.text
+              } else if (isToolUIPart(part)) {
+                if (part.state !== 'approval-responded' && part.state !== 'output-available')
+                  continue
+                approvedToolNames.push(getToolName(part))
+                if (part.type === 'tool-execute_sql') {
+                  const sql = (part.input as any)?.sql
+                  if (typeof sql === 'string') approvedSqlQueries.push(sql)
+                }
               }
             }
           }
 
           const baseOutput = buildAssistantEvalOutput(finishReason, steps)
+          const priorStep = approvedStepText
+            ? [{ text: approvedStepText, toolCalls: [] as { toolName: string; input: unknown }[] }]
+            : []
           const output = {
             ...baseOutput,
+            steps: [...priorStep, ...baseOutput.steps],
             toolNames: [...approvedToolNames, ...baseOutput.toolNames],
             sqlQueries: [...approvedSqlQueries, ...baseOutput.sqlQueries],
           } satisfies AssistantEvalOutput
@@ -221,13 +230,8 @@ export async function generateAssistantResponse({
           } else {
             // Normal turn: input was deferred so we can skip it entirely for Turn 1.
             // Log input + output together here.
-            const lastUserMessage = rawMessages.findLast((m) => m.role === 'user')
-            const lastUserText = lastUserMessage?.parts
-              ?.filter((p): p is { type: 'text'; text: string } => p.type === 'text')
-              .map((p) => p.text)
-              .join('\n')
             span.log({
-              input: { prompt: lastUserText ?? '' } satisfies AssistantEvalInput,
+              input: { prompt: getLastUserText(rawMessages) } satisfies AssistantEvalInput,
               output,
               metadata: {
                 projectRef,
@@ -253,25 +257,14 @@ export async function generateAssistantResponse({
   if (shouldTrace) {
     // startSpan instead of traced() so we control when the span closes — onFinish logs
     // output to the span before we call span.end(), ensuring online scoring sees the output.
-    const span = startSpan({
-      name: 'generateAssistantResponse',
-      type: 'function',
-      ...(parentSpanContext && { parent: parentSpanContext }),
-    })
+    const span = startSpan({ name: 'generateAssistantResponse', type: 'function' })
     onSpanCreated?.(span.id)
-    onSpanExported?.(await span.export())
 
     if (isPostApprovalTurn) {
       // Log input upfront only for Turn 2. For Turn 1 and normal turns, input is deferred
       // to onFinish so that Turn 1 spans end with no data and don't trigger online scoring.
-      const lastUserMessage = rawMessages.findLast((m) => m.role === 'user')
-      const lastUserText = lastUserMessage?.parts
-        ?.filter((p): p is { type: 'text'; text: string } => p.type === 'text')
-        .map((p) => p.text)
-        .join('\n')
-
       span.log({
-        input: { prompt: lastUserText ?? '' } satisfies AssistantEvalInput,
+        input: { prompt: getLastUserText(rawMessages) } satisfies AssistantEvalInput,
         metadata: {
           projectRef,
           chatId,

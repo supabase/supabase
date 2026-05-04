@@ -1,9 +1,5 @@
 import { Chat, type UIMessage as MessageType } from '@ai-sdk/react'
-import {
-  DefaultChatTransport,
-  isToolUIPart,
-  lastAssistantMessageIsCompleteWithApprovalResponses,
-} from 'ai'
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
@@ -245,13 +241,6 @@ function createChatInstance(
         if (spanId) {
           state.pendingSpanIds[options.id] = spanId
         }
-        // Always update the stored span context so it tracks the most recent turn.
-        // It is only sent back as a parent when the next request is an approval
-        // continuation — keeping each normal conversation turn as its own trace.
-        const spanCtx = response.headers.get('x-braintrust-span-context')
-        if (spanCtx) {
-          state.braintrustSpanContexts[options.id] = spanCtx
-        }
         return response
       },
       async prepareSendMessagesRequest({ messages, ...opts }) {
@@ -261,14 +250,6 @@ function createChatInstance(
 
         // Get the chat specific to this request to ensure we have the correct name
         const chat = state.chats[options.id]
-
-        // Only thread the parent span context when this request is an approval
-        // continuation (Turn 2). Normal turns get their own independent trace.
-        const isApprovalContinuation = messages.some(
-          (msg) =>
-            msg.role === 'assistant' &&
-            msg.parts?.some((part) => isToolUIPart(part) && part.state === 'approval-responded')
-        )
 
         return {
           ...opts,
@@ -281,9 +262,6 @@ function createChatInstance(
             orgSlug: state.context.orgSlug,
             context: state.context,
             model: state.model,
-            braintrustParentSpanContext: isApprovalContinuation
-              ? state.braintrustSpanContexts[options.id]
-              : undefined,
             ...opts.body,
           },
           ...(IS_PLATFORM ? { headers: { Authorization: authorizationHeader ?? '' } } : {}),
@@ -337,7 +315,6 @@ export const createAiAssistantState = (): AiAssistantState => {
     chatInstances: {},
     pendingSpanIds: {},
     messageSpanIds: {},
-    braintrustSpanContexts: {},
 
     setContext: (context: Partial<AiAssistantContext>) => {
       state.context = { ...state.context, ...context }
@@ -414,7 +391,6 @@ export const createAiAssistantState = (): AiAssistantState => {
     deleteChat: (id: string) => {
       const { [id]: _, ...remainingChats } = state.chats
       state.chats = remainingChats
-      delete state.braintrustSpanContexts[id]
 
       if (id === state.activeChatId) {
         const remainingChatIds = Object.keys(remainingChats)
@@ -447,7 +423,6 @@ export const createAiAssistantState = (): AiAssistantState => {
         state.suggestions = undefined
         state.sqlSnippets = []
         state.initialInput = ''
-        delete state.braintrustSpanContexts[chat.id]
       }
     },
 
@@ -563,7 +538,6 @@ export type AiAssistantState = AiAssistantData & {
   chatInstances: Record<string, Chat<MessageType>>
   pendingSpanIds: Record<string, string>
   messageSpanIds: Record<string, string>
-  braintrustSpanContexts: Record<string, string>
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
   newChat: (

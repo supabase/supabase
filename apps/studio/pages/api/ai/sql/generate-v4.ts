@@ -64,7 +64,6 @@ const requestBodySchema = z.object({
   chatName: z.string().optional(),
   orgSlug: z.string().optional(),
   model: z.string().optional(),
-  braintrustParentSpanContext: z.string().optional(),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
@@ -92,7 +91,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     chatId,
     chatName,
     model: rawRequestedModel,
-    braintrustParentSpanContext,
   } = data
 
   const requestedModel: AssistantModelId | undefined =
@@ -221,12 +219,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       requestedModel,
       promptProviderOptions,
       abortSignal: abortController.signal,
-      parentSpanContext: braintrustParentSpanContext,
       onSpanCreated: (spanId) => {
         res.setHeader('x-braintrust-span-id', spanId)
-      },
-      onSpanExported: (ctx) => {
-        res.setHeader('x-braintrust-span-context', ctx)
       },
     })
 
