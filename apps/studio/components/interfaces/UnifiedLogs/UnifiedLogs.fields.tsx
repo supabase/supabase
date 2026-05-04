@@ -1,4 +1,3 @@
-import { format } from 'date-fns'
 import { User } from 'lucide-react'
 import { cn } from 'ui'
 
@@ -9,6 +8,12 @@ import { getLevelLabel } from './UnifiedLogs.utils'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { DataTableFilterField, Option } from '@/components/ui/DataTable/DataTable.types'
 import { getLevelColor } from '@/components/ui/DataTable/DataTable.utils'
+import { useFormatDateTime } from '@/lib/datetime'
+
+// prettier-ignore
+type UnifiedLogsFilterField = DataTableFilterField<ColumnSchema>
+// prettier-ignore
+type UnifiedLogsSheetField = SheetField<ColumnSchema, LogsMeta>
 
 // instead of filterFields, maybe just 'fields' with a filterDisabled prop?
 // that way, we could have 'message' or 'headers' field with label and value as well as type!
@@ -114,7 +119,7 @@ export const filterFields = [
       )
     },
   },
-] satisfies DataTableFilterField<ColumnSchema>[]
+] satisfies UnifiedLogsFilterField[]
 
 export const sheetFields = [
   {
@@ -128,11 +133,11 @@ export const sheetFields = [
     label: 'Date',
     type: 'timerange',
     component: (props) => {
-      const date = new Date(props.date)
-      const month = format(date, 'LLL')
-      const day = format(date, 'dd')
-      const year = format(date, 'y')
-      const time = format(date, 'HH:mm:ss')
+      const formatDateTime = useFormatDateTime()
+      const month = formatDateTime(props.date, 'MMM')
+      const day = formatDateTime(props.date, 'DD')
+      const year = formatDateTime(props.date, 'YYYY')
+      const time = formatDateTime(props.date, 'HH:mm:ss')
 
       return (
         <div className="font-mono whitespace-nowrap flex items-center gap-1 justify-end">
@@ -167,4 +172,4 @@ export const sheetFields = [
     type: 'input',
     skeletonClassName: 'w-56',
   },
-] satisfies SheetField<ColumnSchema, LogsMeta>[]
+] satisfies UnifiedLogsSheetField[]

@@ -2,12 +2,18 @@
 
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { useEffect, useRef, useState } from 'react'
 import { cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { useTimestampInfoContext } from './TimestampInfoProvider'
+
+export { TimestampInfoProvider } from './TimestampInfoProvider'
+
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
+dayjs.extend(timezone)
 
 const unixMicroToIsoTimestamp = (unix: string | number): string => {
   return dayjs.unix(Number(unix) / 1000 / 1000).toISOString()
@@ -22,11 +28,18 @@ const isUnixMicro = (unix: string | number): boolean => {
 type TimestampFormatter = {
   utcTimestamp: string | number
   format?: string
+  /**
+   * IANA timezone to render the timestamp in. When omitted, falls back to the
+   * browser's local timezone (preserving the historical default).
+   */
+  timezone?: string
 }
 
-export const timestampLocalFormatter = ({ utcTimestamp, format }: TimestampFormatter) => {
+export const timestampLocalFormatter = ({ utcTimestamp, format, timezone }: TimestampFormatter) => {
   const timestamp = isUnixMicro(utcTimestamp) ? unixMicroToIsoTimestamp(utcTimestamp) : utcTimestamp
-  return dayjs.utc(timestamp).local().format(format)
+  const base = dayjs.utc(timestamp)
+  const localised = timezone ? base.tz(timezone) : base.local()
+  return localised.format(format)
 }
 
 const timestampUtcFormatter = ({ utcTimestamp, format }: TimestampFormatter) => {
@@ -54,6 +67,7 @@ export const TimestampInfo = ({
   format = 'DD MMM YY HH:mm:ss',
   labelFormat = 'DD MMM YY HH:mm:ss',
   label,
+  timezone: timezoneProp,
 }: {
   className?: string
   utcTimestamp: string | number
@@ -61,13 +75,21 @@ export const TimestampInfo = ({
   format?: string
   labelFormat?: string
   label?: string
+  /**
+   * IANA timezone to render the timestamp in. When omitted the component
+   * falls back to the value supplied by `TimestampInfoProvider`, then to the
+   * browser's local timezone.
+   */
+  timezone?: string
 }) => {
-  const local = timestampLocalFormatter({ utcTimestamp, format })
+  const { timezone: timezoneFromContext } = useTimestampInfoContext()
+  const effectiveTimezone = timezoneProp ?? timezoneFromContext
+  const local = timestampLocalFormatter({ utcTimestamp, format, timezone: effectiveTimezone })
   const utc = timestampUtcFormatter({ utcTimestamp, format })
   const relative = timestampRelativeFormatter({ utcTimestamp })
   const [align, setAlign] = useState<'start' | 'end'>('start')
   const triggerRef = useRef<HTMLButtonElement>(null)
-  const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const localTimezone = effectiveTimezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
 
   // Calculate alignment based on trigger position
   // Needed so that the tooltip isn't hidden behind the header on top rows (in logs)
@@ -144,7 +166,11 @@ export const TimestampInfo = ({
           {label
             ? label
             : displayAs === 'local'
-              ? timestampLocalFormatter({ utcTimestamp, format: labelFormat })
+              ? timestampLocalFormatter({
+                  utcTimestamp,
+                  format: labelFormat,
+                  timezone: effectiveTimezone,
+                })
               : timestampUtcFormatter({ utcTimestamp, format: labelFormat })}
         </span>
       </TooltipTrigger>

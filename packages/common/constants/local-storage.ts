@@ -15,6 +15,7 @@ export const LOCAL_STORAGE_KEYS = {
   MAINTENANCE_BANNER_DISMISSED: (id: string) => `maintenance-banner-dismissed-${id}`,
   DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
 
+  UI_TIMEZONE: 'supabase-ui-timezone',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_PREVIEW_UNIFIED_LOGS: 'supabase-ui-preview-unified-logs',
@@ -161,6 +162,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
   LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
   LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+  LOCAL_STORAGE_KEYS.UI_TIMEZONE,
 ]
 
 export function clearLocalStorage() {
