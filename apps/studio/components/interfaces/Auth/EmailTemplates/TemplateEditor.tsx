@@ -24,6 +24,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { SpamValidation } from './SpamValidation'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
@@ -169,6 +170,11 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
   const baselineBodyValue = (authConfig && authConfig[messageSlug]) ?? ''
   const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(baselineValues)
   const hasChanges = hasFormChanges || baselineBodyValue !== bodyValue
+  const saveChangesTooltip = !canEdit
+    ? 'Set up Custom SMTP to edit and save templates'
+    : !hasChanges
+      ? 'Make a change before saving'
+      : undefined
 
   // Function to insert text at cursor position
   const insertTextAtCursor = (text: string) => {
@@ -229,6 +235,10 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
     if (!hasChanges) setValidationResult(undefined)
   }, [hasChanges])
 
+  useEffect(() => {
+    if (!canEdit) setActiveView('preview')
+  }, [canEdit])
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -282,8 +292,13 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                   width={60}
                   options={['preview', 'source']}
                   activeOption={activeView}
-                  onClickOption={(option) => setActiveView(option as 'source' | 'preview')}
+                  onClickOption={(option) => {
+                    if (!canEdit && option === 'source') return
+                    setActiveView(option as 'source' | 'preview')
+                  }}
                   borderOverride="border-muted"
+                  disabledOptions={!canEdit ? ['source'] : []}
+                  disabledOptionTooltip="Set up Custom SMTP to edit the source"
                 />
               </div>
               {activeView === 'source' ? (
@@ -357,14 +372,15 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                   Cancel
                 </Button>
               )}
-              <Button
+              <ButtonTooltip
                 type="primary"
                 htmlType="submit"
                 disabled={!canEdit || isSavingTemplate || !hasChanges}
                 loading={isSavingTemplate}
+                tooltip={{ content: { side: 'bottom', text: saveChangesTooltip } }}
               >
                 Save changes
-              </Button>
+              </ButtonTooltip>
             </CardFooter>
           </>
         )}

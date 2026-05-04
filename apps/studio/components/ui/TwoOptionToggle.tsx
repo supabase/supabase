@@ -1,4 +1,4 @@
-import { cn } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface TwoOptionToggleProps {
   options: string[]
@@ -6,6 +6,8 @@ interface TwoOptionToggleProps {
   activeOption: string
   onClickOption: (value: string) => void
   borderOverride: string
+  disabledOptions?: string[]
+  disabledOptionTooltip?: string
 }
 
 export const TwoOptionToggle = ({
@@ -14,6 +16,8 @@ export const TwoOptionToggle = ({
   activeOption,
   onClickOption,
   borderOverride = 'border-stronger',
+  disabledOptions = [],
+  disabledOptionTooltip,
 }: TwoOptionToggleProps) => {
   const buttonStyle = (
     isActive: boolean
@@ -36,28 +40,43 @@ export const TwoOptionToggle = ({
           'transition-all ease-in-out border border-strong'
         )}
       />
-      {options.map((option, index: number) => (
-        <span
-          key={`toggle_${index}`}
-          style={{ width: width + 1 }}
-          className={`
-              ${activeOption === option ? 'text-foreground' : 'text-foreground-light'}
-              ${index === 0 ? 'right-0' : 'left-0'}
-              ${buttonStyle(activeOption === option)}
-              cursor-pointer
-            `}
-          onClick={() => onClickOption(option)}
-        >
+      {options.map((option, index: number) => {
+        const isDisabled = disabledOptions.includes(option)
+        const optionButton = (
           <span
+            key={`toggle_${index}`}
+            style={{ width: width + 1 }}
             className={cn(
-              'capitalize hover:text-foreground',
-              activeOption === option ? 'text-foreground' : 'text-foreground-light'
+              activeOption === option ? 'text-foreground' : 'text-foreground-light',
+              index === 0 ? 'right-0' : 'left-0',
+              buttonStyle(activeOption === option),
+              isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
             )}
+            onClick={() => {
+              if (!isDisabled) onClickOption(option)
+            }}
           >
-            {option}
+            <span
+              className={cn(
+                'capitalize hover:text-foreground',
+                activeOption === option ? 'text-foreground' : 'text-foreground-light',
+                isDisabled && 'hover:text-foreground-light'
+              )}
+            >
+              {option}
+            </span>
           </span>
-        </span>
-      ))}
+        )
+
+        if (!isDisabled || !disabledOptionTooltip) return optionButton
+
+        return (
+          <Tooltip key={`toggle_${index}`}>
+            <TooltipTrigger asChild>{optionButton}</TooltipTrigger>
+            <TooltipContent side="top">{disabledOptionTooltip}</TooltipContent>
+          </Tooltip>
+        )
+      })}
     </div>
   )
 }
