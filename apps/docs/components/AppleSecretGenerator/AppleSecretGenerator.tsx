@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Button, Input_Shadcn_ as Input } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 function base64URL(value: string) {
@@ -192,14 +193,14 @@ const AppleSecretGenerator = () => {
       {secretKey && (
         <>
           <div style={{ height: '1rem' }} />
-          <Input
+          <FormItemLayout
+            isReactForm={false}
+            layout="vertical"
             label="Secret Key"
-            value={secretKey}
-            descriptionText={`Valid until: ${expiresAt}. Make sure you generate a new one before then!`}
-            reveal
-            copy
-            size="medium"
-          />
+            description={`Valid until: ${expiresAt}. Make sure you generate a new one before then!`}
+          >
+            <DataInput value={secretKey} copy reveal />
+          </FormItemLayout>
         </>
       )}
     </div>
