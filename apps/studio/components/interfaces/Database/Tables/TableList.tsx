@@ -266,7 +266,7 @@ export const TableList = ({
         <div className="flex grow justify-between gap-2 items-center">
           <Input
             size="tiny"
-            className="grow lg:grow-0 w-52"
+            containerClassName="grow lg:grow-0 w-52"
             placeholder="Search for a table"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
