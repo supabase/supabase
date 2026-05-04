@@ -2,10 +2,26 @@ import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 
 import BlogPostClient from './BlogPostClient'
-import { getAbsoluteBlogSocialImage } from '@/lib/blog-images'
+import authors from '@/lib/authors.json'
+import {
+  BLOG_PLACEHOLDER_IMAGE,
+  getAbsoluteBlogSocialImage,
+  toAbsoluteBlogImageUrl,
+} from '@/lib/blog-images'
 import { SITE_ORIGIN } from '@/lib/constants'
+import { blogPostingSchema, serializeJsonLd } from '@/lib/json-ld'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '@/lib/posts'
 import type { Blog, BlogData, PostReturnType } from '@/types/post'
+
+function resolveBlogAuthors(authorField: string | undefined) {
+  return (authorField ?? '')
+    .split(',')
+    .map((id) => id.trim())
+    .filter(Boolean)
+    .map((id) => authors.find((a) => a.author_id === id))
+    .filter((a): a is (typeof authors)[number] => Boolean(a))
+    .map((a) => ({ name: a.author, url: a.author_url }))
+}
 
 export const revalidate = 30
 
@@ -138,6 +154,28 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       isDraftMode: isDraft,
     }
 
-    return <BlogPostClient {...props} />
+    const frontmatter = parsedContent.data
+    const blogAuthors = resolveBlogAuthors(frontmatter.author)
+    const imageUrl =
+      getAbsoluteBlogSocialImage(frontmatter, SITE_ORIGIN) ??
+      toAbsoluteBlogImageUrl(BLOG_PLACEHOLDER_IMAGE, SITE_ORIGIN)
+    const blogJsonLd = blogPostingSchema({
+      url: `${SITE_ORIGIN}/blog/${slug}`,
+      headline: frontmatter.title,
+      description: frontmatter.description,
+      image: imageUrl,
+      datePublished: frontmatter.date,
+      authors: blogAuthors.length > 0 ? blogAuthors : [{ name: 'Supabase' }],
+    })
+
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(blogJsonLd) }}
+        />
+        <BlogPostClient {...props} />
+      </>
+    )
   } catch {}
 }

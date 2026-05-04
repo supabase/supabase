@@ -73,7 +73,7 @@ export const OrganizationInvite = () => {
           <Admonition
             showIcon={false}
             type="default"
-            title={`Sign in${isSignUpEnabled ? ' or create an account' : ''} first to view this invitation`}
+            description={`Sign in${isSignUpEnabled ? ' or create an account' : ''} first to view this invitation.`}
             className="border-0 rounded-none text-left"
           />
           <div className="p-4 border-muted border-t flex gap-x-3 justify-center">
