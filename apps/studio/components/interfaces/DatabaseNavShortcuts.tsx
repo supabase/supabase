@@ -68,6 +68,29 @@ export const DatabaseNavShortcuts = () => {
     () => navigate(SHORTCUT_IDS.NAV_DATABASE_MIGRATIONS),
     { enabled: urlByShortcut.has(SHORTCUT_IDS.NAV_DATABASE_MIGRATIONS) }
   )
+  useShortcut(SHORTCUT_IDS.NAV_DATABASE_TYPES, () => navigate(SHORTCUT_IDS.NAV_DATABASE_TYPES), {
+    enabled: urlByShortcut.has(SHORTCUT_IDS.NAV_DATABASE_TYPES),
+  })
+  useShortcut(
+    SHORTCUT_IDS.NAV_DATABASE_PUBLICATIONS,
+    () => navigate(SHORTCUT_IDS.NAV_DATABASE_PUBLICATIONS),
+    { enabled: urlByShortcut.has(SHORTCUT_IDS.NAV_DATABASE_PUBLICATIONS) }
+  )
+  useShortcut(
+    SHORTCUT_IDS.NAV_DATABASE_COLUMN_PRIVILEGES,
+    () => navigate(SHORTCUT_IDS.NAV_DATABASE_COLUMN_PRIVILEGES),
+    { enabled: urlByShortcut.has(SHORTCUT_IDS.NAV_DATABASE_COLUMN_PRIVILEGES) }
+  )
+  useShortcut(
+    SHORTCUT_IDS.NAV_DATABASE_SETTINGS,
+    () => navigate(SHORTCUT_IDS.NAV_DATABASE_SETTINGS),
+    { enabled: urlByShortcut.has(SHORTCUT_IDS.NAV_DATABASE_SETTINGS) }
+  )
+  useShortcut(
+    SHORTCUT_IDS.NAV_DATABASE_REPLICATION,
+    () => navigate(SHORTCUT_IDS.NAV_DATABASE_REPLICATION),
+    { enabled: urlByShortcut.has(SHORTCUT_IDS.NAV_DATABASE_REPLICATION) }
+  )
 
   return null
 }

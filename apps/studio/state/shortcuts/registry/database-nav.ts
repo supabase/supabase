@@ -19,6 +19,11 @@ export const DATABASE_NAV_SHORTCUT_IDS = {
   NAV_DATABASE_ROLES: 'nav.database-roles',
   NAV_DATABASE_BACKUPS: 'nav.database-backups',
   NAV_DATABASE_MIGRATIONS: 'nav.database-migrations',
+  NAV_DATABASE_TYPES: 'nav.database-types',
+  NAV_DATABASE_PUBLICATIONS: 'nav.database-publications',
+  NAV_DATABASE_COLUMN_PRIVILEGES: 'nav.database-column-privileges',
+  NAV_DATABASE_SETTINGS: 'nav.database-settings',
+  NAV_DATABASE_REPLICATION: 'nav.database-replication',
 }
 
 export type DatabaseNavShortcutId =
@@ -85,6 +90,41 @@ export const databaseNavRegistry: RegistryDefinations<DatabaseNavShortcutId> = {
     id: DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_MIGRATIONS,
     label: 'Go to Migrations',
     sequence: ['D', 'M'],
+    showInSettings: false,
+    options: { registerInCommandMenu: true },
+  },
+  [DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_TYPES]: {
+    id: DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_TYPES,
+    label: 'Go to Enumerated Types',
+    sequence: ['D', 'E'],
+    showInSettings: false,
+    options: { registerInCommandMenu: true },
+  },
+  [DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_PUBLICATIONS]: {
+    id: DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_PUBLICATIONS,
+    label: 'Go to Publications',
+    sequence: ['D', 'P'],
+    showInSettings: false,
+    options: { registerInCommandMenu: true },
+  },
+  [DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_COLUMN_PRIVILEGES]: {
+    id: DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_COLUMN_PRIVILEGES,
+    label: 'Go to Column Privileges',
+    sequence: ['D', 'C'],
+    showInSettings: false,
+    options: { registerInCommandMenu: true },
+  },
+  [DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_SETTINGS]: {
+    id: DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_SETTINGS,
+    label: 'Go to Database Settings',
+    sequence: ['D', 'S'],
+    showInSettings: false,
+    options: { registerInCommandMenu: true },
+  },
+  [DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_REPLICATION]: {
+    id: DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_REPLICATION,
+    label: 'Go to Replication',
+    sequence: ['D', 'L'],
     showInSettings: false,
     options: { registerInCommandMenu: true },
   },

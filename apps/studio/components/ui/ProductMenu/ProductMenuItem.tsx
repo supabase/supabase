@@ -21,14 +21,24 @@ export const ProductMenuItem = ({
 }: ProductMenuItemProps) => {
   const { name = '', url = '', icon, rightIcon, isExternal, label, disabled, shortcutId } = item
 
+  const labelNode = shortcutId ? (
+    <ShortcutTooltip shortcutId={shortcutId} side="right" delayDuration={1000}>
+      <span className="truncate min-w-0">{name}</span>
+    </ShortcutTooltip>
+  ) : (
+    <span className="truncate flex-1 min-w-0">{name}</span>
+  )
+
   const menuItem = (
     <Menu.Item icon={icon} active={isActive} onClick={onClick}>
       <div className="flex w-full items-center justify-between gap-1">
         <div
           className="flex items-center gap-1 min-w-0 flex-1"
-          title={hoverText ? hoverText : typeof name === 'string' ? name : ''}
+          title={
+            shortcutId ? undefined : hoverText ? hoverText : typeof name === 'string' ? name : ''
+          }
         >
-          <span className="truncate flex-1 min-w-0">{name}</span>
+          {labelNode}
           {label !== undefined && (
             <Badge
               className="shrink-0"
@@ -58,21 +68,11 @@ export const ProductMenuItem = ({
       )
     }
 
-    const link = (
+    return (
       <Link href={url} className="block" target={target} onClick={onClick}>
         {menuItem}
       </Link>
     )
-
-    if (shortcutId) {
-      return (
-        <ShortcutTooltip shortcutId={shortcutId} side="right" delayDuration={1000}>
-          {link}
-        </ShortcutTooltip>
-      )
-    }
-
-    return link
   }
 
   return menuItem
