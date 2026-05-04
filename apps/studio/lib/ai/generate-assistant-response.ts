@@ -38,6 +38,8 @@ export async function generateAssistantResponse({
   requestedModel,
   abortSignal,
   onSpanCreated,
+  onSpanExported,
+  parentSpanContext,
 }: {
   messages: UIMessage[]
   model: LanguageModel
@@ -56,6 +58,8 @@ export async function generateAssistantResponse({
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
   onSpanCreated?: (spanId: string) => void
+  onSpanExported?: (ctx: string) => void
+  parentSpanContext?: string
 }) {
   const shouldTrace = allowTracing ?? IS_TRACING_ENABLED
 
@@ -249,8 +253,13 @@ export async function generateAssistantResponse({
   if (shouldTrace) {
     // startSpan instead of traced() so we control when the span closes — onFinish logs
     // output to the span before we call span.end(), ensuring online scoring sees the output.
-    const span = startSpan({ name: 'generateAssistantResponse', type: 'function' })
+    const span = startSpan({
+      name: 'generateAssistantResponse',
+      type: 'function',
+      ...(parentSpanContext && { parent: parentSpanContext }),
+    })
     onSpanCreated?.(span.id)
+    onSpanExported?.(await span.export())
 
     if (isPostApprovalTurn) {
       // Log input upfront only for Turn 2. For Turn 1 and normal turns, input is deferred

@@ -241,6 +241,12 @@ function createChatInstance(
         if (spanId) {
           state.pendingSpanIds[options.id] = spanId
         }
+        // Store the exported span context once per chat so all turns share the same
+        // root trace. Subsequent turns send this back as parentSpanContext.
+        const spanCtx = response.headers.get('x-braintrust-span-context')
+        if (spanCtx && !state.braintrustSpanContexts[options.id]) {
+          state.braintrustSpanContexts[options.id] = spanCtx
+        }
         return response
       },
       async prepareSendMessagesRequest({ messages, ...opts }) {
@@ -262,6 +268,7 @@ function createChatInstance(
             orgSlug: state.context.orgSlug,
             context: state.context,
             model: state.model,
+            braintrustParentSpanContext: state.braintrustSpanContexts[options.id],
             ...opts.body,
           },
           ...(IS_PLATFORM ? { headers: { Authorization: authorizationHeader ?? '' } } : {}),
@@ -315,6 +322,7 @@ export const createAiAssistantState = (): AiAssistantState => {
     chatInstances: {},
     pendingSpanIds: {},
     messageSpanIds: {},
+    braintrustSpanContexts: {},
 
     setContext: (context: Partial<AiAssistantContext>) => {
       state.context = { ...state.context, ...context }
@@ -391,6 +399,7 @@ export const createAiAssistantState = (): AiAssistantState => {
     deleteChat: (id: string) => {
       const { [id]: _, ...remainingChats } = state.chats
       state.chats = remainingChats
+      delete state.braintrustSpanContexts[id]
 
       if (id === state.activeChatId) {
         const remainingChatIds = Object.keys(remainingChats)
@@ -423,6 +432,7 @@ export const createAiAssistantState = (): AiAssistantState => {
         state.suggestions = undefined
         state.sqlSnippets = []
         state.initialInput = ''
+        delete state.braintrustSpanContexts[chat.id]
       }
     },
 
@@ -538,6 +548,7 @@ export type AiAssistantState = AiAssistantData & {
   chatInstances: Record<string, Chat<MessageType>>
   pendingSpanIds: Record<string, string>
   messageSpanIds: Record<string, string>
+  braintrustSpanContexts: Record<string, string>
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
   newChat: (
