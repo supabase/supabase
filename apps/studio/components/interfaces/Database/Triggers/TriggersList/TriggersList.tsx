@@ -1,4 +1,4 @@
-import type { PostgresTrigger } from '@supabase/postgres-meta'
+import { safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { DatabaseZap, Search } from 'lucide-react'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
@@ -10,7 +10,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { CreateTriggerButtons } from './CreateTriggerButtons'
 import { TriggerList } from './TriggerList'
-import { generateTriggerCreateSQL } from './TriggerList.utils'
+import { generateTriggerCreateSQL, type PostgresTrigger } from './TriggerList.utils'
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
 import { TriggerSheet } from '@/components/interfaces/Database/Triggers/TriggerSheet'
@@ -115,10 +115,12 @@ export const TriggersList = () => {
     setTriggerToDuplicate(null)
     if (isInlineEditorEnabled) {
       setEditorPanelInitialPrompt('Create a new database trigger that...')
-      setEditorPanelValue(`create trigger trigger_name
+      setEditorPanelValue(
+        safeSql`create trigger trigger_name
 after insert or update or delete on table_name
 for each row
-execute function function_name();`)
+execute function function_name();`
+      )
       if (editorPanelTemplates.length > 0) {
         setEditorPanelTemplates([])
       }

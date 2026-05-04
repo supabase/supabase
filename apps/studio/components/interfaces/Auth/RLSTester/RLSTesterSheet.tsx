@@ -1,4 +1,9 @@
-import { type PostgresPolicy } from '@supabase/postgres-meta'
+import {
+  acceptUntrustedSql,
+  safeSql,
+  type SafeSqlFragment,
+  type UntrustedSqlFragment,
+} from '@supabase/pg-meta'
 import {
   Select,
   SelectContent,
@@ -10,7 +15,7 @@ import {
 } from '@ui/components/shadcn/ui/select'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { Code } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   DialogSectionSeparator,
@@ -31,13 +36,14 @@ import { RLSTesterEmptyState } from './RLSTesterEmptyState'
 import { RLSTesterResults } from './RLSTesterResults'
 import { RoleSelector } from './RoleSelector'
 import { UserSelector } from './UserSelector'
+import { UserSqlEditor } from './UserSqlEditor'
 import { useTestQueryRLS } from './useTestQueryRLS'
-import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 interface RLSTesterSheetProps {
-  handleSelectEditPolicy: (policy: PostgresPolicy) => void
+  handleSelectEditPolicy: (policy: Policy) => void
 }
 
 export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) => {
@@ -47,28 +53,53 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
   const [selectedOption, setSelectedOption] = useState<'anon' | 'authenticated'>('anon')
 
   const [format, setFormat] = useState<'sql' | 'lib'>('sql')
-  const [inferredSQL, setInferredSQL] = useState<string>()
+  const [inferredSQL, setInferredSQL] = useState<UntrustedSqlFragment>()
 
-  const [value, setValue] = useState<string>('')
+  const [value, setValue] = useState<SafeSqlFragment>(safeSql``)
   const [results, setResults] = useState<Object[] | null>(null)
   const [autoLimit, setAutoLimit] = useState(false)
   const [parseQueryResults, setParseQueryResults] = useState<ParseQueryResults>()
 
-  const { testQuery, isLoading, executeSqlError, parseQueryError, parseClientCodeError } =
-    useTestQueryRLS()
+  const {
+    testQuery,
+    inferSQLFromLib,
+    isLoading,
+    isInferring,
+    executeSqlError,
+    parseQueryError,
+    parseClientCodeError,
+  } = useTestQueryRLS()
+
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleValueChange = (sql: SafeSqlFragment) => {
+    setValue(sql)
+    if (format !== 'lib') return
+
+    if (debounceRef.current !== null) clearTimeout(debounceRef.current)
+    if (!sql) return
+
+    debounceRef.current = setTimeout(() => {
+      inferSQLFromLib(sql, setInferredSQL)
+    }, 1500)
+  }
+
+  const executionCallbacks = {
+    option: selectedOption,
+    onExecuteSQL: ({ result, isAutoLimit }: { result: Object[] | null; isAutoLimit: boolean }) => {
+      setResults(result)
+      setAutoLimit(isAutoLimit)
+    },
+    onParseQuery: setParseQueryResults,
+  }
 
   const onRunQuery = async () => {
-    await testQuery({
-      option: selectedOption,
-      format,
-      value,
-      onInferSQL: setInferredSQL,
-      onParseQuery: setParseQueryResults,
-      onExecuteSQL: ({ result, isAutoLimit }) => {
-        setResults(result)
-        setAutoLimit(isAutoLimit)
-      },
-    })
+    if (format === 'lib') {
+      if (!inferredSQL) return
+      await testQuery({ value: acceptUntrustedSql(inferredSQL), ...executionCallbacks })
+    } else {
+      await testQuery({ value, ...executionCallbacks })
+    }
   }
 
   useEffect(() => {
@@ -110,7 +141,17 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
             <div className="flex items-center justify-between px-5 py-2">
               <p className="text-sm">Query</p>
               <div className="flex items-center gap-x-2">
-                <Select value={format} onValueChange={(x) => setFormat(x as 'sql' | 'lib')}>
+                <Select
+                  value={format}
+                  onValueChange={(x) => {
+                    const newFormat = x as 'sql' | 'lib'
+                    setFormat(newFormat)
+                    if (newFormat !== 'lib') {
+                      setInferredSQL(undefined)
+                      if (debounceRef.current !== null) clearTimeout(debounceRef.current)
+                    }
+                  }}
+                >
                   <SelectTrigger size="tiny">
                     <SelectValue />
                   </SelectTrigger>
@@ -126,21 +167,20 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
             </div>
 
             <div className="h-40 relative">
-              <CodeEditor
+              <UserSqlEditor
                 id="rls-tester"
-                language="pgsql"
                 value={value}
                 placeholder={
                   format === 'sql'
-                    ? 'select * from table;'
-                    : 'SQL will be inferred from client library code'
+                    ? safeSql`select * from table;`
+                    : safeSql`SQL will be inferred from client library code`
                 }
-                onInputChange={(val) => setValue(val ?? '')}
+                onChange={handleValueChange}
                 actions={{
                   runQuery: {
                     enabled: open,
                     callback: () => {
-                      if (!isLoading) onRunQuery()
+                      if (!isInferring && !isLoading) onRunQuery()
                     },
                   },
                 }}
@@ -148,10 +188,10 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
             </div>
           </SheetSection>
 
-          {format === 'lib' && !!inferredSQL && (
+          {format === 'lib' && (
             <div>
               <DialogSectionSeparator />
-              <InferredSQLViewer sql={inferredSQL} />
+              <InferredSQLViewer sql={inferredSQL} isLoading={isInferring} />
             </div>
           )}
 
@@ -214,7 +254,12 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
             <Button type="default" disabled={isLoading} onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="primary" loading={isLoading} onClick={onRunQuery}>
+            <Button
+              type="primary"
+              loading={isInferring || isLoading}
+              disabled={format === 'lib' && !inferredSQL}
+              onClick={onRunQuery}
+            >
               Run query
             </Button>
           </div>

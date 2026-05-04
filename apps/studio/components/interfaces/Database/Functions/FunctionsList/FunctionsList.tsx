@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
@@ -32,7 +33,7 @@ import SchemaSelector from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabaseFunctionDeleteMutation } from '@/data/database-functions/database-functions-delete-mutation'
-import type { DatabaseFunction } from '@/data/database-functions/database-functions-query'
+import type { SavedDatabaseFunction } from '@/data/database-functions/database-functions-query'
 import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -46,7 +47,7 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
-const createFunctionSnippet = `create function function_name()
+const createFunctionSnippet = safeSql`create function function_name()
 returns void
 language plpgsql
 as $$
@@ -79,7 +80,7 @@ export const FunctionsList = () => {
     }
   }
 
-  const duplicateFunction = (fn: DatabaseFunction) => {
+  const duplicateFunction = (fn: SavedDatabaseFunction) => {
     if (isInlineEditorEnabled) {
       const dupFn = {
         ...fn,
@@ -94,7 +95,7 @@ export const FunctionsList = () => {
     }
   }
 
-  const editFunction = (fn: DatabaseFunction) => {
+  const editFunction = (fn: SavedDatabaseFunction) => {
     setSelectedFunctionIdToDuplicate(null)
     if (isInlineEditorEnabled) {
       setEditorPanelValue(fn.complete_statement)
