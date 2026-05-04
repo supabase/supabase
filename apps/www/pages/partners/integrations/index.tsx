@@ -3,7 +3,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
 import supabase from '~/lib/supabaseMisc'
-import { Partner, toPartner } from '~/types/partners'
+import { Category, Partner, toPartner } from '~/types/partners'
 import { type Listing } from 'common/marketplace-client'
 import { Loader, Search } from 'lucide-react'
 import { NextSeo } from 'next-seo'
@@ -40,7 +40,9 @@ function IntegrationPartnersPage(props: Props) {
   const initialPartners = props.partners ?? []
   const [partners, setPartners] = useState(initialPartners)
 
-  const allCategories = Array.from(new Set(initialPartners?.flatMap((p) => p.categories)))
+  const categoryMap: { [slug: string]: Category } = {}
+  initialPartners.forEach((p) => (p.categories.forEach((c) => { if (!(c.slug in categoryMap)) { categoryMap[c.slug] = c } })))
+  const allCategories = Object.keys(categoryMap).toSorted().map((slug) => categoryMap[slug])
 
   const router = useRouter()
 
