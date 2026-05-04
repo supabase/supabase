@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { cn, Separator } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
@@ -16,6 +16,13 @@ import {
 } from './constants'
 import type { McpClient, McpOnCopyCallback } from './types'
 import { getMcpUrl } from './utils/getMcpUrl'
+
+const CLIENT_GROUPS = MCP_CLIENT_GROUPS.map((group) => ({
+  heading: group.heading,
+  clients: group.keys
+    .map((key) => MCP_CLIENTS.find((c) => c.key === key))
+    .filter(Boolean) as (typeof MCP_CLIENTS)[number][],
+}))
 
 export interface McpConfigPanelProps {
   baseUrl?: string
@@ -44,15 +51,6 @@ export function McpConfigPanel({
   const [readonly, setReadonly] = useState(false)
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [selectedClient, setSelectedClient] = useState(initialSelectedClient ?? MCP_CLIENTS[0])
-
-  const clientGroups = useRef(
-    MCP_CLIENT_GROUPS.map((group) => ({
-      heading: group.heading,
-      clients: group.keys
-        .map((key) => MCP_CLIENTS.find((c) => c.key === key))
-        .filter(Boolean) as (typeof MCP_CLIENTS)[number][],
-    }))
-  )
 
   const supportedFeatures = isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
   const selectedFeaturesSupported = useMemo(() => {
@@ -119,7 +117,7 @@ export function McpConfigPanel({
         <ClientSelectDropdown
           label="Client"
           clients={MCP_CLIENTS}
-          groups={clientGroups.current}
+          groups={CLIENT_GROUPS}
           selectedClient={selectedClient}
           onClientChange={handleClientChange}
           theme={theme}
