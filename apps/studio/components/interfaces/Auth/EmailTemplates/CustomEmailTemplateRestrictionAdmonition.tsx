@@ -26,7 +26,7 @@ export const CustomEmailTemplateRestrictionAdmonition = ({
       type="default"
       layout="responsive"
       title="Set up Custom SMTP to edit templates"
-      description="Default templates are read-only while this project uses Supabase’s built-in email service. Set up Custom SMTP or sign up to Pro to edit templates."
+      description="Default emails still send to users. Set up Custom SMTP to edit their subject and body."
       actions={
         <div className="flex w-full @lg:w-auto">
           <Button asChild type="default" className="flex-1 rounded-r-none px-3 @lg:flex-none">
@@ -45,20 +45,20 @@ export const CustomEmailTemplateRestrictionAdmonition = ({
                 <Link
                   href={`/org/${organizationSlug}/billing?panel=subscriptionPlan&source=authEmailTemplates`}
                 >
-                  <div className="space-y-0.5">
+                  <div>
                     <p className="block text-foreground">Upgrade to Pro</p>
-                    <p className="block text-foreground-light">
-                      Edit templates while using Supabase email.
+                    <p className="block text-foreground-lighter">
+                      Edit templates while using Supabase’s email service
                     </p>
                   </div>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href={`/project/${projectRef ?? '_'}/auth/hooks`}>
-                  <div className="space-y-0.5">
+                  <div>
                     <p className="block text-foreground">Configure send-email hook</p>
-                    <p className="block text-foreground-light">
-                      Send auth emails through your own workflow.
+                    <p className="block text-foreground-lighter">
+                      Send auth emails through your own workflow
                     </p>
                   </div>
                 </Link>
