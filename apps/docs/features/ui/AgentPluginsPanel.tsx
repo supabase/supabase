@@ -50,7 +50,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
         <p className="text-sm text-foreground-light">
           Install the Supabase plugin from the{' '}
           <a
-            href="https://claude.com/plugins"
+            href="https://claude.com/plugins/supabase"
             target="_blank"
             rel="noopener noreferrer"
             className="text-brand-link hover:underline"
@@ -153,30 +153,33 @@ export function AgentPluginsPanel() {
       <div className="mt-4 rounded-lg border border-muted p-4">
         <PluginInstructions client={selectedClient} />
       </div>
-      <div className="mt-2 flex gap-4">
-        {selectedClient.docsUrl && (
-          <a
-            href={selectedClient.docsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-xs text-foreground-lighter hover:text-foreground-light transition-colors"
-          >
-            <ExternalLink size={10} />
-            {selectedClient.label} plugin docs
-          </a>
-        )}
-        {selectedClient.repoUrl && (
-          <a
-            href={selectedClient.repoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-xs text-foreground-lighter hover:text-foreground-light transition-colors"
-          >
-            <ExternalLink size={10} />
-            Plugin repository
-          </a>
-        )}
-      </div>
+      {(selectedClient.docsUrl || selectedClient.repoUrl) && (
+        <div className="mt-3 flex items-center gap-2 text-xs text-foreground-light">
+          <span>Need help?</span>
+          {selectedClient.docsUrl && (
+            <a
+              href={selectedClient.docsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-link hover:underline inline-flex items-center"
+            >
+              View {selectedClient.label} plugin docs
+              <ExternalLink className="h-3 w-3 ml-1" />
+            </a>
+          )}
+          {selectedClient.repoUrl && (
+            <a
+              href={selectedClient.repoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-link hover:underline inline-flex items-center"
+            >
+              Give feedback
+              <ExternalLink className="h-3 w-3 ml-1" />
+            </a>
+          )}
+        </div>
+      )}
     </div>
   )
 }
