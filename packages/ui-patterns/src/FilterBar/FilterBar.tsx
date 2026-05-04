@@ -29,7 +29,15 @@ export type FilterBarProps = {
 }
 
 function FilterBarContent({ className }: { className?: string }) {
-  const { filters, error, optionsError, isLoading, variant, icon: loadingIcon } = useFilterBar()
+  const {
+    filters,
+    error,
+    optionsError,
+    isLoading,
+    variant,
+    icon: loadingIcon,
+    handleGroupFreeformFocus,
+  } = useFilterBar()
 
   return (
     <div className="w-full space-y-2 relative">
@@ -42,8 +50,10 @@ function FilterBarContent({ className }: { className?: string }) {
         <div
           className={cn(
             'relative flex items-center justify-center shrink-0 px-2 bg-surface-200',
-            variant === 'pill' ? 'bg-transparent border-r-0' : 'border-r'
+            variant === 'pill' ? 'bg-transparent border-r-0' : 'border-r',
+            !isLoading && 'cursor-pointer'
           )}
+          onClick={() => !isLoading && handleGroupFreeformFocus([])}
         >
           <div
             className={cn(
