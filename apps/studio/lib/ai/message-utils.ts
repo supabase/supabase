@@ -1,4 +1,22 @@
-import type { UIMessage } from 'ai'
+import { isToolUIPart, type UIMessage } from 'ai'
+
+export function isApprovalContinuation(messages: UIMessage[]): boolean {
+  return messages.some(
+    (msg) =>
+      msg.role === 'assistant' &&
+      msg.parts?.some((part) => isToolUIPart(part) && part.state === 'approval-responded')
+  )
+}
+
+export function getLastUserText(messages: UIMessage[]): string {
+  const lastUserMessage = messages.findLast((m) => m.role === 'user')
+  return (
+    lastUserMessage?.parts
+      ?.filter((p): p is { type: 'text'; text: string } => p.type === 'text')
+      .map((p) => p.text)
+      .join('\n') ?? ''
+  )
+}
 
 /**
  * Prepares messages for API transmission by cleaning and limiting history

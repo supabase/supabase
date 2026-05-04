@@ -35,7 +35,7 @@ export const EdgeFunctionRenderer = ({
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref }, { enabled: !!ref })
   const { data: existingFunction } = useEdgeFunctionQuery(
     { projectRef: ref, slug: functionName },
-    { enabled: !!ref && !!functionName && showApprovalFooter }
+    { enabled: !!ref && !!functionName }
   )
 
   const functionUrl = useMemo(() => {

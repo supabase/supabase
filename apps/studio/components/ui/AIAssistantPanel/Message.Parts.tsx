@@ -142,8 +142,12 @@ function MessagePartExecuteSql({
   const { data: chart, success } = parseExecuteSqlChartResult(input)
   if (!success) return null
 
-  if (toolPart.state === 'approval-requested') {
-    const approvalId = toolPart.approval.id
+  if (
+    toolPart.state === 'approval-requested' ||
+    state === 'input-available' ||
+    state === 'output-available'
+  ) {
+    const approvalId = toolPart.state === 'approval-requested' ? toolPart.approval.id : undefined
     return (
       <div className="w-auto overflow-x-hidden my-4 space-y-2">
         <DisplayBlockRenderer
@@ -161,31 +165,16 @@ function MessagePartExecuteSql({
           toolState={toolPart.state}
           isLastPart={isLastPart}
           isLastMessage={isLastMessage}
-          onApprove={() => addToolApprovalResponse?.({ id: approvalId, approved: true })}
-          onDeny={() => addToolApprovalResponse?.({ id: approvalId, approved: false })}
-        />
-      </div>
-    )
-  }
-
-  if (state === 'input-available' || state === 'output-available') {
-    return (
-      <div className="w-auto overflow-x-hidden my-4 space-y-2">
-        <DisplayBlockRenderer
-          messageId={id}
-          toolCallId={toolCallId}
-          initialArgs={{
-            sql: chart.sql,
-            label: chart.label,
-            isWriteQuery: chart.isWriteQuery,
-            view: chart.view,
-            xAxis: chart.xAxis,
-            yAxis: chart.yAxis,
-          }}
-          initialResults={output}
-          toolState={state}
-          isLastPart={isLastPart}
-          isLastMessage={isLastMessage}
+          onApprove={
+            approvalId
+              ? () => addToolApprovalResponse?.({ id: approvalId, approved: true })
+              : undefined
+          }
+          onDeny={
+            approvalId
+              ? () => addToolApprovalResponse?.({ id: approvalId, approved: false })
+              : undefined
+          }
         />
       </div>
     )
