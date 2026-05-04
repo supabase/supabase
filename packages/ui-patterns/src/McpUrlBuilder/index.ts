@@ -8,7 +8,7 @@ export {
   FEATURE_GROUPS_PLATFORM,
   FEATURE_GROUPS_NON_PLATFORM,
   MCP_CLIENTS,
-  CONNECTOR_CLIENT_KEYS,
+  MCP_CLIENT_GROUPS,
 } from './constants'
 export { getMcpUrl } from './utils/getMcpUrl'
 export { createMcpCopyHandler, type McpCopyType } from './utils/createMcpCopyHandler'
