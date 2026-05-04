@@ -1,21 +1,19 @@
 import { EvalScorer, Trace } from 'braintrust'
 import { parse } from 'libpg-query'
+import { z } from 'zod'
 
 import { AssistantEvalInput, AssistantEvalOutput, Expected, getToolSpans } from './scorer'
 import { extractIdentifiers, isQuotedInSql, needsQuoting } from '@/lib/sql-identifier-quoting'
 
+const executeSqlInputSchema = z.object({ sql: z.string() })
+
+/** Extracts SQL strings from all `execute_sql` tool spans in the trace. */
 async function getSqlQueries(trace: Trace): Promise<string[]> {
   const spans = await getToolSpans(trace, 'execute_sql')
-  return spans
-    .map((s) => s.input)
-    .filter(
-      (input): input is { sql: string } =>
-        typeof input === 'object' &&
-        input !== null &&
-        'sql' in input &&
-        typeof input.sql === 'string'
-    )
-    .map((input) => input.sql)
+  return spans.flatMap((s) => {
+    const r = executeSqlInputSchema.safeParse(s.input)
+    return r.success ? [r.data.sql] : []
+  })
 }
 
 export const sqlSyntaxScorer: EvalScorer<

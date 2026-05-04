@@ -163,8 +163,8 @@ export async function generateAssistantResponse({
   }
 
   if (shouldTrace) {
-    // startSpan instead of traced() so we control when the span closes — onFinish logs
-    // output to the span before we call span.end(), ensuring online scoring sees the output.
+    // startSpan instead of traced() so we control when the span closes via onFinish.
+    // Scorers read from child spans (LLM + tool) in the trace rather than a root span output field.
     const span = startSpan({ name: 'generateAssistantResponse', type: 'function' })
     onSpanCreated?.(span.id)
 

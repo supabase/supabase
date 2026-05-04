@@ -2,6 +2,7 @@ import { FinishReason } from 'ai'
 import { LLMClassifierFromTemplate } from 'autoevals'
 import { EvalCase, EvalScorer, SpanData, Trace } from 'braintrust'
 import { stripIndent } from 'common-tags'
+import { z } from 'zod'
 
 import { extractUrls } from '@/lib/helpers'
 
@@ -49,48 +50,47 @@ export type AssistantEvalCase = EvalCase<AssistantEvalInput, Expected, Assistant
 
 // --- Trace helpers ---
 
-type ChatMessage = { role: string; content: unknown }
-
-function isChatMessage(msg: unknown): msg is ChatMessage {
-  return typeof msg === 'object' && msg !== null && 'role' in msg
-}
+const chatMessageSchema = z.object({ role: z.string(), content: z.unknown() })
+const textContentBlockSchema = z.object({ type: z.literal('text'), text: z.string() })
+const loadKnowledgeInputSchema = z.object({ name: z.string() })
+// search_docs returns { content: [{ text: string }] } where each text is a JSON doc string
+const searchDocsOutputSchema = z.object({ content: z.array(z.object({ text: z.string() })) })
 
 function extractMessageText(content: unknown): string {
   if (typeof content === 'string') return content
-  if (Array.isArray(content)) {
-    return content
-      .filter(
-        (c): c is { type: 'text'; text: string } =>
-          typeof c === 'object' &&
-          c !== null &&
-          'type' in c &&
-          c.type === 'text' &&
-          'text' in c &&
-          typeof c.text === 'string'
-      )
-      .map((c) => c.text)
-      .join('\n')
-  }
-  return ''
+  if (!Array.isArray(content)) return ''
+  return content
+    .flatMap((c) => {
+      const r = textContentBlockSchema.safeParse(c)
+      return r.success ? [r.data.text] : []
+    })
+    .join('\n')
 }
 
 async function getLastAssistantText(trace: Trace): Promise<string | null> {
   const thread = await trace.getThread()
   for (let i = thread.length - 1; i >= 0; i--) {
-    const msg = thread[i]
-    if (isChatMessage(msg) && msg.role === 'assistant') {
-      return extractMessageText(msg.content) || null
+    const msg = chatMessageSchema.safeParse(thread[i])
+    if (msg.success && msg.data.role === 'assistant') {
+      return extractMessageText(msg.data.content) || null
     }
   }
   return null
 }
 
+/**
+ * Serializes the full conversation thread (excluding system messages) as
+ * `[role]\ncontent` blocks joined by blank lines, for use by LLM judges that
+ * need multi-turn context.
+ */
 async function getConversationContext(trace: Trace): Promise<string> {
   const thread = await trace.getThread()
   return thread
-    .filter(isChatMessage)
-    .filter((m) => m.role !== 'system')
-    .map((m) => `[${m.role}]\n${extractMessageText(m.content)}`)
+    .flatMap((m) => {
+      const r = chatMessageSchema.safeParse(m)
+      if (!r.success || r.data.role === 'system') return []
+      return [`[${r.data.role}]\n${extractMessageText(r.data.content)}`]
+    })
     .join('\n\n')
 }
 
@@ -130,16 +130,10 @@ export const knowledgeUsageScorer: EvalScorer<
   if (!expected.requiredKnowledge || !trace) return null
 
   const knowledgeSpans = await getToolSpans(trace, 'load_knowledge')
-  const loadedKnowledge = knowledgeSpans
-    .map((s) => s.input)
-    .filter(
-      (input): input is { name: string } =>
-        typeof input === 'object' &&
-        input !== null &&
-        'name' in input &&
-        typeof input.name === 'string'
-    )
-    .map((input) => input.name)
+  const loadedKnowledge = knowledgeSpans.flatMap((s) => {
+    const r = loadKnowledgeInputSchema.safeParse(s.input)
+    return r.success ? [r.data.name] : []
+  })
 
   const presentCount = expected.requiredKnowledge.filter((k) => loadedKnowledge.includes(k)).length
   const totalCount = expected.requiredKnowledge.length
@@ -270,26 +264,13 @@ export const docsFaithfulnessScorer: EvalScorer<
 
   const docs: string[] = []
   for (const span of docsSpans) {
-    const output = span.output
-    if (
-      typeof output !== 'object' ||
-      output === null ||
-      !('content' in output) ||
-      !Array.isArray(output.content)
-    )
-      continue
-    for (const item of output.content) {
-      if (
-        typeof item === 'object' &&
-        item !== null &&
-        'text' in item &&
-        typeof item.text === 'string'
-      ) {
-        try {
-          if (!JSON.parse(item.text)?.error) docs.push(item.text)
-        } catch {
-          docs.push(item.text)
-        }
+    const result = searchDocsOutputSchema.safeParse(span.output)
+    if (!result.success) continue
+    for (const item of result.data.content) {
+      try {
+        if (!JSON.parse(item.text)?.error) docs.push(item.text)
+      } catch {
+        docs.push(item.text)
       }
     }
   }
