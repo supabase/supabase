@@ -100,7 +100,6 @@ router.get('/connect-supabase/oauth2/callback', async (ctx) => {
       code_verifier: codeVerifier,
     }),
   }).then((res) => res.json())
-  console.log('tokens', tokens)
 
   // Store the tokens in your DB for future use.
 
