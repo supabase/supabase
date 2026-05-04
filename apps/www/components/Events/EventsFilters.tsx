@@ -270,7 +270,7 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
               <InputGroupAddon align="inline-end">
                 <InputGroupButton
                   onClick={() => {
-                    setSearchTerm('')
+                    handleSearchByText('')
                     setShowSearchInput(false)
                   }}
                 >
