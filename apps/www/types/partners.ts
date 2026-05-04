@@ -15,6 +15,7 @@ export type Partner = {
   title: string
   partnerName: string
   description: string
+  content: string
   websiteUrl: string
   docsUrl: string | null
   installUrl: string | null
@@ -31,6 +32,7 @@ export function toPartner(dbPartner: DbPartner): Partner {
     title,
     developer,
     description,
+    overview,
     website,
     docs,
     logo,
@@ -47,6 +49,7 @@ export function toPartner(dbPartner: DbPartner): Partner {
     title,
     partnerName: developer,
     description,
+    content: overview,
     websiteUrl: website,
     docsUrl: docs,
     installUrl: call_to_action_link,

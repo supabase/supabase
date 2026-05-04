@@ -8,13 +8,9 @@ import { cn } from 'ui'
 
 import { INTEGRATIONS, Loading, type IntegrationDefinition } from './Integrations.constants'
 import { marketplaceIntegrationsQueryOptions } from '@/data/marketplace/integrations-query'
+import { fullImageUrl } from 'common/marketplace-client'
 import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-
-const fullImageUrl = (imagePath: string) => {
-  const API_URL = process.env.NEXT_PUBLIC_MARKETPLACE_API_URL || ''
-  return `${API_URL}${imagePath}`
-}
 
 /**
  * [Joshen] Returns a combination of

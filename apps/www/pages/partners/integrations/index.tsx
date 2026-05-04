@@ -3,6 +3,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
 import supabase from '~/lib/supabaseMisc'
+import { listPartners } from '~/lib/marketplaceDb'
 import { type Category, type Partner, toPartner } from '~/types/partners'
 import { Loader, Search } from 'lucide-react'
 import { NextSeo } from 'next-seo'
@@ -14,17 +15,9 @@ import { useDebounce } from 'use-debounce'
 import TileGrid from '../../../components/Partners/TileGrid'
 
 export async function getStaticProps(): Promise<{ props: Props; revalidate: number }> {
-  const { data } = await supabase
-    .from('partners')
-    .select('*')
-    .eq('approved', true)
-    .eq('type', 'technology')
-    .order('category')
-    .order('title')
-
   return {
     props: {
-      partners: data?.map(toPartner) || [],
+      partners: await listPartners(),
     },
     // TODO: consider using Next.js' On-demand Revalidation with Supabase Database Webhooks instead
     revalidate: 1800, // 30 minutes
