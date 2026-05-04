@@ -447,9 +447,6 @@ const MergePage: NextPageWithLayout = () => {
   const pageTitle = () => (
     <div className="flex items-center gap-x-4">
       <span>Merge</span>
-      {pgDeltaDiffEnabled && (
-        <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF} />
-      )}
 
       <Link href={`/project/${ref}/editor`}>
         <Badge className="font-mono text-sm gap-1 px-2">
@@ -469,6 +466,10 @@ const MergePage: NextPageWithLayout = () => {
           {mainBranch?.name || 'main'}
         </Badge>
       </Link>
+
+      {pgDeltaDiffEnabled && (
+        <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF} />
+      )}
     </div>
   )
 
@@ -597,7 +598,7 @@ const MergePage: NextPageWithLayout = () => {
         visible={showConfirmDialog}
         title="Confirm Branch Merge"
         description={`Are you sure you want to merge "${currentBranch?.name}" into "${mainBranch?.name || 'main'}"? This action cannot be undone.`}
-        confirmLabel="Merge Branch"
+        confirmLabel="Merge branch"
         confirmLabelLoading="Merging..."
         onConfirm={() => {
           setShowConfirmDialog(false)
