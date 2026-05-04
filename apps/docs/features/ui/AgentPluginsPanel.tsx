@@ -153,10 +153,10 @@ export function AgentPluginsPanel() {
       <div className="mt-4 rounded-lg border border-muted p-4">
         <PluginInstructions client={selectedClient} />
       </div>
-      {(selectedClient.docsUrl || selectedClient.repoUrl) && (
-        <div className="mt-3 flex items-center gap-2 text-xs text-foreground-light">
-          <span>Need help?</span>
-          {selectedClient.docsUrl && (
+      <div className="mt-3 flex flex-col gap-1 text-xs text-foreground-light">
+        {selectedClient.docsUrl && (
+          <div className="flex items-center gap-2">
+            <span>Need help?</span>
             <a
               href={selectedClient.docsUrl}
               target="_blank"
@@ -166,20 +166,20 @@ export function AgentPluginsPanel() {
               View {selectedClient.label} plugin docs
               <ExternalLink className="h-3 w-3 ml-1" />
             </a>
-          )}
-          {selectedClient.repoUrl && (
-            <a
-              href={selectedClient.repoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-brand-link hover:underline inline-flex items-center"
-            >
-              Give feedback
-              <ExternalLink className="h-3 w-3 ml-1" />
-            </a>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+        {selectedClient.repoUrl && (
+          <a
+            href={selectedClient.repoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-link hover:underline inline-flex items-center"
+          >
+            Give feedback
+            <ExternalLink className="h-3 w-3 ml-1" />
+          </a>
+        )}
+      </div>
     </div>
   )
 }
