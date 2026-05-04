@@ -26,7 +26,7 @@ export const CustomEmailTemplateRestrictionAdmonition = ({
       type="default"
       layout="responsive"
       title="Set up Custom SMTP to edit templates"
-      description="Default emails still send to users. Set up Custom SMTP to edit their subject and body."
+      description="You can use these default templates as-is. Set up Custom SMTP to edit their subject and body."
       actions={
         <div className="flex w-full @lg:w-auto">
           <Button asChild type="default" className="flex-1 rounded-r-none px-3 @lg:flex-none">
