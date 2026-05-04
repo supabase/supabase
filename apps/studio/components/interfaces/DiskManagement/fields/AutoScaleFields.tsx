@@ -1,10 +1,8 @@
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
 import {
-  cn,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
@@ -30,7 +28,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
   } = form
   const { totalSize, growthPercent, maxSizeGb, minIncrementGb } = form.watch()
 
-  const { error, isPending: isLoading, isError } = useDiskAutoscaleCustomConfigQuery({ projectRef })
+  const { isError } = useDiskAutoscaleCustomConfigQuery({ projectRef })
 
   const _growthPercent = growthPercent ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
   const _minIncrementGb = minIncrementGb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
@@ -51,7 +49,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
 
   return (
     <>
-      <FormField_Shadcn_
+      <FormField
         name="growthPercent"
         control={control}
         render={({ field }) => {
@@ -68,7 +66,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
               }
               className="[&>div>span]:text-foreground-lighter"
             >
-              <FormControl_Shadcn_ className="max-w-20">
+              <FormControl className="max-w-20">
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
@@ -91,13 +89,13 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     <InputGroupText>%</InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )
         }}
       />
 
-      <FormField_Shadcn_
+      <FormField
         name="minIncrementGb"
         control={control}
         render={({ field }) => {
@@ -114,7 +112,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
               }
               className="[&>div>span]:text-foreground-lighter"
             >
-              <FormControl_Shadcn_ className="max-w-32">
+              <FormControl className="max-w-32">
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
@@ -137,13 +135,13 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     <InputGroupText>GB</InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )
         }}
       />
 
-      <FormField_Shadcn_
+      <FormField
         name="maxSizeGb"
         control={control}
         render={({ field }) => {
@@ -155,7 +153,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
               labelOptional="Maximum size that the disk can grow to"
               className="[&>div>span]:text-foreground-lighter"
             >
-              <FormControl_Shadcn_ className="max-w-32">
+              <FormControl className="max-w-32">
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
@@ -174,7 +172,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                     <InputGroupText>GB</InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )
         }}

@@ -83,7 +83,7 @@ const Subscription = () => {
                   </div>
 
                   <div>
-                    {canChangeTier && (
+                    {canChangeTier ? (
                       <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                         <Button
                           type="default"
@@ -94,40 +94,38 @@ const Subscription = () => {
                           Change subscription plan
                         </Button>
                       </ProjectUpdateDisabledTooltip>
+                    ) : projectUpdateDisabled ? (
+                      <Alert
+                        className="mt-2"
+                        withIcon
+                        variant="info"
+                        title={`Unable to update plan from ${planName}`}
+                      >
+                        We have temporarily disabled project and subscription changes - our
+                        engineers are working on a fix.
+                      </Alert>
+                    ) : (
+                      <Alert
+                        withIcon
+                        className="mt-2"
+                        variant="info"
+                        title={`Unable to update plan from ${planName}`}
+                        actions={[
+                          <Button asChild key="contact-support" type="default">
+                            <SupportLink
+                              queryParams={{
+                                category: SupportCategories.SALES_ENQUIRY,
+                                subject: `Change plan away from ${planName}`,
+                              }}
+                            >
+                              Contact support
+                            </SupportLink>
+                          </Button>,
+                        ]}
+                      >
+                        Please contact us if you'd like to change your plan.
+                      </Alert>
                     )}
-                    {!canChangeTier &&
-                      (projectUpdateDisabled ? (
-                        <Alert
-                          className="mt-2"
-                          withIcon
-                          variant="info"
-                          title={`Unable to update plan from ${planName}`}
-                        >
-                          We have temporarily disabled project and subscription changes - our
-                          engineers are working on a fix.
-                        </Alert>
-                      ) : (
-                        <Alert
-                          withIcon
-                          className="mt-2"
-                          variant="info"
-                          title={`Unable to update plan from ${planName}`}
-                          actions={[
-                            <Button asChild key="contact-support" type="default">
-                              <SupportLink
-                                queryParams={{
-                                  category: SupportCategories.SALES_ENQUIRY,
-                                  subject: `Change plan away from ${planName}`,
-                                }}
-                              >
-                                Contact support
-                              </SupportLink>
-                            </Button>,
-                          ]}
-                        >
-                          Please contact us if you'd like to change your plan.
-                        </Alert>
-                      ))}
                   </div>
 
                   {!subscription?.usage_billing_enabled && (
@@ -135,7 +133,7 @@ const Subscription = () => {
                       type="default"
                       title="This organization is limited by the included usage"
                     >
-                      <div className="[&>p]:!leading-normal prose text-sm">
+                      <div className="[&>p]:leading-normal! prose text-sm">
                         Projects may become unresponsive when this organization exceeds its{' '}
                         <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
                         seamlessly,{' '}

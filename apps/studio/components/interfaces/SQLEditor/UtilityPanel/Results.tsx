@@ -12,9 +12,9 @@ import {
 
 import { CellDetailPanel } from './CellDetailPanel'
 import { formatCellValue, formatClipboardValue } from './Results.utils'
-import { handleCopyCell } from '@/components/grid/SupabaseGrid.utils'
+import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 
-const Results = ({ rows }: { rows: readonly any[] }) => {
+export const Results = ({ rows }: { rows: readonly any[] }) => {
   const [expandCell, setExpandCell] = useState(false)
   const [cellPosition, setCellPosition] = useState<{ column: any; row: any; rowIdx: number }>()
   const contextMenuCellRef = useRef<{ column: string; value: any } | null>(null)
@@ -98,7 +98,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
   return (
     <>
       {rows.length === 0 ? (
-        <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+        <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark">
           <p className="m-0 border-0 px-4 py-3 font-mono text-sm text-foreground-light">
             Success. No rows returned
           </p>
@@ -134,10 +134,10 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
           <DataGrid
             columns={columns}
             rows={rows}
-            className="flex-grow min-h-0 border-t-0"
+            className="grow min-h-0 border-t-0"
             rowClass={() => '[&>.rdg-cell]:items-center'}
             onSelectedCellChange={setCellPosition}
-            onCellKeyDown={handleCopyCell}
+            onCellKeyDown={handleCellKeyDown}
           />
           <CellDetailPanel
             column={cellPosition?.column.name ?? ''}

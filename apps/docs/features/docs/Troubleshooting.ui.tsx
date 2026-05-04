@@ -102,7 +102,7 @@ export function TroubleshootingHeader({
   errors: ITroubleshootingMetadata['errors']
 }) {
   return (
-    <div className="lg:sticky lg:top-[var(--header-height)] lg:z-10 bg-background">
+    <div className="lg:sticky lg:top-(--header-height) lg:z-10 bg-background">
       <div className="pt-8 pb-6 px-5">
         <h1 className="text-4xl tracking-tight mb-7">{title}</h1>
         <p className="text-lg text-foreground-light">{description}</p>

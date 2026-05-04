@@ -1,21 +1,5 @@
 import { PermissionResource, PermissionRow } from './Permissions.types'
 
-const getBestAction = (actions: string[]): string => {
-  const availableActions = actions.filter((a) => a !== 'no access')
-
-  if (availableActions.length === 0) return 'no access'
-
-  const priority = ['read', 'write', 'create', 'delete', 'read-write']
-
-  for (const priorityAction of priority) {
-    if (availableActions.includes(priorityAction)) {
-      return priorityAction
-    }
-  }
-
-  return availableActions[0]
-}
-
 export const sortActions = (actions: string[]): string[] => {
   const sorted: string[] = []
   const remaining = [...actions]

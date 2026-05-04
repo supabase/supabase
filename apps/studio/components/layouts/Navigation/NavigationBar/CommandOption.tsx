@@ -16,7 +16,7 @@ export const CommandOption = ({ icon, label, shortcut, onClick }: CommandOptionP
 
   return (
     <div
-      className="px-2 py-1 transition hover:bg-surface-100 flex items-center justify-between rounded cursor-pointer"
+      className="px-2 py-1 transition hover:bg-surface-100 flex items-center justify-between rounded-sm cursor-pointer"
       onClick={onClick}
     >
       <div className="flex items-center gap-x-2">

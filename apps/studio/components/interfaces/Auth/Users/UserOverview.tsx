@@ -181,7 +181,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         {isBanned ? (
           <Admonition
             type="warning"
-            label={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
+            description={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
             className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5"
           />
         ) : (
@@ -213,12 +213,12 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           <RowData property="SSO" value={user.is_sso_user} />
         </div>
 
-        <div className={cn('flex flex-col !pt-0', PANEL_PADDING)}>
+        <div className={cn('flex flex-col pt-0!', PANEL_PADDING)}>
           <p>Provider Information</p>
           <p className="text-sm text-foreground-light">The user has the following providers</p>
         </div>
 
-        <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
+        <div className={cn('flex flex-col -space-y-1 pt-0!', PANEL_PADDING)}>
           {providers.map((provider) => {
             const providerMeta = PROVIDERS_SCHEMAS.find(
               (x) =>
@@ -256,7 +256,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                     className={cn('mt-1.5', provider.name === 'github' ? 'dark:invert' : '')}
                   />
                 )}
-                <div className="flex-grow mt-0.5">
+                <div className="grow mt-0.5">
                   <p className="capitalize">{providerName}</p>
                   <p className="text-xs text-foreground-light">
                     Signed in with a {providerName} account via{' '}
@@ -378,7 +378,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           </p>
         </div>
 
-        <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
+        <div className={cn('flex flex-col -space-y-1 pt-0!', PANEL_PADDING)}>
           <RowAction
             title="Remove MFA factors"
             description="Removes all MFA factors associated with the user"

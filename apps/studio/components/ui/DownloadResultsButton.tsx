@@ -73,7 +73,7 @@ export const DownloadResultsButton = ({
       return
     }
     copyToClipboard(markdownData, () => {
-      toast.success('Copied markdown to clipboard')
+      toast.success('Copied Markdown to clipboard')
       onCopyAsMarkdown?.()
     })
   }

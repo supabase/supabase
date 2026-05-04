@@ -24,7 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
+const handlePost = async (_req: NextApiRequest, res: NextApiResponse) => {
   const response = {
     api_key: process.env.SUPABASE_SERVICE_KEY ?? '',
   }

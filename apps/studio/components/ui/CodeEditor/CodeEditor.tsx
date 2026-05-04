@@ -43,7 +43,7 @@ interface CodeEditorProps {
   onInputChange?: (value?: string) => void
 }
 
-const CodeEditor = ({
+export const CodeEditor = ({
   id,
   language,
   defaultValue,
@@ -116,11 +116,7 @@ const CodeEditor = ({
               // @ts-ignore
               identifier: 'add-placeholder',
               range: new monaco.Range(1, 1, 1, 1),
-              text: (placeholder ?? '')
-                .split('\n\n')
-                .join('\n')
-                .replaceAll('*', '')
-                .replaceAll('&nbsp;', ' '),
+              text: (placeholder ?? '').split('\n\n').join('\n').replaceAll('&nbsp;', ' '),
             },
           ])
         },
@@ -251,7 +247,7 @@ const CodeEditor = ({
         <div
           className={cn(
             'monaco-placeholder absolute top-[3px] left-[57px] text-sm pointer-events-none font-mono',
-            '[&>div>p]:text-foreground-lighter [&>div>p]:!m-0 tracking-tighter',
+            '[&>div>p]:text-foreground-lighter [&>div>p]:m-0! tracking-tighter',
             showPlaceholder ? 'block' : 'hidden'
           )}
         >

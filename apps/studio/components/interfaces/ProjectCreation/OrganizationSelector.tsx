@@ -6,8 +6,8 @@ import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
+  FormField,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -50,7 +50,7 @@ export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
 
   return (
     <Panel.Content className="space-y-4">
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="organization"
         render={({ field }) => (
@@ -64,18 +64,18 @@ export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
                 value={field.value}
                 defaultValue={field.value}
               >
-                <FormControl_Shadcn_>
+                <FormControl>
                   <SelectTrigger_Shadcn_>
                     <SelectValue_Shadcn_ placeholder="Select an organization" />
                   </SelectTrigger_Shadcn_>
-                </FormControl_Shadcn_>
+                </FormControl>
                 <SelectContent_Shadcn_>
                   <SelectGroup_Shadcn_>
                     {organizations?.map((x) => (
                       <SelectItem_Shadcn_ key={x.id} value={x.slug}>
                         <div className="flex justify-between items-center gap-2 w-full">
                           <span>{x.name}</span>
-                          <Badge className="mt-[1px]">{x.plan.name}</Badge>
+                          <Badge className="mt-px">{x.plan.name}</Badge>
                         </div>
                       </SelectItem_Shadcn_>
                     ))}

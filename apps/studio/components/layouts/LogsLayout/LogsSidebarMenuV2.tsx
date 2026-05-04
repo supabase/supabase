@@ -63,7 +63,7 @@ export function SidebarCollapsible({
 }) {
   return (
     <Collapsible_Shadcn_ defaultOpen={defaultOpen}>
-      <CollapsibleTrigger_Shadcn_ className="flex items-center gap-x-2 px-4 [&[data-state=open]>svg]:!rotate-90 pb-2">
+      <CollapsibleTrigger_Shadcn_ className="flex items-center gap-x-2 px-4 [&[data-state=open]>svg]:rotate-90! pb-2">
         <ChevronRight
           size={16}
           className={'text-foreground-light transition-transform duration-200'}
@@ -279,7 +279,7 @@ export function LogsSidebarMenuV2() {
 
       <div
         className={cn(
-          'flex gap-x-2 items-center sticky top-0 bg-background-200 z-[1] px-4',
+          'flex gap-x-2 items-center sticky top-0 bg-background-200 z-1 px-4',
           !templatesEnabled ? 'pt-4' : 'py-4'
         )}
       >

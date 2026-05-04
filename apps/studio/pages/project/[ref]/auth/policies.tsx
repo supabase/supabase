@@ -20,19 +20,22 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { useIsRLSTesterEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from '@/components/interfaces/Auth/Policies/Policies'
 import { PoliciesDataProvider } from '@/components/interfaces/Auth/Policies/PoliciesDataContext'
 import { getGeneralPolicyTemplates } from '@/components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
 import { PolicyEditorPanel } from '@/components/interfaces/Auth/Policies/PolicyEditorPanel'
 import { generatePolicyUpdateSQL } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { RLSTesterSheet } from '@/components/interfaces/Auth/RLSTester/RLSTesterSheet'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import AlertError from '@/components/ui/AlertError'
-import { BannerRlsEventTrigger } from '@/components/ui/BannerStack/Banners/BannerRlsEventTrigger'
+import { AlertError } from '@/components/ui/AlertError'
+import { AutoEnableRLSNotice } from '@/components/ui/AutoEnableRLSNotice'
+import { BannerRlsTester } from '@/components/ui/BannerStack/Banners/BannerRlsTester'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { DocsButton } from '@/components/ui/DocsButton'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
@@ -109,7 +112,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
+
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
+  const rlsTesterEnabled = useIsRLSTesterEnabled()
+
   const { openSidebar } = useSidebarManagerSnapshot()
   const {
     setValue: setEditorPanelValue,
@@ -126,8 +132,13 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { isSchemaLocked } = useIsProtectedSchema({ schema: schema, excludedSchemas: ['realtime'] })
   const { addBanner, dismissBanner } = useBannerStack()
 
-  const [isRlsBannerDismissed] = useLocalStorageQuery(
+  const [isAutoEnableRLSMinimized] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.RLS_EVENT_TRIGGER_BANNER_DISMISSED(projectRef ?? ''),
+    false
+  )
+
+  const [isRlsTesterBannerDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.RLS_TESTER_BANNER_DISMISSED(projectRef ?? ''),
     false
   )
 
@@ -166,12 +177,11 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
       .map((schema) => schema.trim())
       .filter((schema) => schema.length > 0)
   }, [postgrestConfig?.db_schema])
+
   const { can: canReadPolicies, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'policies'
   )
-  const { can: canCreateTriggers, isSuccess: isTriggerPermissionsLoaded } =
-    useAsyncCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   const handleSelectCreatePolicy = useCallback(
     (table: string) => {
@@ -225,29 +235,23 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const handleResetSearch = useCallback(() => setSearchString(''), [setSearchString])
 
   useEffect(() => {
-    if (!isTriggerPermissionsLoaded) return
+    if (rlsTesterEnabled) return
 
-    if (canCreateTriggers && !isRlsBannerDismissed) {
+    if (!isRlsTesterBannerDismissed) {
       addBanner({
-        id: 'rls-event-trigger-banner',
+        id: 'rls-tester-banner',
         isDismissed: false,
-        content: <BannerRlsEventTrigger />,
-        priority: 2,
+        content: <BannerRlsTester />,
+        priority: 3,
       })
     } else {
-      dismissBanner('rls-event-trigger-banner')
+      dismissBanner('rls-tester-banner')
     }
 
     return () => {
-      dismissBanner('rls-event-trigger-banner')
+      dismissBanner('rls-tester-banner')
     }
-  }, [
-    addBanner,
-    dismissBanner,
-    canCreateTriggers,
-    isTriggerPermissionsLoaded,
-    isRlsBannerDismissed,
-  ])
+  }, [addBanner, dismissBanner, isRlsTesterBannerDismissed, rlsTesterEnabled])
 
   useEffect(() => {
     if (selectedIdToEdit && isPoliciesSuccess && !selectedPolicyToEdit) {
@@ -273,12 +277,17 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             </PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
+            {isAutoEnableRLSMinimized && <AutoEnableRLSNotice iconOnly />}
             <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
+            {rlsTesterEnabled && <RLSTesterSheet handleSelectEditPolicy={handleSelectEditPolicy} />}
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
+
       <PageContainer size="large">
         <PageSection>
+          {!isAutoEnableRLSMinimized && <AutoEnableRLSNotice />}
+
           <PageSectionContent>
             <div className="mb-4 flex flex-row gap-x-2">
               <SchemaSelector

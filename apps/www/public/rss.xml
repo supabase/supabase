@@ -4,9 +4,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 22 Apr 2026 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Tue, 28 Apr 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/introducing-osscar-index</guid>
+  <title>Introducing the OSSCAR Index</title>
+  <link>https://supabase.com/blog/introducing-osscar-index</link>
+  <description>Announcing the OSSCAR Index: a quarterly ranking of the fastest-growing open source organizations. The site, the data, and the scoring code are all open source.</description>
+  <pubDate>Tue, 28 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-is-now-iso-27001-certified</guid>
   <title>Supabase is now ISO 27001 certified</title>
   <link>https://supabase.com/blog/supabase-is-now-iso-27001-certified</link>

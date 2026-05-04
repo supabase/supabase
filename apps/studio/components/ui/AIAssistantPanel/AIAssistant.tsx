@@ -58,7 +58,7 @@ interface AIAssistantProps {
 
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
-  const { ref, id: entityId } = useParams()
+  const { id: entityId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const searchParams = useSearchParamsShallow()
 
@@ -392,7 +392,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         },
       ]}
     >
-      <div className={cn('flex flex-col h-full w-full md:h-full max-h-[100dvh]', className)}>
+      <div className={cn('flex flex-col h-full w-full md:h-full max-h-dvh', className)}>
         <AIAssistantHeader
           isChatLoading={isChatLoading}
           onNewChat={snap.newChat}
@@ -462,6 +462,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
                 />
               )}
+              <p className="text-center text-xs text-foreground-muted mt-6">
+                Supabase AI may not always produce correct answers. Double check responses.
+              </p>
             </ConversationContent>
             <ConversationScrollButton />
           </Conversation>
@@ -486,7 +489,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               exit={{ opacity: 0 }}
               className="pointer-events-none z-10 -mt-24"
             >
-              <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
+              <div className="h-24 w-full bg-linear-to-t from-background to-transparent relative">
                 <motion.div
                   className="absolute left-1/2 z-20 bottom-8 pointer-events-auto"
                   variants={{
@@ -549,7 +552,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
-              'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border-1 [&>form>textarea]:rounded-md [&>form>textarea]:!outline-none [&>form>textarea]:!ring-offset-0 [&>form>textarea]:!ring-0'
+              'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border [&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden! [&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}

@@ -51,9 +51,9 @@ const DatabaseSettings: NextPageWithLayout = () => {
           <PageContainer size="small" className="flex flex-col gap-8 pb-12">
             <DatabaseReadOnlyAlert />
             <ResetDbPassword />
+            {jitDbAccessEnabled && <JitDbAccessConfiguration />}
             <ConnectionPooling />
             <SSLConfiguration />
-            {jitDbAccessEnabled && <JitDbAccessConfiguration />}
             {showNewDiskManagementUI ? (
               // This form is hidden if Disk and Compute form is enabled, new form is on ./settings/compute-and-disk
               <DiskManagementPanelForm />

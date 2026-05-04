@@ -1,11 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag } from 'common'
-import { Loader, Shield, Users, Wrench } from 'lucide-react'
+import { Loader, Shield, Wrench } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, InfoIcon, Listbox, Loading, Modal, WarningIcon } from 'ui'
+import {
+  Button,
+  InfoIcon,
+  Loading,
+  Modal,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  WarningIcon,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -28,7 +40,7 @@ export const TransferProjectButton = () => {
 
   const organizations = (allOrganizations || []).filter((it) => it.id !== projectOrgId)
 
-  const [selectedOrg, setSelectedOrg] = useState()
+  const [selectedOrg, setSelectedOrg] = useState<string>()
 
   const {
     mutate: transferProject,
@@ -156,7 +168,7 @@ export const TransferProjectButton = () => {
 
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <Wrench size={24} className="flex-shrink-0" />
+                <Wrench size={24} className="shrink-0" />
               </span>
               <div>
                 <p className="font-bold">Features</p>
@@ -185,27 +197,30 @@ export const TransferProjectButton = () => {
                   <InfoIcon /> You do not have any organizations you can transfer your project to.
                 </div>
               ) : (
-                <Listbox
-                  label="Select Target Organization"
+                <FormItemLayout
+                  id="organization"
+                  isReactForm={false}
                   layout="vertical"
-                  value={selectedOrg}
-                  onChange={(slug) => setSelectedOrg(slug)}
-                  placeholder="Select Organization"
+                  label="Select Target Organization"
+                  className="gap-[2px]"
+                  size="tiny"
                 >
-                  <Listbox.Option disabled key="no-results" label="Select Organization" value="">
-                    Select Organization
-                  </Listbox.Option>
-                  {organizations.map((x: any) => (
-                    <Listbox.Option
-                      key={x.id}
-                      label={x.name}
-                      value={x.slug}
-                      addOnBefore={() => <Users />}
-                    >
-                      {x.name}
-                    </Listbox.Option>
-                  ))}
-                </Listbox>
+                  <Select_Shadcn_
+                    onValueChange={(slug) => setSelectedOrg(slug)}
+                    value={selectedOrg}
+                  >
+                    <SelectTrigger_Shadcn_ id="organization">
+                      <SelectValue_Shadcn_ placeholder="Select Organization" />
+                    </SelectTrigger_Shadcn_>
+                    <SelectContent_Shadcn_>
+                      {organizations.map((x) => (
+                        <SelectItem_Shadcn_ key={x.id} value={x.slug}>
+                          {x.name}
+                        </SelectItem_Shadcn_>
+                      ))}
+                    </SelectContent_Shadcn_>
+                  </Select_Shadcn_>
+                </FormItemLayout>
               )}
             </div>
           )}
@@ -253,13 +268,13 @@ export const TransferProjectButton = () => {
                       <div className="flex flex-col gap-y-2">
                         {transferPreviewData.warnings.map((warning) => (
                           <div key={warning.key} className="flex items-center gap-2">
-                            <WarningIcon className="flex-shrink-0" />
+                            <WarningIcon className="shrink-0" />
                             <p className="mb-0.5">{warning.message}</p>
                           </div>
                         ))}
                         {transferPreviewData.info.map((info) => (
                           <div key={info.key} className="flex items-start gap-2">
-                            <InfoIcon className="flex-shrink-0 mt-0.5" />
+                            <InfoIcon className="shrink-0 mt-0.5" />
                             <p className="mb-0.5">{info.message}</p>
                           </div>
                         ))}

@@ -10,9 +10,9 @@ import {
   Button,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   Label_Shadcn_,
   Tooltip,
@@ -25,7 +25,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SpamValidation } from './SpamValidation'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
-import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
@@ -67,7 +67,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
   const [validationResult, setValidationResult] = useState<ValidateSpamResponse>()
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
   const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
 
@@ -227,14 +227,14 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   }, [hasChanges])
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <CardContent>
           {Object.keys(properties).map((x: string) => {
             const property = properties[x]
             if (property.type === 'string' && x !== messageSlug) {
               return (
-                <FormField_Shadcn_
+                <FormField
                   key={x}
                   control={form.control}
                   name={x}
@@ -258,9 +258,9 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                         ) : null
                       }
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Input_Shadcn_ id={x} {...field} disabled={!canUpdateConfig} />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -279,18 +279,18 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                   width={60}
                   options={['preview', 'source']}
                   activeOption={activeView}
-                  onClickOption={(option: 'source' | 'preview') => setActiveView(option)}
+                  onClickOption={(option) => setActiveView(option as 'source' | 'preview')}
                   borderOverride="border-muted"
                 />
               </div>
               {activeView === 'source' ? (
                 <>
-                  <div className="overflow-hidden rounded-md border dark:border-control overflow-hidden [&_.monaco-editor]:outline-0 [&_.monaco-editor-background]:!bg-surface-200/30 [&_.monaco-editor_.margin]:!bg-surface-200/30 dark:[&_.monaco-editor-background]:!bg-surface-300 dark:[&_.monaco-editor_.margin]:!bg-surface-300">
+                  <div className="overflow-hidden rounded-md border dark:border-control overflow-hidden [&_.monaco-editor]:outline-0 [&_.monaco-editor-background]:bg-surface-200/30! [&_.monaco-editor_.margin]:bg-surface-200/30! dark:[&_.monaco-editor-background]:bg-surface-300! dark:[&_.monaco-editor_.margin]:bg-surface-300!">
                     <CodeEditor
                       id="code-id"
                       language="html"
                       isReadOnly={!canUpdateConfig}
-                      className="!mb-0 relative h-96 outline-none outline-offset-0 outline-width-0 outline-0"
+                      className="mb-0! relative h-96 outline-hidden outline-offset-0 outline-width-0 outline-0"
                       onInputChange={(e: string | undefined) => {
                         setBodyValue(e ?? '')
                         if (bodyValue !== e) setHasUnsavedChanges(true)
@@ -325,7 +325,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
               ) : (
                 <>
                   <iframe
-                    className="!mb-0 mt-0 overflow-hidden h-96 w-full rounded-md border bg-white"
+                    className="mb-0! mt-0 overflow-hidden h-96 w-full rounded-md border bg-white"
                     title={id}
                     srcDoc={bodyValue}
                     sandbox="allow-scripts allow-forms"
@@ -367,6 +367,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
         )}
       </form>
       <PreventNavigationOnUnsavedChanges hasChanges={hasChanges} />
-    </Form_Shadcn_>
+    </Form>
   )
 }

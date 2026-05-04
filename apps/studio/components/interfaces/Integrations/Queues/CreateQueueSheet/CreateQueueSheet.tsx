@@ -5,7 +5,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form_Shadcn_,
+  Form,
   Separator,
   Sheet,
   SheetContent,
@@ -115,11 +115,11 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
             <SheetTitle>Create a new queue</SheetTitle>
           </SheetHeader>
 
-          <div className="overflow-auto flex-grow">
-            <Form_Shadcn_ {...form}>
+          <div className="overflow-auto grow">
+            <Form {...form}>
               <form
                 id={FORM_ID}
-                className="flex-grow overflow-auto"
+                className="grow overflow-auto"
                 onSubmit={form.handleSubmit(onSubmit)}
               >
                 <QueueNameField form={form} />
@@ -130,7 +130,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
                 <PartitionConfigFields form={form} />
                 <RlsSection form={form} isExposed={isExposed} projectRef={project?.ref} />
               </form>
-            </Form_Shadcn_>
+            </Form>
           </div>
           <SheetFooter>
             <Button

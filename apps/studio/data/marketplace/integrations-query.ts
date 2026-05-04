@@ -9,7 +9,7 @@ async function getMarketplaceIntegrations() {
   const { data, error } = await marketplaceClient
     .from('listings')
     .select('*')
-    .or('publish_location.eq.dashboard,publish_location.eq.both')
+    .is('publish_dashboard', true)
 
   if (error) handleError(error)
   return data ?? []

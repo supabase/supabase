@@ -115,7 +115,7 @@ export const AnimatedLogos = () => {
           )
         })}
       </AnimatePresence>
-      <div className="absolute -inset-4 bg-gradient-to-r from-background-surface-75 via-transparent to-background-surface-75 z-40" />
+      <div className="absolute -inset-4 bg-linear-to-r from-background-surface-75 via-transparent to-background-surface-75 z-40" />
     </div>
   )
 }

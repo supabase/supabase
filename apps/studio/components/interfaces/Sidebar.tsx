@@ -29,10 +29,7 @@ import {
 
 import { Shortcut } from '../ui/Shortcut'
 import { Route } from '../ui/ui.types'
-import {
-  useIsPlatformWebhooksEnabled,
-  useUnifiedLogsPreview,
-} from './App/FeaturePreview/FeaturePreviewContext'
+import { useUnifiedLogsPreview } from './App/FeaturePreview/FeaturePreviewContext'
 import {
   generateOtherRoutes,
   generateProductRoutes,
@@ -40,14 +37,12 @@ import {
   generateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLints } from '@/hooks/misc/useLints'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useAppStateSnapshot } from '@/state/app-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const ICON_SIZE = 32
@@ -101,7 +96,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     type="text"
-                    className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? '!px-2' : ''}`}
+                    className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? 'px-2!' : ''}`}
                     icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
                   />
                 </DropdownMenuTrigger>
@@ -187,7 +182,7 @@ export function SideBarNavLink({
   const buttonProps = {
     disabled: route.disabled,
     isActive: active,
-    className: cn('text-sm', sidebarBehaviour === 'open' ? '!px-2' : ''),
+    className: cn('text-sm', sidebarBehaviour === 'open' ? 'px-2!' : ''),
     size: 'default' as const,
     onClick: onClick,
   }
@@ -244,6 +239,7 @@ const ProjectLinks = () => {
   const { data: project } = useSelectedProjectQuery()
   const { securityLints, errorLints } = useLints()
   const showReports = useIsFeatureEnabled('reports:all')
+  const showLogs = useIsFeatureEnabled('logs:all')
 
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
@@ -274,6 +270,7 @@ const ProjectLinks = () => {
   const otherRoutes = generateOtherRoutes(ref, project, {
     unifiedLogs: isUnifiedLogsEnabled,
     showReports,
+    showLogs,
   })
   const settingsRoutes = generateSettingsRoutes(ref)
 

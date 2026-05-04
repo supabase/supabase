@@ -1,5 +1,5 @@
+import 'react-data-grid/lib/styles.css'
 import '@/styles/globals.css'
-import '../../studio/styles/typography.css'
 
 import type { Metadata, Viewport } from 'next'
 
