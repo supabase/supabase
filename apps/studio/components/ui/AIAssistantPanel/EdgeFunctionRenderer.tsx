@@ -1,9 +1,10 @@
 import { useParams } from 'common'
-import { useMemo, type PropsWithChildren } from 'react'
+import { useMemo, useState, type PropsWithChildren } from 'react'
 
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { ConfirmFooter } from './ConfirmFooter'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
@@ -29,8 +30,13 @@ export const EdgeFunctionRenderer = ({
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
+  const [showReplaceWarning, setShowReplaceWarning] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref }, { enabled: !!ref })
+  const { data: existingFunction } = useEdgeFunctionQuery(
+    { projectRef: ref, slug: functionName },
+    { enabled: !!ref && !!functionName && showApprovalFooter }
+  )
 
   const functionUrl = useMemo(() => {
     const endpoint = settings?.app_config?.endpoint
@@ -57,7 +63,7 @@ export const EdgeFunctionRenderer = ({
     return `supabase functions download ${functionName}`
   }, [functionName])
 
-  const handleApprove = () => {
+  const fireApprove = () => {
     sendEvent({
       action: 'edge_function_deploy_button_clicked',
       properties: { origin: 'functions_ai_assistant' },
@@ -67,6 +73,14 @@ export const EdgeFunctionRenderer = ({
       },
     })
     onApprove?.()
+  }
+
+  const handleApprove = () => {
+    if (existingFunction) {
+      setShowReplaceWarning(true)
+      return
+    }
+    fireApprove()
   }
 
   return (
@@ -80,6 +94,9 @@ export const EdgeFunctionRenderer = ({
         functionUrl={functionUrl}
         deploymentDetailsUrl={deploymentDetailsUrl}
         downloadCommand={downloadCommand}
+        showReplaceWarning={showReplaceWarning}
+        onCancelReplace={() => setShowReplaceWarning(false)}
+        onConfirmReplace={fireApprove}
         hideDeployButton={showApprovalFooter}
       />
       {showApprovalFooter && (

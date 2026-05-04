@@ -125,8 +125,8 @@ function MessagePartExecuteSql({
   // Invalidate write-related queries once a write SQL result is available
   useEffect(() => {
     if (state !== 'output-available') return
-    const isWriteQuery = (input as any)?.isWriteQuery
-    if (!isWriteQuery || !ref) return
+    const parsed = parseExecuteSqlChartResult(input)
+    if (!parsed.success || !parsed.data.isWriteQuery || !ref) return
     queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
     queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(ref) })
   }, [state, input, ref, queryClient])

@@ -82,6 +82,7 @@ export const getStudioTools = (ctx: StudioToolsContext = {}) => {
           throw new Error('projectRef is required')
         }
 
+        const files = [{ name: 'index.ts', content: code }]
         const { data, error } = await post('/v1/projects/{ref}/functions/deploy', {
           params: { path: { ref: projectRef }, query: { slug: name } },
           headers: authorization ? { Authorization: authorization } : {},
@@ -91,13 +92,14 @@ export const getStudioTools = (ctx: StudioToolsContext = {}) => {
               entrypoint_path: 'index.ts',
               verify_jwt: true,
             },
-            file: [{ name: 'index.ts', content: code }] as any,
+            file: files as any,
           },
           bodySerializer(body) {
             const formData = new FormData()
             formData.append('metadata', JSON.stringify(body.metadata))
-            const blob = new Blob([(body.file as any)[0].content], { type: 'text/plain' })
-            formData.append('file', blob, 'index.ts')
+            files.forEach((f) => {
+              formData.append('file', new Blob([f.content], { type: 'text/plain' }), f.name)
+            })
             return formData
           },
         })
