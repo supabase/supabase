@@ -104,19 +104,22 @@ export type FilterBarHandle = {
   focus: () => void
 }
 
-export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(function FilterBarRoot({
-  children,
-  filterProperties,
-  filters,
-  onFilterChange,
-  freeformText,
-  onFreeformTextChange,
-  actions,
-  isLoading: externalLoading,
-  supportsOperators = false,
-  variant = 'default',
-  icon,
-}: FilterBarRootProps, ref: React.Ref<FilterBarHandle>) {
+export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(function FilterBarRoot(
+  {
+    children,
+    filterProperties,
+    filters,
+    onFilterChange,
+    freeformText,
+    onFreeformTextChange,
+    actions,
+    isLoading: externalLoading,
+    supportsOperators = false,
+    variant = 'default',
+    icon,
+  }: FilterBarRootProps,
+  ref: React.Ref<FilterBarHandle>
+) {
   const rootRef = useRef<HTMLDivElement>(null)
 
   const {
