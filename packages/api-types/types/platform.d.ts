@@ -8809,14 +8809,6 @@ export interface components {
         | 'PAUSE_FAILED'
         | 'RESIZING'
       subscription_id: string
-      /** @enum {string} */
-      subscription_tier:
-        | 'tier_free'
-        | 'tier_pro'
-        | 'tier_payg'
-        | 'tier_team'
-        | 'tier_enterprise'
-        | 'tier_platform'
       updated_at: string
       volumeSizeGb?: number
     }

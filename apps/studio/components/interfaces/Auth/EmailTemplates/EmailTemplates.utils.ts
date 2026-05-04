@@ -4,7 +4,6 @@ import type { Project } from '@/data/projects/project-detail-query'
 import type { Organization } from '@/types'
 
 type AuthConfig = components['schemas']['GoTrueConfigResponse']
-type ProjectEmailTemplateRestrictionFields = Pick<Project, 'inserted_at' | 'subscription_tier'>
 const CUSTOM_EMAIL_TEMPLATES_RESTRICTED_PROJECT_CUTOFF = '2026-05-01T00:00:00.000Z'
 
 /**
@@ -23,7 +22,7 @@ export const hasCustomEmailSender = (config?: Partial<AuthConfig>) => {
 }
 
 export const isProjectInCustomEmailTemplateRestrictedCohort = (
-  project?: Pick<ProjectEmailTemplateRestrictionFields, 'inserted_at'>
+  project?: Pick<Project, 'inserted_at'>
 ) => {
   const projectInsertedAtMs = Date.parse(project?.inserted_at ?? '')
 
@@ -33,42 +32,23 @@ export const isProjectInCustomEmailTemplateRestrictedCohort = (
   )
 }
 
-export const isFreeProjectSubscription = (
-  project?: Pick<ProjectEmailTemplateRestrictionFields, 'subscription_tier'>
-) => {
-  return project?.subscription_tier === 'tier_free'
-}
-
 export const isCustomEmailTemplateRestrictionStatusKnown = ({
   authConfig,
-  organization,
-  project,
 }: {
   authConfig?: Partial<AuthConfig>
   organization?: Organization
-  project?: ProjectEmailTemplateRestrictionFields
+  project?: Pick<Project, 'inserted_at'>
 }) => {
-  return (
-    authConfig !== undefined &&
-    (project?.subscription_tier !== undefined || organization?.plan.id !== undefined) &&
-    Number.isFinite(Date.parse(project?.inserted_at ?? ''))
-  )
+  return authConfig !== undefined
 }
 
 export const isCustomEmailTemplateEditingRestricted = ({
   authConfig,
-  organization,
-  project,
 }: {
   authConfig?: Partial<AuthConfig>
   organization?: Organization
-  project?: ProjectEmailTemplateRestrictionFields
+  project?: Pick<Project, 'inserted_at'>
 }) => {
-  const isFreePlan = isFreeProjectSubscription(project) || organization?.plan.id === 'free'
-
-  return (
-    isFreePlan &&
-    isProjectInCustomEmailTemplateRestrictedCohort(project) &&
-    !hasCustomEmailSender(authConfig)
-  )
+  // Temporary Studio-only paygate while Platform/Auth own the exact eligibility cohort.
+  return !hasCustomEmailSender(authConfig)
 }
