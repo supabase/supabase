@@ -101,12 +101,16 @@ export function ShortcutChordHud() {
     }
 
     const fadeStartDelayMs = Math.max(0, remainingMs - timeoutMs * TILE_FADE_START_AT_PROGRESS)
-    const nextRefreshDelayMs = progress > TILE_FADE_START_AT_PROGRESS ? fadeStartDelayMs : remainingMs
+    const nextRefreshDelayMs =
+      progress > TILE_FADE_START_AT_PROGRESS ? fadeStartDelayMs : remainingMs
 
-    refreshTimeoutRef.current = setTimeout(() => {
-      refresh((value) => value + 1)
-      refreshTimeoutRef.current = null
-    }, Math.max(0, nextRefreshDelayMs))
+    refreshTimeoutRef.current = setTimeout(
+      () => {
+        refresh((value) => value + 1)
+        refreshTimeoutRef.current = null
+      },
+      Math.max(0, nextRefreshDelayMs)
+    )
   }, [progress, remainingMs, timeoutMs])
 
   if (!visibleSteps || isSuppressedByInputFocus) {
