@@ -3,7 +3,7 @@
 @source '../registry/**/*.{js,ts,jsx,tsx}';
 @source '../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source '../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
-@source '../content/**/*.mdx',
+/* @source '../content*.mdx', */
 
 @theme {
   --container-site: 128rem;

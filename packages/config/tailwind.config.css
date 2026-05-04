@@ -24,3 +24,5 @@
  * activates on `.dark` or `[data-theme*='dark']`, on the element itself
  * or any ancestor. `:where()` keeps specificity at 0. */
 @custom-variant dark (&:where(.dark, .dark *, [data-theme*='dark'], [data-theme*='dark'] *));
+
+@config './tailwind.config.js';
