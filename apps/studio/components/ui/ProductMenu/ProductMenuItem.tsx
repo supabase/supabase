@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Badge, Button, Menu } from 'ui'
 
 import { ProductMenuGroupItem } from './ProductMenu.types'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 
 interface ProductMenuItemProps {
   item: ProductMenuGroupItem
@@ -18,7 +19,7 @@ export const ProductMenuItem = ({
   hoverText = '',
   onClick,
 }: ProductMenuItemProps) => {
-  const { name = '', url = '', icon, rightIcon, isExternal, label, disabled } = item
+  const { name = '', url = '', icon, rightIcon, isExternal, label, disabled, shortcutId } = item
 
   const menuItem = (
     <Menu.Item icon={icon} active={isActive} onClick={onClick}>
@@ -57,11 +58,21 @@ export const ProductMenuItem = ({
       )
     }
 
-    return (
+    const link = (
       <Link href={url} className="block" target={target} onClick={onClick}>
         {menuItem}
       </Link>
     )
+
+    if (shortcutId) {
+      return (
+        <ShortcutTooltip shortcutId={shortcutId} side="right" delayDuration={1000}>
+          {link}
+        </ShortcutTooltip>
+      )
+    }
+
+    return link
   }
 
   return menuItem
