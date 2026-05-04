@@ -17,7 +17,7 @@ import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
-import type { Partner } from '~/types/partners'
+import { type Partner, toPartner } from '~/types/partners'
 import { useBreakpoint } from 'common'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -47,13 +47,12 @@ function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
   return components
 }
 
-function Partner({
-  partner,
-  overview,
-}: {
+type PartnerData = {
   partner: Partner
   overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
-}) {
+}
+
+function Partner({ partner, overview }: PartnerData) {
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
   const isNarrow = useBreakpoint('lg')
 
@@ -200,13 +199,13 @@ function Partner({
 
               {!isNarrow && <PartnerDetails partner={partner} />}
             </div>
-            {partner.call_to_action_link && (
+            {partner.installUrl && (
               <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-xs max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl font-medium self-center">
                     Get started with {partner.title} and Supabase.
                   </h1>
-                  <a href={partner.call_to_action_link} target="_blank" rel="noreferrer">
+                  <a href={partner.installUrl} target="_blank" rel="noreferrer">
                     <Button size="medium" type="secondary">
                       Add integration
                     </Button>
@@ -222,8 +221,8 @@ function Partner({
 }
 
 const PartnerDetails = ({ partner }: { partner: Partner }) => {
-  const videoThumbnail = partner.video
-    ? `https://img.youtube.com/vi/${partner.video}/0.jpg`
+  const videoThumbnail = partner.youtubeId
+    ? `https://img.youtube.com/vi/${partner.youtubeId}/0.jpg`
     : undefined
 
   return (
@@ -233,9 +232,9 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
           Details
         </h2>
 
-        {partner.video && (
+        {partner.youtubeId && (
           <ExpandableVideo
-            videoId={partner.video}
+            videoId={partner.youtubeId}
             // imgUrl={videoThumbnail}
             imgOverlayText="Watch an introductory video"
             triggerContainerClassName="w-full"
@@ -246,37 +245,39 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
           {partner.type === 'technology' && (
             <div className="flex items-center justify-between py-2">
               <span className="text-foreground-lighter">Developer</span>
-              <span className="text-foreground">{partner.developer}</span>
+              <span className="text-foreground">{partner.partnerName}</span>
             </div>
           )}
 
-          <div className="flex items-center justify-between py-2">
-            <span className="text-lighter">Category</span>
-            <Link
-              href={`/partners/integrations#${partner.category.toLowerCase()}`}
-              className="text-brand-link hover:underline transition-colors"
-            >
-              {partner.category}
-            </Link>
-          </div>
+          {partner.categories.map((category) =>
+            <div key={category.slug} className="flex items-center justify-between py-2">
+              <span className="text-lighter">Category</span>
+              <Link
+                href={`/partners/integrations#${category.slug}`}
+                className="text-brand-link hover:underline transition-colors"
+              >
+                {category.name}
+              </Link>
+            </div>)}
+
 
           <div className="flex items-center justify-between py-2">
             <span className="text-foreground-lighter">Website</span>
             <a
-              href={partner.website}
+              href={partner.websiteUrl}
               target="_blank"
               rel="noreferrer"
               className="text-brand-link hover:underline transition-colors"
             >
-              {new URL(partner.website).host}
+              {new URL(partner.websiteUrl).host}
             </a>
           </div>
 
-          {partner.type === 'technology' && partner.docs && (
+          {partner.type === 'technology' && partner.docsUrl && (
             <div className="flex items-center justify-between py-2">
               <span className="text-foreground-lighter">Documentation</span>
               <a
-                href={partner.docs}
+                href={partner.docsUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="text-brand-link hover:underline transition-colors"
@@ -322,7 +323,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 // This also gets called at build time
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps<PartnerData> = async ({ params }) => {
   let { data: partner } = await supabase
     .from('partners')
     .select('*')
@@ -355,7 +356,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   })
 
   return {
-    props: { partner, overview },
+    props: { partner: toPartner(partner), overview },
     revalidate: 1800, // 30 minutes
   }
 }

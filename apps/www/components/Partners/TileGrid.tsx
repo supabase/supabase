@@ -50,7 +50,7 @@ export default function TileGrid({
                         layout="fill"
                         objectFit="cover"
                         className="bg-surface-100"
-                        src={p.logoUrl}
+                        src={p.logo}
                         alt={p.title}
                       />
                     </div>
@@ -99,7 +99,7 @@ export default function TileGrid({
                             layout="fill"
                             objectFit="cover"
                             className="bg-surface-100"
-                            src={p.logoUrl}
+                            src={p.logo}
                             alt={p.title}
                           />
                         </div>

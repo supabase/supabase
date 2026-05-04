@@ -10,20 +10,48 @@ export type Category = {
 export type Partner = {
   categories: Category[]
   featured: boolean
+  type: 'technology' | 'expert'
   slug: string
   title: string
+  partnerName: string
   description: string
-  logoUrl: string
+  websiteUrl: string
+  docsUrl: string | null
+  installUrl: string | null
+  logo: string
+  images: string[]
+  youtubeId: string | null
 }
 
 export function toPartner(dbPartner: DbPartner): Partner {
-  const { featured, slug, title, description, logo, category } = dbPartner
+  const {
+    featured,
+    slug,
+    type,
+    title,
+    developer,
+    description,
+    website,
+    docs,
+    logo,
+    category,
+    images,
+    call_to_action_link,
+    video,
+  } = dbPartner
   return {
     categories: [{ name: category, slug: category.toLowerCase() }],
     featured: featured ?? false,
+    type,
     slug,
     title,
+    partnerName: developer,
     description,
-    logoUrl: logo,
+    websiteUrl: website,
+    docsUrl: docs,
+    installUrl: call_to_action_link,
+    logo: logo,
+    images: images ?? [],
+    youtubeId: video,
   }
 }
