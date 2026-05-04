@@ -56,11 +56,10 @@ Creates an HTTP GET request returning the request's ID. HTTP requests are not st
 
 ### Signature [#get-signature]
 
-<Admonition type="caution">
-  This is a Postgres [SECURITY
-  DEFINER](/docs/guides/database/postgres/row-level-security#use-security-definer-functions)
-  function.
-</Admonition>
+<Admonition
+  type="caution"
+  description="This is a Postgres [SECURITY DEFINER](/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function."
+/>
 
 ```sql
 net.http_get(
