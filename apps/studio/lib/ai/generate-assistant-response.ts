@@ -143,6 +143,10 @@ export async function generateAssistantResponse({
       model,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
+      // TODO(mattrossman): use the `system` param instead to avoid this suppression — currently
+      // blocked by AI SDK stripping providerOptions from system-role messages in coreMessages
+      // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
+      allowSystemInMessages: true,
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),
