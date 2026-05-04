@@ -67,22 +67,6 @@ export const FEATURE_GROUPS_NON_PLATFORM = FEATURE_GROUPS_PLATFORM.filter((group
 /** Only set hasDistinctDarkIcon: true when the client has a separate -icon-dark.svg that looks different. Otherwise the same -icon.svg is used for both themes. */
 export const MCP_CLIENTS: McpClient[] = [
   {
-    key: 'cursor',
-    label: 'Cursor',
-    icon: 'cursor',
-    configFile: '.cursor/mcp.json',
-    externalDocsUrl: 'https://docs.cursor.com/context/mcp',
-    generateDeepLink: (config) => {
-      const name = 'supabase'
-      const mcpUrl = getMcpUrl(config)
-      const serverConfig = {
-        url: mcpUrl,
-      }
-      const base64Config = Buffer.from(JSON.stringify(serverConfig)).toString('base64')
-      return `cursor://anysphere.cursor-deeplink/mcp/install?name=${name}&config=${encodeURIComponent(base64Config)}`
-    },
-  },
-  {
     key: 'claude-code',
     label: 'Claude Code',
     icon: 'claude',
@@ -136,6 +120,22 @@ export const MCP_CLIENTS: McpClient[] = [
         </p>
       </div>
     ),
+  },
+  {
+    key: 'cursor',
+    label: 'Cursor',
+    icon: 'cursor',
+    configFile: '.cursor/mcp.json',
+    externalDocsUrl: 'https://docs.cursor.com/context/mcp',
+    generateDeepLink: (config) => {
+      const name = 'supabase'
+      const mcpUrl = getMcpUrl(config)
+      const serverConfig = {
+        url: mcpUrl,
+      }
+      const base64Config = Buffer.from(JSON.stringify(serverConfig)).toString('base64')
+      return `cursor://anysphere.cursor-deeplink/mcp/install?name=${name}&config=${encodeURIComponent(base64Config)}`
+    },
   },
   {
     key: 'vscode',
