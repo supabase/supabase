@@ -13,7 +13,6 @@ import {
   Switch,
   Textarea,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 
 import type { FormSchema } from '@/types'
 
@@ -40,7 +39,6 @@ type EmailBlocks = {
 interface EmailTemplateBuilderPrototypeProps {
   initialTemplate: FormSchema
   templates: FormSchema[]
-  canUseRawSource: boolean
 }
 
 const DEFAULT_THEME: EmailTheme = {
@@ -326,7 +324,6 @@ const BlockToggle = ({
 export const EmailTemplateBuilderPrototype = ({
   initialTemplate,
   templates,
-  canUseRawSource,
 }: EmailTemplateBuilderPrototypeProps) => {
   const [selectedTemplateId, setSelectedTemplateId] = useState(initialTemplate.id ?? '')
   const selectedTemplate =
@@ -376,13 +373,7 @@ export const EmailTemplateBuilderPrototype = ({
   }
 
   return (
-    <div className="space-y-4">
-      <Admonition
-        type="default"
-        title="Prototype only"
-        description="This builder uses local state only. It does not save templates, call Platform, or change Auth configuration."
-      />
-
+    <div>
       <div className="overflow-hidden rounded-md border bg-surface-100">
         <div className="grid min-h-[760px] grid-cols-1 xl:grid-cols-[300px_minmax(420px,1fr)_300px]">
           <aside className="border-b bg-surface-75 p-4 xl:border-b-0 xl:border-r">
@@ -478,10 +469,10 @@ export const EmailTemplateBuilderPrototype = ({
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button type="default" icon={<Save size={14} />} disabled>
-                  Save disabled
+                  Save changes
                 </Button>
-                <Button type="default" icon={<Code2 size={14} />} disabled={!canUseRawSource}>
-                  Raw source
+                <Button type="default" icon={<Code2 size={14} />} disabled>
+                  Source locked
                 </Button>
               </div>
             </div>
@@ -498,8 +489,8 @@ export const EmailTemplateBuilderPrototype = ({
               />
             </div>
             <div className="border-t px-5 py-3 text-xs text-foreground-lighter">
-              Raw mode remains the escape hatch for eligible projects; this prototype keeps it
-              visible without making it the main path.
+              Raw source editing is unavailable while this project uses Supabase's built-in email
+              service.
             </div>
           </main>
 
