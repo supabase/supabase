@@ -139,7 +139,7 @@
     "ui-patterns": "workspace:*",
     "use-debounce": "^7.0.1",
     "use-stick-to-bottom": "^1.1.1",
-    "uuid": "^9.0.1",
+    "uuid": "^14.0.0",
     "valtio": "catalog:",
     "zod": "catalog:",
     "zxcvbn": "^4.4.2"
@@ -173,7 +173,6 @@
     "@types/react-simple-maps": "^3.0.1",
     "@types/recharts": "^1.8.23",
     "@types/sqlstring": "^2.3.0",
-    "@types/uuid": "^8.3.4",
     "@types/zxcvbn": "^4.4.1",
     "@typescript-eslint/utils": "8.48.0",
     "@vitejs/plugin-react": "catalog:",

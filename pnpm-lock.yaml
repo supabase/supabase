@@ -105,8 +105,8 @@ overrides:
   supabase>tar: ^7.5.11
   terser-webpack-plugin>serialize-javascript: ^7.0.5
   tmp: ^0.2.4
-  webpack: ^5.104.1
   unhead: ^2.1.13
+  webpack: ^5.104.1
 
 patchedDependencies:
   react-data-grid:
@@ -542,8 +542,8 @@ importers:
         specifier: ^4.1.2
         version: 4.1.2
       uuid:
-        specifier: ^9.0.1
-        version: 9.0.1
+        specifier: ^14.0.0
+        version: 14.0.0
       valtio:
         specifier: 'catalog:'
         version: 1.12.0(@types/react@18.3.3)(react@18.3.1)
@@ -614,9 +614,6 @@ importers:
       '@types/unist':
         specifier: ^2.0.6
         version: 2.0.8
-      '@types/uuid':
-        specifier: ^10.0.0
-        version: 10.0.0
       amaro:
         specifier: ^1.1.5
         version: 1.1.5
@@ -1175,8 +1172,8 @@ importers:
         specifier: ^1.1.1
         version: 1.1.1(react@18.3.1)
       uuid:
-        specifier: ^9.0.1
-        version: 9.0.1
+        specifier: ^14.0.0
+        version: 14.0.0
       valtio:
         specifier: 'catalog:'
         version: 1.12.0(@types/react@18.3.3)(react@18.3.1)
@@ -1271,9 +1268,6 @@ importers:
       '@types/sqlstring':
         specifier: ^2.3.0
         version: 2.3.0
-      '@types/uuid':
-        specifier: ^8.3.4
-        version: 8.3.4
       '@types/zxcvbn':
         specifier: ^4.4.1
         version: 4.4.2
@@ -1846,9 +1840,6 @@ importers:
       '@types/three':
         specifier: ^0.169.0
         version: 0.169.0
-      '@types/uuid':
-        specifier: ^9.0.8
-        version: 9.0.8
       api-types:
         specifier: workspace:*
         version: link:../../packages/api-types
@@ -1874,8 +1865,8 @@ importers:
         specifier: 5.1.3
         version: 5.1.3
       uuid:
-        specifier: ^9.0.1
-        version: 9.0.1
+        specifier: ^14.0.0
+        version: 14.0.0
       vite-tsconfig-paths:
         specifier: 'catalog:'
         version: 6.1.1(supports-color@8.1.1)(typescript@6.0.2)(vite@8.0.8(@types/node@22.13.14)(esbuild@0.25.2)(jiti@2.6.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.3))
@@ -8585,9 +8576,6 @@ packages:
 
   '@types/unist@3.0.3':
     resolution: {integrity: sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==}
-
-  '@types/uuid@10.0.0':
-    resolution: {integrity: sha512-7gqG38EyHgyP1S+7+xomFtL+ZNHcKv6DwNaCZmJmo1vgMugyF3TCnXVg4t1uk89mLNwnLtnY3TpOpCOyp1/xHQ==}
 
   '@types/uuid@8.3.4':
     resolution: {integrity: sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==}
@@ -17168,12 +17156,17 @@ packages:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
 
-  uuid@11.1.0:
-    resolution: {integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==}
+  uuid@11.1.1:
+    resolution: {integrity: sha512-vIYxrBCC/N/K+Js3qSN88go7kIfNPssr/hHCesKCQNAjmgvYS2oqr69kIufEG+O4+PfezOH4EbIeHCfFov8ZgQ==}
+    hasBin: true
+
+  uuid@14.0.0:
+    resolution: {integrity: sha512-Qo+uWgilfSmAhXCMav1uYFynlQO7fMFiMVZsQqZRMIXp0O7rR7qjkj+cPvBHLgBqi960QCoo/PH2/6ZtVqKvrg==}
     hasBin: true
 
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uvu@0.5.6:
@@ -25153,8 +25146,6 @@ snapshots:
 
   '@types/unist@3.0.3': {}
 
-  '@types/uuid@10.0.0': {}
-
   '@types/uuid@8.3.4': {}
 
   '@types/uuid@9.0.8': {}
@@ -30755,7 +30746,7 @@ snapshots:
       roughjs: 4.6.6
       stylis: 4.3.6
       ts-dedent: 2.2.0
-      uuid: 11.1.0
+      uuid: 11.1.1
     transitivePeerDependencies:
       - supports-color
 
@@ -35684,7 +35675,9 @@ snapshots:
 
   utils-merge@1.0.1: {}
 
-  uuid@11.1.0: {}
+  uuid@11.1.1: {}
+
+  uuid@14.0.0: {}
 
   uuid@9.0.1: {}
 
