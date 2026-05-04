@@ -1,3 +1,9 @@
+import {
+  SCHEMA_VISUALIZER_SHORTCUT_IDS,
+  schemaVisualizerRegistry,
+} from './registry/schema-visualizer'
+import { SQL_EDITOR_SHORTCUT_IDS, sqlEditorRegistry } from './registry/sql-editor'
+import { TABLE_EDITOR_SHORTCUT_IDS, tableEditorRegistry } from './registry/table-editor'
 import { ShortcutDefinition } from './types'
 
 /**
@@ -16,10 +22,6 @@ export const SHORTCUT_IDS = {
   RESULTS_COPY_JSON: 'results.copy-json',
   RESULTS_COPY_CSV: 'results.copy-csv',
   RESULTS_DOWNLOAD_CSV: 'results.download-csv',
-  TABLE_EDITOR_JUMP_FIRST_ROW: 'table-editor.jump-first-row',
-  TABLE_EDITOR_JUMP_LAST_ROW: 'table-editor.jump-last-row',
-  TABLE_EDITOR_JUMP_FIRST_COL: 'table-editor.jump-first-col',
-  TABLE_EDITOR_JUMP_LAST_COL: 'table-editor.jump-last-col',
   DATA_TABLE_TOGGLE_FILTERS: 'data-table.toggle-filters',
   DATA_TABLE_RESET_FILTERS: 'data-table.reset-filters',
   DATA_TABLE_RESET_COLUMNS: 'data-table.reset-columns',
@@ -48,6 +50,16 @@ export const SHORTCUT_IDS = {
   NAV_ORG_USAGE: 'nav.org-usage',
   NAV_ORG_BILLING: 'nav.org-billing',
   NAV_ORG_SETTINGS: 'nav.org-settings',
+  SHORTCUTS_OPEN_REFERENCE: 'shortcuts.open-reference',
+
+  // Table editor shortcuts
+  ...TABLE_EDITOR_SHORTCUT_IDS,
+
+  // SQL editor shortcuts
+  ...SQL_EDITOR_SHORTCUT_IDS,
+
+  // Schema visualizer shortcuts
+  ...SCHEMA_VISUALIZER_SHORTCUT_IDS,
 } as const
 
 /**
@@ -111,34 +123,6 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     id: SHORTCUT_IDS.RESULTS_DOWNLOAD_CSV,
     label: 'Download results as CSV',
     sequence: ['Mod+Shift+D'],
-  },
-  [SHORTCUT_IDS.TABLE_EDITOR_JUMP_FIRST_ROW]: {
-    id: SHORTCUT_IDS.TABLE_EDITOR_JUMP_FIRST_ROW,
-    label: 'Jump to first row',
-    sequence: ['Mod+ArrowUp'],
-    showInSettings: false,
-    options: { ignoreInputs: true },
-  },
-  [SHORTCUT_IDS.TABLE_EDITOR_JUMP_LAST_ROW]: {
-    id: SHORTCUT_IDS.TABLE_EDITOR_JUMP_LAST_ROW,
-    label: 'Jump to last row',
-    sequence: ['Mod+ArrowDown'],
-    showInSettings: false,
-    options: { ignoreInputs: true },
-  },
-  [SHORTCUT_IDS.TABLE_EDITOR_JUMP_FIRST_COL]: {
-    id: SHORTCUT_IDS.TABLE_EDITOR_JUMP_FIRST_COL,
-    label: 'Jump to first column',
-    sequence: ['Mod+ArrowLeft'],
-    showInSettings: false,
-    options: { ignoreInputs: true },
-  },
-  [SHORTCUT_IDS.TABLE_EDITOR_JUMP_LAST_COL]: {
-    id: SHORTCUT_IDS.TABLE_EDITOR_JUMP_LAST_COL,
-    label: 'Jump to last column',
-    sequence: ['Mod+ArrowRight'],
-    showInSettings: false,
-    options: { ignoreInputs: true },
   },
   [SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT]: {
     id: SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT,
@@ -314,4 +298,20 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     sequence: ['G', 'O'],
     showInSettings: false,
   },
+  [SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE]: {
+    id: SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE,
+    label: 'Show all keyboard shortcuts',
+    sequence: ['Mod+/'],
+    showInSettings: false,
+    options: { ignoreInputs: true },
+  },
+
+  // Table editor shortcut registration
+  ...tableEditorRegistry,
+
+  // SQL editor shortcut registration
+  ...sqlEditorRegistry,
+
+  // Schema visualizer shortcut registration
+  ...schemaVisualizerRegistry,
 }

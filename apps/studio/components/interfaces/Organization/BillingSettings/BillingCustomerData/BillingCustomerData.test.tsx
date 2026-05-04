@@ -32,7 +32,7 @@ vi.mock('ui', async (importOriginal) => {
   const original = (await importOriginal()) as typeof import('ui')
   return {
     ...original,
-    Form_Shadcn_: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    Form: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   }
 })
 

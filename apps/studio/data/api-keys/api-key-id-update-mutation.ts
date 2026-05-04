@@ -51,7 +51,7 @@ export const useResourceUpdateMutation = ({
   return useMutation<ResourceUpdateData, ResponseError, UpdateAPIKeybyIdVariables>({
     mutationFn: (vars) => updateAPIKeysById(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef, id } = variables
+      const { projectRef } = variables
 
       await queryClient.invalidateQueries({ queryKey: apiKeysKeys.list(projectRef) })
 

@@ -16,18 +16,24 @@ You need:
 
 ## Set up HTTPS
 
-Below are two options for adding a reverse proxy with automatic HTTPS in front of your self-hosted Supabase: **Caddy** (simpler, zero-config TLS) and **Nginx + Let's Encrypt** (more control over proxy settings). Both sit in front of Kong and terminate TLS, so internal traffic stays on HTTP.
+Below are two options for adding a reverse proxy with automatic HTTPS in front of your self-hosted Supabase: **Caddy** (simpler, zero-config TLS) and **Nginx + Let's Encrypt** (more control over proxy settings). Both sit in front of the API gateway and terminate TLS, so internal traffic stays on HTTP.
 
 <Admonition type="tip" label="Using a different reverse proxy?">
 
 If you already run [HAProxy](https://www.haproxy.com/), [Traefik](https://traefik.io/), [Nginx Proxy Manager](https://nginxproxymanager.com/), or another reverse proxy for your infrastructure, you can use it instead of Caddy or Nginx above. The key requirements are:
 
-- Proxy to Kong on port `8000` (or `<your-ip>:8000` if the proxy runs outside the Docker network)
+- Proxy to the API gateway on port `8000` (or `<your-ip>:8000` if the proxy runs outside the Docker network)
 - Enable WebSocket support (required for Realtime)
 - Add `X-Forwarded` headers to all requests
-- Comment out Kong's host port bindings in `docker-compose.yml` if the proxy runs in the same Docker network
+- Comment out the API gateway's host port bindings in `docker-compose.yml` if the proxy runs in the same Docker network
 - Update `SUPABASE_PUBLIC_URL`, `API_EXTERNAL_URL`, and `SITE_URL` in `.env` to your HTTPS URL
 - See `volumes/proxy` for example proxy configuration files
+
+</Admonition>
+
+<Admonition type="note" label="Using Envoy instead of Kong?">
+
+Envoy is an optional [API gateway](/docs/guides/self-hosting/self-hosted-envoy), enabled via the `docker-compose.envoy.yml` overlay. If you already run Envoy instead of Kong, edit `docker-compose.caddy.yml` or `docker-compose.nginx.yml` to comment out the `kong:` block and uncomment the `api-gw:` block (and the matching `depends_on` entry) so the reverse proxy sits in front of Envoy.
 
 </Admonition>
 
@@ -110,7 +116,7 @@ Self-signed certificates trigger browser warnings and are rejected by most OAuth
 
 </Admonition>
 
-For development or internal networks where you cannot use Let's Encrypt, you can configure Kong to serve HTTPS directly using self-signed certificates.
+For development or internal networks where you cannot use Let's Encrypt, here's how you can configure Kong (the current default API gateway) to serve HTTPS directly using self-signed certificates.
 
 ### Step 1: Generate a self-signed certificate
 
@@ -190,7 +196,7 @@ If Caddy or Certbot fails to obtain a certificate:
 
 If Realtime subscriptions fail to connect:
 
-- **Caddy** handles WebSocket upgrades automatically - check that Kong is healthy
+- **Caddy** handles WebSocket upgrades automatically - check that the API gateway is healthy
 - **Nginx** requires explicit `Upgrade` and `Connection` headers on the `/realtime/v1/` location. Verify your `nginx.conf` includes these headers as shown above
 
 ### OAuth callback URL mismatch

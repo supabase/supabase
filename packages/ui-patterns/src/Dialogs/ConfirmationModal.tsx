@@ -1,5 +1,8 @@
 'use client'
 
+// Required to avoid issue:
+// The inferred type of ConfirmationModal cannot be named without a reference to DialogProps
+import { Dialog as _RadixDialog } from 'radix-ui'
 import { forwardRef, MouseEventHandler, useEffect, useState } from 'react'
 import {
   Alert_Shadcn_,
@@ -95,7 +98,7 @@ export const ConfirmationModal = forwardRef<
         <DialogContent
           aria-describedby={undefined}
           ref={ref}
-          className="p-0 gap-0 pb-5 !block"
+          className="p-0 gap-0 pb-5 block!"
           size={size}
         >
           <DialogHeader className={cn('border-b')} padding={'small'}>

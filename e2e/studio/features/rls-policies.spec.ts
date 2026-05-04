@@ -1,9 +1,9 @@
 import { expect, Page } from '@playwright/test'
 
+import { createTableWithRLS, dropTable } from '../utils/db/queries.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { createApiResponseWaiter, waitForApiResponse } from '../utils/wait-for-response.js'
-import { createTableWithRLS, dropTable } from '../utils/db/queries.js'
 
 /**
  * Helper function to navigate to policies page and wait for it to load
@@ -283,7 +283,7 @@ test.describe('RLS Policies', () => {
       await page.getByRole('radio', { name: 'INSERT' }).click()
 
       // Select target role - authenticated
-      await page.getByText('Defaults to all (public) roles if none selected').click()
+      await page.getByRole('combobox', { name: 'Target Roles' }).click()
       await page.getByRole('option', { name: 'authenticated' }).click()
 
       // Close the dropdown
@@ -338,7 +338,7 @@ test.describe('RLS Policies', () => {
       await page.getByRole('radio', { name: 'UPDATE' }).click()
 
       // Select authenticated role
-      await page.getByText('Defaults to all (public) roles if none selected').click()
+      await page.getByRole('combobox', { name: 'Target Roles' }).click()
       await page.getByRole('option', { name: 'authenticated' }).click()
       await page.keyboard.press('Escape')
 
@@ -390,7 +390,7 @@ test.describe('RLS Policies', () => {
       await page.getByRole('radio', { name: 'DELETE' }).click()
 
       // Select authenticated role
-      await page.getByText('Defaults to all (public) roles if none selected').click()
+      await page.getByRole('combobox', { name: 'Target Roles' }).click()
       await page.getByRole('option', { name: 'authenticated' }).click()
       await page.keyboard.press('Escape')
 

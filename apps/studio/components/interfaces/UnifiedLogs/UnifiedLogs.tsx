@@ -13,16 +13,20 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
-import { useDebounce, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useDebounce, useParams } from 'common'
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
+  Button,
   ChartConfig,
   cn,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Separator,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   useIsMobile,
 } from 'ui'
 
@@ -39,20 +43,23 @@ import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.utils'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
 import { DataTableFilterCommand } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterCommand'
-import { DataTableHeaderLayout } from '@/components/ui/DataTable/DataTableHeaderLayout'
+import { DataTableFilterControlsDrawer } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterControlsDrawer'
 import { DataTableInfinite } from '@/components/ui/DataTable/DataTableInfinite'
 import { DataTableSideBarLayout } from '@/components/ui/DataTable/DataTableSideBarLayout'
-import { DataTableToolbar } from '@/components/ui/DataTable/DataTableToolbar'
+import { DataTableViewOptions } from '@/components/ui/DataTable/DataTableViewOptions'
 import { FilterSideBar } from '@/components/ui/DataTable/FilterSideBar'
 import { LiveButton } from '@/components/ui/DataTable/LiveButton'
-import { LiveRow } from '@/components/ui/DataTable/LiveRow'
+import { Kbd } from '@/components/ui/DataTable/primitives/Kbd'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { TimelineChart } from '@/components/ui/DataTable/TimelineChart'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const CHART_CONFIG = {
   success: {
@@ -85,6 +92,18 @@ export const UnifiedLogs = () => {
     .filter(({ value }) => value ?? undefined)
 
   const [topBarHeight, setTopBarHeight] = useState(0)
+  const topBarRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new ResizeObserver(() => {
+      const rect = topBarRef.current?.getBoundingClientRect()
+      if (rect) setTopBarHeight(rect.height)
+    })
+    const topBar = topBarRef.current
+    if (!topBar) return
+    observer.observe(topBar)
+    return () => observer.unobserve(topBar)
+  }, [])
 
   const [sorting, setSorting] = useState<SortingState>(defaultColumnSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
@@ -319,6 +338,8 @@ export const UnifiedLogs = () => {
   const isMobile = useIsMobile()
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
 
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev))
+
   useEffect(() => {
     if (isMobile) {
       setIsFilterBarOpen(false)
@@ -356,30 +377,51 @@ export const UnifiedLogs = () => {
             id="panel-right"
             className="flex max-w-full flex-1 flex-col overflow-hidden"
           >
-            <DataTableHeaderLayout setTopBarHeight={setTopBarHeight}>
-              <DataTableFilterCommand
-                placeholder="Search logs..."
-                searchParamsParser={SEARCH_PARAMS_PARSER}
-              />
-              <DataTableToolbar
-                renderActions={() => [
-                  <DownloadLogsButton key="download" searchParameters={searchParameters} />,
-                  <RefreshButton
-                    key="refresh"
-                    isLoading={isRefetchingData}
-                    onRefresh={refetchAllData}
-                  />,
-                  fetchPreviousPage ? (
+            <div ref={topBarRef} className="top-0 z-10 flex flex-col gap-2 bg-background pb-3">
+              <div className="flex flex-wrap items-center gap-2 px-2 pt-2.5 pb-0.5">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="tiny"
+                      type="text"
+                      icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
+                      onClick={() => setIsFilterBarOpen((prev) => !prev)}
+                      className="hidden w-[26px] sm:flex"
+                      aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <p>
+                      Toggle controls with{' '}
+                      <Kbd className="ml-1 text-muted-foreground group-hover:text-accent-foreground">
+                        <span className="mr-1">⌘</span>
+                        <span>B</span>
+                      </Kbd>
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+                <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 **:[[cmdk-input-wrapper]]:px-3! [&_button]:px-3! [&_button>span]:h-[26px]! [&_button>span]:py-0! [&_input]:h-[26px]! [&_input]:py-0!">
+                  <DataTableFilterCommand
+                    placeholder="Search logs..."
+                    searchParamsParser={SEARCH_PARAMS_PARSER}
+                  />
+                </div>
+                <div className="block sm:hidden">
+                  <DataTableFilterControlsDrawer />
+                </div>
+                <div className="ml-auto flex items-center gap-x-4">
+                  <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS} />
+                  <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />
+                  <DataTableViewOptions />
+                  <DownloadLogsButton searchParameters={searchParameters} />
+                  {fetchPreviousPage ? (
                     <LiveButton
-                      key="live"
                       fetchPreviousPage={fetchPreviousPage}
                       searchParamsParser={SEARCH_PARAMS_PARSER}
                     />
-                  ) : null,
-                ]}
-                isFilterBarOpen={isFilterBarOpen}
-                setIsFilterBarOpen={setIsFilterBarOpen}
-              />
+                  ) : null}
+                </div>
+              </div>
               <TimelineChart
                 data={unifiedLogsChart}
                 className={cn(
@@ -389,42 +431,31 @@ export const UnifiedLogs = () => {
                 columnId="timestamp"
                 chartConfig={filteredChartConfig}
               />
-            </DataTableHeaderLayout>
-            <Separator />
-            <ResizablePanelGroup orientation="horizontal" className="w-full h-full">
-              <ResizablePanel minSize="30" className="h-full">
-                <ResizablePanelGroup key="main-logs" orientation="vertical" className="h-full">
-                  <ResizablePanel
-                    defaultSize="100"
-                    minSize="30"
-                    className={cn(
-                      'bg',
-                      isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
-                    )}
-                  >
-                    <div className="h-full overflow-auto">
-                      <DataTableInfinite
-                        columns={UNIFIED_LOGS_COLUMNS}
-                        totalRows={totalDBRowCount}
-                        filterRows={filterDBRowCount}
-                        totalRowsFetched={totalFetched}
-                        fetchNextPage={fetchNextPage}
-                        hasNextPage={hasNextPage}
-                        renderLiveRow={(props) => {
-                          if (!liveMode.timestamp) return null
-                          if (props?.row?.original.id !== liveMode?.row?.id) return null
-                          return <LiveRow colSpan={UNIFIED_LOGS_COLUMNS.length - 1} />
-                        }}
-                        setColumnOrder={setColumnOrder}
-                        setColumnVisibility={setColumnVisibility}
-                        searchParamsParser={SEARCH_PARAMS_PARSER}
-                      />
-                    </div>
-                  </ResizablePanel>
-                  <LogsListPanel selectedRow={selectedRow} />
-                </ResizablePanelGroup>
+            </div>
+            <ResizablePanelGroup key="main-logs" orientation="vertical" className="flex-1">
+              <ResizablePanel
+                defaultSize="100"
+                minSize="30"
+                className={cn(
+                  'bg',
+                  isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
+                )}
+              >
+                <div className="h-full [&>div]:h-full [&_thead_tr]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]! [&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]! [&_thead_th]:[box-shadow:inset_0_-1px_0_hsl(var(--border-default))]! [&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0! [&_thead_tr:hover]:bg-[linear-gradient(to_bottom,hsl(var(--background-default)),hsl(var(--background-surface-75)))]! [&_thead_th]:text-foreground-lighter!">
+                  <DataTableInfinite
+                    columns={UNIFIED_LOGS_COLUMNS}
+                    totalRows={totalDBRowCount}
+                    filterRows={filterDBRowCount}
+                    totalRowsFetched={totalFetched}
+                    fetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    setColumnOrder={setColumnOrder}
+                    setColumnVisibility={setColumnVisibility}
+                    searchParamsParser={SEARCH_PARAMS_PARSER}
+                  />
+                </div>
               </ResizablePanel>
-
+              <LogsListPanel selectedRow={selectedRow} />
               {selectedRowKey && (
                 <ServiceFlowPanel
                   selectedRow={selectedRow?.original}

@@ -1,7 +1,5 @@
 [data-theme='dark'],
-[data-theme='deep-dark'],
-.dark,
-.deep-dark {
+.dark {
   --code-token-keyword: #bda4ff;
   --code-foreground: #ffffff;
   --code-token-constant: #3ecf8e;

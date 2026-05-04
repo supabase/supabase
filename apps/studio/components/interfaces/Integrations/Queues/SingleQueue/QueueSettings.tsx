@@ -255,7 +255,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
           </SheetDescription>
         </SheetHeader>
 
-        <SheetSection className="p-0 flex-grow">
+        <SheetSection className="p-0 grow">
           {!isExposed ? (
             <Admonition
               type="default"
@@ -278,7 +278,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
             <Admonition
               type="default"
               className="rounded-none border-x-0 border-t-0"
-              title="Only relevant roles for managing queues via client libraries or PostgREST are shown here"
+              description="Only relevant roles for managing queues via client libraries or PostgREST are shown here."
             />
           )}
           <Table>

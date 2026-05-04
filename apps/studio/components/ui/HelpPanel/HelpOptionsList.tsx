@@ -129,7 +129,7 @@ export const HelpOptionsList = ({
               </ButtonGroupItem>
             )
           default: {
-            const _exhaustive: never = id
+            void (id as never)
             return null
           }
         }

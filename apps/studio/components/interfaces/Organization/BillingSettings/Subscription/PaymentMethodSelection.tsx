@@ -14,7 +14,15 @@ import {
   useState,
 } from 'react'
 import { toast } from 'sonner'
-import { Checkbox_Shadcn_, Listbox } from 'ui'
+import {
+  Checkbox,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
@@ -267,15 +275,15 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
         size="invisible"
         onOpen={() => {
           // [Joshen] This is to ensure that hCaptcha popup remains clickable
-          if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.add('pointer-events-auto!')
         }}
         onClose={() => {
           setSetupIntent(undefined)
-          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
         }}
         onVerify={(token) => {
           setCaptchaToken(token)
-          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
         }}
         onExpire={() => {
           setCaptchaToken(null)
@@ -289,48 +297,56 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
             <p className="text-sm text-foreground-light">Retrieving payment methods</p>
           </div>
         ) : paymentMethods?.data && paymentMethods?.data.length > 0 && !setupNewPaymentMethod ? (
-          <Listbox
+          <FormItemLayout
+            id="payment-method"
+            isReactForm={false}
             layout={layout}
             label="Payment method"
-            value={selectedPaymentMethod}
-            onChange={onSelectPaymentMethod}
-            className="flex items-center"
+            className="gap-[2px]"
+            size="tiny"
           >
-            {paymentMethods?.data.map((method: any) => {
-              const label = `•••• •••• •••• ${method.card.last4}`
-              return (
-                <Listbox.Option
-                  key={method.id}
-                  label={label}
-                  value={method.id}
-                  addOnBefore={() => {
-                    return (
-                      <img
-                        alt="Credit Card Brand"
-                        src={`${BASE_PATH}/img/payment-methods/${method.card.brand
-                          .replace(' ', '-')
-                          .toLowerCase()}.png`}
-                        width="32"
-                      />
-                    )
-                  }}
-                >
-                  <div>{label}</div>
-                </Listbox.Option>
-              )
-            })}
-            <div
-              className="flex items-center px-3 py-2 space-x-2 transition cursor-pointer group hover:bg-surface-300"
-              onClick={() => {
-                setSetupNewPaymentMethod(true)
+            <Select_Shadcn_
+              value={selectedPaymentMethod}
+              onValueChange={(value) => {
+                if (value === 'new') {
+                  setSetupNewPaymentMethod(true)
+                  return
+                }
+                onSelectPaymentMethod(value)
               }}
             >
-              <Plus size={16} />
-              <p className="transition text-foreground-light group-hover:text-foreground">
-                Add new payment method
-              </p>
-            </div>
-          </Listbox>
+              <SelectTrigger_Shadcn_ id="payment-method">
+                <SelectValue_Shadcn_ className="flex gap-2" />
+              </SelectTrigger_Shadcn_>
+              <SelectContent_Shadcn_>
+                {paymentMethods?.data.map((method) => {
+                  const label = `•••• •••• •••• ${method.card?.last4}`
+                  return (
+                    <SelectItem_Shadcn_ key={method.id} value={method.id}>
+                      <div className="flex gap-2">
+                        <img
+                          alt="Credit Card Brand"
+                          src={`${BASE_PATH}/img/payment-methods/${method.card?.brand
+                            .replace(' ', '-')
+                            .toLowerCase()}.png`}
+                          width="32"
+                        />
+                        {label}
+                      </div>
+                    </SelectItem_Shadcn_>
+                  )
+                })}
+                <SelectItem_Shadcn_ value="new">
+                  <div className="flex gap-2">
+                    <Plus size={16} />
+                    <p className="transition text-foreground-light group-hover:text-foreground">
+                      Add new payment method
+                    </p>
+                  </div>
+                </SelectItem_Shadcn_>
+              </SelectContent_Shadcn_>
+            </Select_Shadcn_>
+          </FormItemLayout>
         ) : null}
 
         {stripePromise && setupIntent && customerProfile && (
@@ -351,7 +367,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
             {/* If the customer already has a billing address, optionally allow overwriting it - if they have no address, we use that as a default */}
             {customerProfile?.address != null && (
               <div className="flex items-center space-x-2 mt-4">
-                <Checkbox_Shadcn_
+                <Checkbox
                   id="defaultBillingAddress"
                   checked={useAsDefaultBillingAddress}
                   onCheckedChange={() => {

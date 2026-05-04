@@ -78,7 +78,7 @@ export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDel
       >
         <p className="text-sm">
           Are you sure you want to delete the custom domain{' '}
-          <code className="text-code-inline !break-normal">{customDomain.hostname}</code> for your
+          <code className="text-code-inline break-normal!">{customDomain.hostname}</code> for your
           project? You will need to re-verify this domain if you want to use it again.
         </p>
       </ConfirmationModal>

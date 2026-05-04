@@ -302,7 +302,7 @@ export const SubscriptionPlanUpdateDialog = ({
     }
 
     // Prepend the plan cost row when there are adjustment items to show
-    if (changeType !== 'downgrade' && items.length > 0) {
+    if (items.length > 0) {
       items.unshift({
         type: 'amount',
         label: `${subscriptionPlanMeta?.name} Plan`,
@@ -321,7 +321,6 @@ export const SubscriptionPlanUpdateDialog = ({
     newPlanCost,
     taxFailed,
     customerBalance,
-    changeType,
     subscriptionPlanMeta?.name,
   ])
 
@@ -523,23 +522,25 @@ export const SubscriptionPlanUpdateDialog = ({
 
                                       const content = (
                                         <>
+                                          {planItem && (
+                                            <TableRow className="text-foreground-light">
+                                              <TableCell className="py-2! px-0">
+                                                {planItem.description}
+                                              </TableCell>
+                                              <TableCell
+                                                className="text-right py-2 px-0"
+                                                translate="no"
+                                              >
+                                                {formatCurrency(planItem.total_price)}
+                                              </TableCell>
+                                            </TableRow>
+                                          )}
+
                                           {/* Combined projects section */}
                                           {allProjects.length > 0 && (
                                             <>
                                               <TableRow className="text-foreground-light">
-                                                <TableCell className="!py-2 px-0">
-                                                  {planItem?.description}
-                                                </TableCell>
-                                                <TableCell
-                                                  className="text-right py-2 px-0"
-                                                  translate="no"
-                                                >
-                                                  {formatCurrency(planItem?.total_price)}
-                                                </TableCell>
-                                              </TableRow>
-
-                                              <TableRow className="text-foreground-light">
-                                                <TableCell className="!py-2 px-0 flex items-center gap-1">
+                                                <TableCell className="py-2! px-0 flex items-center gap-1">
                                                   <span>Compute</span>
                                                 </TableCell>
                                                 <TableCell
@@ -561,7 +562,7 @@ export const SubscriptionPlanUpdateDialog = ({
                                                   className="text-foreground-light"
                                                 >
                                                   <TableCell
-                                                    className="!py-2 px-0 pl-6"
+                                                    className="py-2! px-0 pl-6"
                                                     translate="no"
                                                   >
                                                     {project.project_name} ({project.computeType}) |{' '}
@@ -572,7 +573,7 @@ export const SubscriptionPlanUpdateDialog = ({
                                               {computeCreditsItem && (
                                                 <TableRow className="text-foreground-light">
                                                   <TableCell
-                                                    className="!py-2 px-0 pl-6"
+                                                    className="py-2! px-0 pl-6"
                                                     translate="no"
                                                   >
                                                     Compute Credits |{' '}

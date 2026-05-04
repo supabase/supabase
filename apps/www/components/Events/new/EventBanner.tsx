@@ -153,10 +153,10 @@ const EventBannerSkeleton = () => {
         {/* Left: title + host + description */}
         <div className="flex flex-col gap-6 flex-1">
           <div className="flex flex-col gap-1.5">
-            <div className="h-8 bg-surface-200 rounded animate-pulse w-3/4" />
-            <div className="h-5 bg-surface-200 rounded animate-pulse w-1/2 mt-1" />
+            <div className="h-8 bg-surface-200 rounded-sm animate-pulse w-3/4" />
+            <div className="h-5 bg-surface-200 rounded-sm animate-pulse w-1/2 mt-1" />
           </div>
-          <div className="h-16 bg-surface-200 rounded animate-pulse w-full" />
+          <div className="h-16 bg-surface-200 rounded-sm animate-pulse w-full" />
         </div>
 
         {/* Right: widgets top, button bottom */}
@@ -166,23 +166,23 @@ const EventBannerSkeleton = () => {
             <div className="flex items-center gap-4">
               <div className="bg-surface-200 w-10 h-10 rounded-md animate-pulse" />
               <div className="flex flex-col gap-2">
-                <div className="h-4 w-32 bg-surface-200 rounded animate-pulse" />
-                <div className="h-3 w-20 bg-surface-200 rounded animate-pulse" />
+                <div className="h-4 w-32 bg-surface-200 rounded-sm animate-pulse" />
+                <div className="h-3 w-20 bg-surface-200 rounded-sm animate-pulse" />
               </div>
             </div>
             {/* Location Widget Skeleton */}
             <div className="flex items-center gap-4">
               <div className="bg-surface-200 w-10 h-10 rounded-md animate-pulse" />
               <div className="flex flex-col gap-2">
-                <div className="h-4 w-20 bg-surface-200 rounded animate-pulse" />
-                <div className="h-3 w-24 bg-surface-200 rounded animate-pulse" />
+                <div className="h-4 w-20 bg-surface-200 rounded-sm animate-pulse" />
+                <div className="h-3 w-24 bg-surface-200 rounded-sm animate-pulse" />
               </div>
             </div>
           </div>
 
           {/* Button Skeleton */}
           <div className="flex justify-end">
-            <div className="h-9 w-24 bg-surface-200 rounded animate-pulse" />
+            <div className="h-9 w-24 bg-surface-200 rounded-sm animate-pulse" />
           </div>
         </div>
       </article>

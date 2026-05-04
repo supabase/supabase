@@ -17,7 +17,7 @@ export function DataTableFilterResetButton<TData>({ value: _value }: DataTableFi
     <Button
       type="outline"
       icon={<X />}
-      className="h-5 rounded-full px-1.5 py-1 font-mono text-[10px] [&>span]:-translate-y-[0.6px] space-x-1"
+      className="h-5 rounded-full px-1.5 py-1 font-mono text-[10px] [&>span]:translate-y-[-0.6px] space-x-1"
       onClick={(e) => {
         e.stopPropagation()
         column?.setFilterValue(undefined)

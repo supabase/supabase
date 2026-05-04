@@ -119,7 +119,7 @@ export const ReportChartV2 = ({
   const firstItem = chartData[0]
   const timestampKey = firstItem?.hasOwnProperty('timestamp') ? 'timestamp' : 'period_start'
 
-  const { data: filledChartData, isError: isFillError } = useFillTimeseriesSorted({
+  const { data: filledChartData } = useFillTimeseriesSorted({
     data: chartData,
     timestampKey,
     valueKey: dynamicAttributes.map((attr) => attr.attribute),
