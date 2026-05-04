@@ -43,7 +43,9 @@ export function McpConfigPanel({
 }: McpConfigPanelProps) {
   const [readonly, setReadonly] = useState(false)
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
-  const [selectedClient, setSelectedClient] = useState(initialSelectedClient ?? MCP_CLIENTS[0])
+  const [selectedClient, setSelectedClient] = useState(
+    initialSelectedClient ?? MCP_CLIENTS.find((c) => c.key === 'claude-code') ?? MCP_CLIENTS[0]
+  )
 
   const supportedFeatures = isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
   const selectedFeaturesSupported = useMemo(() => {
