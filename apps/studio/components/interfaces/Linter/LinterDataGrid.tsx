@@ -7,7 +7,7 @@ import ReactMarkdown from 'react-markdown'
 import { Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import LintDetail from './LintDetail'
+import { LintDetail } from './LintDetail'
 import { EntityTypeIcon } from './Linter.utils'
 import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
 import {
@@ -26,7 +26,7 @@ interface LinterDataGridProps {
   currentTab: LINTER_LEVELS
 }
 
-const LinterDataGrid = ({
+export const LinterDataGrid = ({
   isLoading,
   filteredLints,
   selectedLint,
@@ -195,8 +195,12 @@ const LinterDataGrid = ({
               </div>
               <Button type="text" icon={<X />} onClick={handleSidepanelClose} />
             </div>
-            <div className="p-6 grow min-h-0 overflow-y-auto">
-              <LintDetail lint={selectedLint} projectRef={ref!} />
+            <div className="p-6 flex-grow min-h-0 overflow-y-auto">
+              <LintDetail
+                lint={selectedLint}
+                projectRef={ref!}
+                onAfterAction={handleSidepanelClose}
+              />
             </div>
           </ResizablePanel>
         </>
@@ -204,5 +208,3 @@ const LinterDataGrid = ({
     </ResizablePanelGroup>
   )
 }
-
-export default LinterDataGrid

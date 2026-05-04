@@ -12,7 +12,7 @@ import {
   generateMigrationCliCommand,
   generateSeedCliCommand,
 } from './SQLEditor.utils'
-import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { DOCS_URL } from '@/lib/constants'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 

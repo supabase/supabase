@@ -2,17 +2,23 @@ import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { forwardRef, memo, Ref, useCallback, useMemo, useRef, useState } from 'react'
-import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
-import { Button, cn } from 'ui'
+import DataGrid, {
+  CalculatedColumn,
+  CellClickArgs,
+  CellMouseEvent,
+  DataGridHandle,
+} from 'react-data-grid'
+import { flushSync } from 'react-dom'
+import { Button, cn, DropdownMenu, DropdownMenuTrigger } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ref as valtioRef } from 'valtio'
 
 import type { GridProps, SupaColumn, SupaRow } from '../../types'
 import { isPendingAddRow, isPendingDeleteRow } from '../../types'
+import { RowContextMenuContent } from '../menu/RowContextMenu'
 import { ColumnOverlayItem } from './ColumnOverlayItem'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
-import { RowContextMenuProvider, RowRenderer } from './RowRenderer'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 import { formatForeignKeys } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
@@ -72,18 +78,11 @@ export const Grid = memo(
         snap.setSelectedRows(selectedRows)
       }
 
-      const selectedCellRef = useRef<{
-        rowIdx: number
-        row: SupaRow
-        column: CalculatedColumn<SupaRow, unknown>
-      } | null>(null)
-
       function onSelectedCellChange(args: {
         rowIdx: number
         row: SupaRow
         column: CalculatedColumn<SupaRow, unknown>
       }) {
-        selectedCellRef.current = args
         snap.setSelectedCellPosition({ idx: args.column.idx, rowIdx: args.rowIdx })
       }
 
@@ -217,6 +216,65 @@ export const Grid = memo(
         })
       )
       const [draggedColumn, setDraggedColumn] = useState<SupaColumn | undefined>(undefined)
+      const contextMenuTriggerRef = useRef<HTMLDivElement>(null)
+      const [contextMenuKey, setContextMenuKey] = useState(0)
+      const [isContextMenuOpen, setIsContextMenuOpen] = useState(false)
+      const [contextMenuRow, setContextMenuRow] = useState<SupaRow | null>(null)
+      const [contextMenuCellPosition, setContextMenuCellPosition] = useState<{
+        idx: number
+        rowIdx: number
+      } | null>(null)
+
+      const openContextMenu = useCallback(
+        (
+          event: React.MouseEvent,
+          row: SupaRow,
+          position: {
+            idx: number
+            rowIdx: number
+          }
+        ) => {
+          const trigger = contextMenuTriggerRef.current
+          if (!trigger) return
+
+          trigger.style.left = `${event.clientX}px`
+          trigger.style.top = `${event.clientY}px`
+
+          flushSync(() => {
+            setContextMenuRow(row)
+            setContextMenuCellPosition(position)
+            setContextMenuKey((prev) => prev + 1)
+            setIsContextMenuOpen(true)
+          })
+        },
+        []
+      )
+
+      const handleCellClick = useCallback(
+        (_: CellClickArgs<SupaRow, unknown>, event: React.MouseEvent<HTMLElement>) => {
+          event.currentTarget.focus()
+        },
+        []
+      )
+
+      const handleCellContextMenu = useCallback(
+        (args: CellClickArgs<SupaRow, unknown>, event: CellMouseEvent) => {
+          event.preventDefault()
+          event.currentTarget.focus()
+          args.selectCell()
+          event.preventGridDefault()
+
+          const rowIdx = rows.findIndex(
+            (candidate) => candidate === args.row || candidate.idx === args.row.idx
+          )
+          if (rowIdx === -1) return
+
+          const position = { idx: args.column.idx, rowIdx }
+          snap.setSelectedCellPosition(position)
+          openContextMenu(event, args.row, position)
+        },
+        [openContextMenu, rows, snap]
+      )
 
       return (
         <div
@@ -343,20 +401,35 @@ export const Grid = memo(
               items={columnsWithDirtyCellClass.map((column) => column.key)}
               strategy={horizontalListSortingStrategy}
             >
-              <RowContextMenuProvider>
+              <DropdownMenu
+                modal={false}
+                open={isContextMenuOpen}
+                onOpenChange={setIsContextMenuOpen}
+              >
+                <DropdownMenuTrigger asChild>
+                  <div ref={contextMenuTriggerRef} className="fixed pointer-events-none w-0 h-0" />
+                </DropdownMenuTrigger>
+                {contextMenuRow && (
+                  <RowContextMenuContent
+                    key={contextMenuKey}
+                    row={contextMenuRow}
+                    selectedCellPosition={contextMenuCellPosition}
+                  />
+                )}
                 <DataGrid
                   ref={ref}
-                  className={`${gridClass} grow`}
+                  className={cn(gridClass, 'grow', isContextMenuOpen && 'rdg-context-menu-open')}
                   rowClass={computedRowClass}
                   columns={columnsWithDirtyCellClass}
                   rows={rows ?? []}
-                  renderers={{ renderRow: RowRenderer }}
                   rowKeyGetter={rowKeyGetter}
                   selectedRows={snap.selectedRows}
                   onColumnResize={snap.updateColumnSize}
                   onRowsChange={onRowsChange}
                   onSelectedCellChange={onSelectedCellChange}
                   onSelectedRowsChange={onSelectedRowsChange}
+                  onCellClick={handleCellClick}
+                  onCellContextMenu={handleCellContextMenu}
                   onCellDoubleClick={(props) => {
                     if (typeof props.column.name === 'string') {
                       onRowDoubleClick(props.row, { name: props.column.name })
@@ -370,7 +443,7 @@ export const Grid = memo(
                     })
                   }
                 />
-              </RowContextMenuProvider>
+              </DropdownMenu>
               {/* The DragOverlay is necessary to avoid styling issues while dragging a column */}
               <DragOverlay>
                 {draggedColumn ? <ColumnOverlayItem column={draggedColumn} /> : null}

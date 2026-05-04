@@ -15,6 +15,7 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { filterByProjects, filterByUsers, sortAuditLogs } from './AuditLogs.utils'
 import { LogDetailsPanel } from '@/components/interfaces/AuditLogs/LogDetailsPanel'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
@@ -27,6 +28,7 @@ import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import {
   AuditLog,
+  TIMESTAMP_MICROS_PER_MS,
   useOrganizationAuditLogsQuery,
 } from '@/data/organizations/organization-audit-logs-query'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
@@ -120,26 +122,10 @@ export const AuditLogs = () => {
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   const logs = data?.result ?? []
-  const sortedLogs = logs
-    ?.sort((a, b) =>
-      dateSortDesc
-        ? Number(new Date(b.occurred_at)) - Number(new Date(a.occurred_at))
-        : Number(new Date(a.occurred_at)) - Number(new Date(b.occurred_at))
-    )
-    ?.filter((log) => {
-      if (filters.users.length > 0) {
-        return filters.users.includes(log.actor.id)
-      } else {
-        return log
-      }
-    })
-    ?.filter((log) => {
-      if (filters.projects.length > 0) {
-        return filters.projects.includes(log.target.metadata.ref || '')
-      } else {
-        return log
-      }
-    })
+  const sortedLogs = filterByProjects(
+    filterByUsers(sortAuditLogs(logs, dateSortDesc), filters.users),
+    filters.projects
+  )
 
   const shouldShowLoadingState =
     (isLoading && fetchStatus !== 'idle') || isLoadingPermissions || isLoadingEntitlements
@@ -339,17 +325,13 @@ export const AuditLogs = () => {
                     body={
                       sortedLogs?.map((log) => {
                         const user = (members ?? []).find(
-                          (member) => member.gotrue_id === log.actor.id
+                          (member) => member.gotrue_id === log.actor.user_id
                         )
                         const role = roles.find((role) => user?.role_ids?.[0] === role.id)
-                        const logProjectRef =
-                          log.target.metadata.project_ref ?? log.target.metadata.ref
-                        const logOrgSlug = log.target.metadata.org_slug ?? log.target.metadata.slug
-
-                        const project = projects?.find((project) => project.ref === logProjectRef)
-                        const organization = organizations?.find((org) => org.slug === logOrgSlug)
-
-                        const hasStatusCode = log.action.metadata[0]?.status !== undefined
+                        const project = projects?.find((p) => p.ref === log.project_ref)
+                        const organization = organizations?.find(
+                          (org) => org.slug === log.organization_slug
+                        )
                         const userIcon =
                           user === undefined ? (
                             <div className="flex h-[30px] w-[30px] items-center justify-center border-2 rounded-full border-strong">
@@ -371,7 +353,7 @@ export const AuditLogs = () => {
 
                         return (
                           <Table.tr
-                            key={log.occurred_at}
+                            key={log.request_id}
                             onClick={() => setSelectedLog(log)}
                             className="cursor-pointer hover:bg-alternative! transition duration-100"
                           >
@@ -379,7 +361,9 @@ export const AuditLogs = () => {
                               <div className="flex items-center space-x-4">
                                 <div>{userIcon}</div>
                                 <div>
-                                  <p className="text-foreground-light">{user?.username ?? '-'}</p>
+                                  <p className="text-foreground-light">
+                                    {user?.username ?? log.actor.email ?? '-'}
+                                  </p>
                                   {role && (
                                     <p className="mt-0.5 text-xs text-foreground-light">
                                       {role?.name}
@@ -390,38 +374,43 @@ export const AuditLogs = () => {
                             </Table.td>
                             <Table.td className="max-w-[250px]">
                               <div className="flex items-center space-x-2">
-                                {hasStatusCode && (
-                                  <p className="bg-surface-200 rounded-sm px-1 flex items-center justify-center text-xs font-mono border">
-                                    {log.action.metadata[0].status}
-                                  </p>
-                                )}
+                                <p className="bg-surface-200 rounded-sm px-1 flex items-center justify-center text-xs font-mono border">
+                                  {log.action.status}
+                                </p>
+                                <p className="text-foreground-light text-xs font-mono">
+                                  {log.action.method}
+                                </p>
                                 <p className="truncate" title={log.action.name}>
                                   {log.action.name}
                                 </p>
                               </div>
                             </Table.td>
                             <Table.td>
-                              <p
-                                className="text-foreground-light max-w-[230px] truncate"
-                                title={project?.name ?? organization?.name ?? '-'}
-                              >
-                                {project?.name
-                                  ? 'Project: '
-                                  : organization?.name
-                                    ? 'Organization: '
-                                    : null}
-                                {project?.name ?? organization?.name ?? 'Unknown'}
-                              </p>
-                              <p
-                                className="text-foreground-light text-xs mt-0.5 truncate"
-                                title={logProjectRef ?? logOrgSlug ?? ''}
-                              >
-                                {logProjectRef ? 'Ref: ' : logOrgSlug ? 'Slug: ' : null}
-                                {logProjectRef ?? logOrgSlug}
-                              </p>
+                              {project || organization ? (
+                                <>
+                                  <p
+                                    className="text-foreground-light max-w-[230px] truncate"
+                                    title={project?.name ?? organization?.name}
+                                  >
+                                    {project ? 'Project: ' : 'Organization: '}
+                                    {project?.name ?? organization?.name}
+                                  </p>
+                                  <p className="text-foreground-light text-xs mt-0.5 truncate">
+                                    {log.project_ref
+                                      ? `Ref: ${log.project_ref}`
+                                      : `Slug: ${log.organization_slug}`}
+                                  </p>
+                                </>
+                              ) : (
+                                <p className="text-foreground-light text-sm">
+                                  {log.project_ref ?? log.organization_slug ?? '-'}
+                                </p>
+                              )}
                             </Table.td>
                             <Table.td>
-                              {dayjs(log.occurred_at).format('DD MMM YYYY, HH:mm:ss')}
+                              {dayjs(log.timestamp / TIMESTAMP_MICROS_PER_MS).format(
+                                'DD MMM YYYY, HH:mm:ss'
+                              )}
                             </Table.td>
                             <Table.td align="right">
                               <Button type="default">View details</Button>

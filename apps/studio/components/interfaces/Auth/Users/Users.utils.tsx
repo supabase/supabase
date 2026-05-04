@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { SqlEditor, TableEditor } from 'icons'
 import { Copy, Trash, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
 import {
@@ -260,6 +261,7 @@ export const formatUserColumns = ({
   visibleColumns = [],
   setSortByValue,
   onSelectDeleteUser,
+  onSelectImpersonateUser,
 }: {
   specificFilterColumn: string
   columns: UsersTableColumn[]
@@ -268,6 +270,7 @@ export const formatUserColumns = ({
   visibleColumns?: string[]
   setSortByValue: (val: string) => void
   onSelectDeleteUser: (user: User) => void
+  onSelectImpersonateUser: (user: User, destination: 'sql' | 'table-editor') => Promise<void>
 }) => {
   const columnOrder = config.map((c) => c.id) ?? columns.map((c) => c.id)
 
@@ -402,7 +405,33 @@ export const formatUserColumns = ({
                 <Copy size={12} />
                 <span>Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}</span>
               </ContextMenuItem_Shadcn_>
+
               <ContextMenuSeparator_Shadcn_ />
+
+              <ContextMenuItem_Shadcn_
+                className="gap-x-2"
+                onFocusCapture={(e) => e.stopPropagation()}
+                onSelect={() => {
+                  if (user) onSelectImpersonateUser(user, 'table-editor')
+                }}
+              >
+                <TableEditor size={12} />
+                <span>View data as user</span>
+              </ContextMenuItem_Shadcn_>
+
+              <ContextMenuItem_Shadcn_
+                className="gap-x-2"
+                onFocusCapture={(e) => e.stopPropagation()}
+                onSelect={() => {
+                  if (user) onSelectImpersonateUser(user, 'sql')
+                }}
+              >
+                <SqlEditor size={12} />
+                <span>Run SQL as user</span>
+              </ContextMenuItem_Shadcn_>
+
+              <ContextMenuSeparator_Shadcn_ />
+
               <ContextMenuItem_Shadcn_
                 className="gap-x-2"
                 onFocusCapture={(e) => e.stopPropagation()}

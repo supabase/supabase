@@ -1,12 +1,10 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
+import { ChevronDown, Trash } from 'lucide-react'
 import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
@@ -31,12 +29,8 @@ import {
 } from '@/components/layouts/TableEditorLayout/ExportAllRows'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
-import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
 import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { RoleImpersonationState } from '@/lib/role-impersonation'
 import {
@@ -44,7 +38,6 @@ import {
   useSubscribeToImpersonatedRole,
 } from '@/state/role-impersonation-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
@@ -60,11 +53,10 @@ export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true 
   useSyncFiltersToUrl()
 
   const snap = useTableEditorTableStateSnapshot()
-  const showInsertButton = snap.selectedRows.size === 0
 
   return (
     <div>
-      <div className="flex flex-wrap min-h-10 items-center bg-dash-sidebar dark:bg-surface-100 py-1.5 gap-2">
+      <div className="flex flex-wrap min-h-10 items-center bg-dash-sidebar dark:bg-surface-100">
         {customHeader ? (
           <div className="flex-1 px-1.5">{customHeader}</div>
         ) : snap.selectedRows.size > 0 ? (
@@ -72,162 +64,18 @@ export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true 
             <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
           </div>
         ) : (
-          <div className="w-full flex items-center gap-2 px-1.5 pb-1.5 border-b border-border">
+          <div className="w-full flex items-center justify-between gap-2 pr-1.5 py-1.5 border-b border-border">
             <FilterPopoverNew isRefetching={isRefetching} />
           </div>
         )}
-        <div className="flex items-center gap-2 overflow-x-auto px-1.5">
+        <div className="flex items-center gap-2 overflow-x-auto px-1.5 py-1.5">
           {!customHeader && snap.selectedRows.size === 0 && (
             <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
           )}
           <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
-          {showInsertButton && <InsertButton />}
         </div>
       </div>
     </div>
-  )
-}
-
-const InsertButton = () => {
-  const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-
-  const snap = useTableEditorTableStateSnapshot()
-  const tableEditorSnap = useTableEditorStateSnapshot()
-  const { can: canCreateColumns } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'columns'
-  )
-  const { mutate: sendEvent } = useSendEventMutation()
-
-  const onAddRow =
-    snap.editable && (snap.table.columns ?? []).length > 0 ? tableEditorSnap.onAddRow : undefined
-  const onAddColumn = snap.editable ? tableEditorSnap.onAddColumn : undefined
-  const onImportData = snap.editable ? tableEditorSnap.onImportData : undefined
-
-  const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
-
-  useShortcut(SHORTCUT_IDS.TABLE_EDITOR_INSERT_ROW, () => onAddRow?.(), {
-    registerInCommandMenu: true,
-    enabled: onAddRow !== undefined && canAddNew && canCreateColumns,
-  })
-  useShortcut(SHORTCUT_IDS.TABLE_EDITOR_INSERT_COLUMN, () => onAddColumn?.(), {
-    registerInCommandMenu: true,
-    enabled: onAddColumn !== undefined && canAddNew && canCreateColumns,
-  })
-  useShortcut(SHORTCUT_IDS.TABLE_EDITOR_IMPORT_CSV, () => onImportData?.(), {
-    registerInCommandMenu: true,
-    enabled: onImportData !== undefined && canAddNew && canCreateColumns,
-  })
-
-  if (!canAddNew || !canCreateColumns) return null
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          data-testid="table-editor-insert-new-row"
-          type="primary"
-          size="tiny"
-          icon={<ChevronDown strokeWidth={1.5} />}
-        >
-          Insert
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end">
-        {[
-          ...(onAddRow !== undefined
-            ? [
-                <DropdownMenuItem key="add-row" className="group gap-x-3" onClick={onAddRow}>
-                  <div className="-mt-2 pr-1.5 shrink-0">
-                    <div className="border border-foreground-lighter w-[15px] h-[4px]" />
-                    <div className="border border-foreground-lighter w-[15px] h-[4px] my-[2px]" />
-                    <div
-                      className={cn([
-                        'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
-                        'transition duration-200 group-data-highlighted:border-brand group-data-highlighted:translate-x-0',
-                      ])}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0 pr-4">
-                    <p>Insert row</p>
-                    <p className="text-foreground-light">Insert a new row into {snap.table.name}</p>
-                  </div>
-                  <ShortcutBadge
-                    shortcutId={SHORTCUT_IDS.TABLE_EDITOR_INSERT_ROW}
-                    className="shrink-0"
-                  />
-                </DropdownMenuItem>,
-              ]
-            : []),
-          ...(onAddColumn !== undefined
-            ? [
-                <DropdownMenuItem key="add-column" className="group gap-x-3" onClick={onAddColumn}>
-                  <div className="flex -mt-2 pr-1.5 shrink-0">
-                    <div className="border border-foreground-lighter w-[4px] h-[15px]" />
-                    <div className="border border-foreground-lighter w-[4px] h-[15px] mx-[2px]" />
-                    <div
-                      className={cn([
-                        'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
-                        'transition duration-200 group-data-highlighted:border-brand group-data-highlighted:translate-y-0',
-                      ])}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0 pr-4">
-                    <p>Insert column</p>
-                    <p className="text-foreground-light">
-                      Insert a new column into {snap.table.name}
-                    </p>
-                  </div>
-                  <ShortcutBadge
-                    shortcutId={SHORTCUT_IDS.TABLE_EDITOR_INSERT_COLUMN}
-                    className="shrink-0"
-                  />
-                </DropdownMenuItem>,
-              ]
-            : []),
-          ...(onImportData !== undefined
-            ? [
-                <DropdownMenuItem
-                  key="import-data"
-                  className="group gap-x-3"
-                  onClick={() => {
-                    onImportData()
-                    sendEvent({
-                      action: 'import_data_button_clicked',
-                      properties: { tableType: 'Existing Table' },
-                      groups: {
-                        project: projectRef ?? 'Unknown',
-                        organization: org?.slug ?? 'Unknown',
-                      },
-                    })
-                  }}
-                >
-                  <div className="relative -mt-2 shrink-0">
-                    <FileText size={18} strokeWidth={1.5} className="translate-x-[-2px]" />
-                    <ArrowUp
-                      className={cn(
-                        'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
-                        'group-data-highlighted:translate-y-0 group-data-highlighted:text-brand group-data-highlighted:opacity-100'
-                      )}
-                      strokeWidth={3}
-                      size={12}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0 pr-4">
-                    <p>Import data from CSV</p>
-                    <p className="text-foreground-light">Insert new rows from a CSV</p>
-                  </div>
-                  <ShortcutBadge
-                    shortcutId={SHORTCUT_IDS.TABLE_EDITOR_IMPORT_CSV}
-                    className="shrink-0"
-                  />
-                </DropdownMenuItem>,
-              ]
-            : []),
-        ]}
-      </DropdownMenuContent>
-    </DropdownMenu>
   )
 }
 

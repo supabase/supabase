@@ -24,6 +24,12 @@ interface ShortcutProps {
    * action is a narrower/contextual variant of the registered shortcut.
    */
   label?: string
+  /**
+   * Controlled open state for the tooltip. Pass `false` to force the tooltip
+   * closed (e.g. while a popover or dialog opened by the wrapped element is
+   * visible). Leave `undefined` for default uncontrolled behavior.
+   */
+  tooltipOpen?: boolean
 }
 
 /**
@@ -59,6 +65,7 @@ export const Shortcut = ({
   sideOffset,
   delayDuration,
   label,
+  tooltipOpen,
 }: ShortcutProps) => {
   useShortcut(id, onTrigger, options)
 
@@ -70,6 +77,7 @@ export const Shortcut = ({
       sideOffset={sideOffset}
       delayDuration={delayDuration}
       label={label}
+      open={tooltipOpen}
     >
       {children}
     </ShortcutTooltip>
