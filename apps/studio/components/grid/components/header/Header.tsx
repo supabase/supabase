@@ -74,7 +74,7 @@ export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true 
   }, [isInputFocus])
 
   return (
-    <div className="flex flex-wrap min-h-10 items-center bg-dash-sidebar dark:bg-surface-100">
+    <div className="flex flex-wrap md:min-h-10 items-center bg-dash-sidebar dark:bg-surface-100">
       {customHeader ? (
         <div className="flex-1 px-1.5">{customHeader}</div>
       ) : snap.selectedRows.size > 0 ? (
@@ -84,7 +84,7 @@ export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true 
       ) : (
         <div
           ref={filterContainerRef}
-          className="w-full flex items-center justify-between gap-2 pr-1.5 border-b border-border md:border-none"
+          className="w-full flex items-center justify-between gap-2 pr-1.5 border-b border-border md:border-none pt-1 md:pt-0"
         >
           <FilterPopoverNew
             isRefetching={isRefetching}

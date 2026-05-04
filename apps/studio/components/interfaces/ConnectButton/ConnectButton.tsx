@@ -11,9 +11,14 @@ import { useAppStateSnapshot } from '@/state/app-state'
 interface ConnectButtonProps {
   buttonType?: ComponentProps<typeof Button>['type']
   className?: string
+  iconOnly?: boolean
 }
 
-export const ConnectButton = ({ buttonType = 'default', className }: ConnectButtonProps) => {
+export const ConnectButton = ({
+  buttonType = 'default',
+  className,
+  iconOnly = false,
+}: ConnectButtonProps) => {
   const { data: selectedProject } = useSelectedProjectQuery()
   const { setConnectSheetSource } = useAppStateSnapshot()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -39,7 +44,7 @@ export const ConnectButton = ({ buttonType = 'default', className }: ConnectButt
         },
       }}
     >
-      <span>Connect</span>
+      {!iconOnly && <span>Connect</span>}
     </ButtonTooltip>
   )
 }
