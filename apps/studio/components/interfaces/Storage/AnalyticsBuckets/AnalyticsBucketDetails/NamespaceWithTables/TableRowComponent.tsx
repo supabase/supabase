@@ -241,7 +241,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
       toast.success('Successfully removed table!')
       setShowRemoveTableModal(false)
     } catch (error: any) {
-      toast.error(`Failed to remove table: ${error.message}`)
+      // Error handled by mutation onError
     } finally {
       setIsRemovingTable(false)
     }
@@ -280,7 +280,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
 
       toast.success(`Successfully removed table "${table.name}"!`)
     } catch (error: any) {
-      toast.error(`Failed to remove table: ${error.message}`)
+      // Error handled by mutation onError
     } finally {
       setIsRemovingTable(false)
     }
