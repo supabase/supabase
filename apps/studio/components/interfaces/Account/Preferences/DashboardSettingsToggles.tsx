@@ -33,7 +33,7 @@ export const DashboardSettingsToggles = () => {
     values: {
       inlineEditorEnabled: inlineEditorEnabled ?? false,
       queueOperationsEnabled: isQueueOperationsEnabled ?? false,
-      shortcutChordHudEnabled: isShortcutChordHudEnabled ?? true,
+      shortcutChordHudEnabled: isShortcutChordHudEnabled ?? false,
     },
   })
 

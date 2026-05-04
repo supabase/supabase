@@ -86,7 +86,7 @@ describe('ShortcutChordHud', () => {
     input.remove()
   })
 
-  it('fades the key tiles as the timeout runs down and then animates away', () => {
+  it('fades the key tiles as the timeout runs down and then hides', () => {
     const now = Date.now()
     mockUseHotkeyRegistrations.mockReturnValue({
       hotkeys: [],
@@ -118,12 +118,6 @@ describe('ShortcutChordHud', () => {
       vi.advanceTimersByTime(500)
     })
 
-    expect(screen.getByTestId('shortcut-chord-hud')).toBeInTheDocument()
-
-    act(() => {
-      vi.advanceTimersByTime(250)
-    })
-
     expect(screen.queryByTestId('shortcut-chord-hud')).not.toBeInTheDocument()
   })
 
@@ -150,12 +144,6 @@ describe('ShortcutChordHud', () => {
     })
 
     rerender(<ShortcutChordHud />)
-
-    expect(screen.getByTestId('shortcut-chord-hud')).toBeInTheDocument()
-
-    act(() => {
-      vi.advanceTimersByTime(250)
-    })
 
     expect(screen.queryByTestId('shortcut-chord-hud')).not.toBeInTheDocument()
   })
@@ -201,12 +189,6 @@ describe('ShortcutChordHud', () => {
 
     act(() => {
       vi.advanceTimersByTime(450)
-    })
-
-    expect(screen.getByTestId('shortcut-chord-hud')).toBeInTheDocument()
-
-    act(() => {
-      vi.advanceTimersByTime(250)
     })
 
     expect(screen.queryByTestId('shortcut-chord-hud')).not.toBeInTheDocument()

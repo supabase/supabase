@@ -28,10 +28,10 @@ export const useIsQueueOperationsSetting = () => {
 export const useIsShortcutChordHudSetting = () => {
   const [isShortcutChordHudEnabled, setIsShortcutChordHudEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.UI_SHORTCUT_CHORD_HUD,
-    true
+    false
   )
   return {
-    isShortcutChordHudEnabled: isShortcutChordHudEnabled ?? true,
+    isShortcutChordHudEnabled: isShortcutChordHudEnabled ?? false,
     setIsShortcutChordHudEnabled,
   }
 }
@@ -48,5 +48,5 @@ export const useIsQueueOperationsEnabled = () => {
 
 export const useIsShortcutChordHudEnabled = () => {
   const { isShortcutChordHudEnabled } = useIsShortcutChordHudSetting()
-  return isShortcutChordHudEnabled ?? true
+  return isShortcutChordHudEnabled ?? false
 }
