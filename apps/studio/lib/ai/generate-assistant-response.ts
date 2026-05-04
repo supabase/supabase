@@ -59,6 +59,15 @@ export async function generateAssistantResponse({
 }) {
   const shouldTrace = allowTracing ?? IS_TRACING_ENABLED
 
+  // Turn 2 (post-approval) is uniquely identifiable upfront: the assistant message
+  // from Turn 1 will already have tool parts in 'approval-responded' state. All other
+  // turns (Turn 1 itself, and normal turns) look identical at request time.
+  const isPostApprovalTurn = rawMessages.some(
+    (msg) =>
+      msg.role === 'assistant' &&
+      msg.parts?.some((part) => isToolUIPart(part) && part.state === 'approval-responded')
+  )
+
   const run = async (span?: Span) => {
     // Only returns last 7 messages
     // Filters out tools with invalid states
@@ -163,8 +172,8 @@ export async function generateAssistantResponse({
             }
           }
 
-          // Skip output logging when ending on an approval boundary — Turn 1 has no
-          // result yet. Turn 2 (post-approval) will log the complete output instead.
+          // Turn 1 ends at an approval boundary — no output to log yet. End the span
+          // with no data so online scorers don't fire. Turn 2 will carry the full output.
           const approvalPending = steps.some((step) =>
             step.toolCalls.some(
               (tc) =>
@@ -196,13 +205,41 @@ export async function generateAssistantResponse({
           }
 
           const baseOutput = buildAssistantEvalOutput(finishReason, steps)
-          span.log({
-            output: {
-              ...baseOutput,
-              toolNames: [...approvedToolNames, ...baseOutput.toolNames],
-              sqlQueries: [...approvedSqlQueries, ...baseOutput.sqlQueries],
-            } satisfies AssistantEvalOutput,
-          })
+          const output = {
+            ...baseOutput,
+            toolNames: [...approvedToolNames, ...baseOutput.toolNames],
+            sqlQueries: [...approvedSqlQueries, ...baseOutput.sqlQueries],
+          } satisfies AssistantEvalOutput
+
+          if (isPostApprovalTurn) {
+            // Input was logged upfront — only log output now.
+            span.log({ output })
+          } else {
+            // Normal turn: input was deferred so we can skip it entirely for Turn 1.
+            // Log input + output together here.
+            const lastUserMessage = rawMessages.findLast((m) => m.role === 'user')
+            const lastUserText = lastUserMessage?.parts
+              ?.filter((p): p is { type: 'text'; text: string } => p.type === 'text')
+              .map((p) => p.text)
+              .join('\n')
+            span.log({
+              input: { prompt: lastUserText ?? '' } satisfies AssistantEvalInput,
+              output,
+              metadata: {
+                projectRef,
+                chatId,
+                chatName,
+                aiOptInLevel,
+                userId,
+                orgId,
+                planId,
+                requestedModel,
+                gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
+                environment: process.env.NEXT_PUBLIC_ENVIRONMENT,
+              },
+            })
+          }
+
           span.end()
         },
       }),
@@ -215,27 +252,31 @@ export async function generateAssistantResponse({
     const span = startSpan({ name: 'generateAssistantResponse', type: 'function' })
     onSpanCreated?.(span.id)
 
-    const lastUserMessage = rawMessages.findLast((m) => m.role === 'user')
-    const lastUserText = lastUserMessage?.parts
-      ?.filter((p): p is { type: 'text'; text: string } => p.type === 'text')
-      .map((p) => p.text)
-      .join('\n')
+    if (isPostApprovalTurn) {
+      // Log input upfront only for Turn 2. For Turn 1 and normal turns, input is deferred
+      // to onFinish so that Turn 1 spans end with no data and don't trigger online scoring.
+      const lastUserMessage = rawMessages.findLast((m) => m.role === 'user')
+      const lastUserText = lastUserMessage?.parts
+        ?.filter((p): p is { type: 'text'; text: string } => p.type === 'text')
+        .map((p) => p.text)
+        .join('\n')
 
-    span.log({
-      input: { prompt: lastUserText ?? '' } satisfies AssistantEvalInput,
-      metadata: {
-        projectRef,
-        chatId,
-        chatName,
-        aiOptInLevel,
-        userId,
-        orgId,
-        planId,
-        requestedModel,
-        gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
-        environment: process.env.NEXT_PUBLIC_ENVIRONMENT,
-      },
-    })
+      span.log({
+        input: { prompt: lastUserText ?? '' } satisfies AssistantEvalInput,
+        metadata: {
+          projectRef,
+          chatId,
+          chatName,
+          aiOptInLevel,
+          userId,
+          orgId,
+          planId,
+          requestedModel,
+          gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
+          environment: process.env.NEXT_PUBLIC_ENVIRONMENT,
+        },
+      })
+    }
 
     return withCurrent(span, () => run(span))
   }
