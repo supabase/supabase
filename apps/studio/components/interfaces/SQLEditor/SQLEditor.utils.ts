@@ -1,4 +1,4 @@
-import { type SafeSqlFragment } from '@supabase/pg-meta'
+import { untrustedSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { TABLE_EVENT_ACTIONS } from 'common/telemetry-constants'
 
 import {
@@ -81,7 +81,7 @@ export const createSqlSnippetSkeletonV2 = ({
     content: {
       ...NEW_SQL_SNIPPET_SKELETON.content,
       content_id: id ?? '',
-      sql: sql ?? '',
+      unchecked_sql: untrustedSql(sql ?? ''),
     } as any,
     isNotSavedInDatabaseYet: true,
   }
