@@ -3,6 +3,9 @@ import dayjs from 'dayjs'
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 
+// Escape single quotes in BigQuery string literals to prevent SQL injection
+const escapeSqlLiteral = (value: string): string => value.replace(/'/g, "\\'")
+
 // Pagination and control parameters
 const PAGINATION_PARAMS = ['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live'] as const
 
@@ -29,16 +32,18 @@ const buildQueryConditions = (search: QuerySearchParamsType) => {
 
     // Handle array filters (IN clause)
     if (Array.isArray(value) && value.length > 0) {
-      whereConditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
+      whereConditions.push(
+        `${key} IN (${value.map((v) => `'${escapeSqlLiteral(String(v))}'`).join(',')})`
+      )
       return
     }
 
     // Handle scalar values
     if (value !== null && value !== undefined) {
       if (['host', 'pathname'].includes(key)) {
-        whereConditions.push(`${key} LIKE '%${value}%'`)
+        whereConditions.push(`${key} LIKE '%${escapeSqlLiteral(String(value))}%'`)
       } else {
-        whereConditions.push(`${key} = '${value}'`)
+        whereConditions.push(`${key} = '${escapeSqlLiteral(String(value))}'`)
       }
     }
   })
@@ -379,16 +384,18 @@ const buildFacetWhere = (search: QuerySearchParamsType, excludeField: string): s
 
     // Handle array filters (IN clause)
     if (Array.isArray(value) && value.length > 0) {
-      conditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
+      conditions.push(
+        `${key} IN (${value.map((v) => `'${escapeSqlLiteral(String(v))}'`).join(',')})`
+      )
       return
     }
 
     // Handle scalar values
     if (value !== null && value !== undefined) {
       if (['host', 'pathname'].includes(key)) {
-        conditions.push(`${key} LIKE '%${value}%'`)
+        conditions.push(`${key} LIKE '%${escapeSqlLiteral(String(value))}%'`)
       } else {
-        conditions.push(`${key} = '${value}'`)
+        conditions.push(`${key} = '${escapeSqlLiteral(String(value))}'`)
       }
     }
   })
@@ -413,7 +420,7 @@ ${facet}_count AS (
   FROM unified_logs
   ${buildFacetWhere(search, `${facet}`) || `WHERE ${facet} IS NOT NULL`}
   ${buildFacetWhere(search, `${facet}`) ? ` AND ${facet} IS NOT NULL` : ''}
-  ${!!facetSearch ? `AND ${facet} LIKE '%${facetSearch}%'` : ''}
+  ${!!facetSearch ? `AND ${facet} LIKE '%${escapeSqlLiteral(facetSearch)}%'` : ''}
   GROUP BY ${facet}
   LIMIT ${MAX_FACETS_QUANTITY}
 )

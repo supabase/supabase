@@ -22,8 +22,7 @@ const handleGet = async (_req: NextApiRequest, res: NextApiResponse) => {
     db_anon_role: 'anon',
     db_extra_search_path: process.env.PGRST_DB_EXTRA_SEARCH_PATH ?? 'public',
     db_schema: process.env.PGRST_DB_SCHEMAS ?? 'public,storage,graphql_public',
-    jwt_secret:
-      process.env.AUTH_JWT_SECRET ?? 'super-secret-jwt-token-with-at-least-32-characters-long',
+    jwt_secret: process.env.AUTH_JWT_SECRET ?? '',
     max_rows: Number(process.env.PGRST_DB_MAX_ROWS) || 1000,
     role_claim_key: '.role',
   }

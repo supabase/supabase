@@ -19,8 +19,12 @@ interface UserLogsProps {
   user: User
 }
 
-const API_LOGS_QUERY = (userId: string) =>
-  `select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nWHERE (\n  metadata[SAFE_OFFSET(0)].request[SAFE_OFFSET(0)].sb[SAFE_OFFSET(0)].auth_user\n    = '${userId}'\n)\nlimit 100`
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+const API_LOGS_QUERY = (userId: string) => {
+  const safeUserId = UUID_REGEX.test(userId) ? userId : ''
+  return `select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nWHERE (\n  metadata[SAFE_OFFSET(0)].request[SAFE_OFFSET(0)].sb[SAFE_OFFSET(0)].auth_user\n    = '${safeUserId}'\n)\nlimit 100`
+}
 
 export const UserLogs = ({ user }: UserLogsProps) => {
   const { ref } = useParams()
