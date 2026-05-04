@@ -20,6 +20,14 @@ When any client subscribes, disconnects, or updates their presence payload, Supa
 - **`join`** — a new client has started tracking presence
 - **`leave`** — a client has stopped tracking presence
 
+<Admonition type="caution" title="Presence is not designed for high-frequency updates">
+
+Presence syncs state through the server and notifies **all** subscribers on every change. Calling `track()` rapidly — for example on every mouse move to share cursor positions — will flood the channel and cause performance problems.
+
+For high-frequency or fire-and-forget updates, use [Broadcast](/docs/guides/realtime/broadcast) instead. Presence is best suited for slow-changing state such as online/offline status, active document, or current page.
+
+</Admonition>
+
 <Admonition type="note" title="Sync event behavior">
 
 During a `sync` event, you may receive `join` and `leave` events simultaneously, even though no users are actually joining or leaving. This is expected behavior—Presence reconciles its local state with the server state, which can trigger these events as part of the synchronization process. This reflects state reconciliation, not real user movement.
