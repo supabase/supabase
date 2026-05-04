@@ -1,3 +1,8 @@
+import { LIST_PAGE_SHORTCUT_IDS, listPageRegistry } from './registry/list-page'
+import {
+  SCHEMA_VISUALIZER_SHORTCUT_IDS,
+  schemaVisualizerRegistry,
+} from './registry/schema-visualizer'
 import { SQL_EDITOR_SHORTCUT_IDS, sqlEditorRegistry } from './registry/sql-editor'
 import { TABLE_EDITOR_SHORTCUT_IDS, tableEditorRegistry } from './registry/table-editor'
 import { ShortcutDefinition } from './types'
@@ -53,6 +58,12 @@ export const SHORTCUT_IDS = {
 
   // SQL editor shortcuts
   ...SQL_EDITOR_SHORTCUT_IDS,
+
+  // Schema visualizer shortcuts
+  ...SCHEMA_VISUALIZER_SHORTCUT_IDS,
+
+  // Shared list-page shortcuts (database/* listing pages, etc.)
+  ...LIST_PAGE_SHORTCUT_IDS,
 } as const
 
 /**
@@ -304,4 +315,10 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
 
   // SQL editor shortcut registration
   ...sqlEditorRegistry,
+
+  // Schema visualizer shortcut registration
+  ...schemaVisualizerRegistry,
+
+  // Shared list-page shortcut registration
+  ...listPageRegistry,
 }

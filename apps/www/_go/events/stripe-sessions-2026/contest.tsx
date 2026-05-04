@@ -46,7 +46,7 @@ const page: GoPageInput = {
             <pre className="bg-surface-200 rounded-md p-4 text-sm text-foreground-light overflow-x-auto">
               <code>{`stripe plugin install projects
 stripe projects init my-app
-stripe projects add supabase/supabase:free
+stripe projects add supabase/project
 stripe projects env --sync`}</code>
             </pre>
             <p className="text-foreground-lighter text-sm">

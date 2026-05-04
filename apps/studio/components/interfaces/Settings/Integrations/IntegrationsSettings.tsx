@@ -1,12 +1,11 @@
-import Link from 'next/link'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, WarningIcon } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 import { AWSPrivateLinkSection } from './AWSPrivateLink/AWSPrivateLinkSection'
 import { GitHubSection } from './GithubIntegration/GithubSection'
 import { VercelSection } from './VercelIntegration/VercelSection'
 import { SidePanelVercelProjectLinker } from '@/components/interfaces/Organization/IntegrationSettings/SidePanelVercelProjectLinker'
 import { ScaffoldContainer, ScaffoldDivider } from '@/components/layouts/Scaffold'
-import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
@@ -21,9 +20,8 @@ export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' 
   )
 }
 
-const IntegrationSettings = () => {
+export const IntegrationSettings = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
   const isBranch = project?.parent_project_ref !== undefined
 
   const showVercelIntegration = useIsFeatureEnabled('integrations:vercel')
@@ -36,22 +34,21 @@ const IntegrationSettings = () => {
     <>
       {isBranch && (
         <ScaffoldContainer>
-          <Alert_Shadcn_ variant="default" className="mt-6">
-            <WarningIcon />
-            <AlertTitle_Shadcn_>
-              You are currently on a preview branch of your project
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              To adjust your project's integration settings, you may return to your{' '}
-              <Link href={`/project/${parentProject?.ref}/settings/general`} className="text-brand">
-                main branch
-              </Link>
-              .
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+          <Admonition
+            type="default"
+            className="mt-6"
+            title="You are currently on a preview branch of your project"
+          >
+            To adjust your project's integration settings, you may return to your{' '}
+            <InlineLink href={`/project/${project.parent_project_ref}/settings/integrations`}>
+              main branch
+            </InlineLink>
+            .
+          </Admonition>
         </ScaffoldContainer>
       )}
       <GitHubSection />
+
       {showVercelIntegration && (
         <>
           <ScaffoldDivider />
@@ -59,6 +56,7 @@ const IntegrationSettings = () => {
           <SidePanelVercelProjectLinker />
         </>
       )}
+
       {showAWSPrivateLink && (
         <>
           <ScaffoldDivider />
@@ -68,5 +66,3 @@ const IntegrationSettings = () => {
     </>
   )
 }
-
-export default IntegrationSettings
