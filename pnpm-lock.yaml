@@ -2127,6 +2127,9 @@ importers:
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
+      type-fest:
+        specifier: 5.6.0
+        version: 5.6.0
       typescript:
         specifier: 'catalog:'
         version: 6.0.2
@@ -16698,8 +16701,8 @@ packages:
     resolution: {integrity: sha512-G6zXWS1dLj6eagy6sVhOMQiLtJdxQBHIA9Z6HFUNLOlr6MFOgzV8wvmidtPONfPtEUv0uZsy77XJNzTAfwPDaA==}
     engines: {node: '>=16'}
 
-  type-fest@5.4.4:
-    resolution: {integrity: sha512-JnTrzGu+zPV3aXIUhnyWJj4z/wigMsdYajGLIYakqyOW1nPllzXEJee0QQbHj+CTIQtXGlAjuK0UY+2xTyjVAw==}
+  type-fest@5.6.0:
+    resolution: {integrity: sha512-8ZiHFm91orbSAe2PSAiSVBVko18pbhbiB3U9GglSzF/zCGkR+rxpHx6sEMCUm4kxY4LjDIUGgCfUMtwfZfjfUA==}
     engines: {node: '>=20'}
 
   type-is@1.6.18:
@@ -27194,7 +27197,7 @@ snapshots:
 
   dot-prop@10.1.0:
     dependencies:
-      type-fest: 5.4.4
+      type-fest: 5.6.0
 
   dotenv@16.0.3: {}
 
@@ -33939,7 +33942,7 @@ snapshots:
   serialize-error@13.0.1:
     dependencies:
       non-error: 0.1.0
-      type-fest: 5.4.4
+      type-fest: 5.6.0
 
   serialize-javascript@7.0.5: {}
 
@@ -34985,7 +34988,7 @@ snapshots:
 
   type-fest@4.30.0: {}
 
-  type-fest@5.4.4:
+  type-fest@5.6.0:
     dependencies:
       tagged-tag: 1.0.0
 

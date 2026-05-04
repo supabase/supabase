@@ -3,7 +3,8 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
 import supabase from '~/lib/supabaseMisc'
-import type { Partner } from '~/types/partners'
+import { Partner, toPartner } from '~/types/partners'
+import { type Listing } from 'common/marketplace-client'
 import { Loader, Search } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
@@ -13,8 +14,8 @@ import { useDebounce } from 'use-debounce'
 
 import TileGrid from '../../../components/Partners/TileGrid'
 
-export async function getStaticProps() {
-  const { data: partners } = await supabase
+export async function getStaticProps(): Promise<{ props: Props; revalidate: number }> {
+  const { data } = await supabase
     .from('partners')
     .select('*')
     .eq('approved', true)
@@ -24,7 +25,7 @@ export async function getStaticProps() {
 
   return {
     props: {
-      partners,
+      partners: data?.map(toPartner) || [],
     },
     // TODO: consider using Next.js' On-demand Revalidation with Supabase Database Webhooks instead
     revalidate: 1800, // 30 minutes
@@ -39,7 +40,7 @@ function IntegrationPartnersPage(props: Props) {
   const initialPartners = props.partners ?? []
   const [partners, setPartners] = useState(initialPartners)
 
-  const allCategories = Array.from(new Set(initialPartners?.map((p) => p.category)))
+  const allCategories = Array.from(new Set(initialPartners?.flatMap((p) => p.categories)))
 
   const router = useRouter()
 
@@ -81,7 +82,7 @@ function IntegrationPartnersPage(props: Props) {
 
     searchPartners().then((partners) => {
       if (partners) {
-        setPartners(partners)
+        setPartners(partners.map(toPartner))
       }
 
       setIsSearching(false)
@@ -141,11 +142,11 @@ function IntegrationPartnersPage(props: Props) {
                   <div className="space-y-1">
                     {allCategories.map((category) => (
                       <button
-                        key={category}
-                        onClick={() => router.push(`#${category.toLowerCase()}`)}
+                        key={category.slug}
+                        onClick={() => router.push(`#${category.slug}`)}
                         className="text-foreground-light block text-base"
                       >
-                        {category}
+                        {category.name}
                       </button>
                     ))}
                   </div>
