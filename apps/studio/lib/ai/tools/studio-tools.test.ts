@@ -15,14 +15,16 @@ describe('ai/tools/studio-tools', () => {
       const tools = getStudioTools()
 
       expect(tools.execute_sql).toBeDefined()
-      expect(tools.execute_sql.description.toLowerCase()).toContain('execute a sql statement')
+      expect((tools.execute_sql.description ?? '').toLowerCase()).toContain(
+        'execute a sql statement'
+      )
     })
 
     it('should include deploy_edge_function tool', () => {
       const tools = getStudioTools()
 
       expect(tools.deploy_edge_function).toBeDefined()
-      expect(tools.deploy_edge_function.description.toLowerCase()).toContain(
+      expect((tools.deploy_edge_function.description ?? '').toLowerCase()).toContain(
         'deploy a supabase edge function'
       )
     })

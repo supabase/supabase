@@ -142,11 +142,33 @@ function MessagePartExecuteSql({
   const { data: chart, success } = parseExecuteSqlChartResult(input)
   if (!success) return null
 
-  if (
-    state === 'approval-requested' ||
-    state === 'input-available' ||
-    state === 'output-available'
-  ) {
+  if (toolPart.state === 'approval-requested') {
+    const approvalId = toolPart.approval.id
+    return (
+      <div className="w-auto overflow-x-hidden my-4 space-y-2">
+        <DisplayBlockRenderer
+          messageId={id}
+          toolCallId={toolCallId}
+          initialArgs={{
+            sql: chart.sql,
+            label: chart.label,
+            isWriteQuery: chart.isWriteQuery,
+            view: chart.view,
+            xAxis: chart.xAxis,
+            yAxis: chart.yAxis,
+          }}
+          initialResults={output}
+          toolState={toolPart.state}
+          isLastPart={isLastPart}
+          isLastMessage={isLastMessage}
+          onApprove={() => addToolApprovalResponse?.({ id: approvalId, approved: true })}
+          onDeny={() => addToolApprovalResponse?.({ id: approvalId, approved: false })}
+        />
+      </div>
+    )
+  }
+
+  if (state === 'input-available' || state === 'output-available') {
     return (
       <div className="w-auto overflow-x-hidden my-4 space-y-2">
         <DisplayBlockRenderer
@@ -164,12 +186,6 @@ function MessagePartExecuteSql({
           toolState={state}
           isLastPart={isLastPart}
           isLastMessage={isLastMessage}
-          onApprove={() => {
-            addToolApprovalResponse?.({ id: toolCallId, approved: true })
-          }}
-          onDeny={() => {
-            addToolApprovalResponse?.({ id: toolCallId, approved: false })
-          }}
         />
       </div>
     )
@@ -185,8 +201,9 @@ const TOOL_DEPLOY_EDGE_FUNCTION_STATES_WITH_INPUT = new Set([
 ])
 
 function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
-  const { toolCallId, state, input, output } = toolPart
+  const { state, input, output } = toolPart
   const { addToolApprovalResponse } = useMessageActionsContext()
+  const approvalId = toolPart.state === 'approval-requested' ? toolPart.approval.id : undefined
 
   if (state === 'input-streaming') {
     return (
@@ -217,8 +234,12 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
       functionName={parsedInput.data.functionName}
       showApprovalFooter={state === 'approval-requested'}
       initialIsDeployed={isInitiallyDeployed}
-      onApprove={() => addToolApprovalResponse?.({ id: toolCallId, approved: true })}
-      onDeny={() => addToolApprovalResponse?.({ id: toolCallId, approved: false })}
+      onApprove={() => {
+        if (approvalId) addToolApprovalResponse?.({ id: approvalId, approved: true })
+      }}
+      onDeny={() => {
+        if (approvalId) addToolApprovalResponse?.({ id: approvalId, approved: false })
+      }}
     />
   )
 }
