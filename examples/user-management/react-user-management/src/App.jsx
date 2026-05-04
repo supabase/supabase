@@ -8,11 +8,15 @@ function App() {
   const [claims, setClaims] = useState(null)
 
   useEffect(() => {
-    const { data: { claims } } = supabase.auth.getClaims()
+    const {
+      data: { claims },
+    } = supabase.auth.getClaims()
     setClaims(claims)
 
     supabase.auth.onAuthStateChange(() => {
-      const { data: { claims } } = supabase.auth.getClaims()
+      const {
+        data: { claims },
+      } = supabase.auth.getClaims()
       setClaims(claims)
     })
   }, [])
