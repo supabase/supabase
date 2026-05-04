@@ -1,13 +1,18 @@
 import { motion } from 'framer-motion'
 import { debounce } from 'lib/helpers'
-import { Search } from 'lucide-react'
+import { LayoutGrid, Search, Table2 } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/compat/router'
 import Link from 'next/link'
-import React, { useCallback, useEffect, useState } from 'react'
-import { Button, Checkbox, cn, Input } from 'ui'
+import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
+import { Badge, Button, Checkbox, cn, Input } from 'ui'
 
-import { FeaturesMatrix } from '@/components/FeaturesMatrix'
+import {
+  FeaturesMatrix,
+  productLabel,
+  stageBadgeVariant,
+  stageLabel,
+} from '@/components/FeaturesMatrix'
 import DefaultLayout from '@/components/Layouts/Default'
 import SectionContainer from '@/components/Layouts/SectionContainer'
 import Panel from '@/components/Panel'
@@ -69,7 +74,7 @@ function FeaturesPage() {
   }, [router?.query.q, router?.query.products, router?.query.selfHosted, router?.query.view])
 
   // Handle search input change
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
   }
 
@@ -261,6 +266,16 @@ function FeaturesPage() {
                       >
                         <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:aspect-video! bg-alternative flex items-center justify-center shadow-inner border border-muted">
                           <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
+                          {feature.status && (
+                            <div className="absolute top-0 left-1.5">
+                              <Badge
+                                variant={stageBadgeVariant(feature.status.stage)}
+                                className="text-[10px] py-0 px-1.5 h-4 rounded-sm"
+                              >
+                                {stageLabel(feature.status.stage)}
+                              </Badge>
+                            </div>
+                          )}
                         </div>
                         <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
                           <h3 className="text-sm md:text-base text-foreground leading-5!">
@@ -269,6 +284,16 @@ function FeaturesPage() {
                           <p className="text-foreground-light text-sm line-clamp-2">
                             {feature.subtitle}
                           </p>
+                          <div className="flex flex-wrap items-center gap-1 mb-0.5">
+                            {feature.products.map((product) => (
+                              <span
+                                key={product}
+                                className="inline-flex items-center text-[10px] font-medium px-1.5 py-0 h-4 rounded bg-surface-200 text-foreground-light border border-muted capitalize"
+                              >
+                                {productLabel(product)}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </Panel>
                     </Link>

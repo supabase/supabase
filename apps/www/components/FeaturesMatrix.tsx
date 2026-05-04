@@ -16,7 +16,7 @@ const STAGE_ORDER: Record<PRODUCT_STAGES, number> = {
   [PRODUCT_STAGES.GA]: 4,
 }
 
-function stageBadgeVariant(
+export function stageBadgeVariant(
   stage: PRODUCT_STAGES
 ): 'default' | 'warning' | 'success' | 'destructive' {
   switch (stage) {
@@ -32,7 +32,7 @@ function stageBadgeVariant(
   }
 }
 
-function stageLabel(stage: PRODUCT_STAGES): string {
+export function stageLabel(stage: PRODUCT_STAGES): string {
   switch (stage) {
     case PRODUCT_STAGES.GA:
       return 'GA'
@@ -47,7 +47,7 @@ function stageLabel(stage: PRODUCT_STAGES): string {
   }
 }
 
-function productLabel(product: string): string {
+export function productLabel(product: string): string {
   const labels: Record<string, string> = {
     database: 'Database',
     authentication: 'Auth',
