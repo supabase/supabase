@@ -26,15 +26,15 @@ export const CustomEmailTemplateRestrictionAdmonition = ({
       type="default"
       layout="responsive"
       title="Set up Custom SMTP to edit templates"
-      description="Default templates are read-only while this project uses Supabase's built-in email service."
+      description="Default templates are read-only while this project uses Supabase's built-in email service. Set up Custom SMTP, or sign up to Pro, to edit them."
       actions={
-        <>
-          <Button asChild type="primary">
+        <div className="flex flex-col items-start gap-1">
+          <Button asChild type="default">
             <Link href={`/project/${projectRef ?? '_'}/auth/smtp`}>Set up SMTP</Link>
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="default" iconRight={<ChevronDown size={14} />}>
+              <Button type="text" size="tiny" iconRight={<ChevronDown size={14} />}>
                 Other options
               </Button>
             </DropdownMenuTrigger>
@@ -53,7 +53,7 @@ export const CustomEmailTemplateRestrictionAdmonition = ({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </>
+        </div>
       }
     />
   )
