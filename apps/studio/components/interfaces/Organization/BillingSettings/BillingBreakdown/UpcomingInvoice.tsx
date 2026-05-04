@@ -289,18 +289,6 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
               </TableBody>
 
               <TableFooter>
-                <TableRow>
-                  <TableCell className="font-medium py-2 px-0 flex items-center">
-                    <span className="mr-2">Current Costs</span>
-                    <InfoTooltip>
-                      Costs accumulated from the beginning of the billing cycle up to now.
-                    </InfoTooltip>
-                  </TableCell>
-                  <TableCell className="text-right font-medium py-2 px-0" translate="no">
-                    {formatCurrency(upcomingInvoice?.amount_total) ?? '-'}
-                  </TableCell>
-                </TableRow>
-
                 {prepaidCreditsItem && (
                   <TableRow>
                     <TableCell className="py-2 px-0 flex items-center">
@@ -315,6 +303,19 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                     </TableCell>
                   </TableRow>
                 )}
+                <TableRow>
+                  <TableCell className="font-medium py-2 px-0 flex items-center">
+                    <span className="mr-2">Current Costs</span>
+                    <InfoTooltip>
+                      Costs accumulated from the beginning of the billing cycle up to now.
+                    </InfoTooltip>
+                  </TableCell>
+                  <TableCell className="text-right font-medium py-2 px-0" translate="no">
+                    {formatCurrency(upcomingInvoice?.amount_total) ?? '-'}
+                  </TableCell>
+                </TableRow>
+
+                
 
                 {(!!upcomingInvoice.amount_projected || hasTax || taxFailed) && (
                   <TableRow>
