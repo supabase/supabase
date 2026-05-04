@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'common'
 
 import { subscriptionKeys } from './keys'
+import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -44,3 +46,10 @@ export const useProjectAddonsQuery = <TData = ProjectAddonsData>(
     staleTime: 60 * 60 * 1000,
     ...options,
   })
+
+export const useIpv4AddonQuery = () => {
+  const { ref } = useParams()
+  const { data: addons } = useProjectAddonsQuery({ projectRef: ref })
+  const selectedAddons = addons?.selected_addons ?? []
+  return selectedAddons.find((addon) => addon.type === 'ipv4')
+}
