@@ -53,7 +53,8 @@ export type AssistantEvalCase = EvalCase<AssistantEvalInput, Expected, Assistant
 
 const chatMessageSchema = z.object({ role: z.string(), content: z.unknown() })
 const textContentBlockSchema = z.object({ type: z.literal('text'), text: z.string() })
-// search_docs returns { content: [{ text: string }] } where each text is a JSON doc string
+// MCP protocol wraps tool outputs as { content: [{ text: string }] } — this is the span output
+// shape as Braintrust records it, distinct from the tool's own outputSchema ({ result: unknown })
 const searchDocsOutputSchema = z.object({ content: z.array(z.object({ text: z.string() })) })
 
 /** Extracts plain text from a message content field (string or content-block array). */
