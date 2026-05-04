@@ -197,6 +197,8 @@ const IntegrationsPage: NextPageWithLayout = () => {
     }
   }, [filteredAndSortedIntegrations, integrationFilterCategory, search])
 
+  const NUM_LOADING_CARDS = 8
+
   return (
     <>
       <PageHeader size="large">
@@ -236,7 +238,7 @@ const IntegrationsPage: NextPageWithLayout = () => {
                 className="grid xl:grid-cols-3 2xl:grid-cols-4 gap-x-4 gap-y-3"
                 style={{ gridAutoRows: 'minmax(110px, auto)' }}
               >
-                {new Array(8).fill(0).map((_, idx) => (
+                {Array.from({ length: NUM_LOADING_CARDS }).map((_, idx) => (
                   <IntegrationLoadingCard key={`integration-loading-${idx}`} />
                 ))}
               </div>
