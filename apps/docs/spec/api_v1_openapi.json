@@ -6857,6 +6857,45 @@
         "x-oauth-scope": "database:read"
       }
     },
+    "/v1/projects/{ref}/database/backups/restore": {
+      "post": {
+        "operationId": "v1-restore-physical-backup",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/V1RestoreBackupBody" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["backups_write"] }],
+        "summary": "Restores a physical backup for a database",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["infra"],
+        "x-internal": true,
+        "x-oauth-scope": "database:write"
+      }
+    },
     "/v1/projects/{ref}/database/backups/undo": {
       "post": {
         "operationId": "v1-undo",
@@ -12016,6 +12055,7 @@
             "items": {
               "type": "object",
               "properties": {
+                "id": { "type": "integer" },
                 "is_physical_backup": { "type": "boolean" },
                 "status": {
                   "type": "string",
@@ -12023,7 +12063,7 @@
                 },
                 "inserted_at": { "type": "string" }
               },
-              "required": ["is_physical_backup", "status", "inserted_at"]
+              "required": ["id", "is_physical_backup", "status", "inserted_at"]
             }
           },
           "physical_backup_data": {
@@ -12058,6 +12098,12 @@
           "completed_on": { "type": "string", "format": "date-time", "nullable": true }
         },
         "required": ["name", "status", "completed_on"]
+      },
+      "V1RestoreBackupBody": {
+        "type": "object",
+        "properties": { "id": { "type": "integer" } },
+        "required": ["id"],
+        "example": { "id": 12345 }
       },
       "V1UndoBody": {
         "type": "object",
