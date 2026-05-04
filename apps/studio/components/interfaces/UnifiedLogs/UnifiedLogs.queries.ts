@@ -3,8 +3,9 @@ import dayjs from 'dayjs'
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 
-// Escape single quotes in BigQuery string literals to prevent SQL injection
-const escapeSqlLiteral = (value: string): string => value.replace(/'/g, "\\'")
+// Escape single quotes in BigQuery string literals using SQL-standard quote doubling.
+// Prefer '' over \' so backslashes in the input cannot neutralize the escape.
+const escapeSqlLiteral = (value: string): string => value.replace(/'/g, "''")
 
 // Pagination and control parameters
 const PAGINATION_PARAMS = ['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live'] as const
