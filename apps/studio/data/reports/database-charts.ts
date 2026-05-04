@@ -9,6 +9,19 @@ import { Project } from '@/data/projects/project-detail-query'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 
+// Compute variants below 4XL run on EBS instances that draw on a burst
+// credit pool for disk IO, so the burst balance chart only makes sense for
+// these. Larger instances have dedicated IOPS and don't expose this metric.
+const BURSTABLE_IO_VARIANTS = new Set([
+  'ci_nano',
+  'ci_micro',
+  'ci_small',
+  'ci_medium',
+  'ci_large',
+  'ci_xlarge',
+  'ci_2xlarge',
+])
+
 export const getReportAttributesV2: (
   entitledFeatures: string[],
   project: Project,
@@ -24,13 +37,14 @@ export const getReportAttributesV2: (
   pgBouncerMaxConnections,
   isSpendCapEnabled
 ) => {
+  const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
   const provisionedDiskIops = diskConfig?.attributes?.iops
-  const computeIopsLimit =
-    COMPUTE_MAX_IOPS[mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)]
+  const computeIopsLimit = COMPUTE_MAX_IOPS[computeVariantId]
   const effectiveMaxIops =
     typeof provisionedDiskIops === 'number' && typeof computeIopsLimit === 'number'
       ? Math.min(provisionedDiskIops, computeIopsLimit)
       : provisionedDiskIops
+  const hasBurstableIO = BURSTABLE_IO_VARIANTS.has(computeVariantId)
 
   return [
     {
@@ -250,6 +264,39 @@ export const getReportAttributesV2: (
               : undefined,
           tooltip: 'Maximum disk throughput for your current compute size',
           isMaxValue: true,
+        },
+      ],
+    },
+    {
+      id: 'disk-io-burst-balance',
+      label: 'Disk IO Burst Balance',
+      titleTooltip:
+        'Distinct from IOPS and throughput. This is the burst credit pool that smaller compute instances draw on to sustain IO above their baseline. When the balance hits 0%, sustained throughput is throttled to 5 MB/s until it refills.',
+      docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`,
+      syncId: 'database-reports',
+      hide: !hasBurstableIO,
+      format: '%',
+      valuePrecision: 0,
+      showTooltip: true,
+      showLegend: false,
+      showMaxValue: false,
+      showGrid: true,
+      YAxisProps: {
+        width: 55,
+        domain: [0, 100] as [number, number],
+        allowDataOverflow: true,
+        tickFormatter: (v: number) => `${Math.round(v)}%`,
+      },
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      attributes: [
+        {
+          attribute: 'disk_io_budget',
+          provider: 'infra-monitoring',
+          label: 'Burst credits remaining',
+          format: '%',
+          tooltip:
+            'Percentage of EBS burst credits remaining. Drops only matter while the instance is bursting above its baseline IO. Reaching 0% throttles sustained throughput to 5 MB/s until it refills.',
         },
       ],
     },
