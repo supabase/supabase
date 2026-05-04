@@ -98,8 +98,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
           <p className="text-xs text-foreground-lighter">Inside Codex, type:</p>
           <CodeBlock value="/plugins" language="bash" focusable={false} className="block" />
           <p className="text-xs text-foreground-lighter">
-            The plugin browser groups plugins by marketplace. Open the Supabase plugin and select{' '}
-            <strong>Install</strong>.
+            Search for <strong>Supabase</strong> and select <strong>Install plugin</strong>.
           </p>
         </div>
       </div>
