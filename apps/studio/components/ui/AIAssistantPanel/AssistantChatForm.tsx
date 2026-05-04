@@ -72,7 +72,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       onSelectModel,
       ...props
     },
-    ref
+    _ref
   ) => {
     const formRef = useRef<HTMLFormElement>(null)
     const isMobile = useBreakpoint('md')

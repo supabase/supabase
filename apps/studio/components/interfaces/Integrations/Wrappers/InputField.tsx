@@ -2,7 +2,7 @@ import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import type { Control, FieldPath, FieldValues } from 'react-hook-form'
-import { cn, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Textarea } from 'ui'
+import { cn, FormControl, FormField, Input_Shadcn_, Textarea } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -23,7 +23,7 @@ const InputField = <
   loading = false,
 }: InputFieldProps<TFieldValues>) => {
   return (
-    <FormField_Shadcn_
+    <FormField
       control={control}
       name={option.name as TName}
       defaultValue={(option.defaultValue ?? '') as any}
@@ -49,7 +49,7 @@ const InputField = <
           labelOptional={!option.required ? 'Optional' : undefined}
           description={option.description}
         >
-          <FormControl_Shadcn_>
+          <FormControl>
             {loading ? (
               <span className={cn(InputVariants({ size: 'small' }))}>
                 Fetching value from Vault...
@@ -61,7 +61,7 @@ const InputField = <
             ) : (
               <Input_Shadcn_ {...field} id={option.name} />
             )}
-          </FormControl_Shadcn_>
+          </FormControl>
         </FormItemLayout>
       )}
     />

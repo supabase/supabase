@@ -16,10 +16,10 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
   Input_Shadcn_,
   Label_Shadcn_,
   Popover_Shadcn_,
@@ -42,7 +42,6 @@ import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndE
 import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
@@ -78,7 +77,7 @@ const NOUNS = [
 // Function name validation regex - only allows alphanumeric characters, hyphens, and underscores
 const FUNCTION_NAME_REGEX = /^[A-Za-z0-9_-]+$/
 
-// Define form schema with yup
+// Define form schema with zod
 const FormSchema = z.object({
   functionName: z
     .string()
@@ -375,20 +374,20 @@ const NewFunctionPage = () => {
         setSelectedFileId={setSelectedFileId}
       />
 
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 gap-3"
         >
           <div className="flex items-center gap-3">
             <Label_Shadcn_ htmlFor="functionName">Function name</Label_Shadcn_>
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="functionName"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex flex-col gap-0 m-0">
+                <FormItem className="flex flex-col gap-0 m-0">
                   <div className="flex items-center">
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input_Shadcn_
                         id="functionName"
                         type="text"
@@ -397,7 +396,7 @@ const NewFunctionPage = () => {
                         className="w-[250px]"
                         {...field}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                     {form.formState.errors.functionName && (
                       <Tooltip>
                         <TooltipTrigger>
@@ -409,7 +408,7 @@ const NewFunctionPage = () => {
                       </Tooltip>
                     )}
                   </div>
-                </FormItem_Shadcn_>
+                </FormItem>
               )}
             />
           </div>
@@ -422,7 +421,7 @@ const NewFunctionPage = () => {
             Deploy function
           </Button>
         </form>
-      </Form_Shadcn_>
+      </Form>
       <PreventNavigationOnUnsavedChanges hasChanges={hasUnsavedChanges && !hasDeployed} />
     </PageLayout>
   )

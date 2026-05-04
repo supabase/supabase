@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
 import { AlertTriangle, GitBranchIcon, GitMerge, MoreVertical, Shield, X } from 'lucide-react'
 import Link from 'next/link'
@@ -30,6 +30,7 @@ import { ProjectLayoutWithAuth } from '@/components/layouts/ProjectLayout'
 import { ScaffoldContainer } from '@/components/layouts/Scaffold'
 import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { useBranchDeleteMutation } from '@/data/branches/branch-delete-mutation'
 import { useBranchMergeMutation } from '@/data/branches/branch-merge-mutation'
 import { useBranchPushMutation } from '@/data/branches/branch-push-mutation'
@@ -444,7 +445,7 @@ const MergePage: NextPageWithLayout = () => {
   )
 
   const pageTitle = () => (
-    <div className="flex items-center gap-x-2">
+    <div className="flex items-center gap-x-4">
       <span>Merge</span>
 
       <Link href={`/project/${ref}/editor`}>
@@ -465,6 +466,10 @@ const MergePage: NextPageWithLayout = () => {
           {mainBranch?.name || 'main'}
         </Badge>
       </Link>
+
+      {pgDeltaDiffEnabled && (
+        <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF} />
+      )}
     </div>
   )
 
@@ -593,7 +598,7 @@ const MergePage: NextPageWithLayout = () => {
         visible={showConfirmDialog}
         title="Confirm Branch Merge"
         description={`Are you sure you want to merge "${currentBranch?.name}" into "${mainBranch?.name || 'main'}"? This action cannot be undone.`}
-        confirmLabel="Merge Branch"
+        confirmLabel="Merge branch"
         confirmLabelLoading="Merging..."
         onConfirm={() => {
           setShowConfirmDialog(false)

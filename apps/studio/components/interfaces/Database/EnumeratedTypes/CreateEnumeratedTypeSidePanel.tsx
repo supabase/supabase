@@ -24,13 +24,13 @@ import {
   AlertTitle_Shadcn_,
   Button,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   Input_Shadcn_,
   SidePanel,
 } from 'ui'
@@ -57,7 +57,7 @@ const CreateEnumeratedTypeSidePanel = ({
   const submitRef = useRef<HTMLButtonElement>(null)
   const { data: project } = useSelectedProjectQuery()
   const { mutate: createEnumeratedType, isPending: isCreating } = useEnumeratedTypeCreateMutation({
-    onSuccess: (res, vars) => {
+    onSuccess: (_res, vars) => {
       toast.success(`Successfully created type "${vars.name}"`)
       closePanel()
     },
@@ -114,7 +114,7 @@ const CreateEnumeratedTypeSidePanel = ({
       connectionString: project.connectionString,
       schema,
       name: data.name,
-      description: data.description?.replaceAll("'", "''"),
+      description: data.description,
       values: data.values.filter((x) => x.value.length > 0).map((x) => x.value.trim()),
     })
   }
@@ -144,32 +144,32 @@ const CreateEnumeratedTypeSidePanel = ({
       }}
     >
       <SidePanel.Content className="py-4">
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem_Shadcn_>
-                  <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
-                  <FormControl_Shadcn_>
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
                     <Input_Shadcn_ {...field} />
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem_Shadcn_>
-                  <FormLabel_Shadcn_>Description</FormLabel_Shadcn_>
-                  <FormControl_Shadcn_>
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
                     <Input_Shadcn_ {...field} />
-                  </FormControl_Shadcn_>
-                  <FormDescription_Shadcn_>Optional</FormDescription_Shadcn_>
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormDescription>Optional</FormDescription>
+                </FormItem>
               )}
             />
 
@@ -189,7 +189,7 @@ const CreateEnumeratedTypeSidePanel = ({
                   After creation, values cannot be deleted or sorted
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
-                  <p className="!leading-normal track">
+                  <p className="leading-normal! track">
                     You will need to delete and recreate the enumerated type with the updated values
                     instead.
                   </p>
@@ -242,7 +242,7 @@ const CreateEnumeratedTypeSidePanel = ({
               Update
             </Button>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </SidePanel.Content>
     </SidePanel>
   )

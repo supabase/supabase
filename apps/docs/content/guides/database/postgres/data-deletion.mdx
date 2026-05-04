@@ -1,0 +1,205 @@
+---
+id: 'data-deletion'
+title: 'Deleting data and dropping objects safely'
+description: 'Strategies for removing data and schema objects while minimising impact.'
+footerHelpType: 'postgres'
+---
+
+Deleting rows and dropping database objects are routine operations, but on a live database they can lock tables, block queries, and cause downtime. This guide covers practical strategies for keeping these operations safe and fast.
+
+## Preparing to delete
+
+- Test in a staging environment
+- Ensure you have a recent backup
+- Confirm the table dependencies and foreign key constraints
+- Drop dependent objects explicitly, use [CASCADE](/docs/guides/database/postgres/cascade-deletes) with caution
+- Choose a low traffic time to run the operation
+- Run operations inside a [migration](/docs/guides/deployment/database-migrations)
+- Set timeouts, such as `lock_timeout` and `statement_timeout`
+
+### Identifying dependencies
+
+The system catalog tables `pg_class`, `pg_constraint`, and `pg_depend` can be used to identify dependencies:
+
+```sql
+-- Find tables that depend on a specific table
+select
+  d.classid::regclass as dependent_object,
+  d.objid::regclass as dependent_object_id,
+  d.refclassid::regclass as referenced_object,
+  d.refobjid::regclass as referenced_object_id
+from pg_depend d
+where d.refobjid = 'public.logs'::regclass;
+```
+
+If the object you want to delete has dependencies, you'll need to drop those first or use `CASCADE` which will automatically drop all related objects.
+
+## Data deletion strategies
+
+There are several ways to delete data from a table and the approach you choose depends on how much you want to delete.
+
+### Small deletes
+
+For tables with less than a few thousand rows, a `DELETE` operation is fine:
+
+```sql
+delete from logs
+where created_at < now() - interval '90 days';
+```
+
+This acquires a `ROW EXCLUSIVE` lock on the table, which still allows other `SELECT`, `INSERT`, `UPDATE`, and `DELETE` statements to run concurrently. For small row counts, the operation completes quickly and has minimal impact.
+
+### Large deletes
+
+Deleting millions of rows in a single statement can hold locks for a long time, generate WAL (Write-Ahead Log) traffic, and impact replication. Instead, delete in batches:
+
+```sql
+-- Delete 5,000 rows at a time
+DELETE FROM logs
+WHERE id IN (
+  SELECT id
+  FROM logs
+  WHERE created_at < now() - interval '90 days'
+  LIMIT 5000
+);
+```
+
+This approach has the benefit of controlling when it runs, locking for a shorter period of time and minimising impact on other transactions.
+
+If you know in advance that such large deletes will have to happen in the business cycle of your database, then you should seriously think about using (table parititioning)[/docs/guides/database/partitions] as a management tool.
+
+### Soft deletes
+
+If you need to "delete" data but want the option to recover it, consider a soft-delete pattern:
+
+```sql
+alter table orders
+add column deleted_at timestamptz;
+
+-- "Delete" a row
+update orders
+set deleted_at = now()
+where id = 42;
+```
+
+Then exclude soft-deleted rows in your queries or views:
+
+```sql
+create view active_orders as
+  select * from orders where deleted_at is null;
+```
+
+<Admonition type="tip">
+
+Combine soft deletes with a scheduled hard-delete job (using [pg_cron](/docs/guides/database/extensions/pg_cron)) to permanently remove old soft-deleted rows in batches during low-traffic periods.
+
+</Admonition>
+
+### Deleting all data
+
+If you need to delete all data from a table, consider using `TRUNCATE` instead of `DELETE`:
+
+```sql
+truncate table logs;
+```
+
+`TRUNCATE` is much faster than `DELETE` because it doesn't generate individual row-level WAL entries and doesn't scan the table. It also resets any auto-incrementing sequences.
+
+## Object deletion strategies
+
+### Dropping tables
+
+Dropping a table removes it and all its data permanently. Always use `IF EXISTS` to avoid errors in migrations:
+
+```sql
+drop table if exists old_analytics;
+```
+
+<Admonition type="caution">
+
+`DROP TABLE` acquires an `ACCESS EXCLUSIVE` lock, which blocks **all** other operations on the table, including reads. On a busy table, this can queue up behind long-running queries. See [Monitoring locks](#monitoring-locks) below.
+
+</Admonition>
+
+### Dropping columns
+
+Dropping a column is a metadata-only operation in Postgres — it doesn't rewrite the table. However, it still requires an `ACCESS EXCLUSIVE` lock:
+
+```sql
+alter table users
+drop column if exists legacy_field;
+```
+
+Since the lock is brief (metadata-only), this is generally safe. But on a table with many concurrent transactions, even a brief `ACCESS EXCLUSIVE` lock can queue behind long-running queries. Use a lock timeout to avoid waiting indefinitely:
+
+```sql
+set local lock_timeout = '5s';
+alter table users drop column if exists legacy_field;
+```
+
+If the statement times out, retry during a quieter period.
+
+### Dropping indexes
+
+Dropping a regular index takes an `ACCESS EXCLUSIVE` lock on the index but **not** on the table, so reads and writes to the table continue uninterrupted:
+
+```sql
+drop index if exists idx_users_legacy_field;
+```
+
+<Admonition type="tip">
+
+The `inspect` command in the [Supabase CLI](/docs/reference/cli/supabase-inspect-db-index-stats) can help you identify unused indexes:
+
+```bash
+supabase inspect db index-stats
+```
+
+</Admonition>
+
+## Monitoring
+
+### Check for blocked queries
+
+Query `pg_locks` and `pg_stat_activity` to see currently active queries and queries waiting for locks.
+
+The [Supabase CLI](/docs/reference/cli/supabase-inspect-db-locks) provides commands to view these metrics:
+
+```bash
+supabase inspect db locks
+supabase inspect db blocking
+```
+
+### Monitor table bloat after large deletes
+
+When deleting a large number of rows, the space is not always reclaimed and available for use. In normal cases, the rows are marked as deleted but the space is not immediately freed. You can monitor table bloat to see if the space is being reclaimed:
+
+```bash
+supabase inspect db bloat
+```
+
+## Reclaiming disk space
+
+To reclaim the disk space freed by deleted rows, Postgres' autovacuum process runs automatically to mark deleted rows as reusable, but it may not always keep up with large deletes.
+
+If autovacuum is not keeping up, you can trigger a manual vacuum:
+
+```sql
+vacuum (verbose) logs;
+```
+
+For reclaiming disk space (not just marking tuples as reusable), use `VACUUM FULL` — but be aware this rewrites the entire table and takes an `ACCESS EXCLUSIVE` lock:
+
+```sql
+-- This locks the table for the duration — use during maintenance windows only
+vacuum full logs;
+```
+
+The most efficient way to reclaim disk space, without locks, is to use [pg_repack](/docs/guides/database/extensions/pg_repack).
+
+## Related links
+
+- [Safe Cascading Deletes](/docs/guides/database/postgres/cascade-deletes)
+- [Inspecting your Database](/docs/guides/database/inspect)
+- [Understanding Database and Disk Size](/docs/guides/platform/database-size)
+- [Bloat in Postgres](/docs/blog/postgres-bloat)

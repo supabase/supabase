@@ -3,7 +3,11 @@ import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
 import { Badge, cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
 
 import { useDestinationInformation } from '../useDestinationInformation'
-import { useIsETLBigQueryPrivateAlpha, useIsETLIcebergPrivateAlpha } from '../useIsETLPrivateAlpha'
+import {
+  useIsETLBigQueryPrivateAlpha,
+  useIsETLDucklakePrivateAlpha,
+  useIsETLIcebergPrivateAlpha,
+} from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -11,11 +15,15 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 export const DestinationTypeSelection = () => {
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
+  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
-  const numberOfTypes = [infrastructureReadReplicas, etlEnableBigQuery, etlEnableIceberg].filter(
-    Boolean
-  ).length
+  const numberOfTypes = [
+    infrastructureReadReplicas,
+    etlEnableBigQuery,
+    etlEnableIceberg,
+    etlEnableDucklake,
+  ].filter(Boolean).length
 
   const [urlDestinationType, setDestinationType] = useQueryState(
     'destinationType',
@@ -23,6 +31,7 @@ export const DestinationTypeSelection = () => {
       'Read Replica',
       'BigQuery',
       'Analytics Bucket',
+      'DuckLake',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
@@ -51,10 +60,14 @@ export const DestinationTypeSelection = () => {
         value={destinationType}
         onValueChange={(value) => setDestinationType(value as DestinationType)}
         className={cn(
-          'grid [&>button>div]:py-4 grid-cols-3',
-          numberOfTypes === 3 && !editMode ? 'grid-cols-3' : 'grid-cols-2',
+          'grid [&>button>div]:py-4',
+          !editMode && numberOfTypes >= 4
+            ? 'grid-cols-4'
+            : !editMode && numberOfTypes === 3
+              ? 'grid-cols-3'
+              : 'grid-cols-2',
           '[&>button:first-of-type]:rounded-none [&>button:last-of-type]:rounded-none',
-          '[&>button:first-of-type]:!rounded-l-lg [&>button:last-of-type]:!rounded-r-lg'
+          '[&>button:first-of-type]:rounded-l-lg! [&>button:last-of-type]:rounded-r-lg!'
         )}
       >
         {((!editMode && infrastructureReadReplicas) ||
@@ -118,11 +131,29 @@ export const DestinationTypeSelection = () => {
             </div>
           </RadioGroupStackedItem>
         )}
+
+        {((!editMode && etlEnableDucklake) || (editMode && destinationType === 'DuckLake')) && (
+          <RadioGroupStackedItem label="" showIndicator={false} id="DuckLake" value="DuckLake">
+            <div className="flex flex-col gap-y-2">
+              <Database size={20} />
+              <div className="flex flex-col gap-y-0.5 text-sm text-left">
+                <div className="flex items-center gap-x-2">
+                  <p>DuckLake</p>
+                  <Badge>Alpha</Badge>
+                </div>
+                <p className="text-foreground-lighter">
+                  Send data to a DuckLake catalog backed by S3-compatible object storage for
+                  flexible lakehouse workflows
+                </p>
+              </div>
+            </div>
+          </RadioGroupStackedItem>
+        )}
       </RadioGroupStacked>
 
       {destinationType !== 'Read Replica' && (
         <p className="mt-3 text-sm text-foreground-light">
-          Replication is in alpha. Expect rapid changes and possible breaking updates.{' '}
+          External replication is in alpha. Expect rapid changes and possible breaking updates.{' '}
           <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
             Leave feedback
           </InlineLink>

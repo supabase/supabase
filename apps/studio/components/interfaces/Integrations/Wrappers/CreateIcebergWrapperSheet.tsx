@@ -1,14 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
   Card,
   CardContent,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -49,8 +49,6 @@ const S3TableSchema = z.object({
   region_name: z.string().min(1, 'Required'),
   vault_aws_s3table_bucket_arn: z.string().min(1, 'Required'),
 })
-type S3TableSchemaType = z.infer<typeof S3TableSchema>
-
 const R2CatalogSchema = z.object({
   target: z.literal('R2Catalog'),
   source_schema: z.string().min(1, 'Please provide a namespace name'),
@@ -63,8 +61,6 @@ const R2CatalogSchema = z.object({
   s3: z.object({ endpoint: z.string().min(1, 'Required') }),
   catalog_uri: z.string().min(1, 'Required'),
 })
-type R2CatalogSchemaType = z.infer<typeof R2CatalogSchema>
-
 const IcebergRestCatalogSchema = z.object({
   target: z.literal('IcebergRestCatalog'),
   source_schema: z.string().min(1, 'Please provide a namespace name'),
@@ -79,8 +75,6 @@ const IcebergRestCatalogSchema = z.object({
   s3: z.object({ endpoint: z.string().min(1, 'Required') }),
   catalog_uri: z.string().optional(),
 })
-type IcebergRestCatalogSchemaType = z.infer<typeof IcebergRestCatalogSchema>
-
 const formSchema = z.discriminatedUnion('target', [
   S3TableSchema,
   R2CatalogSchema,
@@ -254,7 +248,7 @@ export const CreateIcebergWrapperSheet = ({
   return (
     <>
       <div className="h-full" tabIndex={-1}>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             id={FORM_ID}
             onSubmit={form.handleSubmit(onSubmit)}
@@ -263,7 +257,7 @@ export const CreateIcebergWrapperSheet = ({
             <SheetHeader>
               <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
             </SheetHeader>
-            <SheetSection className="flex-grow overflow-y-auto">
+            <SheetSection className="grow overflow-y-auto">
               <PageSection>
                 <PageSectionMeta>
                   <PageSectionSummary>
@@ -273,7 +267,7 @@ export const CreateIcebergWrapperSheet = ({
                 <PageSectionContent>
                   <Card>
                     <CardContent>
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="wrapper_name"
                         render={({ field }) => (
@@ -291,9 +285,9 @@ export const CreateIcebergWrapperSheet = ({
                               )
                             }
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Input_Shadcn_ {...field} />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -310,7 +304,7 @@ export const CreateIcebergWrapperSheet = ({
                 <PageSectionContent>
                   <Card>
                     <CardContent>
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="target"
                         render={({ field }) => (
@@ -455,7 +449,7 @@ export const CreateIcebergWrapperSheet = ({
               </Button>
             </SheetFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </div>
     </>
   )

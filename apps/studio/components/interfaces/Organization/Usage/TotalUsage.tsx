@@ -193,7 +193,7 @@ export const TotalUsage = ({
                 )}
               </p>
             )}
-            <div className="grid grid-cols-2 mt-3 gap-[1px] bg-border">
+            <div className="grid grid-cols-2 mt-3 gap-px bg-border">
               {sortedBillingMetrics.map((metric, i) => {
                 return (
                   <div

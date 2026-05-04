@@ -34,7 +34,7 @@ import type { ResponseError } from '@/types'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 
-const UserImpersonationSelector = () => {
+export const UserImpersonationSelector = () => {
   const [searchText, setSearchText] = useState('')
   const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
   const [externalUserId, setExternalUserId] = useState('')
@@ -185,12 +185,12 @@ const UserImpersonationSelector = () => {
     <>
       <div className="px-5 py-3">
         <p className="text-foreground text-sm">
-          {displayName ? `Impersonating ${displayName}` : 'Impersonate a User'}
+          {displayName ? `Impersonating ${displayName}` : 'Impersonate a user'}
         </p>
-        <p className="text-sm text-foreground-light">
+        <p className="text-sm text-foreground-light mb-1">
           {!impersonatingUser && !isExternalAuthImpersonating
-            ? "Select a user to respect your database's Row-Level Security policies for that particular user."
-            : "Results will respect your database's Row-Level Security policies for this user."}
+            ? "Select a user to respect your database's RLS policies for that particular user."
+            : "Results will respect your database's RLS policies for this user."}
         </p>
 
         {impersonatingUser && (
@@ -294,7 +294,7 @@ const UserImpersonationSelector = () => {
                       {previousSearches.length > 0 ? (
                         <>
                           <Collapsible_Shadcn_ className="relative">
-                            <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
+                            <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
                               <div className="flex items-center gap-x-1 w-full">
                                 <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                                   Recents
@@ -382,7 +382,7 @@ const UserImpersonationSelector = () => {
           <DropdownMenuSeparator className="m-0" />
           <div className="px-5 py-2 flex flex-col gap-2 relative">
             <Collapsible_Shadcn_>
-              <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
+              <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
                 <div className="flex items-center gap-x-1 w-full">
                   <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                     Advanced options
@@ -420,8 +420,6 @@ const UserImpersonationSelector = () => {
     </>
   )
 }
-
-export default UserImpersonationSelector
 
 // Base interface for shared impersonation row props to reduce
 // duplication between user and external auth impersonation displays
@@ -462,7 +460,7 @@ const BaseImpersonatingRow = ({
       </div>
 
       <Button type="default" onClick={onClick} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
+        {isImpersonating ? 'Stop' : 'Impersonate'}
       </Button>
     </div>
   )
@@ -558,7 +556,7 @@ const UserRow = ({ user, onClick, isImpersonating = false, isLoading = false }: 
       </div>
 
       <Button type="default" onClick={() => onClick(user)} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
+        {isImpersonating ? 'Stop' : 'Impersonate'}
       </Button>
     </div>
   )

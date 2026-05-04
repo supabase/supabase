@@ -3,16 +3,17 @@ import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack
 import { flexRender } from '@tanstack/react-table'
 import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
-import { Fragment, memo, ReactNode, UIEvent, useCallback, useRef } from 'react'
+import { Fragment, ReactNode, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn } from 'ui'
 
 import { formatCompactNumber } from './DataTable.utils'
 import { useDataTable } from './providers/DataTableProvider'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table'
-import { useHotKey } from '@/hooks/ui/useHotKey'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 // TODO: add a possible chartGroupBy
-export interface DataTableInfiniteProps<TData, TValue, TMeta> {
+export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   columns: ColumnDef<TData, TValue>[]
   defaultColumnVisibility?: VisibilityState
   totalRows?: number
@@ -64,10 +65,10 @@ export function DataTableInfinite<TData, TValue, TMeta>({
     [fetchNextPage, isFetching, totalRows, totalRowsFetched]
   )
 
-  useHotKey(() => {
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_RESET_COLUMNS, () => {
     setColumnOrder([])
     setColumnVisibility(defaultColumnVisibility)
-  }, 'u')
+  })
 
   return (
     <Table ref={tableRef} onScroll={onScroll}>
@@ -145,7 +146,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         {/* Only show load more section if we have rows OR if we're not in initial loading state */}
         {(rows.length > 0 || (!isLoading && !rows.length)) && (
           <TableRow className="hover:bg-transparent data-[state=selected]:bg-transparent">
-            <TableCell colSpan={columns.length} className="text-center !py-2">
+            <TableCell colSpan={columns.length} className="text-center py-2!">
               {hasNextPage || isFetching ? (
                 <div className="flex flex-col items-center gap-2">
                   <Button
@@ -231,9 +232,3 @@ function DataTableRow<TData>({
     </TableRow>
   )
 }
-
-// [Joshen] Using MemoizedRow will cause the column visibility to break as the rows aren't getting re-rendered
-const MemoizedRow = memo(
-  DataTableRow,
-  (prev, next) => prev.row.id === next.row.id && prev.selected === next.selected
-) as typeof DataTableRow

@@ -3,6 +3,7 @@ import { expect } from '@playwright/test'
 import { env } from '../env.config.js'
 import { expectClipboardValue } from '../utils/clipboard.js'
 import { createTable, dropTable, query } from '../utils/db/index.js'
+import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import {
@@ -50,12 +51,20 @@ test.describe('Database', () => {
 );`,
       })
 
+      await expect(page.getByText('Successfully copied as SQL')).toBeVisible({ timeout: 15000 })
+      await dismissToastsIfAny(page)
+      await expect(page.locator('[data-sonner-toast]')).toHaveCount(0)
+
       // downloads schema diagram when export is triggered
       const downloadPromise = page.waitForEvent('download')
-      await page.getByRole('button', { name: 'Download Schema' }).click()
+      await page.getByRole('button', { name: 'Export options' }).click()
       await page.getByRole('menuitem', { name: 'Download as PNG' }).click()
       const download = await downloadPromise
       expect(download.suggestedFilename()).toContain('.png')
+
+      await expect(page.getByText('Successfully downloaded as PNG')).toBeVisible({ timeout: 15000 })
+      await dismissToastsIfAny(page)
+      await expect(page.locator('[data-sonner-toast]')).toHaveCount(0)
 
       // changing schema -> auth
       await page.getByTestId('schema-selector').click()
@@ -100,6 +109,8 @@ test.describe('Database', () => {
       const dialog = page.getByRole('dialog')
       await expect(dialog).toBeVisible()
       await expect(dialog.getByText('timestamptz')).toBeVisible()
+      // FIXME: For some reason, the dialog is not stable and rerenders, sometimes preventing the description to be filled
+      await page.waitForTimeout(500)
       await page.getByLabel('Description').fill('Bazinga')
       await page.getByRole('button', { name: 'Save' }).click()
       await expect(page.getByText(`Successfully updated ${databaseTableName}!`)).toBeVisible()
@@ -111,8 +122,6 @@ test.describe('Database', () => {
       await editTableMenuItem.press('Enter')
       await expect(editTableMenuItem).not.toBeVisible()
       await expect(page.getByRole('dialog')).toBeVisible()
-      // FIXME: For some reason, the dialog is not stable and rerenders, sometimes preventing the description to be filled
-      await page.waitForTimeout(500)
       await expect(page.getByLabel('Description')).toHaveValue('Bazinga')
       await page.getByRole('button', { name: 'Cancel' }).click()
       await expect(page.getByRole('dialog')).not.toBeVisible()
@@ -651,16 +660,26 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
+      const indexWait = waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-public')
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/indexes?schema=public`))
 
       // Wait for database indexes to be populated
-      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-public')
+      await indexWait
 
       // create new index
       await page.getByRole('button', { name: 'Create index' }).click()
       await page.getByRole('button', { name: 'Choose a table' }).click()
+
+      const columnsWait = waitForApiResponse(
+        page,
+        'pg-meta',
+        ref,
+        `query?key=table-columns-public-${databaseTableName}`
+      )
       await page.getByRole('option', { name: databaseTableName, exact: true }).click()
-      await page.getByText('Choose which columns to create an index on').click()
+      await columnsWait
+
+      await page.getByRole('combobox', { name: 'Select up to 32 columns' }).click()
       await page.getByRole('option', { name: databaseColumnName }).click()
       await page.getByRole('button', { name: 'Create index' }).click()
       await expect(
@@ -1051,12 +1070,31 @@ test.describe('Database Enumerated Types', () => {
     const databaseEnumValue1Name = 'pw_database_value1'
     const databaseEnumValue2Name = 'pw_database_value2'
     const databaseEnumValue3Name = 'pw_database_value3'
+    const quotedEnumName = 'pw_database_enum_"quoted"'
+    const updatedQuotedEnumName = 'pw_database_enum_"updated"'
+    const quotedEnumValue1Name = 'pw_database_value_"double"'
+    const quotedEnumValue2Name = `pw_database_value's_apostrophe`
+    const quotedEnumValue3Name = `pw_database_value_"combo"'s`
+    const quotedEnumTypes = [quotedEnumName, updatedQuotedEnumName].map(
+      (name) => `public."${name.replaceAll('"', '""')}"`
+    )
 
-    const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=schemas')
+    await using _ = await withSetupCleanup(
+      async () => {
+        for (const typeName of quotedEnumTypes) {
+          await query(`drop type if exists ${typeName};`)
+        }
+      },
+      async () => {
+        for (const typeName of quotedEnumTypes) {
+          await query(`drop type if exists ${typeName};`)
+        }
+      }
+    )
+
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/types?schema=public`))
 
-    // Wait for database roles list to be populated
-    await wait
+    await page.waitForLoadState('networkidle')
 
     // if enum exists, delete it.
     if ((await page.getByRole('cell', { name: databaseEnumName, exact: true }).count()) > 0) {
@@ -1103,6 +1141,41 @@ test.describe('Database Enumerated Types', () => {
     await page.getByRole('heading', { name: 'Confirm to delete enumerated' }).click()
     await page.getByRole('button', { name: 'Confirm delete' }).click()
     await expect(page.getByText(`Successfully deleted type "${databaseEnumName}"`)).toBeVisible({
+      timeout: 50000,
+    })
+
+    await page.getByRole('button', { name: 'Create type' }).click()
+    await page.getByRole('textbox', { name: 'Name' }).fill(quotedEnumName)
+    await page.locator('input[name="values.0.value"]').fill(quotedEnumValue1Name)
+    await page.getByRole('button', { name: 'Add value' }).click()
+    await page.locator('input[name="values.1.value"]').fill(quotedEnumValue2Name)
+    const quotedEnumCreateWait = createApiResponseWaiter(page, 'pg-meta', ref, 'types')
+    await page.getByRole('button', { name: 'Create type' }).click()
+
+    await quotedEnumCreateWait
+    const quotedEnumRow = page.getByRole('row', { name: `${quotedEnumName}` })
+    await expect(quotedEnumRow).toContainText(quotedEnumName)
+    await expect(quotedEnumRow).toContainText(`${quotedEnumValue1Name}, ${quotedEnumValue2Name}`)
+
+    await quotedEnumRow.getByRole('button').click()
+    await page.getByRole('menuitem', { name: 'Update type' }).click()
+    await page.getByRole('textbox', { name: 'Name' }).fill(updatedQuotedEnumName)
+    await page.getByRole('button', { name: 'Add value' }).click()
+    await page.locator('input[name="values.2.updatedValue"]').fill(quotedEnumValue3Name)
+    await page.getByRole('button', { name: 'Update type' }).click()
+    const updatedQuotedEnumRow = page.getByRole('row', { name: `${updatedQuotedEnumName}` })
+    await expect(updatedQuotedEnumRow).toContainText(updatedQuotedEnumName)
+    await expect(updatedQuotedEnumRow).toContainText(
+      `${quotedEnumValue1Name}, ${quotedEnumValue2Name}, ${quotedEnumValue3Name}`
+    )
+
+    await updatedQuotedEnumRow.getByRole('button').click()
+    await page.getByRole('menuitem', { name: 'Delete type' }).click()
+    await page.getByRole('heading', { name: 'Confirm to delete enumerated' }).click()
+    await page.getByRole('button', { name: 'Confirm delete' }).click()
+    await expect(
+      page.getByText(`Successfully deleted type "${updatedQuotedEnumName}"`)
+    ).toBeVisible({
       timeout: 50000,
     })
   })

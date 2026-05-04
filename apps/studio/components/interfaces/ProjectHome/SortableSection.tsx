@@ -24,7 +24,7 @@ export const SortableSection = ({ id, children }: SortableSectionProps) => {
     <div ref={setNodeRef} style={style} className="relative will-change-transform">
       <button
         aria-label="Drag to reorder section"
-        className="absolute -left-6 top-2 text-foreground-muted hover:text-foreground focus:outline-none cursor-grab active:cursor-grabbing"
+        className="absolute -left-6 top-2 text-foreground-muted hover:text-foreground focus:outline-hidden cursor-grab active:cursor-grabbing"
         {...attributes}
         {...listeners}
       >

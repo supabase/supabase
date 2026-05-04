@@ -1,6 +1,5 @@
 /* eslint-disable no-restricted-exports */
 
-import containerQueries from '@tailwindcss/container-queries'
 import tailwindConfig from 'config/tailwind.config'
 
 export default tailwindConfig({
@@ -11,7 +10,6 @@ export default tailwindConfig({
     './../../packages/ui/src/**/*.{tsx,ts,js}',
     './../../packages/ui-patterns/src/**/*.{tsx,ts,js}',
   ],
-  plugins: [containerQueries],
   theme: {
     extend: {
       fontSize: {

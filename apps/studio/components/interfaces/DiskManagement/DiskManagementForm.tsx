@@ -13,7 +13,7 @@ import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Form_Shadcn_,
+  Form,
   Separator,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -155,6 +155,7 @@ export function DiskManagementForm() {
       CreateDiskStorageSchema({
         defaultTotalSize: defaultValues.totalSize,
         cloudProvider: project?.cloud_provider as CloudProvider,
+        isSpendCapEnabled,
       })
     ),
     defaultValues,
@@ -223,13 +224,14 @@ export function DiskManagementForm() {
 
   const isBranch = project?.parent_project_ref !== undefined
 
-  const disableDiskInputs =
+  const disableDiskSizeInput =
     isRequestingChanges ||
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
-    isSpendCapEnabled ||
     !canUpdateDiskConfiguration ||
     !isAws
+
+  const disableDiskInputs = disableDiskSizeInput || isSpendCapEnabled
 
   const disableComputeInputs = isPlanUpgradeRequired
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
@@ -372,7 +374,7 @@ export function DiskManagementForm() {
         <Separator />
       </ScaffoldContainer>
 
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form
           id="disk-compute-form"
           onSubmit={form.handleSubmit(onSubmit)}
@@ -383,7 +385,7 @@ export function DiskManagementForm() {
 
             {isDiskNoticeVisible && <Separator />}
 
-            <SpendCapDisabledSection />
+            <SpendCapDisabledSection currentDiskSizeGb={defaultValues.totalSize} />
 
             <div className="flex flex-col gap-y-4">
               <NoticeBar
@@ -433,7 +435,7 @@ export function DiskManagementForm() {
 
                   <DiskSizeField
                     form={form}
-                    disableInput={disableDiskInputs}
+                    disableInput={disableDiskSizeInput}
                     setAdvancedSettingsOpenState={setAdvancedSettingsOpenState}
                   />
                 </>
@@ -450,7 +452,7 @@ export function DiskManagementForm() {
                   open={advancedSettingsOpen}
                   onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
                 >
-                  <CollapsibleTrigger_Shadcn_ className="px-card py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
+                  <CollapsibleTrigger_Shadcn_ className="px-card py-3 w-full border flex items-center gap-6 rounded-t data-closed:rounded-b group justify-between">
                     <div className="flex flex-col items-start">
                       <span className="text-sm text-foreground">Advanced disk settings</span>
                       <span className="text-sm text-foreground-light text-left">
@@ -460,14 +462,14 @@ export function DiskManagementForm() {
                     </div>
                     <ChevronRight
                       size={16}
-                      className="text-foreground-light transition-all group-data-[state=open]:rotate-90"
+                      className="text-foreground-light transition-all group-data-open:rotate-90"
                       strokeWidth={1}
                     />
                   </CollapsibleTrigger_Shadcn_>
                   <CollapsibleContent_Shadcn_
                     className={cn(
                       'transition-all rounded-b',
-                      'data-[state=open]:border data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+                      'data-open:border data-closed:animate-collapsible-up data-open:animate-collapsible-down'
                     )}
                   >
                     <div className="flex flex-col gap-y-8 py-8">
@@ -559,7 +561,7 @@ export function DiskManagementForm() {
             ) : null}
           </AnimatePresence>
         </form>
-      </Form_Shadcn_>
+      </Form>
     </>
   )
 }

@@ -8,13 +8,13 @@ import { toast } from 'sonner'
 import {
   Button,
   Calendar,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -45,17 +45,17 @@ export default function CalendarForm() {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="dob"
           render={({ field }) => (
-            <FormItem_Shadcn_ className="flex flex-col">
-              <FormLabel_Shadcn_>Date of birth</FormLabel_Shadcn_>
+            <FormItem className="flex flex-col">
+              <FormLabel>Date of birth</FormLabel>
               <Popover_Shadcn_>
                 <PopoverTrigger_Shadcn_ asChild>
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Button
                       type={'outline'}
                       className={cn(
@@ -66,7 +66,7 @@ export default function CalendarForm() {
                       {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </PopoverTrigger_Shadcn_>
                 <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
                   <Calendar
@@ -78,15 +78,13 @@ export default function CalendarForm() {
                   />
                 </PopoverContent_Shadcn_>
               </Popover_Shadcn_>
-              <FormDescription_Shadcn_>
-                Your date of birth is used to calculate your age.
-              </FormDescription_Shadcn_>
-              <FormMessage_Shadcn_ />
-            </FormItem_Shadcn_>
+              <FormDescription>Your date of birth is used to calculate your age.</FormDescription>
+              <FormMessage />
+            </FormItem>
           )}
         />
         <Button htmlType="submit">Submit</Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

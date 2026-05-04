@@ -37,6 +37,7 @@ export const IntegrationLoadingCard = () => {
 
 export const IntegrationCard = ({
   id,
+  listingId,
   status,
   name,
   icon,
@@ -46,6 +47,7 @@ export const IntegrationCard = ({
   image,
 }: IntegrationCardProps) => {
   const { data: project } = useSelectedProjectQuery()
+  const shouldShowOfficialBadge = !listingId
 
   if (featured) {
     return (
@@ -73,7 +75,7 @@ export const IntegrationCard = ({
               <p className="text-foreground-light text-sm">{description}</p>
               <div className="flex items-center gap-x-1 mt-4">
                 {status && <Badge variant="warning">{status}</Badge>}
-                <Badge>Official</Badge>
+                {shouldShowOfficialBadge && <Badge>Official</Badge>}
               </div>
             </div>
           </CardContent>
@@ -103,7 +105,7 @@ export const IntegrationCard = ({
             <p className="text-foreground-light text-xs flex-1">{description}</p>
             <div className="flex items-center gap-x-1 mt-4">
               {status && <Badge variant="warning">{status}</Badge>}
-              <Badge>Official</Badge>
+              {shouldShowOfficialBadge && <Badge>Official</Badge>}
             </div>
           </div>
         </CardContent>

@@ -29,6 +29,7 @@ Ariuna K
 Arshdeep Singh
 Artur Zakirov
 Artyom Borissov
+Aziz Quadri
 Barco Fourie
 Beng Eu
 Benjamin Coenen
@@ -52,10 +53,12 @@ Chris Martin
 Chris Stockton
 Chris Ward
 Clayton Kast
+Colin Goodheart-Smithe
 Colin Murray
 Colum Ferry
 Craig Cannon
 Cuong Do
+Dane Harrigan
 Daniel Velázquez Lara
 Danny White
 Dave Wilson
@@ -74,7 +77,6 @@ Divit D
 Douglas Hunley
 Dustin Keib
 Eduardo Gurgel
-Egor Romanov
 Eleftheria Trivyzaki
 Eliot Whalan
 Emmett Folger
@@ -89,11 +91,13 @@ Felipe Stival
 Ferhat Elmas
 Firas El Rachidi
 Francesco Sansalvadore
+Gabriel Claudino
 Garrett Crowell
 Gerardo Estaba
 Gildas Garcia
 Giuseppe Mandato
 Greg Kress
+Greg Marzouka
 Greg P
 Greg Richardson
 Gregor Vand
@@ -101,6 +105,7 @@ Guilherme Souza
 Hannah Bowers
 Hardik Maheshwari
 Haritabh Gupta
+Harold Giménez
 Haydn Maley
 Hieu Pham
 Hunter Luckow
@@ -157,10 +162,10 @@ Lenny Urbanowski
 Leonardo Santiago
 Liam Cloud Hogan
 Lindsay Moss
-Long Hoang
 Lukas Bernert
 Łukasz Niemier
 Maksym Ionutsa
+Manuel Mendez
 Manan Gupta
 Marcus Weiner
 Margarita Sandomirskaia
@@ -179,9 +184,11 @@ Natalie Roberge
 Nick B
 Nick Littman
 Nick Nowlan
+Nicolas Nosenzo
 Nyannyacha
 Oli R
 Pamela Chia
+Patricia Szasz
 Patrick Crane
 Paul Caselton
 Paul Cioanca
@@ -197,12 +204,16 @@ Rafael Chacón
 Raminder Singh
 Raúl Barroso
 Riccardo Busetti
+Rob Shields
 Rodrigo Esteves
 Rodrigo Mansueli
+Roman Hernandez
 Ronan Lehane
 Rory Wilding
 Ryan Goulet
+Ryan Senior
 Ruan Maia
+Saba Pochkhua
 Sam Meech-Ward
 Sam Rome
 Sam Rose
@@ -221,6 +232,7 @@ Steve Chavez
 Steven Eubank
 Stojan Dimitrovski
 Szymon Mentel
+Sugat Mahanti
 Sugu Sougoumarane
 Supun Sudaraka Kalidasa
 Taha Le Bras
@@ -239,6 +251,7 @@ Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
+Utkarash Singh
 Victor Farazdagi
 Wen Bo Xie
 Yorvi Arias

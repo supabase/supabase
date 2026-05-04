@@ -44,7 +44,7 @@ const VectorsBucketPage: NextPageWithLayout = () => {
       ]}
       secondaryActions={config?.docsUrl ? [<DocsButton key="docs" href={config.docsUrl} />] : []}
     >
-      <div className="storage-container flex flex-grow">
+      <div className="storage-container flex grow">
         <VectorBucketDetails />
       </div>
     </PageLayout>

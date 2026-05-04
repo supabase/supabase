@@ -1,7 +1,7 @@
-export function formatClipboardValue(value: any) {
+export function formatClipboardValue(value: unknown) {
   if (!value) return ''
-  if (typeof value == 'object' || Array.isArray(value)) {
+  if (typeof value === 'object') {
     return JSON.stringify(value)
   }
-  return value
+  return String(value)
 }

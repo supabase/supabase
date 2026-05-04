@@ -90,7 +90,7 @@ export const FilesBuckets = () => {
               <>
                 {hasNoApiKeys ? (
                   <Admonition type="warning" title="Project has no active API keys enabled">
-                    <p className="!leading-normal text-sm">
+                    <p className="leading-normal! text-sm">
                       The Dashboard relies on having active API keys on the project to function. If
                       you'd like to use Storage through the Dashboard, create a set of API keys{' '}
                       <InlineLink href={`/project/${ref}/settings/api-keys/new`}>here</InlineLink>.
@@ -107,11 +107,11 @@ export const FilesBuckets = () => {
                   <EmptyBucketState bucketType="files" onCreateBucket={() => setVisible(true)} />
                 ) : (
                   <>
-                    <div className="flex flex-grow justify-between gap-x-2 items-center mb-4">
+                    <div className="flex grow justify-between gap-x-2 items-center mb-4">
                       <div className="flex items-center gap-x-2">
                         <Input
                           size="tiny"
-                          className="flex-grow lg:flex-grow-0 w-52"
+                          className="grow lg:grow-0 w-52"
                           placeholder="Search for a bucket"
                           value={filterString}
                           onChange={(e) => setFilterString(e.target.value)}
