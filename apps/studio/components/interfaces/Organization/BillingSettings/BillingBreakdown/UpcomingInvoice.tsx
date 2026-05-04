@@ -305,7 +305,10 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   <TableRow>
                     <TableCell className="py-2 px-0 flex items-center">
                       <span className="mr-2">{prepaidCreditsItem.item_name}</span>
-                      <InfoTooltip>{prepaidCreditsItem.description}</InfoTooltip>
+                      <InfoTooltip className="max-w-xs">
+                        Prepaid credits purchased upfront, applied automatically against your
+                        invoice. Any remaining balance rolls over to the next billing cycle.
+                      </InfoTooltip>
                     </TableCell>
                     <TableCell className="text-right py-2 px-0" translate="no">
                       {formatCurrency(prepaidCreditsItem.amount) ?? '-'}
