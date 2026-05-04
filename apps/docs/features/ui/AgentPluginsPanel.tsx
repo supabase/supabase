@@ -1,29 +1,12 @@
 'use client'
 
-import { Bot, Check, ChevronDown, ExternalLink } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useState } from 'react'
-import {
-  Button,
-  cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-} from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
-import { ConnectionIcon } from 'ui-patterns/McpUrlBuilder'
+import { ClientSelectDropdown, type McpClient } from 'ui-patterns/McpUrlBuilder'
 
-interface PluginClient {
-  key: string
-  label: string
-  icon?: string
-  hasDistinctDarkIcon?: boolean
+interface PluginClient extends McpClient {
   repoUrl?: string
   docsUrl?: string
 }
@@ -59,94 +42,6 @@ const PLUGIN_CLIENTS: PluginClient[] = [
     docsUrl: 'https://geminicli.com/docs/extensions/',
   },
 ]
-
-function ClientDropdown({
-  theme,
-  selectedClient,
-  onClientChange,
-}: {
-  theme: 'light' | 'dark'
-  selectedClient: PluginClient
-  onClientChange: (key: string) => void
-}) {
-  const [open, setOpen] = useState(false)
-
-  return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <div className="flex">
-        <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
-          Client
-        </span>
-        <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            size="small"
-            type="default"
-            className="gap-0 rounded-l-none"
-            iconRight={
-              <ChevronDown
-                strokeWidth={1.5}
-                className={cn('transition-transform duration-200', open && 'rotate-180')}
-              />
-            }
-          >
-            <div className="flex items-center gap-2">
-              {selectedClient.icon ? (
-                <ConnectionIcon
-                  connection={selectedClient.icon}
-                  theme={theme}
-                  hasDistinctDarkIcon={selectedClient.hasDistinctDarkIcon}
-                />
-              ) : (
-                <Bot size={12} aria-hidden />
-              )}
-              {selectedClient.label}
-            </div>
-          </Button>
-        </PopoverTrigger_Shadcn_>
-      </div>
-      <PopoverContent_Shadcn_ className="mt-0 p-0 max-w-48" side="bottom" align="start">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Search..." />
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
-              {PLUGIN_CLIENTS.map((client) => (
-                <CommandItem_Shadcn_
-                  key={client.key}
-                  value={client.key}
-                  onSelect={() => {
-                    onClientChange(client.key)
-                    setOpen(false)
-                  }}
-                  className="flex gap-2 items-center"
-                >
-                  {client.icon ? (
-                    <ConnectionIcon
-                      connection={client.icon}
-                      theme={theme}
-                      hasDistinctDarkIcon={client.hasDistinctDarkIcon}
-                    />
-                  ) : (
-                    <Bot size={12} aria-hidden />
-                  )}
-                  {client.label}
-                  <Check
-                    size={15}
-                    aria-label={client.key === selectedClient.key ? 'selected' : undefined}
-                    className={cn(
-                      'ml-auto',
-                      client.key === selectedClient.key ? 'opacity-100' : 'opacity-0'
-                    )}
-                  />
-                </CommandItem_Shadcn_>
-              ))}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
-  )
-}
 
 function PluginInstructions({ client }: { client: PluginClient }) {
   if (client.key === 'claude-code') {
@@ -258,8 +153,9 @@ export function AgentPluginsPanel() {
 
   return (
     <div className="not-prose">
-      <ClientDropdown
+      <ClientSelectDropdown
         theme={theme}
+        clients={PLUGIN_CLIENTS}
         selectedClient={selectedClient}
         onClientChange={setSelectedClientKey}
       />
