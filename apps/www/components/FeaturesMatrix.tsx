@@ -1,9 +1,10 @@
-import type { FeatureType } from '~/data/features'
-import { PRODUCT_STAGES } from '~/data/features'
 import { Check, ChevronDown, ChevronsUpDown, ChevronUp, ExternalLink, Minus } from 'lucide-react'
 import Link from 'next/link'
-import React, { useState } from 'react'
-import { Badge, cn } from 'ui'
+import { useState } from 'react'
+import { Badge, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+
+import type { FeatureType } from '@/data/features'
+import { PRODUCT_STAGES } from '@/data/features'
 
 type SortColumn = 'title' | 'stage' | 'selfHosted'
 type SortDirection = 'asc' | 'desc'
@@ -116,30 +117,33 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
   const sortableThClass = cn(thClass, 'cursor-pointer select-none')
 
   return (
-    <div className="mt-0 w-full overflow-x-auto rounded-b-xl border border-muted">
-      <table className="w-full text-sm border-collapse table-fixed mt-0">
+    <div className="w-full overflow-x-auto max-w-full rounded-md border border-muted">
+      <Table className="mt-0! table-fixed">
         <colgroup>
-          <col />
-          <col className="hidden md:table-column w-44" />
+          <col className="w-auto" />
+          <col className="hidden md:table-column w-30" />
           <col className="w-28" />
           <col className="w-28" />
         </colgroup>
-        <thead>
-          <tr className="border-b border-muted bg-surface-100">
-            <th className={sortableThClass} onClick={() => handleSort('title')}>
+        <TableHeader>
+          <TableRow className="border-t-0">
+            <TableHead
+              className={cn(sortableThClass, 'md:w-96')}
+              onClick={() => handleSort('title')}
+            >
               <span className="flex items-center gap-1.5">
                 Feature
                 <SortIcon column="title" sortColumn={sortColumn} sortDirection={sortDirection} />
               </span>
-            </th>
-            <th className={cn(thClass, 'hidden md:table-cell')}>Products</th>
-            <th className={sortableThClass} onClick={() => handleSort('stage')}>
+            </TableHead>
+            <TableHead className={cn(thClass, 'hidden md:table-cell')}>Products</TableHead>
+            <TableHead className={sortableThClass} onClick={() => handleSort('stage')}>
               <span className="flex items-center gap-1.5">
                 Stage
                 <SortIcon column="stage" sortColumn={sortColumn} sortDirection={sortDirection} />
               </span>
-            </th>
-            <th className={sortableThClass} onClick={() => handleSort('selfHosted')}>
+            </TableHead>
+            <TableHead className={sortableThClass} onClick={() => handleSort('selfHosted')}>
               <span className="flex items-center gap-1.5">
                 Self-Hosted
                 <SortIcon
@@ -148,31 +152,31 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
                   sortDirection={sortDirection}
                 />
               </span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {sorted.map((feature, i) => {
             const selfHosted = feature.status?.availableOnSelfHosted
             const tooling = feature.status?.selfHostedTooling
             return (
-              <tr
+              <TableRow
                 key={feature.slug}
                 className={cn(
                   'border-b border-muted last:border-0 transition-colors hover:bg-surface-100 group/row',
                   i % 2 === 0 ? 'bg-background' : 'bg-surface-75'
                 )}
               >
-                <td className="px-3 py-3 min-w-0">
+                <TableCell className="px-3 py-3 min-w-0 hover:bg-transparent!">
                   <Link
                     href={`/features/${feature.slug}`}
-                    className="flex items-center gap-2 text-foreground hover:text-foreground-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter rounded min-w-0"
+                    className="flex items-center gap-2 text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter rounded min-w-0"
                   >
-                    <div className="flex-shrink-0 w-7 h-7 rounded-md bg-surface-200 border border-muted flex items-center justify-center">
+                    <div className="shrink-0 w-7 h-7 rounded-md bg-surface-200 border border-muted hidden md:flex items-center justify-center">
                       <feature.icon className="w-3.5 h-3.5 text-foreground-light group-hover/row:text-foreground transition-colors" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <span className="font-medium text-sm leading-tight block">
+                      <span className="font-medium text-sm leading-tight block text-foreground">
                         {feature.title}
                       </span>
                       <span className="hidden sm:block text-foreground-lighter text-xs leading-tight truncate">
@@ -181,23 +185,23 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
                     </div>
                     <ExternalLink
                       size={12}
-                      className="flex-shrink-0 opacity-0 group-hover/row:opacity-50 transition-opacity"
+                      className="shrink-0 opacity-0 group-hover/row:opacity-50 transition-opacity"
                     />
                   </Link>
-                </td>
-                <td className="px-3 py-3 hidden md:table-cell">
+                </TableCell>
+                <TableCell className="px-3 py-3 hidden md:table-cell hover:bg-transparent!">
                   <div className="flex flex-wrap gap-1">
                     {feature.products.map((product) => (
                       <span
                         key={product}
-                        className="inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded bg-surface-200 text-foreground-light border border-muted capitalize"
+                        className="inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded bg-surface-200 text-foreground-light border capitalize"
                       >
                         {productLabel(product)}
                       </span>
                     ))}
                   </div>
-                </td>
-                <td className="px-3 py-3">
+                </TableCell>
+                <TableCell className="px-3 py-3 hover:bg-transparent!">
                   {feature.status ? (
                     <Badge variant={stageBadgeVariant(feature.status.stage)}>
                       {stageLabel(feature.status.stage)}
@@ -205,11 +209,11 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
                   ) : (
                     <span className="text-foreground-muted text-xs">—</span>
                   )}
-                </td>
-                <td className="px-3 py-3">
+                </TableCell>
+                <TableCell className="px-3 py-3 hover:bg-transparent!">
                   {selfHosted ? (
                     <div className="flex items-center gap-1.5">
-                      <Check size={14} className="text-brand flex-shrink-0" />
+                      <Check size={14} className="text-brand shrink-0" />
                       {tooling && (
                         <a
                           href={tooling.link}
@@ -225,12 +229,12 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
                   ) : (
                     <Minus size={14} className="text-foreground-muted" />
                   )}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )
           })}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
       {sorted.length === 0 && (
         <div className="px-4 py-8 text-center text-foreground-lighter text-sm">
           No features found with these filters
