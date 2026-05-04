@@ -80,7 +80,11 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
   const { mutateAsync: updateFDW } = useFDWUpdateMutation()
   const { mutateAsync: dropForeignTable } = useFDWDropForeignTableMutation()
   const { mutateAsync: deleteNamespaceTable, isPending: isDeletingNamespaceTable } =
-    useIcebergNamespaceTableDeleteMutation({ onError: () => {} })
+    useIcebergNamespaceTableDeleteMutation({
+      onError: (error: any) => {
+        toast.error(`Failed to delete namespace table: ${error.message}`)
+      },
+    })
   const { mutateAsync: updatePublication } = useUpdatePublicationMutation()
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
 
