@@ -2135,8 +2135,8 @@ functions:
   - id: admin-api
     title: 'Overview'
     notes: |
-      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
-      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
+      - Any method under the `supabase.auth.admin` namespace requires a `secret` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `secret` key in the browser.
     examples:
       - id: create-auth-admin-client
         name: Create server-side auth client
@@ -2148,7 +2148,7 @@ functions:
 
           supabase = create_client(
               supabase_url,
-              service_role_key,
+              secret_key,
               options=ClientOptions(
                   auto_refresh_token=False,
                   persist_session=False,
@@ -2168,7 +2168,7 @@ functions:
         description: |
           The user's unique identifier
 
-          This function should only be called on a server. Never expose your `service_role` key in the browser.
+          This function should only be called on a server. Never expose your `secret` key in the browser.
     notes: |
       - Fetches the user object from the database based on the user's id.
       - The `get_user_by_id()` method requires the user's id which maps to the `auth.users.id` column.
@@ -2397,8 +2397,8 @@ functions:
         description: |
           If true, then the user will be soft-deleted (setting `deleted_at` to the current timestamp and disabling their account while preserving their data) from the auth schema. Defaults to false for backward compatibility.
 
-          This function should only be called on a server. Never expose your `service_role` key in the browser.
-    description: Delete a user. Requires a `service_role` key.
+          This function should only be called on a server. Never expose your `secret` key in the browser.
+    description: Delete a user. Requires a `secret` key.
     notes: |
       - The `delete_user()` method requires the user's ID, which maps to the `auth.users.id` column.
     examples:
@@ -2655,7 +2655,7 @@ functions:
         description: |
           The data you want to update.
 
-          This function should only be called on a server. Never expose your `service_role` key in the browser.
+          This function should only be called on a server. Never expose your `secret` key in the browser.
         subContent:
           - name: app_metadata
             isOptional: true
@@ -2825,7 +2825,7 @@ functions:
     title: 'Overview'
     notes: |
       - OAuth 2.1 client administration endpoints are available via the `supabase.auth.admin.oauth` namespace.
-      - These methods require a `service_role` key and should only be called server-side.
+      - These methods require a `secret` key and should only be called server-side.
       - Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
       - This is an alpha feature and may change in the future.
 
@@ -2834,7 +2834,7 @@ functions:
     description: |
       Lists OAuth clients with optional pagination.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - Only available when OAuth 2.1 server is enabled.
       - This is an alpha feature and may change in the future.
     params:
@@ -2872,7 +2872,7 @@ functions:
     description: |
       Creates a new OAuth client.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - Only available when OAuth 2.1 server is enabled.
       - This is an alpha feature and may change in the future.
     params:
@@ -2923,7 +2923,7 @@ functions:
     description: |
       Updates an existing OAuth client.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - Only available when OAuth 2.1 server is enabled.
       - This is an alpha feature and may change in the future.
     params:
@@ -2971,7 +2971,7 @@ functions:
     description: |
       Retrieves details of an OAuth client by ID.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - Only available when OAuth 2.1 server is enabled.
       - This is an alpha feature and may change in the future.
     params:
@@ -2992,7 +2992,7 @@ functions:
     description: |
       Deletes an OAuth client.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - Only available when OAuth 2.1 server is enabled.
       - This is an alpha feature and may change in the future.
     params:
@@ -3013,7 +3013,7 @@ functions:
     description: |
       Regenerates the client secret for an OAuth client.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - Only available when OAuth 2.1 server is enabled.
       - This is an alpha feature and may change in the future.
     params:

@@ -271,7 +271,7 @@ const EdgeFunctionDetailsLayout = ({
           <PageHeaderMeta>
             <PageHeaderSummary>
               <PageHeaderTitle>{functionSlug ? name : 'Edge Functions'}</PageHeaderTitle>
-              <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 !text-sm">
+              <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-sm!">
                 <div className="flex items-center gap-x-2">
                   <span className="flex items-center gap-2">{functionUrl}</span>
                   <CopyButton iconOnly type="text" text={functionUrl} />
@@ -350,7 +350,7 @@ const EdgeFunctionDetailsLayout = ({
                             value={`supabase functions download ${functionSlug}`}
                           />
                         </div>
-                        <Separator className="!bg-border-overlay" />
+                        <Separator className="bg-border-overlay!" />
                       </>
                     )}
                     <div className="py-2 px-1">

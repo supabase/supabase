@@ -21,7 +21,7 @@ const buttonVariants = cva(
   ease-out
   duration-200
   rounded-md
-  outline-none
+  outline-hidden
   transition-all
   outline-0
   focus-visible:outline-4

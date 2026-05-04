@@ -30,9 +30,9 @@ const collapsibleClasses = [
   'data-open:bg-surface-200',
   'border-default',
   'hover:border-strong data-open:border-strong',
-  'data-open:pb-px col-span-12 rounded',
+  'data-open:pb-px col-span-12 rounded-sm',
   '-space-y-px overflow-hidden',
-  'border shadow',
+  'border shadow-sm',
   'transition',
   'hover:z-50',
 ]
@@ -63,7 +63,7 @@ const Security: NextPageWithLayout = () => {
           <CollapsibleTrigger_Shadcn_ asChild>
             <button
               type="button"
-              className="group flex w-full items-center justify-between rounded py-3 px-4 md:px-6 text-foreground"
+              className="group flex w-full items-center justify-between rounded-sm py-3 px-4 md:px-6 text-foreground"
             >
               <div className="flex flex-row gap-4 items-center py-1">
                 <Smartphone strokeWidth={1.5} />

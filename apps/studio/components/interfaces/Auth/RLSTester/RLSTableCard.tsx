@@ -108,9 +108,9 @@ export const RLSTableCard = ({
 
   return (
     <Collapsible_Shadcn_
-      className={cn('border rounded', !isRLSEnabled && 'bg-warning-300 border-warning-500')}
+      className={cn('border rounded-sm', !isRLSEnabled && 'bg-warning-300 border-warning-500')}
     >
-      <CollapsibleTrigger_Shadcn_ className="flex items-center justify-between px-3 py-2 w-full [&[data-state=open]>div>svg]:!-rotate-180">
+      <CollapsibleTrigger_Shadcn_ className="flex items-center justify-between px-3 py-2 w-full [&[data-state=open]>div>svg]:-rotate-180!">
         <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-x-2">
             {!isRLSEnabled ? (
@@ -161,7 +161,7 @@ const TableAccessPolicySummary = ({
   handleSelectEditPolicy: (policy: PostgresPolicy) => void
 }) => {
   return (
-    <div className="border rounded mt-4">
+    <div className="border rounded-sm mt-4">
       <p className="text-xs font-mono text-foreground-light uppercase border-b px-3 py-2">
         {policies.length} {policies.length > 1 ? 'policies' : 'policy'} applied
       </p>

@@ -76,7 +76,7 @@ function MessageDisplayTextMessage({
       id={id}
       isLoading={isLoading}
       readOnly={readOnly}
-      className="prose prose-sm max-w-none break-words prose-h2:font-medium"
+      className="prose prose-sm max-w-none wrap-break-word prose-h2:font-medium"
     >
       {children}
     </MessageMarkdown>

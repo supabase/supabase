@@ -184,7 +184,7 @@ export const RegionSelector = ({
                           {selectedRegion?.code && (
                             <img
                               alt="region icon"
-                              className="w-5 rounded-sm"
+                              className="w-5 rounded-xs"
                               src={`${BASE_PATH}/img/regions/${selectedRegion.code}.svg`}
                             />
                           )}
@@ -213,7 +213,7 @@ export const RegionSelector = ({
                                   <div className="flex items-center gap-x-3">
                                     <img
                                       alt="region icon"
-                                      className="w-5 rounded-sm"
+                                      className="w-5 rounded-xs"
                                       src={`${BASE_PATH}/img/regions/${value.code}.svg`}
                                     />
                                     <span className="text-foreground">
@@ -246,7 +246,7 @@ export const RegionSelector = ({
                             value={value.name}
                             className={cn(
                               'w-full [&>:nth-child(2)]:w-full',
-                              value.status !== undefined && '!pointer-events-auto'
+                              value.status !== undefined && 'pointer-events-auto!'
                             )}
                             disabled={value.status !== undefined}
                           >
@@ -254,7 +254,7 @@ export const RegionSelector = ({
                               <div className="flex items-center gap-x-3">
                                 <img
                                   alt="region icon"
-                                  className="w-5 rounded-sm"
+                                  className="w-5 rounded-xs"
                                   src={`${BASE_PATH}/img/regions/${value.code}.svg`}
                                 />
                                 <div className="flex items-center gap-x-2">

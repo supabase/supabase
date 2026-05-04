@@ -31,7 +31,7 @@ export const HelpPanel = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex text-xs items-center justify-between pl-4 pr-3 h-[var(--header-height)] border-b">
+      <div className="flex text-xs items-center justify-between pl-4 pr-3 h-(--header-height) border-b">
         <span>Help & Support</span>
         <ButtonTooltip
           type="text"
@@ -65,7 +65,7 @@ export const HelpPanel = ({
         </div>
         <div className="px-4">
           <div
-            className="relative space-y-2 overflow-hidden rounded px-4 py-4 pb-12 shadow-md"
+            className="relative space-y-2 overflow-hidden rounded-sm px-4 py-4 pb-12 shadow-md"
             style={{ background: '#404EED' }}
           >
             <a

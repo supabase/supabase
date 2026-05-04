@@ -3,6 +3,7 @@ import { expect } from '@playwright/test'
 import { env } from '../env.config.js'
 import { expectClipboardValue } from '../utils/clipboard.js'
 import { createTable, dropTable, query } from '../utils/db/index.js'
+import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import {
@@ -50,12 +51,20 @@ test.describe('Database', () => {
 );`,
       })
 
+      await expect(page.getByText('Successfully copied as SQL')).toBeVisible({ timeout: 15000 })
+      await dismissToastsIfAny(page)
+      await expect(page.locator('[data-sonner-toast]')).toHaveCount(0)
+
       // downloads schema diagram when export is triggered
       const downloadPromise = page.waitForEvent('download')
       await page.getByRole('button', { name: 'Export options' }).click()
       await page.getByRole('menuitem', { name: 'Download as PNG' }).click()
       const download = await downloadPromise
       expect(download.suggestedFilename()).toContain('.png')
+
+      await expect(page.getByText('Successfully downloaded as PNG')).toBeVisible({ timeout: 15000 })
+      await dismissToastsIfAny(page)
+      await expect(page.locator('[data-sonner-toast]')).toHaveCount(0)
 
       // changing schema -> auth
       await page.getByTestId('schema-selector').click()
@@ -651,16 +660,26 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
+      const indexWait = waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-public')
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/indexes?schema=public`))
 
       // Wait for database indexes to be populated
-      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-public')
+      await indexWait
 
       // create new index
       await page.getByRole('button', { name: 'Create index' }).click()
       await page.getByRole('button', { name: 'Choose a table' }).click()
+
+      const columnsWait = waitForApiResponse(
+        page,
+        'pg-meta',
+        ref,
+        `query?key=table-columns-public-${databaseTableName}`
+      )
       await page.getByRole('option', { name: databaseTableName, exact: true }).click()
-      await page.getByText('Choose which columns to create an index on').click()
+      await columnsWait
+
+      await page.getByRole('combobox', { name: 'Select up to 32 columns' }).click()
       await page.getByRole('option', { name: databaseColumnName }).click()
       await page.getByRole('button', { name: 'Create index' }).click()
       await expect(
@@ -1136,9 +1155,7 @@ test.describe('Database Enumerated Types', () => {
     await quotedEnumCreateWait
     const quotedEnumRow = page.getByRole('row', { name: `${quotedEnumName}` })
     await expect(quotedEnumRow).toContainText(quotedEnumName)
-    await expect(quotedEnumRow).toContainText(
-      `${quotedEnumValue1Name}, ${quotedEnumValue2Name}`
-    )
+    await expect(quotedEnumRow).toContainText(`${quotedEnumValue1Name}, ${quotedEnumValue2Name}`)
 
     await quotedEnumRow.getByRole('button').click()
     await page.getByRole('menuitem', { name: 'Update type' }).click()

@@ -60,7 +60,7 @@ export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
         </CardHeader>
 
         <div className="px-4 py-3 bg-warning-200 border-y border-warning-500">
-          <pre className="text-xs font-mono text-warning-600 whitespace-pre-wrap break-words overflow-auto max-h-32">
+          <pre className="text-xs font-mono text-warning-600 whitespace-pre-wrap wrap-break-word overflow-auto max-h-32">
             {errorMessage}
           </pre>
         </div>

@@ -414,6 +414,15 @@ describe('SQLEditor.utils:getCreateTablesMissingRLS', () => {
     expect(getCreateTablesMissingRLS(sql)).toEqual([])
   })
 
+  it('does not flag when ALTER TABLE IF EXISTS enables RLS', () => {
+    const sql = stripIndent`
+      CREATE TABLE IF NOT EXISTS public."Conversations" (id int8 primary key);
+      ALTER TABLE IF EXISTS public."Conversations" ENABLE ROW LEVEL SECURITY;
+      GRANT ALL ON TABLE public."Conversations" TO postgres, anon, authenticated, service_role;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
   it('flags CREATE TEMP TABLE', () => {
     const result = getCreateTablesMissingRLS('create temp table foo (id int8 primary key);')
     expect(result).toHaveLength(1)

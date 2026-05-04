@@ -26,10 +26,22 @@ export const examples: Registry = [
     files: ['example/admonition-button.tsx'],
   },
   {
+    name: 'admonition-description-only',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-description-only.tsx'],
+  },
+  {
     name: 'admonition-warning',
     type: 'components:example',
     registryDependencies: ['admonition'],
     files: ['example/admonition-warning.tsx'],
+  },
+  {
+    name: 'admonition-success',
+    type: 'components:example',
+    registryDependencies: ['admonition'],
+    files: ['example/admonition-success.tsx'],
   },
   {
     name: 'admonition-destructive',
@@ -1417,6 +1429,11 @@ export const examples: Registry = [
     name: 'multi-select-inline-search-input',
     type: 'components:example',
     files: ['example/multi-select-inline-search-input.tsx'],
+  },
+  {
+    name: 'multi-select-in-dialog',
+    type: 'components:example',
+    files: ['example/multi-select-in-dialog.tsx'],
   },
   {
     name: 'tree-view-demo',

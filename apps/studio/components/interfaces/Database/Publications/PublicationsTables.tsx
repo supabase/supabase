@@ -74,15 +74,16 @@ export const PublicationsTables = () => {
               />
             </div>
           </div>
-          {!isLoadingPermissions && !canUpdatePublications && (
-            <Admonition
-              type="note"
-              className="w-[500px]"
-              title="You need additional permissions to update database replications"
-            />
-          )}
         </div>
       </div>
+
+      {!isLoadingPermissions && !canUpdatePublications && (
+        <Admonition
+          type="warning"
+          className="mb-4 w-full"
+          description="You need additional permissions to update database replications."
+        />
+      )}
 
       {(isLoading || isLoadingPermissions) && (
         <div className="mt-8">

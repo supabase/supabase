@@ -98,7 +98,7 @@ export const ConfirmationModal = forwardRef<
         <DialogContent
           aria-describedby={undefined}
           ref={ref}
-          className="p-0 gap-0 pb-5 !block"
+          className="p-0 gap-0 pb-5 block!"
           size={size}
         >
           <DialogHeader className={cn('border-b')} padding={'small'}>

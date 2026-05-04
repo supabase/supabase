@@ -131,7 +131,7 @@ export const ColumnType = ({
         }
         return (
           <FormItem className={cn('flex flex-col space-y-2', className)}>
-            <FormLabel className="text-foreground flex gap-2 items-center break-words">
+            <FormLabel className="text-foreground flex gap-2 items-center wrap-break-word">
               Type
             </FormLabel>
             <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
@@ -169,7 +169,7 @@ export const ColumnType = ({
                     placeholder="Search types..."
                     // [Joshen] Addresses style issues when this component is being used in the old Form component
                     // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
-                    className="!bg-transparent focus:!shadow-none focus:!ring-0 text-xs"
+                    className="bg-transparent! focus:shadow-none! focus:ring-0! text-xs"
                   />
                   <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
 

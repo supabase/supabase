@@ -42,7 +42,9 @@ export function ProjectAndPlanInfo({
       <ProjectSelector form={form} orgSlug={orgSlug} projectRef={projectRef} />
       <ProjectRefHighlighted projectRef={projectRef} />
 
-      {!hasProjectSelected && <Admonition type="default" title="No project has been selected" />}
+      {!hasProjectSelected && (
+        <Admonition type="default" description="No project has been selected." />
+      )}
 
       {showPlanExpectationInfo &&
         orgSlug &&
@@ -149,7 +151,7 @@ function ProjectRefHighlighted({ projectRef }: ProjectRefHighlightedProps) {
         >
           <p className="text-sm transition text-foreground-lighter">
             Project ID:{' '}
-            <code className="text-code-inline !text-foreground-light">{projectRef}</code>
+            <code className="text-code-inline text-foreground-light!">{projectRef}</code>
           </p>
           <CopyButton
             iconOnly

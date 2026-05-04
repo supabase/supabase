@@ -1,6 +1,7 @@
 import { ArrowUpRight, Shuffle, Wifi, X } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
+import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PRODUCT_NAMES } from 'shared-data/products'
@@ -18,6 +19,7 @@ import Solutions from '@/data/MainProducts'
 import ApiExamples from '@/data/products/storage/api-examples'
 import DashboardViewData from '@/data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from '@/data/products/storage/permissions-examples'
+import { serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
 
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
@@ -53,6 +55,21 @@ function StoragePage() {
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(
+              softwareApplicationSchema({
+                name: 'Supabase Storage',
+                description: meta_description,
+                url: 'https://supabase.com/storage',
+                image: `https://supabase.com${basePath}/images/product/storage/storage-og.jpg`,
+              })
+            ),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.STORAGE} />
         <ProductHeader

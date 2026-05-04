@@ -324,7 +324,7 @@ export const S3Connection = () => {
                           ))
                         ) : (
                           <TableRow>
-                            <TableCell colSpan={4} className="!rounded-b-md overflow-hidden">
+                            <TableCell colSpan={4} className="rounded-b-md! overflow-hidden">
                               <p className="text-sm text-foreground">No access keys created</p>
                               <p className="text-sm text-foreground-light">
                                 There are no access keys associated with your project yet

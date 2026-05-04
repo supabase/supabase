@@ -7,7 +7,7 @@ import { BASE_PATH } from '@/lib/constants'
 import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
 
 const VERCEL_ICON = (
-  <div className="bg-black shadow rounded p-1 w-8 h-8 flex justify-center items-center text-white">
+  <div className="bg-black shadow-sm rounded-sm p-1 w-8 h-8 flex justify-center items-center text-white">
     <InlineSVG src={`${BASE_PATH}/img/icons/vercel-icon.svg`} title="Vercel Icon" className="w-4" />
   </div>
 )
