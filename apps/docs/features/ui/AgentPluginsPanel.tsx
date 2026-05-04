@@ -77,13 +77,13 @@ function PluginInstructions({ client }: { client: PluginClient }) {
     return (
       <div className="space-y-3">
         <p className="text-sm text-foreground-light">
-          Start Codex and open the plugin browser with <code>/plugins</code>. Search for Supabase
-          and select <strong>Install plugin</strong>.
+          Install the Supabase plugin from the official OpenAI plugin marketplace:
         </p>
         <CodeBlock value="codex" language="bash" focusable={false} className="block" />
+        <p className="text-xs text-foreground-lighter">Inside Codex, type:</p>
+        <CodeBlock value="/plugins" language="bash" focusable={false} className="block" />
         <p className="text-xs text-foreground-lighter">
-          Then type <code>/plugins</code> inside Codex and search for Supabase. Some plugins ask you
-          to authenticate during install; others wait until first use.
+          Search for <strong>Supabase</strong> and select <strong>Install</strong>.
         </p>
       </div>
     )
