@@ -4,6 +4,7 @@ import { EvalCase, EvalScorer, SpanData, Trace } from 'braintrust'
 import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
+import { loadKnowledgeInputSchema } from '@/lib/ai/tools/studio-tools'
 import { extractUrls } from '@/lib/helpers'
 
 const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2' // NOTE: `gpt-5.2-2025-12-11` snapshot not yet working with online scorers
@@ -52,10 +53,10 @@ export type AssistantEvalCase = EvalCase<AssistantEvalInput, Expected, Assistant
 
 const chatMessageSchema = z.object({ role: z.string(), content: z.unknown() })
 const textContentBlockSchema = z.object({ type: z.literal('text'), text: z.string() })
-const loadKnowledgeInputSchema = z.object({ name: z.string() })
 // search_docs returns { content: [{ text: string }] } where each text is a JSON doc string
 const searchDocsOutputSchema = z.object({ content: z.array(z.object({ text: z.string() })) })
 
+/** Extracts plain text from a message content field (string or content-block array). */
 function extractMessageText(content: unknown): string {
   if (typeof content === 'string') return content
   if (!Array.isArray(content)) return ''
@@ -67,6 +68,7 @@ function extractMessageText(content: unknown): string {
     .join('\n')
 }
 
+/** Returns the text of the last assistant message in the trace thread, or null if none. */
 async function getLastAssistantText(trace: Trace): Promise<string | null> {
   const thread = await trace.getThread()
   for (let i = thread.length - 1; i >= 0; i--) {
@@ -94,6 +96,7 @@ async function getConversationContext(trace: Trace): Promise<string> {
     .join('\n\n')
 }
 
+/** Returns tool spans from the trace, optionally filtered to a specific tool name. */
 export async function getToolSpans(trace: Trace, toolName?: string): Promise<SpanData[]> {
   const spans = await trace.getSpans({ spanType: ['tool'] })
   if (!toolName) return spans
@@ -130,7 +133,7 @@ export const knowledgeUsageScorer: EvalScorer<
   if (!expected.requiredKnowledge || !trace) return null
 
   const knowledgeSpans = await getToolSpans(trace, 'load_knowledge')
-  const loadedKnowledge = knowledgeSpans.flatMap((s) => {
+  const loadedKnowledge: string[] = knowledgeSpans.flatMap((s) => {
     const r = loadKnowledgeInputSchema.safeParse(s.input)
     return r.success ? [r.data.name] : []
   })
