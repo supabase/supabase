@@ -83,7 +83,20 @@ function PluginInstructions({ client }: { client: PluginClient }) {
         <p className="text-xs text-foreground-lighter">Inside Codex, type:</p>
         <CodeBlock value="/plugins" language="bash" focusable={false} className="block" />
         <p className="text-xs text-foreground-lighter">
-          Search for <strong>Supabase</strong> and select <strong>Install</strong>.
+          The plugin browser groups plugins by marketplace. Open the Supabase plugin and select{' '}
+          <strong>Install</strong>.
+        </p>
+        <p className="text-xs text-foreground-lighter">
+          You can also install it directly from the{' '}
+          <a
+            href="https://developers.openai.com/codex/plugins#plugin-directory-in-the-codex-app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-link hover:underline"
+          >
+            Codex desktop app plugin directory
+          </a>
+          .
         </p>
       </div>
     )
