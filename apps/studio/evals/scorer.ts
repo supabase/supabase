@@ -53,9 +53,8 @@ export type AssistantEvalCase = EvalCase<AssistantEvalInput, Expected, Assistant
 
 const chatMessageSchema = z.object({ role: z.string(), content: z.unknown() })
 const textContentBlockSchema = z.object({ type: z.literal('text'), text: z.string() })
-// MCP protocol wraps tool outputs as { content: [{ text: string }] } — this is the span output
-// shape as Braintrust records it, distinct from the tool's own outputSchema ({ result: unknown })
-const searchDocsOutputSchema = z.object({ content: z.array(z.object({ text: z.string() })) })
+// MCP protocol wraps tool outputs as { content: [{ text: string }] } in the Braintrust span output
+const searchDocsSpanOutputSchema = z.object({ content: z.array(z.object({ text: z.string() })) })
 
 /** Extracts plain text from a message content field (string or content-block array). */
 function extractMessageText(content: unknown): string {
@@ -268,7 +267,7 @@ export const docsFaithfulnessScorer: EvalScorer<
 
   const docs: string[] = []
   for (const span of docsSpans) {
-    const result = searchDocsOutputSchema.safeParse(span.output)
+    const result = searchDocsSpanOutputSchema.safeParse(span.output)
     if (!result.success) continue
     for (const item of result.data.content) {
       try {
