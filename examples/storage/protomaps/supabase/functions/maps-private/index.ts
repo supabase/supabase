@@ -21,7 +21,7 @@ Deno.serve((req) => {
   }
 
   const reqUrl = new URL(req.url)
-  const url = `${Deno.env.get('SUPABASE_URL')}/storage/v1/object/authenticated${reqUrl.pathname}
+  const url = `${Deno.env.get('SUPABASE_URL')}/storage/v1/object/authenticated${reqUrl.pathname}`
 
   const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
   const { method, headers } = req
