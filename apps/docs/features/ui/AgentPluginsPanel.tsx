@@ -48,16 +48,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
     return (
       <div className="space-y-3">
         <p className="text-sm text-foreground-light">
-          Add the Supabase{' '}
-          <a
-            href="https://skills.sh"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-brand-link hover:underline"
-          >
-            agent skills
-          </a>{' '}
-          marketplace, then install the plugin from the{' '}
+          Install the Supabase plugin from the{' '}
           <a
             href="https://claude.com/plugins"
             target="_blank"
@@ -69,7 +60,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
           :
         </p>
         <CodeBlock
-          value={`claude plugin marketplace add supabase/agent-skills\nclaude plugin install supabase@claude-plugins-official`}
+          value={`claude plugin marketplace add anthropics/claude-plugins-official\nclaude plugin install supabase@claude-plugins-official`}
           language="bash"
           focusable={false}
           className="block"
