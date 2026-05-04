@@ -320,72 +320,53 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   <TableRow>
                     <TableCell className="font-medium py-2 px-0 flex items-center">
                       <span className="mr-2">Projected Costs</span>
-                      <InfoTooltip className="max-w-xs">
-                        Projected costs at the end of the billing cycle. Includes predictable costs
-                        for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery, but no
-                        costs for metrics like MAU, storage or function invocations. Final amounts
-                        may vary depending on your usage.
+                      <InfoTooltip className="max-w-sm">
+                        <p className="mb-2">
+                          Projected costs at the end of the billing cycle. Includes predictable
+                          costs for Compute Hours, IPv4, Custom Domain and Point-In-Time-Recovery,
+                          but no costs for metrics like MAU, storage or function invocations. Final
+                          amounts may vary depending on your usage.
+                        </p>
+
+                        {hasTax && (
+                          <div className="mt-3 border-t border-muted pt-2 space-y-1">
+                            <div className="flex items-center justify-between gap-4 text-xs">
+                              <span>Subtotal</span>
+                              <span translate="no">
+                                {formatCurrency(upcomingInvoice.tax!.total_amount_excluding_tax)}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between gap-4 text-xs">
+                              <span>
+                                Tax
+                                {upcomingInvoice.tax?.tax_rate_percentage != null &&
+                                  ` (${upcomingInvoice.tax.tax_rate_percentage}%)`}
+                              </span>
+                              <span translate="no">
+                                {formatCurrency(upcomingInvoice.tax!.tax_amount)}
+                              </span>
+                            </div>
+                            <p className="text-foreground-lighter pt-1 text-xs">
+                              Estimated based on your organization's billing address. The final
+                              amount may be adjusted at the end of the billing cycle.
+                            </p>
+                          </div>
+                        )}
+
+                        {taxFailed && (
+                          <p className="mt-3 border-t border-muted pt-2 text-warning">
+                            We were unable to estimate tax for your organization. Please verify your
+                            billing address in your organization settings.
+                          </p>
+                        )}
                       </InfoTooltip>
                     </TableCell>
                     <TableCell className="text-right font-medium py-2 px-0" translate="no">
                       {formatCurrency(
                         hasTax
-                          ? upcomingInvoice.tax!.total_amount_excluding_tax
+                          ? upcomingInvoice.tax!.total_amount_including_tax
                           : upcomingInvoice.amount_projected
                       ) ?? '-'}
-                    </TableCell>
-                  </TableRow>
-                )}
-
-                {hasTax && (
-                  <>
-                    <TableRow>
-                      <TableCell className="py-2 px-0">
-                        <div className="flex items-center gap-1">
-                          <span>Projected Tax</span>
-                          <InfoTooltip>
-                            Estimated tax
-                            {upcomingInvoice?.tax?.tax_rate_percentage != null &&
-                              ` at ${upcomingInvoice.tax.tax_rate_percentage}%`}{' '}
-                            based on your organization's billing address. The final amount may be
-                            adjusted at the end of the billing cycle.
-                          </InfoTooltip>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right py-2 px-0" translate="no">
-                        {formatCurrency(upcomingInvoice?.tax?.tax_amount) ?? '-'}
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium py-2 px-0 flex items-center">
-                        <span className="mr-2">Projected Total</span>
-                        <InfoTooltip>
-                          Projected costs including applicable tax. The final amount may be adjusted
-                          at the end of the billing cycle.
-                        </InfoTooltip>
-                      </TableCell>
-                      <TableCell className="text-right font-medium py-2 px-0" translate="no">
-                        {formatCurrency(upcomingInvoice?.tax!.total_amount_including_tax) ?? '-'}
-                      </TableCell>
-                    </TableRow>
-                  </>
-                )}
-
-                {taxFailed && (
-                  <TableRow>
-                    <TableCell className="py-2 px-0">
-                      <div className="flex items-center gap-1">
-                        <span>Projected Tax</span>
-                        <InfoTooltip>
-                          We were unable to estimate tax for your organization. Please verify your
-                          billing address in your organization settings.
-                        </InfoTooltip>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right py-2 px-0">
-                      <div className="flex items-center justify-end gap-1">
-                        <span className="text-warning">Could not be estimated</span>
-                      </div>
                     </TableCell>
                   </TableRow>
                 )}
