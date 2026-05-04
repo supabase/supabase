@@ -33,6 +33,8 @@ export const GitHubSection = () => {
     [connections, projectRef]
   )
 
+  console.log({ connections })
+
   const GitHubTitle = `GitHub Integration`
 
   return (
