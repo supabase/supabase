@@ -253,10 +253,7 @@ const RedirectToTemplates = () => {
               </PageSectionSummary>
             </PageSectionMeta>
             <PageSectionContent>
-              <EmailTemplateBuilderPrototype
-                initialTemplate={template}
-                templates={TEMPLATES_SCHEMAS}
-              />
+              <EmailTemplateBuilderPrototype initialTemplate={template} />
             </PageSectionContent>
           </PageSection>
         </>

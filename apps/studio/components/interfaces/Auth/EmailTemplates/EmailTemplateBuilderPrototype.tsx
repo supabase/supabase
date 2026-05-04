@@ -1,18 +1,7 @@
-import { Code2, Palette, Save, SlidersHorizontal } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import {
-  Button,
-  cn,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Slider_Shadcn_,
-  Switch,
-  Textarea,
-} from 'ui'
+import { Code2, Palette, RotateCcw, Save, SlidersHorizontal, X } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { useState } from 'react'
+import { Button, cn, Input_Shadcn_, Slider_Shadcn_ } from 'ui'
 
 import type { FormSchema } from '@/types'
 
@@ -38,7 +27,6 @@ type EmailBlocks = {
 
 interface EmailTemplateBuilderPrototypeProps {
   initialTemplate: FormSchema
-  templates: FormSchema[]
 }
 
 const DEFAULT_THEME: EmailTheme = {
@@ -189,85 +177,6 @@ const getTemplateContent = (template: FormSchema) => {
   return TEMPLATE_CONTENT[template.id ?? ''] ?? TEMPLATE_CONTENT.CONFIRMATION
 }
 
-const escapeHtml = (value: string) =>
-  value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-
-const buildPreviewHtml = ({
-  theme,
-  blocks,
-  content,
-  subject,
-}: {
-  theme: EmailTheme
-  blocks: EmailBlocks
-  content: ReturnType<typeof getTemplateContent>
-  subject: string
-}) => {
-  const textAlign = theme.alignment
-  const year = new Date().getFullYear()
-  const safeAppName = escapeHtml(SAMPLE_APP_NAME)
-  const safeSubject = escapeHtml(subject)
-  const safeHeading = escapeHtml(content.heading)
-  const safeBody = escapeHtml(content.body)
-  const safeHelper = escapeHtml(content.helper)
-  const safeSafety = escapeHtml(content.safety)
-
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-</head>
-<body style="margin:0;padding:${theme.outerPadding}px 16px;background:${theme.pageBackground};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:${theme.textColor};">
-  <div style="max-width:${theme.contentWidth}px;margin:0 auto;background:${theme.bodyBackground};border:1px solid rgba(24,24,27,.08);border-radius:8px;overflow:hidden;">
-    <div style="padding:32px 36px 12px;text-align:${textAlign};">
-      ${
-        blocks.appMark
-          ? `<div style="width:32px;height:32px;border-radius:8px;background:${theme.accentColor};display:inline-block;margin-bottom:16px;"></div>`
-          : ''
-      }
-      ${
-        blocks.appName
-          ? `<div style="font-size:13px;font-weight:600;color:${theme.textColor};margin-bottom:20px;">${safeAppName}</div>`
-          : ''
-      }
-      <div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:${theme.accentColor};font-weight:700;margin-bottom:12px;">${escapeHtml(content.eyebrow)}</div>
-      <h1 style="margin:0 0 12px;font-size:24px;line-height:1.25;color:${theme.textColor};font-weight:650;">${safeHeading}</h1>
-      <p style="margin:0;font-size:15px;line-height:1.65;color:${theme.textColor};opacity:.78;">${safeBody}</p>
-    </div>
-    ${
-      content.action
-        ? `<div style="padding:18px 36px 8px;text-align:${textAlign};"><a href="{{ .ConfirmationURL }}" style="display:inline-block;background:${theme.accentColor};color:#ffffff;text-decoration:none;border-radius:6px;padding:11px 16px;font-size:14px;font-weight:600;">${escapeHtml(content.action)}</a></div>`
-        : ''
-    }
-    <div style="padding:18px 36px 32px;text-align:${textAlign};">
-      ${
-        blocks.helper
-          ? `<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:${theme.textColor};opacity:.62;">${safeHelper}</p>`
-          : ''
-      }
-      ${
-        blocks.safety
-          ? `<p style="margin:0;font-size:13px;line-height:1.55;color:${theme.textColor};opacity:.62;">${safeSafety}</p>`
-          : ''
-      }
-    </div>
-    ${
-      blocks.copyright
-        ? `<div style="border-top:1px solid rgba(24,24,27,.08);padding:18px 36px;text-align:${textAlign};font-size:12px;color:${theme.textColor};opacity:.48;">© ${year} ${safeAppName}</div>`
-        : ''
-    }
-  </div>
-  <span style="display:none!important;">${safeSubject}</span>
-</body>
-</html>`
-}
-
 const getSubjectKey = (template: FormSchema) =>
   Object.keys(template.properties).find((key) => key.startsWith('MAILER_SUBJECTS_'))
 
@@ -301,61 +210,48 @@ const ColorField = ({
   </div>
 )
 
-const BlockToggle = ({
+const BLOCK_LABELS: Record<keyof EmailBlocks, string> = {
+  appName: 'App name',
+  appMark: 'Compact app mark',
+  copyright: 'Copyright',
+  helper: 'Secondary helper',
+  safety: 'Ignore this email',
+}
+
+const EditablePreviewBlock = ({
   label,
-  description,
-  checked,
-  onCheckedChange,
+  children,
+  onRemove,
 }: {
   label: string
-  description: string
-  checked: boolean
-  onCheckedChange: (checked: boolean) => void
+  children: ReactNode
+  onRemove: () => void
 }) => (
-  <div className="flex items-start justify-between gap-3 rounded-md border px-3 py-3">
-    <div className="space-y-1">
-      <p className="text-sm text-foreground">{label}</p>
-      <p className="text-xs leading-5 text-foreground-lighter">{description}</p>
-    </div>
-    <Switch checked={checked} onCheckedChange={onCheckedChange} />
+  <div className="group relative rounded-md border border-transparent transition-colors hover:border-border-strong">
+    <div>{children}</div>
+    <Button
+      type="default"
+      size="tiny"
+      icon={<X size={12} />}
+      className="absolute right-2 top-2 opacity-0 shadow-sm transition-opacity group-hover:opacity-100 focus:opacity-100"
+      onClick={onRemove}
+    >
+      Remove {label}
+    </Button>
   </div>
 )
 
 export const EmailTemplateBuilderPrototype = ({
   initialTemplate,
-  templates,
 }: EmailTemplateBuilderPrototypeProps) => {
-  const [selectedTemplateId, setSelectedTemplateId] = useState(initialTemplate.id ?? '')
-  const selectedTemplate =
-    templates.find((template) => template.id === selectedTemplateId) ?? initialTemplate
+  const selectedTemplate = initialTemplate
   const selectedContent = getTemplateContent(selectedTemplate)
   const subjectKey = getSubjectKey(selectedTemplate)
-  const [subjects, setSubjects] = useState<Record<string, string>>(() => {
-    return Object.fromEntries(
-      templates.map((template) => {
-        const content = getTemplateContent(template)
-        return [template.id ?? template.title, content.subject]
-      })
-    )
-  })
-  const [blocks, setBlocks] = useState<Record<string, EmailBlocks>>(() => {
-    return Object.fromEntries(
-      templates.map((template) => [template.id ?? template.title, { ...DEFAULT_BLOCKS }])
-    )
-  })
+  const [subject, setSubject] = useState(selectedContent.subject)
+  const [blocks, setBlocks] = useState<EmailBlocks>(DEFAULT_BLOCKS)
   const [theme, setTheme] = useState<EmailTheme>(DEFAULT_THEME)
-
-  const selectedBlocks = blocks[selectedTemplate.id ?? selectedTemplate.title] ?? DEFAULT_BLOCKS
-  const selectedSubject = subjects[selectedTemplate.id ?? selectedTemplate.title] ?? ''
-  const previewHtml = useMemo(
-    () =>
-      buildPreviewHtml({
-        theme,
-        blocks: selectedBlocks,
-        content: selectedContent,
-        subject: selectedSubject,
-      }),
-    [theme, selectedBlocks, selectedContent, selectedSubject]
+  const hiddenBlocks = (Object.keys(blocks) as Array<keyof EmailBlocks>).filter(
+    (key) => !blocks[key]
   )
 
   const updateTheme = <Key extends keyof EmailTheme>(key: Key, value: EmailTheme[Key]) => {
@@ -363,14 +259,11 @@ export const EmailTemplateBuilderPrototype = ({
   }
 
   const updateBlock = (key: keyof EmailBlocks, value: boolean) => {
-    setBlocks((current) => ({
-      ...current,
-      [selectedTemplate.id ?? selectedTemplate.title]: {
-        ...selectedBlocks,
-        [key]: value,
-      },
-    }))
+    setBlocks((current) => ({ ...current, [key]: value }))
   }
+
+  const textAlign = theme.alignment
+  const year = new Date().getFullYear()
 
   return (
     <div>
@@ -381,80 +274,51 @@ export const EmailTemplateBuilderPrototype = ({
               <SlidersHorizontal size={16} className="text-foreground-lighter" />
               <div>
                 <h2 className="text-sm text-foreground">Template</h2>
-                <p className="text-xs text-foreground-lighter">Content controls are local here.</p>
+                <p className="text-xs text-foreground-lighter">
+                  Edit safe content blocks for this template.
+                </p>
               </div>
             </div>
 
             <div className="space-y-5">
-              <div className="space-y-2">
-                <FieldLabel label="Current template" />
-                <Select_Shadcn_ value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
-                  <SelectTrigger_Shadcn_>
-                    <SelectValue_Shadcn_ placeholder="Select template" />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    {templates.map((template) => (
-                      <SelectItem_Shadcn_ key={template.id} value={template.id ?? template.title}>
-                        {template.title}
-                      </SelectItem_Shadcn_>
-                    ))}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+              <div className="rounded-md border bg-surface-100 p-3">
+                <p className="text-sm text-foreground">{selectedTemplate.title}</p>
+                {selectedTemplate.purpose && (
+                  <p className="mt-1 text-xs leading-5 text-foreground-lighter">
+                    {selectedTemplate.purpose}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
                 <FieldLabel label="Subject" value={subjectKey} />
                 <Input_Shadcn_
-                  value={selectedSubject}
-                  onChange={(event) =>
-                    setSubjects((current) => ({
-                      ...current,
-                      [selectedTemplate.id ?? selectedTemplate.title]: event.target.value,
-                    }))
-                  }
+                  value={subject}
+                  onChange={(event) => setSubject(event.target.value)}
                 />
               </div>
 
               <div className="space-y-2">
-                <FieldLabel label="Template copy" />
-                <Textarea value={selectedContent.body} readOnly rows={5} className="resize-none" />
-                <p className="text-xs leading-5 text-foreground-lighter">
-                  Future versions could expose safe phrases here without opening raw HTML.
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <FieldLabel label="Safe blocks" />
-                <BlockToggle
-                  label="App name"
-                  description="{{> app_name}}"
-                  checked={selectedBlocks.appName}
-                  onCheckedChange={(checked) => updateBlock('appName', checked)}
-                />
-                <BlockToggle
-                  label="Compact app mark"
-                  description="{{> app_logo}} placeholder"
-                  checked={selectedBlocks.appMark}
-                  onCheckedChange={(checked) => updateBlock('appMark', checked)}
-                />
-                <BlockToggle
-                  label="Secondary helper"
-                  description="Context below the main action"
-                  checked={selectedBlocks.helper}
-                  onCheckedChange={(checked) => updateBlock('helper', checked)}
-                />
-                <BlockToggle
-                  label="Ignore this email"
-                  description="Safety copy for unexpected mail"
-                  checked={selectedBlocks.safety}
-                  onCheckedChange={(checked) => updateBlock('safety', checked)}
-                />
-                <BlockToggle
-                  label="Copyright"
-                  description="© {{current_year}} {{app.name}}"
-                  checked={selectedBlocks.copyright}
-                  onCheckedChange={(checked) => updateBlock('copyright', checked)}
-                />
+                <FieldLabel label="Available blocks" />
+                {hiddenBlocks.length === 0 ? (
+                  <p className="rounded-md border bg-surface-100 p-3 text-xs leading-5 text-foreground-lighter">
+                    Hover over optional content in the preview to remove it.
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {hiddenBlocks.map((key) => (
+                      <Button
+                        key={key}
+                        type="default"
+                        size="tiny"
+                        icon={<RotateCcw size={12} />}
+                        onClick={() => updateBlock(key, true)}
+                      >
+                        {BLOCK_LABELS[key]}
+                      </Button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </aside>
@@ -480,13 +344,106 @@ export const EmailTemplateBuilderPrototype = ({
               className="flex flex-1 items-start justify-center overflow-auto p-4 lg:p-8"
               style={{ background: theme.pageBackground }}
             >
-              <iframe
-                title={`${selectedTemplate.title} branded email preview`}
-                srcDoc={previewHtml}
-                sandbox=""
-                className="h-[620px] w-full rounded-md border bg-white shadow-sm"
+              <div
+                className="w-full"
                 style={{ maxWidth: theme.contentWidth + theme.outerPadding * 2 }}
-              />
+              >
+                <div
+                  className="rounded-md border bg-white p-4 shadow-sm"
+                  style={{ background: theme.pageBackground }}
+                >
+                  <div
+                    className="mx-auto overflow-hidden rounded-lg border"
+                    style={{
+                      maxWidth: theme.contentWidth,
+                      background: theme.bodyBackground,
+                      color: theme.textColor,
+                    }}
+                  >
+                    <div className="space-y-3 px-9 pb-3 pt-8" style={{ textAlign }}>
+                      {blocks.appMark && (
+                        <EditablePreviewBlock
+                          label="compact app mark"
+                          onRemove={() => updateBlock('appMark', false)}
+                        >
+                          <div
+                            className="mb-4 inline-block h-8 w-8 rounded-lg"
+                            style={{ background: theme.accentColor }}
+                          />
+                        </EditablePreviewBlock>
+                      )}
+                      {blocks.appName && (
+                        <EditablePreviewBlock
+                          label="app name"
+                          onRemove={() => updateBlock('appName', false)}
+                        >
+                          <div className="mb-5 text-[13px] font-medium">{SAMPLE_APP_NAME}</div>
+                        </EditablePreviewBlock>
+                      )}
+                      <div
+                        className="text-xs font-bold uppercase tracking-widest"
+                        style={{ color: theme.accentColor }}
+                      >
+                        {selectedContent.eyebrow}
+                      </div>
+                      <h1 className="m-0 text-2xl font-semibold leading-tight">
+                        {selectedContent.heading}
+                      </h1>
+                      <p className="m-0 text-[15px] leading-relaxed opacity-80">
+                        {selectedContent.body}
+                      </p>
+                    </div>
+
+                    {selectedContent.action && (
+                      <div className="px-9 pb-2 pt-4" style={{ textAlign }}>
+                        <span
+                          className="inline-block rounded-md px-4 py-2.5 text-sm font-medium text-white"
+                          style={{ background: theme.accentColor }}
+                        >
+                          {selectedContent.action}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="space-y-3 px-9 pb-8 pt-5" style={{ textAlign }}>
+                      {blocks.helper && (
+                        <EditablePreviewBlock
+                          label="secondary helper"
+                          onRemove={() => updateBlock('helper', false)}
+                        >
+                          <p className="m-0 text-[13px] leading-relaxed opacity-60">
+                            {selectedContent.helper}
+                          </p>
+                        </EditablePreviewBlock>
+                      )}
+                      {blocks.safety && (
+                        <EditablePreviewBlock
+                          label="ignore this email copy"
+                          onRemove={() => updateBlock('safety', false)}
+                        >
+                          <p className="m-0 text-[13px] leading-relaxed opacity-60">
+                            {selectedContent.safety}
+                          </p>
+                        </EditablePreviewBlock>
+                      )}
+                    </div>
+
+                    {blocks.copyright && (
+                      <EditablePreviewBlock
+                        label="copyright"
+                        onRemove={() => updateBlock('copyright', false)}
+                      >
+                        <div
+                          className="border-t px-9 py-4 text-xs opacity-50"
+                          style={{ textAlign }}
+                        >
+                          © {year} {SAMPLE_APP_NAME}
+                        </div>
+                      </EditablePreviewBlock>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="border-t px-5 py-3 text-xs text-foreground-lighter">
               Raw source editing is unavailable while this project uses Supabase's built-in email
