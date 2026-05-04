@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
-import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -36,13 +36,12 @@ import {
 import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/AuthTemplatesValidation'
-import { CustomEmailTemplateRestrictionAdmonition } from '@/components/interfaces/Auth/EmailTemplates/CustomEmailTemplateRestrictionAdmonition'
+import { EmailTemplateBuilderPrototype } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplateBuilderPrototype'
 import {
   isCustomEmailTemplateEditingRestricted,
   isCustomEmailTemplateRestrictionStatusKnown,
   slugifyTitle,
 } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
-import { TemplateEditor } from '@/components/interfaces/Auth/EmailTemplates/TemplateEditor'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -211,93 +210,78 @@ const RedirectToTemplates = () => {
         </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="default" className="pb-16">
-        {!isPermissionsLoaded || isLoadingConfig ? (
-          <PageSection>
-            <PageSectionContent>
-              <GenericSkeletonLoader />
-            </PageSectionContent>
-          </PageSection>
-        ) : (
-          <>
-            {showConfigurationSection && (
-              <PageSection>
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle>Configuration</PageSectionTitle>
-                  </PageSectionSummary>
-                </PageSectionMeta>
-                <PageSectionContent>
-                  <Form {...templateForm}>
-                    <form onSubmit={templateForm.handleSubmit(onSubmit)} className="space-y-4">
-                      <Card>
-                        <CardContent>
-                          <FormField
-                            control={templateForm.control}
-                            name={templateEnabledKey as keyof z.infer<typeof TemplateFormSchema>}
-                            render={({ field }) => (
-                              <FormItemLayout
-                                layout="flex-row-reverse"
-                                label="Enable notification"
-                                description="Send this email to users when triggered"
-                              >
-                                <FormControl>
-                                  <Switch
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                    disabled={!canUpdateConfig}
-                                  />
-                                </FormControl>
-                              </FormItemLayout>
-                            )}
-                          />
-                        </CardContent>
-                        <CardFooter className="justify-end space-x-2">
-                          {templateForm.formState.isDirty && (
-                            <Button type="default" onClick={() => templateForm.reset()}>
-                              Cancel
-                            </Button>
-                          )}
-                          <Button
-                            type="primary"
-                            htmlType="submit"
-                            disabled={
-                              !canUpdateConfig ||
-                              isUpdatingConfig ||
-                              !templateForm.formState.isDirty
-                            }
-                            loading={isUpdatingConfig}
-                          >
-                            Save changes
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    </form>
-                  </Form>
-                </PageSectionContent>
-              </PageSection>
-            )}
-
+        <>
+          {showConfigurationSection && !isLoadingConfig && (
             <PageSection>
-              {(showConfigurationSection || isTemplateEditBlocked) && (
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle>Content</PageSectionTitle>
-                  </PageSectionSummary>
-                </PageSectionMeta>
-              )}
+              <PageSectionMeta>
+                <PageSectionSummary>
+                  <PageSectionTitle>Configuration</PageSectionTitle>
+                </PageSectionSummary>
+              </PageSectionMeta>
               <PageSectionContent>
-                {isTemplateEditBlocked && (
-                  <div className="mb-4">
-                    <CustomEmailTemplateRestrictionAdmonition projectRef={projectRef} />
-                  </div>
-                )}
-                <Card>
-                  <TemplateEditor template={template} isReadOnly={isTemplateEditorReadOnly} />
-                </Card>
+                <Form {...templateForm}>
+                  <form onSubmit={templateForm.handleSubmit(onSubmit)} className="space-y-4">
+                    <Card>
+                      <CardContent>
+                        <FormField
+                          control={templateForm.control}
+                          name={templateEnabledKey as keyof z.infer<typeof TemplateFormSchema>}
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="flex-row-reverse"
+                              label="Enable notification"
+                              description="Send this email to users when triggered"
+                            >
+                              <FormControl>
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                  disabled={!canUpdateConfig}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </CardContent>
+                      <CardFooter className="justify-end space-x-2">
+                        {templateForm.formState.isDirty && (
+                          <Button type="default" onClick={() => templateForm.reset()}>
+                            Cancel
+                          </Button>
+                        )}
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          disabled={
+                            !canUpdateConfig || isUpdatingConfig || !templateForm.formState.isDirty
+                          }
+                          loading={isUpdatingConfig}
+                        >
+                          Save changes
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </form>
+                </Form>
               </PageSectionContent>
             </PageSection>
-          </>
-        )}
+          )}
+
+          <PageSection>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Content</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            <PageSectionContent>
+              <EmailTemplateBuilderPrototype
+                initialTemplate={template}
+                templates={TEMPLATES_SCHEMAS}
+                canUseRawSource={!isTemplateEditorReadOnly}
+              />
+            </PageSectionContent>
+          </PageSection>
+        </>
       </PageContainer>
     </>
   )
