@@ -19,7 +19,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { SpamValidation } from './SpamValidation'
@@ -342,18 +341,18 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                   )}
                 </>
               ) : (
-                <>
+                <div>
                   <iframe
-                    className="mb-0! mt-0 overflow-hidden h-96 w-full rounded-md border bg-white"
+                    className="mb-2! mt-0 overflow-hidden h-96 w-full rounded-md border bg-white"
                     title={id}
                     srcDoc={bodyValue}
                     sandbox="allow-scripts allow-forms"
                   />
-                  <Admonition
-                    type="default"
-                    description="The preview shown here may differ slightly from how your email appears in the recipient’s email client."
-                  />
-                </>
+                  <p className="text-xs text-foreground-muted">
+                    The preview shown here may differ slightly from how your email appears in the
+                    recipient’s email client.
+                  </p>
+                </div>
               )}
             </CardContent>
 

@@ -277,16 +277,8 @@ const RedirectToTemplates = () => {
               </PageSection>
             )}
 
-            {isTemplateEditBlocked && (
-              <PageSection>
-                <PageSectionContent>
-                  <CustomEmailTemplateRestrictionAdmonition projectRef={projectRef} />
-                </PageSectionContent>
-              </PageSection>
-            )}
-
             <PageSection>
-              {showConfigurationSection && (
+              {(showConfigurationSection || isTemplateEditBlocked) && (
                 <PageSectionMeta>
                   <PageSectionSummary>
                     <PageSectionTitle>Content</PageSectionTitle>
@@ -294,6 +286,11 @@ const RedirectToTemplates = () => {
                 </PageSectionMeta>
               )}
               <PageSectionContent>
+                {isTemplateEditBlocked && (
+                  <div className="mb-4">
+                    <CustomEmailTemplateRestrictionAdmonition projectRef={projectRef} />
+                  </div>
+                )}
                 <Card>
                   <TemplateEditor template={template} isReadOnly={isTemplateEditorReadOnly} />
                 </Card>
