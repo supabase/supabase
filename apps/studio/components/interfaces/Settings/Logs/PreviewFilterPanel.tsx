@@ -147,7 +147,13 @@ const PreviewFilterPanel = ({
                 {search.length > 0 && (
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <InputGroupButton type="text" onClick={() => handleInputSearch('')}>
+                      <InputGroupButton
+                        type="text"
+                        onClick={() => {
+                          setSearch('')
+                          handleInputSearch('')
+                        }}
+                      >
                         <X />
                       </InputGroupButton>
                     </TooltipTrigger>
