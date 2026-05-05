@@ -40,6 +40,12 @@ supabase functions serve og-images
 
 Now we can visit [localhost:54321/functions/v1/og-images/?site=docs&title=Title&description=Description&type=Auth](http://localhost:54321/functions/v1/og-images/?site=docs&title=Title&description=Description&type=Auth) to see your changes locally.
 
+## Offline Support
+
+This function is optimized for **fully offline local development**. It utilizes the built-in `Deno.serve` API rather than relying on external imports (like `deno.land/std/http/server.ts`). 
+
+Because it lacks remote HTTP dependencies at the boot level, once you have successfully run `supabase start` while online for the first time, all Docker images and dependencies are cached locally. You can subsequently disconnect from the internet entirely, and the Supabase Edge Runtime will continue to boot and serve this function without experiencing DNS or graph resolution crashes!
+
 ## Deploy
 
 To deploy this function, you currently need to deploy it locally. To do this follow the steps below.
