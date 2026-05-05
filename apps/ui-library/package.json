@@ -26,7 +26,7 @@
     "@supabase/vue-blocks": "workspace:*",
     "@tanstack/react-query": "^5.83.0",
     "api-types": "workspace:*",
-    "axios": "^1.12.0",
+    "axios": "^1.15.2",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "common": "workspace:*",
