@@ -1,13 +1,13 @@
-import type { PostgresPolicy } from '@supabase/postgres-meta'
 import type { PropsWithChildren } from 'react'
 import { createContext, useCallback, useContext, useMemo } from 'react'
 
+import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import type { ResponseError } from '@/types'
 
 type TableKey = `${string}.${string}`
 
 type PoliciesDataContextValue = {
-  getPoliciesForTable: (schema: string, table: string) => PostgresPolicy[]
+  getPoliciesForTable: (schema: string, table: string) => Array<Policy>
   isPoliciesLoading: boolean
   isPoliciesError: boolean
   policiesError?: ResponseError | Error
@@ -23,7 +23,7 @@ export const usePoliciesData = () => {
 }
 
 type PoliciesDataProviderProps = {
-  policies: PostgresPolicy[]
+  policies: Array<Policy>
   isPoliciesLoading: boolean
   isPoliciesError: boolean
   policiesError?: ResponseError | Error
@@ -39,7 +39,7 @@ export const PoliciesDataProvider = ({
   exposedSchemas,
 }: PropsWithChildren<PoliciesDataProviderProps>) => {
   const policiesByTable = useMemo(() => {
-    const map = new Map<TableKey, PostgresPolicy[]>()
+    const map = new Map<TableKey, Array<Policy>>()
 
     for (const policy of policies) {
       const key = `${policy.schema}.${policy.table}` satisfies TableKey

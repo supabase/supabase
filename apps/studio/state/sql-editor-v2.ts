@@ -1,3 +1,4 @@
+import { untrustedSql } from '@supabase/pg-meta'
 import { debounce, memoize } from 'lodash'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
@@ -178,7 +179,7 @@ export const sqlEditorState = proxy({
   }) => {
     let snippet = sqlEditorState.snippets[id]?.snippet
     if (snippet?.content) {
-      snippet.content.sql = sql
+      snippet.content.unchecked_sql = untrustedSql(sql)
       sqlEditorState.needsSaving.set(id, shouldInvalidate)
     }
   },

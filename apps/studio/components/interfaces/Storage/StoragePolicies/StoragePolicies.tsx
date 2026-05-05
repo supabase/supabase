@@ -1,4 +1,3 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import { isEmpty } from 'lodash'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -21,6 +20,7 @@ import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import { BucketsPolicies, type SelectBucketPolicyForAction } from './StoragePoliciesBucketsSection'
 import { StoragePoliciesEditPolicyModal } from './StoragePoliciesEditPolicyModal'
 import { PolicyEditorModal } from '@/components/interfaces/Auth/Policies/PolicyEditorModal'
+import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useDatabasePolicyCreateMutation } from '@/data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'
@@ -33,8 +33,8 @@ export const StoragePolicies = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
-  const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<PostgresPolicy>()
+  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<Policy>()
+  const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<Policy>()
   const [isEditingPolicyForBucket, setIsEditingPolicyForBucket] = useState<{
     bucket: string
     table: string

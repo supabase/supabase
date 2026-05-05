@@ -1,25 +1,26 @@
 import 'swiper/css'
-import RealtimeStyles from '~/styles/realtime.module.css'
 
-import dynamic from 'next/dynamic'
-import { NextSeo } from 'next-seo'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { Grid, Layers, Menu } from 'lucide-react'
-import Image from 'next/image'
-
-import { Button } from 'ui'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductsNav from '~/components/Products/ProductsNav'
+import RealtimeShowcase from '~/components/Realtime/realtime-showcase'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import RealtimeShowcase from '~/components/Realtime/realtime-showcase'
-
-import ApiExamples from 'data/products/realtime/api-examples'
 import MainProducts from '~/data/MainProducts'
+import RealtimeStyles from '~/styles/realtime.module.css'
+import ApiExamples from 'data/products/realtime/api-examples'
+import { Grid, Layers, Menu } from 'lucide-react'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
+import Head from 'next/head'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { PRODUCT_NAMES } from 'shared-data/products'
+import { Button } from 'ui'
+
+import { serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
 
 const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
 
@@ -67,6 +68,21 @@ function RealtimePage() {
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(
+              softwareApplicationSchema({
+                name: 'Supabase Realtime',
+                description: meta_description,
+                url: 'https://supabase.com/realtime',
+                image: `https://supabase.com${basePath}/images/realtime/og.jpg`,
+              })
+            ),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.REALTIME} />
         <ProductHeader

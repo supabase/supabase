@@ -1,6 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { AlertCircle, Lock } from 'lucide-react'
+import { Lock } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -14,6 +14,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection } from 'ui-patterns/PageSection'
 
@@ -33,11 +34,11 @@ import {
 import { ProjectUpdateDisabledTooltip } from '@/components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { HorizontalShimmerWithIcon } from '@/components/ui/Shimmers'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -67,10 +68,7 @@ export const Addons = () => {
 
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const { data: selectedProject } = useSelectedProjectQuery()
-  const { data: parentProject } = useProjectDetailQuery({
-    ref: selectedProject?.parent_project_ref,
-  })
-  const isBranch = parentProject !== undefined
+  const isBranch = selectedProject?.parent_project_ref
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
@@ -196,20 +194,18 @@ export const Addons = () => {
     <PageContainer size="default">
       <PageSection className="last:pb-0 gap-0">
         {isBranch && (
-          <Alert_Shadcn_ variant="default" className="mt-6">
-            <AlertCircle strokeWidth={2} />
-            <AlertTitle_Shadcn_>
-              You are currently on a preview branch of your project
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              Updating add-ons here will only apply to this preview branch. To manage add-ons for
-              your main branch, please visit the{' '}
-              <Link href={`/project/${parentProject.ref}/settings/general`} className="text-brand">
-                main branch
-              </Link>
-              .
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+          <Admonition
+            type="default"
+            className="mb-4"
+            title="You are currently on a preview branch of your project"
+          >
+            Updating add-ons here will only apply to this preview branch. To manage add-ons for your
+            main branch, please visit the{' '}
+            <InlineLink href={`/project/${selectedProject.parent_project_ref}/settings/addons`}>
+              main branch
+            </InlineLink>
+            .
+          </Admonition>
         )}
 
         {isLoading && (

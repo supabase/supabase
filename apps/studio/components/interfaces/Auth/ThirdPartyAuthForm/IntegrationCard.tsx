@@ -191,7 +191,7 @@ export const IntegrationCard = ({
         <div className="py-1">
           <Image src={getIntegrationTypeIcon(type)} width={21} height={21} alt={`${type} icon`} />
         </div>
-        <div className="flex flex-col flex-0 overflow-y-auto w-full gap-y-4">
+        <div className="flex min-w-0 flex-1 flex-col gap-y-4 overflow-y-auto">
           <div className="text-sm flex flex-col">
             <span className="text-foreground">{getIntegrationTypeLabel(type)}</span>
             <div className="text-foreground-lighter">{getIntegrationTypeDescription(type)}</div>
@@ -206,7 +206,7 @@ export const IntegrationCard = ({
             </Button>
           </div>
         </div>
-        <div className="flex-1">
+        <div className="shrink-0">
           {true ? (
             <Badge className="space-x-1" variant="success">
               <div className="h-3.5 w-3.5 bg-brand rounded-full flex justify-center items-center">

@@ -9,7 +9,7 @@ import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/compat/router'
 import Link from 'next/link'
 import React, { useCallback, useEffect, useState } from 'react'
-import { Button, Checkbox, cn, Input } from 'ui'
+import { Button, Checkbox, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 
 function FeaturesPage() {
   const router = useRouter()
@@ -122,16 +122,19 @@ function FeaturesPage() {
         <SectionContainer className="relative grid md:grid-cols-4 md:gap-4 pt-0!">
           <div className="relative w-full h-full">
             <div className="mb-4 flex flex-col gap-4 sticky top-20">
-              <Input
-                icon={<Search size="14" />}
-                size="small"
-                autoComplete="off"
-                type="search"
-                placeholder="Search features"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="w-full [&_input]:text-base [&_input]:md:text-sm [&_input]:leading-4!"
-              />
+              <InputGroup className="w-full">
+                <InputGroupAddon>
+                  <Search />
+                </InputGroupAddon>
+                <InputGroupInput
+                  size="small"
+                  autoComplete="off"
+                  type="search"
+                  placeholder="Search features"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+              </InputGroup>
               <div className="hidden md:flex flex-col gap-2.5">
                 <div className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! hover:cursor-pointer! transition-colors">
                   <Checkbox

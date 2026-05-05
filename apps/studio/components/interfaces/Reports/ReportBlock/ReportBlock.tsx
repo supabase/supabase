@@ -70,7 +70,7 @@ export const ReportBlock = ({
     }
   )
 
-  const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.sql : undefined
+  const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.unchecked_sql : undefined
   const chartConfig = { ...DEFAULT_CHART_CONFIG, ...(item.chartConfig ?? {}) }
   const isDeprecatedChart = DEPRECATED_REPORTS.includes(item.attribute)
   const snippetMissing = contentError?.message.includes('Content not found')
