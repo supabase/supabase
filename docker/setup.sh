@@ -105,17 +105,18 @@ detect_os() {
 
 pkg_update() {
     if [ "$OS_FAMILY" = "debian" ]; then
-        $SUDO apt-get update -y
+        $SUDO apt-get update -qq -y
     else
-        $SUDO dnf makecache -y || true
+        $SUDO dnf makecache -q -y || true
     fi
 }
 
 pkg_install() {
     if [ "$OS_FAMILY" = "debian" ]; then
-        $SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y "$@"
+        export DEBIAN_FRONTEND=noninteractive
+        $SUDO apt-get install -qq -y "$@"
     else
-        $SUDO dnf install -y "$@"
+        $SUDO dnf install -q -y "$@"
     fi
 }
 
@@ -237,12 +238,13 @@ determine_source() {
 
     log "No local supabase source found; sparse-cloning supabase repo"
     SRC_TMP=$(mktemp -d)
-    git clone --filter=blob:none --no-checkout --depth=1 \
-        https://github.com/supabase/supabase "$SRC_TMP/supabase"
+    export GIT_TERMINAL_PROMPT=0
+    git clone --filter=blob:none --no-checkout --depth=1 --quiet \
+        https://github.com/supabase/supabase "$SRC_TMP/supabase" 2>/dev/null
     (
         cd "$SRC_TMP/supabase"
-        git sparse-checkout set --cone docker
-        git checkout
+        git sparse-checkout set --cone docker --quiet 2>/dev/null
+        git checkout --quiet 2>/dev/null
     )
     SRC_DIR="$SRC_TMP/supabase/docker"
 }
@@ -279,7 +281,7 @@ determine_source
 
 target="$(pwd)/$PROJECT_DIR"
 if [ -e "$target" ]; then
-    die "Target $target already exists. Pick a different name with --project-dir."
+    die "Target $target already exists. Pick a different name with --project-dir"
 fi
 
 log "Creating project at $target"
@@ -328,8 +330,8 @@ echo "Setup complete. Project ready at: $(pwd)"
 echo ""
 echo "Next steps:"
 echo "  cd $(pwd)"
-echo "  ./run.sh start     # bring up the stack"
-echo "  ./run.sh stop      # tear it down"
+echo "  sh ./run.sh start     # bring up the stack"
+echo "  sh ./run.sh stop      # tear it down"
 echo ""
 echo "To enable docker-compose overrides (pg17, envoy, caddy, nginx, rustfs, s3, local),"
 echo "edit CONFIG in .env (e.g. CONFIG=\"pg17 envoy\")."
