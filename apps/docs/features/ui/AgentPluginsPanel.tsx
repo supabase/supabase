@@ -57,7 +57,6 @@ function PluginInstructions({ client }: { client: PluginClient }) {
           >
             official Anthropic marketplace
           </a>
-          :
         </p>
         <CodeBlock
           value={`claude plugin marketplace add anthropics/claude-plugins-official\nclaude plugin install supabase@claude-plugins-official`}
@@ -93,7 +92,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
         </div>
         <div className="space-y-2">
           <h4 className="text-sm font-medium">CLI</h4>
-          <p className="text-xs text-foreground-lighter">Open the Codex CLI by running:</p>
+          <p className="text-xs text-foreground-lighter">Open the Codex CLI by running</p>
           <CodeBlock value="codex" language="bash" focusable={false} className="block" />
           <p className="text-xs text-foreground-lighter">Inside Codex, type:</p>
           <CodeBlock value="/plugins" language="bash" focusable={false} className="block" />
@@ -134,7 +133,8 @@ function PluginInstructions({ client }: { client: PluginClient }) {
     return (
       <div className="space-y-3">
         <p className="text-sm text-foreground-light">
-          Install the Supabase extension for Gemini CLI:
+          Install the official Supabase extension for Gemini CLI by running the following command in
+          your terminal.
         </p>
         <CodeBlock
           value="gemini extensions install https://github.com/supabase-community/gemini-extension"
@@ -142,6 +142,18 @@ function PluginInstructions({ client }: { client: PluginClient }) {
           focusable={false}
           className="block"
         />
+        <p className="text-xs text-foreground-lighter">
+          You can also find the extension in the{' '}
+          <a
+            href="https://geminicli.com/extensions/?name=supabase-communitygemini-extension"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-link hover:underline"
+          >
+            Gemini CLI extensions directory
+          </a>
+          .
+        </p>
       </div>
     )
   }
@@ -178,7 +190,7 @@ export function AgentPluginsPanel() {
               rel="noopener noreferrer"
               className="text-brand-link hover:underline inline-flex items-center"
             >
-              View {selectedClient.label} plugin docs
+              View {selectedClient.label} extensions docs
               <ExternalLink className="h-3 w-3 ml-1" />
             </a>
           </div>
