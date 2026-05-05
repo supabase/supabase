@@ -68,6 +68,11 @@ function PluginInstructions({ client }: { client: PluginClient }) {
           After installing, run <code>/reload-plugins</code> inside Claude Code to activate the
           plugin.
         </p>
+        <p className="text-xs text-foreground-lighter">
+          Installs with <code>--scope user</code> by default, making it available across all your
+          projects. Use <code>--scope project</code> to track it in source control — useful for
+          teams where all contributors and cloud agents should follow the same Supabase guidance.
+        </p>
       </div>
     )
   }
