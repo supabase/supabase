@@ -1,4 +1,3 @@
-import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { includes, sortBy } from 'lodash'
@@ -17,7 +16,7 @@ import {
   TableRow,
 } from 'ui'
 
-import { generateTriggerCreateSQL } from './TriggerList.utils'
+import { generateTriggerCreateSQL, type PostgresTrigger } from './TriggerList.utils'
 import { selectFilterSchema } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'

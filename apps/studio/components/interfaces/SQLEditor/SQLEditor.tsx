@@ -1,4 +1,11 @@
 import type { Monaco } from '@monaco-editor/react'
+import {
+  acceptUntrustedSql,
+  rawSql,
+  safeSql,
+  type SafeSqlFragment,
+  type UntrustedSqlFragment,
+} from '@supabase/pg-meta'
 import { wrapWithRollback } from '@supabase/pg-meta/src/query'
 import { useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
@@ -311,7 +318,8 @@ export const SQLEditor = () => {
       const selection = editor.getSelection()
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
       const sql = snippet
-        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
+        ? ((selectedValue || editorRef.current?.getValue()) ??
+          snippet.snippet.content?.unchecked_sql)
         : selectedValue || editorRef.current?.getValue()
       const formattedSql = formatSql(sql)
 
@@ -333,7 +341,7 @@ export const SQLEditor = () => {
   })
 
   const executeQuery = useCallback(
-    async (force: boolean = false, sqlOverride?: string) => {
+    async (force: boolean = false, sqlOverride?: SafeSqlFragment) => {
       if (isDiffOpen) {
         clearPendingRunRefocus()
         return
@@ -353,7 +361,8 @@ export const SQLEditor = () => {
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
       const editorSql = snippet
-        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
+        ? ((selectedValue || editorRef.current?.getValue()) ??
+          snippet.snippet.content?.unchecked_sql)
         : selectedValue || editorRef.current?.getValue()
       const sql = sqlOverride ?? editorSql
 
@@ -405,8 +414,9 @@ export const SQLEditor = () => {
         return toast.error('Unable to run query: Connection string is missing')
       }
 
-      const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
-      const formattedSql = suffixWithLimit(sql, limit)
+      const userSql = rawSql(sql)
+      const { appendAutoLimit } = checkIfAppendLimitRequired(userSql, limit)
+      const formattedSql = suffixWithLimit(userSql, limit)
 
       execute({
         projectRef: project.ref,
@@ -463,7 +473,8 @@ export const SQLEditor = () => {
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
       const sql = snippet
-        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
+        ? ((selectedValue || editorRef.current?.getValue()) ??
+          snippet.snippet.content?.unchecked_sql)
         : selectedValue || editorRef.current?.getValue()
 
       // Check for multiple statements - EXPLAIN only works on a single statement
@@ -491,7 +502,8 @@ export const SQLEditor = () => {
       }
 
       // Wrap the query with EXPLAIN ANALYZE only if it's not already an EXPLAIN query
-      const explainSql = isExplainSql(sql) ? sql : `EXPLAIN ANALYZE ${sql}`
+      const userSql = rawSql(sql ?? '')
+      const explainSql = isExplainSql(sql) ? userSql : safeSql`EXPLAIN ANALYZE ${userSql}`
 
       // Wrap EXPLAIN queries in a transaction with rollback to prevent data modifications
       // This ensures EXPLAIN ANALYZE INSERT/UPDATE/DELETE queries don't actually modify data
@@ -566,7 +578,9 @@ export const SQLEditor = () => {
   const buildDebugPrompt = useCallback(() => {
     const snippet = snapV2.snippets[id]
     const result = snapV2.results[id]?.[0]
-    const sql = (snippet?.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim()
+    const sql = (snippet?.snippet.content?.unchecked_sql ?? '')
+      .replace(sqlAiDisclaimerComment, '')
+      .trim()
     const errorMessage = result?.error?.message ?? 'Unknown error'
     const prompt = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
 
@@ -581,7 +595,7 @@ export const SQLEditor = () => {
       aiSnap.newChat({
         name: 'Debug SQL snippet',
         sqlSnippets: [
-          (snippet.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),
+          (snippet.snippet.content?.unchecked_sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),
         ],
         initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
       })
@@ -878,7 +892,7 @@ export const SQLEditor = () => {
           shouldRefocusAfterRunRef.current = true
           setPotentialIssues(undefined)
           refocusEditor()
-          void executeQuery(true, rewrittenSql)
+          void executeQuery(true, acceptUntrustedSql(rewrittenSql as UntrustedSqlFragment))
         }}
       />
 

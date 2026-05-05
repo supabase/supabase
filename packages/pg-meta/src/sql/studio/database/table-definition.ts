@@ -9,7 +9,9 @@
  * WHERE name = 'search_path';
  */
 
-export const CREATE_PG_GET_TABLEDEF_SQL = /* SQL */ `
+import { joinSqlFragments, literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
+
+export const CREATE_PG_GET_TABLEDEF_SQL = safeSql`
   DROP TYPE IF EXISTS pg_temp.tabledefs CASCADE;
   CREATE TYPE pg_temp.tabledefs AS ENUM ('PKEY_INTERNAL','PKEY_EXTERNAL','FKEYS_INTERNAL', 'FKEYS_EXTERNAL', 'COMMENTS', 'FKEYS_NONE', 'INCLUDE_TRIGGERS', 'NO_TRIGGERS');
 
@@ -702,10 +704,10 @@ export const CREATE_PG_GET_TABLEDEF_SQL = /* SQL */ `
       END;
 
     END;
-  $$;`.trim()
+  $$;`
 
-export const getTableDefinitionSql = ({ id }: { id: number }) => {
-  const sql = /* SQL */ `
+export const getTableDefinitionSql = ({ id }: { id: number }): SafeSqlFragment => {
+  const sql = safeSql`
     ${CREATE_PG_GET_TABLEDEF_SQL}
 
     with table_info as (
@@ -714,7 +716,7 @@ export const getTableDefinitionSql = ({ id }: { id: number }) => {
         c.relname::text as name
       from pg_class c
       join pg_namespace n on n.oid = c.relnamespace
-      where c.oid = ${id}
+      where c.oid = ${literal(id)}
     )
     select pg_temp.pg_get_tabledef (
       t.schema,
@@ -724,7 +726,7 @@ export const getTableDefinitionSql = ({ id }: { id: number }) => {
       'INCLUDE_TRIGGERS'
     ) as definition
     from table_info t;
-  `.trim()
+  `
 
   return sql
 }
@@ -735,8 +737,8 @@ export const getEntityDefinitionsSql = ({
 }: {
   schemas: string[]
   limit?: number
-}) => {
-  const sql = /* SQL */ `
+}): SafeSqlFragment => {
+  const sql = safeSql`
 ${CREATE_PG_GET_TABLEDEF_SQL}
 
 with records as (
@@ -781,9 +783,12 @@ with records as (
       )
       or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
     )
-    and nc.nspname IN (${schemas.map((schema) => `'${schema.replace(/'/g, "''")}'`).join(', ')})
+    and nc.nspname IN (${joinSqlFragments(
+      schemas.map((schema) => literal(schema)),
+      ', '
+    )})
   order by c.relname asc
-  limit ${limit}
+  limit ${literal(limit)}
   offset 0
 )
 select
@@ -796,7 +801,7 @@ select
     ), '[]'::jsonb)
   ) "data"
 from records r;
-  `.trim()
+  `
 
   return sql
 }

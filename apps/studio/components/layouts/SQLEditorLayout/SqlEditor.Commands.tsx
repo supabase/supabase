@@ -237,7 +237,7 @@ function SnippetSelector({
       </CommandList_Shadcn_>
       <CodeBlock
         language="sql"
-        value={isSQLSnippet ? selectedSnippet?.content?.sql : ''}
+        value={isSQLSnippet ? selectedSnippet?.content?.unchecked_sql : ''}
         wrapperClassName="hidden md:block"
         className="w-full h-full border-0 [&>code]:overflow-scroll [&>code]:block [&>code]:w-full [&>code]:h-full"
         hideCopy
@@ -249,7 +249,7 @@ function SnippetSelector({
 function snippetValue(snippet: SqlSnippet) {
   if (snippet.type !== 'sql') return ''
   return escapeAttributeSelector(
-    `${snippet.id}-${snippet.name}-${snippet?.content?.sql.slice(0, 30)}`
+    `${snippet.id}-${snippet.name}-${snippet?.content?.unchecked_sql.slice(0, 30)}`
   ).toLowerCase()
 }
 

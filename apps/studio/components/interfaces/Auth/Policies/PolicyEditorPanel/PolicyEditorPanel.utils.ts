@@ -1,3 +1,4 @@
+import { ident } from '@supabase/pg-meta/src/pg-format'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { isEqual } from 'lodash'
 
@@ -65,7 +66,7 @@ export const generateCreatePolicyQuery = ({
   using?: string
   check?: string
 }) => {
-  const querySkeleton = `create policy "${name}" on "${schema}"."${table}" as ${behavior} for ${command} to ${roles}`
+  const querySkeleton = `create policy ${ident(name)} on ${ident(schema)}.${ident(table)} as ${behavior} for ${command} to ${roles}`
   const query =
     command === 'insert'
       ? `${querySkeleton} with check (${check});`
