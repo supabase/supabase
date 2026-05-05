@@ -27,6 +27,10 @@ export const TimezoneDropdown = () => {
   const track = useTrack()
   const [open, setOpen] = useState(false)
 
+  // The "Auto detect" row always advertises the browser's own timezone, even
+  // when the user is currently overriding it with a manual pick.
+  const browserTimezone = useMemo(() => guessLocalTimezone(), [])
+
   const triggerLabel = useMemo(() => {
     return findTimezoneByIana(timezone)?.text ?? timezone
   }, [timezone])
@@ -62,12 +66,12 @@ export const TimezoneDropdown = () => {
                 <ScrollArea className="h-72">
                   <CommandItem_Shadcn_
                     key={AUTO_OPTION_VALUE}
-                    value={`Auto detect ${timezone}`}
+                    value={`Auto detect ${browserTimezone}`}
                     onSelect={() => handleSelect('')}
                   >
                     <div className="flex flex-col">
                       <span>Auto detect</span>
-                      <span className="text-xs text-foreground-lighter">{timezone}</span>
+                      <span className="text-xs text-foreground-lighter">{browserTimezone}</span>
                     </div>
                     <CheckIcon
                       className={cn(

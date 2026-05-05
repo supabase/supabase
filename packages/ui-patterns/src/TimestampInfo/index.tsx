@@ -84,12 +84,18 @@ export const TimestampInfo = ({
 }) => {
   const { timezone: timezoneFromContext } = useTimestampInfoContext()
   const effectiveTimezone = timezoneProp ?? timezoneFromContext
+  const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   const local = timestampLocalFormatter({ utcTimestamp, format, timezone: effectiveTimezone })
+  const browserLocal = timestampLocalFormatter({ utcTimestamp, format })
   const utc = timestampUtcFormatter({ utcTimestamp, format })
   const relative = timestampRelativeFormatter({ utcTimestamp })
   const [align, setAlign] = useState<'start' | 'end'>('start')
   const triggerRef = useRef<HTMLButtonElement>(null)
-  const localTimezone = effectiveTimezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
+  const localTimezone = effectiveTimezone ?? browserTimezone
+  // Show the browser timezone as a separate row whenever the user has
+  // overridden it via the picker, so they don't lose context for "what time
+  // is it where I am" while reading logs in another timezone.
+  const showBrowserRow = !!effectiveTimezone && effectiveTimezone !== browserTimezone
 
   // Calculate alignment based on trigger position
   // Needed so that the tooltip isn't hidden behind the header on top rows (in logs)
@@ -177,6 +183,7 @@ export const TimestampInfo = ({
       <TooltipContent align={align} side="right" className="font-mono p-0 py-1 min-w-80">
         <TooltipRow label="UTC" value={utc} />
         <TooltipRow label={localTimezone} value={local} />
+        {showBrowserRow && <TooltipRow label={browserTimezone} value={browserLocal} />}
         <TooltipRow label="Relative" value={relative} />
         <TooltipRow label="Timestamp" value={String(utcTimestamp)} />
       </TooltipContent>
