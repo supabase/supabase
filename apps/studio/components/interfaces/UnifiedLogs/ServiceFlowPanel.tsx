@@ -125,19 +125,16 @@ export function ServiceFlowPanel({
             className="flex h-full w-full flex-col"
           >
             <div className="flex items-center justify-between px-4 border-b border-border">
-              <TabsList className="flex h-auto gap-x-4 rounded-none !border-none">
+              <TabsList className="flex h-auto gap-x-4 rounded-none border-none!">
                 {shouldShowServiceFlow && (
                   <TabsTrigger
                     value="overview"
-                    className="border-b-[1px] py-3 font-mono text-xs uppercase"
+                    className="border-b py-3 font-mono text-xs uppercase"
                   >
                     Overview
                   </TabsTrigger>
                 )}
-                <TabsTrigger
-                  value="raw-json"
-                  className="border-b-[1px] py-3 font-mono text-xs uppercase"
-                >
+                <TabsTrigger value="raw-json" className="border-b py-3 font-mono text-xs uppercase">
                   Raw JSON
                 </TabsTrigger>
               </TabsList>
