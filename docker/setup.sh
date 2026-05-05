@@ -237,16 +237,18 @@ determine_source() {
     fi
 
     log "No local supabase source found; sparse-cloning supabase repo"
-    SRC_TMP=$(mktemp -d)
-    export GIT_TERMINAL_PROMPT=0
+    SRC_TMP=$(mktemp -d) || return 1
     git clone --filter=blob:none --no-checkout --depth=1 --quiet \
-        https://github.com/supabase/supabase "$SRC_TMP/supabase" 2>/dev/null
-    (
-        cd "$SRC_TMP/supabase"
-        git sparse-checkout set --cone docker --quiet 2>/dev/null
-        git checkout --quiet 2>/dev/null
-    )
-    SRC_DIR="$SRC_TMP/supabase/docker"
+        https://github.com/supabase/supabase "$SRC_TMP/supabase" 2>/dev/null || \
+    { rm -rf "$SRC_TMP"; return 1; }
+
+    cd "$SRC_TMP/supabase" || { rm -rf "$SRC_TMP"; return 1; }
+    git config core.sparseCheckout true && \
+    git sparse-checkout init --cone && \
+    git sparse-checkout set docker && \
+    git checkout --quiet 2>/dev/null
+    SRC_DIR="$PWD/docker"
+    cd -
 }
 
 cleanup_src_tmp() {
