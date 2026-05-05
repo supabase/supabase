@@ -21,7 +21,7 @@ export default function TileGrid({
     })
   )
 
-  const featuredPartners = partners.filter((p) => p.featured)
+  const featuredPartners = partners.filter((p) => p.featured).toSorted((a, b) => a.title.localeCompare(b.title))
 
   return (
     <>
