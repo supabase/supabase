@@ -248,7 +248,7 @@ determine_source() {
     git sparse-checkout set docker && \
     git checkout --quiet 2>/dev/null
     SRC_DIR="$PWD/docker"
-    cd -
+    cd - > /dev/null
 }
 
 cleanup_src_tmp() {

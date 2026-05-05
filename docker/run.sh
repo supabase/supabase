@@ -61,6 +61,10 @@ case "$CMD" in
         ;;
     restart)
         # shellcheck disable=SC2086
+        docker compose $COMPOSE_FILES restart
+        ;;
+    recreate)
+        # shellcheck disable=SC2086
         docker compose $COMPOSE_FILES down
         # shellcheck disable=SC2086
         exec docker compose $COMPOSE_FILES up -d --wait
@@ -79,7 +83,8 @@ case "$CMD" in
         ;;
     config)
         echo "CONFIG=$CONFIG"
-        echo "compose files:$COMPOSE_FILES"
+        echo "compose files: $COMPOSE_FILES"
+        echo ""
         ;;
     secrets)
         if [ ! -f .env ]; then
@@ -96,6 +101,7 @@ case "$CMD" in
                 echo "${var}="
             fi
         done
+        echo ""
         ;;
     help|-h|--help)
         cat <<EOF
@@ -104,12 +110,14 @@ Usage: $(basename "$0") <command>
 Commands:
   start              Start the stack (docker compose up -d --wait)
   stop               Stop the stack (docker compose down)
-  restart            Stop then start
+  restart            Restart the stack (docker compose restart)
+  recreate           Stop then start (docker compose down && docker compose up -d --wait)
   status             Show service status
   logs [service]     Follow logs (optionally for a single service)
   pull               Pull all images
   config             Show resolved CONFIG and compose files
   secrets            Show key passwords and API keys from .env
+
 EOF
         ;;
     *)
