@@ -142,8 +142,8 @@ export default {
 Hono (with the included adapter):
 
 ```typescript
-import { Hono } from 'hono'
 import { withSupabase } from '@supabase/server/adapters/hono'
+import { Hono } from 'hono'
 
 const app = new Hono()
 
@@ -162,10 +162,10 @@ Most developers don't need anything beyond `withSupabase` or `createSupabaseCont
 
 ```typescript
 import {
-  verifyAuth,
-  createContextClient,
   createAdminClient,
+  createContextClient,
   resolveEnv,
+  verifyAuth,
 } from '@supabase/server/core'
 ```
 
@@ -174,7 +174,7 @@ These are useful when you need more control: multiple routes with different auth
 Here's an Edge Function with per-route auth:
 
 ```typescript
-import { verifyAuth, createContextClient } from '@supabase/server/core'
+import { createContextClient, verifyAuth } from '@supabase/server/core'
 
 export default {
   fetch: async (req) => {
@@ -284,4 +284,4 @@ export default {
 
 `@supabase/server` is in public beta. We're looking for feedback on the API surface, the adapter patterns, and edge cases we haven't hit yet.
 
-Check out the [GitHub repo](https://github.com/supabase/server) and let us know what you build.
+Check out the [GitHub repo](https://github.com/supabase/server) and the [docs](https://supabase.github.io/server/) and let us know what you build.
