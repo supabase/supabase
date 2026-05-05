@@ -55,6 +55,16 @@ export interface ShortcutOptions {
    * context-specific shortcuts that only make sense in certain views.
    */
   registerInCommandMenu?: boolean
+
+  /**
+   * Override the registry's default `label` for the duration of this mount.
+   * Flows to the Cmd+K command-menu entry and the hover tooltip rendered via
+   * `<Shortcut>`. Use for shared shortcuts whose contextual label changes per
+   * page (e.g. `list-page.focus-search` rendering as "Search tables" on one
+   * page and "Search functions" on another). Leave `undefined` to use the
+   * registry default.
+   */
+  label?: string
 }
 
 /**

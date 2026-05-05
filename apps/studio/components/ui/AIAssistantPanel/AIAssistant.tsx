@@ -127,7 +127,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const isInSQLEditor = router.pathname.includes('/sql/[id]')
   const snippet = snippets[entityId ?? '']
-  const snippetContent = snippet?.snippet?.content?.sql
+  const snippetContent = snippet?.snippet?.content?.unchecked_sql
 
   const { data: tables } = useTablesQuery(
     {

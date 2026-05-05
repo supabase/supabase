@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseEventTriggerKeys } from './keys'
+import type { EventTrigger } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggerList.utils'
 import { executeSql } from '@/data/sql/execute-sql-query'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -67,16 +68,23 @@ export async function getDatabaseEventTriggers(
 export type DatabaseEventTriggersData = Awaited<ReturnType<typeof getDatabaseEventTriggers>>
 export type DatabaseEventTriggersError = ResponseError
 
-export const useDatabaseEventTriggersQuery = <TData = DatabaseEventTriggersData>(
+function markSavedEventTriggerSafe(trigger: DatabaseEventTrigger): EventTrigger {
+  return trigger as EventTrigger
+}
+
+export const useDatabaseEventTriggersQuery = <TData = EventTrigger[]>(
   { projectRef, connectionString }: DatabaseEventTriggersVariables,
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<DatabaseEventTriggersData, DatabaseEventTriggersError, TData> = {}
+  }: UseCustomQueryOptions<EventTrigger[], DatabaseEventTriggersError, TData> = {}
 ) =>
-  useQuery<DatabaseEventTriggersData, DatabaseEventTriggersError, TData>({
+  useQuery<EventTrigger[], DatabaseEventTriggersError, TData>({
     queryKey: databaseEventTriggerKeys.list(projectRef),
-    queryFn: ({ signal }) => getDatabaseEventTriggers({ projectRef, connectionString }, signal),
+    queryFn: ({ signal }) =>
+      getDatabaseEventTriggers({ projectRef, connectionString }, signal).then((data) =>
+        data.map(markSavedEventTriggerSafe)
+      ),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })

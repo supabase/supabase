@@ -1,14 +1,14 @@
 import { cn } from 'ui'
 
 interface TwoOptionToggleProps {
-  options: any
+  options: string[]
   width?: number
-  activeOption: any
-  onClickOption: any
+  activeOption: string
+  onClickOption: (value: string) => void
   borderOverride: string
 }
 
-const TwoOptionToggle = ({
+export const TwoOptionToggle = ({
   options,
   width = 50,
   activeOption,
@@ -35,8 +35,8 @@ const TwoOptionToggle = ({
           'z-0 inline-block rounded-sm h-full bg-overlay-hover shadow-sm transform',
           'transition-all ease-in-out border border-strong'
         )}
-      ></span>
-      {options.map((option: any, index: number) => (
+      />
+      {options.map((option, index: number) => (
         <span
           key={`toggle_${index}`}
           style={{ width: width + 1 }}
@@ -61,5 +61,3 @@ const TwoOptionToggle = ({
     </div>
   )
 }
-
-export default TwoOptionToggle

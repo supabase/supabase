@@ -1,4 +1,6 @@
-export const DEFAULT_EVENT_TRIGGER_SQL = `CREATE OR REPLACE FUNCTION event_trigger_fn()
+import { safeSql } from '@supabase/pg-meta'
+
+export const DEFAULT_EVENT_TRIGGER_SQL = safeSql`CREATE OR REPLACE FUNCTION event_trigger_fn()
 RETURNS event_trigger
 LANGUAGE plpgsql
 AS $$
@@ -13,7 +15,7 @@ ON ddl_command_end
 EXECUTE FUNCTION event_trigger_fn();
 `
 
-export const AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL = `
+export const AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL = safeSql`
 CREATE OR REPLACE FUNCTION rls_auto_enable()
 RETURNS EVENT_TRIGGER
 LANGUAGE plpgsql
@@ -59,7 +61,7 @@ export const EVENT_TRIGGER_TEMPLATES = [
   {
     name: 'Prevent table drops',
     description: 'Block dropping tables using the sql_drop event trigger.',
-    content: `-- Function
+    content: safeSql`-- Function
 CREATE OR REPLACE FUNCTION dont_drop_function()
   RETURNS event_trigger LANGUAGE plpgsql AS $$
 DECLARE

@@ -4,6 +4,7 @@ import 'swiper/css'
 import { ArrowUpRight, X } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
+import Head from 'next/head'
 import NextImage from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -23,6 +24,7 @@ import ExtensionsExamplesData from '@/data/products/database/extensions-examples
 import HighlightsCards from '@/data/products/database/highlight-cards'
 import SqlViewCarouselData from '@/data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from '@/data/products/database/table-view-carousel.json'
+import { serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
 
 const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
 const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
@@ -72,6 +74,21 @@ function Database() {
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(
+              softwareApplicationSchema({
+                name: 'Supabase Database',
+                description: meta_description,
+                url: 'https://supabase.com/database',
+                image: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
+              })
+            ),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.DATABASE} />
         <ProductHeader
