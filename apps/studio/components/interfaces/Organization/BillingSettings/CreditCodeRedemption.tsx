@@ -59,7 +59,7 @@ export const CreditCodeRedemption = ({
   const { data: org, isLoading: isOrgLoading } = useOrganizationQuery({ slug })
   const { data: orgBalance, isLoading: isOrgBalanceLoading } = useOrgBalanceQuery(
     { orgSlug: slug },
-    { enabled: modalVisible }
+    { enabled: codeRedemptionModalVisible }
   )
   const combinedCreditBalanceCents = orgBalance?.total_balance_cents
 
