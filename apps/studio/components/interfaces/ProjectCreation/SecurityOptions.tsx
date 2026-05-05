@@ -99,11 +99,10 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
                   <FormLabel
                     className={cn('text-sm text-foreground', !dataApi && 'text-foreground-muted')}
                   >
-                    Automatically expose new tables and functions
+                    Automatically expose new tables
                   </FormLabel>
                   <FormDescription className="text-foreground-lighter">
-                    Grants privileges to Data API roles by default, exposing new tables and
-                    functions.
+                    Grants privileges to Data API roles by default, exposing new tables.
                     <br />
                     <strong className="font-medium text-foreground-light">
                       We recommend disabling this to control access manually.

@@ -47,6 +47,7 @@ export const IntegrationSettings = () => {
           </Admonition>
         </ScaffoldContainer>
       )}
+
       <GitHubSection />
 
       {showVercelIntegration && (

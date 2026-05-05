@@ -129,7 +129,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
                 </div>
 
                 <div
-                  className="relative overflow-hidden transition-all duration-500 ease-in-out bg-_secondary"
+                  className="relative overflow-hidden transition-all duration-500 ease-in-out bg-[hsl(var(--secondary-default))]"
                   style={{
                     width: `${showNewSize ? newUsedPercentageWAL : usedPercentageWAL}%`,
                   }}
@@ -216,7 +216,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
           <LegendItem
             name="WAL"
             size={diskBreakdownBytes.walSizeBytes}
-            color="bg-_secondary"
+            color="bg-[hsl(var(--secondary-default))]"
             description="Total space on disk used by the write-ahead log."
           />
 

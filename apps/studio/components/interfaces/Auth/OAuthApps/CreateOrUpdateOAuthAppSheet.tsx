@@ -18,6 +18,11 @@ import {
   FormField,
   FormLabel,
   Input_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
   Separator,
   Sheet,
   SheetClose,
@@ -62,6 +67,9 @@ const FormSchema = z.object({
     .array()
     .min(1, 'At least one redirect URI is required'),
   client_type: z.enum(['public', 'confidential']).default('confidential'),
+  token_endpoint_auth_method: z
+    .enum(['client_secret_basic', 'client_secret_post', 'none'])
+    .default('client_secret_basic'),
   client_id: z.string().optional(),
   client_secret: z.string().optional(),
   logo_uri: z.string().optional(),
@@ -74,6 +82,7 @@ const initialValues = {
   type: 'manual' as const,
   redirect_uris: [{ value: '' }],
   client_type: 'confidential' as const,
+  token_endpoint_auth_method: 'client_secret_basic' as const,
   client_id: '',
   client_secret: '',
   logo_uri: '',
@@ -140,6 +149,11 @@ export const CreateOrUpdateOAuthAppSheet = ({
               ? appToEdit.redirect_uris.map((uri) => ({ value: uri }))
               : [{ value: '' }],
           client_type: appToEdit.client_type,
+          token_endpoint_auth_method:
+            (appToEdit.token_endpoint_auth_method as
+              | 'client_secret_basic'
+              | 'client_secret_post'
+              | 'none') || 'client_secret_basic',
           client_id: appToEdit.client_id,
           client_secret: '****************************************************************',
           logo_uri: appToEdit.logo_uri || undefined,
@@ -184,10 +198,12 @@ export const CreateOrUpdateOAuthAppSheet = ({
     }
 
     if (isEditMode && appToEdit) {
-      const payload: UpdateOAuthClientParams = {
+      const payload: UpdateOAuthClientParams & { token_endpoint_auth_method?: string } = {
         client_name: data.name,
         redirect_uris: validRedirectUris,
         logo_uri: uploadedLogoUri,
+        token_endpoint_auth_method:
+          data.client_type === 'public' ? 'none' : data.token_endpoint_auth_method,
       }
 
       updateOAuthApp({
@@ -197,12 +213,18 @@ export const CreateOrUpdateOAuthAppSheet = ({
         ...payload,
       })
     } else {
-      const payload: CreateOAuthClientParams & { logo_uri?: string; client_type?: string } = {
+      const payload: CreateOAuthClientParams & {
+        logo_uri?: string
+        client_type?: string
+        token_endpoint_auth_method?: string
+      } = {
         client_name: data.name,
         client_uri: '',
         client_type: data.client_type,
         redirect_uris: validRedirectUris,
         logo_uri: uploadedLogoUri || undefined,
+        token_endpoint_auth_method:
+          data.client_type === 'public' ? 'none' : data.token_endpoint_auth_method,
       }
 
       createOAuthApp({
@@ -438,15 +460,50 @@ export const CreateOrUpdateOAuthAppSheet = ({
                       <FormControl>
                         <Switch
                           checked={field.value === 'public'}
-                          onCheckedChange={(checked) =>
-                            field.onChange(checked ? 'public' : 'confidential')
-                          }
+                          onCheckedChange={(checked) => {
+                            const newType = checked ? 'public' : 'confidential'
+                            field.onChange(newType)
+                            form.setValue(
+                              'token_endpoint_auth_method',
+                              newType === 'public' ? 'none' : 'client_secret_basic'
+                            )
+                          }}
                           disabled={isEditMode}
                         />
                       </FormControl>
                     </FormItemLayout>
                   )}
                 />
+
+                {form.watch('client_type') === 'confidential' && (
+                  <FormField
+                    control={form.control}
+                    name="token_endpoint_auth_method"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label="Token Endpoint Auth Method"
+                        description="How the client authenticates with the token endpoint. The client secret is included in either the Authorization header or the request body."
+                        className="px-5"
+                      >
+                        <FormControl>
+                          <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger_Shadcn_ className="text-sm">
+                              <SelectValue_Shadcn_ />
+                            </SelectTrigger_Shadcn_>
+                            <SelectContent_Shadcn_>
+                              <SelectItem_Shadcn_ value="client_secret_basic" className="text-sm">
+                                HTTP Basic Auth header (client_secret_basic)
+                              </SelectItem_Shadcn_>
+                              <SelectItem_Shadcn_ value="client_secret_post" className="text-sm">
+                                Request body (client_secret_post)
+                              </SelectItem_Shadcn_>
+                            </SelectContent_Shadcn_>
+                          </Select_Shadcn_>
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                )}
               </form>
             </Form>
           </SheetSection>

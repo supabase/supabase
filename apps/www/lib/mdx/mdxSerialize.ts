@@ -187,8 +187,9 @@ export async function mdxSerialize(source: string, options?: { tocDepth?: number
   })
 
   // Expose TOC via scope for consumers (keeps function signature stable)
+  const minLvl = collectedToc.length > 0 ? Math.min(...collectedToc.map((h) => h.lvl)) : 1
   const tocMarkdown = collectedToc
-    .map((h) => `${'  '.repeat(Math.max(0, h.lvl - 1))}- [${h.content}](#${h.slug})`)
+    .map((h) => `${'  '.repeat(Math.max(0, h.lvl - minLvl))}- [${h.content}](#${h.slug})`)
     .join('\n')
 
   mdxSource.scope = {
