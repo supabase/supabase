@@ -1,16 +1,9 @@
-import { AlertTriangleIcon } from 'lucide-react'
-
 import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
-import { DOCS_URL } from 'lib/constants'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
+import { AlertTriangleIcon } from 'lucide-react'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Dialog,
   DialogClose,
@@ -22,6 +15,13 @@ import {
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
+
+import { Markdown } from '@/components/interfaces/Markdown'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
+import { DOCS_URL } from '@/lib/constants'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { useDatabaseSettingsStateSnapshot } from '@/state/database-settings'
 
 export const PoolingModesModal = () => {
   const { ref: projectRef } = useParams()

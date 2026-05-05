@@ -1,9 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useIsSchemaExposed } from 'hooks/misc/useIsSchemaExposed'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import {
@@ -23,6 +18,11 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
+import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useIsSchemaExposed } from '@/hooks/misc/useIsSchemaExposed'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import {
   checkDataApiPrivilegesNonEmpty,
@@ -30,6 +30,7 @@ import {
   EMPTY_DATA_API_PRIVILEGES,
   type ApiPrivilegesByRole,
 } from '@/lib/data-api-types'
+import { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
@@ -282,6 +283,7 @@ export const ApiAccessToggle = ({
   isNewRecord,
   handler,
 }: ApiAccessToggleComponentProps): ReactNode => {
+  const track = useTrack()
   const isPending = handler.isPending
   const isError = handler.isError
   const isSchemaExposed = handler.data?.schemaExposed
@@ -294,6 +296,13 @@ export const ApiAccessToggle = ({
   const handleMasterToggle = (checked: boolean) => {
     if (!handler.isSuccess) return
     if (!isSchemaExposed) return
+
+    if (isNewRecord) {
+      track('table_api_access_toggle_clicked', {
+        newState: checked ? 'enabled' : 'disabled',
+        schemaName: schemaName ?? 'unknown',
+      })
+    }
 
     if (checked) {
       handler.data?.restorePreviousPrivileges()

@@ -1,15 +1,16 @@
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
-import { IS_PLATFORM } from 'lib/constants'
 import { Alert, Button } from 'ui'
+
 import { InlineLink } from './InlineLink'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useProjectUpgradingStatusQuery } from '@/data/config/project-upgrade-status-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import { guessLocalTimezone } from '@/lib/dayjs'
 
 // [Joshen] Think twice about the category though - it doesn't correspond
 
@@ -28,11 +29,11 @@ export const ProjectUpgradeFailedBanner = () => {
   const isFailed = status === DatabaseUpgradeStatus.Failed
   const initiatedAt = dayjs
     .utc(initiated_at ?? 0)
-    .tz(dayjs.tz.guess())
+    .tz(guessLocalTimezone())
     .format('DD MMM YYYY HH:mm:ss')
 
-  const subject = 'Upgrade%20failed%20for%20project'
-  const message = `Upgrade information:%0A• Initiated at: ${initiated_at}%0A• Error: ${error}`
+  const subject = 'Upgrade failed for project'
+  const message = `Upgrade information:\n• Initiated at: ${initiated_at}\n• Error: ${error}`
 
   const initiatedAtEncoded = encodeURIComponent(
     dayjs.utc(initiated_at ?? 0).format('YYYY-MM-DDTHH:mm:ss')

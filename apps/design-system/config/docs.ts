@@ -212,6 +212,16 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/status-codes',
           items: [],
         },
+        {
+          title: 'Key/Value Field Array',
+          href: '/docs/fragments/key-value-field-array',
+          items: [],
+        },
+        {
+          title: 'Single Value Field Array',
+          href: '/docs/fragments/single-value-field-array',
+          items: [],
+        },
       ],
     },
     {
@@ -500,6 +510,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Expanding Textarea',
           href: '/docs/components/expanding-textarea',
+          items: [],
+        },
+        {
+          title: 'Keyboard Shortcut',
+          href: '/docs/components/keyboard-shortcut',
           items: [],
         },
       ],

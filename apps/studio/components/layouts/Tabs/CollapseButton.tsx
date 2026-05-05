@@ -1,7 +1,8 @@
 import { useBreakpoint } from 'common'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
-import { useAppStateSnapshot } from 'state/app-state'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
   const { showSidebar, setShowSidebar, mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
@@ -20,7 +21,7 @@ export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
       <TooltipTrigger asChild>
         <button
           className={cn(
-            'hidden md:flex items-center justify-center w-10 h-[var(--header-height)] hover:bg-surface-100 shrink-0',
+            'hidden md:flex items-center justify-center w-10 h-(--header-height) hover:bg-surface-100 shrink-0',
             !hideTabs && 'border-b border-b-default'
           )}
           onClick={handleToggle}

@@ -1,4 +1,4 @@
-import { DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from 'lib/constants'
+import { DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from '@/lib/constants'
 
 // This is the same as the ZXCVBNScore type from zxcvbn
 // but we need to define it here because we don't to import zxcvbn everywhere

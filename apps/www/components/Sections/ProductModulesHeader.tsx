@@ -98,7 +98,7 @@ const ProductModulesHeader = (props: Types) => (
           <h1 className="text-3xl md:text-5xl tracking-[-.5px] max-w-lg" key={`h1`}>
             {props.h1}
           </h1>
-          <p className="p !text-foreground-light">{props.subheader}</p>
+          <p className="p text-foreground-light!">{props.subheader}</p>
         </div>
         <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
           {props.cta && (

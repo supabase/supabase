@@ -8,6 +8,7 @@ import {
   CartesianGrid,
   AreaChart as RechartAreaChart,
   ReferenceArea,
+  ReferenceLine,
   XAxis,
   YAxis,
 } from 'recharts'
@@ -42,20 +43,26 @@ export type ChartHighlightAction = {
   onSelect: (ctx: { start: string; end: string; clear: () => void }) => void
 }
 
+export type ChartReferenceLine = {
+  y: number
+  label?: string
+  stroke?: string
+  strokeWidth?: number
+  strokeDasharray?: string
+}
+
 export interface ChartLineProps {
   data: ChartLineTick[]
   dataKey: string
-  dataKeys?: string[] // Add this line
+  dataKeys?: string[]
   config?: ChartConfig
+  tooltipDetails?: (datum: ChartLineTick, key: string, value: unknown) => ReactNode
   onLineClick?: (datum: ChartLineTick, tooltipData?: CategoricalChartState) => void
   DateTimeFormat?: string
   isFullHeight?: boolean
   className?: string
   color?: string
-  hoverColor?: string
   chartHighlight?: ChartHighlight
-  updateDateRange?: (from: string, to: string) => void
-  highlightActions?: ChartHighlightAction[]
   syncId?: string
   showHighlightArea?: boolean
   cursor?: string
@@ -68,22 +75,21 @@ export interface ChartLineProps {
     [key: string]: any
   }
   strokeWidth?: number
+  referenceLines?: ChartReferenceLine[]
 }
 
 export const ChartLine = ({
   data,
   dataKey,
-  dataKeys, // Add this line
+  dataKeys,
   config,
+  tooltipDetails,
   onLineClick,
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
   isFullHeight = false,
   className,
   color = CHART_COLORS.BRAND,
-  hoverColor = CHART_COLORS.BRAND_HOVER,
   chartHighlight,
-  updateDateRange,
-  highlightActions,
   syncId,
   showHighlightArea = true,
   cursor,
@@ -91,6 +97,7 @@ export const ChartLine = ({
   showYAxis = false,
   YAxisProps,
   strokeWidth = 1.5,
+  referenceLines,
 }: ChartLineProps) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const { resolvedTheme } = useTheme()
@@ -134,12 +141,20 @@ export const ChartLine = ({
     bottom: 0,
   }
 
+  const formatTooltipValue = (value: unknown) => {
+    if (typeof value === 'number') {
+      return YAxisProps?.tickFormatter ? YAxisProps.tickFormatter(value) : value.toLocaleString()
+    }
+
+    return String(value)
+  }
+
   return (
     <div
       data-testid="chart-line"
       className={cn('flex flex-col gap-y-3 w-full', isFullHeight ? 'h-full' : 'h-24', className)}
     >
-      <ChartContainer className="!w-full h-full" config={chartConfig}>
+      <ChartContainer className="w-full! h-full" config={chartConfig}>
         <RechartAreaChart
           data={data}
           syncId={syncId}
@@ -200,6 +215,32 @@ export const ChartLine = ({
               <ChartTooltipContent
                 className="text-foreground-light -mt-5"
                 labelFormatter={(v: string) => dayjs(v).format(DateTimeFormat)}
+                formatter={(value, name, item) => {
+                  const key = String(item.dataKey || name || dataKey)
+                  const itemConfig = chartConfig[key]
+                  const indicatorColor = item.payload.fill || item.color || color
+                  const detail = tooltipDetails?.(item.payload as ChartLineTick, key, value)
+
+                  return (
+                    <>
+                      <div
+                        className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                        style={{ backgroundColor: indicatorColor }}
+                      />
+                      <div className="flex flex-1 justify-between gap-3 leading-none">
+                        <div className="grid gap-1">
+                          <span className="text-foreground-light">
+                            {itemConfig?.label || name || key}
+                          </span>
+                          {detail}
+                        </div>
+                        <span className="font-mono font-medium tabular-nums text-foreground">
+                          {formatTooltipValue(value)}
+                        </span>
+                      </div>
+                    </>
+                  )
+                }}
               />
             }
           />
@@ -214,6 +255,15 @@ export const ChartLine = ({
               fillOpacity={0.2}
             />
           )}
+          {referenceLines?.map((line, index) => (
+            <ReferenceLine
+              key={`${line.y}-${index}`}
+              y={line.y}
+              stroke={line.stroke ?? CHART_COLORS.TICK}
+              strokeWidth={line.strokeWidth ?? 1.5}
+              strokeDasharray={line.strokeDasharray ?? '4 4'}
+            />
+          ))}
           {keysToRender.map((key, index) => {
             const keyConfig = chartConfig[key]
             const lineColor =

@@ -1,13 +1,13 @@
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { useParams } from 'common'
 import { AlertCircle, Loader } from 'lucide-react'
 import { PropsWithChildren } from 'react'
-
-import { useParams } from 'common'
-import Panel from 'components/ui/Panel'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { Input } from 'ui'
+
+import Panel from '@/components/ui/Panel'
+import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 
 export const DisplayConfigSettings = () => {
   const { ref: projectRef } = useParams()
@@ -66,7 +66,7 @@ export const DisplayConfigSettings = () => {
               layout="horizontal"
             />
           </Panel.Content>
-          <Panel.Content className="border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+          <Panel.Content className="border-t border-panel-border-interior-light in-data-[theme*=dark]:border-panel-border-interior-dark">
             <Input
               label="JWT Secret"
               readOnly

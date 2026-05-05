@@ -3,10 +3,10 @@ import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import React from 'react'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
+import { getAbsoluteBlogSocialImage } from '~/lib/blog-images'
 import { generateReadingTime } from '~/lib/helpers'
 
 interface Props {
@@ -31,14 +31,12 @@ const LayoutComparison = ({ components, props }: Props) => {
     )
   }
 
-  const { basePath } = useRouter()
-
   const NextCard = (props: any) => {
     const { post, label, className } = props
     return (
       <Link href={`${post.url}`} as={`${post.url}`}>
         <div className={className}>
-          <div className="border-default hover:bg-surface-100 cursor-pointer rounded border p-6 transition">
+          <div className="border-default hover:bg-surface-100 cursor-pointer rounded-sm border p-6 transition">
             <div className="space-y-4">
               <div>
                 <p className="text-muted text-sm">{label}</p>
@@ -77,12 +75,8 @@ const LayoutComparison = ({ components, props }: Props) => {
             }),
           },
           images: (() => {
-            const img = props.blog.imgSocial || props.blog.imgThumb
-            if (!img) return []
-            const url =
-              img.startsWith('/') || img.startsWith('http')
-                ? img
-                : `https://supabase.com${basePath}/images/blog/${img}`
+            const url = getAbsoluteBlogSocialImage(props.blog, 'https://supabase.com')
+            if (!url) return []
             return [{ url }]
           })(),
         }}

@@ -1,5 +1,3 @@
-import { HomeIcon } from 'components/layouts/Navigation/LayoutHeader/HomeIcon'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BoxPlus } from 'icons'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
@@ -17,6 +15,8 @@ import {
 import { EmptyStatePresentational } from 'ui-patterns'
 
 import { ShimmeringCard } from './ShimmeringCard'
+import { HomeIcon } from '@/components/layouts/Navigation/LayoutHeader/HomeIcon'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const Header = () => {
   return (

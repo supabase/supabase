@@ -44,8 +44,6 @@ export function ConnectConfigSection({
 }: ConnectConfigSectionProps) {
   if (activeFields.length === 0) return null
 
-  const formLayoutClassName = 'md:[&>div:first-child]:!w-1/3 xl:[&>div:first-child]:!w-2/5'
-
   return (
     <div className="flex flex-col gap-y-4">
       {activeFields.map((field) => {
@@ -82,7 +80,7 @@ export function ConnectConfigSection({
                       className="flex-1 rounded-lg text-left"
                     >
                       <div className="flex items-center gap-2">
-                        {option.icon && <ConnectionIcon icon={option.icon} />}
+                        {option.icon && <ConnectionIcon supportsDarkMode icon={option.icon} />}
                         <span className="text-sm">{option.label}</span>
                       </div>
                     </RadioGroupStackedItem>
@@ -177,7 +175,7 @@ export function ConnectConfigSection({
                 layout="horizontal"
                 label={field.label}
                 description={field.description}
-                className="[&>div>label>span]:!break-keep [&>div>label>span]:text-balance"
+                className="[&>div>label>span]:break-keep! [&>div>label>span]:text-balance"
               >
                 <Switch
                   id={field.id}
@@ -246,7 +244,7 @@ interface ModeSelectorProps {
 
 export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
   return (
-    <div className="grid grid-cols-4 rounded-lg border">
+    <div className="grid grid-cols-4 rounded-lg border overflow-hidden">
       {modes.map((mode) => (
         <button
           key={mode.id}

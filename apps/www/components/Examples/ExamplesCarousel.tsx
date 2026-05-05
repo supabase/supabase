@@ -30,7 +30,7 @@ const ExamplesCarousel = ({
   return (
     <div id="examples" className="container">
       <div className="w-full flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4">
-        <h3 className="h2 !mb-0">{title}</h3>
+        <h3 className="h2 mb-0!">{title}</h3>
         {cta && (
           <Button asChild type="default" size="tiny">
             <Link href={cta.href}>{cta.label}</Link>

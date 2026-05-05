@@ -1,0 +1,267 @@
+---
+title: 'Understanding SSO Login Flows'
+description: 'Learn about IdP-initiated and SP-initiated SSO login flows and when to use each approach.'
+---
+
+When configuring SSO for your organization, you can choose between two different login flows: **identity provider (IdP)-initiated** and **service provider (SP)-initiated**. Understanding the difference helps you provide the best experience for your users.
+
+<Admonition type="tip" label="Quick decision guide">
+
+Most enterprises use IdP-initiated flow for its simplicity and better user experience. Enable SP-initiated only if you need users to start their login journey at supabase.com.
+
+See our [Choosing the Right Login Flow guide](/docs/guides/platform/sso/choosing-login-flow) for use case examples.
+
+</Admonition>
+
+## Overview of login flows
+
+### IdP-initiated (Identity Provider Initiated)
+
+With IdP-initiated flow, users start their login journey from your identity provider (Okta, Azure AD, Google Workspace, etc.) and are directly authenticated into Supabase.
+
+**User experience:**
+
+1. User opens their identity provider dashboard (e.g., Okta homepage, Azure MyApps)
+2. User clicks the Supabase app tile or bookmark
+3. User is immediately logged into Supabase (if already authenticated with IdP)
+
+**Key characteristics:**
+
+- ✅ Simpler user experience - one click from IdP
+- ✅ No domain configuration required
+- ✅ Works automatically once SSO is enabled
+- ✅ Better for intranet portals and employee app catalogs
+- ✅ Default behavior in Supabase
+
+### SP-initiated (Service Provider Initiated)
+
+With SP-initiated flow, users start at supabase.com, enter their email address, and are redirected to your identity provider for authentication.
+
+**User experience:**
+
+1. User visits supabase.com and clicks "Sign in with SSO"
+2. User enters their email address
+3. User is redirected to their identity provider
+4. After authenticating, user is redirected back to Supabase
+
+**Key characteristics:**
+
+- ✅ Familiar flow for users who bookmark supabase.com
+- ✅ Supports domain-based automatic IdP routing
+- ⚠️ Requires configuring email domains
+- ⚠️ More steps in the login process
+
+## Choosing between flows
+
+### When to use IdP-initiated (recommended)
+
+**Best for:**
+
+- Organizations with established identity provider workflows
+- Users who primarily access apps through their IdP dashboard
+- Multiple SAML apps per domain (Dev, Staging, Prod environments)
+- Simplifying user onboarding
+
+**Common scenarios:**
+
+- "Our team accesses all tools through Okta tiles"
+- "We want the simplest possible login experience"
+- "We need separate Dev and Prod SAML apps under the same domain"
+- "Users should never need to remember supabase.com"
+
+### When to use SP-initiated
+
+**Best for:**
+
+- Organizations where users bookmark supabase.com directly
+- Migrating from password-based authentication
+- Users unfamiliar with identity provider dashboards
+
+**Common scenarios:**
+
+- "Some users bookmark supabase.com and expect to start there"
+- "We're transitioning from password auth to SSO"
+- "Users need a consistent login page across all tools"
+- "We want domain-based automatic IdP selection"
+
+### When to enable both flows
+
+You can enable both flows simultaneously to support different user preferences.
+
+**Best for:**
+
+- Large organizations with diverse user needs
+- Gradual SSO migration with mixed authentication
+- Supporting both technical and non-technical users
+
+## Configuring login flows
+
+### Enabling IdP-initiated flow (default)
+
+IdP-initiated flow is automatically enabled when you configure SSO. No additional steps required.
+
+1. Navigate to [the **SSO** settings](/dashboard/org/_/sso) section of the dashboard
+2. Enable "Single Sign-On"
+3. Configure your identity provider metadata and attribute mapping
+4. Save your configuration
+
+Users can now access Supabase through your IdP's app catalog.
+
+<Admonition type="note" label="Domain configuration optional">
+
+With IdP-initiated flow, you don't need to configure email domains. Your identity provider handles all authentication routing.
+
+</Admonition>
+
+### Enabling SP-initiated flow
+
+To enable SP-initiated flow, you need to configure email domains:
+
+1. Navigate to [the **SSO** settings](/dashboard/org/_/sso) section of the dashboard
+2. Enable "Single Sign-On"
+3. Toggle **Enable SP-initiated login** to "ON"
+4. Add one or more email domains (e.g., `yourcompany.com`)
+5. Configure your identity provider metadata and attribute mapping
+6. Save your configuration
+
+#### Email domain requirements
+
+- At least one domain required when SP-initiated is enabled
+- Domains must be verified through your identity provider
+- Multiple domains supported (e.g., `company.com`, `subsidiary.com`)
+- Users with matching email domains will be routed to your IdP
+
+<Admonition type="caution" label="Domain restrictions apply">
+
+Only users with email addresses matching your configured domains can use SP-initiated login. Users with other domains cannot sign in via SSO at supabase.com (but can still use IdP-initiated flow if you configure it in your IdP).
+
+</Admonition>
+
+### Switching between flows
+
+You can change login flow configuration at any time:
+
+#### To switch from SP-initiated to IdP-only
+
+1. Navigate to [the **SSO** settings](/dashboard/org/_/sso) section of the dashboard
+2. Toggle **Enable SP-initiated login** to "OFF"
+3. Save changes
+
+Existing users can continue signing in via IdP-initiated flow.
+
+#### To switch from IdP-only to SP-initiated
+
+1. Navigate to [the **SSO** settings](/dashboard/org/_/sso) section of the dashboard
+2. Toggle **Enable SP-initiated login** to "ON"
+3. Add required email domains
+4. Save changes
+
+## Technical details
+
+### How IdP-initiated flow works
+
+1. User clicks app tile in identity provider
+2. IdP generates SAML assertion and POSTs to Supabase ACS URL
+3. Supabase validates assertion and creates session
+4. User is redirected to Supabase dashboard
+
+**No domain lookup required** - The IdP assertion contains all necessary user information.
+
+### How SP-initiated flow works
+
+1. User enters email at supabase.com/sign-in-sso
+2. Supabase matches email domain to configured SSO provider
+3. Supabase generates SAML request and redirects to IdP
+4. IdP authenticates user and generates SAML assertion
+5. IdP POSTs assertion to Supabase ACS URL
+6. Supabase validates assertion and creates session
+
+**Domain matching is critical** - Without matching domains, users cannot complete SP-initiated flow.
+
+## Multiple SAML apps per domain
+
+One of the key advantages of IdP-initiated flow is supporting multiple SAML applications under the same domain.
+
+### The problem with SP-initiated only
+
+Many enterprises need separate SAML apps for different environments:
+
+- Development SAML app
+- Staging SAML app
+- Production SAML app
+
+**With SP-initiated flow only:** Each SAML app requires a unique domain. You'd need:
+
+- `dev.company.com`
+- `staging.company.com`
+- `prod.company.com`
+
+This is often impractical since all employees use `company.com` email addresses.
+
+### The solution with IdP-initiated flow
+
+**With IdP-initiated flow:** All SAML apps can use the same domain (`company.com`) because:
+
+- Users access each app through different IdP tiles/bookmarks
+- No domain-based routing is needed
+- Each SAML app has its own unique ACS URL and metadata
+
+#### Configuration in your IdP
+
+- Create "Supabase Dev" SAML app → Points to dev org's ACS URL
+- Create "Supabase Staging" SAML app → Points to staging org's ACS URL
+- Create "Supabase Production" SAML app → Points to prod org's ACS URL
+
+Users click the appropriate tile for the environment they need.
+
+<Admonition type="tip">
+
+This is the recommended approach for enterprises with multiple environments. Configure each environment as IdP-initiated only (no domains needed).
+
+</Admonition>
+
+## Common questions
+
+### Can you use both flows simultaneously?
+
+Yes! Enable SP-initiated login and configure domains. IdP-initiated flow continues to work automatically.
+
+### What happens when you don't configure domains?
+
+Without domains, only IdP-initiated flow is available. Users cannot start their login at supabase.com.
+
+### Does the IdP require configuration?
+
+For **IdP-initiated flow:** Configure the Supabase ACS URL and entity ID in your IdP. See our provider-specific guides:
+
+- [Google Workspace](/docs/guides/platform/sso/gsuite)
+- [Azure Active Directory](/docs/guides/platform/sso/azure)
+- [Okta](/docs/guides/platform/sso/okta)
+
+For **SP-initiated flow:** Same configuration, but also ensure your IdP accepts SAML requests from Supabase.
+
+### What happens if a user tries SP-initiated with no matching domain?
+
+They receive an error message indicating no SSO provider found for their email domain. They can still sign in using password or social auth (if they have a non-SSO account).
+
+### Can you disable SP-initiated flow after enabling it?
+
+Yes, toggle it off at any time. Existing users can continue using IdP-initiated flow.
+
+### Which flow is more secure?
+
+Both flows are equally secure when properly configured. Security depends on:
+
+- Strong identity provider authentication policies
+- Certificate management and rotation
+- Attribute mapping configuration
+- Regular security audits
+
+See our [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices) guide for security recommendations.
+
+## Next steps
+
+- **Choose your login flow:** See [Choosing the Right Login Flow](/docs/guides/platform/sso/choosing-login-flow)
+- **Configure your provider:** Follow our [provider-specific guides](/docs/guides/platform/sso#supported-providers)
+- **Test thoroughly:** Review [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices)
+- **Enable auto-join:** Configure [auto-join settings](/docs/guides/platform/sso#key-configuration-options) for seamless onboarding

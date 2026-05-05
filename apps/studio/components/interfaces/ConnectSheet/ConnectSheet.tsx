@@ -1,7 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
 import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from 'ui'
@@ -10,14 +8,29 @@ import type { ConnectMode, ProjectKeys } from './Connect.types'
 import { CONNECT_MODES } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
 import { ConnectStepsSection } from './ConnectStepsSection'
-import { useConnectState } from './useConnectState'
 import { useAvailableConnectModes } from './useAvailableConnectModes'
+import { useConnectState } from './useConnectState'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
-import { useTrack } from 'lib/telemetry/track'
 
 function isConnectMode(value: string): value is ConnectMode {
   return CONNECT_MODES.some((mode) => mode === value)
+}
+
+function mapConnectTabToMode(tab: string | null): ConnectMode | null {
+  if (!tab) return null
+  switch (tab) {
+    case 'frameworks':
+    case 'mobiles':
+      return 'framework'
+    case 'orms':
+      return 'orm'
+    default:
+      return isConnectMode(tab) ? tab : null
+  }
 }
 
 export const ConnectSheet = () => {
@@ -30,6 +43,11 @@ export const ConnectSheet = () => {
     parseAsBoolean.withDefault(false)
   )
   const [connectTab, setConnectTab] = useQueryState('connectTab', parseAsString)
+  const [queryFramework, setQueryFramework] = useQueryState('framework', parseAsString)
+  const [queryUsing, setQueryUsing] = useQueryState('using', parseAsString)
+  const [queryMethod, setQueryMethod] = useQueryState('method', parseAsString)
+  const [queryType, setQueryType] = useQueryState('type', parseAsString)
+  const [queryMcpClient, setQueryMcpClient] = useQueryState('mcpClient', parseAsString)
   const { connectSheetSource, setConnectSheetSource } = useAppStateSnapshot()
   const track = useTrack()
   const prevShowConnect = useRef(false)
@@ -46,23 +64,51 @@ export const ConnectSheet = () => {
     track('connect_sheet_opened', { source: connectSheetSource })
     setConnectSheetSource('header_button')
 
-    if (connectTab && isConnectMode(connectTab) && availableModeIds.includes(connectTab)) {
-      setMode(connectTab)
+    const mappedMode = mapConnectTabToMode(connectTab)
+    if (mappedMode && availableModeIds.includes(mappedMode)) {
+      setMode(mappedMode)
+    }
+
+    if (mappedMode === 'framework') {
+      if (queryFramework) {
+        updateField('framework', queryFramework)
+        if (queryUsing) updateField('frameworkVariant', queryUsing)
+      }
+    } else if (mappedMode === 'orm') {
+      if (queryFramework) updateField('orm', queryFramework)
+    } else if (mappedMode === 'direct') {
+      if (queryMethod) updateField('connectionMethod', queryMethod)
+      if (queryType) updateField('connectionType', queryType)
+    } else if (mappedMode === 'mcp') {
+      if (queryMcpClient) updateField('mcpClient', queryMcpClient)
     }
   }, [
     showConnect,
     connectSheetSource,
     connectTab,
+    queryFramework,
+    queryUsing,
+    queryMethod,
+    queryType,
+    queryMcpClient,
     availableModeIds,
     track,
     setConnectSheetSource,
     setMode,
+    updateField,
   ])
 
+  const clearAllQueryParams = () => {
+    setConnectTab(null)
+    setQueryFramework(null)
+    setQueryUsing(null)
+    setQueryMethod(null)
+    setQueryType(null)
+    setQueryMcpClient(null)
+  }
+
   const handleOpenChange = (sheetOpen: boolean) => {
-    if (!sheetOpen) {
-      setConnectTab(null)
-    }
+    if (!sheetOpen) clearAllQueryParams()
     setShowConnect(sheetOpen)
   }
 
@@ -93,6 +139,31 @@ export const ConnectSheet = () => {
   const handleModeChange = (mode: ConnectMode) => {
     setMode(mode)
     setConnectTab(mode)
+    setQueryFramework(null)
+    setQueryUsing(null)
+    setQueryMethod(null)
+    setQueryType(null)
+    setQueryMcpClient(null)
+  }
+
+  const handleFieldChange = (fieldId: string, value: string | boolean | string[]) => {
+    updateField(fieldId, value)
+    const str = String(value)
+    if (fieldId === 'framework') {
+      setQueryFramework(str)
+      setQueryUsing(null)
+    } else if (fieldId === 'frameworkVariant') {
+      setQueryUsing(str)
+    } else if (fieldId === 'orm') {
+      setQueryFramework(str)
+    } else if (fieldId === 'connectionMethod') {
+      setQueryMethod(str)
+      setQueryType(null)
+    } else if (fieldId === 'connectionType') {
+      setQueryType(str)
+    } else if (fieldId === 'mcpClient') {
+      setQueryMcpClient(str)
+    }
   }
 
   return (
@@ -116,7 +187,7 @@ export const ConnectSheet = () => {
             <ConnectConfigSection
               state={state}
               activeFields={activeFields}
-              onFieldChange={updateField}
+              onFieldChange={handleFieldChange}
               getFieldOptions={getFieldOptions}
             />
           </div>

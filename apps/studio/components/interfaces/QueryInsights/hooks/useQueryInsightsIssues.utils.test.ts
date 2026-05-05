@@ -1,15 +1,16 @@
-import { describe, it, expect, vi } from 'vitest'
-import { classifyQuery } from './useQueryInsightsIssues.utils'
+import { safeSql } from '@supabase/pg-meta'
+import { describe, expect, it, vi } from 'vitest'
+
+import { hasIndexRecommendations } from '../../QueryPerformance/IndexAdvisor/index-advisor.utils'
 import type { QueryPerformanceRow } from '../../QueryPerformance/QueryPerformance.types'
+import { classifyQuery } from './useQueryInsightsIssues.utils'
 
 vi.mock('../../QueryPerformance/IndexAdvisor/index-advisor.utils', () => ({
   hasIndexRecommendations: vi.fn(),
 }))
 
-import { hasIndexRecommendations } from '../../QueryPerformance/IndexAdvisor/index-advisor.utils'
-
 const baseRow: QueryPerformanceRow = {
-  query: 'SELECT * FROM users',
+  query: safeSql`SELECT * FROM users`,
   calls: 10,
   mean_time: 50,
   min_time: 10,

@@ -132,9 +132,9 @@ Instead, design your tests to be independent by using unique user IDs for each t
 Here's an example using TypeScript that mirrors the pgTAP tests above:
 
 ```typescript
+import crypto from 'crypto'
 import { createClient } from '@supabase/supabase-js'
 import { beforeAll, describe, expect, it } from 'vitest'
-import crypto from 'crypto'
 
 describe('Todos RLS', () => {
   // Generate unique IDs for this test suite to avoid conflicts with other tests
@@ -145,7 +145,7 @@ describe('Todos RLS', () => {
 
   beforeAll(async () => {
     // Setup test data specific to this test suite
-    const adminSupabase = createClient(process.env.SUPABASE_URL!, process.env.SERVICE_ROLE_KEY!)
+    const adminSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SECRET_KEY!)
 
     // Create test users with unique IDs
     await adminSupabase.auth.admin.createUser({

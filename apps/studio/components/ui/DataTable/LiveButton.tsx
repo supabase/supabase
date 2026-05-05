@@ -2,10 +2,12 @@ import type { FetchPreviousPageOptions } from '@tanstack/react-query'
 import { CirclePause, CirclePlay } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect } from 'react'
+import { cn } from 'ui'
 
-import { useHotKey } from 'hooks/ui/useHotKey'
-import { Button, cn } from 'ui'
+import { ButtonTooltip } from '../ButtonTooltip'
 import { useDataTable } from './providers/DataTableProvider'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const REFRESH_INTERVAL = 10_000
 
@@ -17,7 +19,7 @@ interface LiveButtonProps {
 export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButtonProps) {
   const [{ live, date, sort }, setSearch] = useQueryStates(searchParamsParser)
   const { table } = useDataTable()
-  useHotKey(handleClick, 'j')
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE, handleClick)
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
@@ -58,14 +60,15 @@ export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButton
   }
 
   return (
-    <Button
+    <ButtonTooltip
       className={cn(live && 'border-info text-info hover:text-info')}
       onClick={handleClick}
       type={live ? 'primary' : 'default'}
       size="tiny"
       icon={live ? <CirclePause className="h-4 w-4" /> : <CirclePlay className="h-4 w-4" />}
+      tooltip={{ content: { side: 'bottom', text: live ? 'Pause live mode' : 'Start live mode' } }}
     >
       Live
-    </Button>
+    </ButtonTooltip>
   )
 }

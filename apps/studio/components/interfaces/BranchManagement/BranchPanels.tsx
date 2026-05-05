@@ -1,5 +1,3 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import type { Branch } from 'data/branches/branches-query'
 import dayjs from 'dayjs'
 import { Github } from 'lucide-react'
 import Link from 'next/link'
@@ -10,6 +8,8 @@ import { TimestampInfo } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { WorkflowLogs } from './WorkflowLogs'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import type { Branch } from '@/data/branches/branches-query'
 
 interface BranchManagementSectionProps {
   header: string | ReactNode
@@ -23,10 +23,10 @@ export const BranchManagementSection = ({
 }: PropsWithChildren<BranchManagementSectionProps>) => {
   return (
     <div className="border rounded-lg overflow-hidden">
-      <div className="bg-surface-100 shadow-sm flex justify-between items-center px-4 py-3 rounded-t-lg text-xs font-mono uppercase">
+      <div className="bg-surface-100 shadow-xs flex justify-between items-center px-4 py-3 rounded-t-lg text-xs font-mono uppercase">
         {typeof header === 'string' ? <span>{header}</span> : header}
       </div>
-      <div className="bg-surface border-t shadow-sm rounded-b-lg text-sm divide-y">{children}</div>
+      <div className="bg-surface border-t shadow-xs rounded-b-lg text-sm divide-y">{children}</div>
       {footer !== undefined && <div className="bg-surface-100 px-6 py-1 border-t">{footer}</div>}
     </div>
   )
@@ -87,7 +87,6 @@ export const BranchRow = ({
     : null
   const isDeletionPending = willBeDeletedIn !== null && willBeDeletedIn < 0
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
-  const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
   const navigateUrl = rowLink ?? `/project/${branch.project_ref}`
 

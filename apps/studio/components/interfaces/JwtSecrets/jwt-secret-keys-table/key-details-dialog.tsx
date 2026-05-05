@@ -1,7 +1,5 @@
 import { FileKey } from 'lucide-react'
 import { useMemo } from 'react'
-
-import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import {
   Button,
   DialogFooter,
@@ -13,6 +11,8 @@ import {
   Label_Shadcn_,
   Textarea,
 } from 'ui'
+
+import { JWTSigningKey } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
 
 export function KeyDetailsDialog({
   selectedKey,

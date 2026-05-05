@@ -1,17 +1,17 @@
 'use client'
 
+import { Feedback } from '~/components/Feedback'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { isFeatureEnabled } from 'common'
+import { Chatgpt, Claude } from 'icons'
 import { Check, Copy, ExternalLink } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { isFeatureEnabled } from 'common'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns/Toc'
-import { Feedback } from '~/components/Feedback'
+
 import { useTocAnchors } from '../features/docs/GuidesMdx.state'
-import { Chatgpt } from 'icons'
-import { Claude } from 'icons'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 interface TOCHeader {
   id?: string
@@ -30,7 +30,15 @@ function AiTools({ className }: { className?: string }) {
 
     try {
       const res = await fetch(mdUrl)
-      const text = await res.text()
+      let text: string
+
+      if (res.ok) {
+        text = await res.text()
+      } else {
+        // Default to HTML content within the article when no .md file is available.
+        text = document.getElementById('sb-docs-guide-main-article')?.innerHTML ?? ''
+      }
+
       await navigator.clipboard.writeText(text)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)

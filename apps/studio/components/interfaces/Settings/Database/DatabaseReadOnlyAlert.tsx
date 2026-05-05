@@ -2,12 +2,12 @@ import { useParams } from 'common'
 import { AlertTriangle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ConfirmDisableReadOnlyModeModal from './DatabaseSettings/ConfirmDisableReadOnlyModal'
+import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 export const DatabaseReadOnlyAlert = () => {
   const { ref: projectRef } = useParams()

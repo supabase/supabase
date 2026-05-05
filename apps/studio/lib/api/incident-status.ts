@@ -1,7 +1,7 @@
+import { IS_PLATFORM } from 'common'
 import z from 'zod'
 
-import { IS_PLATFORM } from 'common'
-import { InternalServerError } from 'lib/api/apiHelpers'
+import { InternalServerError } from '@/lib/api/apiHelpers'
 
 export type IncidentCache = {
   affected_regions: Array<string> | null
@@ -81,7 +81,7 @@ export async function getActiveIncidents(): Promise<IncidentInfo[]> {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    cache: 'no-store',
+    next: { revalidate: 180 },
     signal: AbortSignal.timeout(30_000),
   })
   const responseText = await response.text()

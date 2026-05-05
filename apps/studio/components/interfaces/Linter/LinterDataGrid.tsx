@@ -1,13 +1,4 @@
 import { useParams } from 'common'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import {
-  LintCategoryBadge,
-  LintEntity,
-  lintInfoMap,
-  NoIssuesFound,
-} from 'components/interfaces/Linter/Linter.utils'
-import { Lint } from 'data/lint/lint-query'
-import { useTrack } from 'lib/telemetry/track'
 import { X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useRef } from 'react'
@@ -16,8 +7,17 @@ import ReactMarkdown from 'react-markdown'
 import { Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import LintDetail from './LintDetail'
+import { LintDetail } from './LintDetail'
 import { EntityTypeIcon } from './Linter.utils'
+import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
+import {
+  LintCategoryBadge,
+  LintEntity,
+  lintInfoMap,
+  NoIssuesFound,
+} from '@/components/interfaces/Linter/Linter.utils'
+import { Lint } from '@/data/lint/lint-query'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface LinterDataGridProps {
   isLoading: boolean
@@ -26,7 +26,7 @@ interface LinterDataGridProps {
   currentTab: LINTER_LEVELS
 }
 
-const LinterDataGrid = ({
+export const LinterDataGrid = ({
   isLoading,
   filteredLints,
   selectedLint,
@@ -71,7 +71,11 @@ const LinterDataGrid = ({
       name: 'Description',
       description: undefined,
       minWidth: 400,
-      value: (row: any) => <ReactMarkdown className="text-xs">{row.description}</ReactMarkdown>,
+      value: (row: any) => (
+        <div className="text-xs">
+          <ReactMarkdown>{row.description}</ReactMarkdown>
+        </div>
+      ),
     },
   ]
 
@@ -86,7 +90,7 @@ const LinterDataGrid = ({
         return (
           <div className="flex items-center justify-between font-mono font-normal text-xs w-full">
             <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">{col.name}</p>
+              <p className="text-foreground!">{col.name}</p>
               {col.description && <p className="text-foreground-lighter">{col.description}</p>}
             </div>
           </div>
@@ -118,14 +122,14 @@ const LinterDataGrid = ({
   return (
     <ResizablePanelGroup
       orientation="horizontal"
-      className="relative flex flex-grow bg-alternative min-h-0"
+      className="relative flex grow bg-alternative min-h-0"
       autoSaveId="linter-layout-v1"
     >
       <ResizablePanel>
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
-          className={cn('flex-1 flex-grow h-full')}
+          className={cn('flex-1 grow h-full')}
           rowHeight={44}
           headerRowHeight={36}
           columns={columns}
@@ -135,7 +139,7 @@ const LinterDataGrid = ({
             return [
               `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
               `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
-              '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+              '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
               '[&>.rdg-cell:first-child>div]:ml-4',
             ].join(' ')
           }}
@@ -192,7 +196,11 @@ const LinterDataGrid = ({
               <Button type="text" icon={<X />} onClick={handleSidepanelClose} />
             </div>
             <div className="p-6 flex-grow min-h-0 overflow-y-auto">
-              <LintDetail lint={selectedLint} projectRef={ref!} />
+              <LintDetail
+                lint={selectedLint}
+                projectRef={ref!}
+                onAfterAction={handleSidepanelClose}
+              />
             </div>
           </ResizablePanel>
         </>
@@ -200,5 +208,3 @@ const LinterDataGrid = ({
     </ResizablePanelGroup>
   )
 }
-
-export default LinterDataGrid

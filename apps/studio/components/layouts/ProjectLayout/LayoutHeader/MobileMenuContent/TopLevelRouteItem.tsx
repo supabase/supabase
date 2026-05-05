@@ -1,8 +1,8 @@
-import type { Route } from 'components/ui/ui.types'
 import Link from 'next/link'
 import { cn, sidebarMenuButtonVariants, SidebarMenuItem } from 'ui'
 
 import { isDirectLinkAtTopLevel } from './useMobileMenuNavigation'
+import type { Route } from '@/components/ui/ui.types'
 
 export interface TopLevelRouteItemProps {
   route: Route

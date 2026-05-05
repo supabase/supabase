@@ -1,10 +1,6 @@
-import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
-import type { Filter } from 'components/grid/types'
-import { useSqlFilterGenerateMutation } from 'data/ai/sql-filter-mutation'
 import { format } from 'date-fns'
 import { Loader2 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { AiIconAnimation, Button, Calendar } from 'ui'
 import {
   CustomOptionProps,
@@ -18,9 +14,12 @@ import {
 } from 'ui-patterns'
 
 import { columnToFilterProperty } from './FilterPopoverNew.utils'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import type { Filter } from '@/components/grid/types'
+import { useSqlFilterGenerateMutation } from '@/data/ai/sql-filter-mutation'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface FilterPopoverProps {
-  portal?: boolean
   isRefetching?: boolean
 }
 
@@ -59,7 +58,10 @@ function filterGroupToFilters(group: FilterGroup): Filter[] {
 
 // Custom date picker component for the FilterBar
 function DatePickerOption({ onChange, onCancel, search }: CustomOptionProps) {
-  const [date, setDate] = useState<Date | undefined>(search ? new Date(search) : undefined)
+  const parsed = search ? new Date(search) : undefined
+  const [date, setDate] = useState<Date | undefined>(
+    parsed && !isNaN(parsed.getTime()) ? parsed : undefined
+  )
 
   return (
     <div className="w-[300px] space-y-4">
@@ -117,7 +119,7 @@ function serializeFilterProperties(
 }
 
 export const FilterPopoverNew = ({ isRefetching = false }: FilterPopoverProps) => {
-  const { filters, setFilters } = useTableFilterNew()
+  const { filters, setFilters } = useTableFilter()
   const snap = useTableEditorTableStateSnapshot()
 
   const [freeformText, setFreeformText] = useState('')
@@ -207,7 +209,7 @@ export const FilterPopoverNew = ({ isRefetching = false }: FilterPopoverProps) =
         actions={actions}
         isLoading={isGenerating}
         variant="pill"
-        className="bg-transparent border-0 overflow-visible"
+        className="bg-transparent border-0 overflow-visible px-1.5 [&>div>div>div>input]:!text-xs"
         icon={icon}
       />
     </div>

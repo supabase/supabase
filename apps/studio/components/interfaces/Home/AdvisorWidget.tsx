@@ -1,18 +1,7 @@
 import { useParams } from 'common'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { createLintSummaryPrompt, EntityTypeIcon } from 'components/interfaces/Linter/Linter.utils'
-import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { useTrack } from 'lib/telemetry/track'
 import { Activity, ExternalLink, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
-import { useAdvisorStateSnapshot } from 'state/advisor-state'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Card,
   CardContent,
@@ -31,6 +20,21 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { useQueryPerformanceQuery } from '../QueryPerformance/useQueryPerformanceQuery'
+import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
+import {
+  createLintSummaryPrompt,
+  EntityTypeIcon,
+} from '@/components/interfaces/Linter/Linter.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { Lint, useProjectLintsQuery } from '@/data/lint/lint-query'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAdvisorStateSnapshot } from '@/state/advisor-state'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+
 interface SlowQuery {
   rolname: string
   mean_time: number
@@ -43,9 +47,7 @@ export const AdvisorWidget = () => {
   const [selectedTab, setSelectedTab] = useState<'security' | 'performance'>('security')
   const { data: lints, isPending: isLoadingLints } = useProjectLintsQuery({ projectRef })
   const { data: slowestQueriesData, isLoading: isLoadingSlowestQueries } = useQueryPerformanceQuery(
-    {
-      preset: 'slowestExecutionTime',
-    }
+    { preset: 'slowestExecutionTime' }
   )
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
@@ -124,7 +126,7 @@ export const AdvisorWidget = () => {
   ) => {
     const topIssues = lints
       .filter((lint) => lint.level === LINTER_LEVELS.ERROR || lint.level === LINTER_LEVELS.WARN)
-      .sort((a, b) => (a.level === LINTER_LEVELS.ERROR ? -1 : 1))
+      .sort((a, _b) => (a.level === LINTER_LEVELS.ERROR ? -1 : 1))
 
     return (
       <div className="h-full">
@@ -211,15 +213,15 @@ export const AdvisorWidget = () => {
         <Card className="h-80">
           <Tabs value={selectedTab} className="h-full flex flex-col">
             <CardHeader className="h-10 py-0 pl-4 pr-2 flex flex-row items-center justify-between flex-0">
-              <TabsList className="flex justify-start rounded-none gap-x-4 border-b-0 !mt-0 pt-0">
+              <TabsList className="flex justify-start rounded-none gap-x-4 border-b-0 mt-0! pt-0">
                 <TabsTrigger
                   value="security"
                   onClick={() => setSelectedTab('security')}
-                  className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
+                  className="flex items-center gap-2 text-xs py-3 border-b font-mono uppercase"
                 >
                   Security{' '}
                   {securityErrorCount + securityWarningCount > 0 && (
-                    <div className="rounded bg-warning text-warning-100 px-1">
+                    <div className="rounded-sm bg-warning text-warning-100 px-1">
                       {securityErrorCount + securityWarningCount}
                     </div>
                   )}
@@ -227,11 +229,11 @@ export const AdvisorWidget = () => {
                 <TabsTrigger
                   value="performance"
                   onClick={() => setSelectedTab('performance')}
-                  className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
+                  className="flex items-center gap-2 text-xs py-3 border-b font-mono uppercase"
                 >
                   Performance{' '}
                   {performanceErrorCount + performanceWarningCount > 0 && (
-                    <div className="rounded bg-warning text-warning-100 px-1">
+                    <div className="rounded-sm bg-warning text-warning-100 px-1">
                       {performanceErrorCount + performanceWarningCount}
                     </div>
                   )}
@@ -240,7 +242,7 @@ export const AdvisorWidget = () => {
               <ButtonTooltip
                 asChild
                 type="text"
-                className="!mt-0 w-7"
+                className="mt-0! w-7"
                 icon={<ExternalLink />}
                 tooltip={{
                   content: {
@@ -253,7 +255,7 @@ export const AdvisorWidget = () => {
                 <Link href={`/project/${projectRef}/advisors/${selectedTab}`} />
               </ButtonTooltip>
             </CardHeader>
-            <CardContent className="!p-0 mt-0 flex-1 overflow-y-auto">
+            <CardContent className="p-0! mt-0 flex-1 overflow-y-auto">
               <TabsContent value="security" className="p-0 mt-0 h-full">
                 {renderLintTabContent(
                   'Security',
@@ -282,7 +284,7 @@ export const AdvisorWidget = () => {
             <ButtonTooltip
               asChild
               type="text"
-              className="!mt-0 w-7"
+              className="mt-0! w-7"
               icon={<ExternalLink />}
               tooltip={{
                 content: {
@@ -294,7 +296,7 @@ export const AdvisorWidget = () => {
               <Link href={`/project/${projectRef}/reports/query-performance`} />
             </ButtonTooltip>
           </CardHeader>
-          <CardContent className="!p-0 flex-1 overflow-y-auto">
+          <CardContent className="p-0! flex-1 overflow-y-auto">
             {isLoadingSlowestQueries ? (
               <div className="space-y-2 p-4">
                 <ShimmeringLoader />

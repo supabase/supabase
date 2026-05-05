@@ -1,7 +1,8 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import { globby } from 'globby'
 import matter from 'gray-matter'
+import { create as createTar } from 'tar'
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 
@@ -160,6 +161,16 @@ async function generate() {
 
   const summary = warnings ? ` (${warnings} with warnings)` : ''
   console.log(`Generated ${files.length} markdown files under public/docs/guides/${summary}`)
+
+  // Create a tar.gz archive of the generated docs, served at /docs/docs.tar.gz.
+  // Sorted entries, portable headers, and a fixed mtime keep the output deterministic.
+  const archivePath = 'public/docs.tar.gz'
+  const entries = (await globby(['**'], { cwd: 'public/docs' })).sort()
+  await createTar(
+    { gzip: true, file: archivePath, cwd: 'public/docs', portable: true, mtime: new Date() },
+    entries
+  )
+  console.log(`Created archive at ${archivePath}`)
 }
 
 generate()

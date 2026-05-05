@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
+import { Handle, Node, NodeProps } from '@xyflow/react'
 import { TableEditor } from 'icons'
 import {
   Copy,
@@ -13,7 +13,7 @@ import {
   Table2,
 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { Handle, NodeProps } from 'reactflow'
+import { toast } from 'sonner'
 import {
   Button,
   cn,
@@ -21,6 +21,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Tooltip,
   TooltipContent,
@@ -28,40 +29,28 @@ import {
 } from 'ui'
 
 import { useSchemaGraphContext } from './SchemaGraphContext'
+import { TableNodeData } from './Schemas.constants'
+import { getTableDefinitionAsMarkdown } from './Schemas.utils'
+import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import { getTableDefinition } from '@/data/database/table-definition-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { formatSql } from '@/lib/formatSql'
 
 // ReactFlow is scaling everything by the factor of 2
 export const TABLE_NODE_WIDTH = 320
 export const TABLE_NODE_ROW_HEIGHT = 40
 
-export type TableNodeData = {
-  id: number
-  schema: string
-  name: string
-  ref?: string
-  isForeign: boolean
-  description: string
-  columns: {
-    id: string
-    isPrimary: boolean
-    isNullable: boolean
-    isUnique: boolean
-    isIdentity: boolean
-    name: string
-    format: string
-  }[]
-}
-
 export const TableNode = ({
+  id,
   data,
   targetPosition,
   sourcePosition,
   placeholder,
-}: NodeProps<TableNodeData> & { placeholder?: boolean }) => {
+}: NodeProps<Node<TableNodeData>> & { placeholder?: boolean }) => {
   // Important styles is a nasty hack to use Handles (required for edges calculations), but do not show them in the UI.
   // ref: https://github.com/wbkd/react-flow/discussions/2698
-  const hiddenNodeConnector = '!h-px !w-px !min-w-0 !min-h-0 !cursor-grab !border-0 !opacity-0'
+  const hiddenNodeConnector = 'h-px! w-px! min-w-0! min-h-0! cursor-grab! border-0! opacity-0!'
   const schemaGraphContext = useSchemaGraphContext()
   const { data: project } = useSelectedProjectQuery()
   const { can: canUpdateColumns } = useAsyncCheckPermissions(
@@ -71,10 +60,18 @@ export const TableNode = ({
   const router = useRouter()
   const itemHeight = 'h-[22px]'
 
+  const hasEdgesSelected =
+    schemaGraphContext.selectedEdge?.source === id || schemaGraphContext.selectedEdge?.target === id
+
   return (
-    <>
+    <article>
       {data.isForeign ? (
-        <header className="text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative flex gap-1 items-center">
+        <header
+          className={cn(
+            'text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative flex gap-1 items-center',
+            hasEdgesSelected ? 'outline outline-1 outline-brand' : undefined
+          )}
+        >
           {data.name}
           {targetPosition && (
             <Handle
@@ -87,7 +84,10 @@ export const TableNode = ({
         </header>
       ) : (
         <div
-          className="border-[0.5px] overflow-hidden rounded-[4px] shadow-sm"
+          className={cn(
+            'border-[0.5px] overflow-hidden rounded-[4px] shadow-xs',
+            hasEdgesSelected ? 'outline outline-1 outline-brand' : undefined
+          )}
           style={{ width: TABLE_NODE_WIDTH / 2 }}
         >
           <header
@@ -96,7 +96,7 @@ export const TableNode = ({
               itemHeight
             )}
           >
-            <div className="min-w-0 flex flex-shrink gap-x-1 items-center">
+            <div className="min-w-0 flex shrink gap-x-1 items-center">
               <Table2 strokeWidth={1} size={12} className="text-light" />
               <span className="whitespace-nowrap overflow-hidden text-ellipsis" title={data.name}>
                 {data.name}
@@ -105,7 +105,7 @@ export const TableNode = ({
             {
               // Hide the actions while downloading the schema as png/svg
               !schemaGraphContext.isDownloading ? (
-                <div className="flex flex-shrink-0 items-center gap-2">
+                <div className="flex shrink-0 items-center gap-2">
                   {data.description && (
                     <Tooltip>
                       <TooltipTrigger asChild className="cursor-default ">
@@ -118,7 +118,10 @@ export const TableNode = ({
                   {!placeholder && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button type="text" className="px-0 w-[16px] h-[16px] rounded nodrag nopan">
+                        <Button
+                          type="text"
+                          className="px-0 w-[16px] h-[16px] rounded-sm nodrag nopan"
+                        >
                           <MoreVertical size={10} />
                           <span className="sr-only">{data.name} actions</span>
                         </Button>
@@ -130,16 +133,6 @@ export const TableNode = ({
                         >
                           <Edit size={12} />
                           <p>Edit table</p>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="flex items-center space-x-2 whitespace-nowrap"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            copyToClipboard(data.name)
-                          }}
-                        >
-                          <Copy size={12} />
-                          <span>Copy name</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="flex items-center space-x-2 whitespace-nowrap"
@@ -155,6 +148,73 @@ export const TableNode = ({
                         >
                           <TableEditor size={12} />
                           <p>View in Table Editor</p>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="flex items-center space-x-2 whitespace-nowrap"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            copyToClipboard(data.name)
+                          }}
+                        >
+                          <Copy size={12} />
+                          <span>Copy name</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          key="copy-schema-sql"
+                          className="space-x-2"
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            const toastId = toast.loading('Getting table schema...')
+
+                            const formattedSchema = getTableDefinition({
+                              id: data.id,
+                              projectRef: project?.ref,
+                              connectionString: project?.connectionString,
+                            }).then((tableDefinition) => {
+                              if (!tableDefinition) {
+                                throw new Error('Failed to get table schema')
+                              }
+                              return formatSql(tableDefinition)
+                            })
+
+                            try {
+                              await copyToClipboard(formattedSchema, () => {
+                                toast.success('Table schema copied to clipboard', { id: toastId })
+                              })
+                            } catch (err) {
+                              toast.error(
+                                'Failed to copy schema: ' + ((err as Error).message || err),
+                                {
+                                  id: toastId,
+                                }
+                              )
+                            }
+                          }}
+                        >
+                          <Copy size={12} />
+                          <span>Copy as SQL</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          key="copy-schema-markdown"
+                          className="space-x-2"
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            const markdown = getTableDefinitionAsMarkdown(data)
+
+                            try {
+                              await copyToClipboard(markdown, () => {
+                                toast.success('Table schema copied to clipboard')
+                              })
+                            } catch (err) {
+                              toast.error(
+                                'Failed to copy schema: ' + ((err as Error).message || err)
+                              )
+                            }
+                          }}
+                        >
+                          <Copy size={12} />
+                          <span>Copy as Markdown</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -191,37 +251,43 @@ export const TableNode = ({
                     strokeWidth={1}
                     className={cn(
                       // 'sb-grid-column-header__inner__primary-key'
-                      'flex-shrink-0',
+                      'shrink-0',
                       'text-light'
                     )}
                   />
                 )}
                 {column.isNullable && (
-                  <DiamondIcon size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
+                  <DiamondIcon size={8} strokeWidth={1} className="shrink-0 text-light" />
                 )}
                 {!column.isNullable && (
                   <DiamondIcon
                     size={8}
                     strokeWidth={1}
                     fill="currentColor"
-                    className="flex-shrink-0 text-light"
+                    className="shrink-0 text-light"
                   />
                 )}
                 {column.isUnique && (
-                  <Fingerprint size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
+                  <Fingerprint size={8} strokeWidth={1} className="shrink-0 text-light" />
                 )}
                 {column.isIdentity && (
-                  <Hash size={8} strokeWidth={1} className="flex-shrink-0 text-light" />
+                  <Hash size={8} strokeWidth={1} className="shrink-0 text-light" />
                 )}
               </div>
               <div className="flex w-full justify-between min-w-0">
                 <span
-                  className="text-ellipsis overflow-hidden whitespace-nowrap min-w-0 max-w-[80%]"
+                  className={cn(
+                    'text-ellipsis overflow-hidden whitespace-nowrap min-w-0 max-w-[80%]',
+                    schemaGraphContext.selectedEdge?.sourceHandle === column.id ||
+                      schemaGraphContext.selectedEdge?.targetHandle === column.id
+                      ? 'text-brand'
+                      : undefined
+                  )}
                   title={column.name}
                 >
                   {column.name}
                 </span>
-                <span className="flex-shrink-0 pl-2 pr-1 inline-flex justify-end font-mono text-lighter text-[0.4rem] group-hover:hidden">
+                <span className="shrink-0 pl-2 pr-1 inline-flex justify-end font-mono text-lighter text-[0.4rem] group-hover:hidden">
                   {column.format}
                 </span>
               </div>
@@ -230,7 +296,7 @@ export const TableNode = ({
                   type="target"
                   id={column.id}
                   position={targetPosition}
-                  className={cn(hiddenNodeConnector, '!left-0')}
+                  className={cn(hiddenNodeConnector)}
                 />
               )}
               {sourcePosition && (
@@ -238,7 +304,7 @@ export const TableNode = ({
                   type="source"
                   id={column.id}
                   position={sourcePosition}
-                  className={cn(hiddenNodeConnector, '!right-0')}
+                  className={cn(hiddenNodeConnector)}
                 />
               )}
               <DropdownMenu>
@@ -246,7 +312,7 @@ export const TableNode = ({
                   <Button
                     type="text"
                     // Use opacity to hide the button so that it remains accessible (users can tab to it)
-                    className="opacity-0 focus:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100 absolute right-0 top-1/2 -translate-y-1/2 px-0 mr-1 w-[16px] h-[16px] rounded"
+                    className="opacity-0 focus:opacity-100 group-hover:opacity-100 data-open:opacity-100 absolute right-0 top-1/2 -translate-y-1/2 px-0 mr-1 w-[16px] h-[16px] rounded-sm"
                   >
                     <MoreVertical size={10} />
                     <span className="sr-only">
@@ -289,6 +355,6 @@ export const TableNode = ({
           ))}
         </div>
       )}
-    </>
+    </article>
   )
 }
