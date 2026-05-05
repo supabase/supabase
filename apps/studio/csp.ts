@@ -192,7 +192,28 @@ export function getCSP() {
 
   const workerSrcDirective = [`worker-src 'self'`, `blob:`, `data:`].join(' ')
 
+  const connectSrcDirective = [
+    `connect-src 'self'`,
+    `data:`,
+    `blob:`,
+    ...DEFAULT_SRC_URLS,
+    ...(isDevOrStaging
+      ? [
+          SUPABASE_STAGING_PROJECTS_URL,
+          SUPABASE_STAGING_PROJECTS_URL_WS,
+          NIMBUS_STAGING_PROJECTS_URL,
+          NIMBUS_STAGING_PROJECTS_URL_WS,
+          VERCEL_LIVE_URL,
+          SUPABASE_DOCS_PROJECT_URL,
+          SUPABASE_CONTENT_API_URL,
+        ]
+      : []),
+    PUSHER_URL_WS,
+    SENTRY_URL,
+  ].join(' ')
+
   const cspDirectives = [
+    connectSrcDirective,
     defaultSrcDirective,
     imgSrcDirective,
     scriptSrcDirective,
