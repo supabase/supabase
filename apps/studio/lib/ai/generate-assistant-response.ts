@@ -151,15 +151,19 @@ export async function generateAssistantResponse({
       tools,
       ...(abortSignal && { abortSignal }),
       ...(span && {
-        onFinish: ({ steps }) => {
+        onFinish: ({ steps, finishReason }) => {
+          const metadata: Record<string, unknown> = {
+            isFinalStep: finishReason === 'stop',
+          }
           for (const step of steps) {
             for (const toolCall of step.toolCalls) {
               if (toolCall.toolName === 'rename_chat') {
                 const { newName } = toolCall.input as { newName: string }
-                span.log({ metadata: { chatName: newName } })
+                metadata.chatName = newName
               }
             }
           }
+          span.log({ metadata })
           span.end()
         },
       }),
