@@ -32,7 +32,14 @@ interface DisplayBlockRendererProps {
   initialResults?: unknown
   onResults?: (args: { messageId: string; results: unknown }) => void
   onError?: (args: { messageId: string; errorText: string }) => void
-  toolState?: 'input-streaming' | 'input-available' | 'output-available' | 'output-error'
+  onApprove?: () => void
+  onDeny?: () => void
+  toolState?:
+    | 'input-streaming'
+    | 'input-available'
+    | 'approval-requested'
+    | 'output-available'
+    | 'output-error'
   isLastPart?: boolean
   isLastMessage?: boolean
   showConfirmFooter?: boolean
@@ -47,6 +54,8 @@ export const DisplayBlockRenderer = ({
   initialResults,
   onResults,
   onError,
+  onApprove,
+  onDeny,
   toolState,
   isLastPart = false,
   isLastMessage = false,
@@ -219,12 +228,14 @@ export const DisplayBlockRenderer = ({
   }
 
   const resolvedHasDecision = initialResults !== undefined || rows !== undefined
-  const shouldShowConfirmFooter =
+  const isApprovalPending = toolState === 'approval-requested' && isLastPart && isLastMessage
+  const isLegacyConfirm =
     showConfirmFooter &&
     !resolvedHasDecision &&
     toolState === 'input-available' &&
     isLastPart &&
     isLastMessage
+  const shouldShowConfirmFooter = isApprovalPending || isLegacyConfirm
 
   return (
     <div className="display-block w-auto overflow-x-hidden">
@@ -252,10 +263,18 @@ export const DisplayBlockRenderer = ({
             confirmLabel={executeSqlLoading ? 'Running...' : 'Run Query'}
             isLoading={executeSqlLoading}
             onCancel={async () => {
-              onResults?.({ messageId, results: 'User skipped running the query' })
+              if (onDeny) {
+                onDeny()
+              } else {
+                onResults?.({ messageId, results: 'User skipped running the query' })
+              }
             }}
             onConfirm={() => {
-              handleExecute(isWriteQuery ? 'mutation' : 'select')
+              if (onApprove) {
+                onApprove()
+              } else {
+                handleExecute(isWriteQuery ? 'mutation' : 'select')
+              }
             }}
           />
         </div>

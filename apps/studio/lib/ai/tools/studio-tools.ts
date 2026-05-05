@@ -1,6 +1,8 @@
 import { tool } from 'ai'
 import { z } from 'zod'
 
+import { deployEdgeFunction } from '@/data/edge-functions/edge-functions-deploy-mutation'
+import { executeSql } from '@/data/sql/execute-sql-query'
 import {
   EDGE_FUNCTION_PROMPT,
   PG_BEST_PRACTICES,
@@ -44,32 +46,70 @@ export const loadKnowledgeInputSchema = z.object({
     .describe('The knowledge to load'),
 })
 
-export const getStudioTools = () => ({
-  execute_sql: tool({
-    description: 'Asks the user to execute a SQL statement and return the results',
-    inputSchema: executeSqlInputSchema,
-  }),
-  deploy_edge_function: tool({
-    description:
-      'Ask the user to deploy a Supabase Edge Function from provided code on the client. Client will confirm before deploying and return the result',
-    inputSchema: z.object({
-      name: z.string().describe('The URL-friendly name/slug of the Edge Function.'),
-      code: z.string().describe('The TypeScript code for the Edge Function.'),
+export type StudioToolsContext = {
+  projectRef?: string
+  connectionString?: string
+  authorization?: string
+}
+
+export const getStudioTools = (ctx: StudioToolsContext = {}) => {
+  const { projectRef, connectionString, authorization } = ctx
+  const authHeaders = authorization
+    ? { 'Content-Type': 'application/json', Authorization: authorization }
+    : undefined
+
+  return {
+    execute_sql: tool({
+      description:
+        'Asks the user to execute a SQL statement and return the results. Requires user approval for write queries.',
+      inputSchema: executeSqlInputSchema,
+      needsApproval: (input) => input.isWriteQuery === true,
+      execute: async ({ sql }) => {
+        const { result } = await executeSql(
+          { projectRef, connectionString, sql },
+          undefined,
+          authHeaders
+        )
+        return result
+      },
     }),
-  }),
-  rename_chat: tool({
-    description: `Rename the current chat session when the current chat name doesn't describe the conversation topic.`,
-    inputSchema: z.object({
-      newName: z.string().describe('The new name for the chat session. Five words or less.'),
+    deploy_edge_function: tool({
+      description:
+        'Asks the user to deploy a Supabase Edge Function from provided code. Requires user approval before deploying.',
+      inputSchema: z.object({
+        name: z.string().describe('The URL-friendly name/slug of the Edge Function.'),
+        code: z.string().describe('The TypeScript code for the Edge Function.'),
+      }),
+      needsApproval: true,
+      execute: async ({ name, code }) => {
+        await deployEdgeFunction({
+          projectRef: projectRef ?? '',
+          slug: name,
+          metadata: {
+            entrypoint_path: 'index.ts',
+            name,
+            verify_jwt: true,
+          },
+          files: [{ name: 'index.ts', content: code }],
+          authorization,
+        })
+        return { success: true }
+      },
     }),
-    execute: async () => {
-      return { status: 'Chat request sent to client' }
-    },
-  }),
-  load_knowledge: tool({
-    description:
-      'Load detailed knowledge about a Supabase topic before answering questions about it.',
-    inputSchema: loadKnowledgeInputSchema,
-    execute: ({ name }) => KNOWLEDGE[name],
-  }),
-})
+    rename_chat: tool({
+      description: `Rename the current chat session when the current chat name doesn't describe the conversation topic.`,
+      inputSchema: z.object({
+        newName: z.string().describe('The new name for the chat session. Five words or less.'),
+      }),
+      execute: async () => {
+        return { status: 'Chat request sent to client' }
+      },
+    }),
+    load_knowledge: tool({
+      description:
+        'Load detailed knowledge about a Supabase topic before answering questions about it.',
+      inputSchema: loadKnowledgeInputSchema,
+      execute: ({ name }) => KNOWLEDGE[name],
+    }),
+  }
+}
