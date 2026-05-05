@@ -1,6 +1,5 @@
+import { MarketingForm } from 'marketing'
 import type { GoPageInput } from 'marketing'
-
-import HubSpotFormEmbed from './components/HubSpotFormEmbed'
 
 const page: GoPageInput = {
   template: 'lead-gen',
@@ -110,8 +109,61 @@ const page: GoPageInput = {
       id: 'form',
       title: 'Apply for your credits',
       children: (
-        <div className="mx-auto w-full max-w-2xl border border-muted rounded-2xl p-6 sm:p-8">
-          <HubSpotFormEmbed portalId="19953346" formId="db2718f8-1f23-4fe1-aaab-b4924dc4ca54" />
+        <div className="mx-auto w-full max-w-2xl">
+          <MarketingForm
+            fields={[
+              {
+                type: 'text',
+                name: 'firstName',
+                label: 'First name',
+                placeholder: 'First name',
+                required: true,
+                half: true,
+              },
+              {
+                type: 'text',
+                name: 'lastName',
+                label: 'Last name',
+                placeholder: 'Last name',
+                required: true,
+                half: true,
+              },
+              {
+                type: 'email',
+                name: 'email',
+                label: 'Work email',
+                placeholder: 'you@company.com',
+                required: true,
+              },
+              {
+                type: 'text',
+                name: 'company',
+                label: 'Company',
+                placeholder: 'Company name',
+                required: true,
+              },
+              {
+                type: 'text',
+                name: 'awsAccountId',
+                label: 'AWS account ID',
+                placeholder: '12-digit AWS account ID',
+                required: true,
+              },
+            ]}
+            submitLabel="Apply for credits"
+            successMessage="Thanks! We've received your application and will review it within 5 business days."
+            disclaimer="By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy)."
+            crm={{
+              hubspot: {
+                formGuid: 'db2718f8-1f23-4fe1-aaab-b4924dc4ca54',
+                fieldMap: {
+                  firstName: 'firstname',
+                  lastName: 'lastname',
+                  awsAccountId: 'aws_account_id',
+                },
+              },
+            }}
+          />
         </div>
       ),
     },
