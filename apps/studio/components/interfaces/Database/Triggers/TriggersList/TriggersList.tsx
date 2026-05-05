@@ -255,6 +255,7 @@ execute function function_name();`
             </Shortcut>
             <InputGroup className="w-full lg:w-52">
               <InputGroupInput
+                ref={searchInputRef}
                 size="tiny"
                 placeholder="Search for a trigger"
                 value={filterString}

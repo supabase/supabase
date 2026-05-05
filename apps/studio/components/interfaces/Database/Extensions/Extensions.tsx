@@ -83,6 +83,7 @@ export const Extensions = () => {
       <div className="mb-4">
         <InputGroup className="w-52">
           <InputGroupInput
+            ref={searchInputRef}
             size="tiny"
             placeholder="Search for an extension"
             value={filterString}
