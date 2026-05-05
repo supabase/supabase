@@ -135,7 +135,7 @@ const PreviewFilterPanel = ({
               <div className="flex items-center gap-x-1">
                 {hasEdits && (
                   <Tooltip>
-                    <TooltipTrigger>
+                    <TooltipTrigger asChild>
                       <InputGroupButton type="text" onClick={() => handleInputSearch(search)}>
                         <span>↲</span>
                       </InputGroupButton>
@@ -146,7 +146,7 @@ const PreviewFilterPanel = ({
 
                 {search.length > 0 && (
                   <Tooltip>
-                    <TooltipTrigger>
+                    <TooltipTrigger asChild>
                       <InputGroupButton type="text" onClick={() => handleInputSearch('')}>
                         <X />
                       </InputGroupButton>
