@@ -7,7 +7,7 @@
 #   2. Installs Docker Engine + Compose plugin (if missing)
 #   3. Installs Node.js >= 16 (if missing)
 #   4. Optionally installs the AWS CLI v2 (--with-aws)
-#   5. Either uses the supabase clone it lives in, or sparse-clones the repo
+#   5. Sparse-clones the repo to extract the contents of ./docker
 #   6. Creates a project directory in CWD and copies docker/* into it
 #   7. Prompts for the main URLs and writes them to .env
 #   8. Generates secrets and asymmetric API keys via utils/*.sh
