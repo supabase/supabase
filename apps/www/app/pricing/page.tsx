@@ -3,7 +3,13 @@ import { plans } from 'shared-data/plans'
 
 import PricingContent from './PricingContent'
 import pricingFaq from '@/data/PricingFAQ.json'
-import { faqPageSchema, pricingProductSchema, serializeJsonLd } from '@/lib/json-ld'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import {
+  breadcrumbListSchema,
+  faqPageSchema,
+  pricingProductSchema,
+  serializeJsonLd,
+} from '@/lib/json-ld'
 
 const PRICING_DESCRIPTION =
   'Explore Supabase fees and pricing information. Find our competitive pricing Plans, with no hidden pricing. We have a generous Free Plan for those getting started, and Pay As You Go for those scaling up.'
@@ -41,6 +47,12 @@ const PRODUCT_JSON_LD = serializeJsonLd(
 export default function PricingPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.pricing)),
+        }}
+      />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: FAQ_JSON_LD }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: PRODUCT_JSON_LD }} />
       <PricingContent />

@@ -802,7 +802,7 @@
     "mdast": "^3.0.0",
     "mermaid": "^11.12.1",
     "monaco-editor": "*",
-    "next-themes": "*",
+    "next-themes": "catalog:",
     "openai": "^4.75.1",
     "prism-react-renderer": "^2.3.1",
     "radix-ui": "catalog:",
