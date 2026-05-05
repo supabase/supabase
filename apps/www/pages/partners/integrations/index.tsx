@@ -2,9 +2,8 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
-import supabase from '~/lib/supabaseMisc'
-import { listPartners } from '~/lib/marketplaceDb'
-import { type Category, type Partner, toPartner } from '~/types/partners'
+import { listPartners, searchPartners } from '~/lib/marketplaceDb'
+import { type Category, type Partner } from '~/types/partners'
 import { Loader, Search } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
@@ -46,26 +45,9 @@ function IntegrationPartnersPage(props: Props) {
   const [isSearching, setIsSearching] = useState(false)
 
   useEffect(() => {
-    const searchPartners = async () => {
+    const doSearch = async () => {
       setIsSearching(true)
-
-      let query = supabase
-        .from('partners')
-        .select('*')
-        .eq('approved', true)
-        .order('category')
-        .order('title')
-
-      if (search.trim()) {
-        query = query.textSearch('tsv', `${search.trim()}`, {
-          type: 'websearch',
-          config: 'english',
-        })
-      }
-
-      const { data: partners } = await query
-
-      return partners
+      return await searchPartners(search)
     }
 
     if (search.trim() === '') {
@@ -74,9 +56,9 @@ function IntegrationPartnersPage(props: Props) {
       return
     }
 
-    searchPartners().then((partners) => {
+    doSearch().then((partners) => {
       if (partners) {
-        setPartners(partners.map(toPartner))
+        setPartners(partners)
       }
 
       setIsSearching(false)

@@ -16,8 +16,8 @@ import 'swiper/css'
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import supabase from '~/lib/supabaseMisc'
-import { type Partner, toPartner } from '~/types/partners'
+import { getPartner, listPartnerSlugs } from '~/lib/marketplaceDb'
+import { type Partner } from '~/types/partners'
 import { useBreakpoint } from 'common'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -300,17 +300,13 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
 
 // This function gets called at build time
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: slugs } = await supabase
-    .from('partners')
-    .select('slug')
-    .eq('approved', true)
-    .eq('type', 'technology')
+  const slugs = await listPartnerSlugs()
 
   const paths: {
     params: { slug: string }
     locale?: string | undefined
   }[] =
-    slugs?.map(({ slug }) => ({
+    slugs?.map((slug) => ({
       params: {
         slug,
       },
@@ -324,16 +320,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 // This also gets called at build time
 export const getStaticProps: GetStaticProps<PartnerData> = async ({ params }) => {
-  let { data: partner } = await supabase
-    .from('partners')
-    .select('*')
-    .eq('approved', true)
-    .eq('slug', params!.slug as string)
-    .single()
+  const partner = await getPartner(params!.slug as string)
 
-  if (!partner || partner.type === 'expert') {
+  if (!partner) {
     return {
-      notFound: true,
+      notFound: true
     }
   }
 
@@ -347,7 +338,7 @@ export const getStaticProps: GetStaticProps<PartnerData> = async ({ params }) =>
 
   // Parse markdown
   const overview = await serialize({
-    source: partner.overview,
+    source: partner.content,
     options: {
       mdxOptions: {
         remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
@@ -356,7 +347,7 @@ export const getStaticProps: GetStaticProps<PartnerData> = async ({ params }) =>
   })
 
   return {
-    props: { partner: toPartner(partner), overview },
+    props: { partner, overview },
     revalidate: 1800, // 30 minutes
   }
 }
