@@ -4,7 +4,8 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Form, FormControl, FormField, Input, Input_Shadcn_ } from 'ui'
+import { Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -225,14 +226,12 @@ const SecondStep = ({
           <InformationBox
             title="Unable to scan?"
             description={
-              <Input
-                copy
-                disabled
-                id="ref"
-                size="small"
+              <FormItemLayout
+                isReactForm={false}
                 label="You can also enter this secret key into your authenticator app"
-                value={factor.totp.secret}
-              />
+              >
+                <Input copy disabled id="ref" size="small" value={factor.totp.secret} />
+              </FormItemLayout>
             }
           />
 

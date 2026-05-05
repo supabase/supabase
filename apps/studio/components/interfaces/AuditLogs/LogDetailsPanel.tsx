@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
-import { Input, SidePanel } from 'ui'
+import { Input_Shadcn_ as Input, SidePanel, TextArea_Shadcn_ as TextArea } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import {
   FormSection,
@@ -34,9 +35,7 @@ export const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) 
     >
       <FormSection header={<FormSectionLabel>General</FormSectionLabel>}>
         <FormSectionContent loading={false}>
-          <Input
-            readOnly
-            size="small"
+          <FormItemLayout
             label="Occurred at"
             value={
               selectedLog
