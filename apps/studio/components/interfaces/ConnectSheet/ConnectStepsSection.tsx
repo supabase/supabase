@@ -154,7 +154,15 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
   const stepsContainerRef = useRef<HTMLDivElement | null>(null)
   const connectionStringPooler = useConnectionStringPooler()
 
-  const ipv4Addon = useIpv4AddonQuery()
+  const { data: ipv4Addon } = useProjectAddonsQuery(
+    { projectRef: ref },
+    {
+      select: (data) => {
+        const selectedAddons = data?.selected_addons ?? []
+        return selectedAddons.find((addon) => addon.type === 'ipv4')
+      },
+    }
+  )
 
   if (steps.length === 0) return null
 
