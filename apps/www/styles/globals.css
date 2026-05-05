@@ -158,6 +158,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/*
+ * Typography
+ */
 .h1:not(.prose *):not(.overwrite),
 .h2:not(.prose *):not(.overwrite),
 .h3:not(.prose *):not(.overwrite),
@@ -356,6 +359,9 @@ table {
   @apply wrap-break-word;
 }
 
+/*
+ * sets the image in @Next/Image components to respect the height of the content
+ */
 .next-image--dynamic-fill {
   display: block;
   width: 100%;

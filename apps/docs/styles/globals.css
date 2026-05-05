@@ -269,6 +269,9 @@ article p code {
   border: none;
 }
 
+/*
+ * sets the image in @Next/Image components to respect the height of the content
+ */
 .next-image--dynamic-fill {
   width: 100%;
   grid-column: 1 / -1;
