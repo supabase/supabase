@@ -1,7 +1,16 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
-import { Badge, cn, HoverCard, HoverCardContent, HoverCardTrigger, Input } from 'ui'
+import {
+  Badge,
+  cn,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from 'ui'
 import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
 import {
@@ -56,14 +65,17 @@ export const PolicyTemplates = ({
       <label className="sr-only" htmlFor="template-search">
         Search templates
       </label>
-      <Input
-        size="small"
-        id="template-search"
-        icon={<Search className="text-foreground-muted" />}
-        placeholder="Search templates"
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-      />
+      <InputGroup>
+        <InputGroupInput
+          id="template-search"
+          placeholder="Search templates"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <InputGroupAddon>
+          <Search />
+        </InputGroupAddon>
+      </InputGroup>
 
       {search.length > 0 && filteredTemplates.length === 0 && (
         <NoSearchResults searchString={search} className="min-w-full" />
