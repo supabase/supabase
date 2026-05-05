@@ -18,19 +18,9 @@ To install a specific skill from the repository:
 npx skills add supabase/agent-skills --skill SKILL_NAME
 ```
 
-Skills install at project scope by default, placing them in your repository so all contributors and cloud agents share the same setup. Pass `--global` to install once across all your projects instead:
+Skills install at project scope by default, placing them in your repository so all contributors and cloud agents share the same setup. Pass `--global` to install once across all your projects instead. You can also install for all detected agents at the same time by passing `--all`. See the [skills package](https://github.com/vercel-labs/skills) for more options.
 
-```bash
-npx skills add supabase/agent-skills --global
-```
-
-Skills work with 18+ AI agents including Claude Code, GitHub Copilot, Cursor, Cline, and many others. To install for all agents at once:
-
-```bash
-npx skills add supabase/agent-skills --all
-```
-
-If you use Claude Code, the [Supabase agent plugin](/docs/guides/getting-started/plugins) bundles both skills and the Supabase MCP server into a single install.
+Skills work with 18+ AI agents including Claude Code, GitHub Copilot, Cursor, Cline, and many others. If you use Claude Code, the [Supabase agent plugin](/docs/guides/getting-started/plugins) bundles both skills and the Supabase MCP server into a single install.
 
 ## Available skills
 
@@ -49,3 +39,4 @@ npx skills find QUERY
 - [Agent Skills Repository](https://github.com/supabase/agent-skills)
 - [Agent Skills Documentation](https://agentskills.io/home)
 - [Agent Skills Overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)
+- [skills npm package](https://github.com/vercel-labs/skills)
