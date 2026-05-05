@@ -8,7 +8,7 @@ import { StatusIcon } from './../../StatusIcon'
 
 export const SONNER_DEFAULT_DURATION = 4000
 
-type ToasterProps = React.ComponentProps & { theme: 'light' | 'dark' | 'system' }
+type ToasterProps = React.ComponentProps<typeof Sonner> & { theme: 'light' | 'dark' | 'system' }
 
 const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
   return (
