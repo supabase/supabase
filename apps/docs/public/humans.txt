@@ -207,6 +207,7 @@ Rafael Chacón
 Raminder Singh
 Raúl Barroso
 Riccardo Busetti
+Richard Kasprzak
 Rob Shields
 Rodrigo Esteves
 Rodrigo Mansueli
