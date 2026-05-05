@@ -61,7 +61,7 @@ case "$CMD" in
         ;;
     restart)
         # shellcheck disable=SC2086
-        docker compose $COMPOSE_FILES restart
+        exec docker compose $COMPOSE_FILES restart
         ;;
     recreate)
         # shellcheck disable=SC2086

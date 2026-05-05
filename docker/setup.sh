@@ -63,20 +63,18 @@ log()  { printf "===> %s\n" "$*"; }
 warn() { printf "WARNING: %s\n" "$*" >&2; }
 die()  { printf "ERROR: %s\n" "$*" >&2; exit 1; }
 
-# Prompt with a default. Non-interactive (-y or no tty) keeps the default.
+# Prompt with a default; echoes the chosen value on stdout.
+# Non-interactive (-y or no tty) returns the default unchanged.
 ask() {
-    # ask <prompt> <default> <var-name>
+    # ask <prompt> <default>  -> echoes chosen value
     if [ "$ASSUME_YES" = "1" ] || [ ! -t 0 ]; then
-        eval "$3=\"\$2\""
+        printf '%s' "$2"
         return
     fi
-    printf "%s [%s]: " "$1" "$2"
+    printf "%s [%s]: " "$1" "$2" >&2
     read -r reply
-    if [ -z "$reply" ]; then
-        eval "$3=\"\$2\""
-    else
-        eval "$3=\"\$reply\""
-    fi
+    [ -z "$reply" ] && reply="$2"
+    printf '%s' "$reply"
 }
 
 OS_FAMILY=""
@@ -189,7 +187,19 @@ install_node() {
         return 0
     fi
 
-    node_ok || die "Node.js >= 16 still not available after install."
+    log "Distro Node.js missing or too old; installing Node.js 20 from NodeSource"
+    if [ "$OS_FAMILY" = "debian" ]; then
+        $SUDO apt-get remove --purge -y nodejs npm 2>/dev/null || true
+        curl -fsSL https://deb.nodesource.com/setup_20.x | $SUDO -E bash -
+        $SUDO apt-get update -qq -y
+        pkg_install nodejs
+    else
+        $SUDO dnf remove -y nodejs npm 2>/dev/null || true
+        curl -fsSL https://rpm.nodesource.com/setup_20.x | $SUDO -E bash -
+        pkg_install nodejs
+    fi
+
+    node_ok || die "Node.js >= 16 still not available after NodeSource install."
     log "Node.js installed: $(node -v)"
 }
 
@@ -307,9 +317,9 @@ echo ""
 echo "Configure the main URLs (press Enter to accept the default)."
 echo ""
 
-ask "SUPABASE_PUBLIC_URL (Studio + APIs)" "$current_public_url" public_url
-ask "API_EXTERNAL_URL (Auth callbacks)"   "$public_url"         api_url
-ask "SITE_URL (default Auth redirect)"    "$current_site_url"   site_url
+public_url=$(ask "SUPABASE_PUBLIC_URL (Studio + APIs)" "$current_public_url")
+api_url=$(ask   "API_EXTERNAL_URL (Auth callbacks)"   "$public_url")
+site_url=$(ask  "SITE_URL (default Auth redirect)"    "$current_site_url")
 
 sed -i.old \
     -e "s|^SUPABASE_PUBLIC_URL=.*$|SUPABASE_PUBLIC_URL=${public_url}|" \
