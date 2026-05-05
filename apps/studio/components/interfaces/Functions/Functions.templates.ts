@@ -14,7 +14,7 @@ interface ReqPayload {
 console.info("server started");
 
 export default {
-  fetch: withSupabase({ allow: ["public", "secret"] }, async (req, ctx) => {
+  fetch: withSupabase({ auth: ["publishable", "secret"] }, async (req, ctx) => {
     const { name }: ReqPayload = await req.json();
 
     // Using 'sb_secret_xyz' bypasses RLS — use for privileged operations
@@ -40,7 +40,7 @@ import { withSupabase } from "jsr:@supabase/server";
 
 // This endpoint uses 'user' access, credentials is required.
 export default {
-  fetch: withSupabase({ allow: "user" }, async (_req, { supabase }) => {
+  fetch: withSupabase({ auth: "user" }, async (_req, { supabase }) => {
     // TODO: Change the table_name to your table
     const { data, error } = await supabase.from("table_name").select("*");
 
@@ -65,7 +65,7 @@ import { withSupabase } from "jsr:@supabase/server";
 import { randomUUID } from "node:crypto"
 
 export default {
-  fetch: withSupabase({ allow: "public" }, async (req, { supabase }) => {
+  fetch: withSupabase({ auth: "publishable" }, async (req, { supabase }) => {
     const formData = await req.formData()
     const file = formData.get('file')
 
@@ -165,7 +165,7 @@ const openai = createOpenAI({
 const SYSTEM_PROMPT = "You are a helpful AI assistant.";
 
 export default {
-  fetch: withSupabase({ allow: "public", cors }, async (req, _ctx) => {
+  fetch: withSupabase({ auth: "publishable", cors }, async (req, _ctx) => {
     if (req.method === "OPTIONS") {
       return new Response("ok");
     }
@@ -251,7 +251,7 @@ const SYSTEM_PROMPT =
   "You are a recipe generator. Always return a structured recipe matching the given schema.";
 
 export default {
-  fetch: withSupabase({ allow: "public", cors }, async (req, _ctx) => {
+  fetch: withSupabase({ auth: "publishable", cors }, async (req, _ctx) => {
     if (req.method === "OPTIONS") {
       return new Response("ok");
     }
@@ -311,7 +311,7 @@ import Stripe from "npm:stripe";
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!);
 
 export default {
-  fetch: withSupabase({ allow: "always" }, async (req, { supabaseAdmin }) => {
+  fetch: withSupabase({ auth: "none" }, async (req, { supabaseAdmin }) => {
     const body = await req.text();
     const sig = req.headers.get("stripe-signature")!;
 
@@ -356,7 +356,7 @@ import { withSupabase } from "jsr:@supabase/server";
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
 
 export default {
-  fetch: withSupabase({ allow: "public" }, async (req, _ctx) => {
+  fetch: withSupabase({ auth: "publishable" }, async (req, _ctx) => {
     const { to, subject, html } = await req.json();
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -392,7 +392,7 @@ import {
 await initializeImageMagick();
 
 export default {
-  fetch: withSupabase({ allow: "public" }, async (req, _ctx) => {
+  fetch: withSupabase({ auth: "publishable" }, async (req, _ctx) => {
     const formData = await req.formData();
     const file = formData.get("file");
     const content = await file.arrayBuffer();
@@ -419,7 +419,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "jsr:@supabase/server";
 
 export default {
-  fetch: withSupabase({ allow: "public" }, async (req, _ctx) => {
+  fetch: withSupabase({ auth: "publishable" }, async (req, _ctx) => {
     const upgrade = req.headers.get("upgrade") || "";
     if (upgrade.toLowerCase() != "websocket") {
       return new Response("request isn't trying to upgrade to websocket.");
