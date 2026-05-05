@@ -706,7 +706,7 @@ export default {
           rounded: `rounded-md`,
         },
         pills: {
-          base: `my-px px-3 py-[3px] rounded-md transition-colors`,
+          base: `my-px px-3 py-[3px] rounded-md transition-colors active:bg-sidebar-accent/50`,
           normal: `
             font-normal
             border-default
