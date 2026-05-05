@@ -6647,7 +6647,51 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "https://schemas.example.com/queryVectorBody.json"
+                "type": "object",
+                "properties": {
+                  "filter": {
+                    "type": "object",
+                    "description": "Boolean filter expression. Supports field operators ($eq, $ne, $gt, $gte, $lt, $lte, $in, $nin, $exists) and logical operators ($and, $or) with arbitrary nesting.",
+                    "additionalProperties": true
+                  },
+                  "indexArn": {
+                    "type": "string"
+                  },
+                  "indexName": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 45,
+                    "pattern": "^[a-z0-9](?:[a-z0-9.-]{1,61})?[a-z0-9]$"
+                  },
+                  "queryVector": {
+                    "type": "object",
+                    "properties": {
+                      "float32": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        }
+                      }
+                    },
+                    "required": ["float32"],
+                    "additionalProperties": false
+                  },
+                  "returnDistance": {
+                    "type": "boolean"
+                  },
+                  "returnMetadata": {
+                    "type": "boolean"
+                  },
+                  "topK": {
+                    "type": "number"
+                  },
+                  "vectorBucketName": {
+                    "type": "string"
+                  }
+                },
+                "required": ["vectorBucketName", "indexName", "queryVector", "topK"],
+                "additionalProperties": false,
+                "title": "queryVectorBodyDoc"
               }
             }
           }
@@ -6856,6 +6900,53 @@
         },
         "required": ["statusCode", "error", "message"],
         "title": "errorSchema"
+      },
+      "def-2": {
+        "type": "object",
+        "properties": {
+          "filter": {
+            "type": "object",
+            "description": "Boolean filter expression. Supports field operators ($eq, $ne, $gt, $gte, $lt, $lte, $in, $nin, $exists) and logical operators ($and, $or) with arbitrary nesting.",
+            "additionalProperties": true
+          },
+          "indexArn": {
+            "type": "string"
+          },
+          "indexName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 45,
+            "pattern": "^[a-z0-9](?:[a-z0-9.-]{1,61})?[a-z0-9]$"
+          },
+          "queryVector": {
+            "type": "object",
+            "properties": {
+              "float32": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            },
+            "required": ["float32"],
+            "additionalProperties": false
+          },
+          "returnDistance": {
+            "type": "boolean"
+          },
+          "returnMetadata": {
+            "type": "boolean"
+          },
+          "topK": {
+            "type": "number"
+          },
+          "vectorBucketName": {
+            "type": "string"
+          }
+        },
+        "required": ["vectorBucketName", "indexName", "queryVector", "topK"],
+        "additionalProperties": false,
+        "title": "queryVectorBodyDoc"
       }
     }
   }
