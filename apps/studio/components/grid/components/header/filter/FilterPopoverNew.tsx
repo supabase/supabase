@@ -20,7 +20,6 @@ import { useSqlFilterGenerateMutation } from '@/data/ai/sql-filter-mutation'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface FilterPopoverProps {
-  portal?: boolean
   isRefetching?: boolean
 }
 
