@@ -109,25 +109,16 @@ function PluginInstructions({ client }: { client: PluginClient }) {
     return (
       <div className="space-y-3">
         <p className="text-sm text-foreground-light">
-          In the{' '}
-          <a
-            href="https://cursor.com/docs/plugins"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-brand-link hover:underline"
-          >
-            Cursor desktop or web app
-          </a>
-          , type the following in the chat to install the Supabase plugin from the{' '}
+          In the Cursor desktop or web app, type the following in the chat to install the{' '}
           <a
             href="https://cursor.com/marketplace/supabase"
             target="_blank"
             rel="noopener noreferrer"
             className="text-brand-link hover:underline"
           >
-            Cursor marketplace
-          </a>
-          :
+            Supabase
+          </a>{' '}
+          plugin from the Cursor plugin marketplace
         </p>
         <CodeBlock
           value="/add-plugin supabase"
