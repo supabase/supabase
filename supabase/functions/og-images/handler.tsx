@@ -1,4 +1,6 @@
+// @ts-ignore: Deno remote imports cannot be resolved by standard TypeScript
 import React from 'https://esm.sh/react@18.2.0?deno-std=0.140.0'
+// @ts-ignore: Deno remote imports cannot be resolved by standard TypeScript
 import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.4/mod.ts'
 import CustomerStories from './component/CustomerStories.tsx'
 import Docs from './component/Docs.tsx'
@@ -26,7 +28,7 @@ const CIRCULAR_FONT_DATA = await FONT_CIRCULAR
 const MONO_FONT_DATA = await FONT_MONO
 
 const getParamValue = (
-  url: string,
+  url: URL,
   value: string,
   options?: {
     lowercase?: boolean

@@ -6,81 +6,9 @@ settings:
 
 catalogs:
   default:
-    '@sentry/nextjs':
-      specifier: ^10.26.0
-      version: 10.27.0
-    '@supabase/auth-js':
-      specifier: 2.104.1
-      version: 2.104.1
-    '@supabase/postgrest-js':
-      specifier: 2.104.1
-      version: 2.104.1
-    '@supabase/realtime-js':
-      specifier: 2.104.1
-      version: 2.104.1
-    '@supabase/ssr':
-      specifier: 0.10.2
-      version: 0.10.2
     '@supabase/supabase-js':
       specifier: 2.104.1
       version: 2.104.1
-    '@types/node':
-      specifier: ^22.0.0
-      version: 22.13.14
-    '@types/react':
-      specifier: ^18.3.0
-      version: 18.3.3
-    '@types/react-dom':
-      specifier: ^18.3.0
-      version: 18.3.0
-    '@vitejs/plugin-react':
-      specifier: ^6.0.1
-      version: 6.0.1
-    '@vitest/coverage-v8':
-      specifier: ^4.1.4
-      version: 4.1.4
-    '@vitest/ui':
-      specifier: ^4.1.4
-      version: 4.1.4
-    next:
-      specifier: 16.2.3
-      version: 16.2.3
-    radix-ui:
-      specifier: ^1.4.3
-      version: 1.4.3
-    react:
-      specifier: ^18.3.0
-      version: 18.3.1
-    react-dom:
-      specifier: ^18.3.0
-      version: 18.3.1
-    recharts:
-      specifier: ^2.15.4
-      version: 2.15.4
-    tailwindcss:
-      specifier: ^4.2.4
-      version: 4.2.4
-    tsx:
-      specifier: 4.20.3
-      version: 4.20.3
-    typescript:
-      specifier: ~6.0.0
-      version: 6.0.2
-    valtio:
-      specifier: ^1.12.0
-      version: 1.12.0
-    vite:
-      specifier: ^8.0.8
-      version: 8.0.8
-    vite-tsconfig-paths:
-      specifier: ^6.1.1
-      version: 6.1.1
-    vitest:
-      specifier: ^4.1.4
-      version: 4.1.4
-    zod:
-      specifier: 3.25.76
-      version: 3.25.76
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
@@ -1951,6 +1879,15 @@ importers:
       tsx:
         specifier: 'catalog:'
         version: 4.20.3
+
+  offline-test:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: 'catalog:'
+        version: 2.104.1
+      postgres:
+        specifier: ^3.4.9
+        version: 3.4.9
 
   packages/ai-commands:
     dependencies:
@@ -14916,6 +14853,10 @@ packages:
 
   postgres-range@1.1.4:
     resolution: {integrity: sha512-i/hbxIE9803Alj/6ytL7UHQxRvZkI9O4Sy+J3HGc4F4oo/2eQAjTSNJ0bfxyse3bH0nuVesCk+3IRLaMtG3H6w==}
+
+  postgres@3.4.9:
+    resolution: {integrity: sha512-GD3qdB0x1z9xgFI6cdRD6xu2Sp2WCOEoe3mtnyB5Ee0XrrL5Pe+e4CCnJrRMnL1zYtRDZmQQVbvOttLnKDLnaw==}
+    engines: {node: '>=12'}
 
   posthog-js@1.357.0:
     resolution: {integrity: sha512-hMmgQ/ylepbOv8FubOI32qxqhB0OxWBX1odr5X/1Sgv6K/0g7hlP+ARvjv2FwTWQZ1AKuENpcMo8We5NLUhmQw==}
@@ -32935,6 +32876,8 @@ snapshots:
   postgres-interval@3.0.0: {}
 
   postgres-range@1.1.4: {}
+
+  postgres@3.4.9: {}
 
   posthog-js@1.357.0:
     dependencies:
