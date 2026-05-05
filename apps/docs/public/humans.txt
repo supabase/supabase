@@ -35,6 +35,7 @@ Beng Eu
 Benjamin Coenen
 Bo Lu
 Bobbie Soedirgo
+Brad Gyger
 Brendan Stephens
 Brent Newson
 Carel de Waal
@@ -171,6 +172,7 @@ Marcus Weiner
 Margarita Sandomirskaia
 Mark Burggraf
 Matthew Hambright
+Matt Hudson
 Matt Johnston
 Matt Rossman
 Matthias Luft

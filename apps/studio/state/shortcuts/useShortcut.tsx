@@ -72,6 +72,7 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
   const ignoreInputs = options?.ignoreInputs ?? def.options?.ignoreInputs
   const registerInCommandMenu =
     options?.registerInCommandMenu ?? def.options?.registerInCommandMenu ?? false
+  const label = options?.label ?? def.label
 
   // Only include `ignoreInputs` when set. The library resolves it to a concrete
   // boolean at register time (false for Meta/Ctrl/Escape, true otherwise), but
@@ -86,7 +87,7 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
 
   // Handle overrides for command menu
   const enabledInCommandMenu = enabled && registerInCommandMenu
-  const depsInCommandMenu = [enabled, def.label]
+  const depsInCommandMenu = [enabled, label]
   const callbackRef = useLatest(callback)
   const setCommandMenuOpen = useSetCommandMenuOpen()
   const stableAction = useCallback(() => {
@@ -99,7 +100,7 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
     [
       {
         id,
-        name: def.label,
+        name: label,
         action: stableAction,
         badge: () => (
           <div className="flex items-center gap-1">
