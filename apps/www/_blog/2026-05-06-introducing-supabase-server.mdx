@@ -25,7 +25,7 @@ Today we're happy to release `@supabase/server` in public beta. A new package th
 import { withSupabase } from '@supabase/server'
 
 export default {
-  fetch: withSupabase({ allow: 'user' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
     const { data } = await ctx.supabase.from('todos').select()
     return Response.json(data)
   }),
@@ -44,7 +44,7 @@ import { withSupabase } from 'npm:@supabase/server'
 // Classic Deno.serve on Edge Functions
 // same functionality as the code above
 Deno.serve(
-  withSupabase({ allow: 'user' }, async (req, ctx) => {
+  withSupabase({ auth: 'user' }, async (req, ctx) => {
     const { data } = await ctx.supabase.from('todos').select()
     return Response.json(data)
   })
@@ -58,7 +58,7 @@ import { createSupabaseContext } from '@supabase/server'
 
 export default {
   fetch: async (req) => {
-    const { data: ctx, error } = await createSupabaseContext(req, { allow: 'user' })
+    const { data: ctx, error } = await createSupabaseContext(req, { auth: 'user' })
     if (error) return Response.json({ error: error.message }, { status: error.status })
 
     const { data } = await ctx.supabase.from('todos').select()
@@ -78,8 +78,8 @@ interface SupabaseContext {
   supabase: SupabaseClient // RLS-scoped to the caller
   supabaseAdmin: SupabaseClient // bypasses RLS
   userClaims: UserIdentity | null
-  claims: JWTClaims | null
-  authType: Allow
+  jwtClaims: JWTClaims | null
+  authType: AuthType
 }
 ```
 
@@ -87,20 +87,23 @@ interface SupabaseContext {
 
 ## Declarative access control
 
-The `allow` config declares who can call each function:
+The `auth` config declares who can call each function:
 
 ```typescript
 // authenticated users only (default)
-withSupabase({ allow: 'user' }, handler)
+withSupabase({ auth: 'user' }, handler)
 
 // no auth required, good for webhooks and health checks
-withSupabase({ allow: 'always' }, handler)
+withSupabase({ auth: 'none' }, handler)
 
 // server-to-server with secret key
-withSupabase({ allow: 'secret' }, handler)
+withSupabase({ auth: 'secret' }, handler)
+
+// with publishable key
+withSupabase({ auth: 'publishable' }, handler)
 
 // accept either a user JWT or a secret key
-withSupabase({ allow: ['user', 'secret'] }, handler)
+withSupabase({ auth: ['user', 'secret'] }, handler)
 ```
 
 Your function's security model is visible in one line.
@@ -117,8 +120,8 @@ We fixed it. `@supabase/server` handles new key validation and JWT verification 
 import { withSupabase } from '@supabase/server'
 
 export default {
-  // allow: 'user' will handle incoming user JWT validation for you
-  fetch: withSupabase({ allow: 'user' }, async (req, { supabase }) => {
+  // auth: 'user' will handle incoming user JWT validation for you
+  fetch: withSupabase({ auth: 'user' }, async (req, { supabase }) => {
     const { data } = await supabase.from('subscriptions').select('*')
     return Response.json(data)
   }),
@@ -135,7 +138,7 @@ Edge Functions and Cloudflare Workers:
 
 ```typescript
 export default {
-  fetch: withSupabase({ allow: 'user' }, handler),
+  fetch: withSupabase({ auth: 'user' }, handler),
 }
 ```
 
@@ -147,7 +150,7 @@ import { Hono } from 'hono'
 
 const app = new Hono()
 
-app.get('/todos', withSupabase({ allow: 'user' }), async (c) => {
+app.get('/todos', withSupabase({ auth: 'user' }), async (c) => {
   const { supabase } = c.var.supabaseContext
   const { data } = await supabase.from('todos').select()
   return c.json(data)
@@ -185,7 +188,7 @@ export default {
     }
 
     if (url.pathname === '/todos') {
-      const { data: auth, error } = await verifyAuth(req, { allow: 'user' })
+      const { data: auth, error } = await verifyAuth(req, { auth: 'user' })
       if (error) return Response.json({ error: error.message }, { status: error.status })
 
       const supabase = createContextClient(auth.token)
@@ -275,7 +278,7 @@ Or write it by hand:
 import { withSupabase } from '@supabase/server'
 
 export default {
-  fetch: withSupabase({ allow: 'user' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
     const { data } = await ctx.supabase.from('todos').select()
     return Response.json(data)
   }),
