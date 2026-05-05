@@ -1,22 +1,26 @@
 import { useParams } from 'common'
-import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
 import { Box, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import type { ComponentProps } from 'react'
 import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns'
 
 import { AppLayoutDropdownTriggerButton } from './AppLayoutDropdown'
 import { sanitizeRoute } from './ProjectDropdown.utils'
 import { ProjectRowLink } from './ProjectRowLink'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
+import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
+import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { ManagedBy } from '@/lib/constants/infrastructure'
 
 // --- Sub-components ---
 
@@ -79,6 +83,7 @@ function ProjectDropdownNonPlatformView({ projectName }: { projectName: string }
 interface ProjectDropdownPlatformViewProps {
   projectRef: string | undefined
   projectName: string
+  projectManagedBy?: ManagedBy
   selectorProps: Omit<
     ComponentProps<typeof OrganizationProjectSelector>,
     'renderTrigger' | 'embedded'
@@ -88,23 +93,22 @@ interface ProjectDropdownPlatformViewProps {
 function ProjectDropdownPlatformView({
   projectRef,
   projectName,
+  projectManagedBy,
   selectorProps,
 }: ProjectDropdownPlatformViewProps) {
   return (
-    <div className="flex items-center flex-shrink-0">
-      <Link
-        href={`/project/${projectRef}`}
-        className="flex items-center gap-2 flex-shrink-0 text-sm"
-      >
+    <div className="flex items-center shrink-0">
+      <Link href={`/project/${projectRef}`} className="flex items-center gap-2 shrink-0 text-sm">
         <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
         <span title={projectName} className="text-foreground max-w-32 lg:max-w-64 truncate">
           {projectName}
         </span>
+        {projectManagedBy && <PartnerIcon organization={{ managed_by: projectManagedBy }} />}
       </Link>
 
       <OrganizationProjectSelector
         {...selectorProps}
-        renderTrigger={() => <AppLayoutDropdownTriggerButton className="flex-shrink-0" />}
+        renderTrigger={() => <AppLayoutDropdownTriggerButton className="shrink-0" />}
       />
     </div>
   )
@@ -139,9 +143,14 @@ export const ProjectDropdown = ({
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
+  const selectedProjectManagedBy = selectedProject?.integration_source
+    ? getManagedByFromOrganizationPartner(undefined, selectedProject.integration_source)
+    : selectedOrganization?.billing_partner
+      ? selectedOrganization.managed_by
+      : undefined
 
   if (isLoadingProject || (isBranch && isLoadingParentProject) || !selectedProject) {
-    if (!embedded) return <GenericSkeletonLoader className="p-2" />
+    if (!embedded) return <ShimmeringLoader className="p-2 md:mr-2 md:w-[90px]" />
   }
 
   const handleSetOpen = embedded ? (_value: boolean) => onClose?.() : setOpen
@@ -156,7 +165,7 @@ export const ProjectDropdown = ({
       close()
       router.push(href)
     },
-    renderRow: (project: { ref: string; name: string; status?: string }) => (
+    renderRow: (project: Pick<OrgProject, 'ref' | 'name' | 'status' | 'integration_source'>) => (
       <ProjectRowLink
         project={project}
         selectedRef={ref}
@@ -184,6 +193,7 @@ export const ProjectDropdown = ({
     <ProjectDropdownPlatformView
       projectRef={project?.ref}
       projectName={selectedProject?.name ?? ''}
+      projectManagedBy={selectedProjectManagedBy}
       selectorProps={selectorProps}
     />
   ) : (

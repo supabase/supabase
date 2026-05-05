@@ -1,9 +1,8 @@
 import { noop } from 'lodash'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Modal } from 'ui'
-
-import CardButton from 'components/ui/CardButton'
 import { Edit, ExternalLink, FlaskConical, Grid } from 'lucide-react'
-import { useAppStateSnapshot } from 'state/app-state'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, Modal } from 'ui'
+
+import CardButton from '@/components/ui/CardButton'
 
 interface PolicySelectionProps {
   description: string
@@ -20,8 +19,6 @@ const PolicySelection = ({
   onViewEditor = noop,
   onToggleFeaturePreviewModal,
 }: PolicySelectionProps) => {
-  const snap = useAppStateSnapshot()
-
   return (
     <Modal.Content className="space-y-4 py-4">
       <div className="flex flex-col gap-y-2">
@@ -36,7 +33,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-foreground text-background
+                  rounded-sm bg-foreground text-background
                 "
                 >
                   <Grid size={14} strokeWidth={2} />
@@ -54,7 +51,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-foreground text-background
+                  rounded-sm bg-foreground text-background
                 "
                 >
                   <Edit size={14} strokeWidth={2} />

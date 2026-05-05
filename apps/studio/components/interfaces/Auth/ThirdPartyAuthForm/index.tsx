@@ -94,7 +94,7 @@ export const ThirdPartyAuthForm = () => {
         {isLoading && (
           <div
             className={cn(
-              'border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4'
+              'border rounded-sm border-default px-20 py-16 flex flex-col items-center justify-center space-y-4'
             )}
           >
             <Loader2 size={24} className="animate-spin" />

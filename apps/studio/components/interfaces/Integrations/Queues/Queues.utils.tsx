@@ -1,8 +1,7 @@
 import { Column } from 'react-data-grid'
+import { cn } from 'ui'
 import z from 'zod'
 
-import { PostgresQueue } from 'data/database-queues/database-queues-query'
-import { cn } from 'ui'
 import {
   QueueCreatedAtCell,
   QueueNameCell,
@@ -11,6 +10,7 @@ import {
   QueueTypeCell,
   QueueWithMetrics,
 } from './QueueCells'
+import { PostgresQueue } from '@/data/database-queues/database-queues-query'
 
 export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
   return [
@@ -23,7 +23,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       renderHeaderCell: () => {
         return (
           <div className={cn('flex items-center justify-between font-normal text-xs w-full ml-8')}>
-            <p className="!text-foreground">Name</p>
+            <p className="text-foreground!">Name</p>
           </div>
         )
       },
@@ -40,7 +40,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       renderHeaderCell: () => {
         return (
           <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
-            <p className="!text-foreground">Type</p>
+            <p className="text-foreground!">Type</p>
           </div>
         )
       },
@@ -57,7 +57,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       renderHeaderCell: () => {
         return (
           <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
-            <p className="!text-foreground">RLS enabled</p>
+            <p className="text-foreground!">RLS enabled</p>
           </div>
         )
       },
@@ -74,7 +74,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       renderHeaderCell: () => {
         return (
           <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
-            <p className="!text-foreground">Created at</p>
+            <p className="text-foreground!">Created at</p>
           </div>
         )
       },
@@ -91,7 +91,7 @@ export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
       renderHeaderCell: () => {
         return (
           <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
-            <p className="!text-foreground">Size</p>
+            <p className="text-foreground!">Size</p>
           </div>
         )
       },

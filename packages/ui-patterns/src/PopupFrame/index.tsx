@@ -47,8 +47,8 @@ export function PopupFrame({
         hideFooter
         showCloseButton={false}
         className={cn(
-          '!bg-[#f8f9fa]/95 dark:!bg-[#1c1c1c]/80',
-          '!border-[#e6e8eb]/90 dark:!border-[#282828]/90',
+          'bg-[#f8f9fa]/95! dark:bg-[#1c1c1c]/80!',
+          'border-[#e6e8eb]/90! dark:border-[#282828]/90!',
           'transition ease-out',
           'mx-auto backdrop-blur-md w-[calc(100%-2rem)]',
           className
@@ -62,7 +62,7 @@ export function PopupFrame({
         }}
         size="xxlarge"
       >
-        <div className="device-frame !w-full h-full flex items-center justify-center">
+        <div className="device-frame w-full! h-full flex items-center justify-center">
           <div className="modal-group relative w-full h-full">
             <button
               onClick={() => setOpen(false)}
@@ -70,7 +70,7 @@ export function PopupFrame({
             >
               <p className="text-xs">Close</p>
             </button>
-            <div className="modal-content h-full !rounded-lg !border-none !overflow-hidden">
+            <div className="modal-content h-full rounded-lg! border-none! overflow-hidden!">
               {children}
             </div>
           </div>

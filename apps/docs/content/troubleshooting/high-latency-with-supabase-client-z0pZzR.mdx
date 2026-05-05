@@ -79,7 +79,7 @@ def psycop_call(): #user_ids: list[str]):
 
 
 def supabase_call():
-    supabase: Client = create_client("SUPABASE_URL", "SUPBASE_SERVICE_ROLE_KEY")
+    supabase: Client = create_client("SUPABASE_URL", "SUPABASE_SECRET_KEY")
     start = time.time()
     result = supabase.table("your_table_name").select("*").execute()
     stop = time.time()

@@ -6,10 +6,10 @@ import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  FormField_Shadcn_,
+  FormField,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -29,7 +29,7 @@ interface SupportAccessToggleProps {
 
 export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
   return (
-    <FormField_Shadcn_
+    <FormField
       name="allowSupportAccess"
       control={form.control}
       render={({ field }) => {
@@ -42,7 +42,7 @@ export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
             label={
               <div className="flex items-center gap-x-2">
                 <span className="text-foreground">Allow support access to your project</span>
-                <Badge className="bg-opacity-100">Recommended</Badge>
+                <Badge>Recommended</Badge>
               </div>
             }
             description={
@@ -53,12 +53,12 @@ export function SupportAccessToggle({ form }: SupportAccessToggleProps) {
                 <Collapsible_Shadcn_ className="mt-2">
                   <CollapsibleTrigger_Shadcn_
                     className={
-                      'group flex items-center gap-x-1 group-data-[state=open]:text-foreground hover:text-foreground transition'
+                      'group flex items-center gap-x-1 group-data-open:text-foreground hover:text-foreground transition'
                     }
                   >
                     <ChevronRight
                       size={14}
-                      className="transition-all group-data-[state=open]:rotate-90 text-foreground-muted -ml-1"
+                      className="transition-all group-data-open:rotate-90 text-foreground-muted -ml-1"
                     />
                     <span className="text-sm">More information</span>
                   </CollapsibleTrigger_Shadcn_>

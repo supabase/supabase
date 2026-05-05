@@ -4,9 +4,9 @@
 
 export const environment = {
   production: false,
-  supabaseUrl: "",
-  supabaseKey: ""
-};
+  supabaseUrl: '',
+  supabasePublishableKey: '',
+}
 
 /*
  * For easier debugging in development mode, you can import the following file

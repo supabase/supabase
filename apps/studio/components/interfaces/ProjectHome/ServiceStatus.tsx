@@ -1,16 +1,8 @@
 import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { SingleStat } from 'components/ui/SingleStat'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
-import { useProjectServiceStatusQuery } from 'data/service-status/service-status-query'
 import dayjs from 'dayjs'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { cn, InfoIcon, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
 
 import {
   extractDbSchema,
@@ -18,6 +10,14 @@ import {
   StatusIcon,
   StatusMessage,
 } from '../Home/ServiceStatus'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { SingleStat } from '@/components/ui/SingleStat'
+import { useBranchesQuery } from '@/data/branches/branches-query'
+import { useEdgeFunctionServiceStatusQuery } from '@/data/service-status/edge-functions-status-query'
+import { useProjectServiceStatusQuery } from '@/data/service-status/service-status-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
@@ -131,7 +131,7 @@ export const ServiceStatus = () => {
       docsUrl: undefined,
       isLoading,
       // If PostgREST has an empty schema, it means it's been disabled
-      status: extractDbSchema(restStatus) === '' ? 'DISABLED' : restStatus?.status ?? 'UNHEALTHY',
+      status: extractDbSchema(restStatus) === '' ? 'DISABLED' : (restStatus?.status ?? 'UNHEALTHY'),
       logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled
@@ -240,8 +240,8 @@ export const ServiceStatus = () => {
   const overallStatusLabel = getOverallStatusLabel()
 
   return (
-    <Popover_Shadcn_>
-      <PopoverTrigger_Shadcn_>
+    <HoverCard openDelay={200} closeDelay={100}>
+      <HoverCardTrigger>
         <SingleStat
           icon={
             // Spinner only while the overall project is in COMING_UP; otherwise show 6-dot grid
@@ -270,8 +270,8 @@ export const ServiceStatus = () => {
           label={<span>Status</span>}
           value={<span>{overallStatusLabel}</span>}
         />
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-60" side="bottom" align="start">
+      </HoverCardTrigger>
+      <HoverCardContent className="p-0 w-60" side="bottom" align="start">
         {services.map((service) => (
           <Link
             href={`/project/${ref}${service.logsUrl}`}
@@ -327,7 +327,7 @@ export const ServiceStatus = () => {
             </div>
           </div>
         )}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </HoverCardContent>
+    </HoverCard>
   )
 }

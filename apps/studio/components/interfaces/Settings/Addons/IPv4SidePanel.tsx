@@ -1,28 +1,28 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
-import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import type { AddonVariantId } from 'data/subscriptions/types'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useIsAwsCloudProvider } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { formatCurrency } from 'lib/helpers'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { useAddonsPagePanel } from 'state/addons-page'
-import { Button, cn, RadioGroup_Shadcn_, RadioGroupLargeItem_Shadcn_, SidePanel } from 'ui'
+import { cn, RadioGroup, RadioGroupLargeItem, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useProjectAddonRemoveMutation } from '@/data/subscriptions/project-addon-remove-mutation'
+import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addon-update-mutation'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import type { AddonVariantId } from '@/data/subscriptions/types'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsAwsCloudProvider } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { formatCurrency } from '@/lib/helpers'
+import { useAddonsPagePanel } from '@/state/addons-page'
 
 const IPv4SidePanel = () => {
   const isAws = useIsAwsCloudProvider()
   const { ref: projectRef } = useParams()
-  const { data: organization } = useSelectedOrganizationQuery()
 
   const [selectedOption, setSelectedOption] = useState<string>('ipv4_none')
 
@@ -75,7 +75,7 @@ const IPv4SidePanel = () => {
       priceContent: (
         <>
           <p className="text-foreground text-sm">$0</p>
-          <p className="text-foreground-light translate-y-[1px] text-sm">/ month</p>
+          <p className="text-foreground-light translate-y-px text-sm">/ month</p>
         </>
       ),
       priceRowClassName: 'mt-2',
@@ -166,15 +166,15 @@ const IPv4SidePanel = () => {
           )}
 
           {isAws && (
-            <div className={cn('!mt-8 pb-4', !hasAccessToIPv4 && 'opacity-75')}>
-              <RadioGroup_Shadcn_
+            <div className={cn('mt-8! pb-4', !hasAccessToIPv4 && 'opacity-75')}>
+              <RadioGroup
                 name="ipv4"
                 value={selectedOption}
                 onValueChange={setSelectedOption}
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
                 {ipv4Options.map((option) => (
-                  <RadioGroupLargeItem_Shadcn_
+                  <RadioGroupLargeItem
                     key={option.id}
                     value={option.value}
                     label=""
@@ -196,9 +196,10 @@ const IPv4SidePanel = () => {
                         {option.priceContent}
                       </div>
                     </div>
-                  </RadioGroupLargeItem_Shadcn_>
+                  </RadioGroupLargeItem>
                 ))}
-              </RadioGroup_Shadcn_>
+              </RadioGroup>
+              <TaxDisclaimer className="mt-3" />
             </div>
           )}
 
@@ -229,16 +230,13 @@ const IPv4SidePanel = () => {
           )}
 
           {!hasAccessToIPv4 && (
-            <Admonition type="note" title="IPv4 add-on is unavailable on the Free Plan">
-              <p>Upgrade your plan to enable an IPv4 address for your project</p>
-              <Button asChild type="default">
-                <Link
-                  href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=ipv4SidePanel`}
-                >
-                  View available plans
-                </Link>
-              </Button>
-            </Admonition>
+            <UpgradeToPro
+              addon="ipv4"
+              source="ipv4SidePanel"
+              featureProposition="connect from IPv4-only networks"
+              primaryText="Dedicated IPv4 address is a Pro Plan add-on"
+              secondaryText="Enable the add-on to connect to your project from IPv4-only networks."
+            />
           )}
         </div>
       </SidePanel.Content>

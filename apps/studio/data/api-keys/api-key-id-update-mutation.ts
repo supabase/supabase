@@ -1,9 +1,9 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { handleError, patch } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { apiKeysKeys } from './keys'
+import { handleError, patch } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export interface UpdateAPIKeybyIdVariables {
   projectRef?: string
@@ -51,7 +51,7 @@ export const useResourceUpdateMutation = ({
   return useMutation<ResourceUpdateData, ResponseError, UpdateAPIKeybyIdVariables>({
     mutationFn: (vars) => updateAPIKeysById(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef, id } = variables
+      const { projectRef } = variables
 
       await queryClient.invalidateQueries({ queryKey: apiKeysKeys.list(projectRef) })
 

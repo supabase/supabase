@@ -1,3 +1,3 @@
-export const stripeFabricKeys = {
-  get: (arId: string | undefined) => ['stripe', 'fabric', arId] as const,
+export const stripeProjectsKeys = {
+  get: (arId: string | undefined) => ['stripe', 'projects', arId] as const,
 }

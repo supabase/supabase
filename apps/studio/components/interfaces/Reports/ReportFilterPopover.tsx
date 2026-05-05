@@ -1,26 +1,26 @@
 import { isEqual } from 'lodash'
 import { ChevronDown, Filter as FilterIcon, Plus, X } from 'lucide-react'
 import { KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react'
-
-import { DropdownControl } from 'components/grid/components/common/DropdownControl'
 import {
   Button,
+  cn,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
   Input,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  cn,
 } from 'ui'
 import { sizes } from 'ui/src/lib/commonCva'
 import defaultTheme from 'ui/src/lib/theme/defaultTheme'
+
 import type { ReportFilter, ReportFilterProperty } from './Reports.types'
+import { DropdownControl } from '@/components/grid/components/common/DropdownControl'
 
 const FilterableInput = ({
   value,
@@ -87,7 +87,7 @@ const FilterableInput = ({
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           className={cn('h-6 text-sm', defaultTheme.input.variants.standard, sizes.tiny)}
-          wrapperClassName="!p-0 !border !border-control rounded-md"
+          wrapperClassName="p-0! border! border-control! rounded-md"
           showSearchIcon={false}
         />
         <div

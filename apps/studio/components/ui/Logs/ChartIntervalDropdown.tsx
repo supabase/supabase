@@ -1,5 +1,3 @@
-import { InlineLink } from 'components/ui/InlineLink'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { ChevronDown } from 'lucide-react'
 import {
   Button,
@@ -14,6 +12,8 @@ import {
 } from 'ui'
 
 import { CHART_INTERVALS } from './logs.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 function getDaysRequired(startValue: number, startUnit: string): number {
   if (startUnit === 'day') return startValue
@@ -58,7 +58,7 @@ export const ChartIntervalDropdown = ({
               return (
                 <Tooltip key={i.key}>
                   <TooltipTrigger asChild>
-                    <DropdownMenuRadioItem disabled value={i.key} className="!pointer-events-auto">
+                    <DropdownMenuRadioItem disabled value={i.key} className="pointer-events-auto!">
                       {i.label}
                     </DropdownMenuRadioItem>
                   </TooltipTrigger>

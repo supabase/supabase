@@ -1,9 +1,6 @@
+import { useFlag } from 'common'
 import { motion } from 'framer-motion'
 import { MoreVertical } from 'lucide-react'
-
-import { useFlag } from 'common'
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import type { APIKeysData } from 'data/api-keys/api-keys-query'
 import {
   Button,
   DropdownMenu,
@@ -13,8 +10,11 @@ import {
   TableRow,
 } from 'ui'
 import { ShimmeringLoader, TimestampInfo } from 'ui-patterns'
+
 import { APIKeyDeleteDialog } from './APIKeyDeleteDialog'
 import { ApiKeyPill } from './ApiKeyPill'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import type { APIKeysData } from '@/data/api-keys/api-keys-query'
 
 export const APIKeyRow = ({
   apiKey,
@@ -88,7 +88,7 @@ export const APIKeyRow = ({
         <TableCell className="py-2">
           <div className="flex justify-end">
             <DropdownMenu>
-              <DropdownMenuTrigger className="px-1 focus-visible:outline-none" asChild>
+              <DropdownMenuTrigger className="px-1 focus-visible:outline-hidden" asChild>
                 <Button
                   type="text"
                   size="tiny"

@@ -3,37 +3,28 @@ import { Monaco } from '@monaco-editor/react'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { IStandaloneCodeEditor } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
-import { databasePoliciesKeys } from 'data/database-policies/keys'
-import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import {
   Button,
-  Checkbox_Shadcn_,
-  Form_Shadcn_,
+  Checkbox,
+  cn,
+  Form,
   Label_Shadcn_,
   ScrollArea,
   Sheet,
   SheetContent,
   SheetFooter,
+  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-  cn,
 } from 'ui'
+import * as z from 'zod'
+
 import { LockedCreateQuerySection, LockedRenameQuerySection } from './LockedQuerySection'
 import { PolicyDetailsV2 } from './PolicyDetailsV2'
 import { checkIfPolicyHasChanged, generateCreatePolicyQuery } from './PolicyEditorPanel.utils'
@@ -41,6 +32,15 @@ import { PolicyEditorPanelHeader } from './PolicyEditorPanelHeader'
 import { PolicyTemplates } from './PolicyTemplates'
 import { QueryError } from './QueryError'
 import { RLSCodeEditor } from './RLSCodeEditor'
+import { IStandaloneCodeEditor } from '@/components/interfaces/SQLEditor/SQLEditor.types'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDatabasePolicyUpdateMutation } from '@/data/database-policies/database-policy-update-mutation'
+import { databasePoliciesKeys } from '@/data/database-policies/keys'
+import { QueryResponseError, useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 interface PolicyEditorPanelProps {
   visible: boolean
@@ -197,7 +197,7 @@ export const PolicyEditorPanel = memo(function ({
         command,
         roles: roles.length === 0 ? 'public' : roles,
         using: using ?? '',
-        check: command === 'insert' ? using ?? '' : check ?? '',
+        check: command === 'insert' ? (using ?? '') : (check ?? ''),
       })
 
       setError(undefined)
@@ -290,7 +290,7 @@ export const PolicyEditorPanel = memo(function ({
 
   return (
     <>
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
           <Sheet open={visible} onOpenChange={handleOpenChange}>
             <SheetContent
@@ -298,7 +298,7 @@ export const PolicyEditorPanel = memo(function ({
               size={showTools ? 'lg' : 'default'}
               className={cn(
                 'bg-surface-200 p-0 flex flex-row gap-0',
-                showTools ? '!min-w-[100vw] lg:!min-w-[1000px]' : '!min-w-[100vw] lg:!min-w-[600px]'
+                showTools ? 'min-w-screen! lg:min-w-[1000px]!' : 'min-w-screen! lg:min-w-[600px]!'
               )}
             >
               <div className={cn('flex flex-col grow w-full', showTools && 'w-[60%]')}>
@@ -461,7 +461,7 @@ export const PolicyEditorPanel = memo(function ({
 
                     {supportWithCheck && (
                       <div className="px-5 py-3 flex items-center gap-x-2">
-                        <Checkbox_Shadcn_
+                        <Checkbox
                           id="use-check"
                           name="use-check"
                           checked={showCheckBlock}
@@ -481,7 +481,7 @@ export const PolicyEditorPanel = memo(function ({
                     {error !== undefined && (
                       <QueryError error={error} open={errorPanelOpen} setOpen={setErrorPanelOpen} />
                     )}
-                    <SheetFooter className="flex items-center !justify-end px-5 py-4 w-full border-t">
+                    <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
                       <Button
                         type="default"
                         disabled={isExecuting || isUpdating}
@@ -532,7 +532,7 @@ export const PolicyEditorPanel = memo(function ({
                     <TabsContent_Shadcn_
                       value="templates"
                       className={cn(
-                        '!mt-0 overflow-y-auto',
+                        'mt-0! overflow-y-auto',
                         'data-[state=active]:flex data-[state=active]:grow'
                       )}
                     >
@@ -571,7 +571,7 @@ export const PolicyEditorPanel = memo(function ({
             </SheetContent>
           </Sheet>
         </form>
-      </Form_Shadcn_>
+      </Form>
 
       <DiscardChangesConfirmationDialog
         {...modalProps}

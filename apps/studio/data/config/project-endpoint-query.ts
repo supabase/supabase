@@ -8,7 +8,7 @@ export const useProjectApiUrl = (
   { projectRef }: { projectRef?: string },
   { enabled = true }: { enabled?: boolean } = {}
 ) => {
-  const { data } = useProjectAddonsQuery({ projectRef })
+  const { data } = useProjectAddonsQuery({ projectRef }, { enabled })
   const hasCustomDomainsAddon = !!data?.selected_addons.find((x) => x.type === 'custom_domain')
 
   const {
@@ -34,7 +34,8 @@ export const useProjectApiUrl = (
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
 
-  const hostEndpoint = isSuccessProjectSettings ? `${protocol}://${endpoint}` : undefined
+  const hostEndpoint =
+    isSuccessProjectSettings && endpoint ? `${protocol}://${endpoint}` : undefined
   const resolvedEndpoint = isCustomDomainsActive ? customEndpoint : hostEndpoint
   const storageEndpoint = settings?.app_config?.storage_endpoint
     ? `${IS_PLATFORM ? 'https' : protocol}://${settings?.app_config?.storage_endpoint}`

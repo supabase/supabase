@@ -1,6 +1,4 @@
 import { useParams } from 'common'
-import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
-import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { Clock, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -9,6 +7,8 @@ import { Admonition, TimestampInfo } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { parseEdgeFunctionEventMessage } from './EdgeFunctionRecentInvocations.utils'
+import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import useLogsPreview from '@/hooks/analytics/useLogsPreview'
 
 interface EdgeFunctionRecentInvocationsProps {
   functionId: string
@@ -89,7 +89,7 @@ export const EdgeFunctionRecentInvocations = ({
                   {statusCode ? (
                     <div
                       className={cn(
-                        'flex items-center justify-center border px-1.5 py-0.5 rounded text-xs font-mono',
+                        'flex items-center justify-center border px-1.5 py-0.5 rounded-sm text-xs font-mono',
                         is2xx && 'text-brand border-brand bg-brand-300',
                         is4xx && 'text-warning border-warning bg-warning-300',
                         is5xx && 'text-destructive border-destructive bg-destructive-300',

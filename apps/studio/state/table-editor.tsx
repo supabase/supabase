@@ -1,17 +1,7 @@
+import * as Sentry from '@sentry/nextjs'
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { useConstant } from 'common'
-import type { SupaRow } from 'components/grid/types'
-import {
-  resolveDeleteRowConflicts,
-  resolveEditCellConflicts,
-  upsertOperation,
-} from 'components/grid/utils/queueConflictResolution'
-import { generateTableChangeKey } from 'components/grid/utils/queueOperationUtils'
-import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
-import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
-import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
 import { createContext, PropsWithChildren, useContext } from 'react'
-import type { Dictionary } from 'types'
 import { proxy, useSnapshot } from 'valtio'
 
 import {
@@ -20,6 +10,17 @@ import {
   type OperationQueueState,
   type QueueStatus,
 } from './table-editor-operation-queue.types'
+import type { SupaRow } from '@/components/grid/types'
+import {
+  resolveDeleteRowConflicts,
+  resolveEditCellConflicts,
+  upsertOperation,
+} from '@/components/grid/utils/queueConflictResolution'
+import { generateTableChangeKey } from '@/components/grid/utils/queueOperationUtils'
+import { ForeignKey } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
+import type { EditValue } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
+import type { TableField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
+import type { Dictionary } from '@/types'
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
 
@@ -105,6 +106,11 @@ export const createTableEditorState = () => {
 
     /* Tables */
     onAddTable: (templateData?: Partial<TableField>) => {
+      // Record that the table creator was opened
+      Sentry.startSpan({ name: 'table_creator.opened', op: 'ui.action' }, (span) => {
+        span.setAttribute('table_creator.opened', 1)
+      })
+
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'table', mode: 'new', templateData },
@@ -297,6 +303,16 @@ export const createTableEditorState = () => {
       state.operationQueue.operations = state.operationQueue.operations.filter(
         (op) => op.id !== operationId
       )
+      if (state.operationQueue.operations.length === 0) {
+        state.operationQueue.status = 'idle'
+      }
+    },
+
+    /**
+     * Undo the latest operation from the queue
+     */
+    undoLatestOperation: () => {
+      state.operationQueue.operations = state.operationQueue.operations.slice(0, -1)
       if (state.operationQueue.operations.length === 0) {
         state.operationQueue.status = 'idle'
       }

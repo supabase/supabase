@@ -1,16 +1,7 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useContentQuery } from 'data/content/content-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Metric, METRIC_CATEGORIES, METRICS } from 'lib/constants/metrics'
 import { Home, Plus } from 'lucide-react'
 import { useState } from 'react'
-import { editorPanelState } from 'state/editor-panel-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import type { Dashboards } from 'types'
 import {
   Command_Shadcn_,
   CommandGroup_Shadcn_,
@@ -27,6 +18,15 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DEPRECATED_REPORTS } from './Reports.constants'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useContentQuery } from '@/data/content/content-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { Metric, METRIC_CATEGORIES, METRICS } from '@/lib/constants/metrics'
+import { editorPanelState } from '@/state/editor-panel-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import type { Dashboards } from '@/types'
 
 interface MetricOptionsProps {
   config?: Dashboards.Content

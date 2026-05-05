@@ -1,0 +1,104 @@
+@reference "../../../../styles/main.css";
+
+.root :global(.graphiql-sidebar) {
+  @apply border-r border-default;
+  overflow-x: hidden;
+}
+
+.root :global(.graphiql-sidebar [data-value='settings']),
+.root :global(.graphiql-sidebar [data-value='short-keys']) {
+  display: none;
+}
+
+.root :global(.graphiql-sessions) {
+  @apply m-0;
+}
+
+.root :global(#graphiql-session) {
+  @apply p-0;
+}
+
+.root :global(.graphiql-session-header) {
+  display: none;
+}
+
+.root :global(.graphiql-horizontal-drag-bar) {
+  @apply border-l border-default;
+}
+
+.root :global(.graphiql-horizontal-drag-bar:hover::after) {
+  @apply rounded-full;
+}
+
+.root :global(.graphiql-plugin) {
+  border-left: 0;
+}
+
+/* Lift the response panel above the editor surface so the two read as separate panes.
+ * The token differs per theme because the editor sits at a different baseline lightness
+ * in each (~12% L in dark, ~94% L in light), so a single surface token can't lift it
+ * meaningfully in both directions. */
+.root :global(.graphiql-response),
+.root :global(.graphiql-response .monaco-editor),
+.root :global(.graphiql-response .monaco-editor .margin),
+.root :global(.graphiql-response .monaco-editor .monaco-editor-background) {
+  background-color: var(--graphiql-response-bg) !important;
+}
+
+/* Editor-to-response drag bar: blend it into the response side so it doesn't read as
+ * a third color sandwiched between the two panes. The plugin-to-main drag bar is left
+ * alone — it sits next to the editor surface and our default border there is fine. */
+.root :global(.graphiql-editors + .graphiql-horizontal-drag-bar) {
+  background-color: var(--graphiql-response-bg);
+  border-left: 0;
+}
+
+.root :global(.graphiql-button),
+.root :global(button.graphiql-button),
+.root :global(.graphiql-un-styled),
+.root :global(button.graphiql-un-styled),
+.root :global(button.graphiql-execute-button) {
+  @apply rounded-md;
+}
+
+.root :global(.graphiql-button-group) {
+  @apply rounded-lg;
+}
+
+.root :global(.graphiql-doc-explorer-search),
+.root :global(.graphiql-doc-explorer-search-input) {
+  @apply rounded-md;
+}
+
+.root :global(.graphiql-doc-explorer-search [role='listbox']) {
+  @apply rounded-b-md;
+}
+
+/* Theme variable overrides */
+
+.root {
+  --font-family: theme(fontFamily.sans);
+  --font-family-mono: theme(fontFamily.mono);
+  --border-radius-2: 0;
+  --border-radius-4: 0;
+  --border-radius-8: 0;
+  --border-radius-12: 0;
+  --popover-box-shadow: none;
+}
+
+:global(body.graphiql-dark) .root {
+  /* HSL form of #1f1f1f, matches the editor.background returned by getTheme('dark') */
+  --color-base: 0, 0%, 12%;
+  --color-primary: 153, 50%, 50%;
+  --graphiql-response-bg: hsl(var(--background-surface-300));
+}
+
+:global(body.graphiql-light) .root {
+  /* HSL form of #fcfcfc, matches the dashboard bg-default and the editor.background
+   * we override to in GraphiQLTab.tsx so the editor reads as part of the surrounding UI. */
+  --color-base: 0, 0%, 98.8%;
+  --color-primary: 153, 50%, 50%;
+  /* Drop the response below the editor in light mode (inverse of dark) so it reads as
+   * the lower / "data" surface rather than the lifted one. */
+  --graphiql-response-bg: hsl(var(--background-surface-300));
+}

@@ -1,15 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { literal, safeSql } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { formatWrapperTables } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
-import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
-import { fdwKeys } from 'data/fdw/keys'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -24,8 +16,8 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  FormField_Shadcn_,
-  Form_Shadcn_,
+  Form,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -34,6 +26,15 @@ import z from 'zod'
 import { getDecryptedParameters } from '../../Storage.utils'
 import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
+import { formatWrapperTables } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useSchemaCreateMutation } from '@/data/database/schema-create-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
+import { useFDWUpdateMutation } from '@/data/fdw/fdw-update-mutation'
+import { fdwKeys } from '@/data/fdw/keys'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 import { isGreaterThanOrEqual } from '@/lib/semver'
 
 // Create foreign tables for vector bucket
@@ -115,7 +116,9 @@ export const InitializeForeignSchemaDialog = () => {
         serverName: wrapperInstance.server_name,
         sourceSchema: updatedImportForeignSchemaSyntax ? bucketId : values.schema,
         targetSchema: values.schema,
-        schemaOptions: updatedImportForeignSchemaSyntax ? undefined : [`bucket_name '${bucketId}'`],
+        schemaOptions: updatedImportForeignSchemaSyntax
+          ? undefined
+          : [safeSql`bucket_name ${literal(bucketId)}`],
       })
 
       toast.success(
@@ -140,7 +143,7 @@ export const InitializeForeignSchemaDialog = () => {
         <Button type="default">Query from Postgres</Button>
       </DialogTrigger>
       <DialogContent size="medium" aria-describedby={undefined}>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
               <DialogTitle>Query this vector bucket from Postgres</DialogTitle>
@@ -152,7 +155,7 @@ export const InitializeForeignSchemaDialog = () => {
                 Create a Postgres schema to expose tables from the "{bucketId}" bucket as foreign
                 tables.
               </p>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="schema"
                 render={({ field }) => (
@@ -162,7 +165,7 @@ export const InitializeForeignSchemaDialog = () => {
                 )}
               />
             </DialogSection>
-            <DialogFooter className="!justify-between">
+            <DialogFooter className="justify-between!">
               <DocsButton href={`${DOCS_URL}/guides/storage/vector/querying-vectors`} />
               <div className="flex items-center gap-x-2">
                 <Button type="default" disabled={isCreating} onClick={() => setIsOpen(false)}>
@@ -174,7 +177,7 @@ export const InitializeForeignSchemaDialog = () => {
               </div>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

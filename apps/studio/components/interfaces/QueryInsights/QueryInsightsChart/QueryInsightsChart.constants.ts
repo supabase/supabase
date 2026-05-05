@@ -1,4 +1,4 @@
-import { CHART_COLORS } from 'components/ui/Charts/Charts.constants'
+import { CHART_COLORS } from '@/components/ui/Charts/Charts.constants'
 
 export const CHART_TABS = [
   { id: 'query_latency', label: 'Query latency' },

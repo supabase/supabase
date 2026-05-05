@@ -1,6 +1,7 @@
 import { IS_PLATFORM } from 'common'
-import { isValidEdgeFunctionURL } from 'lib/api/edgeFunctions'
 import { NextApiRequest, NextApiResponse } from 'next'
+
+import { isValidEdgeFunctionURL } from '@/lib/api/edgeFunctions'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req

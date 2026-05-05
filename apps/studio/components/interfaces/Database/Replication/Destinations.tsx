@@ -1,20 +1,17 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { AlertError } from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
-import { replicationKeys } from 'data/replication/keys'
-import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
-import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
-import { DOCS_URL } from 'lib/constants'
-import { Plus, Search, X } from 'lucide-react'
+import { MoreVertical, Plus, Search, X } from 'lucide-react'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Card,
   CardContent,
   cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   Table,
   TableBody,
   TableCell,
@@ -29,11 +26,27 @@ import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConf
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
+import { DisableExternalReplicationDialog } from './DisableExternalReplicationDialog'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
-import { useIsETLBigQueryPrivateAlpha, useIsETLIcebergPrivateAlpha } from './useIsETLPrivateAlpha'
+import {
+  useIsETLBigQueryPrivateAlpha,
+  useIsETLDucklakePrivateAlpha,
+  useIsETLIcebergPrivateAlpha,
+} from './useIsETLPrivateAlpha'
+import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
+import { replicationKeys } from '@/data/replication/keys'
+import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
+import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
@@ -41,6 +54,7 @@ export const Destinations = () => {
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
+  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const newDestinationDefaultType = infrastructureReadReplicas
@@ -49,11 +63,16 @@ export const Destinations = () => {
       ? 'BigQuery'
       : etlEnableIceberg
         ? 'Analytics Bucket'
-        : null
+        : etlEnableDucklake
+          ? 'DuckLake'
+          : null
 
   const prefetchedRef = useRef(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
   const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
+  const [showDisableExternalReplicationDialog, setShowDisableExternalReplicationDialog] =
+    useState(false)
 
   const [_, setDestinationType] = useQueryState(
     'destinationType',
@@ -61,6 +80,7 @@ export const Destinations = () => {
       'Read Replica',
       'BigQuery',
       'Analytics Bucket',
+      'DuckLake',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
@@ -94,7 +114,7 @@ export const Destinations = () => {
   const hasDestinations = isDestinationsSuccess && destinationsData?.destinations.length > 0
   const filteredDestinations =
     filterString.length === 0
-      ? destinations ?? []
+      ? (destinations ?? [])
       : (destinations ?? []).filter((destination) =>
           destination.name.toLowerCase().includes(filterString.toLowerCase())
         )
@@ -102,9 +122,41 @@ export const Destinations = () => {
   const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery({
     projectRef,
   })
+  const pipelines = pipelinesData?.pipelines ?? []
+
+  const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
+    projectRef,
+  })
+  const externalReplicationSource = useMemo(
+    () => sourcesData?.sources.find((source) => source.name === projectRef),
+    [projectRef, sourcesData?.sources]
+  )
+  const canDisableExternalReplication =
+    isSourcesSuccess &&
+    isDestinationsSuccess &&
+    isPipelinesSuccess &&
+    !!externalReplicationSource &&
+    destinations.length === 0 &&
+    pipelines.length === 0
 
   const isLoading = isDestinationsLoading || isDatabasesLoading
   const hasErrorsFetchingData = isDestinationsError || isDatabasesError
+
+  const openDestinationPanel = () => {
+    if (!newDestinationDefaultType) return
+    setDestinationType(newDestinationDefaultType)
+  }
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search destinations' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
 
   useEffect(() => {
     if (
@@ -153,6 +205,7 @@ export const Destinations = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Input
+              ref={searchInputRef}
               placeholder="Filter destinations"
               size="tiny"
               icon={<Search />}
@@ -172,15 +225,35 @@ export const Destinations = () => {
             />
           </div>
           <div className="flex items-center gap-x-2">
-            <Button
-              type="default"
-              icon={<Plus />}
-              disabled={!newDestinationDefaultType}
-              onClick={() => setDestinationType(newDestinationDefaultType)}
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+              label="Add destination"
+              onTrigger={openDestinationPanel}
+              options={{ enabled: !!newDestinationDefaultType }}
+              side="bottom"
             >
-              Add destination
-            </Button>
+              <Button
+                type="default"
+                icon={<Plus />}
+                disabled={!newDestinationDefaultType}
+                onClick={openDestinationPanel}
+              >
+                Add destination
+              </Button>
+            </Shortcut>
             <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
+            {canDisableExternalReplication && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" icon={<MoreVertical />} className="w-7" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuItem onClick={() => setShowDisableExternalReplicationDialog(true)}>
+                    Disable external replication
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </div>
@@ -264,7 +337,8 @@ export const Destinations = () => {
               </p>
               <Button
                 icon={<Plus />}
-                onClick={() => setDestinationType('Read Replica')}
+                disabled={!newDestinationDefaultType}
+                onClick={openDestinationPanel}
                 className="mt-4"
               >
                 Add destination
@@ -275,6 +349,11 @@ export const Destinations = () => {
       </div>
 
       <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
+
+      <DisableExternalReplicationDialog
+        open={showDisableExternalReplicationDialog}
+        setOpen={setShowDisableExternalReplicationDialog}
+      />
     </>
   )
 }

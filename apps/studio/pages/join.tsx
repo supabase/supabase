@@ -1,11 +1,11 @@
-import Link from 'next/link'
-
-import { OrganizationInvite } from 'components/interfaces/OrganizationInvite/OrganizationInvite'
-import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import type { NextPageWithLayout } from 'types'
 import { cn } from 'ui'
+
+import { OrganizationInvite } from '@/components/interfaces/OrganizationInvite/OrganizationInvite'
+import { BASE_PATH } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const JoinOrganizationPage: NextPageWithLayout = () => {
   const { resolvedTheme } = useTheme()
@@ -25,7 +25,7 @@ const JoinOrganizationPage: NextPageWithLayout = () => {
     <>
       <Link href="/projects" className="flex items-center justify-center gap-4">
         {mounted && (
-          <img src={imgUrl} alt="Supabase" className="block h-[24px] cursor-pointer rounded" />
+          <img src={imgUrl} alt="Supabase" className="block h-[24px] cursor-pointer rounded-sm" />
         )}
       </Link>
       <OrganizationInvite />

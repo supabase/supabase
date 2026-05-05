@@ -1,37 +1,10 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import { useTableSort } from 'components/grid/hooks/useTableSort'
-import { queueRowDeletesWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { GridHeaderActions } from 'components/interfaces/TableGridEditor/GridHeaderActions'
-import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import {
-  useExportAllRowsAsCsv,
-  useExportAllRowsAsJson,
-  useExportAllRowsAsSql,
-} from 'components/layouts/TableEditorLayout/ExportAllRows'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { RoleImpersonationState } from 'lib/role-impersonation'
-import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
+import { ChevronDown, Trash } from 'lucide-react'
 import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  useRoleImpersonationStateSnapshot,
-  useSubscribeToImpersonatedRole,
-} from 'state/role-impersonation-state'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import {
   Button,
-  cn,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
@@ -40,10 +13,33 @@ import {
   Separator,
 } from 'ui'
 
+import { useInitializeFiltersFromUrl, useSyncFiltersToUrl } from '../../hooks/useFilterLifeCycle'
 import { ExportDialog } from './ExportDialog'
-import { FilterPopover } from './filter/FilterPopover'
+import { FilterPopoverNew } from './filter/FilterPopoverNew'
 import { formatRowsForCSV } from './Header.utils'
 import { SortPopover } from './sort/SortPopover'
+import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
+import { useTableSort } from '@/components/grid/hooks/useTableSort'
+import { GridHeaderActions } from '@/components/interfaces/TableGridEditor/GridHeaderActions'
+import { formatTableRowsToSQL } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import {
+  useExportAllRowsAsCsv,
+  useExportAllRowsAsJson,
+  useExportAllRowsAsSql,
+} from '@/components/layouts/TableEditorLayout/ExportAllRows'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
+import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { RoleImpersonationState } from '@/lib/role-impersonation'
+import {
+  useRoleImpersonationStateSnapshot,
+  useSubscribeToImpersonatedRole,
+} from '@/state/role-impersonation-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export type HeaderProps = {
   customHeader: ReactNode
@@ -52,167 +48,33 @@ export type HeaderProps = {
 }
 
 export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true }: HeaderProps) => {
+  useInitializeFiltersFromUrl()
+
+  useSyncFiltersToUrl()
+
   const snap = useTableEditorTableStateSnapshot()
 
   return (
     <div>
-      <div className="flex h-10 items-center justify-between bg-dash-sidebar dark:bg-surface-100 px-1.5 py-1.5 gap-2 overflow-x-auto ">
+      <div className="flex flex-wrap min-h-10 items-center bg-dash-sidebar dark:bg-surface-100">
         {customHeader ? (
-          customHeader
+          <div className="flex-1 px-1.5">{customHeader}</div>
         ) : snap.selectedRows.size > 0 ? (
-          <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
-        ) : (
-          <DefaultHeader tableQueriesEnabled={tableQueriesEnabled} />
-        )}
-        <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
-      </div>
-    </div>
-  )
-}
-
-const DefaultHeader = ({
-  tableQueriesEnabled = true,
-}: Pick<HeaderProps, 'tableQueriesEnabled'>) => {
-  const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-
-  const snap = useTableEditorTableStateSnapshot()
-  const tableEditorSnap = useTableEditorStateSnapshot()
-  const { can: canCreateColumns } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'columns'
-  )
-  const { mutate: sendEvent } = useSendEventMutation()
-
-  const onAddRow =
-    snap.editable && (snap.table.columns ?? []).length > 0 ? tableEditorSnap.onAddRow : undefined
-  const onAddColumn = snap.editable ? tableEditorSnap.onAddColumn : undefined
-  const onImportData = snap.editable ? tableEditorSnap.onImportData : undefined
-
-  const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
-
-  return (
-    <div className="flex items-center gap-4">
-      <div className="flex items-center gap-2">
-        <FilterPopover />
-        <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
-      </div>
-      {canAddNew && (
-        <>
-          <div className="h-[20px] w-px border-r border-control" />
-          <div className="flex items-center gap-2">
-            {canCreateColumns && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    data-testid="table-editor-insert-new-row"
-                    type="primary"
-                    size="tiny"
-                    icon={<ChevronDown strokeWidth={1.5} />}
-                  >
-                    Insert
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="start">
-                  {[
-                    ...(onAddRow !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="add-row"
-                            className="group space-x-2"
-                            onClick={onAddRow}
-                          >
-                            <div className="-mt-2 pr-1.5">
-                              <div className="border border-foreground-lighter w-[15px] h-[4px]" />
-                              <div className="border border-foreground-lighter w-[15px] h-[4px] my-[2px]" />
-                              <div
-                                className={cn([
-                                  'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
-                                ])}
-                              />
-                            </div>
-                            <div>
-                              <p>Insert row</p>
-                              <p className="text-foreground-light">
-                                Insert a new row into {snap.table.name}
-                              </p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                    ...(onAddColumn !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="add-column"
-                            className="group space-x-2"
-                            onClick={onAddColumn}
-                          >
-                            <div className="flex -mt-2 pr-1.5">
-                              <div className="border border-foreground-lighter w-[4px] h-[15px]" />
-                              <div className="border border-foreground-lighter w-[4px] h-[15px] mx-[2px]" />
-                              <div
-                                className={cn([
-                                  'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
-                                ])}
-                              />
-                            </div>
-                            <div>
-                              <p>Insert column</p>
-                              <p className="text-foreground-light">
-                                Insert a new column into {snap.table.name}
-                              </p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                    ...(onImportData !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="import-data"
-                            className="group space-x-2"
-                            onClick={() => {
-                              onImportData()
-                              sendEvent({
-                                action: 'import_data_button_clicked',
-                                properties: { tableType: 'Existing Table' },
-                                groups: {
-                                  project: projectRef ?? 'Unknown',
-                                  organization: org?.slug ?? 'Unknown',
-                                },
-                              })
-                            }}
-                          >
-                            <div className="relative -mt-2">
-                              <FileText
-                                size={18}
-                                strokeWidth={1.5}
-                                className="-translate-x-[2px]"
-                              />
-                              <ArrowUp
-                                className={cn(
-                                  'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
-                                  'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
-                                )}
-                                strokeWidth={3}
-                                size={12}
-                              />
-                            </div>
-                            <div>
-                              <p>Import data from CSV</p>
-                              <p className="text-foreground-light">Insert new rows from a CSV</p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                  ]}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+          <div className="flex-1 px-1.5">
+            <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
           </div>
-        </>
-      )}
+        ) : (
+          <div className="w-full flex items-center justify-between gap-2 pr-1.5 py-1.5 border-b border-border">
+            <FilterPopoverNew isRefetching={isRefetching} />
+          </div>
+        )}
+        <div className="flex items-center gap-2 overflow-x-auto px-1.5 py-1.5">
+          {!customHeader && snap.selectedRows.size === 0 && (
+            <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
+          )}
+          <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
+        </div>
+      </div>
     </div>
   )
 }
@@ -225,16 +87,15 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
-  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
-  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
+  const { deleteRows } = useTableRowOperations()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const isImpersonatingRole = roleImpersonationState.role !== undefined
 
-  const { filters } = useTableFilter()
+  const filters = snap.filters
   const { sorts } = useTableSort()
 
   const [isExporting, setIsExporting] = useState(false)
@@ -274,27 +135,23 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
     snap.setSelectedRows(new Set(allRows.map((row) => row.idx)), true)
   }
 
+  const onToggleSelectAllInTable = () => {
+    if (snap.allRowsSelected) {
+      snap.setSelectedRows(new Set(), false)
+    } else {
+      onSelectAllRows()
+    }
+  }
+
   const onRowsDelete = () => {
     const rowIdxs = Array.from(snap.selectedRows) as number[]
     const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
 
-    // Queue delete operations directly if queue mode is enabled (and not all rows selected)
-    if (isQueueOperationsEnabled && !snap.allRowsSelected) {
-      queueRowDeletesWithOptimisticUpdate({
-        rows,
-        table: snap.originalTable,
-        queryClient,
-        queueOperation: tableEditorSnap.queueOperation,
-        projectRef: project?.ref,
-      })
-      snap.resetSelectedRows()
-      return
-    }
-
-    // Fall back to confirmation dialog
-    tableEditorSnap.onDeleteRows(rows, {
+    deleteRows({
+      rows,
+      table: snap.originalTable,
       allRowsSelected: snap.allRowsSelected,
-      numRows: snap.allRowsSelected ? totalRows : rows.length,
+      totalRows,
       callback: () => {
         snap.resetSelectedRows()
       },
@@ -410,28 +267,37 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
     <>
       <div className="flex items-center gap-x-2">
         {snap.editable && (
-          <ButtonTooltip
-            type="default"
-            size="tiny"
-            icon={<Trash />}
-            onClick={onRowsDelete}
-            disabled={snap.allRowsSelected && isImpersonatingRole}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text:
-                  snap.allRowsSelected && isImpersonatingRole
-                    ? 'Table truncation is not supported when impersonating a role'
-                    : undefined,
-              },
+          <Shortcut
+            id={SHORTCUT_IDS.TABLE_EDITOR_DELETE_SELECTED_ROWS}
+            onTrigger={onRowsDelete}
+            options={{
+              registerInCommandMenu: true,
+              enabled: !(snap.allRowsSelected && isImpersonatingRole),
             }}
           >
-            {snap.allRowsSelected
-              ? `Delete all rows in table`
-              : snap.selectedRows.size > 1
-                ? `Delete ${snap.selectedRows.size} rows`
-                : `Delete ${snap.selectedRows.size} row`}
-          </ButtonTooltip>
+            <ButtonTooltip
+              type="default"
+              size="tiny"
+              icon={<Trash />}
+              onClick={onRowsDelete}
+              disabled={snap.allRowsSelected && isImpersonatingRole}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text:
+                    snap.allRowsSelected && isImpersonatingRole
+                      ? 'Table truncation is not supported when impersonating a role'
+                      : undefined,
+                },
+              }}
+            >
+              {snap.allRowsSelected
+                ? `Delete all rows in table`
+                : snap.selectedRows.size > 1
+                  ? `Delete ${snap.selectedRows.size} rows`
+                  : `Delete ${snap.selectedRows.size} row`}
+            </ButtonTooltip>
+          </Shortcut>
         )}
 
         {!snap.allRowsSelected ? (
@@ -497,14 +363,20 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {!snap.allRowsSelected && totalRows > allRows.length && (
+        {snap.selectedRows.size > 0 && totalRows > allRows.length && (
           <>
             <div className="h-6 ml-0.5">
               <Separator orientation="vertical" />
             </div>
-            <Button type="text" onClick={() => onSelectAllRows()}>
-              Select all rows in table
-            </Button>
+            <Shortcut
+              id={SHORTCUT_IDS.TABLE_EDITOR_SELECT_ALL_IN_TABLE}
+              onTrigger={onToggleSelectAllInTable}
+              options={{ registerInCommandMenu: true }}
+            >
+              <Button type="text" onClick={onToggleSelectAllInTable}>
+                {snap.allRowsSelected ? 'Deselect all rows in table' : 'Select all rows in table'}
+              </Button>
+            </Shortcut>
           </>
         )}
       </div>

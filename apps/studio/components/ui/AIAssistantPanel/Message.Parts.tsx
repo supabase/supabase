@@ -1,8 +1,8 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { type DynamicToolUIPart, type ReasoningUIPart, type TextUIPart, type ToolUIPart } from 'ai'
 import { BrainIcon, CheckIcon, Loader2 } from 'lucide-react'
-
 import { cn } from 'ui'
+
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { Tool } from './elements/Tool'
@@ -23,7 +23,7 @@ function MessagePartText({ textPart }: { textPart: TextUIPart }) {
       isLoading={isLoading}
       readOnly={readOnly}
       className={cn(
-        'max-w-none space-y-4 prose prose-sm prose-li:mt-1 [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h2:text-lg prose-h2:font-medium prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground prose-ol:space-y-3 prose-ul:space-y-3 prose-li:my-0 break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
+        'max-w-none space-y-4 prose prose-sm prose-li:mt-1 [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h2:text-lg prose-h2:font-medium prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground prose-ol:space-y-3 prose-ul:space-y-3 prose-li:my-0 wrap-break-word [&>p:not(:last-child)]:mb-2! [&>*>p:first-child]:mt-0! [&>*>p:last-child]:mb-0! [&>*>*>p:first-child]:mt-0! [&>*>*>p:last-child]:mb-0! [&>ol>li]:pl-4!',
         isUserMessage && 'text-foreground [&>p]:font-medium',
         state === 'editing' && 'animate-pulse'
       )}
@@ -236,7 +236,8 @@ export function MessagePartSwitcher({
     }
     case 'tool-list_policies':
     case 'tool-search_docs':
-    case 'tool-get_active_incidents': {
+    case 'tool-get_active_incidents':
+    case 'tool-load_knowledge': {
       return <MessagePart.Tool toolPart={part} />
     }
     case 'reasoning':

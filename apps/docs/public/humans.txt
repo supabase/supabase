@@ -4,7 +4,6 @@ Supabase is 100% remote.
 
 Aaron Brooks
 Aaron Byrne
-Ada Wong
 Adam Mohammed
 Adam Mokan
 AJ Matias
@@ -17,6 +16,7 @@ Alexander Korotkov
 Ali Waseem
 Allan S
 Amir Issaei
+Amogh Rao
 Amy Q
 Ana Mogul
 Andrew Valleteau
@@ -26,13 +26,16 @@ Anna Weihl
 Ant Evans
 Ant Wilson
 Ariuna K
+Arshdeep Singh
 Artur Zakirov
 Artyom Borissov
+Aziz Quadri
 Barco Fourie
 Beng Eu
 Benjamin Coenen
 Bo Lu
 Bobbie Soedirgo
+Brad Gyger
 Brendan Stephens
 Brent Newson
 Carel de Waal
@@ -51,25 +54,31 @@ Chris Martin
 Chris Stockton
 Chris Ward
 Clayton Kast
+Colin Goodheart-Smithe
+Colin Murray
+Colum Ferry
 Craig Cannon
 Cuong Do
+Dane Harrigan
+Daniel Mitterdorfer
 Daniel Velázquez Lara
 Danny White
-Darren Cunningham
 Dave Wilson
 David A. Ventimiglia
+David Alvarez
 David Birdsong
 David Camacho Cateura
 David Weitzman
+Davide Pellegatta
 Deepthi Sigireddi
 Deji I
 Dennis Senn
+Dimitrios Liappis
 Div Arora
 Divit D
 Douglas Hunley
 Dustin Keib
 Eduardo Gurgel
-Egor Romanov
 Eleftheria Trivyzaki
 Eliot Whalan
 Emmett Folger
@@ -84,11 +93,13 @@ Felipe Stival
 Ferhat Elmas
 Firas El Rachidi
 Francesco Sansalvadore
+Gabriel Claudino
 Garrett Crowell
 Gerardo Estaba
 Gildas Garcia
 Giuseppe Mandato
 Greg Kress
+Greg Marzouka
 Greg P
 Greg Richardson
 Gregor Vand
@@ -96,6 +107,7 @@ Guilherme Souza
 Hannah Bowers
 Hardik Maheshwari
 Haritabh Gupta
+Harold Giménez
 Haydn Maley
 Hieu Pham
 Hunter Luckow
@@ -104,9 +116,9 @@ Illia Basalaiev
 Inian P
 Ivan Vasilov
 Jamie Boyd
+Jared Patterson
 Jason Farber
 Jean-Paul Argudo
-Jeezy
 Jeff Smick
 Jenny Kibiri
 Jeremias Menichelli
@@ -114,6 +126,7 @@ Jess Shears
 Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
+Joanna Michniewicz
 Joaquim Moreno
 Joel Low
 Joey Freeland
@@ -124,10 +137,12 @@ John Pena
 John Schaeffer
 Jon M
 Jonny Summers-Muir
+Jordan McQueen
 Jordi Enric
 José Luis Ledesma
 Joshen Lim
 Julien Goux
+Kai M
 Kalleby Santos
 Kanishk Dudeja
 Kamil Ogórek
@@ -144,22 +159,22 @@ Krishna Sai Vandavasi
 Lakshan Perera
 Laura C
 Laurence Isla
+Leandro Pereira
 Leigh Anne Applewhite
 Lenny Urbanowski
 Leonardo Santiago
 Liam Cloud Hogan
 Lindsay Moss
-Long Hoang
-Luca Forstner
 Lukas Bernert
 Łukasz Niemier
 Maksym Ionutsa
+Manuel Mendez
 Manan Gupta
 Marcus Weiner
 Margarita Sandomirskaia
 Mark Burggraf
-Marouane Souda
 Matthew Hambright
+Matt Hudson
 Matt Johnston
 Matt Rossman
 Matthias Luft
@@ -169,12 +184,15 @@ Michal Kleczek
 Miles Thomas
 Monica Khoury
 Mykhailo Mischa Lieibenson
+Natalie Roberge
 Nick B
 Nick Littman
 Nick Nowlan
+Nicolas Nosenzo
 Nyannyacha
 Oli R
 Pamela Chia
+Patricia Szasz
 Patrick Crane
 Paul Caselton
 Paul Cioanca
@@ -190,15 +208,20 @@ Rafael Chacón
 Raminder Singh
 Raúl Barroso
 Riccardo Busetti
+Rob Shields
 Rodrigo Esteves
 Rodrigo Mansueli
+Roman Hernandez
 Ronan Lehane
 Rory Wilding
 Ryan Goulet
+Ryan Senior
 Ruan Maia
+Saba Pochkhua
 Sam Meech-Ward
 Sam Rome
 Sam Rose
+Samir Ketema
 Sana Cordeaux
 Sara Read
 Sean Oliver
@@ -208,12 +231,12 @@ Sergio Cioban Filho
 Shane E
 Shreekar Shetty
 Sreyas Udayavarman
-Stanislav M
 Stephen Morgan
 Steve Chavez
 Steven Eubank
 Stojan Dimitrovski
 Szymon Mentel
+Sugat Mahanti
 Sugu Sougoumarane
 Supun Sudaraka Kalidasa
 Taha Le Bras
@@ -221,7 +244,6 @@ Tanun Chalermsinsuwan
 Taryn King
 Terry Sutton
 Thomas E
-Thor Schaeff
 Tim Frietas
 Tim Palmer
 Timothy Lim
@@ -233,10 +255,11 @@ Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
+Utkarash Singh
+Victor Farazdagi
 Wen Bo Xie
 Yorvi Arias
 Yuliya Marinova
-Yuri Santana
 Zach Marinov
 Zsolt Pazmandy
 ____________

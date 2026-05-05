@@ -1,4 +1,4 @@
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 
 interface DeleteDestinationProps {
   visible: boolean
