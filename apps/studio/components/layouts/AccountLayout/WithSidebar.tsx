@@ -11,10 +11,6 @@ interface WithSidebarProps {
   title?: string
   sections: SidebarSection[]
   header?: ReactNode
-  subitems?: any[]
-  subitemsParentKey?: number
-  hideSidebar?: boolean
-  customSidebarContent?: ReactNode
   backToDashboardURL?: string
 }
 
@@ -23,24 +19,17 @@ export const WithSidebar = ({
   header,
   children,
   sections,
-  subitems,
-  subitemsParentKey,
-  hideSidebar = false,
-  customSidebarContent,
   backToDashboardURL,
 }: PropsWithChildren<WithSidebarProps>) => {
-  const noContent = !sections && !customSidebarContent
+  const noContent = !sections
 
   return (
     <div className="flex flex-col md:flex-row h-full">
-      {!hideSidebar && !noContent && (
+      {!noContent && (
         <SidebarContent
           title={title}
           header={header}
           sections={sections}
-          subitems={subitems}
-          subitemsParentKey={subitemsParentKey}
-          customSidebarContent={customSidebarContent}
           backToDashboardURL={backToDashboardURL}
           className="hidden md:flex"
         />
@@ -55,12 +44,10 @@ export const WithSidebar = ({
 export const SidebarContent = ({
   header,
   sections,
-  subitems,
-  customSidebarContent,
   backToDashboardURL,
   className,
 }: PropsWithChildren<Omit<WithSidebarProps, 'breadcrumbs'>> & { className?: string }) => {
-  const page = subitems ? undefined : getActiveKey(sections)
+  const page = getActiveKey(sections)
   const subMenuSections = toSubMenuSections(sections)
 
   return (
@@ -90,7 +77,6 @@ export const SidebarContent = ({
           {header && header}
           <div className="flex-1 overflow-auto">
             <div className="flex flex-col">
-              {customSidebarContent}
               <SubMenu sections={subMenuSections} page={page} />
             </div>
           </div>
