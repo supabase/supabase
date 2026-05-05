@@ -276,6 +276,7 @@ read_env() {
 # --- Main ---
 
 log "Setup starting in $(pwd)"
+log "This may take several minutes..."
 
 if [ "$SKIP_DEPS" = "1" ]; then
     log "Skipping system-package installation (--skip-deps)"
