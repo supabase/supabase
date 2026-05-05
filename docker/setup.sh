@@ -231,7 +231,7 @@ install_aws() {
 SRC_DIR=""
 SRC_TMP=""
 
-determine_source() {
+prepare_source() {
     script_path=""
 
     if [ -f "$0" ]; then
@@ -291,7 +291,7 @@ if [ "$WITH_AWS" = "1" ]; then
     install_aws
 fi
 
-determine_source
+prepare_source
 
 target="$(pwd)/$PROJECT_DIR"
 if [ -e "$target" ]; then
@@ -348,8 +348,8 @@ echo "Setup complete. Project ready at: $(pwd)"
 echo ""
 echo "Next steps:"
 echo "  cd $(pwd)"
-echo "  sh ./run.sh start     # bring up the stack"
-echo "  sh ./run.sh stop      # tear it down"
+echo "  sh ./run.sh start"
+echo "  sh ./run.sh secrets"
 echo ""
 echo "To enable docker-compose overrides (pg17, envoy, caddy, nginx, rustfs, s3, logs),"
 echo "edit CONFIG in .env (e.g. CONFIG=\"pg17 envoy\")."
