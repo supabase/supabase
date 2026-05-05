@@ -157,13 +157,14 @@ Deno.serve(async (req) => {
 
 ## Simplifying with `@supabase/server`
 
-The [`@supabase/server`](https://github.com/supabase/server) package wraps your handler, checks the caller's credentials against a declared `allow` mode, and hands you a pre-configured Supabase client on `ctx`. The same patterns above, written against the SDK, look like this.
+The [`@supabase/server`](https://github.com/supabase/server) package wraps your handler, checks the caller's credentials against a declared `auth` mode, and hands you a pre-configured Supabase client on `ctx`. The same patterns above, written against the SDK, look like this.
 
-| Mode              | Accepts                                    |
-| ----------------- | ------------------------------------------ |
-| `'user'`          | A valid user JWT on `Authorization`        |
-| `'secret:<name>'` | A named secret key on `apikey`             |
-| `'always'`        | Any caller, no check (for signed webhooks) |
+| Mode                   | Accepts                                    |
+| ---------------------- | ------------------------------------------ |
+| `'user'`               | A valid user JWT on `Authorization`        |
+| `'secret:<name>'`      | A named secret key on `apikey`             |
+| `'publishable:<name>'` | A named publishable key on `apikey`        |
+| `'none'`               | Any caller, no check (for signed webhooks) |
 
 <Admonition type="tip">
 
@@ -173,13 +174,13 @@ See the [`@supabase/server` docs](https://github.com/supabase/server) for the fu
 
 ### Authenticated user calls [#authenticated-user-calls-with-server-sdk]
 
-`allow: 'user'` pairs with `verify_jwt = true`. The platform validates the JWT, and the SDK hands you `ctx.supabase` already scoped to the caller.
+`auth: 'user'` pairs with `verify_jwt = true`. The platform validates the JWT, and the SDK hands you `ctx.supabase` already scoped to the caller.
 
 ```ts
 import { withSupabase } from 'npm:@supabase/server'
 
 export default {
-  fetch: withSupabase({ allow: 'user' }, async (_req, ctx) => {
+  fetch: withSupabase({ auth: 'user' }, async (_req, ctx) => {
     // your business logic. ctx.supabase is scoped to the caller
     return Response.json({ email: ctx.userClaims?.email })
   }),
@@ -188,13 +189,13 @@ export default {
 
 ### Service-to-service calls [#service-to-service-calls-with-server-sdk]
 
-`allow: 'secret:<name>'` validates the `apikey` header against the named secret key from your [dashboard](/dashboard/project/_/settings/api-keys) and gives you `ctx.supabaseAdmin` for privileged work. The `<name>` matches the name you gave the key. Keep `verify_jwt = false`.
+`auth: 'secret:<name>'` validates the `apikey` header against the named secret key from your [dashboard](/dashboard/project/_/settings/api-keys) and gives you `ctx.supabaseAdmin` for privileged work. The `<name>` matches the name you gave the key. Keep `verify_jwt = false`.
 
 ```ts
 import { withSupabase } from 'npm:@supabase/server'
 
 export default {
-  fetch: withSupabase({ allow: 'secret:automations' }, async (_req, ctx) => {
+  fetch: withSupabase({ auth: 'secret:automations' }, async (_req, ctx) => {
     // your business logic. ctx.supabaseAdmin bypasses RLS
     return Response.json({ ok: true })
   }),
@@ -211,11 +212,11 @@ Create a named secret key for each caller in the [**Settings > API keys**](/dash
 
 ### Public functions [#public-functions-with-server-sdk]
 
-The SDK adds nothing to a truly public function. Use the raw pattern from the previous section. If you need a Supabase client anyway, `allow: 'always'` with `verify_jwt = false` skips every check and treats every caller as anonymous.
+The SDK adds nothing to a truly public function. Use the raw pattern from the previous section. If you need a Supabase client anyway, `auth: 'none'` with `verify_jwt = false` skips every check and treats every caller as anonymous.
 
 ### External webhooks [#external-webhooks-with-server-sdk]
 
-Use `allow: 'always'` to skip the SDK's credential check, then verify the provider's signature inside the handler. Keep `verify_jwt = false`.
+Use `auth: 'none'` to skip the SDK's credential check, then verify the provider's signature inside the handler. Keep `verify_jwt = false`.
 
 ```ts
 import { withSupabase } from 'npm:@supabase/server'
@@ -224,7 +225,7 @@ import Stripe from 'npm:stripe'
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!)
 
 export default {
-  fetch: withSupabase({ allow: 'always' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
     const signature = req.headers.get('stripe-signature') ?? ''
     const body = await req.text()
 
@@ -242,19 +243,19 @@ export default {
 
 <Admonition type="caution">
 
-`allow: 'always'` disables every credential check. Your handler is fully responsible for authenticating the caller. Never use it on an endpoint that reads or writes sensitive data without verifying the caller some other way.
+`auth: 'none'` disables every credential check. Your handler is fully responsible for authenticating the caller. Never use it on an endpoint that reads or writes sensitive data without verifying the caller some other way.
 
 </Admonition>
 
 ### Combining modes
 
-Functions that answer both users and internal callers take an array on `allow`. Modes are tried in order. The first match wins, and `ctx.authType` tells you which matched.
+Functions that answer both users and internal callers take an array on `auth`. Modes are tried in order. The first match wins, and `ctx.authType` tells you which matched.
 
 ```ts
 import { withSupabase } from 'npm:@supabase/server'
 
 export default {
-  fetch: withSupabase({ allow: ['user', 'secret:automations'] }, async (req, ctx) => {
+  fetch: withSupabase({ auth: ['user', 'secret:automations'] }, async (req, ctx) => {
     if (ctx.authType === 'user') {
       // your business logic for user calls. ctx.supabase is scoped to them
       return Response.json({ ok: true })
@@ -275,7 +276,7 @@ import { createSupabaseContext } from 'npm:@supabase/server'
 
 export default {
   fetch: async (req: Request) => {
-    const { data: ctx, error } = await createSupabaseContext(req, { allow: 'user' })
+    const { data: ctx, error } = await createSupabaseContext(req, { auth: 'user' })
     if (error) {
       return Response.json({ message: error.message, code: error.code }, { status: error.status })
     }
