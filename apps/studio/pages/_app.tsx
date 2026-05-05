@@ -87,10 +87,10 @@ const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
   ? [{ id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> }]
   : []
 
-// prettier-ignore
-type FeatureFlagProviderProps = ComponentProps<typeof FeatureFlagProvider>
-
-const FeatureFlagProviderWithOrgContext = ({ children, ...props }: FeatureFlagProviderProps) => {
+const FeatureFlagProviderWithOrgContext = ({
+  children,
+  ...props
+}: ComponentProps<typeof FeatureFlagProvider>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
 
   return (

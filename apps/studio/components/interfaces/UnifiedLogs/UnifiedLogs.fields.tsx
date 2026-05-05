@@ -10,11 +10,6 @@ import { DataTableFilterField, Option } from '@/components/ui/DataTable/DataTabl
 import { getLevelColor } from '@/components/ui/DataTable/DataTable.utils'
 import { useFormatDateTime } from '@/lib/datetime'
 
-// prettier-ignore
-type UnifiedLogsFilterField = DataTableFilterField<ColumnSchema>
-// prettier-ignore
-type UnifiedLogsSheetField = SheetField<ColumnSchema, LogsMeta>
-
 const DateCell = (props: { date: ColumnSchema['date'] }) => {
   const formatDateTime = useFormatDateTime()
   const month = formatDateTime(props.date, 'MMM')
@@ -139,7 +134,7 @@ export const filterFields = [
       )
     },
   },
-] satisfies UnifiedLogsFilterField[]
+] satisfies DataTableFilterField<ColumnSchema>[]
 
 export const sheetFields = [
   {
@@ -174,4 +169,4 @@ export const sheetFields = [
     type: 'input',
     skeletonClassName: 'w-56',
   },
-] satisfies UnifiedLogsSheetField[]
+] satisfies SheetField<ColumnSchema, LogsMeta>[]
