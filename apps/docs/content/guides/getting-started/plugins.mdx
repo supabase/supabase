@@ -1,12 +1,37 @@
 ---
 id: 'ai-tools-plugins'
-title: 'Supabase Agent Plugins'
-subtitle: 'Install Supabase agent plugin for your AI coding agent'
-description: 'Install Supabase agent plugin for your AI coding agent'
+title: 'Supabase Agent Plugin'
+subtitle: 'One-click setup for Supabase in your AI coding agent'
+description: 'The Supabase agent plugin bundles the MCP server and agent skills into a single install for your AI coding agent.'
 sidebar_label: 'Supabase Agent Plugin'
 ---
 
-The Supabase agent plugin bundles the [Supabase MCP server](/docs/guides/getting-started/mcp) and [Supabase agent skills](/docs/guides/getting-started/ai-skills) into a single install for your AI coding agent. Once installed, your agent can query your database, manage migrations, and follow Supabase and Postgres best practices without manual configuration.
+The Supabase agent plugin is a single install that gives your AI coding agent everything it needs to work with Supabase. It bundles the [Supabase MCP server](/docs/guides/getting-started/mcp) and [Supabase agent skills](/docs/guides/getting-started/ai-skills) so your agent can query your database, manage migrations, deploy Edge Functions, and follow Supabase and Postgres best practices — without manual configuration.
+
+## Why use the plugin?
+
+You can install the [MCP server](/docs/guides/getting-started/mcp) and [agent skills](/docs/guides/getting-started/ai-skills) separately. The plugin is the recommended way to get started because it sets everything up in a single step and keeps your MCP connection and skills in sync as updates are released.
+
+Agent plugins are packages of AI agent extensions. A single plugin can bundle any combination of:
+
+- **MCP servers** — external tool integrations that let your agent interact with services like Supabase
+- **Skills** — procedural knowledge and context your agent loads on demand to work more accurately
+- **Hooks** — event handlers that run at agent lifecycle points (e.g. before or after a tool call)
+- **Agents** — specialized subagents with specific personas and tool configurations
+- **Slash commands** — custom commands you can invoke directly in chat
+
+The Supabase plugin currently bundles an MCP server and skills. Support for additional components may be added in future releases.
+
+You can install the plugin globally to use it across all your projects, or per project to keep it isolated.
+
+## Supported clients
+
+| Client      | Type                       |
+| ----------- | -------------------------- |
+| Claude Code | AI agent CLI               |
+| Codex       | AI agent CLI + desktop app |
+| Cursor      | IDE (desktop + web)        |
+| Gemini CLI  | AI agent CLI               |
 
 ## Installation
 
