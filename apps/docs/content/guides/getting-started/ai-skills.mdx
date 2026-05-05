@@ -18,7 +18,19 @@ To install a specific skill from the repository:
 npx skills add supabase/agent-skills --skill SKILL_NAME
 ```
 
-Skills work with 18+ AI agents including Claude Code, GitHub Copilot, Cursor, Cline, and many others.
+Skills install at project scope by default, placing them in your repository so all contributors and cloud agents share the same setup. Pass `--global` to install once across all your projects instead:
+
+```bash
+npx skills add supabase/agent-skills --global
+```
+
+Skills work with 18+ AI agents including Claude Code, GitHub Copilot, Cursor, Cline, and many others. To install for all agents at once:
+
+```bash
+npx skills add supabase/agent-skills --all
+```
+
+If you use Claude Code, the [Supabase agent plugin](/docs/guides/getting-started/plugins) bundles both skills and the Supabase MCP server into a single install.
 
 ## Available skills
 
