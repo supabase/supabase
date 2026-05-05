@@ -2,20 +2,16 @@ import { Copy, Expand } from 'lucide-react'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 import {
-  Button,
-  cn,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuTrigger_Shadcn_,
   copyToClipboard,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 
 import { CellDetailPanel } from './CellDetailPanel'
-import { formatCellValue, formatClipboardValue, isLargeValue } from './Results.utils'
+import { ResultCell } from './ResultCell'
+import { formatClipboardValue } from './Results.utils'
 import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 
 export const Results = ({ rows }: { rows: readonly any[] }) => {
@@ -75,42 +71,14 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
           frozen: false,
           sortable: false,
           isLastFrozenColumn: false,
-          renderCell: ({ row }: { row: any }) => {
-            const cellValue = row[key]
-            const showExpand = isLargeValue(cellValue)
-            return (
-              <div
-                className={cn(
-                  'group/cell relative flex items-center h-full font-mono text-xs w-full whitespace-pre',
-                  cellValue === null && 'text-foreground-lighter'
-                )}
-                onContextMenu={(e) => {
-                  e.preventDefault()
-                  handleContextMenu(e, key, cellValue)
-                }}
-              >
-                {formatCellValue(cellValue)}
-                {showExpand && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="default"
-                        size="tiny"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 px-1 opacity-0 group-hover/cell:opacity-100 focus-visible:opacity-100"
-                        icon={<Expand size={10} />}
-                        aria-label="View full cell content"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setExpandedCell({ column: key, value: cellValue })
-                        }}
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent side="left">View full cell content</TooltipContent>
-                  </Tooltip>
-                )}
-              </div>
-            )
-          },
+          renderCell: ({ row }: { row: any }) => (
+            <ResultCell
+              column={key}
+              value={row[key]}
+              onContextMenu={handleContextMenu}
+              onExpand={(column, value) => setExpandedCell({ column, value })}
+            />
+          ),
           renderHeaderCell: () => columnRender(key),
         }
       }),
