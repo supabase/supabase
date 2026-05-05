@@ -232,22 +232,7 @@ SRC_DIR=""
 SRC_TMP=""
 
 prepare_source() {
-    script_path=""
-
-    if [ -f "$0" ]; then
-        script_path="$0"
-    fi
-
-    if [ -n "$script_path" ]; then
-        candidate=$(cd "$(dirname "$script_path")" 2>/dev/null && pwd)
-        if [ -n "$candidate" ] && [ -f "$candidate/docker-compose.yml" ] && [ -d "$candidate/utils" ]; then
-            SRC_DIR="$candidate"
-            log "Using local source: $SRC_DIR"
-            return 0
-        fi
-    fi
-
-    log "No local supabase source found; sparse-cloning supabase repo"
+    log "Sparse-cloning supabase repo"
     SRC_TMP=$(mktemp -d) || return 1
     git clone --filter=blob:none --no-checkout --depth=1 --quiet \
         https://github.com/supabase/supabase "$SRC_TMP/supabase" 2>/dev/null || \
@@ -289,6 +274,14 @@ fi
 
 if [ "$WITH_AWS" = "1" ]; then
     install_aws
+fi
+
+# Idempotent re-run: if CWD is already a set-up project, skip bootstrap.
+# A clone has docker-compose.yml + utils/ but only .env.example;
+# a set-up project also has a real .env.
+if [ -f .env ] && [ -f docker-compose.yml ] && [ -d utils ]; then
+    log "Already in a Supabase project directory; skipping bootstrap."
+    exit 0
 fi
 
 prepare_source
