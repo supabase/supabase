@@ -9,7 +9,8 @@ import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { PRODUCT_MODULES_NAMES, PRODUCT_MODULES_SHORTNAMES } from 'shared-data/products'
 
-import { serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
 
 const ProductModulesHeader = dynamic(() => import('~/components/Sections/ProductModulesHeader'))
 const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
@@ -59,6 +60,12 @@ function VectorPage() {
                 image: meta_image,
               })
             ),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.vector)),
           }}
         />
       </Head>

@@ -1,3 +1,4 @@
+import { keyword, literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { toString as CronToString } from 'cronstrue'
 import { Column } from 'react-data-grid'
 import { cn } from 'ui'
@@ -7,12 +8,10 @@ import { CRON_TABLE_COLUMNS, HTTPHeader, secondsPattern } from './CronJobs.const
 import { CronJobTableCell } from './CronJobTableCell'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 
-const escapeSqlLiteral = (value = '') => value.replaceAll("'", "''")
 const unescapeSqlLiteral = (value = '') => value.replaceAll("''", "'")
 
-export function buildCronQuery(name: string, schedule: string, command: string) {
-  const escapedName = escapeSqlLiteral(name)
-  return `select cron.schedule('${escapedName}', '${schedule}', ${command});`
+export function buildCronQuery(name: string, schedule: string, command: string): SafeSqlFragment {
+  return safeSql`select cron.schedule(${literal(name)}, ${literal(schedule)}, ${literal(command)});`
 }
 
 export const buildHttpRequestCommand = (
@@ -21,18 +20,18 @@ export const buildHttpRequestCommand = (
   headers: HTTPHeader[] = [],
   body: string | undefined,
   timeout: number
-) => {
-  return `
+): SafeSqlFragment => {
+  const funcName = keyword(method === 'GET' ? 'http_get' : 'http_post')
+  const headersJson = JSON.stringify(
+    Object.fromEntries(headers.filter((v) => v.name && v.value).map((v) => [v.name, v.value]))
+  )
+  const bodyPart = method === 'POST' && body ? safeSql`\n      body:=${literal(body)},` : safeSql``
+  return safeSql`
 select
-  net.${method === 'GET' ? 'http_get' : 'http_post'}(
-      url:='${escapeSqlLiteral(url)}',
-      headers:=jsonb_build_object(${headers
-        .filter((v) => v.name && v.value)
-        .map((v) => `'${escapeSqlLiteral(v.name)}', '${escapeSqlLiteral(v.value)}'`)
-        .join(
-          ', '
-        )}), ${method === 'POST' && body ? `\n      body:='${escapeSqlLiteral(body)}',` : ''}
-      timeout_milliseconds:=${timeout}
+  net.${funcName}(
+      url:=${literal(url)},
+      headers:=${literal(headersJson)}::jsonb, ${bodyPart}
+      timeout_milliseconds:=${literal(timeout)}
   );`
 }
 
