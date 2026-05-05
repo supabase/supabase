@@ -1,3 +1,4 @@
+import { ident, literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Loader } from 'lucide-react'
@@ -51,12 +52,12 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
     if (isUpdating || !canUpdateDescription) return false
 
     setIsUpdating(true)
-    let query = ''
-    let description = value.replaceAll("'", "''")
+    let query: string | undefined
     if (table && column)
-      query = `comment on column public."${table}"."${column}" is '${description}';`
-    if (table && !column) query = `comment on table public."${table}" is '${description}';`
-    if (rpc) query = `comment on function "${rpc}" is '${description}';`
+      query = safeSql`comment on column ${ident('public')}.${ident(table)}.${ident(column)} is ${literal(value)};`
+    if (table && !column)
+      query = safeSql`comment on table ${ident('public')}.${ident(table)} is ${literal(value)};`
+    if (rpc) query = safeSql`comment on function ${ident(rpc)} is ${literal(value)};`
 
     if (query) {
       try {
