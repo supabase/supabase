@@ -1,0 +1,287 @@
+---
+title: 'Introducing @supabase/server'
+description: 'Stateless auth, RLS-scoped clients, and CORS on the server, without the boilerplate.'
+author: tomas_pozo, kalleby_santos, katerina_skroumpelou, matt_johnston
+date: '2026-05-04'
+categories:
+  - product
+tags:
+  - supabase-server
+  - edge-functions
+  - server
+  - typescript
+imgSocial: 'introducing-supabase-server/og.png'
+imgThumb: 'introducing-supabase-server/thumb.png'
+toc_depth: 2
+---
+
+We analyzed 25,000 deployed Edge Functions. In every one, `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` were used for the same thing: creating a Supabase client. Most functions also need an admin client that bypasses RLS, which requires its own initialization with the service role key. Add auth verification, CORS handling, and environment variable management on top.
+
+To avoid repeating this setup, most developers create shared utility files: `_shared/supabase.ts`, `_shared/supabase-admin.ts`, `_shared/cors.ts`. Sound familiar?
+
+Today we're happy to release `@supabase/server` in public beta. A new package that handles all of this for you. Declare who can call your endpoint, and you get a ready-to-use context with a user-scoped client, an admin client, verified user identity, and JWT claims. Same package works across Edge Functions, Cloudflare Workers, Hono and Bun.
+
+```typescript
+import { withSupabase } from '@supabase/server'
+
+export default {
+  fetch: withSupabase({ allow: 'user' }, async (req, ctx) => {
+    const { data } = await ctx.supabase.from('todos').select()
+    return Response.json(data)
+  }),
+}
+```
+
+> The export-default-fetch pattern works on Edge Functions too as it is supported since Deno v2. You can read more about it [here](https://docs.deno.com/runtime/fundamentals/http_server/#default-fetch-export).
+
+## How it works
+
+`@supabase/server` gives you multiple ways to get a `SupabaseContext`. The most common is `withSupabase`, a wrapper that handles auth, client creation, and CORS before your handler runs:
+
+```typescript
+import { withSupabase } from 'npm:@supabase/server'
+
+// Classic Deno.serve on Edge Functions
+// same functionality as the code above
+Deno.serve(
+  withSupabase({ allow: 'user' }, async (req, ctx) => {
+    const { data } = await ctx.supabase.from('todos').select()
+    return Response.json(data)
+  })
+)
+```
+
+You can also call `createSupabaseContext` directly if you need more control over error handling and responses:
+
+```typescript
+import { createSupabaseContext } from '@supabase/server'
+
+export default {
+  fetch: async (req) => {
+    const { data: ctx, error } = await createSupabaseContext(req, { allow: 'user' })
+    if (error) return Response.json({ error: error.message }, { status: error.status })
+
+    const { data } = await ctx.supabase.from('todos').select()
+    return Response.json(data)
+  },
+}
+```
+
+Both approaches give you the same `SupabaseContext`. No shared utility files. No environment variable management. No manual JWT verification.
+
+## What's in the context
+
+Every approach produces the same `SupabaseContext`:
+
+```typescript
+interface SupabaseContext {
+  supabase: SupabaseClient // RLS-scoped to the caller
+  supabaseAdmin: SupabaseClient // bypasses RLS
+  userClaims: UserIdentity | null
+  claims: JWTClaims | null
+  authType: Allow
+}
+```
+
+`ctx.supabase` is scoped to the authenticated user. RLS policies apply automatically. `ctx.supabaseAdmin` uses the service role for operations that need to bypass RLS. Both come pre-configured.
+
+## Declarative access control
+
+The `allow` config declares who can call each function:
+
+```typescript
+// authenticated users only (default)
+withSupabase({ allow: 'user' }, handler)
+
+// no auth required, good for webhooks and health checks
+withSupabase({ allow: 'always' }, handler)
+
+// server-to-server with secret key
+withSupabase({ allow: 'secret' }, handler)
+
+// accept either a user JWT or a secret key
+withSupabase({ allow: ['user', 'secret'] }, handler)
+```
+
+Your function's security model is visible in one line.
+
+## Adopting new auth keys without the boilerplate
+
+Last year we improved project security with [asymmetric JWT Signing Keys](https://supabase.com/docs/guides/auth/signing-keys) and [new API keys](https://github.com/orgs/supabase/discussions/29260). Better security for every project. But we heard from you: the migration is hard.
+
+Usage of API keys and auth wiring have been one of the top feedback themes from developers. The current migration path asks you to bring in `jose`, set up a JWKS endpoint, build your own `AuthMiddleware`, manually expose new keys as secrets, and rewire every function.
+
+We fixed it. `@supabase/server` handles new key validation and JWT verification internally. You adopt the package and the new security model comes with it. No `jose`. No JWKS configuration. No manual secret setup.
+
+```typescript
+import { withSupabase } from '@supabase/server'
+
+export default {
+  // allow: 'user' will handle incoming user JWT validation for you
+  fetch: withSupabase({ allow: 'user' }, async (req, { supabase }) => {
+    const { data } = await supabase.from('subscriptions').select('*')
+    return Response.json(data)
+  }),
+}
+```
+
+Shared utility files deleted. New keys working. No manual JWT verification. You focus on your business logic.
+
+## Same code, every runtime
+
+`withSupabase` returns a standard `(Request) => Promise<Response>` handler. It works with any runtime that supports the Web API pattern.
+
+Edge Functions and Cloudflare Workers:
+
+```typescript
+export default {
+  fetch: withSupabase({ allow: 'user' }, handler),
+}
+```
+
+Hono (with the included adapter):
+
+```typescript
+import { Hono } from 'hono'
+import { withSupabase } from '@supabase/server/adapters/hono'
+
+const app = new Hono()
+
+app.get('/todos', withSupabase({ allow: 'user' }), async (c) => {
+  const { supabase } = c.var.supabaseContext
+  const { data } = await supabase.from('todos').select()
+  return c.json(data)
+})
+
+export default { fetch: app.fetch }
+```
+
+## Composable primitives
+
+Most developers don't need anything beyond `withSupabase` or `createSupabaseContext`. But the building blocks behind them are public API.
+
+```typescript
+import {
+  verifyAuth,
+  createContextClient,
+  createAdminClient,
+  resolveEnv,
+} from '@supabase/server/core'
+```
+
+These are useful when you need more control: multiple routes with different auth, custom response headers, or domain-specific wrappers like MCP servers.
+
+Here's an Edge Function with per-route auth:
+
+```typescript
+import { verifyAuth, createContextClient } from '@supabase/server/core'
+
+export default {
+  fetch: async (req) => {
+    const url = new URL(req.url)
+
+    if (url.pathname === '/health') {
+      return Response.json({ status: 'ok' })
+    }
+
+    if (url.pathname === '/todos') {
+      const { data: auth, error } = await verifyAuth(req, { allow: 'user' })
+      if (error) return Response.json({ error: error.message }, { status: error.status })
+
+      const supabase = createContextClient(auth.token)
+      const { data } = await supabase.from('todos').select()
+      return Response.json(data)
+    }
+
+    return new Response('Not found', { status: 404 })
+  },
+}
+```
+
+These are the same primitives that power `withSupabase`. Teams building MCP servers, custom middleware, or framework adapters can compose them into their own patterns.
+
+## One pattern for humans and AI agents
+
+We designed `@supabase/server` with agentic development in mind. Every function follows the same structure: declare access, receive context, write logic.
+
+During internal testing, Claude Code migrated an entire project's Edge Functions to `@supabase/server` in a single prompt. That included adopting new API keys, removing shared utility files, and switching every function to `withSupabase`. All functions worked on the first run.
+
+When every function looks the same, agents produce correct code from a single example.
+
+## FAQ
+
+**Does this replace `@supabase/ssr`?**
+
+No. `@supabase/ssr` handles cookie-based session management for frameworks like Next.js and SvelteKit. `@supabase/server` handles stateless, header-based auth for Edge Functions, Workers, and other backend runtimes. The two packages coexist and are not replacements for each other. Deeper integration with `@supabase/ssr` is on the roadmap.
+
+If you would like to adopt the DX that this package provides, check our [SSR frameworks](https://github.com/supabase/server/blob/main/docs/ssr-frameworks.md) documentation for implementation references.
+
+**Does this only support Hono?**
+
+No. `withSupabase` works with any runtime that supports the standard `Request`/`Response` Web API: Edge Functions, Cloudflare Workers, Bun, and more. Hono was the first framework adapter we shipped, and we have already merged a community PR for the H3 adapter. We expect to accept more through our community contributions to adapters.
+
+**Where is the documentation?**
+
+The package ships with full documentation in the [GitHub repo](https://github.com/supabase/server). We're also working on adding guides to the [Supabase docs](https://supabase.com/docs).
+
+**What about environment variables?**
+
+On the Supabase platform and Local Development (CLI), your Edge Functions will receive the required environment variables to work out of the box (`SUPABASE_PUBLISHABLE_KEYS`, `SUPABASE_SECRET_KEYS`, `SUPABASE_JWKS`).
+
+On local development or self-hosted environments, use the same plural form: `SUPABASE_PUBLISHABLE_KEYS` instead of `SUPABASE_ANON_KEY`, `SUPABASE_SECRET_KEYS` instead of `SUPABASE_SERVICE_ROLE_KEY`.
+
+Check out the [environment variables documentation](https://github.com/supabase/server/blob/main/docs/environment-variables.md) for more details.
+
+**How can I leave feedback?**
+
+Open an issue on the [GitHub repo](https://github.com/supabase/server) or join the conversation in [Discord](https://discord.supabase.com/).
+
+## Get started
+
+Install the package and the AI skill:
+
+```bash
+npm install @supabase/server@latest
+npx skills add supabase/server
+```
+
+The skill gives Claude Code and Cursor full context on the API surface, patterns, and migration paths. From there, you can prompt your way through most tasks.
+
+Migrate existing Edge Functions to the new API keys:
+
+```
+Analyze all edge functions, and plan a full migration to use
+the new API keys with @supabase/server
+```
+
+Scaffold a new REST API with Hono:
+
+```
+Create a Hono API with @supabase/server that has CRUD
+endpoints for a todos table, using per-route auth
+```
+
+Add a protected Edge Function with admin operations:
+
+```
+Create an edge function that accepts user or secret key auth,
+reads from a user's profile with RLS, and writes audit logs
+with the admin client
+```
+
+Or write it by hand:
+
+```typescript
+import { withSupabase } from '@supabase/server'
+
+export default {
+  fetch: withSupabase({ allow: 'user' }, async (req, ctx) => {
+    const { data } = await ctx.supabase.from('todos').select()
+    return Response.json(data)
+  }),
+}
+```
+
+`@supabase/server` is in public beta. We're looking for feedback on the API surface, the adapter patterns, and edge cases we haven't hit yet.
+
+Check out the [GitHub repo](https://github.com/supabase/server) and let us know what you build.
