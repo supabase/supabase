@@ -172,7 +172,9 @@ describe('TemplateEditor reset to default', () => {
 
   it('resets the template through the dedicated reset endpoint after confirmation', async () => {
     const user = userEvent.setup()
-    resetTemplateMock.mockImplementation((_vars, callbacks) => callbacks?.onSuccess?.(resetAuthConfig))
+    resetTemplateMock.mockImplementation((_vars, callbacks) =>
+      callbacks?.onSuccess?.(resetAuthConfig)
+    )
 
     renderTemplateEditor({ hasCustomBody: true })
 
@@ -195,7 +197,9 @@ describe('TemplateEditor reset to default', () => {
 
   it('does not reset through the auth config update payload', async () => {
     const user = userEvent.setup()
-    resetTemplateMock.mockImplementation((_vars, callbacks) => callbacks?.onSuccess?.(resetAuthConfig))
+    resetTemplateMock.mockImplementation((_vars, callbacks) =>
+      callbacks?.onSuccess?.(resetAuthConfig)
+    )
 
     renderTemplateEditor({ hasCustomBody: true })
 
@@ -210,9 +214,15 @@ describe('TemplateEditor reset to default', () => {
 
   it('uses the reset response as the new editor state', async () => {
     const user = userEvent.setup()
-    resetTemplateMock.mockImplementation((_vars, callbacks) => callbacks?.onSuccess?.(resetAuthConfig))
+    resetTemplateMock.mockImplementation((_vars, callbacks) =>
+      callbacks?.onSuccess?.(resetAuthConfig)
+    )
 
-    renderTemplateEditor({ body: '<p>Custom body</p>', hasCustomBody: true, hasCustomSubject: true })
+    renderTemplateEditor({
+      body: '<p>Custom body</p>',
+      hasCustomBody: true,
+      hasCustomSubject: true,
+    })
 
     await user.click(screen.getByRole('button', { name: 'Reset template' }))
     const dialog = await screen.findByRole('alertdialog')

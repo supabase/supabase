@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { authKeys } from './keys'
 import type { ProjectAuthConfigData } from './auth-config-query'
+import { authKeys } from './keys'
 import type { components } from '@/data/api'
 import { handleError, patch } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'

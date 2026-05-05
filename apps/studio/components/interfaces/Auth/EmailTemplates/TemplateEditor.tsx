@@ -122,13 +122,16 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
 
-  const getFormValuesFromConfig = useCallback((config: AuthConfigResponse | undefined) => {
-    const result: { [x: string]: string } = {}
-    Object.keys(properties).forEach((key) => {
-      result[key] = ((config && config[key as keyof typeof config]) ?? '') as string
-    })
-    return result
-  }, [properties])
+  const getFormValuesFromConfig = useCallback(
+    (config: AuthConfigResponse | undefined) => {
+      const result: { [x: string]: string } = {}
+      Object.keys(properties).forEach((key) => {
+        result[key] = ((config && config[key as keyof typeof config]) ?? '') as string
+      })
+      return result
+    },
+    [properties]
+  )
 
   const INITIAL_VALUES = useMemo(() => {
     return getFormValuesFromConfig(authConfig)
@@ -434,8 +437,8 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Reset template to default</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This will remove your custom subject line and body content. The default
-                        template content will be used instead.
+                        This will remove your custom subject line and email body content. The
+                        default values will be used instead.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
