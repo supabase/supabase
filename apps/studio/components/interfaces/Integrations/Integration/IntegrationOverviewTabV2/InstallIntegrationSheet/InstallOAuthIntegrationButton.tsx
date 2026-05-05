@@ -57,15 +57,15 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
       if (!integration.listingId) return toast.error('Listing ID is required')
       installOAuthIntegration({ projectRef, id: integration.listingId })
     } else {
-      let redirectUrl
+      let redirectUrl = '/'
+
       if (integration.installUrl) {
         const url = new URL(integration.installUrl)
         url.searchParams.append('organization_slug', selectedOrg?.slug ?? '')
         url.searchParams.append('project_id', projectRef)
         redirectUrl = url.href
-      } else {
-        redirectUrl = '/'
       }
+
       window.open(redirectUrl, '_blank', 'noreferrer')
     }
   }
