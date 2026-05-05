@@ -11,5 +11,5 @@
   "version": "v2",
   "name": "JavaScript",
   "ignoreDefinitions": ["constructor"],
-  "categoryOrder": ["Database", "Auth", "Functions", "Realtime", "Storage"]
+  "categoryOrder": ["Database", "Auth", "Edge Functions", "Realtime", "Storage"]
 }

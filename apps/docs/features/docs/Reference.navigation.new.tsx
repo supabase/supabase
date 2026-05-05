@@ -1,18 +1,22 @@
-import { type PropsWithChildren } from 'react'
+'use client'
+
+import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
+import { type AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
+import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
+import { useState, type PropsWithChildren } from 'react'
 import {
   Badge,
   cn,
+  Collapsible_Shadcn_ as Collapsible,
+  CollapsibleContent_Shadcn_ as CollapsibleContent,
+  CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from 'ui'
-
-import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
-import { type AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
-import { ChevronDown } from 'lucide-react'
 
 interface ReferenceNavigationProps {
   name: string
@@ -24,7 +28,7 @@ interface ReferenceNavigationProps {
   sections: AbbrevApiReferenceSection[]
 }
 
-export async function ReferenceNavigation({
+export function ReferenceNavigation({
   name,
   icon,
   library,
@@ -44,7 +48,7 @@ export async function ReferenceNavigation({
       </div>
       <ul className="flex flex-col gap-2">
         {sections?.map((section, index) =>
-          section.type === 'category' ? (
+          section.items ? (
             <li key={`${section.slug}-${String(index)}`}>
               <RefCategory basePath={basePath} section={section} />
             </li>
@@ -84,20 +88,53 @@ function RefCategory({
     <>
       <Divider />
       {'title' in section && section.slug ? (
-        <a href={`${basePath}#${section.slug}`}>
+        <a href={`#${section.slug}`}>
           <SideMenuTitle className="py-2">{section.title}</SideMenuTitle>
         </a>
       ) : (
         'title' in section && <SideMenuTitle className="py-2">{section.title}</SideMenuTitle>
       )}
       <ul className="space-y-2">
-        {section.items?.map((item, index) => (
-          <li key={`${item.slug}-${String(index)}`} className="leading-5">
-            <ReferenceLink section={item} />
-          </li>
-        ))}
+        {section.items?.map((item, index) =>
+          item.items?.length ? (
+            <li key={`${item.slug}-${String(index)}`}>
+              <NavSubcategory section={item} />
+            </li>
+          ) : (
+            <li key={`${item.slug}-${String(index)}`} className="leading-5">
+              <ReferenceLink section={item} />
+            </li>
+          )
+        )}
       </ul>
     </>
+  )
+}
+
+function NavSubcategory({ section }: { section: AbbrevApiReferenceSection }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <CollapsibleTrigger className="flex items-center justify-between gap-1 w-full text-left group py-0.5">
+        <span className="text-sm text-foreground-light group-hover:text-foreground transition-colors">
+          {section.title}
+        </span>
+        <ChevronDown
+          size={13}
+          className={cn('transition-transform shrink-0', open ? 'rotate-0' : '-rotate-90')}
+        />
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <ul className="pl-4 mt-1 space-y-1 border-l border-control">
+          {section.items?.map((item, index) => (
+            <li key={`${item.slug}-${String(index)}`} className="leading-5">
+              <ReferenceLink section={item} />
+            </li>
+          ))}
+        </ul>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }
 

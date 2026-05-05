@@ -1,0 +1,19 @@
+## CORS headers for Edge Functions
+
+Default CORS headers for Supabase Edge Functions.
+
+Includes all headers sent by Supabase client libraries and allows all standard HTTP methods. Use this for simple CORS configurations with wildcard origin.
+
+```ts
+import { corsHeaders } from '@supabase/supabase-js/cors'
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  return new Response(JSON.stringify({ data: 'Hello' }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
+})
+```

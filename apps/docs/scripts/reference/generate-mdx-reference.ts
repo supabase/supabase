@@ -105,20 +105,56 @@ function buildSections(categories: SpecCategory[], specDir: string): object[] {
         }))
       : []
 
+    // Group definitions by subcategory, preserving insertion order.
+    // Deduplicate by name within each group (same method can appear on multiple classes).
+    // Definitions without a subcategory are emitted flat; those with one are
+    // collected into a subcategory node the first time the subcategory is seen.
+    const defItems: object[] = []
+    const seenFlat = new Set<string>()
+    const subcatIndex = new Map<string, { items: object[]; seen: Set<string> }>()
+
+    for (const def of definitions) {
+      const fnItem = {
+        id: `${catSlug}-${toSlug(def.name)}`,
+        slug: `${catSlug}-${toSlug(def.name)}`,
+        type: 'function',
+        title: def.name,
+      }
+      if (def.subcategory) {
+        if (!subcatIndex.has(def.subcategory)) {
+          const subcatItems: object[] = []
+          subcatIndex.set(def.subcategory, { items: subcatItems, seen: new Set() })
+          defItems.push({
+            id: `${catSlug}-${toSlug(def.subcategory)}`,
+            slug: `${catSlug}-${toSlug(def.subcategory)}`,
+            type: 'category',
+            title: def.subcategory,
+            items: subcatItems,
+          })
+        }
+        const group = subcatIndex.get(def.subcategory)!
+        if (!group.seen.has(def.name)) {
+          group.seen.add(def.name)
+          group.items.push(fnItem)
+        }
+      } else {
+        if (!seenFlat.has(def.name)) {
+          seenFlat.add(def.name)
+          defItems.push(fnItem)
+        }
+      }
+    }
+
+    // Subcategory nodes go last so flat function links appear first in navigation
+    const flatItems = defItems.filter((item: any) => !item.items)
+    const subcatItems = defItems.filter((item: any) => item.items)
+
     return {
       id: catSlug,
       slug: catSlug,
       type: 'category',
       title: category,
-      items: [
-        ...partialH2Items,
-        ...definitions.map((def) => ({
-          id: `${catSlug}-${toSlug(def.name)}`,
-          slug: `${catSlug}-${toSlug(def.name)}`,
-          type: 'function',
-          title: def.name,
-        })),
-      ],
+      items: [...partialH2Items, ...flatItems, ...subcatItems],
     }
   })
 

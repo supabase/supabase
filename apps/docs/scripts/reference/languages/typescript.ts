@@ -5,8 +5,9 @@
  * TypeDoc declarations, and returns structured categories with definitions.
  */
 
-import { readFileSync, readdirSync } from 'fs'
+import { readdirSync, readFileSync } from 'fs'
 import { join } from 'path'
+
 import type { IgnoreDefinition, OverrideDefinition, SpecCategory, SpecConfig } from '../types.js'
 
 type ContentItem = { kind: string; text: string }
@@ -304,9 +305,16 @@ export function processSpec(specDir: string): { categories: SpecCategory[]; conf
     const sig = decl.signatures[0]
     const remarkTags = blockTags.filter((t) => t.tag === '@remarks')
     const examples = parseExamples(blockTags)
+    const subcategoryTag = blockTags.find((t) => t.tag === '@subcategory')
+    const subcategory =
+      subcategoryTag?.content
+        ?.map((c) => c.text)
+        .join('')
+        .trim() || undefined
 
     const definition: any = {
       name: decl.name,
+      ...(subcategory ? { subcategory } : {}),
       description: contentToMd(decl.comment?.summary ?? []),
       ...(remarkTags.length
         ? { remarks: remarkTags.map((t) => contentToMd(t.content ?? [])) }
