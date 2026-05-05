@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { cn } from 'ui'
 
 import { getStatusLevel } from '../../../UnifiedLogs.utils'
 import { BlockFieldConfig } from '../../types'
@@ -7,10 +8,11 @@ import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableCo
 interface FieldValueProps {
   config: BlockFieldConfig
   value: unknown
+  wrap?: boolean
 }
 
-export const FieldValue = ({ config, value }: FieldValueProps): ReactNode => {
-  if (value === null || value === undefined || value === '') return value as ReactNode
+export const FieldValue = ({ config, value, wrap }: FieldValueProps): ReactNode => {
+  if (value === null || value === undefined || value === '') return null
 
   if (config.id === 'status') {
     return (
@@ -19,6 +21,20 @@ export const FieldValue = ({ config, value }: FieldValueProps): ReactNode => {
         level={getStatusLevel(value as string | number)}
         className="text-xs"
       />
+    )
+  }
+
+  if (typeof value === 'string' || typeof value === 'number') {
+    return (
+      <span
+        className={cn(
+          'font-mono text-xs text-foreground',
+          wrap ? 'break-all text-right max-w-[calc(100%-12rem)]' : 'truncate text-right',
+          'group-hover:underline'
+        )}
+      >
+        {value}
+      </span>
     )
   }
 

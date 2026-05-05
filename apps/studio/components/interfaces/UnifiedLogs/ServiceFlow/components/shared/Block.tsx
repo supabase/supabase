@@ -40,7 +40,7 @@ const FieldRow = ({
   return (
     <DetailRow
       label={config.label}
-      value={<FieldValue config={config} value={value} />}
+      value={<FieldValue config={config} value={value} wrap={config.wrap} />}
       filterId={config.id}
       filterValue={typeof value === 'string' || typeof value === 'number' ? value : undefined}
       filterFields={filterFields}

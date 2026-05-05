@@ -113,7 +113,7 @@ export function ServiceFlowPanel({
       <ResizableHandle withHandle />
       <ResizablePanel
         id="log-sidepanel"
-        defaultSize={380}
+        defaultSize={400}
         minSize={300}
         className="bg-dash-sidebar"
       >
