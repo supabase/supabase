@@ -267,7 +267,7 @@ function FeaturesPage() {
                         <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:aspect-video! bg-alternative flex items-center justify-center shadow-inner border border-muted">
                           <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
                           {feature.status && (
-                            <div className="absolute top-0 left-1.5">
+                            <div className="absolute bottom-1.5 left-1.5">
                               <Badge
                                 variant={stageBadgeVariant(feature.status.stage)}
                                 className="text-[10px] py-0 px-1.5 h-4 rounded-sm"
