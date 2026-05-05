@@ -15,7 +15,10 @@ import {
   Badge,
   Button,
   cn,
-  Input,
+  Input_Shadcn_ as Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Sheet,
   SheetClose,
   SheetContent,
@@ -433,15 +436,18 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
           <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
             {activeTab === 'events' && (
               <div className="flex-1 overflow-hidden flex flex-col">
-                <div className="flex items-center justify-between border-b shrink-0 px-6 py-2">
-                  <Input
-                    size="tiny"
-                    placeholder="Filter events..."
-                    value={eventFilter}
-                    onChange={(e) => setEventFilter(e.target.value)}
-                    icon={<Search size={14} className="text-foreground-lighter" />}
-                    className="flex-1 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0 max-w-96"
-                  />
+                <div className="flex items-center justify-between border-b shrink-0 px-6 py-2 gap-2">
+                  <InputGroup className="w-full max-w-sm">
+                    <InputGroupInput
+                      size="tiny"
+                      placeholder="Filter events..."
+                      value={eventFilter}
+                      onChange={(e) => setEventFilter(e.target.value)}
+                    />
+                    <InputGroupAddon>
+                      <Search size={14} className="text-foreground-lighter" />
+                    </InputGroupAddon>
+                  </InputGroup>
                   <Button
                     type="default"
                     onClick={() => setEvents([])}

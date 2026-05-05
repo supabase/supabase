@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.95.4
+  version: 2.98.1
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -27,11 +27,11 @@ flags:
       - id: auto
         name: auto
         type: '[ auto | yes | no ]'
-      - id: 'yes'
-        name: 'yes'
+      - id: "yes"
+        name: "yes"
         type: '[ auto | yes | no ]'
-      - id: 'no'
-        name: 'no'
+      - id: "no"
+        name: "no"
         type: '[ auto | yes | no ]'
   - id: create-ticket
     name: --create-ticket
@@ -92,7 +92,7 @@ flags:
     name: --workdir <string>
     description: path to a Supabase project directory
     default_value: ''
-  - id: 'yes'
+  - id: "yes"
     name: --yes
     description: answer yes to all prompts
     default_value: 'false'
@@ -548,6 +548,8 @@ commands:
       > It is recommended to have at least 7GB of RAM to start all services.
 
       Health checks are automatically added to verify the started containers. Use `--ignore-health-check` flag to ignore these errors.
+
+      > If the CLI is running inside a dev container with the Docker socket bind-mounted, set the `SUPABASE_SERVICES_HOSTNAME` environment variable to the hostname reachable from inside that container, such as `host.docker.internal`.
     examples:
       - id: basic-usage
         name: Basic usage

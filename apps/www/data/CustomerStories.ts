@@ -20,6 +20,18 @@ export type CustomerStoryType = {
 export const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
+    title: 'Cofounder builds autonomous companies on Supabase',
+    description:
+      "Cofounder gives every customer an entire engineering, sales, marketing, support, and product team made of agents. Supabase for Platforms gives Cofounder the database platform to run an entire software company on every customer's behalf, from day one.",
+    organization: 'Cofounder',
+    imgUrl: 'images/customers/logos/cofounder.png',
+    logo: '/images/customers/logos/cofounder.png',
+    logo_inverse: '/images/customers/logos/light/cofounder.png',
+    url: '/customers/cofounder',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
     title: 'Hyper builds AI marketing agents on Supabase',
     description:
       'Hyper is an AI-native marketing platform with agents that operate across the entire marketing workflow. Supabase gives their three-person team the database platform to do it at enterprise scale.',

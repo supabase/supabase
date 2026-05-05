@@ -78,7 +78,7 @@ export type Blog = {
   slug: string
   title: string
   description?: string
-  content: MDXRemoteSerializeResult
+  content: string
   toc: string | { content: string }
   author?: string
   authors?: StaticAuthor[]
@@ -113,7 +113,7 @@ export type BlogData = {
   slug: string
   title: string
   description?: string
-  content: MDXRemoteSerializeResult
+  content: string
   toc: string | { content: string }
   author?: string
   authors?: StaticAuthor[]

@@ -126,17 +126,6 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "admonition-description-only": {
-      name: "admonition-description-only",
-      type: "components:example",
-      registryDependencies: ["admonition"],
-      component: React.lazy(() => import("@/registry/default/example/admonition-description-only")),
-      source: "",
-      files: ["registry/default/example/admonition-description-only.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
     "admonition-warning": {
       name: "admonition-warning",
       type: "components:example",
@@ -144,17 +133,6 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/admonition-warning")),
       source: "",
       files: ["registry/default/example/admonition-warning.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "admonition-success": {
-      name: "admonition-success",
-      type: "components:example",
-      registryDependencies: ["admonition"],
-      component: React.lazy(() => import("@/registry/default/example/admonition-success")),
-      source: "",
-      files: ["registry/default/example/admonition-success.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
