@@ -2,8 +2,6 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { X } from 'lucide-react'
-import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
@@ -19,13 +17,6 @@ export const ProjectUpgradeFailedBanner = () => {
   const { ref } = useParams()
   const { data } = useProjectUpgradingStatusQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { status, initiated_at, latest_status_at, error } = data?.databaseUpgradeStatus ?? {}
-
-  const key = `supabase-upgrade-${ref}-${initiated_at}`
-
-  const [hasDismissed, setHasDismissed] = useState(false)
-  useEffect(() => {
-    setHasDismissed(localStorage?.getItem(key) === 'true')
-  }, [key])
 
   const isFailed = status === DatabaseUpgradeStatus.Failed
   const initiatedAt = dayjs
@@ -47,12 +38,7 @@ export const ProjectUpgradeFailedBanner = () => {
   )
   const timestampFilter = `its=${initiatedAtEncoded}&ite=${latestStatusAtEncoded}`
 
-  const acknowledgeMessage = () => {
-    setHasDismissed(true)
-    localStorage.setItem(key, 'true')
-  }
-
-  if (!isFailed || hasDismissed) return null
+  if (!isFailed) return null
 
   return (
     <div className="max-w-7xl">
@@ -60,26 +46,18 @@ export const ProjectUpgradeFailedBanner = () => {
         type="warning"
         title={`Postgres version upgrade was not successful (Initiated at ${initiatedAt})`}
         actions={
-          <div className="flex items-center h-full space-x-4">
-            <Button asChild type="default">
-              <SupportLink
-                queryParams={{
-                  category: SupportCategories.DATABASE_UNRESPONSIVE,
-                  projectRef: ref,
-                  subject,
-                  message,
-                }}
-              >
-                Contact support
-              </SupportLink>
-            </Button>
-            <Button
-              type="text"
-              className="px-1"
-              icon={<X size={16} strokeWidth={1.5} />}
-              onClick={() => acknowledgeMessage()}
-            />
-          </div>
+          <Button asChild type="default">
+            <SupportLink
+              queryParams={{
+                category: SupportCategories.DATABASE_UNRESPONSIVE,
+                projectRef: ref,
+                subject,
+                message,
+              }}
+            >
+              Contact support
+            </SupportLink>
+          </Button>
         }
       >
         <div>
