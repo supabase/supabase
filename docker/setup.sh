@@ -327,10 +327,28 @@ public_url=$(ask "SUPABASE_PUBLIC_URL (Studio + APIs)" "$current_public_url")
 api_url=$(ask   "API_EXTERNAL_URL (Auth callbacks)"   "$public_url")
 site_url=$(ask  "SITE_URL (default Auth redirect)"    "$current_site_url")
 
+# Suggest PROXY_DOMAIN from the public_url host (unless it's localhost-ish)
+public_host=$(printf '%s' "$public_url" | sed -e 's|^https*://||' -e 's|/.*$||' -e 's|:.*$||')
+case "$public_host" in
+    localhost|127.*|"") current_proxy_domain=$(read_env PROXY_DOMAIN) ;;
+    *)                  current_proxy_domain="$public_host" ;;
+esac
+[ -z "$current_proxy_domain" ] && current_proxy_domain="your-domain.example.com"
+
+proxy_domain=$(ask "PROXY_DOMAIN (for nginx/caddy HTTPS proxy)" "$current_proxy_domain")
+
+# Derive CERTBOT_EMAIL = admin@<last-two-labels-of-proxy-domain>.
+# Naive: doesn't handle ccTLDs like .co.uk; user can edit .env after.
+domain_root=$(printf '%s' "$proxy_domain" | awk -F. 'NF>=2 { print $(NF-1)"."$NF; next } { print }')
+certbot_email="admin@${domain_root}"
+log "Setting CERTBOT_EMAIL=${certbot_email}"
+
 sed -i.old \
     -e "s|^SUPABASE_PUBLIC_URL=.*$|SUPABASE_PUBLIC_URL=${public_url}|" \
     -e "s|^API_EXTERNAL_URL=.*$|API_EXTERNAL_URL=${api_url}|" \
     -e "s|^SITE_URL=.*$|SITE_URL=${site_url}|" \
+    -e "s|^PROXY_DOMAIN=.*$|PROXY_DOMAIN=${proxy_domain}|" \
+    -e "s|^CERTBOT_EMAIL=.*$|CERTBOT_EMAIL=${certbot_email}|" \
     .env
 rm -f .env.old
 
