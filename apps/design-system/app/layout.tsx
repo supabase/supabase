@@ -4,7 +4,7 @@ import '@/styles/globals.css'
 import type { Metadata, Viewport } from 'next'
 
 import { customFont, sourceCodePro } from './fonts'
-import { ThemeProvider } from './Providers'
+import { Providers } from './Providers'
 import { Toaster } from './toaster'
 
 const className = `${customFont.variable} ${sourceCodePro.variable}`
@@ -131,16 +131,12 @@ export default async function Layout({ children }: RootLayoutProps) {
         />
       </head>
       <body>
-        <ThemeProvider
-          themes={['dark', 'light', 'classic-dark']}
-          defaultTheme="system"
-          enableSystem
-        >
+        <Providers>
           <div vaul-drawer-wrapper="">
             <div className="relative flex min-h-screen flex-col bg-background">{children}</div>
           </div>
           <Toaster />
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   )

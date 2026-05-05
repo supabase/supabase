@@ -6,6 +6,7 @@ import { Button, cn } from 'ui'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 interface ConnectButtonProps {
@@ -17,6 +18,7 @@ export const ConnectButton = ({ buttonType = 'default', className }: ConnectButt
   const { data: selectedProject } = useSelectedProjectQuery()
   const { setConnectSheetSource } = useAppStateSnapshot()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+  const track = useTrack()
 
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
@@ -27,6 +29,7 @@ export const ConnectButton = ({ buttonType = 'default', className }: ConnectButt
       className={cn('rounded-full', className)}
       icon={<Plug className="rotate-90" />}
       onClick={() => {
+        track('header_connect_button_clicked')
         setConnectSheetSource('header_button')
         setShowConnect(true)
       }}

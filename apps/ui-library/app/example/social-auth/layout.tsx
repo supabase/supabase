@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 import { BaseInjector } from './../base-injector'
-import { ThemeProvider } from '@/app/Providers'
+import { Providers } from '@/app/Providers'
 
 export const metadata: Metadata = {
   title: 'Social Auth Example',
@@ -27,11 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body style={{ height: '100%', margin: 0, padding: 0, overflow: 'hidden' }}>
         <BaseInjector />
-        <ThemeProvider
-          themes={['dark', 'light', 'classic-dark']}
-          defaultTheme="system"
-          enableSystem
-        >
+        <Providers>
           <div
             className="flex w-full h-full items-center justify-center p-6 md:p-10 preview bg-surface-100"
             style={{ minHeight: '100%' }}
@@ -39,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="z-0 pointer-events-none absolute h-full w-full bg-[radial-gradient(hsla(var(--foreground-default)/0.05)_1px,transparent_1px)] bg-size-[16px_16px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
             <div className="w-full max-w-sm">{children}</div>
           </div>
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   )

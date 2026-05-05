@@ -2,11 +2,14 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
 import { features } from '~/data/features'
+import { breadcrumbs } from '~/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import { motion } from 'framer-motion'
 import { debounce } from 'lib/helpers'
 import { Search } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/compat/router'
+import Head from 'next/head'
 import Link from 'next/link'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Button, Checkbox, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
@@ -103,6 +106,14 @@ function FeaturesPage() {
           url: '/customers',
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.features)),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <SectionContainer className="py-0! sm:px-0!">
           <div className="border border-muted rounded-xl bg-alternative my-4 px-6 py-8 md:py-10 lg:px-16 lg:py-20 xl:px-20 bg-center bg-cover bg-[url('/images/features/features-cover-light.svg')] dark:bg-[url('/images/features/features-cover-dark.svg')]">

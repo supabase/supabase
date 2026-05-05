@@ -17,6 +17,7 @@ import { getSupportLinkQueryParams } from '@/components/ui/HelpPanel/HelpPanel.u
 import { HelpSection } from '@/components/ui/HelpPanel/HelpSection'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -28,6 +29,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
   const { openSidebar } = useSidebarManagerSnapshot()
   const [isOpen, setIsOpen] = useState(false)
   const [stage, setStage] = useState<'select' | 'issue-options' | 'widget'>('select')
+  const track = useTrack()
 
   const projectRef = project?.parent_project_ref ?? (router.query.ref as string | undefined)
   const supportLinkQueryParams = getSupportLinkQueryParams(
@@ -41,6 +43,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
       modal={false}
       open={isOpen}
       onOpenChange={(e) => {
+        if (e) track('header_feedback_dropdown_opened')
         setIsOpen(e)
         if (!e) setStage('select')
       }}
