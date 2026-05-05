@@ -7,6 +7,7 @@ keywords = []
 When getting an error where your connections are overwhelmed `Error: too many connections for database "postgres"`
 
 ## Why this occurs
+
 This issue occurs when `datconnlimit` gets modified. The default value for `datconnlimit` is -1.
 https://www.postgresql.org/docs/current/catalog-pg-database.html
 
