@@ -11,6 +11,7 @@ import { Admonition } from 'ui-patterns'
 import { Results } from '../../SQLEditor/UtilityPanel/Results'
 import { RLSTableCard } from './RLSTableCard'
 import { ParseQueryResults } from './RLSTester.types'
+import { deriveRLSTestState } from './RLSTesterResults.utils'
 import { useTestQueryRLS } from './useTestQueryRLS'
 import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 
@@ -29,16 +30,12 @@ export const RLSTesterResults = ({
 }: RLSTesterResultsProps) => {
   const { limit } = useTestQueryRLS()
 
-  const isServiceRole = parseQueryResults?.role === undefined
-  const tableWithRLSEnabledButNoPolicies = parseQueryResults?.tables.find(
-    (x) => x.isRLSEnabled && x.tablePolicies.length === 0
-  )
-  const tableWithRLSEnabledWithPolicyFalse = parseQueryResults?.tables.find(
-    (x) => x.isRLSEnabled && x.tablePolicies.some((y) => y.definition === 'false')
-  )
-
-  const noAccessToData =
-    !isServiceRole && (!!tableWithRLSEnabledButNoPolicies || !!tableWithRLSEnabledWithPolicyFalse)
+  const {
+    isServiceRole,
+    tableWithRLSEnabledButNoPolicies,
+    tableWithRLSEnabledWithPolicyFalse,
+    noAccessToData,
+  } = deriveRLSTestState(parseQueryResults)
 
   return (
     <div className="p-5 pt-4">
