@@ -124,7 +124,7 @@ install_base_packages() {
     pkg_update
     if [ "$OS_FAMILY" = "debian" ]; then
         pkg_install git curl openssl jq unzip ca-certificates \
-            apt-transport-https gnupg lsb-release software-properties-common
+            apt-transport-https gnupg lsb-release
     else
         pkg_install git curl openssl jq unzip ca-certificates dnf-plugins-core
     fi
