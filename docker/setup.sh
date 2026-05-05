@@ -64,15 +64,16 @@ warn() { printf "WARNING: %s\n" "$*" >&2; }
 die()  { printf "ERROR: %s\n" "$*" >&2; exit 1; }
 
 # Prompt with a default; echoes the chosen value on stdout.
-# Non-interactive (-y or no tty) returns the default unchanged.
+# Reads from /dev/tty so prompts work even when stdin is a pipe (curl | sh).
+# Falls back to the default with -y or when no controlling terminal exists.
 ask() {
     # ask <prompt> <default>  -> echoes chosen value
-    if [ "$ASSUME_YES" = "1" ] || [ ! -t 0 ]; then
+    if [ "$ASSUME_YES" = "1" ] || ! { : > /dev/tty; } 2>/dev/null; then
         printf '%s' "$2"
         return
     fi
-    printf "%s [%s]: " "$1" "$2" >&2
-    read -r reply
+    printf "%s [%s]: " "$1" "$2" > /dev/tty
+    read -r reply < /dev/tty
     [ -z "$reply" ] && reply="$2"
     printf '%s' "$reply"
 }
@@ -190,12 +191,12 @@ install_node() {
     log "Distro Node.js missing or too old; installing Node.js 20 from NodeSource"
     if [ "$OS_FAMILY" = "debian" ]; then
         $SUDO apt-get remove --purge -y nodejs npm 2>/dev/null || true
-        curl -fsSL https://deb.nodesource.com/setup_20.x | $SUDO -E bash -
+        curl -fsSL https://deb.nodesource.com/setup_20.x | $SUDO bash -
         $SUDO apt-get update -qq -y
         pkg_install nodejs
     else
         $SUDO dnf remove -y nodejs npm 2>/dev/null || true
-        curl -fsSL https://rpm.nodesource.com/setup_20.x | $SUDO -E bash -
+        curl -fsSL https://rpm.nodesource.com/setup_20.x | $SUDO bash -
         pkg_install nodejs
     fi
 
@@ -313,9 +314,13 @@ current_site_url=$(read_env SITE_URL)
 [ -z "$current_api_url" ]    && current_api_url="$current_public_url"
 [ -z "$current_site_url" ]   && current_site_url="http://localhost:3000"
 
-echo ""
-echo "Configure the main URLs (press Enter to accept the default)."
-echo ""
+if [ "$ASSUME_YES" = "1" ] || ! { : > /dev/tty; } 2>/dev/null; then
+    log "Non-interactive: keeping default URLs (edit .env to change)"
+else
+    echo ""
+    echo "Configure the main URLs (press Enter to accept the default)."
+    echo ""
+fi
 
 public_url=$(ask "SUPABASE_PUBLIC_URL (Studio + APIs)" "$current_public_url")
 api_url=$(ask   "API_EXTERNAL_URL (Auth callbacks)"   "$public_url")
@@ -345,6 +350,6 @@ echo "  cd $(pwd)"
 echo "  sh ./run.sh start     # bring up the stack"
 echo "  sh ./run.sh stop      # tear it down"
 echo ""
-echo "To enable docker-compose overrides (pg17, envoy, caddy, nginx, rustfs, s3, local),"
+echo "To enable docker-compose overrides (pg17, envoy, caddy, nginx, rustfs, s3, logs),"
 echo "edit CONFIG in .env (e.g. CONFIG=\"pg17 envoy\")."
 echo ""
