@@ -28,7 +28,7 @@ export const ProductMenu = ({ page, menu, onItemClick }: ProductMenuProps) => {
                     ) : null
                   }
                 />
-                <div className="flex flex-col gap-0.5">
+                <div>
                   {group.items.map((item) => {
                     const isActive = !!item.pages
                       ? item.pages.includes(page ?? '')
