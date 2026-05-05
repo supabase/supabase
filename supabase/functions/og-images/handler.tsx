@@ -65,14 +65,12 @@ export async function handler(req: Request) {
   switch (site) {
     case 'docs':
       return new ImageResponse(
-        (
-          <Docs
-            title={title}
-            description={description !== 'undefined' ? description : ''}
-            type={type}
-            icon={icon}
-          />
-        ),
+        <Docs
+          title={title}
+          description={description !== 'undefined' ? description : ''}
+          type={type}
+          icon={icon}
+        />,
         {
           width: 1200,
           height: 630,
@@ -114,15 +112,13 @@ export async function handler(req: Request) {
       })
     case 'events':
       return new ImageResponse(
-        (
-          <Events
-            title={title}
-            description={description !== 'undefined' ? description : ''}
-            eventType={eventType}
-            date={date}
-            duration={duration ?? ''}
-          />
-        ),
+        <Events
+          title={title}
+          description={description !== 'undefined' ? description : ''}
+          eventType={eventType}
+          date={date}
+          duration={duration ?? ''}
+        />,
         {
           width: 1200,
           height: 630,
