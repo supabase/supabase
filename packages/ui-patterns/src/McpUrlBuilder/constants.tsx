@@ -67,22 +67,6 @@ export const FEATURE_GROUPS_NON_PLATFORM = FEATURE_GROUPS_PLATFORM.filter((group
 /** Only set hasDistinctDarkIcon: true when the client has a separate -icon-dark.svg that looks different. Otherwise the same -icon.svg is used for both themes. */
 export const MCP_CLIENTS: McpClient[] = [
   {
-    key: 'cursor',
-    label: 'Cursor',
-    icon: 'cursor',
-    configFile: '.cursor/mcp.json',
-    externalDocsUrl: 'https://docs.cursor.com/context/mcp',
-    generateDeepLink: (config) => {
-      const name = 'supabase'
-      const mcpUrl = getMcpUrl(config)
-      const serverConfig = {
-        url: mcpUrl,
-      }
-      const base64Config = Buffer.from(JSON.stringify(serverConfig)).toString('base64')
-      return `cursor://anysphere.cursor-deeplink/mcp/install?name=${name}&config=${encodeURIComponent(base64Config)}`
-    },
-  },
-  {
     key: 'claude-code',
     label: 'Claude Code',
     icon: 'claude',
@@ -136,6 +120,22 @@ export const MCP_CLIENTS: McpClient[] = [
         </p>
       </div>
     ),
+  },
+  {
+    key: 'cursor',
+    label: 'Cursor',
+    icon: 'cursor',
+    configFile: '.cursor/mcp.json',
+    externalDocsUrl: 'https://docs.cursor.com/context/mcp',
+    generateDeepLink: (config) => {
+      const name = 'supabase'
+      const mcpUrl = getMcpUrl(config)
+      const serverConfig = {
+        url: mcpUrl,
+      }
+      const base64Config = Buffer.from(JSON.stringify(serverConfig)).toString('base64')
+      return `cursor://anysphere.cursor-deeplink/mcp/install?name=${name}&config=${encodeURIComponent(base64Config)}`
+    },
   },
   {
     key: 'vscode',
@@ -554,7 +554,39 @@ export const MCP_CLIENTS: McpClient[] = [
       </>
     ),
   },
+  {
+    key: 'claude-ai',
+    label: 'Claude.ai',
+    icon: 'claude',
+    externalDocsUrl: 'https://claude.com/docs/connectors/overview',
+    generateDeepLink: () =>
+      'https://claude.ai/directory/connectors/11ca66fc-1e98-49d5-ab9b-7cb4672a8f10',
+  },
+  {
+    key: 'chatgpt',
+    label: 'ChatGPT',
+    icon: 'openai',
+    hasDistinctDarkIcon: true,
+    externalDocsUrl: 'https://chatgpt.com/features/apps/',
+    generateDeepLink: () =>
+      'https://chatgpt.com/apps/supabase/asdk_app_69d3e5ee6a708191baa733f7b8931995',
+  },
 ]
+
+export const MCP_CLIENT_GROUPS = [
+  {
+    heading: 'AI Agent CLI',
+    keys: ['claude-code', 'codex', 'gemini-cli', 'opencode', 'factory'],
+  },
+  {
+    heading: 'Web Clients',
+    keys: ['claude-ai', 'chatgpt', 'goose'],
+  },
+  {
+    heading: 'IDE',
+    keys: ['cursor', 'vscode', 'antigravity', 'kiro', 'windsurf'],
+  },
+] as const
 
 export const DEFAULT_MCP_URL_PLATFORM = 'http://localhost:8080/mcp'
 export const DEFAULT_MCP_URL_NON_PLATFORM = 'http://localhost:54321/mcp'

@@ -135,13 +135,7 @@ export const PlanUpdateSidePanel = () => {
     { enabled: visible }
   )
 
-  const {
-    data: subscriptionPreview,
-    error: subscriptionPreviewError,
-    isPending: subscriptionPreviewIsLoading,
-    isFetching: subscriptionPreviewIsFetching,
-    isSuccess: subscriptionPreviewInitialized,
-  } = useOrganizationBillingSubscriptionPreview({
+  const subscriptionPreviewData = useOrganizationBillingSubscriptionPreview({
     tier: selectedTier,
     organizationSlug: slug,
     address: debouncedAddress,
@@ -181,10 +175,10 @@ export const PlanUpdateSidePanel = () => {
   }, [visible])
 
   useEffect(() => {
-    if (visible && isSuccessSubscription) {
+    if (visible && isSuccessSubscription && subscription.plan.id) {
       originalPlanRef.current = subscription.plan.id
     }
-  }, [visible, isSuccessSubscription])
+  }, [visible, isSuccessSubscription, subscription?.plan.id])
 
   const onConfirmDowngrade = () => {
     setSelectedTier(undefined)
@@ -198,6 +192,14 @@ export const PlanUpdateSidePanel = () => {
   const planMeta = selectedTier
     ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
     : null
+
+  const currentPlanMeta = {
+    ...availablePlans.find((p) => p.id === subscription?.plan?.id),
+    features:
+      subscriptionsPlans.find((plan) => plan.id === `tier_${subscription?.plan?.id}`)?.features ||
+      [],
+  }
+
   const stripeProjectsUpgradeCommand = getStripeProjectsUpgradeCommand(
     selectedOrganization?.plan?.id ?? subscription?.plan?.id
   )
@@ -321,7 +323,7 @@ export const PlanUpdateSidePanel = () => {
                           hasOrioleProjects
                         }
                         onClick={() => {
-                          setSelectedTier(plan.id as any)
+                          setSelectedTier(plan.id as 'tier_free' | 'tier_pro' | 'tier_team')
                           sendEvent({
                             action: 'studio_pricing_plan_cta_clicked',
                             properties: {
@@ -403,19 +405,9 @@ export const PlanUpdateSidePanel = () => {
         selectedTier={selectedTier}
         onClose={() => setSelectedTier(undefined)}
         planMeta={planMeta}
-        subscriptionPreviewError={subscriptionPreviewError}
-        subscriptionPreviewIsLoading={subscriptionPreviewIsLoading}
-        subscriptionPreviewIsFetching={subscriptionPreviewIsFetching}
-        subscriptionPreviewInitialized={subscriptionPreviewInitialized}
-        subscriptionPreview={subscriptionPreview}
-        subscription={subscription}
+        subscriptionPreviewQueryResult={subscriptionPreviewData}
         projects={orgProjects}
-        currentPlanMeta={{
-          ...availablePlans.find((p) => p.id === subscription?.plan?.id),
-          features:
-            subscriptionsPlans.find((plan) => plan.id === `tier_${subscription?.plan?.id}`)
-              ?.features || [],
-        }}
+        currentPlanMeta={currentPlanMeta}
         onAddressChange={handleAddressChange}
         onTaxIdChange={handleTaxIdChange}
         useAsDefaultBillingAddress={useAsDefaultBillingAddress}

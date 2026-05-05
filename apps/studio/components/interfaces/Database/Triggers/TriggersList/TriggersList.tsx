@@ -1,8 +1,8 @@
-import type { PostgresTrigger } from '@supabase/postgres-meta'
+import { safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { DatabaseZap, Search } from 'lucide-react'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
@@ -10,7 +10,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { CreateTriggerButtons } from './CreateTriggerButtons'
 import { TriggerList } from './TriggerList'
-import { generateTriggerCreateSQL } from './TriggerList.utils'
+import { generateTriggerCreateSQL, type PostgresTrigger } from './TriggerList.utils'
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
 import { TriggerSheet } from '@/components/interfaces/Database/Triggers/TriggerSheet'
@@ -22,6 +22,7 @@ import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/L
 import AlertError from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import SchemaSelector from '@/components/ui/SchemaSelector'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabaseTriggerDeleteMutation } from '@/data/database-triggers/database-trigger-delete-mutation'
 import { useDatabaseTriggersQuery } from '@/data/database-triggers/database-triggers-query'
@@ -31,7 +32,10 @@ import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema, useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const TriggersList = () => {
@@ -44,6 +48,9 @@ export const TriggersList = () => {
     'tables',
     parseAsJson(selectFilterSchema.parse).withDefault([])
   )
+
+  const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
   const {
@@ -108,10 +115,12 @@ export const TriggersList = () => {
     setTriggerToDuplicate(null)
     if (isInlineEditorEnabled) {
       setEditorPanelInitialPrompt('Create a new database trigger that...')
-      setEditorPanelValue(`create trigger trigger_name
+      setEditorPanelValue(
+        safeSql`create trigger trigger_name
 after insert or update or delete on table_name
 for each row
-execute function function_name();`)
+execute function function_name();`
+      )
       if (editorPanelTemplates.length > 0) {
         setEditorPanelTemplates([])
       }
@@ -160,6 +169,30 @@ execute function function_name();`)
   const schemaTriggers = triggers.filter((x) => x.schema === selectedSchema)
   const tables = Array.from(new Set(schemaTriggers.map((x) => x.table))).sort()
 
+  const canAddTriggers = canCreateTriggers && !isSchemaLocked && hasTables
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search triggers' }
+  )
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
+    () => {
+      createTrigger()
+    },
+    { enabled: canAddTriggers, label: 'Create new trigger' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterString('')
+    setTablesFilter([])
+  })
+
   useEffect(() => {
     if (isSuccess && !!triggerIdToEdit && !triggerToEdit) {
       toast('Trigger not found')
@@ -194,20 +227,31 @@ execute function function_name();`)
       <div className="space-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
-            <SchemaSelector
-              className="w-full lg:w-[180px]"
-              size="tiny"
-              showError={false}
-              selectedSchemaName={selectedSchema}
-              onSelectSchema={setSelectedSchema}
-            />
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
+              onTrigger={() => setSchemaSelectorOpen(true)}
+              side="bottom"
+              tooltipOpen={schemaSelectorOpen ? false : undefined}
+            >
+              <SchemaSelector
+                className="w-full lg:w-[180px]"
+                size="tiny"
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
+                open={schemaSelectorOpen}
+                onOpenChange={setSchemaSelectorOpen}
+              />
+            </Shortcut>
             <Input
+              inputRef={searchInputRef}
               placeholder="Search for a trigger"
               size="tiny"
               icon={<Search />}
               value={filterString}
               className="w-full lg:w-52"
               onChange={(e) => setFilterString(e.target.value)}
+              onKeyDown={onSearchInputEscape(filterString, setFilterString)}
             />
             <ReportsSelectFilter
               label="Table"

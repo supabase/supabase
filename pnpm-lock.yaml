@@ -1594,6 +1594,9 @@ importers:
       '@heroicons/react':
         specifier: ^1.0.6
         version: 1.0.6(react@18.3.1)
+      '@mdx-js/mdx':
+        specifier: ^3.0.1
+        version: 3.0.1(supports-color@8.1.1)
       '@mdx-js/react':
         specifier: ^3.0.0
         version: 3.1.1(@types/react@18.3.3)(react@18.3.1)
@@ -9245,10 +9248,6 @@ packages:
   astral-regex@2.0.0:
     resolution: {integrity: sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ==}
     engines: {node: '>=8'}
-
-  astring@1.8.6:
-    resolution: {integrity: sha512-ISvCdHdlTDlH5IpxQJIex7BWBywFWgjJSVdwst+/iQCoEYnyOaQ95+X1JGshuBjGp6nxKUy1jMgE3zPqN7fQdg==}
-    hasBin: true
 
   astring@1.9.0:
     resolution: {integrity: sha512-LElXdjswlqjWrPpJFg1Fx4wpkOCxj1TDHlSV4PlaRxHGWko024xICaa97ZkMfs6DRKlCguiAI+rbXv5GWwXIkg==}
@@ -25971,8 +25970,6 @@ snapshots:
 
   astral-regex@2.0.0: {}
 
-  astring@1.8.6: {}
-
   astring@1.9.0: {}
 
   async-sema@3.1.1: {}
@@ -28035,7 +28032,7 @@ snapshots:
   estree-util-to-js@2.0.0:
     dependencies:
       '@types/estree-jsx': 1.0.1
-      astring: 1.8.6
+      astring: 1.9.0
       source-map: 0.7.6
 
   estree-util-value-to-estree@3.3.3:

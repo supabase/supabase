@@ -1,16 +1,18 @@
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult, StripeElementsOptions } from '@stripe/stripe-js'
+import { useParams } from 'common'
 import { Check, InfoIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { toast } from 'sonner'
-import { Button, cn, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
+import { Button, cn, Dialog, DialogContent } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { InvoiceEstimateTooltip } from './InvoiceEstimateTooltip'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from '@/components/interfaces/Billing/Payment/PaymentConfirmation'
@@ -19,13 +21,13 @@ import {
   billingPartnerLabel,
   getPlanChangeType,
 } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
-import AlertError from '@/components/ui/AlertError'
-import { OrganizationBillingSubscriptionPreviewData } from '@/data/organizations/organization-billing-subscription-preview'
+import { type OrganizationBillingSubscriptionPreviewQueryResult } from '@/data/organizations/organization-billing-subscription-preview'
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useConfirmPendingSubscriptionChangeMutation } from '@/data/subscriptions/org-subscription-confirm-pending-change'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subscription-update-mutation'
-import { SubscriptionTier } from '@/data/subscriptions/types'
+import { OrgPlan, SubscriptionTier } from '@/data/subscriptions/types'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   DOCS_URL,
@@ -62,14 +64,9 @@ type BreakdownItem =
 interface Props {
   selectedTier: 'tier_free' | 'tier_pro' | 'tier_team' | undefined
   onClose: () => void
-  planMeta: any
-  subscriptionPreviewError: any
-  subscriptionPreviewIsLoading: boolean
-  subscriptionPreviewIsFetching: boolean
-  subscriptionPreviewInitialized: boolean
-  subscriptionPreview: OrganizationBillingSubscriptionPreviewData | undefined
-  subscription: any
-  currentPlanMeta: any
+  planMeta?: OrgPlan | null
+  currentPlanMeta?: Partial<OrgPlan> & { features: (string | string[])[] }
+  subscriptionPreviewQueryResult: OrganizationBillingSubscriptionPreviewQueryResult
   projects: OrgProject[]
   onAddressChange?: (address: CustomerAddress) => void
   onTaxIdChange?: (taxId: CustomerTaxId | null) => void
@@ -81,12 +78,7 @@ export const SubscriptionPlanUpdateDialog = ({
   selectedTier,
   onClose,
   planMeta,
-  subscriptionPreviewError,
-  subscriptionPreviewIsLoading,
-  subscriptionPreviewIsFetching,
-  subscriptionPreviewInitialized,
-  subscriptionPreview,
-  subscription,
+  subscriptionPreviewQueryResult,
   currentPlanMeta,
   projects,
   onAddressChange,
@@ -94,6 +86,7 @@ export const SubscriptionPlanUpdateDialog = ({
   useAsDefaultBillingAddress,
   onUseAsDefaultBillingAddressChange,
 }: Props) => {
+  const { slug } = useParams()
   const { resolvedTheme } = useTheme()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
@@ -104,6 +97,16 @@ export const SubscriptionPlanUpdateDialog = ({
     validateBillingProfile: () => Promise<boolean>
   }>(null)
 
+  const {
+    data: subscriptionPreview,
+    isPending: subscriptionPreviewIsLoading,
+    isFetching: subscriptionPreviewIsFetching,
+    isSuccess: subscriptionPreviewInitialized,
+  } = subscriptionPreviewQueryResult
+
+  const { data: subscription } = useOrgSubscriptionQuery({
+    orgSlug: slug,
+  })
   const billingViaPartner = subscription?.billing_via_partner === true
   const billingPartner = subscription?.billing_partner
 
@@ -225,7 +228,7 @@ export const SubscriptionPlanUpdateDialog = ({
   // Features that will be lost when downgrading
   const featuresToLose =
     changeType === 'downgrade'
-      ? currentPlanFeatures.filter((feature: string | [string, ...any[]]) => {
+      ? currentPlanFeatures.filter((feature) => {
           const featureStr = typeof feature === 'string' ? feature : feature[0]
           // Check if this feature exists in the new plan
           return !topFeatures.some((newFeature: string | string[]) => {
@@ -367,6 +370,7 @@ export const SubscriptionPlanUpdateDialog = ({
                     <p className="text-sm">
                       This organization is billed through our partner{' '}
                       {billingPartnerLabel(billingPartner)}.{' '}
+                      {/* @ts-ignore [Joshen] Might be API types issue */}
                       {billingPartner === 'aws' ? (
                         <>The organization's credit balance will be decreased accordingly.</>
                       ) : (
@@ -448,202 +452,9 @@ export const SubscriptionPlanUpdateDialog = ({
                     <div className="flex items-center justify-between gap-2 text-foreground-lighter text-xs mt-4">
                       <div className="py-2 pl-0 flex items-center gap-1">
                         <span>Monthly invoice estimate</span>
-                        <InfoTooltip side="right">
-                          <div className="w-[520px] p-6">
-                            <h3 className="font-medium mb-2">Your new monthly invoice</h3>
-                            <p className="prose text-xs mb-2">
-                              First project included. Additional projects cost{' '}
-                              <span translate="no">$10</span>+/month regardless of activity.{' '}
-                              <Link
-                                href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
-                                target="_blank"
-                              >
-                                Learn more
-                              </Link>
-                              .
-                            </p>
-
-                            {subscriptionPreviewError && (
-                              <AlertError
-                                error={subscriptionPreviewError}
-                                subject="Failed to preview subscription."
-                              />
-                            )}
-
-                            {subscriptionPreviewIsLoading && (
-                              <div className="space-y-2 p-6">
-                                <span className="text-sm">Estimating monthly costs...</span>
-                                <ShimmeringLoader />
-                                <ShimmeringLoader className="w-3/4" />
-                                <ShimmeringLoader className="w-1/2" />
-                              </div>
-                            )}
-
-                            {subscriptionPreviewInitialized && (
-                              <>
-                                <Table className="[&_tr:last-child]:border-t font-mono text-xs">
-                                  <TableBody>
-                                    {/* Non-compute items and Projects list */}
-                                    {(() => {
-                                      // Combine all compute-related projects
-                                      const computeItems =
-                                        subscriptionPreview?.breakdown?.filter(
-                                          (item) =>
-                                            item.description?.toLowerCase().includes('compute') &&
-                                            item.breakdown &&
-                                            item.breakdown.length > 0
-                                        ) || []
-
-                                      const computeCreditsItem =
-                                        subscriptionPreview?.breakdown?.find((item) =>
-                                          item.description.startsWith('Compute Credits')
-                                        ) ?? null
-
-                                      const planItem = subscriptionPreview?.breakdown?.find(
-                                        (item) => item.description?.toLowerCase().includes('plan')
-                                      )
-
-                                      const allProjects = computeItems.flatMap((item) =>
-                                        (item.breakdown || []).map((project) => ({
-                                          ...project,
-                                          computeType: item.description,
-                                          computeCosts: Math.round(
-                                            item.total_price / item.breakdown!.length
-                                          ),
-                                        }))
-                                      )
-
-                                      const otherItems =
-                                        subscriptionPreview?.breakdown?.filter(
-                                          (item) =>
-                                            !item.description?.toLowerCase().includes('compute') &&
-                                            !item.description?.toLowerCase().includes('plan')
-                                        ) || []
-
-                                      const content = (
-                                        <>
-                                          {planItem && (
-                                            <TableRow className="text-foreground-light">
-                                              <TableCell className="py-2! px-0">
-                                                {planItem.description}
-                                              </TableCell>
-                                              <TableCell
-                                                className="text-right py-2 px-0"
-                                                translate="no"
-                                              >
-                                                {formatCurrency(planItem.total_price)}
-                                              </TableCell>
-                                            </TableRow>
-                                          )}
-
-                                          {/* Combined projects section */}
-                                          {allProjects.length > 0 && (
-                                            <>
-                                              <TableRow className="text-foreground-light">
-                                                <TableCell className="py-2! px-0 flex items-center gap-1">
-                                                  <span>Compute</span>
-                                                </TableCell>
-                                                <TableCell
-                                                  className="text-right py-2 px-0"
-                                                  translate="no"
-                                                >
-                                                  {formatCurrency(
-                                                    computeItems.reduce(
-                                                      (sum: number, item) => sum + item.total_price,
-                                                      0
-                                                    ) + (computeCreditsItem?.total_price ?? 0)
-                                                  )}
-                                                </TableCell>
-                                              </TableRow>
-                                              {/* Show first 3 projects */}
-                                              {allProjects.map((project) => (
-                                                <TableRow
-                                                  key={project.project_ref}
-                                                  className="text-foreground-light"
-                                                >
-                                                  <TableCell
-                                                    className="py-2! px-0 pl-6"
-                                                    translate="no"
-                                                  >
-                                                    {project.project_name} ({project.computeType}) |{' '}
-                                                    {formatCurrency(project.computeCosts)}
-                                                  </TableCell>
-                                                </TableRow>
-                                              ))}
-                                              {computeCreditsItem && (
-                                                <TableRow className="text-foreground-light">
-                                                  <TableCell
-                                                    className="py-2! px-0 pl-6"
-                                                    translate="no"
-                                                  >
-                                                    Compute Credits |{' '}
-                                                    {formatCurrency(computeCreditsItem.total_price)}
-                                                  </TableCell>
-                                                </TableRow>
-                                              )}
-                                            </>
-                                          )}
-
-                                          {/* Non-compute items */}
-                                          {otherItems.map((item) => (
-                                            <TableRow
-                                              key={item.description}
-                                              className="text-foreground-light"
-                                            >
-                                              <TableCell className="text-xs py-2 px-0">
-                                                <div className="flex items-center gap-1">
-                                                  <span>{item.description ?? 'Unknown'}</span>
-                                                  {item.breakdown && item.breakdown.length > 0 && (
-                                                    <InfoTooltip className="max-w-sm">
-                                                      <p>Projects using {item.description}:</p>
-                                                      <ul className="ml-6 list-disc">
-                                                        {item.breakdown.map((breakdown) => (
-                                                          <li
-                                                            key={`${item.description}-breakdown-${breakdown.project_ref}`}
-                                                          >
-                                                            {breakdown.project_name}
-                                                          </li>
-                                                        ))}
-                                                      </ul>
-                                                    </InfoTooltip>
-                                                  )}
-                                                </div>
-                                              </TableCell>
-                                              <TableCell
-                                                className="text-right text-xs py-2 px-0"
-                                                translate="no"
-                                              >
-                                                {formatCurrency(item.total_price)}
-                                              </TableCell>
-                                            </TableRow>
-                                          ))}
-                                        </>
-                                      )
-                                      return content
-                                    })()}
-
-                                    <TableRow>
-                                      <TableCell className="font-medium py-2 px-0">
-                                        Total per month (excluding other usage)
-                                      </TableCell>
-                                      <TableCell
-                                        className="text-right font-medium py-2 px-0"
-                                        translate="no"
-                                      >
-                                        {formatCurrency(
-                                          subscriptionPreview?.breakdown?.reduce(
-                                            (prev, cur) => prev + cur.total_price,
-                                            0
-                                          ) ?? 0
-                                        )}
-                                      </TableCell>
-                                    </TableRow>
-                                  </TableBody>
-                                </Table>
-                              </>
-                            )}
-                          </div>
-                        </InfoTooltip>
+                        <InvoiceEstimateTooltip
+                          subscriptionPreviewQueryResult={subscriptionPreviewQueryResult}
+                        />
                       </div>
                       <div className="py-2 pr-0 text-right tabular-nums" translate="no">
                         {formatCurrency(
@@ -730,7 +541,7 @@ export const SubscriptionPlanUpdateDialog = ({
                       Please review carefully before downgrading.
                     </p>
                     <div className="space-y-2 mb-4 text-foreground-light">
-                      {featuresToLose.map((feature: string | [string, ...any[]]) => (
+                      {featuresToLose.map((feature) => (
                         <div
                           key={typeof feature === 'string' ? feature : feature[0]}
                           className="flex items-center gap-2"
