@@ -539,7 +539,17 @@ export function RLSPlayground() {
                 <Admonition
                   type="warning"
                   title="No data in sandbox"
-                  description='Click "Seed data" to load data into the sandbox.'
+                  description="Load data into the sandbox to test your queries."
+                  actions={
+                    <Button
+                      type="default"
+                      size="tiny"
+                      icon={<Download size={12} />}
+                      onClick={() => setSeedModalOpen(true)}
+                    >
+                      Seed data
+                    </Button>
+                  }
                 />
               )}
 

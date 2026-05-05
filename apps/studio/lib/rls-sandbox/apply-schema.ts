@@ -1,6 +1,6 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 
-import type { CustomRole, RlsTableStatus } from '@/data/rls-sandbox/project-schema-ddl-query'
+import type { ProjectSchemaDDL } from '@/data/rls-sandbox/project-schema-ddl-query'
 import { getErrorMessage } from '@/lib/get-error-message'
 
 interface Executor {
@@ -65,60 +65,54 @@ async function applyDDLWithRetries(sandbox: Executor, ddlStatements: string[]): 
 export async function applySchema(
   sandbox: Executor,
   {
+    typeDefinitions,
     entityDefinitions,
     functionDefinitions,
     policies,
     rlsStatuses,
     customRoles,
-  }: {
-    entityDefinitions: string[]
-    functionDefinitions: string[]
-    policies: PostgresPolicy[]
-    rlsStatuses: RlsTableStatus[]
-    customRoles: CustomRole[]
-  }
+  }: ProjectSchemaDDL
 ): Promise<void> {
-  for (const role of customRoles) {
-    const safeName = role.name.replace(/"/g, '""')
-    const safeNameLiteral = role.name.replace(/'/g, "''")
-    await tryExec(
-      sandbox,
-      `DO $$ BEGIN
-        IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '${safeNameLiteral}') THEN
-          CREATE ROLE "${safeName}" NOLOGIN;
-        END IF;
-      END $$`,
-      `role ${role.name}`
-    )
+  if (customRoles.length > 0) {
+    const checks = customRoles
+      .map(({ name }) => {
+        const safeLiteral = name.replace(/'/g, "''")
+        const safeIdent = name.replace(/"/g, '""')
+        return `IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '${safeLiteral}') THEN CREATE ROLE "${safeIdent}" NOLOGIN; END IF;`
+      })
+      .join('\n')
+    await tryExec(sandbox, `DO $$ BEGIN\n${checks}\nEND $$`, 'custom roles')
   }
 
+  await applyDDLWithRetries(sandbox, typeDefinitions)
   await applyDDLWithRetries(sandbox, entityDefinitions)
 
-  // Grant Supabase roles access to public schema — mirrors real Supabase grants
   await tryExec(
     sandbox,
     `GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role`,
     'grant schema usage'
   )
 
-  for (const table of rlsStatuses) {
-    await tryExec(
-      sandbox,
-      `GRANT SELECT, INSERT, UPDATE, DELETE ON "${table.schema}"."${table.table}" TO anon, authenticated, service_role`,
-      `grant roles on ${table.schema}.${table.table}`
-    )
-    if (table.rls_enabled) {
-      await tryExec(
-        sandbox,
-        `ALTER TABLE "${table.schema}"."${table.table}" ENABLE ROW LEVEL SECURITY`,
-        `enable RLS ${table.schema}.${table.table}`
+  if (rlsStatuses.length > 0) {
+    const grants = rlsStatuses
+      .map(
+        (t) =>
+          `GRANT SELECT, INSERT, UPDATE, DELETE ON "${t.schema}"."${t.table}" TO anon, authenticated, service_role`
       )
+      .join('; ')
+    await tryExec(sandbox, grants, 'grant roles on all tables')
+
+    const rlsEnables = rlsStatuses
+      .filter((t) => t.rls_enabled)
+      .map((t) => `ALTER TABLE "${t.schema}"."${t.table}" ENABLE ROW LEVEL SECURITY`)
+      .join('; ')
+    if (rlsEnables) {
+      await tryExec(sandbox, rlsEnables, 'enable RLS on all tables')
     }
   }
 
-  // Apply user-defined functions before policies — policies reference them and Postgres resolves
-  // function bodies at query time, not at CREATE POLICY time. Disable check_function_bodies so a
-  // function referencing a not-yet-created object doesn't abort the batch.
+  // Disable check_function_bodies so functions referencing not-yet-created objects don't abort.
+  // Postgres resolves policy→function references at query time, not at CREATE POLICY time.
   await tryExec(sandbox, `SET check_function_bodies = off`, 'set check_function_bodies')
   for (const fn of functionDefinitions) {
     await tryExec(sandbox, fn, `function ${fn.slice(0, 60).replace(/\s+/g, ' ')}`)
