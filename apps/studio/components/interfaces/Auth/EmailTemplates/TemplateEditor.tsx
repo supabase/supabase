@@ -2,11 +2,20 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import type { editor } from 'monaco-editor'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
   Button,
   CardContent,
   CardFooter,
@@ -26,8 +35,11 @@ import { SpamValidation } from './SpamValidation'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
+import type { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import type { AuthTemplateType } from '@/data/auth/auth-template-reset-mutation'
+import { useAuthTemplateResetMutation } from '@/data/auth/auth-template-reset-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import type { FormSchema } from '@/types'
@@ -35,6 +47,31 @@ import type { FormSchema } from '@/types'
 interface TemplateEditorProps {
   template: FormSchema
 }
+
+type EmailTemplateContentKey = Extract<
+  keyof AuthConfigResponse,
+  `MAILER_TEMPLATES_${string}_CONTENT`
+>
+type EmailTemplateSubjectKey = Exclude<
+  Extract<keyof AuthConfigResponse, `MAILER_SUBJECTS_${string}`>,
+  'MAILER_SUBJECTS_CUSTOM_CONTENTS'
+>
+
+const AUTH_TEMPLATE_TYPES_BY_ID = {
+  CONFIRMATION: 'confirmation',
+  EMAIL_CHANGE: 'email-change',
+  INVITE: 'invite',
+  MAGIC_LINK: 'magic-link',
+  RECOVERY: 'recovery',
+  REAUTHENTICATION: 'reauthentication',
+  PASSWORD_CHANGED_NOTIFICATION: 'password-changed-notification',
+  EMAIL_CHANGED_NOTIFICATION: 'email-changed-notification',
+  PHONE_CHANGED_NOTIFICATION: 'phone-changed-notification',
+  MFA_FACTOR_ENROLLED_NOTIFICATION: 'mfa-factor-enrolled-notification',
+  MFA_FACTOR_UNENROLLED_NOTIFICATION: 'mfa-factor-unenrolled-notification',
+  IDENTITY_LINKED_NOTIFICATION: 'identity-linked-notification',
+  IDENTITY_UNLINKED_NOTIFICATION: 'identity-unlinked-notification',
+} satisfies Record<string, AuthTemplateType>
 
 export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
@@ -56,9 +93,20 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     },
   })
 
+  const { mutate: resetAuthTemplate } = useAuthTemplateResetMutation({
+    onError: (error) => {
+      setIsResettingTemplate(false)
+      toast.error(`Failed to reset email template: ${error.message}`)
+    },
+  })
+
   const { id, properties } = template
 
-  const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT` as keyof typeof authConfig
+  const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT` as EmailTemplateContentKey
+  const subjectSlug = Object.keys(properties).find((key) => key.startsWith('MAILER_SUBJECTS_')) as
+    | EmailTemplateSubjectKey
+    | undefined
+  const templateType = AUTH_TEMPLATE_TYPES_BY_ID[id as keyof typeof AUTH_TEMPLATE_TYPES_BY_ID]
   const messageProperty = properties[messageSlug]
   const builtInSMTP =
     isSuccess &&
@@ -69,17 +117,22 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
   const [, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
+  const [isResettingTemplate, setIsResettingTemplate] = useState(false)
   const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
 
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
 
-  const INITIAL_VALUES = useMemo(() => {
+  const getFormValuesFromConfig = useCallback((config: AuthConfigResponse | undefined) => {
     const result: { [x: string]: string } = {}
     Object.keys(properties).forEach((key) => {
-      result[key] = ((authConfig && authConfig[key as keyof typeof authConfig]) ?? '') as string
+      result[key] = ((config && config[key as keyof typeof config]) ?? '') as string
     })
     return result
-  }, [authConfig, properties])
+  }, [properties])
+
+  const INITIAL_VALUES = useMemo(() => {
+    return getFormValuesFromConfig(authConfig)
+  }, [authConfig, getFormValuesFromConfig])
 
   const form = useForm({
     defaultValues: INITIAL_VALUES,
@@ -164,8 +217,36 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const formValues = form.watch()
   const baselineValues = INITIAL_VALUES
   const baselineBodyValue = (authConfig && authConfig[messageSlug]) ?? ''
+  const hasCustomTemplate =
+    authConfig?.MAILER_TEMPLATES_CUSTOM_CONTENTS?.[messageSlug] === true ||
+    (subjectSlug !== undefined &&
+      authConfig?.MAILER_SUBJECTS_CUSTOM_CONTENTS?.[subjectSlug] === true)
   const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(baselineValues)
   const hasChanges = hasFormChanges || baselineBodyValue !== bodyValue
+
+  const resetTemplateToDefault = () => {
+    if (!projectRef) return console.error('Project ref is required')
+    if (!templateType) return console.error('Template type is required')
+
+    setIsResettingTemplate(true)
+    resetAuthTemplate(
+      {
+        projectRef,
+        template: templateType,
+      },
+      {
+        onSuccess: (config) => {
+          form.reset(getFormValuesFromConfig(config))
+          setBodyValue((config && config[messageSlug]) ?? '')
+          setValidationResult(undefined)
+          setHasUnsavedChanges(false)
+          setIsResettingTemplate(false)
+          toast.success('Email template reset to default')
+        },
+        onError: () => setIsResettingTemplate(false),
+      }
+    )
+  }
 
   // Function to insert text at cursor position
   const insertTextAtCursor = (text: string) => {
@@ -198,14 +279,10 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   // Update form values when authConfig changes
   useEffect(() => {
     if (authConfig) {
-      const values: { [key: string]: string } = {}
-      Object.keys(properties).forEach((key) => {
-        values[key] = ((authConfig && authConfig[key as keyof typeof authConfig]) ?? '') as string
-      })
-      form.reset(values)
+      form.reset(getFormValuesFromConfig(authConfig))
       setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
     }
-  }, [authConfig, properties, messageSlug, form])
+  }, [authConfig, getFormValuesFromConfig, messageSlug, form])
 
   useEffect(() => {
     if (projectRef && id && !!authConfig) {
@@ -341,27 +418,64 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
             <SpamValidation spamRules={spamRules} />
 
-            <CardFooter className="flex flex-row justify-end gap-2">
-              {hasChanges && (
-                <Button
-                  type="default"
-                  onClick={() => {
-                    form.reset(INITIAL_VALUES)
-                    setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
-                    setHasUnsavedChanges(false)
-                  }}
-                >
-                  Cancel
-                </Button>
+            <CardFooter className="flex flex-row justify-between gap-2">
+              {hasCustomTemplate && !hasChanges && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      type="default"
+                      htmlType="button"
+                      disabled={!canUpdateConfig || isSavingTemplate || isResettingTemplate}
+                    >
+                      Reset template
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Reset template to default</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will remove your custom subject line and body content. The default
+                        template content will be used instead.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={isResettingTemplate}>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={resetTemplateToDefault}
+                        disabled={isResettingTemplate}
+                        variant="warning"
+                      >
+                        Reset
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               )}
-              <Button
-                type="primary"
-                htmlType="submit"
-                disabled={!canUpdateConfig || isSavingTemplate || !hasChanges}
-                loading={isSavingTemplate}
-              >
-                Save changes
-              </Button>
+              <div className="ml-auto flex flex-row gap-2">
+                {hasChanges && (
+                  <Button
+                    type="default"
+                    htmlType="button"
+                    onClick={() => {
+                      form.reset(INITIAL_VALUES)
+                      setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+                      setHasUnsavedChanges(false)
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={
+                    !canUpdateConfig || isSavingTemplate || isResettingTemplate || !hasChanges
+                  }
+                  loading={isSavingTemplate}
+                >
+                  Save changes
+                </Button>
+              </div>
             </CardFooter>
           </>
         )}
