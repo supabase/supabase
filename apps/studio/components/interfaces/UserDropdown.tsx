@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
@@ -37,6 +38,7 @@ export function UserDropdown({
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
+  const timezonePickerEnabled = useFlag('timezonePicker')
   const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
@@ -139,10 +141,14 @@ export function UserDropdown({
             ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <TimezoneDropdown />
-        </DropdownMenuGroup>
+        {timezonePickerEnabled && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <TimezoneDropdown />
+            </DropdownMenuGroup>
+          </>
+        )}
         {IS_PLATFORM && (
           <>
             <DropdownMenuSeparator />
