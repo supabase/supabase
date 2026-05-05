@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useParams } from 'common'
 
 import { subscriptionKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
