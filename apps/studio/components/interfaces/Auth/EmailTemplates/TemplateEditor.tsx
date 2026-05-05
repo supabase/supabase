@@ -37,6 +37,35 @@ interface TemplateEditorProps {
   isReadOnly?: boolean
 }
 
+const previewBaseStyles = `
+  <style>
+    html {
+      background: white;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+    }
+  </style>
+`
+
+const getPreviewSrcDoc = (html: string) => {
+  if (/<head[\s>]/i.test(html)) {
+    return html.replace(/<head([^>]*)>/i, `<head$1>${previewBaseStyles}`)
+  }
+
+  if (/<html[\s>]/i.test(html)) {
+    return html.replace(/<html([^>]*)>/i, `<html$1><head>${previewBaseStyles}</head>`)
+  }
+
+  if (/<body[\s>]/i.test(html)) {
+    return `<!doctype html><html><head>${previewBaseStyles}</head>${html}</html>`
+  }
+
+  return `<!doctype html><html><head>${previewBaseStyles}</head><body>${html}</body></html>`
+}
+
 export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
@@ -72,6 +101,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
   const [, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
   const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
+  const previewSrcDoc = useMemo(() => getPreviewSrcDoc(bodyValue), [bodyValue])
 
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
 
@@ -345,7 +375,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                   <iframe
                     className="mb-2! mt-0 overflow-hidden h-96 w-full rounded-md border bg-white"
                     title={id}
-                    srcDoc={bodyValue}
+                    srcDoc={previewSrcDoc}
                     sandbox="allow-scripts allow-forms"
                   />
                   <p className="text-xs text-foreground-muted">
