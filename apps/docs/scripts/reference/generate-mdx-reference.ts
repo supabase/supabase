@@ -1,6 +1,7 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'fs'
-import { join, dirname, relative } from 'path'
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs'
+import { dirname, join, relative } from 'path'
 import { fileURLToPath } from 'url'
+
 import type { SpecCategory, SpecConfig } from './types.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -65,14 +66,14 @@ function scanPartialH2s(content: string): string[] {
 }
 
 /**
- * Replaces `## Heading` lines in a partial with <Heading> JSX so they get
- * proper anchors. prefix is prepended to the slug (e.g. the category slug).
+ * Replaces `## Heading` lines in a partial with the `## Text [#id]` notation
+ * so they get proper stable anchors. prefix is prepended to the slug.
  */
 function processPartialForMdx(content: string, prefix?: string): string {
   return content.replace(/^##\s+(.+)$/gm, (_, text) => {
     const t = text.trim()
     const slug = prefix ? `${prefix}-${toSlug(t)}` : toSlug(t)
-    return `<Heading tag="h2" customAnchor="${slug}">${t}</Heading>`
+    return `## ${t} [#${slug}]`
   })
 }
 
@@ -219,7 +220,7 @@ function generateMdx(categories: SpecCategory[], config: SpecConfig, specDir: st
       lines.push('', '<hr />', '')
     }
 
-    lines.push(`<Heading tag="h2" customAnchor="${catSlug}">${category.trim()}</Heading>`, '')
+    lines.push(`## ${category.trim()} [#${catSlug}]`, '')
 
     // Insert optional partial: <specDir>/<category-slug>.partial.mdx
     const partialPath = join(specDir, `${catSlug}.partial.mdx`)
@@ -232,7 +233,7 @@ function generateMdx(categories: SpecCategory[], config: SpecConfig, specDir: st
       const isLastInCategory = j === definitions.length - 1
       const defSlug = `${catSlug}-${toSlug(def.name)}`
 
-      lines.push(`<Heading tag="h3" customAnchor="${defSlug}">${def.name}</Heading>`, '')
+      lines.push(`### ${def.name} [#${defSlug}]`, '')
 
       if (def.description) {
         lines.push(escapeMdxProse(def.description), '')
