@@ -150,7 +150,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
         <p className="text-xs text-foreground-lighter">
           You can also find the extension in the{' '}
           <a
-            href="https://geminicli.com/extensions/?name=supabase-community-gemini-extension"
+            href="https://geminicli.com/extensions/?name=supabase-communitygemini-extension"
             target="_blank"
             rel="noopener noreferrer"
             className="text-brand-link hover:underline"
