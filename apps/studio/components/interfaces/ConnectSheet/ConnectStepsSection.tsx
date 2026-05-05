@@ -163,6 +163,11 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
       },
     }
   )
+  const showIpv4AddonNotice =
+    state.mode === 'direct' &&
+    !ipv4Addon &&
+    (state.connectionMethod === 'direct' ||
+      (state.connectionMethod === 'transaction' && !state.useSharedPooler))
 
   if (steps.length === 0) return null
 
@@ -173,10 +178,10 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
 
         <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} />
 
-        {state.mode === 'direct' && !ipv4Addon && (
+        {showIpv4AddonNotice && (
           <Admonition
             type="default"
-            title="Direct connections use IPv6 by default"
+            title={`${state.connectionMethod === 'direct' ? 'Direct connections use' : 'Transaction pooler uses'} IPv6 by default`}
             description="Enable the dedicated IPv4 address add-on to connect from IPv4-only networks"
             actions={[
               <Button asChild key="addon" type="default">
