@@ -128,7 +128,7 @@ interface FaqEntry {
   answer: string
 }
 
-function markdownAnswerToText(markdown: string): string {
+function stripMarkdownLinks(markdown: string): string {
   return markdown.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').trim()
 }
 
@@ -141,7 +141,7 @@ export function faqPageSchema(entries: FaqEntry[]) {
       name: entry.question,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: markdownAnswerToText(entry.answer),
+        text: stripMarkdownLinks(entry.answer),
       },
     })),
   }
@@ -195,7 +195,10 @@ export function pricingProductSchema(input: PricingProductSchemaInput) {
     description: input.description,
     image: input.image,
     url: input.url,
-    brand: { '@id': ORG_ID },
+    brand: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+    },
     offers,
     ...(customPlans.length > 0 && {
       additionalProperty: customPlans.map((plan) => ({
