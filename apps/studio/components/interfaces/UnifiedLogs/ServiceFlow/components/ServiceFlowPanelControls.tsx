@@ -1,9 +1,7 @@
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo } from 'react'
-import { Button, Separator } from 'ui'
+import { Button, KeyboardShortcut, Separator, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { Kbd } from '@/components/ui/DataTable/primitives/Kbd'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 
 export const ServiceFlowPanelControls = () => {
@@ -73,42 +71,47 @@ export const ServiceFlowPanelControls = () => {
 
   return (
     <div className="flex h-7 items-center gap-1">
-      <ButtonTooltip
-        size="tiny"
-        type="text"
-        disabled={!prevId}
-        onClick={onPrev}
-        className="px-1"
-        icon={<ChevronUp />}
-        tooltip={{
-          content: {
-            text: (
-              <p>
-                Previous <Kbd>↑</Kbd>
-              </p>
-            ),
-          },
-        }}
-      />
-      <ButtonTooltip
-        size="tiny"
-        type="text"
-        disabled={!nextId}
-        onClick={onNext}
-        className="px-1"
-        icon={<ChevronDown />}
-        tooltip={{
-          content: {
-            text: (
-              <p>
-                Next <Kbd>↓</Kbd>
-              </p>
-            ),
-          },
-        }}
-      />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            size="tiny"
+            type="text"
+            disabled={!prevId}
+            onClick={onPrev}
+            className="px-1"
+            icon={<ChevronUp />}
+          />
+        </TooltipTrigger>
+        <TooltipContent side="top" className="flex items-center gap-2">
+          <span>Previous</span>
+          <KeyboardShortcut keys={['ArrowUp']} />
+        </TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            size="tiny"
+            type="text"
+            disabled={!nextId}
+            onClick={onNext}
+            className="px-1"
+            icon={<ChevronDown />}
+          />
+        </TooltipTrigger>
+        <TooltipContent side="top" className="flex items-center gap-2">
+          <span>Next</span>
+          <KeyboardShortcut keys={['ArrowDown']} />
+        </TooltipContent>
+      </Tooltip>
       <Separator orientation="vertical" className="mx-1 h-4" />
-      <Button size="tiny" type="text" onClick={onClose} className="px-1" icon={<X />} />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button size="tiny" type="text" onClick={onClose} className="px-1" icon={<X />} />
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          <span>Close</span>
+        </TooltipContent>
+      </Tooltip>
     </div>
   )
 }
