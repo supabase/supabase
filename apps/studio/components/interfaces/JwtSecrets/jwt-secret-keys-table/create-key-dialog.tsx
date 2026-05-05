@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import {
   Badge,
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -187,11 +187,7 @@ export const CreateKeyDialog = ({
         </div>
         <div className="flex flex-col gap-4">
           <Label_Shadcn_ htmlFor="byok" className="flex items-center gap-x-2">
-            <Checkbox_Shadcn_
-              id="byok"
-              checked={isBYOK}
-              onCheckedChange={(value) => setBYOK(!!value)}
-            />
+            <Checkbox id="byok" checked={isBYOK} onCheckedChange={(value) => setBYOK(!!value)} />
             {newKeyAlgorithm === 'HS256'
               ? 'Import an existing secret'
               : 'Import an existing private key'}
@@ -220,7 +216,7 @@ export const CreateKeyDialog = ({
           {isBYOK && newKeyAlgorithm === 'HS256' && (
             <>
               <Label_Shadcn_ htmlFor="base64" className="flex items-center gap-x-2">
-                <Checkbox_Shadcn_
+                <Checkbox
                   id="base64"
                   checked={isBase64}
                   onCheckedChange={(value) => setBase64(!!value)}

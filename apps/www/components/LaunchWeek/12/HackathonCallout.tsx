@@ -10,10 +10,10 @@ const HackathonCallout = ({ className }: { className?: string }) => {
         className
       )}
     >
-      <div className="!text-foreground [&_*]:text-foreground text-sm flex flex-col sm:flex-row sm:items-center sm:gap-3">
+      <div className="text-foreground! **:text-foreground text-sm flex flex-col sm:flex-row sm:items-center sm:gap-3">
         Open Source Hackathon 2024
       </div>
-      <div className="!m-0 flex items-center">
+      <div className="m-0! flex items-center">
         <TextLink
           label="Learn more"
           url="/blog/supabase-oss-hackathon"

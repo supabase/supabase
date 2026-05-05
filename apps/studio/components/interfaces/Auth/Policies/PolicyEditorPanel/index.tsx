@@ -10,9 +10,9 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
-  Form_Shadcn_,
+  Form,
   Label_Shadcn_,
   ScrollArea,
   Sheet,
@@ -290,7 +290,7 @@ export const PolicyEditorPanel = memo(function ({
 
   return (
     <>
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
           <Sheet open={visible} onOpenChange={handleOpenChange}>
             <SheetContent
@@ -298,7 +298,7 @@ export const PolicyEditorPanel = memo(function ({
               size={showTools ? 'lg' : 'default'}
               className={cn(
                 'bg-surface-200 p-0 flex flex-row gap-0',
-                showTools ? '!min-w-[100vw] lg:!min-w-[1000px]' : '!min-w-[100vw] lg:!min-w-[600px]'
+                showTools ? 'min-w-screen! lg:min-w-[1000px]!' : 'min-w-screen! lg:min-w-[600px]!'
               )}
             >
               <div className={cn('flex flex-col grow w-full', showTools && 'w-[60%]')}>
@@ -461,7 +461,7 @@ export const PolicyEditorPanel = memo(function ({
 
                     {supportWithCheck && (
                       <div className="px-5 py-3 flex items-center gap-x-2">
-                        <Checkbox_Shadcn_
+                        <Checkbox
                           id="use-check"
                           name="use-check"
                           checked={showCheckBlock}
@@ -481,7 +481,7 @@ export const PolicyEditorPanel = memo(function ({
                     {error !== undefined && (
                       <QueryError error={error} open={errorPanelOpen} setOpen={setErrorPanelOpen} />
                     )}
-                    <SheetFooter className="flex items-center !justify-end px-5 py-4 w-full border-t">
+                    <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
                       <Button
                         type="default"
                         disabled={isExecuting || isUpdating}
@@ -532,7 +532,7 @@ export const PolicyEditorPanel = memo(function ({
                     <TabsContent_Shadcn_
                       value="templates"
                       className={cn(
-                        '!mt-0 overflow-y-auto',
+                        'mt-0! overflow-y-auto',
                         'data-[state=active]:flex data-[state=active]:grow'
                       )}
                     >
@@ -571,7 +571,7 @@ export const PolicyEditorPanel = memo(function ({
             </SheetContent>
           </Sheet>
         </form>
-      </Form_Shadcn_>
+      </Form>
 
       <DiscardChangesConfirmationDialog
         {...modalProps}

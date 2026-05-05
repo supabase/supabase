@@ -138,6 +138,8 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
               <BigQuery size={18} className="text-foreground-light" />
             ) : type === 'Analytics Bucket' ? (
               <AnalyticsBucket size={18} className="text-foreground-light" />
+            ) : type === 'DuckLake' ? (
+              <Database size={18} className="text-foreground-light" />
             ) : (
               <Database size={18} className="text-foreground-light" />
             )}

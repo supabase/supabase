@@ -31,7 +31,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-type GetRequestData = paths['/platform/projects/{ref}/content']['get']['parameters']['query']
 type GetResponseData =
   paths['/platform/projects/{ref}/content']['get']['responses']['200']['content']['application/json']
 

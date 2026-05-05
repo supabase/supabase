@@ -55,7 +55,7 @@ const IconContainer = (
   <div
     className={cn(
       'w-6 h-6',
-      'bg-surface-100 border rounded',
+      'bg-surface-100 border rounded-sm',
       'flex items-center justify-center',
       'text-foreground-muted',
       'group-aria-selected:bg-surface-200 group-aria-selected:text-foreground-lighter group-aria-selected:[&_svg]:scale-[103%]',
@@ -202,7 +202,7 @@ const DocsSearchPage = () => {
                 key={`${page.path}-group`}
                 value={`${escapeAttributeSelector(page.title)}-group-index-${i}`}
                 forceMount={true}
-                className="overflow-hidden py-3 px-2 text-border-strong [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted"
+                className="overflow-hidden py-3 px-2 text-border-strong **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5 **:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted"
               >
                 <CommandItem_Shadcn_
                   key={`${page.path}-item`}
@@ -270,7 +270,7 @@ const DocsSearchPage = () => {
             )
           })}
         {state.status === 'initial' && (
-          <CommandGroup_Shadcn_ className="overflow-hidden py-3 px-2 text-border-strong [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted">
+          <CommandGroup_Shadcn_ className="overflow-hidden py-3 px-2 text-border-strong **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5 **:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted">
             {questions.map((question) => {
               const key = question.replace(/\s+/g, '_')
               return (
@@ -346,9 +346,9 @@ export function getPageIcon(page: Page) {
     case PageType.Reference:
     case PageType.Integration:
     case PageType.Troubleshooting:
-      return <Book strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Book strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <Github strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Github strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -360,9 +360,9 @@ export function getPageSectionIcon(page: Page) {
     case PageType.Reference:
     case PageType.Integration:
     case PageType.Troubleshooting:
-      return <Hash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Hash strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <MessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <MessageSquare strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }

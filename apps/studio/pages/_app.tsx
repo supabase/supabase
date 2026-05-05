@@ -11,12 +11,8 @@ import '@/styles/react-data-grid-logs.css'
 import '@/styles/reactflow.css'
 import '@/styles/storage.css'
 import '@/styles/stripe.css'
-import '@/styles/toast.css'
-import '@/styles/typography.css'
 import '@/styles/ui.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
-import 'ui/build/css/themes/dark.css'
-import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
@@ -52,7 +48,9 @@ import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProv
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
 import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
+import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { useRootQueryClient } from '@/data/query-client'
 import { customFont, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
@@ -122,7 +120,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const getLayout = Component.getLayout ?? ((page) => page)
 
-  const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
+  const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
     Sentry.withScope(function (scope) {
       scope.setTag('globalErrorBoundary', true)
       const eventId = Sentry.captureException(error)
@@ -184,23 +182,21 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   <MetaFaviconsPagesRouter applicationName="Supabase Studio" includeManifest />
                   <TooltipProvider delayDuration={0}>
                     <RouteValidationWrapper>
-                      <ThemeProvider
-                        defaultTheme="system"
-                        themes={['dark', 'light', 'classic-dark']}
-                        enableSystem
-                        disableTransitionOnChange
-                      >
+                      <ThemeProvider>
                         <DevToolbarProvider apiUrl={API_URL}>
                           <AiAssistantStateContextProvider>
                             <CommandProvider>
-                              <FeaturePreviewContextProvider>
-                                <MainScrollContainerProvider>
-                                  {getLayout(<Component {...pageProps} />)}
-                                </MainScrollContainerProvider>
-                                <StudioCommandMenu />
-                                <FeaturePreviewModal />
-                                <UpdateBillingAddressModal />
-                              </FeaturePreviewContextProvider>
+                              <BannerStackProvider>
+                                <FeaturePreviewContextProvider>
+                                  <MainScrollContainerProvider>
+                                    {getLayout(<Component {...pageProps} />)}
+                                  </MainScrollContainerProvider>
+                                  <GlobalShortcuts />
+                                  <StudioCommandMenu />
+                                  <FeaturePreviewModal />
+                                  <UpdateBillingAddressModal />
+                                </FeaturePreviewContextProvider>
+                              </BannerStackProvider>
                               <Toaster />
                               <MonacoThemeProvider />
                             </CommandProvider>

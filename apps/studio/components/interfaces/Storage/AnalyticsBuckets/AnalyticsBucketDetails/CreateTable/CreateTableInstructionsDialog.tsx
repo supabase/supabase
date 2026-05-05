@@ -41,11 +41,7 @@ export const CreateTableInstructionsDialog = () => {
         {enableCreationOfTablesFromDashboard && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                type="primary"
-                className="w-7 rounded-l-none -ml-[1px]"
-                icon={<ChevronDown />}
-              />
+              <Button type="primary" className="w-7 rounded-l-none -ml-px" icon={<ChevronDown />} />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48" align="end">
               <DropdownMenuItem onClick={() => setShowModal(true)}>Via Pyiceberg</DropdownMenuItem>

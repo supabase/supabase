@@ -1,3 +1,5 @@
+@reference "./main.css";
+
 .data-grid--simple-logs {
   .rdg {
     overflow-x: auto;
@@ -33,7 +35,7 @@
 
     &.rdg-row--focused .rdg-cell,
     &.rdg-row--focused .rdg-cell span {
-      @apply text-foreground !important;
+      @apply !text-foreground;
     }
   }
 }
@@ -48,7 +50,9 @@
 
   .rdg-cell,
   .rdg-cell span {
-    @apply text-foreground-light font-normal !important;
+    @apply !text-foreground-light !font-normal;
+    border-left: none;
+    border-right: none;
     overflow: visible;
     text-overflow: clip;
   }
@@ -73,7 +77,7 @@
 
     &.rdg-row--focused .rdg-cell,
     &.rdg-row--focused .rdg-cell span {
-      @apply text-foreground-light font-semibold !important;
+      @apply !text-foreground-light !font-semibold;
     }
   }
 }

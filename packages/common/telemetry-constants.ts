@@ -360,14 +360,6 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     useOrioleDb?: boolean
     /**
-     * Whether the tableEditorApiAccessToggle PostHog flag was enabled for this user.
-     * Gates the integrations → Data API settings surface only; no longer controls
-     * project-creation revoke behaviour (see dataApiRevokeOnCreateDefaultEnabled).
-     * true/false = flag state when project was created
-     * omitted = PostHog flags had not loaded at the time of project creation
-     */
-    tableEditorApiAccessToggleEnabled?: boolean
-    /**
      * Raw checkbox state for "Automatically expose new tables and functions" at submission.
      * true = default privileges are granted on new entities (current behaviour)
      * false = revoke SQL ran; user must manually grant access per entity
@@ -2772,6 +2764,22 @@ export interface AiExternalToolClickedEvent {
 }
 
 /**
+ * User clicked a CTA in the project security gate.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ProjectSecurityCtaClickedEvent {
+  action: 'project_security_cta_clicked'
+  properties: {
+    type: 'ask_assistant' | 'copy_prompt' | 'skip_to_home' | 'view_policies'
+    schema?: string
+    tableName?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User opened the request upgrade modal (for users without billing permissions).
  *
  * @group Events
@@ -2920,10 +2928,10 @@ export interface IntegrationInstallCompletedEvent {
 export interface IntegrationInstallSubmittedEvent {
   action: 'integration_install_submitted'
   properties: {
-    /**
-     * The name of the integration being installed
-     */
+    /** The name of the integration being installed */
     integrationName: string
+    /** The integration method (will be 'template' for frontend-driven integrations.) */
+    method: string
   }
   groups: TelemetryGroups
 }
@@ -3108,35 +3116,6 @@ export interface StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
 }
 
 /**
- * User was exposed to the pricing value/flexibility experiment on the /pricing page.
- *
- * @group Events
- * @source www
- * @page /pricing
- */
-export interface PricingPageExperimentExposedEvent {
-  action: 'pricing_page_experiment_exposed'
-  properties: {
-    /**
-     * Experiment identifier for tracking
-     */
-    experiment_id: 'pricingPageExperiment'
-    /**
-     * Experiment variant.
-     * GROWTH-694: flexibility (section), flexibility_card (on card), hourly_rate (on card)
-     * GROWTH-697: multi_project (on card), estimate_cta (on card)
-     */
-    variant:
-      | 'control'
-      | 'flexibility'
-      | 'flexibility_card'
-      | 'hourly_rate'
-      | 'multi_project'
-      | 'estimate_cta'
-  }
-}
-
-/**
  * Triggered when an access token is successfully created.
  *
  * @group Events
@@ -3208,6 +3187,20 @@ export interface ResourceExhaustionBannerAiAssistantClickedEvent {
   properties: {
     warningTypes: string[]
   }
+}
+
+/**
+ * User clicked a row in the Unified Logs interface.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface UnifiedLogsRowClickedEvent {
+  action: 'unified_logs_row_clicked'
+  properties: {
+    logType: string
+  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -3365,6 +3358,7 @@ export type TelemetryEvent =
   | AiPromptCopiedEvent
   | AiAssistantDropdownButtonClickedEvent
   | AiExternalToolClickedEvent
+  | ProjectSecurityCtaClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | DashboardErrorCreatedEvent
@@ -3383,9 +3377,9 @@ export type TelemetryEvent =
   | ComputeBadgeUpgradeClickedEvent
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
-  | PricingPageExperimentExposedEvent
   | HeaderUpgradeCtaClickedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
   | ResourceExhaustionBannerAiAssistantClickedEvent
+  | UnifiedLogsRowClickedEvent

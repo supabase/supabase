@@ -6,9 +6,7 @@ import { Admonition } from 'ui-patterns'
 
 import { isFilterRelatedError } from './GridError.utils'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
-import { useTableFilterNew } from '@/components/grid/hooks/useTableFilterNew'
 import { useTableSort } from '@/components/grid/hooks/useTableSort'
-import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from '@/components/ui/AlertError'
 import { HighCostError } from '@/components/ui/HighQueryCost'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -26,21 +24,15 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
 
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
-  const newFilterBarEnabled = useIsTableFilterBarEnabled()
-  const { filters: oldFilters, clearFilters: clearOldFilters } = useTableFilter()
-  const { filters: newFilters, clearFilters: clearNewFilters } = useTableFilterNew()
+  const { filters, clearFilters } = useTableFilter()
   const { sorts } = useTableSort()
 
   const snap = useTableEditorTableStateSnapshot()
   const tableEditorSnap = useTableEditorStateSnapshot()
 
   const removeAllFilters = useCallback(() => {
-    if (newFilterBarEnabled) {
-      clearNewFilters()
-    } else {
-      clearOldFilters()
-    }
-  }, [clearOldFilters, clearNewFilters, newFilterBarEnabled])
+    clearFilters()
+  }, [clearFilters])
 
   const handleLoadData = useCallback(() => {
     if (!!tableId) {
@@ -61,7 +53,7 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
   const isForeignTableMissingVaultKeyError =
     isForeignTable && error?.message?.includes('query vault failed')
 
-  const hasActiveFilters = oldFilters.length > 0 || newFilters.length > 0
+  const hasActiveFilters = filters.length > 0
 
   const hasFilterRelatedError = hasActiveFilters && isFilterRelatedError(error?.message)
 
@@ -129,7 +121,7 @@ const FilterError = ({ removeAllFilters }: { removeAllFilters: () => void }) => 
       className="pointer-events-auto"
       title="No results found — check your filter values"
     >
-      <p className="!mb-4">
+      <p className="mb-4!">
         One or more of your filters may have a value or operator that doesn't match the column's
         data type. Try updating or removing the filter.
       </p>
@@ -153,16 +145,16 @@ const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
       className="pointer-events-auto"
       title={`Sorting is not supporting on ${sorts.length > 1 ? 'one of the selected columns' : 'the selected column'}`}
     >
-      <p className="!mb-0">
+      <p className="mb-0!">
         Unable to retrieve results as sorting is not supported on{' '}
         {sorts.length > 1 ? 'one of the selected columns' : 'the selected column'} due to its data
         type. ({formattedInvalidDataType})
       </p>
-      <p className="!mb-2">
+      <p className="mb-2!">
         Remove any sorts on columns with the data type {formattedInvalidDataType} applying the sorts
         again.
       </p>
-      <p className="text-sm text-foreground-lighter prose max-w-full !mb-4">
+      <p className="text-sm text-foreground-lighter prose max-w-full mb-4!">
         Error: <code className="text-code-inline">{error.message}</code>
       </p>
 
