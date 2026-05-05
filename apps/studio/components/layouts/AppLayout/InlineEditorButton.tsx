@@ -20,7 +20,7 @@ export const InlineEditorButton = () => {
   const track = useTrack()
 
   const handleClick = () => {
-    track('inline_editor_button_clicked')
+    track('header_inline_editor_button_clicked')
     toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
   }
 

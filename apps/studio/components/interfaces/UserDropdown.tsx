@@ -45,7 +45,7 @@ export function UserDropdown({
   return (
     <DropdownMenu
       onOpenChange={(open) => {
-        if (open) track('user_dropdown_opened')
+        if (open) track('header_user_dropdown_opened')
       }}
     >
       <DropdownMenuTrigger asChild className={cn('border shrink-0 px-3', triggerClassName)}>

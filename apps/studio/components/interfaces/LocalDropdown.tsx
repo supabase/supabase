@@ -39,7 +39,7 @@ export const LocalDropdown = ({
   return (
     <DropdownMenu
       onOpenChange={(open) => {
-        if (open) track('local_dropdown_opened')
+        if (open) track('header_local_dropdown_opened')
       }}
     >
       <DropdownMenuTrigger className={cn('border shrink-0 px-3', triggerClassName)} asChild>

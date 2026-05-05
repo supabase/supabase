@@ -32,7 +32,7 @@ export const BranchDropdown = ({
   const track = useTrack()
 
   const handleOpenChange = (next: boolean) => {
-    if (next) track('branch_dropdown_opened')
+    if (next) track('header_branch_dropdown_opened')
     setOpen(next)
   }
 

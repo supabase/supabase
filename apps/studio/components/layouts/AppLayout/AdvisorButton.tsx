@@ -38,7 +38,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
 
   const handleClick = () => {
-    track('advisor_button_clicked')
+    track('header_advisor_button_clicked')
     toggleSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
   }
 

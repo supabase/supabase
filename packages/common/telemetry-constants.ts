@@ -3209,8 +3209,8 @@ export interface UnifiedLogsRowClickedEvent {
  * @group Events
  * @source studio
  */
-export interface HomeLogoClickedEvent {
-  action: 'home_logo_clicked'
+export interface HeaderHomeLogoClickedEvent {
+  action: 'header_home_logo_clicked'
   groups: Partial<TelemetryGroups>
 }
 
@@ -3242,8 +3242,8 @@ export interface HeaderExceedingUsageBadgeClickedEvent {
  * @group Events
  * @source studio
  */
-export interface OrganizationDropdownOpenedEvent {
-  action: 'organization_dropdown_opened'
+export interface HeaderOrganizationDropdownOpenedEvent {
+  action: 'header_organization_dropdown_opened'
   groups: Partial<TelemetryGroups>
 }
 
@@ -3253,8 +3253,8 @@ export interface OrganizationDropdownOpenedEvent {
  * @group Events
  * @source studio
  */
-export interface ProjectDropdownOpenedEvent {
-  action: 'project_dropdown_opened'
+export interface HeaderProjectDropdownOpenedEvent {
+  action: 'header_project_dropdown_opened'
   groups: Partial<TelemetryGroups>
 }
 
@@ -3264,8 +3264,8 @@ export interface ProjectDropdownOpenedEvent {
  * @group Events
  * @source studio
  */
-export interface BranchDropdownOpenedEvent {
-  action: 'branch_dropdown_opened'
+export interface HeaderBranchDropdownOpenedEvent {
+  action: 'header_branch_dropdown_opened'
   groups: Partial<TelemetryGroups>
 }
 
@@ -3277,8 +3277,8 @@ export interface BranchDropdownOpenedEvent {
  * @group Events
  * @source studio
  */
-export interface MergeRequestButtonClickedEvent {
-  action: 'merge_request_button_clicked'
+export interface HeaderMergeRequestButtonClickedEvent {
+  action: 'header_merge_request_button_clicked'
   properties: {
     /** Whether a review has already been requested for this branch. */
     hasReviewRequested: boolean
@@ -3292,8 +3292,8 @@ export interface MergeRequestButtonClickedEvent {
  * @group Events
  * @source studio
  */
-export interface ConnectButtonClickedEvent {
-  action: 'connect_button_clicked'
+export interface HeaderConnectButtonClickedEvent {
+  action: 'header_connect_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -3303,8 +3303,8 @@ export interface ConnectButtonClickedEvent {
  * @group Events
  * @source studio
  */
-export interface FeedbackDropdownOpenedEvent {
-  action: 'feedback_dropdown_opened'
+export interface HeaderFeedbackDropdownOpenedEvent {
+  action: 'header_feedback_dropdown_opened'
   groups: Partial<TelemetryGroups>
 }
 
@@ -3314,8 +3314,8 @@ export interface FeedbackDropdownOpenedEvent {
  * @group Events
  * @source studio
  */
-export interface AdvisorButtonClickedEvent {
-  action: 'advisor_button_clicked'
+export interface HeaderAdvisorButtonClickedEvent {
+  action: 'header_advisor_button_clicked'
   groups: Partial<TelemetryGroups>
 }
 
@@ -3325,8 +3325,8 @@ export interface AdvisorButtonClickedEvent {
  * @group Events
  * @source studio
  */
-export interface InlineEditorButtonClickedEvent {
-  action: 'inline_editor_button_clicked'
+export interface HeaderInlineEditorButtonClickedEvent {
+  action: 'header_inline_editor_button_clicked'
   groups: Partial<TelemetryGroups>
 }
 
@@ -3336,8 +3336,8 @@ export interface InlineEditorButtonClickedEvent {
  * @group Events
  * @source studio
  */
-export interface AssistantButtonClickedEvent {
-  action: 'assistant_button_clicked'
+export interface HeaderAssistantButtonClickedEvent {
+  action: 'header_assistant_button_clicked'
   groups: Partial<TelemetryGroups>
 }
 
@@ -3347,8 +3347,8 @@ export interface AssistantButtonClickedEvent {
  * @group Events
  * @source studio
  */
-export interface UserDropdownOpenedEvent {
-  action: 'user_dropdown_opened'
+export interface HeaderUserDropdownOpenedEvent {
+  action: 'header_user_dropdown_opened'
   groups: Partial<TelemetryGroups>
 }
 
@@ -3358,8 +3358,8 @@ export interface UserDropdownOpenedEvent {
  * @group Events
  * @source studio
  */
-export interface LocalDropdownOpenedEvent {
-  action: 'local_dropdown_opened'
+export interface HeaderLocalDropdownOpenedEvent {
+  action: 'header_local_dropdown_opened'
   groups: Partial<TelemetryGroups>
 }
 
@@ -3369,8 +3369,8 @@ export interface LocalDropdownOpenedEvent {
  * @group Events
  * @source studio
  */
-export interface LocalVersionPopoverOpenedEvent {
-  action: 'local_version_popover_opened'
+export interface HeaderLocalVersionPopoverOpenedEvent {
+  action: 'header_local_version_popover_opened'
   groups: Partial<TelemetryGroups>
 }
 
@@ -3554,18 +3554,18 @@ export type TelemetryEvent =
   | ResourceExhaustionBannerUpgradeClickedEvent
   | ResourceExhaustionBannerAiAssistantClickedEvent
   | UnifiedLogsRowClickedEvent
-  | HomeLogoClickedEvent
+  | HeaderHomeLogoClickedEvent
   | HeaderBackToDashboardClickedEvent
   | HeaderExceedingUsageBadgeClickedEvent
-  | OrganizationDropdownOpenedEvent
-  | ProjectDropdownOpenedEvent
-  | BranchDropdownOpenedEvent
-  | MergeRequestButtonClickedEvent
-  | ConnectButtonClickedEvent
-  | FeedbackDropdownOpenedEvent
-  | AdvisorButtonClickedEvent
-  | InlineEditorButtonClickedEvent
-  | AssistantButtonClickedEvent
-  | UserDropdownOpenedEvent
-  | LocalDropdownOpenedEvent
-  | LocalVersionPopoverOpenedEvent
+  | HeaderOrganizationDropdownOpenedEvent
+  | HeaderProjectDropdownOpenedEvent
+  | HeaderBranchDropdownOpenedEvent
+  | HeaderMergeRequestButtonClickedEvent
+  | HeaderConnectButtonClickedEvent
+  | HeaderFeedbackDropdownOpenedEvent
+  | HeaderAdvisorButtonClickedEvent
+  | HeaderInlineEditorButtonClickedEvent
+  | HeaderAssistantButtonClickedEvent
+  | HeaderUserDropdownOpenedEvent
+  | HeaderLocalDropdownOpenedEvent
+  | HeaderLocalVersionPopoverOpenedEvent

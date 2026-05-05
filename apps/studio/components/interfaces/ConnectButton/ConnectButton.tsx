@@ -29,7 +29,7 @@ export const ConnectButton = ({ buttonType = 'default', className }: ConnectButt
       className={cn('rounded-full', className)}
       icon={<Plug className="rotate-90" />}
       onClick={() => {
-        track('connect_button_clicked')
+        track('header_connect_button_clicked')
         setConnectSheetSource('header_button')
         setShowConnect(true)
       }}

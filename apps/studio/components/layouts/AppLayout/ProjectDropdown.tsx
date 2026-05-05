@@ -158,7 +158,7 @@ export const ProjectDropdown = ({
   const handleSetOpen = embedded
     ? (_value: boolean) => onClose?.()
     : (next: boolean) => {
-        if (next) track('project_dropdown_opened')
+        if (next) track('header_project_dropdown_opened')
         setOpen(next)
       }
 

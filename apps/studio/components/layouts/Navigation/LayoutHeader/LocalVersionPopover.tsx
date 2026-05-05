@@ -53,7 +53,7 @@ export const LocalVersionPopover = () => {
   return (
     <Popover_Shadcn_
       onOpenChange={(open) => {
-        if (open) track('local_version_popover_opened')
+        if (open) track('header_local_version_popover_opened')
       }}
     >
       <PopoverTrigger_Shadcn_ className="flex items-center">

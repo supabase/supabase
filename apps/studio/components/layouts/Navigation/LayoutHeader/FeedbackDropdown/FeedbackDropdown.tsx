@@ -43,7 +43,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
       modal={false}
       open={isOpen}
       onOpenChange={(e) => {
-        if (e) track('feedback_dropdown_opened')
+        if (e) track('header_feedback_dropdown_opened')
         setIsOpen(e)
         if (!e) setStage('select')
       }}

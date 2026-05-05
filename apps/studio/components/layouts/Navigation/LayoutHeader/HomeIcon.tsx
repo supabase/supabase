@@ -35,7 +35,7 @@ export const HomeIcon = ({ className }: { className?: string }) => {
   return (
     <Link
       href={href}
-      onClick={() => track('home_logo_clicked')}
+      onClick={() => track('header_home_logo_clicked')}
       className={cn('items-center justify-center shrink-0 flex', className)}
     >
       <img

@@ -24,7 +24,7 @@ export const AssistantButton = () => {
         isOpen && 'bg-foreground text-background'
       )}
       onClick={() => {
-        track('assistant_button_clicked')
+        track('header_assistant_button_clicked')
         toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
       }}
       tooltip={{

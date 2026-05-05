@@ -44,7 +44,7 @@ export const OrganizationDropdown = ({
   const track = useTrack()
 
   const handleOpenChange = (next: boolean) => {
-    if (next) track('organization_dropdown_opened')
+    if (next) track('header_organization_dropdown_opened')
     setOpen(next)
   }
 

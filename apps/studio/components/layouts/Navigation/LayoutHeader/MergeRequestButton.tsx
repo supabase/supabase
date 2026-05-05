@@ -39,7 +39,7 @@ export const MergeRequestButton = () => {
   const buttonLabel = hasReviewRequested ? 'Review merge request' : 'Open merge request'
 
   const handleClick = () => {
-    track('merge_request_button_clicked', { hasReviewRequested })
+    track('header_merge_request_button_clicked', { hasReviewRequested })
     if (hasReviewRequested) {
       router.push(`/project/${selectedBranch.project_ref}/merge`)
     } else {
