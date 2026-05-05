@@ -2928,10 +2928,10 @@ export interface IntegrationInstallCompletedEvent {
 export interface IntegrationInstallSubmittedEvent {
   action: 'integration_install_submitted'
   properties: {
-    /**
-     * The name of the integration being installed
-     */
+    /** The name of the integration being installed */
     integrationName: string
+    /** The integration method (will be 'template' for frontend-driven integrations.) */
+    method: string
   }
   groups: TelemetryGroups
 }

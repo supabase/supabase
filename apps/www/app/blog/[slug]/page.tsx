@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
+import { notFound } from 'next/navigation'
 
 import BlogPostClient from './BlogPostClient'
 import authors from '@/lib/authors.json'
@@ -181,6 +182,8 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       </>
     )
   } catch (err) {
+    if (err instanceof Error && (err as Error & { code?: string }).code === 'POST_NOT_FOUND')
+      notFound()
     throw err
   }
 }
