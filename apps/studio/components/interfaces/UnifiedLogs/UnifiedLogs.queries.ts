@@ -23,7 +23,7 @@ const buildQueryConditions = (search: QuerySearchParamsType) => {
   // Process all search parameters for filtering
   Object.entries(search).forEach(([key, value]) => {
     // Skip pagination/control parameters
-    if (EXCLUDED_QUERY_PARAMS.includes(key as any)) {
+    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) {
       return
     }
 
@@ -54,12 +54,12 @@ const buildQueryConditions = (search: QuerySearchParamsType) => {
  * and determines the appropriate bucketing level (minute, hour, day)
  * Ported from the older implementation (apps/studio/components/interfaces/Settings/Logs/Logs.utils.ts)
  */
-const calculateChartBucketing = (search: SearchParamsType | Record<string, any>): string => {
+const calculateChartBucketing = (search: SearchParamsType | Record<string, unknown>): string => {
   // Extract start and end times from the date array if available
-  const dateRange = search.date || []
+  const dateRange = (search.date as Array<Date | string | number | null | undefined>) || []
 
   // Handle timestamps that could be in various formats
-  const convertToMillis = (timestamp: any) => {
+  const convertToMillis = (timestamp: Date | string | number | null | undefined) => {
     if (!timestamp) return null
     // If timestamp is a Date object
     if (timestamp instanceof Date) return timestamp.getTime()
@@ -375,7 +375,7 @@ const buildFacetWhere = (search: QuerySearchParamsType, excludeField: string): s
 
   Object.entries(search).forEach(([key, value]) => {
     if (key === excludeField) return // Skip the field we're getting facets for
-    if (EXCLUDED_QUERY_PARAMS.includes(key as any)) return // Skip pagination and special params
+    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) return // Skip pagination and special params
 
     // Handle array filters (IN clause)
     if (Array.isArray(value) && value.length > 0) {

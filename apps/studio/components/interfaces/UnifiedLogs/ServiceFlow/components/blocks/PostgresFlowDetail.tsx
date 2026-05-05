@@ -1,15 +1,14 @@
 import { Table } from '@tanstack/react-table'
 import { Cable, Clock, Database } from 'lucide-react'
-import { memo, ReactNode } from 'react'
+import { memo } from 'react'
 
 import { ColumnSchema } from '../../../UnifiedLogs.schema'
-import { getStatusLevel } from '../../../UnifiedLogs.utils'
 import { postgresDetailsFields, postgresPrimaryFields } from '../../config/serviceFlowFields'
 import { BlockFieldConfig } from '../../types'
 import { DetailRow } from '../shared/DetailRow'
 import { DetailSectionHeader } from '../shared/DetailSection'
+import { FieldValue } from '../shared/FieldValue'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
-import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
 interface PostgresFlowDetailProps {
   data: ColumnSchema
@@ -19,22 +18,6 @@ interface PostgresFlowDetailProps {
   filterFields: DataTableFilterField<any>[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches ServiceFlow types convention
   table: Table<any>
-}
-
-const renderFieldValue = (config: BlockFieldConfig, value: unknown): ReactNode => {
-  if (value === null || value === undefined || value === '') return value as ReactNode
-
-  if (config.id === 'status') {
-    return (
-      <DataTableColumnStatusCode
-        value={value as string | number}
-        level={getStatusLevel(value as string | number)}
-        className="text-xs"
-      />
-    )
-  }
-
-  return value as ReactNode
 }
 
 const FieldDetailRow = ({
@@ -60,7 +43,7 @@ const FieldDetailRow = ({
   return (
     <DetailRow
       label={config.label}
-      value={renderFieldValue(config, value)}
+      value={<FieldValue config={config} value={value} />}
       filterId={config.id}
       filterValue={typeof value === 'string' || typeof value === 'number' ? value : undefined}
       filterFields={filterFields}
@@ -85,7 +68,9 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
       : null
   const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 
-  const severity: string | undefined = enrichedData?.error_severity ?? (data as any)?.error_severity
+  const severity: string | undefined =
+    enrichedData?.error_severity ??
+    ((data as Record<string, unknown>)?.error_severity as string | undefined)
 
   return (
     <div className="[&>*:nth-child(even)]:bg-surface-100/50">

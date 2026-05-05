@@ -1,11 +1,10 @@
 import { LucideIcon } from 'lucide-react'
-import { memo, ReactNode } from 'react'
+import { memo } from 'react'
 
-import { getStatusLevel } from '../../../UnifiedLogs.utils'
-import { BlockFieldConfig, ServiceFlowBlockProps } from '../../types'
+import { BlockFieldConfig, BlockFieldProps, ServiceFlowBlockProps } from '../../types'
 import { DetailRow } from './DetailRow'
 import { DetailSectionHeader } from './DetailSection'
-import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { FieldValue } from './FieldValue'
 
 export interface BlockSection {
   title: string
@@ -28,28 +27,20 @@ export interface BlockConfig {
   sections?: (BlockSection | FieldWithSeeMoreSection)[]
 }
 
-const renderValue = (config: BlockFieldConfig, value: unknown): ReactNode => {
-  if (value === null || value === undefined || value === '') return value as ReactNode
-  if (config.id === 'status') {
-    return (
-      <DataTableColumnStatusCode
-        value={value as string | number}
-        level={getStatusLevel(value as string | number)}
-        className="text-xs"
-      />
-    )
-  }
-  return value as ReactNode
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches ServiceFlow types convention
-const FieldRow = ({ config, data, enrichedData, isLoading, filterFields, table }: any) => {
+const FieldRow = ({
+  config,
+  data,
+  enrichedData,
+  isLoading,
+  filterFields,
+  table,
+}: BlockFieldProps) => {
   const value = config.getValue(data, enrichedData)
   const showSkeleton = !!config.requiresEnrichedData && !!isLoading && !value
   return (
     <DetailRow
       label={config.label}
-      value={renderValue(config, value)}
+      value={<FieldValue config={config} value={value} />}
       filterId={config.id}
       filterValue={typeof value === 'string' || typeof value === 'number' ? value : undefined}
       filterFields={filterFields}
