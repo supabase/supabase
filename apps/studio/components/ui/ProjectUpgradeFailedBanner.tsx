@@ -4,7 +4,8 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Alert, Button } from 'ui'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 import { InlineLink } from './InlineLink'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
@@ -55,9 +56,8 @@ export const ProjectUpgradeFailedBanner = () => {
 
   return (
     <div className="max-w-7xl">
-      <Alert
-        withIcon
-        variant={'warning'}
+      <Admonition
+        type="warning"
         title={`Postgres version upgrade was not successful (Initiated at ${initiatedAt})`}
         actions={
           <div className="flex items-center h-full space-x-4">
@@ -93,7 +93,7 @@ export const ProjectUpgradeFailedBanner = () => {
           </InlineLink>
           .
         </div>
-      </Alert>
+      </Admonition>
     </div>
   )
 }
