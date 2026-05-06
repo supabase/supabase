@@ -281,6 +281,8 @@ export interface TimezonePickerClickedEvent {
     nextTimezone: string
     /** True when the user opted back into the browser-detected default. */
     isAutoDetected: boolean
+    /** Where the picker was rendered. */
+    source: 'user_dropdown' | 'account_preferences'
   }
   groups: TelemetryGroups
 }

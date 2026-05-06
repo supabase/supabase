@@ -42,6 +42,7 @@ export const TimezoneDropdown = () => {
       previousTimezone: timezone,
       nextTimezone: resolvedNext,
       isAutoDetected: nextStored === '',
+      source: 'user_dropdown',
     })
     setOpen(false)
   }
