@@ -2,6 +2,7 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
 import {
   Button,
+  cn,
   Dialog,
   DialogClose,
   DialogContent,
@@ -46,8 +47,8 @@ export const NoticeBanner = () => {
 const UpdatedTermsOfServiceDialog = ({ onDismiss }: { onDismiss: () => void }) => {
   return (
     <Dialog>
-      <DialogTrigger>
-        <p className={InlineLinkClassName}>Learn more</p>
+      <DialogTrigger className={cn(InlineLinkClassName, 'cursor-pointer')}>
+        Learn more
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
