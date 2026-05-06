@@ -4,10 +4,10 @@ import { InlineLink } from '@/components/ui/InlineLink'
 
 export const RESTRICTION_MESSAGES = {
   GRACE_PERIOD: {
-    title: 'Organization plan has exceeded its quota',
+    title: 'Organization exceeded its quota in the previous billing cycle',
     description: (date: string, slug: string): ReactNode => (
       <>
-        You have been given a grace period until {date}.{' '}
+        You have a grace period until {date} to bring usage back under quota.{' '}
         <InlineLink href={`/org/${slug}/usage`}>Review usage</InlineLink>
       </>
     ),
