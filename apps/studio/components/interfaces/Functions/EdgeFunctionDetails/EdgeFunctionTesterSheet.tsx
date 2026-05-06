@@ -176,6 +176,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
     let testAuthorization: string | undefined
     const role = getImpersonatedRoleState().role
 
+
     if (
       projectRef !== undefined &&
       config?.jwt_secret !== undefined &&
@@ -210,20 +211,22 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
     const finalUrl = queryString ? `${url}?${queryString}` : url
 
     testEdgeFunction({
-      url: finalUrl,
-      method: values.method,
-      body: values.body,
-      headers: {
-        ...(accessToken && {
-          Authorization: `Bearer ${accessToken}`,
-        }),
-        'x-test-authorization': testAuthorization ?? `Bearer ${serviceKey?.api_key}`,
-        'Content-Type': 'application/json',
-        ...customHeaders,
-      },
-    })
-  }
-
+  url: finalUrl,
+  method: values.method,
+  body: values.body,
+  headers: {
+    ...(accessToken && {
+      Authorization: `Bearer ${accessToken}`,
+    }),
+    'x-test-authorization':
+      testAuthorization ??
+      (role?.name === 'anon'
+        ? `Bearer ${settings?.api?.anon_key ?? ''}`
+        : `Bearer ${serviceKey?.api_key}`),
+    'Content-Type': 'application/json',
+    ...customHeaders,
+  },
+})
   const renderKeyValuePairs = (type: 'headers' | 'queryParams', label: string) => (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
