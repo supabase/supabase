@@ -3,7 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseQueuesKeys } from './keys'
-import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import {
+  isQueueNameValid,
+  pgmqQueueTable,
+} from '@/components/interfaces/Integrations/Queues/Queues.utils'
 import { executeSql } from '@/data/sql/execute-sql-query'
 import { tableKeys } from '@/data/tables/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -44,7 +47,7 @@ export async function createDatabaseQueue({
         : safeSql`SELECT pgmq.create(${literal(name)});`
 
   const rlsFragment = enableRls
-    ? safeSql` alter table ${ident('pgmq')}.${ident(`q_${name}`)} enable row level security;`
+    ? safeSql` alter table ${ident('pgmq')}.${ident(pgmqQueueTable(name))} enable row level security;`
     : safeSql``
 
   const { result } = await executeSql({

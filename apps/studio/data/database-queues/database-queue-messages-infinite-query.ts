@@ -4,7 +4,11 @@ import dayjs from 'dayjs'
 import { last } from 'lodash'
 
 import { databaseQueuesKeys } from './keys'
-import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import {
+  isQueueNameValid,
+  pgmqArchiveTable,
+  pgmqQueueTable,
+} from '@/components/interfaces/Integrations/Queues/Queues.utils'
 import { QUEUE_MESSAGE_TYPE } from '@/components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
 import { executeSql } from '@/data/sql/execute-sql-query'
 import { DATE_FORMAT } from '@/lib/constants'
@@ -47,8 +51,8 @@ export async function getDatabaseQueue({
   }
 
   // handles when scheduled and available are deselected
-  const queueTable = safeSql`${ident('pgmq')}.${ident(`q_${queueName}`)}`
-  const archivedTable = safeSql`${ident('pgmq')}.${ident(`a_${queueName}`)}`
+  const queueTable = safeSql`${ident('pgmq')}.${ident(pgmqQueueTable(queueName))}`
+  const archivedTable = safeSql`${ident('pgmq')}.${ident(pgmqArchiveTable(queueName))}`
   const nowLiteral = literal(dayjs(new Date()).format(DATE_FORMAT))
 
   let queueQuery: SafeSqlFragment | null = null
