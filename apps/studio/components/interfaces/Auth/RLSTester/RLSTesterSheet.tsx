@@ -39,14 +39,20 @@ import { UserSelector } from './UserSelector'
 import { UserSqlEditor } from './UserSqlEditor'
 import { useTestQueryRLS } from './useTestQueryRLS'
 import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface RLSTesterSheetProps {
   handleSelectEditPolicy: (policy: Policy) => void
 }
 
 export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) => {
+  const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const { setRole } = useRoleImpersonationStateSnapshot()
 
   const [open, setOpen] = useState(false)
@@ -100,6 +106,17 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
     } else {
       await testQuery({ value, ...executionCallbacks })
     }
+  }
+
+  const onDebugWithAssistant = () => {
+    console.log({ parseQueryResults })
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    aiSnap.newChat({
+      name: 'Debug RLS policies',
+      sqlSnippets: [value],
+      initialInput: `Help me fix my RLS policy based on the attached SQL snippet that gave the following error: \n\n${executeSqlError?.message} \n\nEvaluate if the problem might be query first, before checking my RLS policies.`,
+    })
+    setOpen(false)
   }
 
   useEffect(() => {
@@ -197,7 +214,7 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
 
           <DialogSectionSeparator />
 
-          {parseQueryError && (
+          {parseQueryError ? (
             <div className="p-4">
               <Admonition
                 type="warning"
@@ -205,9 +222,7 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
                 description={parseQueryError.message}
               />
             </div>
-          )}
-
-          {parseClientCodeError && (
+          ) : parseClientCodeError ? (
             <div className="p-4">
               <Admonition
                 type="warning"
@@ -215,20 +230,29 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
                 description={parseClientCodeError.message}
               />
             </div>
-          )}
-
-          {executeSqlError && (
-            <div className="p-4">
-              <Admonition
-                type="warning"
-                title="Error running SQL query"
-                description={executeSqlError.message}
-              />
-            </div>
+          ) : (
+            executeSqlError && (
+              <div className="p-4">
+                <Admonition
+                  type="warning"
+                  title="Error running SQL query"
+                  description={executeSqlError.message}
+                  actions={[
+                    <AiAssistantDropdown
+                      key="ai-assistant"
+                      label="Ask Assistant"
+                      telemetrySource="rls_tester"
+                      buildPrompt={() => 'asd'}
+                      onOpenAssistant={onDebugWithAssistant}
+                    />,
+                  ]}
+                />
+              </div>
+            )
           )}
 
           {results === null ? (
-            <RLSTesterEmptyState />
+            !parseQueryError && !parseClientCodeError && !executeSqlError && <RLSTesterEmptyState />
           ) : !!parseQueryResults ? (
             <RLSTesterResults
               results={results}
