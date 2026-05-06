@@ -5,7 +5,7 @@ export const EDGE_FUNCTION_TEMPLATES = [
     description: 'Basic function that returns a JSON response',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { withSupabase } from "jsr:@supabase/server";
+import { withSupabase } from "jsr:@supabase/server^1";
 
 interface ReqPayload {
   name: string;
@@ -36,7 +36,7 @@ export default {
     description: 'Example using Supabase client to query your database',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { withSupabase } from "jsr:@supabase/server";
+import { withSupabase } from "jsr:@supabase/server^1";
 
 // This endpoint uses 'user' access, credentials is required.
 export default {
@@ -61,7 +61,7 @@ export default {
     description: 'Upload files to Supabase Storage',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { withSupabase } from "jsr:@supabase/server";
+import { withSupabase } from "jsr:@supabase/server^1";
 import { randomUUID } from "node:crypto"
 
 export default {
@@ -144,7 +144,7 @@ app.listen(8000);`,
  */
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { withSupabase } from "jsr:@supabase/server";
+import { withSupabase } from "jsr:@supabase/server^1";
 import { createOpenAI } from "npm:@ai-sdk/openai";
 import { convertToModelMessages, streamText } from "npm:ai";
 
@@ -220,7 +220,7 @@ export default {
  * 2) Call this endpoint with { prompt, model? } to generate a recipe object matching the schema below.
  */
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { withSupabase } from "jsr:@supabase/server";
+import { withSupabase } from "jsr:@supabase/server^1";
 import { createOpenAI } from "npm:@ai-sdk/openai";
 import { generateText, Output } from "npm:ai";
 import { z } from "npm:zod";
@@ -305,7 +305,7 @@ export default {
     description: 'Handle Stripe webhook events securely',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { withSupabase } from "jsr:@supabase/server";
+import { withSupabase } from "jsr:@supabase/server^1";
 import Stripe from "npm:stripe";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!);
@@ -351,7 +351,7 @@ export default {
     description: 'Send emails using the Resend API',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { withSupabase } from "jsr:@supabase/server";
+import { withSupabase } from "jsr:@supabase/server^1";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
 
@@ -383,7 +383,7 @@ export default {
     description: 'Transform images using ImageMagick WASM',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { withSupabase } from "jsr:@supabase/server";
+import { withSupabase } from "jsr:@supabase/server^1";
 import {
   ImageMagick,
   initializeImageMagick,
@@ -416,7 +416,7 @@ export default {
     description: 'Create a real-time WebSocket server',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { withSupabase } from "jsr:@supabase/server";
+import { withSupabase } from "jsr:@supabase/server^1";
 
 export default {
   fetch: withSupabase({ auth: "publishable" }, async (req, _ctx) => {
