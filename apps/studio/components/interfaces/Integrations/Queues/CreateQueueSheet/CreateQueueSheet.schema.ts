@@ -1,6 +1,6 @@
 import z from 'zod'
 
-import { QueryNameSchema } from '../Queues.utils'
+import { QueueNameSchema } from '../Queues.utils'
 
 const normalQueueSchema = z.object({
   type: z.literal('basic'),
@@ -17,7 +17,7 @@ const unloggedQueueSchema = z.object({
 })
 
 export const FormSchema = z.object({
-  name: QueryNameSchema,
+  name: QueueNameSchema,
   enableRls: z.boolean(),
   values: z.discriminatedUnion('type', [
     normalQueueSchema,

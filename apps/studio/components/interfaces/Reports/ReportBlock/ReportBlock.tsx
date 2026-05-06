@@ -1,3 +1,4 @@
+import { acceptUntrustedSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { X } from 'lucide-react'
@@ -104,7 +105,10 @@ export const ReportBlock = ({
       return executeSql({
         projectRef,
         connectionString,
-        sql,
+        // acceptUntrustedSql is usually not allowed in an auto-run position,
+        // but in this case we are explicitly allowing it because adding a block
+        // to a report is an explicit user action.
+        sql: acceptUntrustedSql(sql),
       })
     },
     enabled: !isLoadingContent && contentError == null,
