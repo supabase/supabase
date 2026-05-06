@@ -98,7 +98,7 @@ export const pgTriggerCreateZod = z.object({
   function_name: z.string(),
   function_args: z.array(z.string()).optional(),
   activation: z.enum(['BEFORE', 'AFTER', 'INSTEAD OF']),
-  events: z.array(z.string()),
+  events: z.array(z.string()).min(1),
   orientation: z.enum(['ROW', 'STATEMENT']).optional(),
   condition: z.string().optional(),
 })
@@ -120,6 +120,19 @@ export function create({
   sql: string
   zod: z.ZodType<void>
 } {
+  pgTriggerCreateZod.parse({
+    name,
+    schema,
+    table,
+    function_schema,
+    function_name,
+    function_args,
+    activation,
+    events,
+    orientation,
+    condition,
+  })
+
   const qualifiedTableName = `${ident(schema)}.${ident(table)}`
   const qualifiedFunctionName = `${ident(function_schema)}.${ident(function_name)}`
   const triggerEvents = events.join(' or ')

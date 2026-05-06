@@ -363,3 +363,17 @@ withTestDatabase('triggers on capitalized schema and table names', async ({ exec
     ]
   `)
 })
+
+test('create trigger validation rejects empty events array', () => {
+  expect(() =>
+    pgMeta.triggers.create({
+      name: 'invalid_trigger',
+      schema: 'public',
+      table: 'users',
+      function_schema: 'public',
+      function_name: 'audit_action',
+      activation: 'BEFORE',
+      events: [],
+    })
+  ).toThrow()
+})
