@@ -408,7 +408,7 @@ export const UnifiedLogs = () => {
                 <div className="block sm:hidden">
                   <DataTableFilterControlsDrawer />
                 </div>
-                <div className="ml-auto flex items-center gap-x-4">
+                <div className="ml-auto flex items-center gap-x-2">
                   <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />
                   <DataTableViewOptions />
                   <DownloadLogsButton searchParameters={searchParameters} />
