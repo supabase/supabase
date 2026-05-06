@@ -348,7 +348,7 @@ import { withSupabase } from "jsr:@supabase/server^1";
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
 
 export default {
-  fetch: withSupabase({ auth: "publishable" }, async (req, _ctx) => {
+  fetch: withSupabase({ auth: "user" }, async (req, _ctx) => {
     const { to, subject, html } = await req.json();
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
