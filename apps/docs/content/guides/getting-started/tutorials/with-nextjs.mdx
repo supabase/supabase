@@ -10,7 +10,7 @@ description: 'Learn how to use Supabase in your Next.js App.'
 
 <Admonition type="note">
 
-If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management).
+If you get stuck while working through this guide, you can find the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management).
 
 </Admonition>
 
@@ -29,13 +29,15 @@ npx create-next-app@latest --ts --use-npm supabase-nextjs
 cd supabase-nextjs
 ```
 
-Then install the Supabase client library: [supabase-js](https://github.com/supabase/supabase-js)
+Install [supabase-js](https://github.com/supabase/supabase-js):
 
 ```bash
 npm install @supabase/supabase-js
 ```
 
 Save the environment variables in a `.env.local` file at the root of the project, and paste the API URL and the key that you copied [earlier](#get-api-details).
+
+The application exposes these variables in the browser, and that's fine as Supabase enables [Row Level Security](/docs/guides/database/postgres/row-level-security) by default on all tables.
 
 ```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
@@ -47,11 +49,11 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 An optional step is to update the CSS file `app/globals.css` to make the app look better.
 You can find the full contents of this file [in the example repository](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/nextjs-user-management/app/globals.css).
 
-### Supabase Server-Side Auth
+### Supabase Server-Side Auth package
 
-Next.js is a highly versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and proxy edge-functions.
+Next.js is a versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and proxy edge-functions.
 
-To better integrate with the framework, we've created the `@supabase/ssr` package for Server-Side Auth. It has all the functionalities to quickly configure your Supabase project to use cookies for storing user sessions. Read the [Next.js Server-Side Auth guide](/docs/guides/auth/server-side/nextjs) for more information.
+To better integrate with the framework, we've created the `@supabase/ssr` package for Server-Side Auth. It has all the functionalities to quickly configure your Supabase project to use cookies for storing user sessions. Read the [Next.js Server-Side Auth guide](/docs/guides/auth/server-side/creating-a-client?queryGroups=package-manager&package-manager=npm&queryGroups=framework&framework=nextjs) for more information.
 
 Install the package for Next.js.
 
@@ -66,9 +68,9 @@ There are two different types of clients in Supabase:
 1. **Client Component client** - To access Supabase from Client Components, which run in the browser.
 2. **Server Component client** - To access Supabase from Server Components, Server Actions, and Route Handlers, which run only on the server.
 
-We recommend creating the following essential utilities files for creating clients, and organize them within `lib/supabase` at the root of the project.
+We recommend creating the following utilities files for creating clients, and organize them within `lib/supabase` at the root of the project.
 
-Create a `client.ts` and a `server.ts` with the following functionalities for client-side Supabase and server-side Supabase, respectively.
+Create a `client.ts` and a `server.ts` with the following code for client-side Supabase and server-side Supabase, respectively.
 
 <$CodeTabs>
 
@@ -90,7 +92,7 @@ meta="name=lib/supabase/server.ts"
 
 Since Server Components can't write cookies, you need [Proxy](https://nextjs.org/docs/app/getting-started/proxy) to refresh expired Auth tokens and store them.
 
-You can accomplish this by:
+You accomplish this by:
 
 - Refreshing the Auth token with the call to `supabase.auth.getClaims`.
 - Passing the refreshed Auth token to Server Components through `request.cookies.set`, so they don't attempt to refresh the same token themselves.
@@ -102,13 +104,9 @@ You could also add a matcher, so that the Proxy only runs on routes that access 
 
 Be careful when protecting pages. The server gets the user session from the cookies, which anyone can spoof.
 
-Most of the time, use `supabase.auth.getClaims()` to protect pages and user data.
-
-_Never_ trust `supabase.auth.getSession()` inside server code such as proxy. It isn't guaranteed to revalidate the Auth token.
-
-It's safe to trust `getClaims()` because it validates the token in storage, either directly or by calling `getUser()` solely to check the result. It doesn't use the response from `getUser()` itself, only whether the validation succeeded.
-
 </Admonition>
+
+<$Partial path="auth_methods.mdx" />
 
 Create a `proxy.ts` file at the project root and another one within the `lib/supabase` folder. The `lib/supabase` file contains the logic for updating the session. The `proxy.ts` file uses this, which is a Next.js convention.
 
@@ -128,13 +126,11 @@ meta="name=lib/supabase/proxy.ts"
 
 </$CodeTabs>
 
-## Set up a login page
+### Set up a login page
 
-### Login and signup form
+#### Login and signup form
 
-In order to add login/signup page for your application:
-
-Create a new folder named `login`, containing a `page.tsx` file with a login/signup form.
+To add login/signup page for your application, create a new folder named `login`, containing a `page.tsx` file with the following code for a login/signup form:
 
 <$CodeTabs>
 
@@ -146,19 +142,11 @@ meta="name=app/login/page.tsx"
 
 </$CodeTabs>
 
-Next, you need to create the login/signup actions to hook up the form to the function. Which does the following:
+Create the login/signup actions to hook up the form to the function which does the following:
 
 - Retrieve the user's information.
-- Send that information to Supabase as a signup request, which in turns sends a confirmation email.
+- Send that information to Supabase as a signup request, which in turns sends a confirmation email. It uses [Magic Links](/docs/guides/auth/auth-email-passwordless#with-magic-link), so users can sign in with their email without using passwords.
 - Handle any error that arises.
-
-<Admonition type="caution">
-
-The `cookies` method is called before any calls to Supabase, which takes fetch calls out of Next.js's caching. This is important for authenticated data fetches, to ensure that users get access only to their own data.
-
-Read the Next.js docs to learn more about [opting out of data caching](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating#opting-out-of-data-caching).
-
-</Admonition>
 
 Create the `action.ts` file in the `app/login` folder, which contains the login and signup functions and the `error/page.tsx` file, which displays an error message if the login or signup fails.
 
@@ -178,7 +166,15 @@ meta="name=app/error/page.tsx"
 
 </$CodeTabs>
 
-### Email template
+<Admonition type="caution">
+
+The `cookies` method is called before any calls to Supabase, which takes fetch calls out of Next.js's caching. This is important for authenticated data fetches, to ensure that users get access only to their own data.
+
+Read the Next.js docs to learn more about [opting out of data caching](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating#opting-out-of-data-caching).
+
+</Admonition>
+
+#### Email template
 
 Before proceeding, change the email template to support a server-side authentication flow that sends a token hash:
 
@@ -188,11 +184,11 @@ Before proceeding, change the email template to support a server-side authentica
 
 <Admonition type="tip" label="Did you know?">
 
-You can also customize other emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
+You can customize other emails sent out to new users, including the email's looks, content, and query parameters from [the **Authentication > Email**](/dashboard/project/_/auth/templates) section of the Dashboard.
 
 </Admonition>
 
-### Confirmation endpoint
+#### Confirmation endpoint
 
 As you are working in a server-side rendering (SSR) environment, you need to create a server endpoint responsible for exchanging the `token_hash` for a session.
 
@@ -210,13 +206,13 @@ meta="name=app/auth/confirm/route.ts"
 
 ### Account page
 
-After a user signs in, allow them to edit their profile details and manage their account.
+After a user signs in, they need a way to edit their profile details and manage their accounts.
 
 Create a new component for that called `AccountForm` within the `app/account` folder.
 
 <$CodeSample
 path="/user-management/nextjs-user-management/app/account/account-form.tsx"
-lines={[[1, 4], [7, 78], [88, -1]]}
+lines={[[1, 4], [7, 78], [88, 89], [99, -1]]}
 meta="name=app/account/account-form.tsx"
 />
 
@@ -238,9 +234,33 @@ lines={[[1, -1]]}
 meta="name=app/auth/signout/route.ts"
 />
 
+## Profile photos
+
+Next, add a way for users to upload a profile photo. Supabase configures every project with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+
+### Create an upload widget
+
+Start by creating a new component:
+
+<$CodeSample
+path="/user-management/nextjs-user-management/app/account/avatar.tsx"
+lines={[[1, -1]]}
+meta="name=app/account/avatar.tsx"
+/>
+
+### Update the account form
+
+With the Avatar component created, update `app/account/account-form.tsx` to include it:
+
+<$CodeSample
+path="/user-management/nextjs-user-management/app/account/account-form.tsx"
+lines={[[1, -1]]}
+meta="name=app/account/account-form.tsx"
+/>
+
 ### Launch
 
-Now you have all the pages, route handlers, and components in place, run the following in a terminal window:
+With all the pages, route handlers, and components in place, run the following in a terminal window:
 
 ```bash
 npm run dev
@@ -249,31 +269,6 @@ npm run dev
 And then open the browser to [localhost:3000/login](http://localhost:3000/login) and you should see the completed app.
 
 When you enter your email and password, you will receive an email with the title **Confirm Your Signup**. Congrats 🎉!!!
-
-## Bonus: Profile photos
-
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like
-photos and videos.
-
-### Create an upload widget
-
-Create an avatar widget for the user so that they can upload a profile photo. Start by creating a new component:
-
-<$CodeSample
-path="/user-management/nextjs-user-management/app/account/avatar.tsx"
-lines={[[1, -1]]}
-meta="name=app/account/avatar.tsx"
-/>
-
-### Add the new widget
-
-Then add the widget to the `AccountForm` component:
-
-<$CodeSample
-path="/user-management/nextjs-user-management/app/account/account-form.tsx"
-lines={[[5, 5], [77, 87], [137, -1]]}
-meta="name=app/account/account-form.tsx"
-/>
 
 At this stage you have a fully functional application!
 

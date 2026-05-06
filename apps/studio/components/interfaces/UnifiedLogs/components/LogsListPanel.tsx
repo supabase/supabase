@@ -3,9 +3,10 @@ import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import { Button, cn, ResizableHandle, ResizablePanel } from 'ui'
 
+import { ColumnSchema } from '../UnifiedLogs.schema'
 import { LogsList } from './LogsList'
 
-export const LogsListPanel = ({ selectedRow }: { selectedRow?: Row<any> }) => {
+export const LogsListPanel = ({ selectedRow }: { selectedRow?: Row<ColumnSchema> }) => {
   const [open, setOpenState] = useState(true)
 
   return (

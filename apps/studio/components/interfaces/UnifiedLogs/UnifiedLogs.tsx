@@ -13,7 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
-import { LOCAL_STORAGE_KEYS, useDebounce, useParams } from 'common'
+import { useDebounce, useParams } from 'common'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -39,8 +39,11 @@ import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
+import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.utils'
+import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
+import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
 import { DataTableFilterCommand } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterCommand'
 import { DataTableFilterControlsDrawer } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterControlsDrawer'
@@ -52,7 +55,6 @@ import { LiveButton } from '@/components/ui/DataTable/LiveButton'
 import { Kbd } from '@/components/ui/DataTable/primitives/Kbd'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { TimelineChart } from '@/components/ui/DataTable/TimelineChart'
-import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
@@ -129,7 +131,7 @@ export const UnifiedLogs = () => {
           }
           return acc
         },
-        {} as Record<string, any>
+        {} as Record<string, unknown>
       ) as QuerySearchParamsType,
     [search]
   )
@@ -193,18 +195,22 @@ export const UnifiedLogs = () => {
 
   // Create a filtered version of the chart config based on selected levels
   const filteredChartConfig = useMemo(() => {
-    const levelFilter = search.level || ['success', 'warning', 'error']
+    const levelFilter = search.level || LEVELS
     return Object.fromEntries(
-      Object.entries(CHART_CONFIG).filter(([key]) => levelFilter.includes(key as any))
+      Object.entries(CHART_CONFIG).filter(([key]) =>
+        levelFilter.includes(key as (typeof LEVELS)[number])
+      )
     ) as ChartConfig
   }, [search.level])
 
-  const getRowClassName = <TData extends { date: Date; level: string; timestamp: number }>(
+  const getRowClassName = <
+    TData extends { date: Date; level: (typeof LEVELS)[number]; timestamp: number },
+  >(
     row: Row<TData>
   ) => {
     const rowTimestamp = row.original.timestamp
     const isPast = rowTimestamp <= (liveMode.timestamp || -1)
-    const levelClassName = getLevelRowClassName(row.original.level as any)
+    const levelClassName = getLevelRowClassName(row.original.level)
     return cn(levelClassName, isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
   }
 
@@ -213,7 +219,7 @@ export const UnifiedLogs = () => {
     return generateDynamicColumns(flatData)
   }, [flatData])
 
-  const table: Table<any> = useReactTable({
+  const table: Table<ColumnSchema> = useReactTable({
     data: flatData,
     columns: dynamicColumns,
     state: {
@@ -262,22 +268,15 @@ export const UnifiedLogs = () => {
       if (!facetsField) return field
 
       // For hardcoded enum fields, keep the predefined options (facets only used for counts)
-      const isHardcodedField = ['log_type', 'method', 'level'].includes(field.value as string)
-      if (isHardcodedField) {
-        return field // Keep original predefined options
+      if (field.value === 'log_type' || field.value === 'method' || field.value === 'level') {
+        return field
       }
 
       // For dynamic fields, use faceted options
-      const options = facetsField.rows.map(({ value }) => ({ label: `${value}`, value }))
-
-      if (field.type === ('slider' as any)) {
-        return {
-          ...(field as any),
-          min: facetsField.min ?? (field as any).min,
-          max: facetsField.max ?? (field as any).max,
-          options,
-        }
-      }
+      const options: Option[] = facetsField.rows.map(({ value }) => ({
+        label: `${value}`,
+        value,
+      }))
 
       return { ...field, options }
     })
@@ -410,7 +409,6 @@ export const UnifiedLogs = () => {
                   <DataTableFilterControlsDrawer />
                 </div>
                 <div className="ml-auto flex items-center gap-x-4">
-                  <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS} />
                   <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />
                   <DataTableViewOptions />
                   <DownloadLogsButton searchParameters={searchParameters} />
@@ -435,7 +433,7 @@ export const UnifiedLogs = () => {
             <ResizablePanelGroup key="main-logs" orientation="vertical" className="flex-1">
               <ResizablePanel
                 defaultSize="100"
-                minSize="30"
+                minSize="10"
                 className={cn(
                   'bg',
                   isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
