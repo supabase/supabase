@@ -157,10 +157,26 @@ export const RealtimeSettings = () => {
       connection_pool: Number(
         values.connection_pool ?? data?.connection_pool ?? REALTIME_DEFAULT_CONFIG.connection_pool
       ),
-      max_concurrent_users: Number(values.max_concurrent_users),
-      max_events_per_second: Number(values.max_events_per_second),
-      max_presence_events_per_second: Number(values.max_presence_events_per_second),
-      max_payload_size_in_kb: Number(values.max_payload_size_in_kb),
+      max_concurrent_users: Number(
+        values.max_concurrent_users ??
+          data?.max_concurrent_users ??
+          REALTIME_DEFAULT_CONFIG.max_concurrent_users
+      ),
+      max_events_per_second: Number(
+        values.max_events_per_second ??
+          data?.max_events_per_second ??
+          REALTIME_DEFAULT_CONFIG.max_events_per_second
+      ),
+      max_presence_events_per_second: Number(
+        values.max_presence_events_per_second ??
+          data?.max_presence_events_per_second ??
+          REALTIME_DEFAULT_CONFIG.max_presence_events_per_second
+      ),
+      max_payload_size_in_kb: Number(
+        values.max_payload_size_in_kb ??
+          data?.max_payload_size_in_kb ??
+          REALTIME_DEFAULT_CONFIG.max_payload_size_in_kb
+      ),
       suspend: values.suspend,
     })
   }
