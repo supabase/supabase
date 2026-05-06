@@ -15,6 +15,10 @@ export type FeaturePreview = {
   enabled: boolean
 }
 
+const IS_STAGING_OR_LOCAL =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+
 export const useFeaturePreviews = (): FeaturePreview[] => {
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
   const { isEligible: isEnterpriseOrSupabaseOrg } = useIsEnterpriseOrSupabaseOrg()
@@ -37,7 +41,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
       name: 'New Logs interface',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
-      enabled: isUnifiedLogsPreviewAvailable && isEnterpriseOrSupabaseOrg,
+      enabled: isUnifiedLogsPreviewAvailable && (IS_STAGING_OR_LOCAL || isEnterpriseOrSupabaseOrg),
       isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: false,
