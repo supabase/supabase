@@ -19,6 +19,10 @@ import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
+// Update this whenever the banner content below changes so old client bundles
+// stop displaying outdated notices after the relevant date passes.
+const BANNER_EXPIRES_AT = new Date('2026-07-04T00:00:00Z')
+
 /**
  * Used to display urgent notices that apply for all users, such as maintenance windows.
  */
@@ -30,7 +34,12 @@ export const NoticeBanner = () => {
     false
   )
 
-  if (router.pathname.includes('sign-in') || !isSuccess || bannerAcknowledged) {
+  if (
+    Date.now() >= BANNER_EXPIRES_AT.getTime() ||
+    router.pathname.includes('sign-in') ||
+    !isSuccess ||
+    bannerAcknowledged
+  ) {
     return null
   }
 
