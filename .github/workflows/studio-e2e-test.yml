@@ -83,9 +83,21 @@ jobs:
         if: steps.filter.outputs.studio == 'true'
         run: rm -rf supabase && pnpm exec supabase init && mkdir supabase/functions
 
+      - name: Pre-start diagnostics
+        run: |
+          docker ps -a
+          sudo ss -tlnp | grep 5432 || echo "5432 free"
+
       - name: Start supabase
         if: steps.filter.outputs.studio == 'true'
         run: SKIP_ASSET_UPLOAD=1 pnpm run e2e:setup:cli
+
+      - name: Failure diagnostics
+        if: failure()
+        run: |
+          docker ps -a
+          sudo ss -tlnp | grep 5432
+          docker logs $(docker ps -aq) 2>&1 || true
 
       - name: Build studio
         if: steps.filter.outputs.studio == 'true'
