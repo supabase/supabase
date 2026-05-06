@@ -1,4 +1,4 @@
-import * as jose from 'https://deno.land/x/jose@v4.14.4/index.ts'
+import * as jose from 'jsr:@panva/jose@6'
 
 console.log('main function started')
 
