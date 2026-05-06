@@ -1,5 +1,6 @@
 @import 'config/tailwind.config.css';
 @import './../../../packages/ui/build/css/themes/classic-dark.css';
+@import 'config/typography.css';
 
 @source '../app/**/*.{js,ts,jsx,tsx}';
 @source '../components/**/*.{js,ts,jsx,tsx}';
@@ -12,8 +13,6 @@
   /* added to get max-w-site */
   --container-site: 128rem;
 }
-
-@import 'config/typography.css';
 
 @layer base {
   :root {

@@ -1,11 +1,10 @@
 @import 'config/tailwind.config.css';
 @import './../../../packages/ui/build/css/themes/classic-dark.css';
+@import 'config/typography.css';
 
 @source '../app/**/*.{ts,tsx}';
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
-
-@import 'config/typography.css';
 
 @font-face {
   font-family: 'custom-font';

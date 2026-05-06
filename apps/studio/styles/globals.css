@@ -1,5 +1,6 @@
 @import 'config/tailwind.config.css';
 @import './../../../packages/ui/build/css/themes/classic-dark.css';
+@import 'config/typography.css';
 
 @source '../pages/**/*.{js,ts,jsx,tsx}';
 @source '../components/**/*.{js,ts,jsx,tsx}';
@@ -106,8 +107,6 @@
     transform: rotate(10deg) scale(1.5) translateY(2rem);
   }
 }
-
-@import 'config/typography.css';
 
 :root {
   --chart-1: var(--brand-default);
