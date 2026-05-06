@@ -530,6 +530,7 @@ const MultiSelectorList = React.forwardRef<
         className
       )}
       style={{ maxHeight: dropdownMaxHeight }}
+      onWheel={(e) => e.stopPropagation()}
     >
       {children}
       {creatable && inputValue.length > 0 && !isOptionExists ? (

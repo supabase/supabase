@@ -1,4 +1,4 @@
-import { ident } from '@supabase/pg-meta/src/pg-format'
+import { ident, keyword, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { isEqual } from 'lodash'
 
@@ -62,16 +62,19 @@ export const generateCreatePolicyQuery = ({
   table: string
   behavior: string
   command: string
-  roles: string
-  using?: string
-  check?: string
-}) => {
-  const querySkeleton = `create policy ${ident(name)} on ${ident(schema)}.${ident(table)} as ${behavior} for ${command} to ${roles}`
-  const query =
-    command === 'insert'
-      ? `${querySkeleton} with check (${check});`
-      : `${querySkeleton} using (${using})${(check ?? '').length > 0 ? `with check (${check});` : ';'}`
-  return query
+  roles: SafeSqlFragment
+  using?: SafeSqlFragment
+  check?: SafeSqlFragment
+}): SafeSqlFragment => {
+  const skeleton = safeSql`create policy ${ident(name)} on ${ident(schema)}.${ident(table)} as ${keyword(behavior)} for ${keyword(command)} to ${roles}`
+  if (command === 'insert') {
+    return safeSql`${skeleton} with check (${check ?? safeSql``});`
+  }
+  const withUsing = safeSql`${skeleton} using (${using ?? safeSql``})`
+  if ((check ?? '').length > 0) {
+    return safeSql`${withUsing} with check (${check ?? safeSql``});`
+  }
+  return safeSql`${withUsing};`
 }
 
 export const checkIfPolicyHasChanged = (

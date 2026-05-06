@@ -128,7 +128,8 @@ export const useTestQueryRLS = () => {
             (x) =>
               x.schema === schema &&
               x.table === table &&
-              x.roles.includes(role?.role ?? '') &&
+              (x.roles.includes(role?.role ?? '') ||
+                (x.roles.length === 1 && x.roles[0] === 'public')) &&
               x.command === data.operation
           )
           return {

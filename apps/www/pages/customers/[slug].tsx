@@ -1,6 +1,8 @@
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
+import { breadcrumbs } from '~/lib/breadcrumbs'
 import { SITE_ORIGIN } from '~/lib/constants'
+import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
@@ -8,6 +10,7 @@ import matter from 'gray-matter'
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
 import { MDXClient } from 'next-mdx-remote-client/csr'
 import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from 'ui'
@@ -88,6 +91,11 @@ function CaseStudyPage(props: any) {
     url: `${SITE_ORIGIN}/customers/${slug}`,
   }
 
+  const breadcrumbItems = [
+    ...breadcrumbs.customersIndex,
+    { name: meta_title ?? title, url: `https://supabase.com/customers/${slug}` },
+  ]
+
   return (
     <>
       <NextSeo
@@ -111,6 +119,14 @@ function CaseStudyPage(props: any) {
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbItems)),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <div
           className="
