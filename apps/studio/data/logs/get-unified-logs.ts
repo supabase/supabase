@@ -27,7 +27,7 @@ export async function retrieveUnifiedLogs({
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search, hoursAgo)
   const sql = `${getUnifiedLogsQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${limit}`
 
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all.otel`, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
   })
@@ -37,7 +37,8 @@ export async function retrieveUnifiedLogs({
   const resultData = data?.result ?? []
 
   const result = resultData.map((row: any) => {
-    const date = new Date(Number(row.timestamp) / 1000)
+    const numericTs = Number(row.timestamp)
+    const date = Number.isFinite(numericTs) ? new Date(numericTs / 1000) : new Date(row.timestamp)
     return {
       id: row.id,
       date,
@@ -62,16 +63,9 @@ export async function retrieveUnifiedLogs({
   return result
 }
 
-type LogDrainCreateData = Awaited<ReturnType<typeof retrieveUnifiedLogs>>
+type LogDrainCreateData = Awaited
 
-export const useGetUnifiedLogsMutation = ({
-  onSuccess,
-  onError,
-  ...options
-}: Omit<
-  UseCustomMutationOptions<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>,
-  'mutationFn'
-> = {}) => {
+export const useGetUnifiedLogsMutation = ({ onSuccess, onError, ...options }: Omit = {}) => {
   return useMutation<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>({
     mutationFn: (vars) => retrieveUnifiedLogs(vars),
     async onSuccess(data, variables, context) {

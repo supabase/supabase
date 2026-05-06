@@ -41,7 +41,7 @@ export async function getUnifiedLogsChart(
 
   let headers = new Headers(headersInit)
 
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all.otel`, {
     params: { path: { ref: projectRef } },
     body: { sql, iso_timestamp_start: dateStart, iso_timestamp_end: dateEnd },
     signal,
@@ -50,12 +50,7 @@ export async function getUnifiedLogsChart(
 
   if (error) handleError(error)
 
-  const chartData: Array<{
-    timestamp: number
-    success: number
-    warning: number
-    error: number
-  }> = []
+  const chartData: Array = []
 
   const dataByTimestamp = new Map<
     number,
@@ -69,9 +64,12 @@ export async function getUnifiedLogsChart(
 
   if (data?.result) {
     data.result.forEach((row: any) => {
-      // The API returns timestamps in microseconds (needs to be converted to milliseconds for JS Date)
-      const microseconds = Number(row.time_bucket)
-      const milliseconds = Math.floor(microseconds / 1000)
+      // The OTEL endpoint may return time_bucket as a numeric microseconds
+      // value or as a parseable date string. Tolerate both.
+      const numericBucket = Number(row.time_bucket)
+      const milliseconds = Number.isFinite(numericBucket)
+        ? Math.floor(numericBucket / 1000)
+        : new Date(row.time_bucket).getTime()
 
       // Create chart data point
       const dataPoint = {
@@ -141,15 +139,12 @@ export async function getUnifiedLogsChart(
   return chartData
 }
 
-export type UnifiedLogsChartData = Awaited<ReturnType<typeof getUnifiedLogsChart>>
+export type UnifiedLogsChartData = Awaited
 export type UnifiedLogsChartError = ExecuteSqlError
 
 export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
   { projectRef, search }: UnifiedLogsVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions = {}
 ) =>
   useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
     queryKey: logsKeys.unifiedLogsChart(projectRef, search),

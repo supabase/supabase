@@ -23,7 +23,7 @@ export async function getUnifiedLogsCount(
   const sql = getLogsCountQuery(search)
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
 
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all.otel`, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
     signal,
@@ -32,8 +32,8 @@ export async function getUnifiedLogsCount(
   if (error) handleError(error)
 
   // Process count results into facets structure
-  const facets: Record<string, FacetMetadataSchema> = {}
-  const countsByDimension: Record<string, Map<string, number>> = {}
+  const facets: Record = {}
+  const countsByDimension: Record = {}
   let totalRowCount = 0
 
   // Group by dimension
@@ -74,15 +74,12 @@ export async function getUnifiedLogsCount(
   return { totalRowCount, facets }
 }
 
-export type UnifiedLogsCountData = Awaited<ReturnType<typeof getUnifiedLogsCount>>
+export type UnifiedLogsCountData = Awaited
 export type UnifiedLogsCountError = ExecuteSqlError
 
 export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
   { projectRef, search }: UnifiedLogsVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<UnifiedLogsCountData, UnifiedLogsCountError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions = {}
 ) =>
   useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
     queryKey: logsKeys.unifiedLogsCount(projectRef, search),

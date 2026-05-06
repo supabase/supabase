@@ -34,7 +34,7 @@ ${getUnifiedLogsCTE()},
 ${getFacetCountCTE({ search, facet, facetSearch })}
 SELECT dimension, value, count from ${facet}_count;
 `.trim()
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all.otel`, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
     signal,
@@ -44,15 +44,12 @@ SELECT dimension, value, count from ${facet}_count;
   return (data.result ?? []) as Option[]
 }
 
-export type UnifiedLogsFacetCountData = Awaited<ReturnType<typeof getUnifiedLogsFacetCount>>
+export type UnifiedLogsFacetCountData = Awaited
 export type UnifiedLogsFacetCountError = ExecuteSqlError
 
 export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>(
   { projectRef, search, facet, facetSearch }: UnifiedLogsFacetCountVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions = {}
 ) =>
   useQuery<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData>({
     queryKey: logsKeys.unifiedLogsFacetCount(projectRef, facet, facetSearch, search),

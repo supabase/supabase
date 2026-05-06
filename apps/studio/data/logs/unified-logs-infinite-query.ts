@@ -95,7 +95,7 @@ export async function getUnifiedLogs(
 
   let headers = new Headers(headersInit)
 
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all.otel`, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: timestampEnd, sql },
     signal,
@@ -107,8 +107,10 @@ export async function getUnifiedLogs(
   const resultData = data?.result ?? []
 
   const result = resultData.map((row: any) => {
-    // Create a date object for display purposes
-    const date = new Date(Number(row.timestamp) / 1000)
+    // The OTEL endpoint may return timestamps as ISO strings or as numeric
+    // microseconds. Tolerate both.
+    const numericTs = Number(row.timestamp)
+    const date = Number.isFinite(numericTs) ? new Date(numericTs / 1000) : new Date(row.timestamp)
 
     return {
       id: row.id,
@@ -150,16 +152,7 @@ export async function getUnifiedLogs(
 
 export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
   { projectRef, search }: UnifiedLogsVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomInfiniteQueryOptions<
-    UnifiedLogsData,
-    UnifiedLogsError,
-    InfiniteData<TData>,
-    readonly unknown[],
-    PageParam | null
-  > = {}
+  { enabled = true, ...options }: UseCustomInfiniteQueryOptions = {}
 ) => {
   return useInfiniteQuery({
     queryKey: logsKeys.unifiedLogsInfinite(projectRef, search),
