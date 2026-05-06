@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useEffect, useState } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 
 import { getSandboxCore, type SandboxCore } from './sandbox.core'
 import { getErrorMessage } from '@/lib/get-error-message'
@@ -41,3 +41,5 @@ export const PostgresSandboxProvider = ({ children }: PropsWithChildren) => {
     <SandboxContext.Provider value={{ status, error, sandbox }}>{children}</SandboxContext.Provider>
   )
 }
+
+export const usePostgresSandbox = () => useContext(SandboxContext)

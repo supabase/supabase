@@ -40,13 +40,23 @@ import { UserSqlEditor } from './UserSqlEditor'
 import { useTestQueryRLS } from './useTestQueryRLS'
 import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
+import { PostgresSandboxProvider, usePostgresSandbox } from '@/state/postgres-sandbox/sandbox'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 interface RLSTesterSheetProps {
   handleSelectEditPolicy: (policy: Policy) => void
 }
 
-export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) => {
+export const RLSTesterSheet = (props: RLSTesterSheetProps) => {
+  return (
+    <PostgresSandboxProvider>
+      <RLSTesterSheetContents {...props} />
+    </PostgresSandboxProvider>
+  )
+}
+
+const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps) => {
+  const { status } = usePostgresSandbox()
   const { setRole } = useRoleImpersonationStateSnapshot()
 
   const [open, setOpen] = useState(false)
@@ -110,161 +120,169 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
     }
   }, [setRole])
 
+  useEffect(() => {
+    if (open && status === 'ready') {
+      console.log('Sync pglite with primary DB')
+    }
+  }, [open, status])
+
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button type="default" icon={<Code />}>
-          Test
-        </Button>
-      </SheetTrigger>
+    <PostgresSandboxProvider>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>
+          <Button type="default" icon={<Code />}>
+            Test
+          </Button>
+        </SheetTrigger>
 
-      <SheetContent className="w-[600px]! flex flex-col gap-y-0">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-x-4">
-            <span>What data can my users see?</span>
-            <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER} />
-          </SheetTitle>
-          <SheetDescription>
-            See what data a user is allowed to read based on your RLS policies
-          </SheetDescription>
-        </SheetHeader>
+        <SheetContent className="w-[600px]! flex flex-col gap-y-0">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-x-4">
+              <span>What data can my users see?</span>
+              <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER} />
+            </SheetTitle>
+            <SheetDescription>
+              See what data a user is allowed to read based on your RLS policies
+            </SheetDescription>
+          </SheetHeader>
 
-        <div className="grow overflow-y-auto flex flex-col">
-          <SheetSection className="px-0 py-0">
-            <div className="flex flex-col p-5 pt-4 gap-y-4">
-              <RoleSelector onSelectRole={setSelectedOption} />
-              {selectedOption === 'authenticated' && <UserSelector />}
-            </div>
+          <div className="grow overflow-y-auto flex flex-col">
+            <SheetSection className="px-0 py-0">
+              <div className="flex flex-col p-5 pt-4 gap-y-4">
+                <RoleSelector onSelectRole={setSelectedOption} />
+                {selectedOption === 'authenticated' && <UserSelector />}
+              </div>
+
+              <DialogSectionSeparator />
+
+              <div className="flex items-center justify-between px-5 py-2">
+                <p className="text-sm">Query</p>
+                <div className="flex items-center gap-x-2">
+                  <Select
+                    value={format}
+                    onValueChange={(x) => {
+                      const newFormat = x as 'sql' | 'lib'
+                      setFormat(newFormat)
+                      if (newFormat !== 'lib') {
+                        setInferredSQL(undefined)
+                        if (debounceRef.current !== null) clearTimeout(debounceRef.current)
+                      }
+                    }}
+                  >
+                    <SelectTrigger size="tiny">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Query format</SelectLabel>
+                        <SelectItem value="sql">SQL</SelectItem>
+                        <SelectItem value="lib">Client library</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="h-40 relative">
+                <UserSqlEditor
+                  id="rls-tester"
+                  value={value}
+                  placeholder={
+                    format === 'sql'
+                      ? safeSql`select * from table;`
+                      : safeSql`SQL will be inferred from client library code`
+                  }
+                  onChange={handleValueChange}
+                  actions={{
+                    runQuery: {
+                      enabled: open,
+                      callback: () => {
+                        if (!isInferring && !isLoading) onRunQuery()
+                      },
+                    },
+                  }}
+                />
+              </div>
+            </SheetSection>
+
+            {format === 'lib' && (
+              <div>
+                <DialogSectionSeparator />
+                <InferredSQLViewer sql={inferredSQL} isLoading={isInferring} />
+              </div>
+            )}
 
             <DialogSectionSeparator />
 
-            <div className="flex items-center justify-between px-5 py-2">
-              <p className="text-sm">Query</p>
-              <div className="flex items-center gap-x-2">
-                <Select
-                  value={format}
-                  onValueChange={(x) => {
-                    const newFormat = x as 'sql' | 'lib'
-                    setFormat(newFormat)
-                    if (newFormat !== 'lib') {
-                      setInferredSQL(undefined)
-                      if (debounceRef.current !== null) clearTimeout(debounceRef.current)
-                    }
-                  }}
-                >
-                  <SelectTrigger size="tiny">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Query format</SelectLabel>
-                      <SelectItem value="sql">SQL</SelectItem>
-                      <SelectItem value="lib">Client library</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+            {parseQueryError && (
+              <div className="p-4">
+                <Admonition
+                  type="warning"
+                  title="Error parsing query"
+                  description={parseQueryError.message}
+                />
               </div>
-            </div>
+            )}
 
-            <div className="h-40 relative">
-              <UserSqlEditor
-                id="rls-tester"
-                value={value}
-                placeholder={
-                  format === 'sql'
-                    ? safeSql`select * from table;`
-                    : safeSql`SQL will be inferred from client library code`
-                }
-                onChange={handleValueChange}
-                actions={{
-                  runQuery: {
-                    enabled: open,
-                    callback: () => {
-                      if (!isInferring && !isLoading) onRunQuery()
-                    },
-                  },
-                }}
+            {parseClientCodeError && (
+              <div className="p-4">
+                <Admonition
+                  type="warning"
+                  title="Error parsing client code"
+                  description={parseClientCodeError.message}
+                />
+              </div>
+            )}
+
+            {executeSqlError && (
+              <div className="p-4">
+                <Admonition
+                  type="warning"
+                  title="Error running SQL query"
+                  description={executeSqlError.message}
+                />
+              </div>
+            )}
+
+            {results === null ? (
+              <RLSTesterEmptyState />
+            ) : !!parseQueryResults ? (
+              <RLSTesterResults
+                results={results}
+                parseQueryResults={parseQueryResults}
+                autoLimit={autoLimit}
+                handleSelectEditPolicy={handleSelectEditPolicy}
               />
-            </div>
-          </SheetSection>
-
-          {format === 'lib' && (
-            <div>
-              <DialogSectionSeparator />
-              <InferredSQLViewer sql={inferredSQL} isLoading={isInferring} />
-            </div>
-          )}
-
-          <DialogSectionSeparator />
-
-          {parseQueryError && (
-            <div className="p-4">
-              <Admonition
-                type="warning"
-                title="Error parsing query"
-                description={parseQueryError.message}
-              />
-            </div>
-          )}
-
-          {parseClientCodeError && (
-            <div className="p-4">
-              <Admonition
-                type="warning"
-                title="Error parsing client code"
-                description={parseClientCodeError.message}
-              />
-            </div>
-          )}
-
-          {executeSqlError && (
-            <div className="p-4">
-              <Admonition
-                type="warning"
-                title="Error running SQL query"
-                description={executeSqlError.message}
-              />
-            </div>
-          )}
-
-          {results === null ? (
-            <RLSTesterEmptyState />
-          ) : !!parseQueryResults ? (
-            <RLSTesterResults
-              results={results}
-              parseQueryResults={parseQueryResults}
-              autoLimit={autoLimit}
-              handleSelectEditPolicy={handleSelectEditPolicy}
-            />
-          ) : null}
-        </div>
-
-        <SheetFooter className="sm:justify-between">
-          <Button asChild type="text">
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-foreground-light hover:text-foreground"
-              href="https://github.com/orgs/supabase/discussions/45233"
-            >
-              Give feedback
-            </a>
-          </Button>
-          <div className="flex items-center gap-x-2">
-            <Button type="default" disabled={isLoading} onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              loading={isInferring || isLoading}
-              disabled={format === 'lib' && !inferredSQL}
-              onClick={onRunQuery}
-            >
-              Run query
-            </Button>
+            ) : null}
           </div>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+
+          <SheetFooter className="sm:justify-between">
+            <Button asChild type="text">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground-light hover:text-foreground"
+                href="https://github.com/orgs/supabase/discussions/45233"
+              >
+                Give feedback
+              </a>
+            </Button>
+            <div className="flex items-center gap-x-2">
+              <Button type="default" disabled={isLoading} onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                loading={isInferring || isLoading}
+                disabled={format === 'lib' && !inferredSQL}
+                onClick={onRunQuery}
+              >
+                Run query
+              </Button>
+            </div>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+    </PostgresSandboxProvider>
   )
 }
