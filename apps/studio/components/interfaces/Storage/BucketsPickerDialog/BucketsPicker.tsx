@@ -99,7 +99,11 @@ export const BucketsPicker = ({
       {isSuccessBuckets && (
         <>
           {hasNoBuckets ? (
-            <EmptyBucketState bucketType="files" onCreateBucket={() => showCreateBucket(true)} />
+            <EmptyBucketState
+              bucketType="files"
+              onCreateBucket={() => showCreateBucket(true)}
+              className="h-full justify-center"
+            />
           ) : (
             <>
               <div className="flex items-center justify-between">
