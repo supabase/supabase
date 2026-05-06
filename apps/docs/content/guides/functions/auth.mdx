@@ -249,14 +249,14 @@ export default {
 
 ### Combining modes
 
-Functions that answer both users and internal callers take an array on `auth`. Modes are tried in order. The first match wins, and `ctx.authType` tells you which matched.
+Functions that answer both users and internal callers take an array on `auth`. Modes are tried in order. The first match wins, and `ctx.authMode` tells you which matched.
 
 ```ts
 import { withSupabase } from 'npm:@supabase/server'
 
 export default {
   fetch: withSupabase({ auth: ['user', 'secret:automations'] }, async (req, ctx) => {
-    if (ctx.authType === 'user') {
+    if (ctx.authMode === 'user') {
       // your business logic for user calls. ctx.supabase is scoped to them
       return Response.json({ ok: true })
     }
