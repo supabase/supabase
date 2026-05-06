@@ -9,7 +9,8 @@
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 
 @theme {
-  --max-w-site: 128rem;
+  /* added to get max-w-site */
+  --container-site: 128rem;
 }
 
 @import 'config/typography.css';

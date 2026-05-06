@@ -6,7 +6,8 @@
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 
 @theme {
-  --max-w-site: 128rem;
+  /* added to get max-w-site */
+  --container-site: 128rem;
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
