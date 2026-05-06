@@ -1,11 +1,12 @@
 import { useHotkeySequence } from '@tanstack/react-hotkeys'
-import { Fragment, useCallback } from 'react'
+import { Fragment, useCallback, useMemo } from 'react'
 import { KeyboardShortcut } from 'ui'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import type { ICommand } from 'ui-patterns/CommandMenu/api/types'
 
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS, type ShortcutId } from './registry'
 import type { ShortcutOptions } from './types'
+import { useRegisterActiveShortcut } from './activeShortcuts'
 import { useIsShortcutEnabled } from './useIsShortcutEnabled'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import useLatest from '@/hooks/misc/useLatest'
@@ -73,6 +74,15 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
   const registerInCommandMenu =
     options?.registerInCommandMenu ?? def.options?.registerInCommandMenu ?? false
   const label = options?.label ?? def.label
+  const activeDefinition = useMemo(
+    () => ({
+      id,
+      label,
+      sequence: def.sequence,
+      referenceGroup: def.referenceGroup,
+    }),
+    [def.referenceGroup, def.sequence, id, label]
+  )
 
   // Only include `ignoreInputs` when set. The library resolves it to a concrete
   // boolean at register time (false for Meta/Ctrl/Escape, true otherwise), but
@@ -84,6 +94,7 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
     timeout,
     ...(ignoreInputs !== undefined && { ignoreInputs }),
   })
+  useRegisterActiveShortcut(activeDefinition, enabled)
 
   // Handle overrides for command menu
   const enabledInCommandMenu = enabled && registerInCommandMenu

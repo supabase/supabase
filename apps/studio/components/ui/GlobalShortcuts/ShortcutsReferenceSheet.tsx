@@ -12,9 +12,16 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
+import {
+  SHORTCUT_REFERENCE_GROUPS,
+  SHORTCUT_REFERENCE_GROUP_LABELS,
+  SHORTCUT_REFERENCE_GROUP_ORDER,
+} from '@/state/shortcuts/referenceGroups'
+import {
+  useActiveShortcuts,
+  type ActiveShortcutDefinition,
+} from '@/state/shortcuts/activeShortcuts'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
-import { SHORTCUT_DEFINITIONS } from '@/state/shortcuts/registry'
-import type { ShortcutDefinition } from '@/state/shortcuts/types'
 
 interface ShortcutsReferenceSheetProps {
   open: boolean
@@ -24,10 +31,11 @@ interface ShortcutsReferenceSheetProps {
 interface ShortcutGroup {
   group: string
   label: string
-  definitions: ShortcutDefinition[]
+  definitions: ActiveShortcutDefinition[]
 }
 
 const GROUP_LABELS: Record<string, string> = {
+  ...SHORTCUT_REFERENCE_GROUP_LABELS,
   'action-bar': 'Actions',
   'ai-assistant': 'AI Assistant',
   'command-menu': 'Command Menu',
@@ -43,35 +51,31 @@ const GROUP_LABELS: Record<string, string> = {
   'unified-logs': 'Logs',
 }
 
-const GROUP_ORDER = [
-  'command-menu',
-  'shortcuts',
-  'nav',
-  'ai-assistant',
-  'inline-editor',
-  'results',
-  'data-table',
-  'table-editor',
-  'schema-visualizer',
-  'list-page',
-  'action-bar',
-  'operation-queue',
-  'unified-logs',
-]
-
 const getGroupOrder = (group: string) => {
-  const index = GROUP_ORDER.indexOf(group)
-  return index === -1 ? GROUP_ORDER.length : index
+  const index = SHORTCUT_REFERENCE_GROUP_ORDER.indexOf(group)
+  return index === -1 ? SHORTCUT_REFERENCE_GROUP_ORDER.length : index
 }
 
 const getGroupLabel = (group: string) => GROUP_LABELS[group] ?? group
 
+const isScopedNavigationGroup = (group: string) =>
+  group.startsWith('navigation.') && group !== SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL
+
 const normalizeSearchValue = (value: string) => value.trim().toLowerCase()
 
-const groupDefinitions = (): ShortcutGroup[] => {
-  const grouped = Object.values(SHORTCUT_DEFINITIONS).reduce<Record<string, ShortcutDefinition[]>>(
+const groupDefinitions = (activeShortcuts: ActiveShortcutDefinition[]): ShortcutGroup[] => {
+  const uniqueShortcuts = Array.from(
+    activeShortcuts
+      .reduce<Map<string, ActiveShortcutDefinition>>((acc, definition) => {
+        acc.set(definition.id, definition)
+        return acc
+      }, new Map())
+      .values()
+  )
+
+  const grouped = uniqueShortcuts.reduce<Record<string, ActiveShortcutDefinition[]>>(
     (acc, definition) => {
-      const prefix = definition.id.split('.')[0]
+      const prefix = definition.referenceGroup ?? definition.id.split('.')[0]
       acc[prefix] = acc[prefix] ?? []
       acc[prefix].push(definition)
       return acc
@@ -79,12 +83,21 @@ const groupDefinitions = (): ShortcutGroup[] => {
     {}
   )
 
+  const hasScopedNavigationGroup = Object.keys(grouped).some(isScopedNavigationGroup)
+
   return Object.entries(grouped)
-    .map(([group, definitions]) => ({
-      group,
-      label: getGroupLabel(group),
-      definitions,
-    }))
+    .map(([group, definitions]) => {
+      const label =
+        group === SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL && !hasScopedNavigationGroup
+          ? 'Navigation'
+          : getGroupLabel(group)
+
+      return {
+        group,
+        label,
+        definitions,
+      }
+    })
     .sort((a, b) => getGroupOrder(a.group) - getGroupOrder(b.group))
 }
 
@@ -111,7 +124,7 @@ const filterGroups = (groups: ShortcutGroup[], search: string) => {
   }, [])
 }
 
-const ShortcutSequence = ({ sequence }: Pick<ShortcutDefinition, 'sequence'>) => (
+const ShortcutSequence = ({ sequence }: Pick<ActiveShortcutDefinition, 'sequence'>) => (
   <div className="flex items-center gap-1">
     {sequence.map((step, index) => (
       <Fragment key={`${step}-${index}`}>
@@ -124,7 +137,8 @@ const ShortcutSequence = ({ sequence }: Pick<ShortcutDefinition, 'sequence'>) =>
 
 export function ShortcutsReferenceSheet({ open, onOpenChange }: ShortcutsReferenceSheetProps) {
   const [search, setSearch] = useState('')
-  const groups = filterGroups(groupDefinitions(), search)
+  const activeShortcuts = useActiveShortcuts()
+  const groups = filterGroups(groupDefinitions(activeShortcuts), search)
 
   useEffect(() => {
     if (!open) setSearch('')

@@ -3,17 +3,55 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ShortcutsReferenceSheet } from './ShortcutsReferenceSheet'
-import { SHORTCUT_DEFINITIONS } from '@/state/shortcuts/registry'
+import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
+import { useRegisterActiveShortcut } from '@/state/shortcuts/activeShortcuts'
 import { customRender } from '@/tests/lib/custom-render'
 
-const NAVIGATION_LABELS = Object.values(SHORTCUT_DEFINITIONS)
-  .filter((definition) => definition.id.startsWith('nav.'))
-  .map((definition) => definition.label)
+const ACTIVE_SHORTCUT_IDS = [
+  SHORTCUT_IDS.COMMAND_MENU_OPEN,
+  SHORTCUT_IDS.NAV_HOME,
+] satisfies ShortcutId[]
 
-const renderShortcutsReferenceSheet = () => {
+const ACTIVE_DATABASE_SHORTCUT_IDS = [
+  ...ACTIVE_SHORTCUT_IDS,
+  SHORTCUT_IDS.NAV_DATABASE_TABLES,
+] satisfies ShortcutId[]
+
+const activeShortcutDefinition = (id: ShortcutId) => {
+  const definition = SHORTCUT_DEFINITIONS[id]
+
+  return {
+    id: definition.id,
+    label: definition.label,
+    sequence: definition.sequence,
+    referenceGroup: definition.referenceGroup,
+  }
+}
+
+function ActiveShortcutSeedItem({ id }: { id: ShortcutId }) {
+  useRegisterActiveShortcut(activeShortcutDefinition(id), true)
+  return null
+}
+
+function ActiveShortcutSeed({ ids }: { ids: ShortcutId[] }) {
+  return (
+    <>
+      {ids.map((id) => (
+        <ActiveShortcutSeedItem key={id} id={id} />
+      ))}
+    </>
+  )
+}
+
+const renderShortcutsReferenceSheet = (ids: ShortcutId[] = ACTIVE_SHORTCUT_IDS) => {
   const onOpenChange = vi.fn()
 
-  customRender(<ShortcutsReferenceSheet open onOpenChange={onOpenChange} />)
+  customRender(
+    <>
+      <ActiveShortcutSeed ids={ids} />
+      <ShortcutsReferenceSheet open onOpenChange={onOpenChange} />
+    </>
+  )
 
   return { onOpenChange }
 }
@@ -26,11 +64,13 @@ describe('ShortcutsReferenceSheet', () => {
     expect(screen.getByLabelText('Search shortcuts')).toBeInTheDocument()
     expect(screen.getByText('Command Menu')).toBeInTheDocument()
     expect(screen.getByText('Navigation')).toBeInTheDocument()
+    expect(screen.queryByText('Global Navigation')).not.toBeInTheDocument()
+    expect(screen.queryByText('Database Navigation')).not.toBeInTheDocument()
     expect(screen.getByText('Open command menu')).toBeInTheDocument()
     expect(screen.getByText('Go to Project Overview')).toBeInTheDocument()
   })
 
-  it('shows every shortcut in a group when the group label matches the search', async () => {
+  it('shows only active shortcuts in a group when the group label matches the search', async () => {
     const user = userEvent.setup()
 
     renderShortcutsReferenceSheet()
@@ -38,11 +78,9 @@ describe('ShortcutsReferenceSheet', () => {
     await user.type(screen.getByLabelText('Search shortcuts'), 'navigation')
 
     expect(screen.getByText('Navigation')).toBeInTheDocument()
+    expect(screen.getByText('Go to Project Overview')).toBeInTheDocument()
     expect(screen.queryByText('Command Menu')).not.toBeInTheDocument()
-
-    for (const label of NAVIGATION_LABELS) {
-      expect(screen.getByText(label)).toBeInTheDocument()
-    }
+    expect(screen.queryByText('Go to Database')).not.toBeInTheDocument()
   })
 
   it('keeps the parent group header when only an item label matches', async () => {
@@ -50,12 +88,32 @@ describe('ShortcutsReferenceSheet', () => {
 
     renderShortcutsReferenceSheet()
 
-    await user.type(screen.getByLabelText('Search shortcuts'), 'Go to Organization Integrations')
+    await user.type(screen.getByLabelText('Search shortcuts'), 'Go to Project Overview')
 
     expect(screen.getByText('Navigation')).toBeInTheDocument()
-    expect(screen.getByText('Go to Organization Integrations')).toBeInTheDocument()
-    expect(screen.queryByText('Go to Logs')).not.toBeInTheDocument()
+    expect(screen.getByText('Go to Project Overview')).toBeInTheDocument()
+    expect(screen.queryByText('Open command menu')).not.toBeInTheDocument()
     expect(screen.queryByText('Command Menu')).not.toBeInTheDocument()
+  })
+
+  it('shows the database navigation section when database shortcuts are active', async () => {
+    renderShortcutsReferenceSheet(ACTIVE_DATABASE_SHORTCUT_IDS)
+
+    expect(await screen.findByText('Global Navigation')).toBeInTheDocument()
+    expect(screen.getByText('Database Navigation')).toBeInTheDocument()
+    expect(screen.queryByText(/^Navigation$/)).not.toBeInTheDocument()
+    expect(screen.getByText('Go to Tables')).toBeInTheDocument()
+  })
+
+  it('does not show inactive database shortcuts in search results', async () => {
+    const user = userEvent.setup()
+
+    renderShortcutsReferenceSheet()
+
+    await user.type(screen.getByLabelText('Search shortcuts'), 'Go to Tables')
+
+    expect(screen.getByText('No matching shortcuts found')).toBeInTheDocument()
+    expect(screen.queryByText('Database Navigation')).not.toBeInTheDocument()
   })
 
   it('shows a clear button when searching and resets the list when clicked', async () => {

@@ -7,6 +7,7 @@ import { CommandProvider } from 'ui-patterns/CommandMenu'
 // End of third-party imports
 
 import { ProfileContext, type ProfileContextType } from '@/lib/profile'
+import { ActiveShortcutsProvider } from '@/state/shortcuts/activeShortcuts'
 
 type AdapterProps = Partial<Parameters<typeof NuqsTestingAdapter>[0]>
 
@@ -35,7 +36,9 @@ const CustomWrapper = ({
     <QueryClientProvider client={_queryClient}>
       <NuqsTestingAdapter {...nuqs}>
         <TooltipProvider>
-          <CommandProvider openKey="">{children}</CommandProvider>
+          <CommandProvider openKey="">
+            <ActiveShortcutsProvider>{children}</ActiveShortcutsProvider>
+          </CommandProvider>
         </TooltipProvider>
       </NuqsTestingAdapter>
     </QueryClientProvider>
