@@ -290,26 +290,22 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                       ? 'Additional permissions required to assign role'
                                       : undefined
 
-                                  const item = (
+                                  return (
                                     <SelectItem_Shadcn_
                                       key={role.id}
                                       value={role.id.toString()}
                                       className="text-sm hover:bg-selection cursor-pointer"
                                       disabled={disabled}
                                     >
-                                      {role.name}
+                                      <div className="flex flex-col gap-0.5">
+                                        <span>{role.name}</span>
+                                        {disabledReason && (
+                                          <span className="text-xs text-foreground-lighter">
+                                            {disabledReason}
+                                          </span>
+                                        )}
+                                      </div>
                                     </SelectItem_Shadcn_>
-                                  )
-
-                                  if (!disabledReason) return item
-
-                                  return (
-                                    <Tooltip key={role.id}>
-                                      <TooltipTrigger asChild>
-                                        <span style={{ pointerEvents: 'all' }}>{item}</span>
-                                      </TooltipTrigger>
-                                      <TooltipContent side="right">{disabledReason}</TooltipContent>
-                                    </Tooltip>
                                   )
                                 })}
                               </SelectGroup_Shadcn_>

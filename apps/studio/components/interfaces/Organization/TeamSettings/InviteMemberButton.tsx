@@ -26,9 +26,6 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -323,26 +320,22 @@ export const InviteMemberButton = () => {
                                   ? 'Additional permissions required to assign role'
                                   : undefined
 
-                              const item = (
+                              return (
                                 <SelectItem_Shadcn_
                                   key={role.id}
                                   value={role.id.toString()}
                                   className="text-sm"
                                   disabled={disabled}
                                 >
-                                  {role.name}
+                                  <div className="flex flex-col gap-0.5">
+                                    <span>{role.name}</span>
+                                    {disabledReason && (
+                                      <span className="text-xs text-foreground-lighter">
+                                        {disabledReason}
+                                      </span>
+                                    )}
+                                  </div>
                                 </SelectItem_Shadcn_>
-                              )
-
-                              if (!disabledReason) return item
-
-                              return (
-                                <Tooltip key={role.id}>
-                                  <TooltipTrigger asChild>
-                                    <span style={{ pointerEvents: 'all' }}>{item}</span>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="right">{disabledReason}</TooltipContent>
-                                </Tooltip>
                               )
                             })}
                           </SelectGroup_Shadcn_>
