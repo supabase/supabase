@@ -815,7 +815,7 @@ export const UsersV2 = () => {
                   onClick={handleRefresh}
                   tooltip={{ content: { side: 'bottom', text: 'Refresh' } }}
                 />
-                <AddUserDropdown />
+                <AddUserDropdown canCreateUsers canInviteUsers />
               </div>
             </>
           )}
