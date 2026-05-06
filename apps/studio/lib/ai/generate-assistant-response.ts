@@ -5,6 +5,7 @@ import {
   stepCountIs,
   type LanguageModel,
   type ModelMessage,
+  type SystemModelMessage,
   type ToolSet,
   type UIMessage,
 } from 'ai'
@@ -32,7 +33,7 @@ export async function generateAssistantResponse({
   userId,
   orgId,
   planId,
-  promptProviderOptions,
+  systemProviderOptions,
   providerOptions,
   requestedModel,
   abortSignal,
@@ -51,7 +52,7 @@ export async function generateAssistantResponse({
   orgId?: number
   planId?: string
   requestedModel?: string
-  promptProviderOptions?: Record<string, any>
+  systemProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
   onSpanCreated?: (spanId: string) => void
@@ -108,8 +109,6 @@ export async function generateAssistantResponse({
       - \`realtime\` — Supabase Realtime
     `
 
-    // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
-    // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
     const hasProjectContext =
       projectRef || chatName || schemasString !== "You don't have access to any schemas."
 
@@ -117,19 +116,17 @@ export async function generateAssistantResponse({
       ? `The user's current project is ${projectRef || 'unknown'}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName || 'unnamed'}.`
       : undefined
 
+    const systemMessage: SystemModelMessage = {
+      role: 'system',
+      content: system,
+      ...(systemProviderOptions && { providerOptions: systemProviderOptions }),
+    }
+
     const coreMessages: ModelMessage[] = [
-      {
-        role: 'system',
-        content: system,
-        ...(promptProviderOptions && {
-          providerOptions: promptProviderOptions,
-        }),
-      },
       ...(assistantContent
         ? [
             {
               role: 'assistant' as const,
-              // Add any dynamic context here
               content: assistantContent,
             },
           ]
@@ -141,12 +138,9 @@ export async function generateAssistantResponse({
 
     return streamTextFn({
       model,
+      system: systemMessage,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
-      // TODO(mattrossman): use the `system` param instead to avoid this suppression — currently
-      // blocked by AI SDK stripping providerOptions from system-role messages in coreMessages
-      // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
-      allowSystemInMessages: true,
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),
