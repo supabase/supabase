@@ -3,27 +3,32 @@ import * as jose from 'jsr:@panva/jose@6'
 console.log('main function started')
 
 const JWT_SECRET = Deno.env.get('JWT_SECRET')
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+const SUPABASE_JWKS = parseJwks(Deno.env.get('SUPABASE_JWKS'))
 const VERIFY_JWT = Deno.env.get('VERIFY_JWT') === 'true'
 
-// Create JWKS for ES256/RS256 tokens (newer tokens)
-let SUPABASE_JWKS: ReturnType<typeof jose.createRemoteJWKSet> | null = null
-if (SUPABASE_URL) {
+// Support both { keys: [...] } and bare array [...] formats
+// NOTE:(kallebysantos) We don't check for valid keys but just the bare array parsing,
+// let this for 'jose' lib verification
+export function parseJwks(raw: string | undefined): jose.JSONWebKeySet | null {
+  if (!raw) return null
   try {
-    SUPABASE_JWKS = jose.createRemoteJWKSet(
-      new URL('/auth/v1/.well-known/jwks.json', SUPABASE_URL)
-    )
-  } catch (e) {
-    console.error('Failed to fetch JWKS from SUPABASE_URL:', e)
+    const parsed = JSON.parse(raw)
+    if (Array.isArray(parsed)) return { keys: parsed }
+    if (parsed?.keys && Array.isArray(parsed.keys)) {
+      return parsed as jose.JSONWebKeySet
+    }
+    return null
+  } catch {
+    return null
   }
 }
 
 /**
  * Extract JWT token from Authorization header
- * 
+ *
  * Parses the Authorization header to extract the Bearer token.
  * Expects format: "Bearer <token>"
- * 
+ *
  * @param req - The HTTP request object
  * @returns The JWT token string
  * @throws Error if Authorization header is missing or malformed
@@ -47,7 +52,7 @@ async function isValidLegacyJWT(jwt: string): Promise<boolean> {
   }
 
   const encoder = new TextEncoder();
-  const secretKey = encoder.encode(JWT_SECRET)
+  const secretKey = encoder.encode(JWT_SECRET);
 
   try {
     await jose.jwtVerify(jwt, secretKey);
@@ -65,7 +70,8 @@ async function isValidJWT(jwt: string): Promise<boolean> {
   }
 
   try {
-    await jose.jwtVerify(jwt, SUPABASE_JWKS)
+    const localJwks = jose.createLocalJWKSet(SUPABASE_JWKS);
+    await jose.jwtVerify(jwt, localJwks);
   } catch (e) {
     console.error('Asymmetric JWT verification error', e);
     return false
