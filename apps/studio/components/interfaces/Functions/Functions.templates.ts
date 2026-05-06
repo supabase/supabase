@@ -166,10 +166,6 @@ const SYSTEM_PROMPT = "You are a helpful AI assistant.";
 
 export default {
   fetch: withSupabase({ auth: "publishable", cors }, async (req, _ctx) => {
-    if (req.method === "OPTIONS") {
-      return new Response("ok");
-    }
-
     try {
       const body = await req.json().catch(() => {
         throw new ClientError("Invalid JSON payload");
@@ -252,10 +248,6 @@ const SYSTEM_PROMPT =
 
 export default {
   fetch: withSupabase({ auth: "publishable", cors }, async (req, _ctx) => {
-    if (req.method === "OPTIONS") {
-      return new Response("ok");
-    }
-
     try {
       const body = await req.json().catch(() => {
         throw new ClientError("Invalid JSON payload");
