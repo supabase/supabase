@@ -44,6 +44,7 @@ export const useTestQueryRLS = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  console.log({ policies })
 
   const { mutateAsync: executeSql, error: executeSqlError } = useExecuteSqlMutation({
     onError: () => {},
@@ -130,7 +131,7 @@ export const useTestQueryRLS = () => {
               x.table === table &&
               (x.roles.includes(role?.role ?? '') ||
                 (x.roles.length === 1 && x.roles[0] === 'public')) &&
-              x.command === data.operation
+              (x.command === 'ALL' || x.command === data.operation)
           )
           return {
             table,
