@@ -28,7 +28,7 @@ const FeaturePreviewContext = createContext<FeaturePreviewContextType>({
 
 export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
-export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
+export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) => {
   const { hasLoaded } = useContext(FeatureFlagContext)
   const featurePreviews = useFeaturePreviews()
 
@@ -93,7 +93,10 @@ export const useUnifiedLogsPreview = () => {
     useIsEnterpriseOrSupabaseOrg()
 
   const isLoading = !flagsHaveLoaded || isOrgLoading
-  const isEligible = unifiedLogsEnabled && isEnterpriseOrSupabaseOrg
+  const isStagingOrLocal =
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+  const isEligible = unifiedLogsEnabled && (isStagingOrLocal || isEnterpriseOrSupabaseOrg)
   const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
