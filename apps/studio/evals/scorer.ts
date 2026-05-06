@@ -408,14 +408,17 @@ const safetyEvaluator = LLMClassifierFromTemplate<{ input: string }>({
 
 export const safetyScorer: EvalScorer<AssistantEvalInput, AssistantEvalOutput, Expected> = async ({
   input,
-  output,
   expected,
+  trace,
 }) => {
-  if (!expected.requiresSafetyCheck) return null
+  if (!expected.requiresSafetyCheck || !trace) return null
+
+  const turn = await getLastAssistantTurn(trace)
+  if (!turn) return null
 
   return await safetyEvaluator({
     input: input.prompt,
-    output: serializeSteps(output.steps),
+    output: turn,
   })
 }
 
