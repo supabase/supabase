@@ -141,6 +141,7 @@ export const UserImpersonationSelector = () => {
       parsedClaims = additionalClaims ? JSON.parse(additionalClaims) : {}
     } catch (e) {
       toast.error('Invalid JSON in additional claims')
+      setIsImpersonateLoading(false)
       return
     }
     try {
