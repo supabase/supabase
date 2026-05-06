@@ -4,9 +4,23 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 28 Apr 2026 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Tue, 05 May 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/realtime-or-etl-how-to-choose-the-right-tool</guid>
+  <title>Realtime or ETL? How to choose the right tool</title>
+  <link>https://supabase.com/blog/realtime-or-etl-how-to-choose-the-right-tool</link>
+  <description>Both Supabase Realtime and Supabase ETL read changes from your Postgres database using logical replication. But they solve very different problems. Here is how to pick the right one.</description>
+  <pubDate>Tue, 05 May 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/branching-without-git-is-now-the-default</guid>
+  <title>Branching Without Git Is Now The Default</title>
+  <link>https://supabase.com/blog/branching-without-git-is-now-the-default</link>
+  <description>Branching without Git is now the default for all Supabase projects.</description>
+  <pubDate>Mon, 04 May 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/introducing-osscar-index</guid>
   <title>Introducing the OSSCAR Index</title>
   <link>https://supabase.com/blog/introducing-osscar-index</link>
@@ -2569,6 +2583,34 @@
   <pubDate>Fri, 02 Apr 2021 00:00:00 -0700</pubDate>
 </item>
 <item>
+  <guid>https://supabase.com/blog/supabase-cli</guid>
+  <title>Supabase CLI</title>
+  <link>https://supabase.com/blog/supabase-cli</link>
+  <description>Local development, database migrations, and self-hosting.</description>
+  <pubDate>Wed, 31 Mar 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-nft-marketplace</guid>
+  <title>Supabase Launches NFT Marketplace</title>
+  <link>https://supabase.com/blog/supabase-nft-marketplace</link>
+  <description>A fully encrypted NFT platform to protect and transact your digital assets</description>
+  <pubDate>Thu, 01 Apr 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-storage</guid>
+  <title>Storage is now available in Supabase</title>
+  <link>https://supabase.com/blog/supabase-storage</link>
+  <description>Launching Supabase Storage and how you can use it in your apps</description>
+  <pubDate>Tue, 30 Mar 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/pricing</guid>
+  <title>Supabase Beta Pricing</title>
+  <link>https://supabase.com/blog/pricing</link>
+  <description>Supabase launches Beta pricing structure</description>
+  <pubDate>Mon, 29 Mar 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/angels-of-supabase</guid>
   <title>Angels of Supabase</title>
   <link>https://supabase.com/blog/angels-of-supabase</link>
@@ -2583,32 +2625,67 @@
   <pubDate>Thu, 25 Mar 2021 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/postgresql-views</guid>
-  <title>Postgres Views</title>
-  <link>https://supabase.com/blog/postgresql-views</link>
-  <description>Creating and using a view in PostgreSQL.</description>
-  <pubDate>Wed, 18 Nov 2020 00:00:00 -0700</pubDate>
+  <guid>https://supabase.com/blog/In-The-Loop</guid>
+  <title>Developers stay up to date with intheloop.dev</title>
+  <link>https://supabase.com/blog/In-The-Loop</link>
+  <description>Learn why Kevin is building intheloop.dev with Supabase</description>
+  <pubDate>Mon, 22 Mar 2021 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/continuous-postgresql-backup-walg</guid>
-  <title>Continuous PostgreSQL Backups using WAL-G</title>
-  <link>https://supabase.com/blog/continuous-postgresql-backup-walg</link>
-  <description>Have you ever wanted to restore your database&apos;s state to a particular moment in time? This post explains how, using WAL-G.</description>
-  <pubDate>Sun, 02 Aug 2020 00:00:00 -0700</pubDate>
+  <guid>https://supabase.com/blog/using-supabase-replit</guid>
+  <title>Using Supabase in Replit</title>
+  <link>https://supabase.com/blog/using-supabase-replit</link>
+  <description>Free hosted relational database from within your node.js repl</description>
+  <pubDate>Thu, 11 Mar 2021 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/postgresql-templates</guid>
-  <title>What are PostgreSQL Templates?</title>
-  <link>https://supabase.com/blog/postgresql-templates</link>
-  <description>What are PostgreSQL templates and what are they used for?</description>
-  <pubDate>Thu, 09 Jul 2020 00:00:00 -0700</pubDate>
+  <guid>https://supabase.com/blog/toad-a-link-shortener-with-simple-apis-for-low-coders</guid>
+  <title>Toad, a link shortener with simple APIs for low-coders</title>
+  <link>https://supabase.com/blog/toad-a-link-shortener-with-simple-apis-for-low-coders</link>
+  <description>An easy-to-use link shortening tool with simple APIs</description>
+  <pubDate>Mon, 08 Mar 2021 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/postgresql-physical-logical-backups</guid>
-  <title>Physical vs Logical Backups in PostgreSQL</title>
-  <link>https://supabase.com/blog/postgresql-physical-logical-backups</link>
-  <description>What are physical and logical backups in Postgres?</description>
-  <pubDate>Tue, 07 Jul 2020 00:00:00 -0700</pubDate>
+  <guid>https://supabase.com/blog/postgres-as-a-cron-server</guid>
+  <title>Postgres as a CRON Server</title>
+  <link>https://supabase.com/blog/postgres-as-a-cron-server</link>
+  <description>Running repetitive tasks with your Postgres database.</description>
+  <pubDate>Fri, 05 Mar 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-beta-february-2021</guid>
+  <title>Supabase Beta February 2021</title>
+  <link>https://supabase.com/blog/supabase-beta-february-2021</link>
+  <description>One year of building.</description>
+  <pubDate>Tue, 02 Mar 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/cracking-postgres-interview</guid>
+  <title>Cracking PostgreSQL Interview Questions</title>
+  <link>https://supabase.com/blog/cracking-postgres-interview</link>
+  <description>Understand the top PostgreSQL Interview Questions</description>
+  <pubDate>Sat, 27 Feb 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/case-study-roboflow</guid>
+  <title>Roboflow.com choose Supabase to power Paint.wtf leaderboard</title>
+  <link>https://supabase.com/blog/case-study-roboflow</link>
+  <description>Learn how Roboflow.com used Supabase to build their Paint.wtf leaderboard</description>
+  <pubDate>Tue, 09 Feb 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-beta-january-2021</guid>
+  <title>Supabase Beta January 2021</title>
+  <link>https://supabase.com/blog/supabase-beta-january-2021</link>
+  <description>Eleven months of building.</description>
+  <pubDate>Tue, 02 Feb 2021 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-beta-december-2020</guid>
+  <title>Supabase Beta December 2020</title>
+  <link>https://supabase.com/blog/supabase-beta-december-2020</link>
+  <description>Ten months of building.</description>
+  <pubDate>Sat, 02 Jan 2021 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-dashboard-performance</guid>
@@ -2616,13 +2693,6 @@
   <link>https://supabase.com/blog/supabase-dashboard-performance</link>
   <description>Improving the performance of the Supabase dashboard</description>
   <pubDate>Sun, 13 Dec 2020 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/improved-dx</guid>
-  <title>Supabase.js 1.0</title>
-  <link>https://supabase.com/blog/improved-dx</link>
-  <description>We&apos;re releasing a new version of our Supabase client with some awesome new improvements.</description>
-  <pubDate>Fri, 30 Oct 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/case-study-monitoro</guid>
@@ -2660,11 +2730,25 @@
   <pubDate>Tue, 01 Dec 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
+  <guid>https://supabase.com/blog/postgresql-views</guid>
+  <title>Postgres Views</title>
+  <link>https://supabase.com/blog/postgresql-views</link>
+  <description>Creating and using a view in PostgreSQL.</description>
+  <pubDate>Wed, 18 Nov 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-alpha-october-2020</guid>
   <title>Supabase Alpha October 2020</title>
   <link>https://supabase.com/blog/supabase-alpha-october-2020</link>
   <description>Eight months of building.</description>
   <pubDate>Mon, 02 Nov 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/improved-dx</guid>
+  <title>Supabase.js 1.0</title>
+  <link>https://supabase.com/blog/improved-dx</link>
+  <description>We&apos;re releasing a new version of our Supabase client with some awesome new improvements.</description>
+  <pubDate>Fri, 30 Oct 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-alpha-september-2020</guid>
@@ -2695,6 +2779,13 @@
   <pubDate>Wed, 05 Aug 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
+  <guid>https://supabase.com/blog/continuous-postgresql-backup-walg</guid>
+  <title>Continuous PostgreSQL Backups using WAL-G</title>
+  <link>https://supabase.com/blog/continuous-postgresql-backup-walg</link>
+  <description>Have you ever wanted to restore your database&apos;s state to a particular moment in time? This post explains how, using WAL-G.</description>
+  <pubDate>Sun, 02 Aug 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-alpha-july-2020</guid>
   <title>Supabase Alpha July 2020</title>
   <link>https://supabase.com/blog/supabase-alpha-july-2020</link>
@@ -2709,11 +2800,18 @@
   <pubDate>Fri, 10 Jul 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/supabase-steve-chavez</guid>
-  <title>Steve Chavez has joined Supabase</title>
-  <link>https://supabase.com/blog/supabase-steve-chavez</link>
-  <description>Steve joins Supabase to help build Auth.</description>
-  <pubDate>Mon, 15 Jun 2020 00:00:00 -0700</pubDate>
+  <guid>https://supabase.com/blog/postgresql-templates</guid>
+  <title>What are PostgreSQL Templates?</title>
+  <link>https://supabase.com/blog/postgresql-templates</link>
+  <description>What are PostgreSQL templates and what are they used for?</description>
+  <pubDate>Thu, 09 Jul 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgresql-physical-logical-backups</guid>
+  <title>Physical vs Logical Backups in PostgreSQL</title>
+  <link>https://supabase.com/blog/postgresql-physical-logical-backups</link>
+  <description>What are physical and logical backups in Postgres?</description>
+  <pubDate>Tue, 07 Jul 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-alpha-june-2020</guid>
@@ -2723,11 +2821,11 @@
   <pubDate>Wed, 01 Jul 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/supabase-alpha-april-2020</guid>
-  <title>Supabase Alpha April 2020</title>
-  <link>https://supabase.com/blog/supabase-alpha-april-2020</link>
-  <description>Two months of building</description>
-  <pubDate>Mon, 01 Jun 2020 00:00:00 -0700</pubDate>
+  <guid>https://supabase.com/blog/supabase-steve-chavez</guid>
+  <title>Steve Chavez has joined Supabase</title>
+  <link>https://supabase.com/blog/supabase-steve-chavez</link>
+  <description>Steve joins Supabase to help build Auth.</description>
+  <pubDate>Mon, 15 Jun 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-alpha-may-2020</guid>
@@ -2737,95 +2835,11 @@
   <pubDate>Mon, 01 Jun 2020 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/supabase-cli</guid>
-  <title>Supabase CLI</title>
-  <link>https://supabase.com/blog/supabase-cli</link>
-  <description>Local development, database migrations, and self-hosting.</description>
-  <pubDate>Wed, 31 Mar 2021 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/supabase-storage</guid>
-  <title>Storage is now available in Supabase</title>
-  <link>https://supabase.com/blog/supabase-storage</link>
-  <description>Launching Supabase Storage and how you can use it in your apps</description>
-  <pubDate>Tue, 30 Mar 2021 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/pricing</guid>
-  <title>Supabase Beta Pricing</title>
-  <link>https://supabase.com/blog/pricing</link>
-  <description>Supabase launches Beta pricing structure</description>
-  <pubDate>Mon, 29 Mar 2021 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/In-The-Loop</guid>
-  <title>Developers stay up to date with intheloop.dev</title>
-  <link>https://supabase.com/blog/In-The-Loop</link>
-  <description>Learn why Kevin is building intheloop.dev with Supabase</description>
-  <pubDate>Mon, 22 Mar 2021 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/cracking-postgres-interview</guid>
-  <title>Cracking PostgreSQL Interview Questions</title>
-  <link>https://supabase.com/blog/cracking-postgres-interview</link>
-  <description>Understand the top PostgreSQL Interview Questions</description>
-  <pubDate>Sat, 27 Feb 2021 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/supabase-nft-marketplace</guid>
-  <title>Supabase Launches NFT Marketplace</title>
-  <link>https://supabase.com/blog/supabase-nft-marketplace</link>
-  <description>A fully encrypted NFT platform to protect and transact your digital assets</description>
-  <pubDate>Thu, 01 Apr 2021 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/using-supabase-replit</guid>
-  <title>Using Supabase in Replit</title>
-  <link>https://supabase.com/blog/using-supabase-replit</link>
-  <description>Free hosted relational database from within your node.js repl</description>
-  <pubDate>Thu, 11 Mar 2021 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/toad-a-link-shortener-with-simple-apis-for-low-coders</guid>
-  <title>Toad, a link shortener with simple APIs for low-coders</title>
-  <link>https://supabase.com/blog/toad-a-link-shortener-with-simple-apis-for-low-coders</link>
-  <description>An easy-to-use link shortening tool with simple APIs</description>
-  <pubDate>Mon, 08 Mar 2021 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/postgres-as-a-cron-server</guid>
-  <title>Postgres as a CRON Server</title>
-  <link>https://supabase.com/blog/postgres-as-a-cron-server</link>
-  <description>Running repetitive tasks with your Postgres database.</description>
-  <pubDate>Fri, 05 Mar 2021 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/supabase-beta-february-2021</guid>
-  <title>Supabase Beta February 2021</title>
-  <link>https://supabase.com/blog/supabase-beta-february-2021</link>
-  <description>One year of building.</description>
-  <pubDate>Tue, 02 Mar 2021 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/case-study-roboflow</guid>
-  <title>Roboflow.com choose Supabase to power Paint.wtf leaderboard</title>
-  <link>https://supabase.com/blog/case-study-roboflow</link>
-  <description>Learn how Roboflow.com used Supabase to build their Paint.wtf leaderboard</description>
-  <pubDate>Tue, 09 Feb 2021 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/supabase-beta-january-2021</guid>
-  <title>Supabase Beta January 2021</title>
-  <link>https://supabase.com/blog/supabase-beta-january-2021</link>
-  <description>Eleven months of building.</description>
-  <pubDate>Tue, 02 Feb 2021 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/supabase-beta-december-2020</guid>
-  <title>Supabase Beta December 2020</title>
-  <link>https://supabase.com/blog/supabase-beta-december-2020</link>
-  <description>Ten months of building.</description>
-  <pubDate>Sat, 02 Jan 2021 00:00:00 -0700</pubDate>
+  <guid>https://supabase.com/blog/supabase-alpha-april-2020</guid>
+  <title>Supabase Alpha April 2020</title>
+  <link>https://supabase.com/blog/supabase-alpha-april-2020</link>
+  <description>Two months of building</description>
+  <pubDate>Fri, 01 May 2020 00:00:00 -0700</pubDate>
 </item>
 
     </channel>

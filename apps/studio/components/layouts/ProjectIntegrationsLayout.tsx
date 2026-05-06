@@ -8,7 +8,7 @@ import { GenericSkeletonLoader } from 'ui-patterns'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { ProjectLayout } from '@/components/layouts/ProjectLayout'
 import AlertError from '@/components/ui/AlertError'
-import { ProductMenuItem } from '@/components/ui/ProductMenu/ProductMenuItem'
+import { ProductMenu } from '@/components/ui/ProductMenu'
 import { marketplaceCategoriesQueryOptions } from '@/data/marketplace/integration-categories-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { withAuth } from '@/hooks/misc/withAuth'
@@ -93,18 +93,21 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   ]
 
   return (
-    <div className="px-4 py-6 md:px-6">
-      <Menu.Group title={<span className="uppercase font-mono">Explore</span>} />
+    <>
       {isLoading ? (
-        <GenericSkeletonLoader />
-      ) : (
-        <div>
-          {allCategories.map((item) => (
-            <ProductMenuItem key={item.key} isActive={pageKey === item.key} item={item} />
-          ))}
+        <div className="px-4 py-6 md:px-6">
+          <Menu type="pills">
+            <Menu.Group title={<span className="uppercase font-mono">Explore</span>} />
+          </Menu>
+          <GenericSkeletonLoader />
         </div>
+      ) : (
+        <ProductMenu
+          page={pageKey}
+          menu={[{ key: 'explore', title: 'Explore', items: allCategories }]}
+        />
       )}
-    </div>
+    </>
   )
 }
 
@@ -133,23 +136,28 @@ const InstalledIntegrationsMenu = ({ page }: { page: string }) => {
   }))
 
   return (
-    <div className="px-4 py-6 md:px-6">
-      <Menu.Group title={<span className="uppercase font-mono">Installed</span>} />
-      {isLoading && <GenericSkeletonLoader />}
-      {isError && (
-        <AlertError
-          showIcon={false}
-          error={error}
-          subject="Failed to retrieve installed integrations"
-        />
-      )}
-      {isSuccess && (
-        <div>
-          {installedIntegrationItems.map((item) => (
-            <ProductMenuItem key={item.key} isActive={page === item.key} item={item} />
-          ))}
+    <>
+      {(isLoading || isError) && (
+        <div className="px-4 py-6 md:px-6">
+          <Menu type="pills">
+            <Menu.Group title={<span className="uppercase font-mono">Installed</span>} />
+          </Menu>
+          {isLoading && <GenericSkeletonLoader />}
+          {isError && (
+            <AlertError
+              showIcon={false}
+              error={error}
+              subject="Failed to retrieve installed integrations"
+            />
+          )}
         </div>
       )}
-    </div>
+      {isSuccess && (
+        <ProductMenu
+          page={page}
+          menu={[{ key: 'installed', title: 'Installed', items: installedIntegrationItems }]}
+        />
+      )}
+    </>
   )
 }
