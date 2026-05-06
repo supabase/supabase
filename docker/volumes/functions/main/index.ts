@@ -6,14 +6,12 @@ const JWT_SECRET = Deno.env.get('JWT_SECRET')
 const SUPABASE_JWKS = parseJwks(Deno.env.get('SUPABASE_JWKS'))
 const VERIFY_JWT = Deno.env.get('VERIFY_JWT') === 'true'
 
-// Support both { keys: [...] } and bare array [...] formats
 // NOTE:(kallebysantos) We don't check for valid keys but just the bare array parsing,
 // let this for 'jose' lib verification
 export function parseJwks(raw: string | undefined): jose.JSONWebKeySet | null {
   if (!raw) return null
   try {
     const parsed = JSON.parse(raw)
-    if (Array.isArray(parsed)) return { keys: parsed }
     if (parsed?.keys && Array.isArray(parsed.keys)) {
       return parsed as jose.JSONWebKeySet
     }
