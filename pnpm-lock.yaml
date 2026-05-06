@@ -975,7 +975,7 @@ importers:
         specifier: ^2.7.29
         version: 2.7.30
       ai:
-        specifier: ^6.0.173
+        specifier: ^6.0.174
         version: 6.0.174(zod@3.25.76)
       ai-commands:
         specifier: workspace:*
