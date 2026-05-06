@@ -55,8 +55,8 @@ const chatMessageSchema = z.object({ role: z.string(), content: z.unknown() })
 const textContentBlockSchema = z.object({ type: z.literal('text'), text: z.string() })
 // MCP protocol wraps tool outputs as { content: [{ text: string }] } in the Braintrust span output
 const searchDocsSpanOutputSchema = z.object({ content: z.array(z.object({ text: z.string() })) })
-// wrapAISDK logs the streamText result as { text, finishReason } on the function span
-const streamTextSpanOutputSchema = z.object({ text: z.string(), finishReason: z.string() })
+// Braintrust thread messages use { type: 'tool_call', tool_name } for assistant tool invocations
+const toolCallBlockSchema = z.object({ type: z.literal('tool_call'), tool_name: z.string() })
 
 /** Extracts plain text from a message content field (string or content-block array). */
 function extractMessageText(content: unknown): string {
@@ -71,40 +71,77 @@ function extractMessageText(content: unknown): string {
 }
 
 /**
- * Returns the final assistant text from the streamText function span.
- * More reliable than getThread() for multi-step tool-calling conversations —
- * getThread() can drop the final response when the tool context is large.
+ * Like extractMessageText but also labels tool_call blocks so scorers can see
+ * which tools were invoked within an assistant message.
  */
+function extractMessageTextWithTools(content: unknown): string {
+  if (typeof content === 'string') return content
+  if (!Array.isArray(content)) return ''
+  return content
+    .flatMap((c) => {
+      const text = textContentBlockSchema.safeParse(c)
+      if (text.success) return [text.data.text]
+      const tool = toolCallBlockSchema.safeParse(c)
+      if (tool.success) return [`[called ${tool.data.tool_name}]`]
+      return []
+    })
+    .join('\n')
+}
+
+/** Returns the text of the last assistant message in the thread. */
 async function getLastAssistantText(trace: Trace): Promise<string | null> {
-  const spans = await trace.getSpans({ spanType: ['function'] })
-  for (const span of spans) {
-    if (span.span_attributes?.name !== 'streamText') continue
-    const r = streamTextSpanOutputSchema.safeParse(span.output)
-    if (r.success && r.data.text) return r.data.text
+  const thread = await trace.getThread()
+  for (let i = thread.length - 1; i >= 0; i--) {
+    const r = chatMessageSchema.safeParse(thread[i])
+    if (!r.success || r.data.role !== 'assistant') continue
+    const text = extractMessageText(r.data.content)
+    if (text) return text
   }
   return null
 }
 
 /**
- * Serializes the full conversation thread (excluding system messages) as
- * `[role]\ncontent` blocks joined by blank lines, for use by LLM judges that
+ * Returns every assistant message after the final user message, with tool
+ * calls inlined as [called tool_name]. Tool-result messages are omitted —
+ * their content is always empty in the thread and they'd create confusing
+ * mismatches when multiple tools are called in one step.
+ */
+async function getLastAssistantTurn(trace: Trace): Promise<string | null> {
+  const thread = await trace.getThread()
+
+  let lastUserIdx = -1
+  for (let i = thread.length - 1; i >= 0; i--) {
+    const r = chatMessageSchema.safeParse(thread[i])
+    if (r.success && r.data.role === 'user') {
+      lastUserIdx = i
+      break
+    }
+  }
+
+  if (lastUserIdx === -1) return null
+
+  const parts = thread.slice(lastUserIdx + 1).flatMap((m) => {
+    const r = chatMessageSchema.safeParse(m)
+    if (!r.success || r.data.role === 'tool') return []
+    return [`[${r.data.role}]\n${extractMessageTextWithTools(r.data.content)}`]
+  })
+
+  return parts.length > 0 ? parts.join('\n\n') : null
+}
+
+/**
+ * Serializes the full conversation thread (excluding system and tool messages)
+ * as [role]\ncontent blocks joined by blank lines, for use by LLM judges that
  * need multi-turn context.
  */
 async function getConversationContext(trace: Trace): Promise<string> {
-  const [thread, finalText] = await Promise.all([trace.getThread(), getLastAssistantText(trace)])
+  const thread = await trace.getThread()
 
   const parts = thread.flatMap((m) => {
     const r = chatMessageSchema.safeParse(m)
-    if (!r.success || r.data.role === 'system') return []
-    return [`[${r.data.role}]\n${extractMessageText(r.data.content)}`]
+    if (!r.success || r.data.role === 'system' || r.data.role === 'tool') return []
+    return [`[${r.data.role}]\n${extractMessageTextWithTools(r.data.content)}`]
   })
-
-  // getThread() drops the final assistant response in multi-step conversations when tool
-  // context is large (the preprocessor only includes messages that appear in a later LLM
-  // call's input; the last step's output never does). Append from the span if missing.
-  if (finalText && parts[parts.length - 1]?.split('\n')[0] !== '[assistant]') {
-    parts.push(`[assistant]\n${finalText}`)
-  }
 
   return parts.join('\n\n')
 }
@@ -213,9 +250,9 @@ export const completenessScorer: EvalScorer<
   Expected
 > = async ({ input, trace }) => {
   if (!trace) return null
-  const text = await getLastAssistantText(trace)
-  if (!text) return null
-  return await completenessEvaluator({ input: input.prompt, output: text })
+  const turn = await getLastAssistantTurn(trace)
+  if (!turn) return null
+  return await completenessEvaluator({ input: input.prompt, output: turn })
 }
 
 const goalCompletionEvaluator = LLMClassifierFromTemplate<{ input: string }>({
