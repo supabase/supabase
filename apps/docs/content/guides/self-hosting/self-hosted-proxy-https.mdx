@@ -33,7 +33,7 @@ If you already run [HAProxy](https://www.haproxy.com/), [Traefik](https://traefi
 
 <Admonition type="note" label="Using Envoy instead of Kong?">
 
-Envoy is an optional [API gateway](/docs/guides/self-hosting/self-hosted-envoy), enabled via the `docker-compose.envoy.yml` overlay. If you already run Envoy instead of Kong, edit `docker-compose.caddy.yml` or `docker-compose.nginx.yml` to comment out the `kong:` block and uncomment the `api-gw:` block (and the matching `depends_on` entry) so the reverse proxy sits in front of Envoy.
+Envoy is an optional [API gateway](/docs/guides/self-hosting/self-hosted-envoy), enabled via the `docker-compose.envoy.yml` override. If you already run Envoy instead of Kong, edit `docker-compose.caddy.yml` or `docker-compose.nginx.yml` to comment out the `kong:` block and uncomment the `api-gw:` block (and the matching `depends_on` entry) so the reverse proxy sits in front of Envoy.
 
 </Admonition>
 
@@ -56,7 +56,7 @@ CERTBOT_EMAIL=admin@your-domain.example.com
 
 ### Step 2: Start the reverse proxy
 
-Pick one of the options below and use the corresponding Docker Compose overlay.
+Pick one of the options below and use the corresponding Docker Compose override.
 
 <Tabs
 scrollable
@@ -68,7 +68,7 @@ defaultActiveId="caddy"
 
 [Caddy](https://caddyserver.com/) automatically provisions and renews Let's Encrypt TLS certificates with zero configuration. It also handles HTTP-to-HTTPS redirects, WebSocket upgrades, and HTTP/2 and HTTP/3 out of the box.
 
-Start Caddy by using the pre-configured `docker-compose.caddy.yml` overlay:
+Start Caddy by using the pre-configured `docker-compose.caddy.yml` override:
 
 ```sh
 docker compose -f docker-compose.yml -f docker-compose.caddy.yml up -d
@@ -81,7 +81,7 @@ Caddy configuration is in `volumes/proxy/caddy/Caddyfile`.
 
 This option uses a third-party Nginx Docker image ([`jonasal/nginx-certbot`](https://github.com/JonasAlfredsson/docker-nginx-certbot)), which includes Certbot for automatic Let's Encrypt certificate issuance and renewal in a single container.
 
-Start Nginx by using the pre-configured `docker-compose.nginx.yml` overlay:
+Start Nginx by using the pre-configured `docker-compose.nginx.yml` override:
 
 ```sh
 docker compose -f docker-compose.yml -f docker-compose.nginx.yml up -d
