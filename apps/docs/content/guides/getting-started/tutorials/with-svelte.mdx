@@ -50,7 +50,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 Now you have the API credentials in place, create a helper file to initialize the Supabase client. These variables will be exposed on the browser, and that's fine since you have [Row Level Security](/docs/guides/auth#row-level-security) enabled on the Database.
 
 <$CodeSample
-path="user-management/svelte-user-management/src/supabaseClient.ts"
+path="/user-management/svelte-user-management/src/supabaseClient.ts"
 meta="name=src/supabaseClient.ts"
 />
 
@@ -64,7 +64,7 @@ You can find the full contents of this file [in the example repository](https://
 Set up a Svelte component to manage logins and sign ups. It uses Magic Links, so users can sign in with their email without using passwords.
 
 <$CodeSample
-path="user-management/svelte-user-management/src/lib/Auth.svelte"
+path="/user-management/svelte-user-management/src/lib/Auth.svelte"
 meta="name=src/lib/Auth.svelte"
 />
 
@@ -88,7 +88,8 @@ Next, add a way for users to upload a profile photo. Supabase configures every p
 Start by creating a new component:
 
 <$CodeSample
-path="user-management/svelte-user-management/src/lib/Avatar.svelte"
+path="/user-management/svelte-user-management/src/lib/Avatar.svelte"
+lines={[[1, -1]]}
 meta="name=src/lib/Avatar.svelte"
 />
 
@@ -107,7 +108,7 @@ meta="name=src/lib/Account.svelte"
 With all the components in place, update `App.svelte`:
 
 <$CodeSample
-path="user-management/svelte-user-management/src/App.svelte"
+path="/user-management/svelte-user-management/src/App.svelte"
 meta="name=src/App.svelte"
 />
 

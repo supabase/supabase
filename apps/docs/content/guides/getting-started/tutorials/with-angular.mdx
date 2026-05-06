@@ -46,8 +46,6 @@ meta="name=src/environments/environment.ts"
 
 With the API credentials in place, create a `SupabaseService` with `ng g s supabase` and add the following code to initialize the Supabase client and implement functions to communicate with the Supabase API.
 
-{/* This uses the [`getUser`](/docs/reference/javascript/auth-getuser) method to get the current user details if there is an existing session. This method performs a network request to the Supabase Auth server. */}
-
 <$CodeSample
 path="/user-management/angular-user-management/src/app/supabase.service.ts"
 lines={[[1, -1]]}
@@ -160,6 +158,8 @@ meta="name=src/app/app.module.ts"
 
 With all the components in place, change the contents of `AppComponent` to include the new components and Auth logic:
 
+<$Partial path="auth_methods.mdx" />
+
 <$CodeTabs>
 
 <$CodeSample
@@ -175,8 +175,6 @@ meta="name=src/app/app.component.html"
 />
 
 </$CodeTabs>
-
-<$Partial path="auth_methods.mdx" />
 
 Now run the application in a terminal:
 
