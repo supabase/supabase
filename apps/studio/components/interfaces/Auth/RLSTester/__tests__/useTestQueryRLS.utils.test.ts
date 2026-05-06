@@ -12,7 +12,13 @@ const makePolicy = (overrides: Partial<Policy>): Policy =>
     ...overrides,
   }) as Policy
 
-const base = { policies: [] as Policy[], schema: 'public', table: 'items', role: 'anon', operation: 'SELECT' as const }
+const base = {
+  policies: [] as Policy[],
+  schema: 'public',
+  table: 'items',
+  role: 'anon',
+  operation: 'SELECT' as const,
+}
 
 describe('filterTablePolicies', () => {
   describe('schema / table matching', () => {
@@ -56,7 +62,11 @@ describe('filterTablePolicies', () => {
     it('handles undefined role (service role) — matches nothing unless public', () => {
       const rolePolicy = makePolicy({ roles: ['anon'] })
       const publicPolicy = makePolicy({ roles: ['public'] })
-      const result = filterTablePolicies({ ...base, role: undefined, policies: [rolePolicy, publicPolicy] })
+      const result = filterTablePolicies({
+        ...base,
+        role: undefined,
+        policies: [rolePolicy, publicPolicy],
+      })
       expect(result).toHaveLength(1)
       expect(result[0]).toBe(publicPolicy)
     })
@@ -65,36 +75,66 @@ describe('filterTablePolicies', () => {
   describe('command matching', () => {
     it('includes policy when command matches the operation', () => {
       const policy = makePolicy({ command: 'SELECT' })
-      expect(filterTablePolicies({ ...base, operation: 'SELECT', policies: [policy] })).toHaveLength(1)
+      expect(
+        filterTablePolicies({ ...base, operation: 'SELECT', policies: [policy] })
+      ).toHaveLength(1)
     })
 
     it('excludes policy when command does not match the operation', () => {
       const policy = makePolicy({ command: 'INSERT' })
-      expect(filterTablePolicies({ ...base, operation: 'SELECT', policies: [policy] })).toHaveLength(0)
+      expect(
+        filterTablePolicies({ ...base, operation: 'SELECT', policies: [policy] })
+      ).toHaveLength(0)
     })
 
     it('includes policy with command ALL regardless of operation', () => {
       const policy = makePolicy({ command: 'ALL' })
-      expect(filterTablePolicies({ ...base, operation: 'SELECT', policies: [policy] })).toHaveLength(1)
+      expect(
+        filterTablePolicies({ ...base, operation: 'SELECT', policies: [policy] })
+      ).toHaveLength(1)
     })
 
     it('includes ALL command policy for non-SELECT operations too', () => {
       const policy = makePolicy({ command: 'ALL' })
-      expect(filterTablePolicies({ ...base, operation: 'INSERT', policies: [policy] })).toHaveLength(1)
+      expect(
+        filterTablePolicies({ ...base, operation: 'INSERT', policies: [policy] })
+      ).toHaveLength(1)
     })
 
     it('does not include a SELECT-only policy when operation is INSERT', () => {
       const policy = makePolicy({ command: 'SELECT' })
-      expect(filterTablePolicies({ ...base, operation: 'INSERT', policies: [policy] })).toHaveLength(0)
+      expect(
+        filterTablePolicies({ ...base, operation: 'INSERT', policies: [policy] })
+      ).toHaveLength(0)
     })
   })
 
   describe('combined filters', () => {
     it('returns only policies that satisfy all conditions', () => {
-      const match = makePolicy({ schema: 'public', table: 'items', roles: ['anon'], command: 'ALL' })
-      const wrongSchema = makePolicy({ schema: 'private', table: 'items', roles: ['anon'], command: 'ALL' })
-      const wrongRole = makePolicy({ schema: 'public', table: 'items', roles: ['authenticated'], command: 'ALL' })
-      const wrongCommand = makePolicy({ schema: 'public', table: 'items', roles: ['anon'], command: 'INSERT' })
+      const match = makePolicy({
+        schema: 'public',
+        table: 'items',
+        roles: ['anon'],
+        command: 'ALL',
+      })
+      const wrongSchema = makePolicy({
+        schema: 'private',
+        table: 'items',
+        roles: ['anon'],
+        command: 'ALL',
+      })
+      const wrongRole = makePolicy({
+        schema: 'public',
+        table: 'items',
+        roles: ['authenticated'],
+        command: 'ALL',
+      })
+      const wrongCommand = makePolicy({
+        schema: 'public',
+        table: 'items',
+        roles: ['anon'],
+        command: 'INSERT',
+      })
 
       const result = filterTablePolicies({
         ...base,
