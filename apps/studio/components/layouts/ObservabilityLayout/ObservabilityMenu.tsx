@@ -134,7 +134,7 @@ const ObservabilityMenu = () => {
   })
 
   return (
-    <div className="mt-6">
+    <div>
       {isLoading ? (
         <div className="px-5 my-4 space-y-2">
           <ShimmeringLoader />
