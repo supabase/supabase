@@ -1,3 +1,5 @@
+import { DATABASE_NAV_SHORTCUT_IDS, databaseNavRegistry } from './registry/database-nav'
+import { LIST_PAGE_SHORTCUT_IDS, listPageRegistry } from './registry/list-page'
 import {
   SCHEMA_VISUALIZER_SHORTCUT_IDS,
   schemaVisualizerRegistry,
@@ -60,6 +62,12 @@ export const SHORTCUT_IDS = {
 
   // Schema visualizer shortcuts
   ...SCHEMA_VISUALIZER_SHORTCUT_IDS,
+
+  // Shared list-page shortcuts (database/* listing pages, etc.)
+  ...LIST_PAGE_SHORTCUT_IDS,
+
+  // Database sub-page navigation chords
+  ...DATABASE_NAV_SHORTCUT_IDS,
 } as const
 
 /**
@@ -314,4 +322,10 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
 
   // Schema visualizer shortcut registration
   ...schemaVisualizerRegistry,
+
+  // Shared list-page shortcut registration
+  ...listPageRegistry,
+
+  // Database sub-page navigation chord registration
+  ...databaseNavRegistry,
 }

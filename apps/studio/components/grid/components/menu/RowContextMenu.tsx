@@ -1,8 +1,7 @@
-import { ContextMenuContent } from '@ui/components/shadcn/ui/context-menu'
 import { Copy, Edit, ListFilter, Trash } from 'lucide-react'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
-import { ContextMenuItem_Shadcn_, ContextMenuSeparator_Shadcn_, copyToClipboard } from 'ui'
+import { copyToClipboard, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from 'ui'
 
 import { useTableRowOperations } from '../../hooks/useTableRowOperations'
 import { formatClipboardValue } from '../../utils/common'
@@ -13,12 +12,17 @@ import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 type RowContextMenuContentProps = {
   row: SupaRow
+  selectedCellPosition?: { idx: number; rowIdx: number } | null
 }
 
-export const RowContextMenuContent = ({ row }: RowContextMenuContentProps) => {
+export const RowContextMenuContent = ({
+  row,
+  selectedCellPosition,
+}: RowContextMenuContentProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
   const { deleteRows } = useTableRowOperations()
+  const activeCellPosition = selectedCellPosition ?? snap.selectedCellPosition
 
   const onDeleteRow = useCallback(() => {
     if (!row) {
@@ -33,29 +37,33 @@ export const RowContextMenuContent = ({ row }: RowContextMenuContentProps) => {
   }, [row, tableEditorSnap])
 
   const onCopyCellContent = useCallback(() => {
-    if (!snap.selectedCellPosition) return
+    if (!activeCellPosition) return
 
-    const columnKey = snap.gridColumns[snap.selectedCellPosition.idx as number].key
-    const value = row[columnKey]
+    const column = snap.gridColumns[activeCellPosition.idx]
+    if (!column) return
+
+    const value = row[column.key]
     const text = formatClipboardValue(value)
 
-    copyToClipboard(text)
-    toast.success('Copied cell value to clipboard')
-  }, [row, snap.gridColumns, snap.selectedCellPosition])
+    void copyToClipboard(text, () => {
+      toast.success('Copied cell value to clipboard')
+    })
+  }, [activeCellPosition, row, snap.gridColumns])
 
   const onCopyRowContent = useCallback(() => {
-    copyToClipboard(JSON.stringify(row))
-    toast.success('Copied row to clipboard')
+    void copyToClipboard(JSON.stringify(row), () => {
+      toast.success('Copied row to clipboard')
+    })
   }, [row])
 
   const getRowAndColumn = useCallback(() => {
-    if (!snap.selectedCellPosition) return null
+    if (!activeCellPosition) return null
 
-    const column = snap.gridColumns[snap.selectedCellPosition.idx as number]
+    const column = snap.gridColumns[activeCellPosition.idx as number]
     if (!row || !column) return null
 
     return { row, column }
-  }, [row, snap.selectedCellPosition, snap.gridColumns])
+  }, [activeCellPosition, row, snap.gridColumns])
 
   const onFilterByValue = useCallback(() => {
     const result = getRowAndColumn()
@@ -77,35 +85,35 @@ export const RowContextMenuContent = ({ row }: RowContextMenuContentProps) => {
   }, [getRowAndColumn])
 
   return (
-    <ContextMenuContent className="min-w-36!">
-      <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onCopyCellContent}>
+    <DropdownMenuContent align="start" side="right" sideOffset={0} className="w-36 min-w-36!">
+      <DropdownMenuItem className="gap-x-2" onSelect={onCopyCellContent}>
         <Copy size={12} />
         <span className="text-xs">Copy cell</span>
-      </ContextMenuItem_Shadcn_>
-      <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onCopyRowContent}>
+      </DropdownMenuItem>
+      <DropdownMenuItem className="gap-x-2" onSelect={onCopyRowContent}>
         <Copy size={12} />
         <span className="text-xs">Copy row</span>
-      </ContextMenuItem_Shadcn_>
+      </DropdownMenuItem>
       {isFilterByValueVisible() && (
-        <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onFilterByValue}>
+        <DropdownMenuItem className="gap-x-2" onSelect={onFilterByValue}>
           <ListFilter size={12} />
           <span className="text-xs">Filter by value</span>
-        </ContextMenuItem_Shadcn_>
+        </DropdownMenuItem>
       )}
       {snap.editable && (
         <>
-          <ContextMenuSeparator_Shadcn_ />
-          <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onEditRowClick}>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="gap-x-2" onSelect={onEditRowClick}>
             <Edit size={12} />
             <span className="text-xs">Edit row</span>
-          </ContextMenuItem_Shadcn_>
-          <ContextMenuSeparator_Shadcn_ />
-          <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onDeleteRow}>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="gap-x-2" onSelect={onDeleteRow}>
             <Trash size={12} />
             <span className="text-xs">Delete row</span>
-          </ContextMenuItem_Shadcn_>
+          </DropdownMenuItem>
         </>
       )}
-    </ContextMenuContent>
+    </DropdownMenuContent>
   )
 }

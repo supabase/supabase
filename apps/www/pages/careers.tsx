@@ -3,10 +3,13 @@ import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import career from '~/data/career.json'
+import { breadcrumbs } from '~/lib/breadcrumbs'
 import { filterGenericJob, groupJobsByTeam, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
+import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import Styles from '~/styles/career.module.css'
 import { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -109,6 +112,14 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.careers)),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <header className="container relative mx-auto px-6 pt-12 pb-8 lg:pt-24 lg:px-16 xl:px-20 text-center space-y-4">
           <h1 className="text-sm text-brand md:text-base">

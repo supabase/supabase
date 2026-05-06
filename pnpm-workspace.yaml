@@ -20,6 +20,7 @@ catalog:
   lodash: ^4.18.1
   lodash-es: ^4.18.1
   next: 16.2.3
+  next-themes: ^0.4.6
   postcss: ^8.5.10
   radix-ui: ^1.4.3
   react: ^18.3.0
@@ -77,6 +78,7 @@ overrides:
   nodemailer: ^7.0.11
   payload>undici: ^7.18.2
   pgsql-parser>libpg-query: ^15.2.0
+  postcss: 'catalog:'
   refractor>prismjs: ^1.30.0
   supabase>tar: ^7.5.11
   terser-webpack-plugin>serialize-javascript: ^7.0.5

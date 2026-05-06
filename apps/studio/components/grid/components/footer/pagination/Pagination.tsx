@@ -235,7 +235,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   }
 
   return (
-    <div className="flex items-center gap-x-4">
+    <div className="flex items-center gap-x-4 min-w-fit">
       <div className="flex items-center gap-x-2">
         <Button
           aria-label="Previous page"

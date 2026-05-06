@@ -1,6 +1,12 @@
+import { ident, joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { PostgresPolicy } from '@supabase/postgres-meta'
 
 import type { TableApiAccessData } from '@/data/privileges/table-api-access-query'
+
+export type Policy = Omit<PostgresPolicy, 'definition' | 'check'> & {
+  definition: SafeSqlFragment | null
+  check: SafeSqlFragment | null
+}
 
 /**
  * Single classifier for the RLS page's per-table admonition state. Shares the
@@ -61,21 +67,22 @@ export function getTableAdmonitionMessage(status: TableDataApiStatus): string | 
   }
 }
 
-export const generatePolicyUpdateSQL = (policy: PostgresPolicy) => {
-  let expression = ''
-  if (policy.definition !== null && policy.definition !== undefined) {
-    expression += `using (${policy.definition})${
-      policy.check === null || policy.check === undefined ? ';' : ''
-    }\n`
+export const generatePolicyUpdateSQL = (policy: Policy): SafeSqlFragment => {
+  const parts: Array<SafeSqlFragment> = []
+
+  if (policy.definition != null) {
+    const semicolon = policy.check == null ? safeSql`;` : safeSql``
+    parts.push(safeSql`using (${policy.definition})${semicolon}`)
   }
-  if (policy.check !== null && policy.check !== undefined) {
-    expression += `with check (${policy.check});\n`
+  if (policy.check != null) {
+    parts.push(safeSql`with check (${policy.check});`)
   }
 
-  return `
-alter policy "${policy.name}" 
-on "${policy.schema}"."${policy.table}"
-to ${policy.roles.join(', ')}
-${expression}
-`.trim()
+  const expression = parts.length > 0 ? joinSqlFragments(parts, '\n') : safeSql``
+
+  return safeSql`
+alter policy ${ident(policy.name)}
+on ${ident(policy.schema)}.${ident(policy.table)}
+to ${joinSqlFragments(policy.roles.map(ident), ', ')}
+${expression}`
 }

@@ -1,6 +1,9 @@
 import { useParams } from 'common'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { useMemo, useRef } from 'react'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type {
@@ -14,11 +17,13 @@ import { ConnectSheetStep } from './ConnectSheetStep'
 import { CopyPromptAdmonition } from './CopyPromptAdmonition'
 import { getConnectionStrings } from './DatabaseSettings.utils'
 import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { DOCS_URL } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
 interface ConnectStepsSectionProps {
@@ -145,8 +150,24 @@ function StepContent({
 }
 
 export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsSectionProps) {
+  const { ref } = useParams()
   const stepsContainerRef = useRef<HTMLDivElement | null>(null)
   const connectionStringPooler = useConnectionStringPooler()
+
+  const { data: ipv4Addon } = useProjectAddonsQuery(
+    { projectRef: ref },
+    {
+      select: (data) => {
+        const selectedAddons = data?.selected_addons ?? []
+        return selectedAddons.find((addon) => addon.type === 'ipv4')
+      },
+    }
+  )
+  const showIpv4AddonNotice =
+    state.mode === 'direct' &&
+    !ipv4Addon &&
+    (state.connectionMethod === 'direct' ||
+      (state.connectionMethod === 'transaction' && !state.useSharedPooler))
 
   if (steps.length === 0) return null
 
@@ -156,6 +177,20 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
         <h3>Connect your app</h3>
 
         <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} />
+
+        {showIpv4AddonNotice && (
+          <Admonition
+            type="default"
+            title={`${state.connectionMethod === 'direct' ? 'Direct connections use' : 'Transaction pooler uses'} IPv6 by default`}
+            description="Enable the dedicated IPv4 address add-on to connect from IPv4-only networks"
+            actions={[
+              <Button asChild key="addon" type="default">
+                <Link href={`/project/${ref}/settings/addons?panel=ipv4`}>Enable IPv4 add-on</Link>
+              </Button>,
+              <DocsButton key="docs" href={`${DOCS_URL}/guides/platform/ipv4-address`} />,
+            ]}
+          />
+        )}
 
         <div className="mt-6" ref={stepsContainerRef}>
           {steps.map((step, index) => (

@@ -39,7 +39,7 @@
   box-shadow: inset 0 0 0 1px #24b47e;
 }
 
-.rdg:not(:focus-within) .rdg-cell[aria-selected='true'] {
+.rdg:not(:focus-within):not(.rdg-context-menu-open) .rdg-cell[aria-selected='true'] {
   box-shadow: none;
   outline: none;
 }

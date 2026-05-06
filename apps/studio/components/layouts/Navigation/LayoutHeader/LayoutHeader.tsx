@@ -30,6 +30,7 @@ import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 
@@ -69,6 +70,7 @@ export const LayoutHeader = ({
   const { ref: projectRef, slug } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const commandMenuEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
 
@@ -104,6 +106,7 @@ export const LayoutHeader = ({
           <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
             <Link
               href={backToDashboardURL}
+              onClick={() => track('header_back_to_dashboard_clicked')}
               className="flex items-center justify-center border-none bg-transparent! rounded-md min-w-[30px] w-[30px] h-[30px] text-foreground-lighter hover:text-foreground transition-colors"
             >
               <ChevronLeft strokeWidth={1.5} size={16} />
@@ -160,7 +163,10 @@ export const LayoutHeader = ({
 
                     {exceedingLimits && (
                       <div className="ml-2">
-                        <Link href={`/org/${selectedOrganization?.slug}/usage`}>
+                        <Link
+                          href={`/org/${selectedOrganization?.slug}/usage`}
+                          onClick={() => track('header_exceeding_usage_badge_clicked')}
+                        >
                           <Badge variant="destructive">Exceeding usage limits</Badge>
                         </Link>
                       </div>

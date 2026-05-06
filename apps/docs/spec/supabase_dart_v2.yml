@@ -2114,15 +2114,15 @@ functions:
   - id: admin-api
     title: 'Overview'
     notes: |
-      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
-      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the Flutter app.
+      - Any method under the `supabase.auth.admin` namespace requires a `secret` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `secret` key in the Flutter app.
     examples:
       - id: create-auth-admin-client
         name: Create server-side auth client
         isSpotlight: true
         code: |
           ```dart
-          final supabase = SupabaseClient(supabaseUrl, serviceRoleKey);
+          final supabase = SupabaseClient(supabaseUrl, secretKey);
           ```
   - id: get-user-by-id
     title: 'getUserById()'

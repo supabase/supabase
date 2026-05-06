@@ -15,7 +15,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
 } from 'ui'
 
 interface Props {
@@ -251,32 +254,31 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
           exit={{ opacity: 0, transition: { duration: 0.05 } }}
           className="w-full h-[38px] flex justify-end gap-2 items-stretch lg:max-w-[240px] xl:max-w-[280px]"
         >
-          <Input
-            inputRef={inputRef}
-            icon={<Search size="14" />}
-            size="small"
-            layout="vertical"
-            autoComplete="off"
-            type="search"
-            placeholder="Search event"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="w-full"
-            actions={
-              isMobile && (
-                <Button
-                  type="link"
+          <InputGroup className="w-full">
+            <InputGroupInput
+              size="small"
+              autoComplete="off"
+              type="search"
+              placeholder="Search event"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+            {isMobile && (
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
                   onClick={() => {
-                    setSearchTerm('')
+                    handleSearchByText('')
                     setShowSearchInput(false)
                   }}
-                  className="text-foreground-light hover:text-foreground bg-control hover:bg-selection"
                 >
                   <CloseIcon size="14" />
-                </Button>
-              )
-            }
-          />
+                </InputGroupButton>
+              </InputGroupAddon>
+            )}
+          </InputGroup>
         </motion.div>
       )}
     </div>

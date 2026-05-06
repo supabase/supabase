@@ -9,6 +9,7 @@ import {
   CellKeyDownArgs,
   RowsChangeData,
 } from 'react-data-grid'
+import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
@@ -283,11 +284,18 @@ export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
 ) => {
   const { mode, column, row, rowIdx } = args
   if (mode !== 'SELECT') return
+  const key = event.key.toLowerCase()
 
-  if (event.code === 'KeyC' && (event.metaKey || event.ctrlKey)) {
-    const cellValue = row[column.key] ?? ''
-    const value = formatClipboardValue(cellValue)
-    copyToClipboard(value)
+  if (key === 'c' && (event.metaKey || event.ctrlKey)) {
+    if (window.getSelection()?.isCollapsed === false) return
+
+    const value = formatClipboardValue(row[column.key] ?? '')
+    event.preventDefault()
+    event.preventGridDefault()
+    void copyToClipboard(value, () => {
+      toast.success('Copied cell value to clipboard')
+    })
+    return
   }
 
   // Let registered shortcuts win over rdg's "type a key to enter edit mode" default,
@@ -312,7 +320,6 @@ export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
   // Toggle boolean cells with T/F when no modifier keys are pressed.
   if (context === undefined) return
 
-  const key = event.key.toLowerCase()
   if (event.altKey || event.ctrlKey || event.metaKey || (key !== 't' && key !== 'f')) return
 
   const supaColumn = context.columns.find((c) => c.name === column.key)
