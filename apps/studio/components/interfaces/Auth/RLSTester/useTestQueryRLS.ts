@@ -45,7 +45,6 @@ export const useTestQueryRLS = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  console.log({ policies })
 
   const { mutateAsync: executeSql, error: executeSqlError } = useExecuteSqlMutation({
     onError: () => {},
