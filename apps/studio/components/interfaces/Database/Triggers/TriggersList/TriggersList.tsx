@@ -19,6 +19,7 @@ import { EmptyStatePresentational } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { CreateTriggerButtons } from './CreateTriggerButtons'
+import { TriggerAuditActivity } from './TriggerAuditActivity'
 import { TriggerList } from './TriggerList'
 import { generateTriggerCreateSQL, type PostgresTrigger } from './TriggerList.utils'
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
@@ -333,6 +334,8 @@ execute function function_name();`
             </Card>
           </div>
         )}
+
+        <TriggerAuditActivity />
       </div>
 
       <TriggerSheet

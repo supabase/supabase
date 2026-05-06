@@ -4,6 +4,7 @@ import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 
+import { EdgeFunctionAuditActivity } from './EdgeFunctionAuditActivity'
 import { EdgeFunctionInvocationsSection } from './EdgeFunctionInvocationsSection'
 import {
   EDGE_FUNCTION_CHART_INTERVALS,
@@ -229,6 +230,8 @@ export const EdgeFunctionOverview = () => {
         totalExternalMemory={totalExternalMemory}
         totalMemoryByType={totalMemoryByType}
       />
+
+      <EdgeFunctionAuditActivity />
     </>
   )
 }

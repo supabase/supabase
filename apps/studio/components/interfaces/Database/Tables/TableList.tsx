@@ -35,6 +35,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
+import { TableAuditActivity } from './TableAuditActivity'
 import { formatAllEntities } from './Tables.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import AlertError from '@/components/ui/AlertError'
@@ -594,6 +595,8 @@ export const TableList = ({
           </Card>
         </div>
       )}
+
+      <TableAuditActivity />
     </div>
   )
 }

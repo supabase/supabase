@@ -14,6 +14,7 @@ import { BannedIPs } from '@/components/interfaces/Settings/Database/BannedIPs'
 import { ConnectionPooling } from '@/components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling'
 import { DatabaseReadOnlyAlert } from '@/components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
 import ResetDbPassword from '@/components/interfaces/Settings/Database/DatabaseSettings/ResetDbPassword'
+import { DatabaseSettingsAuditActivity } from '@/components/interfaces/Settings/Database/DatabaseSettingsAuditActivity'
 import { DiskSizeConfiguration } from '@/components/interfaces/Settings/Database/DiskSizeConfiguration'
 import { JitDbAccessConfiguration } from '@/components/interfaces/Settings/Database/JitDatabaseAccess/JitDbAccessConfiguration'
 import { NetworkRestrictions } from '@/components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions'
@@ -62,6 +63,7 @@ const DatabaseSettings: NextPageWithLayout = () => {
             )}
             {databaseNetworkRestrictions && <NetworkRestrictions />}
             <BannedIPs />
+            <DatabaseSettingsAuditActivity />
           </PageContainer>
           <PoolingModesModal />
         </>
