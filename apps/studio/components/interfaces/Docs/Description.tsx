@@ -85,9 +85,9 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 px-0.5">
       <ExpandingTextArea
-        className="w-full"
+        className="w-full min-h-auto"
         placeholder="Click to edit."
         value={value}
         onChange={(e: any) => setValue(e.target.value)}
