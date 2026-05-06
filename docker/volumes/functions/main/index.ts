@@ -7,10 +7,10 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const VERIFY_JWT = Deno.env.get('VERIFY_JWT') === 'true'
 
 // Create JWKS for ES256/RS256 tokens (newer tokens)
-let SUPABASE_JWT_KEYS: ReturnType<typeof jose.createRemoteJWKSet> | null = null
+let SUPABASE_JWKS: ReturnType<typeof jose.createRemoteJWKSet> | null = null
 if (SUPABASE_URL) {
   try {
-    SUPABASE_JWT_KEYS = jose.createRemoteJWKSet(
+    SUPABASE_JWKS = jose.createRemoteJWKSet(
       new URL('/auth/v1/.well-known/jwks.json', SUPABASE_URL)
     )
   } catch (e) {
@@ -59,13 +59,13 @@ async function isValidLegacyJWT(jwt: string): Promise<boolean> {
 }
 
 async function isValidJWT(jwt: string): Promise<boolean> {
-  if (!SUPABASE_JWT_KEYS) {
+  if (!SUPABASE_JWKS) {
     console.error('JWKS not available for ES256/RS256 token verification')
     return false
   }
 
   try {
-    await jose.jwtVerify(jwt, SUPABASE_JWT_KEYS)
+    await jose.jwtVerify(jwt, SUPABASE_JWKS)
   } catch (e) {
     console.error('Asymmetric JWT verification error', e);
     return false
