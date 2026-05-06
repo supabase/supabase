@@ -14,6 +14,7 @@ import { Callout } from './callout'
 import { ComponentPreview } from './component-preview'
 import { CopyButton } from './copy-button'
 import { DualRealtimeChat } from './dual-realtime-chat'
+import { DualRealtimeCursor } from './dual-realtime-cursor'
 import { DualRealtimeMonaco } from './dual-realtime-monaco'
 import { RegistryBlock } from './registry-block'
 import { StyleWrapper } from './style-wrapper'
@@ -181,6 +182,7 @@ const components = {
   BlockPreview,
   DualRealtimeChat,
   DualRealtimeMonaco,
+  DualRealtimeCursor,
   TanstackDBGenerator,
 }
 
