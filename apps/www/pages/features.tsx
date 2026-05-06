@@ -6,10 +6,8 @@ import { useRouter } from 'next/compat/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
-import { Button, Checkbox, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+import { Badge, Button, Checkbox, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 
-import { breadcrumbs } from '@/lib/breadcrumbs'
-import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 import {
   FeaturesMatrix,
   productLabel,
@@ -20,6 +18,8 @@ import DefaultLayout from '@/components/Layouts/Default'
 import SectionContainer from '@/components/Layouts/SectionContainer'
 import Panel from '@/components/Panel'
 import { features } from '@/data/features'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 
 type ViewMode = 'grid' | 'matrix'
 
@@ -229,12 +229,12 @@ function FeaturesPage() {
               <span className="text-foreground-muted text-xs">
                 {filteredFeatures.length} feature{filteredFeatures.length !== 1 ? 's' : ''}
               </span>
-              <div className="flex items-center rounded-lg border border-muted overflow-hidden">
+              <div className="flex items-center rounded-lg border border-muted">
                 <button
                   title="Grid view"
                   onClick={() => setViewMode('grid')}
                   className={cn(
-                    'flex items-center justify-center w-8 h-8 transition-colors',
+                    'relative flex items-center justify-center w-8 h-8 transition-colors rounded-l-lg focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-1 focus-visible:ring-offset-background',
                     viewMode === 'grid'
                       ? 'bg-surface-300 text-foreground'
                       : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
@@ -246,7 +246,7 @@ function FeaturesPage() {
                   title="Matrix view"
                   onClick={() => setViewMode('matrix')}
                   className={cn(
-                    'flex items-center justify-center w-8 h-8 transition-colors border-l border-muted',
+                    'relative flex items-center justify-center w-8 h-8 transition-colors border-l border-muted rounded-r-lg focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-1 focus-visible:ring-offset-background',
                     viewMode === 'matrix'
                       ? 'bg-surface-300 text-foreground'
                       : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
