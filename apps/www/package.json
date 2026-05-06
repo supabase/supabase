@@ -65,7 +65,7 @@
     "micromark-extension-gfm": "^2.0.3",
     "micromark-extension-mdxjs": "^1.0.1",
     "next": "^15.5.15",
-    "next-mdx-remote": "^6.0.0",
+    "next-mdx-remote-client": "^1.1.7",
     "next-seo": "^6.5.0",
     "next-themes": "catalog:",
     "nuqs": "^2.8.1",
