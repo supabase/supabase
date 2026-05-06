@@ -656,6 +656,12 @@ export const storageDetailsFields: BlockFieldConfig[] = [
 // Primary Postgres Fields (Always Visible)
 export const postgresPrimaryFields: BlockFieldConfig[] = [
   {
+    id: 'event_message',
+    label: 'Message',
+    getValue: (data, enrichedData) => enrichedData?.event_message || data?.event_message,
+    wrap: true,
+  },
+  {
     id: 'status',
     label: 'Status',
     getValue: (data, enrichedData) => enrichedData?.status || data?.status,
@@ -697,10 +703,7 @@ export const postgresDetailsFields: BlockFieldConfig[] = [
   {
     id: 'session_id',
     label: 'Session ID',
-    getValue: (data, enrichedData) => {
-      const sessionId = enrichedData?.session_id || data?.session_id
-      return sessionId ? `${sessionId.substring(0, 12)}...` : null
-    },
+    getValue: (data, enrichedData) => enrichedData?.session_id || data?.session_id,
     requiresEnrichedData: true,
   },
   {
