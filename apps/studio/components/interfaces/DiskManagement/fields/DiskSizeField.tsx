@@ -139,27 +139,30 @@ export function DiskSizeField({
             </FormItemLayout>
           )}
         />
-        <div className="flex flex-col gap-1">
+
+        <div className="flex flex-col gap-y-2 mt-2">
           <BillingChangeBadge
             className="mt-1"
             beforePrice={Number(diskSizePrice.oldPrice)}
             afterPrice={Number(diskSizePrice.newPrice)}
             show={isDirty && !errors.totalSize && diskSizePrice.oldPrice !== diskSizePrice.newPrice}
           />
-          <span className="text-foreground-lighter text-sm">
+          <p className="text-foreground-lighter text-sm">
             {includedDiskGB > 0 &&
               org?.plan.id &&
-              `Your plan includes up to ${includedDiskGB} GB of ${watchedStorageType} storage.`}
-
-            <div className="mt-3">
-              <DocsButton abbrev={false} href={`${DOCS_URL}/guides/platform/database-size`} />
-            </div>
-          </span>
+              `Your plan includes up to ${includedDiskGB} GB of ${watchedStorageType.toUpperCase()} storage.`}
+          </p>
+          <DocsButton
+            className="w-min"
+            abbrev={false}
+            href={`${DOCS_URL}/guides/platform/database-size`}
+          />
           <DiskTypeRecommendationSection
             form={form}
             actions={
               <Button
                 type="default"
+                className="mt-2"
                 onClick={() => {
                   setValue('storageType', 'io2')
                   trigger('provisionedIOPS')
@@ -173,6 +176,7 @@ export function DiskSizeField({
           />
         </div>
       </div>
+
       <div className="col-span-8">
         <DiskSpaceBar form={form} />
 
