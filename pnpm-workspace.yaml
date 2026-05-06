@@ -71,6 +71,7 @@ overrides:
   '@rollup/plugin-terser>serialize-javascript': ^7.0.5
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
+  express-rate-limit>ip-address: ^10.1.1
   esbuild: ^0.25.2
   lodash: 'catalog:'
   lodash-es: 'catalog:'

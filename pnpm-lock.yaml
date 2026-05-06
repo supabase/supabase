@@ -94,6 +94,7 @@ overrides:
   '@rollup/plugin-terser>serialize-javascript': ^7.0.5
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
+  express-rate-limit>ip-address: ^10.1.1
   esbuild: ^0.25.2
   lodash: ^4.18.1
   lodash-es: ^4.18.1
@@ -12162,10 +12163,6 @@ packages:
   ioredis@5.10.0:
     resolution: {integrity: sha512-HVBe9OFuqs+Z6n64q09PQvP1/R4Bm+30PAyyD4wIEqssh3v9L21QjCVk4kRLucMBcDokJTcLjsGeVRlq/nH6DA==}
     engines: {node: '>=12.22.0'}
-
-  ip-address@10.1.0:
-    resolution: {integrity: sha512-XXADHxXmvT9+CRxhXg56LJovE+bmWnEWB78LB83VZTprKTmaC5QfruXocxzTZ2Kl0DNwKuBdlIhjL8LeY8Sf8Q==}
-    engines: {node: '>= 12'}
 
   ip-address@10.2.0:
     resolution: {integrity: sha512-/+S6j4E9AHvW9SWMSEY9Xfy66O5PWvVEJ08O0y5JGyEKQpojb0K0GKpz/v5HJ/G0vi3D2sjGK78119oXZeE0qA==}
@@ -28128,7 +28125,7 @@ snapshots:
   express-rate-limit@8.3.1(express@5.2.1(supports-color@8.1.1)):
     dependencies:
       express: 5.2.1(supports-color@8.1.1)
-      ip-address: 10.1.0
+      ip-address: 10.2.0
 
   express@4.22.1(supports-color@8.1.1):
     dependencies:
@@ -29367,8 +29364,6 @@ snapshots:
       standard-as-callback: 2.1.0
     transitivePeerDependencies:
       - supports-color
-
-  ip-address@10.1.0: {}
 
   ip-address@10.2.0: {}
 
