@@ -117,6 +117,7 @@ export const BucketFilePickerHeader = () => {
 
   const [isSearching, setIsSearching] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
 
   const uploadButtonRef = useRef<HTMLInputElement | null>(null)
 
@@ -159,6 +160,7 @@ export const BucketFilePickerHeader = () => {
     }
     const files = Array.from(event.target.files || [])
     try {
+      setIsUploading(true)
       await uploadFilesToBucket({
         files,
         projectRef: projectRef!,
@@ -176,6 +178,7 @@ export const BucketFilePickerHeader = () => {
       // Consider showing a toast notification to the user
     } finally {
       event.target.value = ''
+      setIsUploading(false)
     }
   }
 
@@ -317,6 +320,7 @@ export const BucketFilePickerHeader = () => {
                 icon={<Upload size={16} strokeWidth={2} />}
                 type="text"
                 disabled={!canUpdateStorage}
+                loading={isUploading}
                 onClick={onSelectUpload}
                 tooltip={{
                   content: {
