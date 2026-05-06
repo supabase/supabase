@@ -35,7 +35,6 @@ const SelectAllCheckbox = ({
   onChange: () => void
 }) => (
   <Checkbox
-    label=""
     className="-mt-0.5"
     checked={columnFiles.length !== 0 && selectedFilesFromColumn.length === columnFiles.length}
     disabled={columnFiles.length === 0}
@@ -191,7 +190,7 @@ export const BucketFilePickerColumn = ({
     [view, index, selectedItems, maxFiles]
   )
 
-  const onSelectAllItemsInColumn = (columnIndex: number) => {
+  const onSelectAllItemsInColumn = () => {
     const columnFiles = columnItems.filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
 
     const columnFilesId = compact(columnFiles.map((item) => item.id))
@@ -265,7 +264,7 @@ export const BucketFilePickerColumn = ({
         className={cn(
           fullWidth ? 'w-full' : 'w-64 border-r border-overlay',
           view === STORAGE_VIEWS.LIST && 'h-full',
-          'hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto'
+          'hide-scrollbar relative flex shrink-0 flex-col overflow-auto'
         )}
         onDragOver={onDragOver}
         onDrop={onDrop}
@@ -279,7 +278,7 @@ export const BucketFilePickerColumn = ({
         {view === STORAGE_VIEWS.COLUMNS && maxFiles !== 1 && (
           <div
             className={cn(
-              'sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 [[data-theme*=dark]_&]:bg-table-header-dark',
+              'sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 in-data-[theme*=dark]:bg-table-header-dark',
               haveSelectedItems ? 'h-10 py-3 opacity-100' : 'h-0 py-0 opacity-0',
               'transition-all duration-200'
             )}
@@ -290,7 +289,7 @@ export const BucketFilePickerColumn = ({
                 <SelectAllCheckbox
                   columnFiles={columnFiles}
                   selectedFilesFromColumn={selectedFilesFromColumn}
-                  onChange={() => onSelectAllItemsInColumn(index)}
+                  onChange={() => onSelectAllItemsInColumn()}
                 />
                 <p className="text-sm text-foreground-light">
                   Select all {columnFiles.length} files
@@ -310,7 +309,7 @@ export const BucketFilePickerColumn = ({
                 <SelectAllCheckbox
                   columnFiles={columnFiles}
                   selectedFilesFromColumn={selectedFilesFromColumn}
-                  onChange={() => onSelectAllItemsInColumn(index)}
+                  onChange={() => onSelectAllItemsInColumn()}
                 />
               )}
               <p className="text-sm">Name</p>
@@ -327,7 +326,7 @@ export const BucketFilePickerColumn = ({
           <div
             className={`
             ${fullWidth ? 'w-full' : 'w-64 border-r border-default'}
-            px-2 py-1 my-1 flex flex-shrink-0 flex-col space-y-2 overflow-auto
+            px-2 py-1 my-1 flex shrink-0 flex-col space-y-2 overflow-auto
           `}
           >
             <ShimmeringLoader />
@@ -418,7 +417,7 @@ export const BucketFilePickerColumn = ({
 
         {/* List interface footer */}
         {view === STORAGE_VIEWS.LIST && (
-          <div className="shrink-0 rounded-b-md z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 [[data-theme*=dark]_&]:bg-panel-footer-dark w-full">
+          <div className="shrink-0 rounded-b-md z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 in-data-[theme*=dark]:bg-panel-footer-dark w-full">
             <p className="text-sm">
               {formatBytes(columnItemsSize)} for {columnItems.length} items
             </p>

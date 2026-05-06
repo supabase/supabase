@@ -25,7 +25,7 @@ export function BucketFilePickerExplorer({ onSelect }: { onSelect: (value: strin
         <div className="flex flex-1 min-h-0">
           <div
             className={cn(
-              'file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full relative',
+              'file-explorer flex grow overflow-x-auto justify-between h-full w-full relative',
               view === STORAGE_VIEWS.LIST && 'flex-col'
             )}
           >

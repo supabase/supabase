@@ -6,8 +6,8 @@ import type {
 } from '@supabase/supabase-js'
 import { useParams } from 'common'
 import { Storage } from 'icons'
-import { ImageOff, Trash2, Upload, X } from 'lucide-react'
-import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { ImageOff, Trash2, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {

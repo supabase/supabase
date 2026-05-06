@@ -91,7 +91,7 @@ export const BucketFilePickerRow = ({
       <div
         className={cn(
           'storage-row group flex h-full items-center px-2.5',
-          'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
+          'hover:bg-panel-footer-light in-data-[theme*=dark]:hover:bg-panel-footer-dark',
           `${isOpened ? 'bg-selection' : ''}`,
           `${isSelected ? 'bg-selection' : ''}`,
           `${isPreviewed ? 'bg-selection hover:bg-selection' : ''}`,
@@ -163,7 +163,7 @@ export const BucketFilePickerRow = ({
 
         <div
           className={`flex items-center justify-end ${
-            view === STORAGE_VIEWS.LIST ? 'flex-grow' : 'w-[10%]'
+            view === STORAGE_VIEWS.LIST ? 'grow' : 'w-[10%]'
           }`}
           onClick={(event) =>
             // Stops click event from this div, to resolve an issue with menu item's click event triggering unexpected row select

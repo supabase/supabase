@@ -1,5 +1,4 @@
 import { useBreakpoint } from 'common'
-import { ChevronLeft } from 'lucide-react'
 import {
   Button,
   Dialog,

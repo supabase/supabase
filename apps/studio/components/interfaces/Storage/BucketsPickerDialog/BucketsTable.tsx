@@ -29,7 +29,6 @@ export const BucketsTable = (props: BucketsTableProps) => {
 
 const BucketsTableUnvirtualized = ({
   buckets,
-  projectRef,
   filterString,
   formattedGlobalUploadLimit,
   onSelectBucket,
@@ -75,7 +74,6 @@ const BucketsTableUnvirtualized = ({
 
 const BucketsTableVirtualized = ({
   buckets,
-  projectRef,
   filterString,
   formattedGlobalUploadLimit,
   onSelectBucket,
