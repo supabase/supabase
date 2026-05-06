@@ -1,8 +1,7 @@
-import { render, renderHook, screen, waitFor } from '@testing-library/react'
+import { render, renderHook } from '@testing-library/react'
 import type { ICommand } from 'ui-patterns/CommandMenu/api/types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { ActiveShortcutsProvider, useActiveShortcuts } from './activeShortcuts'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from './registry'
 import { useShortcut } from './useShortcut'
 
@@ -34,7 +33,12 @@ vi.mock('./useIsShortcutEnabled', () => ({
 const getLastHotkeyOptions = () => {
   const call = mockUseHotkeySequence.mock.calls.at(-1)
   if (!call) throw new Error('useHotkeySequence was not called')
-  return call[2] as { enabled: boolean; timeout: number | undefined; ignoreInputs?: boolean }
+  return call[2] as {
+    enabled: boolean
+    timeout: number | undefined
+    ignoreInputs?: boolean
+    meta?: { id?: string; name?: string; referenceGroup?: string }
+  }
 }
 
 const getLastRegisterCall = () => {
@@ -45,38 +49,6 @@ const getLastRegisterCall = () => {
     Array<{ id: string; name: string; action: () => void; badge: () => any }>,
     { enabled: boolean; deps: unknown[]; orderCommands?: unknown },
   ]
-}
-
-function ActiveShortcutsReader() {
-  const activeShortcuts = useActiveShortcuts()
-
-  return (
-    <div data-testid="active-shortcuts">
-      {activeShortcuts.map((shortcut) => `${shortcut.id}:${shortcut.label}`).join('|')}
-    </div>
-  )
-}
-
-function RegisteredShortcut({ enabled = true, label }: { enabled?: boolean; label?: string }) {
-  useShortcut(SHORTCUT_IDS.NAV_HOME, vi.fn(), { enabled, label })
-  return null
-}
-
-function ActiveShortcutHarness({
-  mounted = true,
-  enabled = true,
-  label,
-}: {
-  mounted?: boolean
-  enabled?: boolean
-  label?: string
-}) {
-  return (
-    <ActiveShortcutsProvider>
-      {mounted && <RegisteredShortcut enabled={enabled} label={label} />}
-      <ActiveShortcutsReader />
-    </ActiveShortcutsProvider>
-  )
 }
 
 describe('useShortcut', () => {
@@ -342,55 +314,32 @@ describe('useShortcut', () => {
     })
   })
 
-  describe('active shortcut reference registration', () => {
-    it('registers mounted enabled shortcuts', async () => {
-      render(<ActiveShortcutHarness />)
-
-      await waitFor(() => {
-        expect(screen.getByTestId('active-shortcuts')).toHaveTextContent(
-          `${SHORTCUT_IDS.NAV_HOME}:Go to Project Overview`
-        )
+  describe('reference-sheet metadata', () => {
+    it('forwards id, label, and referenceGroup as registration meta', () => {
+      renderHook(() => useShortcut(SHORTCUT_IDS.NAV_HOME, vi.fn()))
+      expect(getLastHotkeyOptions().meta).toEqual({
+        id: SHORTCUT_IDS.NAV_HOME,
+        name: SHORTCUT_DEFINITIONS[SHORTCUT_IDS.NAV_HOME].label,
+        referenceGroup: SHORTCUT_DEFINITIONS[SHORTCUT_IDS.NAV_HOME].referenceGroup,
       })
     })
 
-    it('unregisters when the shortcut unmounts', async () => {
-      const { rerender } = render(<ActiveShortcutHarness />)
-
-      await screen.findByText((content) => content.includes(SHORTCUT_IDS.NAV_HOME))
-
-      rerender(<ActiveShortcutHarness mounted={false} />)
-
-      await waitFor(() => {
-        expect(screen.getByTestId('active-shortcuts')).toHaveTextContent('')
-      })
+    it('uses the caller label override in meta.name', () => {
+      renderHook(() => useShortcut(SHORTCUT_IDS.NAV_HOME, vi.fn(), { label: 'Go home' }))
+      expect(getLastHotkeyOptions().meta?.name).toBe('Go home')
     })
 
-    it('does not register when caller enabled is false', async () => {
-      render(<ActiveShortcutHarness enabled={false} />)
+    it('keeps a stable meta reference when inputs do not change', () => {
+      const { rerender } = renderHook(
+        ({ cb }: { cb: () => void }) => useShortcut(SHORTCUT_IDS.NAV_HOME, cb),
+        { initialProps: { cb: vi.fn() } }
+      )
 
-      await waitFor(() => {
-        expect(screen.getByTestId('active-shortcuts')).toHaveTextContent('')
-      })
-    })
+      const first = getLastHotkeyOptions().meta
 
-    it('does not register when the global preference disables the shortcut', async () => {
-      mockUseIsShortcutEnabled.mockReturnValue(false)
+      rerender({ cb: vi.fn() })
 
-      render(<ActiveShortcutHarness />)
-
-      await waitFor(() => {
-        expect(screen.getByTestId('active-shortcuts')).toHaveTextContent('')
-      })
-    })
-
-    it('registers label overrides', async () => {
-      render(<ActiveShortcutHarness label="Go home" />)
-
-      await waitFor(() => {
-        expect(screen.getByTestId('active-shortcuts')).toHaveTextContent(
-          `${SHORTCUT_IDS.NAV_HOME}:Go home`
-        )
-      })
+      expect(getLastHotkeyOptions().meta).toBe(first)
     })
   })
 })

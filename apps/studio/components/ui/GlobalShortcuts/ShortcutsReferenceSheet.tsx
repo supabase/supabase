@@ -1,5 +1,6 @@
+import { useHotkeyRegistrations, type SequenceRegistrationView } from '@tanstack/react-hotkeys'
 import { CircleX } from 'lucide-react'
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import {
   Button,
   KeyboardShortcut,
@@ -12,20 +13,24 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
-import {
-  useActiveShortcuts,
-  type ActiveShortcutDefinition,
-} from '@/state/shortcuts/activeShortcuts'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import {
   SHORTCUT_REFERENCE_GROUP_LABELS,
   SHORTCUT_REFERENCE_GROUP_ORDER,
   SHORTCUT_REFERENCE_GROUPS,
 } from '@/state/shortcuts/referenceGroups'
+import type { ShortcutHotkeyMeta } from '@/state/shortcuts/useShortcut'
 
 interface ShortcutsReferenceSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+}
+
+interface ActiveShortcutDefinition {
+  id: string
+  label: string
+  sequence: string[]
+  referenceGroup?: string
 }
 
 interface ShortcutGroup {
@@ -63,17 +68,41 @@ const isScopedNavigationGroup = (group: string) =>
 
 const normalizeSearchValue = (value: string) => value.trim().toLowerCase()
 
-const groupDefinitions = (activeShortcuts: ActiveShortcutDefinition[]): ShortcutGroup[] => {
-  const uniqueShortcuts = Array.from(
-    activeShortcuts
-      .reduce<Map<string, ActiveShortcutDefinition>>((acc, definition) => {
-        acc.set(definition.id, definition)
-        return acc
-      }, new Map())
-      .values()
-  )
+const toActiveDefinition = (
+  registration: SequenceRegistrationView
+): ActiveShortcutDefinition | null => {
+  const meta = registration.options.meta as ShortcutHotkeyMeta | undefined
+  if (!meta?.id || !meta.name) return null
+  return {
+    id: meta.id,
+    label: meta.name,
+    sequence: registration.sequence,
+    referenceGroup: meta.referenceGroup,
+  }
+}
 
-  const grouped = uniqueShortcuts.reduce<Record<string, ActiveShortcutDefinition[]>>(
+const useActiveShortcuts = (): ActiveShortcutDefinition[] => {
+  const { sequences } = useHotkeyRegistrations()
+
+  return useMemo(() => {
+    const definitions: ActiveShortcutDefinition[] = []
+    const seen = new Set<string>()
+
+    for (const registration of sequences) {
+      if (registration.options.enabled === false) continue
+      const definition = toActiveDefinition(registration)
+      if (!definition) continue
+      if (seen.has(definition.id)) continue
+      seen.add(definition.id)
+      definitions.push(definition)
+    }
+
+    return definitions
+  }, [sequences])
+}
+
+const groupDefinitions = (activeShortcuts: ActiveShortcutDefinition[]): ShortcutGroup[] => {
+  const grouped = activeShortcuts.reduce<Record<string, ActiveShortcutDefinition[]>>(
     (acc, definition) => {
       const prefix = definition.referenceGroup ?? definition.id.split('.')[0]
       acc[prefix] = acc[prefix] ?? []

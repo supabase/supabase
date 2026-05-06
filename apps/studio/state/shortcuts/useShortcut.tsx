@@ -1,15 +1,25 @@
-import { useHotkeySequence } from '@tanstack/react-hotkeys'
+import { useHotkeySequence, type HotkeyMeta } from '@tanstack/react-hotkeys'
 import { Fragment, useCallback, useMemo } from 'react'
 import { KeyboardShortcut } from 'ui'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import type { ICommand } from 'ui-patterns/CommandMenu/api/types'
 
-import { useRegisterActiveShortcut } from './activeShortcuts'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS, type ShortcutId } from './registry'
 import type { ShortcutOptions } from './types'
 import { useIsShortcutEnabled } from './useIsShortcutEnabled'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import useLatest from '@/hooks/misc/useLatest'
+
+/**
+ * Shape we store on each registration's `options.meta` so the Keyboard
+ * shortcuts reference sheet can read it back via `useHotkeyRegistrations()`.
+ * The library's `HotkeyMeta` is open for declaration merging, but we don't
+ * own a direct dep on `@tanstack/hotkeys`, so we keep the extension local.
+ */
+export interface ShortcutHotkeyMeta extends HotkeyMeta {
+  id: ShortcutId
+  referenceGroup?: string
+}
 
 const hotkeyToKeys = (hotkey: string): string[] =>
   hotkey.split('+').map((part) => (part === 'Mod' ? 'Meta' : part))
@@ -74,14 +84,13 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
   const registerInCommandMenu =
     options?.registerInCommandMenu ?? def.options?.registerInCommandMenu ?? false
   const label = options?.label ?? def.label
-  const activeDefinition = useMemo(
-    () => ({
-      id,
-      label,
-      sequence: def.sequence,
-      referenceGroup: def.referenceGroup,
-    }),
-    [def.referenceGroup, def.sequence, id, label]
+
+  // Stable identity so we don't churn the registration store on every render.
+  // setOptions in @tanstack/hotkeys notifies subscribers each call, which
+  // would cascade to every component using useHotkeyRegistrations().
+  const meta = useMemo<ShortcutHotkeyMeta>(
+    () => ({ id, name: label, referenceGroup: def.referenceGroup }),
+    [def.referenceGroup, id, label]
   )
 
   // Only include `ignoreInputs` when set. The library resolves it to a concrete
@@ -92,9 +101,9 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
   useHotkeySequence(def.sequence, callback, {
     enabled,
     timeout,
+    meta,
     ...(ignoreInputs !== undefined && { ignoreInputs }),
   })
-  useRegisterActiveShortcut(activeDefinition, enabled)
 
   // Handle overrides for command menu
   const enabledInCommandMenu = enabled && registerInCommandMenu

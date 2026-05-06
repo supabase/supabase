@@ -61,7 +61,6 @@ import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { Toaster } from '@/lib/toaster'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
-import { ActiveShortcutsProvider } from '@/state/shortcuts/activeShortcuts'
 import type { AppPropsWithLayout } from '@/types'
 
 dayjs.extend(customParseFormat)
@@ -189,12 +188,10 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                             <CommandProvider>
                               <BannerStackProvider>
                                 <FeaturePreviewContextProvider>
-                                  <ActiveShortcutsProvider>
-                                    <MainScrollContainerProvider>
-                                      {getLayout(<Component {...pageProps} />)}
-                                    </MainScrollContainerProvider>
-                                    <GlobalShortcuts />
-                                  </ActiveShortcutsProvider>
+                                  <MainScrollContainerProvider>
+                                    {getLayout(<Component {...pageProps} />)}
+                                  </MainScrollContainerProvider>
+                                  <GlobalShortcuts />
                                   <StudioCommandMenu />
                                   <FeaturePreviewModal />
                                   <UpdateBillingAddressModal />
