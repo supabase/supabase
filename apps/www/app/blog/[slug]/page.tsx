@@ -9,8 +9,9 @@ import {
   getAbsoluteBlogSocialImage,
   toAbsoluteBlogImageUrl,
 } from '@/lib/blog-images'
+import { breadcrumbs } from '@/lib/breadcrumbs'
 import { SITE_ORIGIN } from '@/lib/constants'
-import { blogPostingSchema, serializeJsonLd } from '@/lib/json-ld'
+import { blogPostingSchema, breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '@/lib/posts'
 import type { Blog, BlogData, PostReturnType } from '@/types/post'
 
@@ -171,12 +172,20 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       datePublished: frontmatter.date,
       authors: blogAuthors.length > 0 ? blogAuthors : [{ name: 'Supabase' }],
     })
+    const breadcrumbJsonLd = breadcrumbListSchema([
+      ...breadcrumbs.blogIndex,
+      { name: frontmatter.title, url: `https://supabase.com/blog/${slug}` },
+    ])
 
     return (
       <>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(blogJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
         />
         <BlogPostClient {...props} />
       </>

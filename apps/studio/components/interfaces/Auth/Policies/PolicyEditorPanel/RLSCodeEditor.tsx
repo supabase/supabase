@@ -33,6 +33,7 @@ interface RLSCodeEditorProps {
 export const RLSCodeEditor = ({
   id,
   defaultValue,
+  onInputChange,
   wrapperClassName,
   className,
   value,
@@ -115,6 +116,7 @@ export const RLSCodeEditor = ({
     }
 
     onChange()
+    onInputChange?.(value)
   }
 
   // when the value has changed, trigger the onChange callback so that the height of the container can be adjusted.

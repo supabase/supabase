@@ -1,13 +1,13 @@
 'use client'
 
-import { ChevronRight, Play, Sparkles } from 'lucide-react'
-import Link from 'next/link'
-import { useTheme } from 'next-themes'
 // End of third-party imports
-
 import { isFeatureEnabled, useBreakpoint } from 'common'
+import { ChevronRight, Play, Sparkles } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { cn, IconBackground } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
+
 import { getCustomContent } from '../lib/custom-content/getCustomContent'
 import DocsCoverLogo from './DocsCoverLogo'
 
@@ -41,7 +41,7 @@ const HomePageCover = (props) => {
   const iconSize = isXs ? 'sm' : 'lg'
   const { homepageHeading } = getCustomContent(['homepage:heading'])
   const { resolvedTheme } = useTheme()
-  const isLightMode = resolvedTheme !== 'dark'
+  const isLightMode = !resolvedTheme?.includes('dark')
 
   const frameworks = [
     {
