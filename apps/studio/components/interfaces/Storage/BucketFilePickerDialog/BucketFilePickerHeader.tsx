@@ -139,7 +139,7 @@ export const BucketFilePickerHeader = () => {
   const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const breadcrumbs = columns
-  const backDisabled = columns.length <= 1
+  const backDisabled = columns.length < 1
 
   const onSelectBack = () => {
     popColumn()
