@@ -18,7 +18,9 @@ To install a specific skill from the repository:
 npx skills add supabase/agent-skills --skill SKILL_NAME
 ```
 
-Skills install at project scope by default, placing them in your repository so all contributors and cloud agents share the same setup. Pass `--global` to install once across all your projects instead. You can also install for all detected agents at the same time by passing `--all`. See the [skills package](https://github.com/vercel-labs/skills) for more options.
+Skills are installed at project scope by default, placing them in your repository so contributors and cloud agents all share the same setup. Pass `--global` to install across all your projects instead.
+
+Add skills for all detected agents at the same time by passing `--all`. See the [skills package](https://github.com/vercel-labs/skills) for more options.
 
 You can also install the agent skills together with the Supabase MCP server using the [Supabase agent plugin](/docs/guides/getting-started/plugins) for an agent-first workflow.
 
