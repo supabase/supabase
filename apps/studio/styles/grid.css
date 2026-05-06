@@ -31,8 +31,8 @@
   @apply h-full;
 }
 
-.rdg-cell-frozen-last {
-  @apply border-secondary border-r-2 shadow-none;
+.rdg-row .rdg-cell-frozen:nth-last-child(1 of .rdg-cell-frozen) {
+  @apply border-secondary border-r;
 }
 
 .rdg-cell[aria-selected='true'] {
@@ -135,6 +135,15 @@
 
 .rdg-header-row .rdg-cell {
   @apply bg-surface-200 border-default border-b;
+}
+
+.rdg-header-row .rdg-cell-frozen:nth-last-child(1 of .rdg-cell-frozen) {
+  @apply border-default border-r border-b;
+}
+
+[data-theme='dark'] .rdg-row .rdg-cell-frozen:nth-last-child(1 of .rdg-cell-frozen),
+[data-theme='dark'] .rdg-header-row .rdg-cell-frozen:nth-last-child(1 of .rdg-cell-frozen) {
+  @apply border-r-strong;
 }
 
 .rdg-header-row .rdg-cell p {
