@@ -79,7 +79,7 @@ interface SupabaseContext {
   supabaseAdmin: SupabaseClient // bypasses RLS
   userClaims: UserIdentity | null
   jwtClaims: JWTClaims | null
-  authType: AuthType
+  authMode: AuthMode
 }
 ```
 
