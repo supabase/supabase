@@ -277,7 +277,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                             >
                               {role?.name ?? 'Please select a role'}
                             </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                            <SelectContent_Shadcn_ align="end">
                               <SelectGroup_Shadcn_>
                                 {(orgScopedRoles ?? []).map((role) => {
                                   const canAssignRole = rolesAddable.includes(role.id)
