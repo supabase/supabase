@@ -97,24 +97,27 @@ export default {
 Both approaches give you the same `SupabaseContext`. No shared utility files. No environment variable management. No manual JWT verification.
 
 ## What's in the context
+Every `withSupabase` handler receives a `ctx` object with two pre-configured clients:
 
-Every approach produces the same `SupabaseContext`:
+`ctx.supabase` — a user-scoped client that automatically respects RLS policies
+`ctx.supabaseAdmin` — an admin client using the service role for privileged operations
 
+No manual client setup, JWT verification, or environment variable wiring required.
+
+The full context looks like this:
 ```typescript
 interface SupabaseContext {
-  supabase: SupabaseClient // RLS-scoped to the caller
-  supabaseAdmin: SupabaseClient // bypasses RLS
+  supabase: SupabaseClient
+  supabaseAdmin: SupabaseClient
   userClaims: UserIdentity | null
   jwtClaims: JWTClaims | null
   authMode: AuthMode
 }
 ```
 
-`ctx.supabase` is scoped to the authenticated user. RLS policies apply automatically. `ctx.supabaseAdmin` uses the service role for operations that need to bypass RLS. Both come pre-configured.
-
 ## Declarative access control
 
-With @supabase/server, authentication happens before your handler runs.
+With `@supabase/server`, authentication happens before your handler runs.
 
 You declare who is allowed to call the endpoint, and the package handles verification automatically.
 
