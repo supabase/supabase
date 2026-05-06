@@ -22,6 +22,7 @@ This is a new package that handles auth verification, client setup, request cont
 We anonymously analyzed 25,000 deployed Edge Functions and saw the same pattern everywhere: developers were rebuilding the same setup code over and over just to get to their actual business logic.
 
 Every Supabase Edge Function starts the same way:
+
 - Create a Supabase client with `SUPABASE_ANON_KEY`
 - Create another admin client with `SUPABASE_SERVICE_ROLE_KEY` that can bypass Row Level Security
 - Verify the JWT
@@ -37,7 +38,6 @@ With `@supabase/server` just declare who can call your endpoint, and you get a f
 - Verified user identity
 - JWT claims
 - Built-in request/auth helpers
-
 
 ```typescript
 import { withSupabase } from '@supabase/server'
@@ -55,12 +55,11 @@ export default {
   fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
     const { data } = await ctx.supabase.from('todos').select()
     return Response.json(data)
-  })
+  }),
 }
 ```
 
 Note that `export default { fetch }` is equivalent to `Deno.serve(...)`. Both define a request handler. We use `export default` throughout this post because it works across Edge Functions, Workers, and Bun. If you prefer `Deno.serve`, you can keep using it — it's [still supported](https://docs.deno.com/runtime/fundamentals/http_server/#default-fetch-export) on Edge Functions.
-
 
 ## How it works
 
@@ -75,6 +74,7 @@ That includes:
 - Auth metadata
 
 `@supabase/server` gives you multiple ways to get a `SupabaseContext`. The most common is `withSupabase`, a wrapper that handles auth, client creation, and CORS before your handler runs:
+
 ```typescript
 import { withSupabase } from 'npm:@supabase/server'
 
@@ -105,6 +105,7 @@ export default {
 Both approaches give you the same `SupabaseContext`. No shared utility files. No environment variable management. No manual JWT verification.
 
 ## What's in the context
+
 Every `withSupabase` handler receives a `ctx` object with two pre-configured clients:
 
 `ctx.supabase` — a user-scoped client that automatically respects RLS policies
@@ -113,6 +114,7 @@ Every `withSupabase` handler receives a `ctx` object with two pre-configured cli
 No manual client setup, JWT verification, or environment variable wiring required.
 
 The full context looks like this:
+
 ```typescript
 interface SupabaseContext {
   supabase: SupabaseClient
@@ -149,9 +151,11 @@ export default {
   }),
 }
 ```
+
 If the request does not include a valid user token, the request is rejected before your handler executes.
 
 Here's all of the auth modes included in the package:
+
 ```typescript
 // authenticated users only (default)
 withSupabase({ auth: 'user' }, handler)
