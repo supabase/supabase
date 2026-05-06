@@ -1,10 +1,7 @@
 import { useParams } from 'common'
-import { Realtime } from 'icons'
-import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -12,10 +9,8 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
 } from 'ui'
 
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
@@ -23,12 +18,18 @@ import { Entity } from '@/data/table-editor/table-editor-types'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
 
-export const RealtimeToggle = ({ table }: { table: Entity }) => {
+export const RealtimeToggleDialog = ({
+  table,
+  open,
+  setOpen,
+}: {
+  table: Entity
+  open: boolean
+  setOpen: (value: boolean) => void
+}) => {
   const track = useTrack()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-
-  const [open, setOpen] = useState(false)
 
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
@@ -81,27 +82,6 @@ export const RealtimeToggle = ({ table }: { table: Entity }) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <ButtonTooltip
-          type="default"
-          size="tiny"
-          icon={
-            <Realtime
-              strokeWidth={1.5}
-              className={isRealtimeEnabled ? 'text-brand' : 'text-foreground-muted'}
-            />
-          }
-          className={cn('w-7 h-7 p-0', isRealtimeEnabled && 'text-brand hover:text-brand-hover')}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: isRealtimeEnabled
-                ? 'Disable Realtime for this table'
-                : 'Enable Realtime for this table',
-            },
-          }}
-        />
-      </DialogTrigger>
       <DialogContent size="small" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>

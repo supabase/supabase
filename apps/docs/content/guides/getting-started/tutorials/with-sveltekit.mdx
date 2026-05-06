@@ -9,7 +9,7 @@ description: 'Learn how to use Supabase in your SvelteKit App.'
 
 <Admonition type="note">
 
-If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/sveltekit-user-management).
+If you get stuck while working through this guide, you can find the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/sveltekit-user-management).
 
 </Admonition>
 
@@ -132,7 +132,7 @@ meta="name=src/routes/+layout.svelte"
 
 </$CodeTabs>
 
-## Set up a login page
+### Set up a login page
 
 Create a magic link login/signup page for your application by updating the `routes/+page.svelte` file:
 
@@ -158,7 +158,7 @@ meta="name=src/routes/+page.server.ts"
 
 </$CodeTabs>
 
-### Email template
+#### Email template
 
 Change the email template to support a server-side authentication flow.
 
@@ -175,7 +175,7 @@ You can also customize emails sent out to new users, including the email's looks
 
 </Admonition>
 
-### Confirmation endpoint
+#### Confirmation endpoint
 
 As this is a server-side rendering (SSR) environment, you need to create a server endpoint responsible for exchanging the `token_hash` for a session.
 
@@ -195,7 +195,7 @@ meta="name=src/routes/auth/confirm/+server.ts"
 
 </$CodeTabs>
 
-### Authentication error page
+#### Authentication error page
 
 If there is an error with confirming the token, redirect the user to an error page.
 
@@ -208,7 +208,7 @@ meta="name=src/routes/auth/error/+page.svelte"
 
 </$CodeTabs>
 
-### Account page
+#### Account page
 
 After a user signs in, they need to be able to edit their profile details page.
 Create a new `src/routes/account/+page.svelte` file with the content below.
@@ -217,7 +217,7 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 
 <$CodeSample
 path="/user-management/sveltekit-user-management/src/routes/account/+page.svelte"
-lines={[[1, 3],[6,12],[15,38],[47,-1]]}
+lines={[[1, 3],[6,12],[15,38],[49,-1]]}
 meta="name=src/routes/account/+page.svelte"
 />
 
@@ -232,25 +232,13 @@ lines={[[1, -1]]}
 meta="name=src/routes/account/+page.server.ts"
 />
 
-### Launch!
+## Profile photos
 
-With all the pages in place, run this command in a terminal:
-
-```bash
-npm run dev
-```
-
-And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
-
-![Supabase Svelte](/docs/img/supabase-svelte-demo.png)
-
-## Bonus: Profile photos
-
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Next, add a way for users to upload a profile photo. Supabase configures every project with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 
-Create an avatar for the user so that they can upload a profile photo. Start by creating a new component called `Avatar.svelte` in the `src/routes/account` directory:
+Start by creating a new component called `Avatar.svelte` in the `src/routes/account` directory:
 
 <$CodeTabs>
 
@@ -262,18 +250,30 @@ meta="name=src/routes/account/Avatar.svelte"
 
 </$CodeTabs>
 
-### Add the new widget
+### Update the account page
 
-Add the widget to the Account page:
+With the Avatar component created, update `src/routes/account/+page.svelte` to include it:
 
 <$CodeTabs>
 
 <$CodeSample
 path="/user-management/sveltekit-user-management/src/routes/account/+page.svelte"
-lines={[[1, 1], [4,4], [31,31],[39,46],[82,82]]}
+lines={[[1, -1]]}
 meta="name=src/routes/account/+page.svelte"
 />
 
 </$CodeTabs>
+
+### Launch!
+
+With all the pages in place, run this command in a terminal:
+
+```bash
+npm run dev
+```
+
+And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
+
+![Supabase Svelte](/docs/img/supabase-svelte-demo.png)
 
 At this stage you have a fully functional application!

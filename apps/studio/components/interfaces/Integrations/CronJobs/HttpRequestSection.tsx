@@ -5,7 +5,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input,
+  Input_Shadcn_ as Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -63,12 +67,12 @@ export const HttpRequestSection = ({ form }: HttpRequestSectionProps) => {
         name="values.timeoutMs"
         render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Timeout" className="gap-1">
-            <Input
-              {...rest}
-              type="number"
-              placeholder="1000"
-              actions={<p className="text-foreground-light pr-2">ms</p>}
-            />
+            <InputGroup>
+              <InputGroupInput {...rest} type="number" placeholder="1000" />
+              <InputGroupAddon align="inline-end">
+                <InputGroupText> ms</InputGroupText>
+              </InputGroupAddon>
+            </InputGroup>
           </FormItemLayout>
         )}
       />

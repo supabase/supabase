@@ -13,8 +13,8 @@ export async function installOAuthIntegration({
   projectRef,
   id,
 }: OAuthIntegrationInstallVariables) {
-  const { data, error } = await post('/platform/integrations/partners/{ref}/{listing_id}', {
-    params: { path: { ref: projectRef, listing_id: id } },
+  const { data, error } = await post('/platform/integrations/partners/{ref}/{listing_slug}', {
+    params: { path: { ref: projectRef, listing_slug: id } },
   })
 
   if (error) handleError(error)

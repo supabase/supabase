@@ -501,6 +501,10 @@ export const gettingstarted: NavMenuConstant = {
       url: undefined,
       items: [
         {
+          name: 'Supabase Agent Plugin',
+          url: '/guides/getting-started/plugins' as `/${string}`,
+        },
+        {
           name: 'Prompts',
           url: '/guides/getting-started/ai-prompts' as `/${string}`,
         },

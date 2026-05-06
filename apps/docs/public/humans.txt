@@ -60,6 +60,7 @@ Colum Ferry
 Craig Cannon
 Cuong Do
 Dane Harrigan
+Daniel Mitterdorfer
 Daniel Velázquez Lara
 Danny White
 Dave Wilson
@@ -68,6 +69,7 @@ David Alvarez
 David Birdsong
 David Camacho Cateura
 David Weitzman
+David Whittington
 Davide Pellegatta
 Deepthi Sigireddi
 Deji I
@@ -141,6 +143,7 @@ Jordi Enric
 José Luis Ledesma
 Joshen Lim
 Julien Goux
+Kai M
 Kalleby Santos
 Kanishk Dudeja
 Kamil Ogórek
@@ -148,6 +151,7 @@ Kang Ming Tay
 Karan S
 Karlo Ison
 Katerina Skroumpelou
+Keith Fiske
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
@@ -221,6 +225,7 @@ Sam Rome
 Sam Rose
 Samir Ketema
 Sana Cordeaux
+Sasi Kanumuri
 Sara Read
 Sean Oliver
 Sean Romberg

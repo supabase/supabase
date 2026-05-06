@@ -8,11 +8,11 @@ import {
 } from '@/components/ui/Forms/FormSection'
 import {
   TIMESTAMP_MICROS_PER_MS,
-  type V2AuditLog,
+  type AuditLog,
 } from '@/data/organizations/organization-audit-logs-query'
 
 interface LogDetailsPanelProps {
-  selectedLog?: V2AuditLog
+  selectedLog?: AuditLog
   onClose: () => void
 }
 

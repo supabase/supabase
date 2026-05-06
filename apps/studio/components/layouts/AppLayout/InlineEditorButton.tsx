@@ -3,6 +3,7 @@ import { cn, KeyboardShortcut } from 'ui'
 
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -16,8 +17,10 @@ const InlineEditorKeyboardTooltip = () => {
 export const InlineEditorButton = () => {
   const { activeSidebar, toggleSidebar } = useSidebarManagerSnapshot()
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.EDITOR_PANEL
+  const track = useTrack()
 
   const handleClick = () => {
+    track('header_inline_editor_button_clicked')
     toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
   }
 

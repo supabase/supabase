@@ -1,0 +1,42 @@
+---
+id: 'ai-tools-plugins'
+title: 'Supabase Agent Plugin'
+subtitle: 'One-click setup for Supabase in your AI coding agent'
+description: 'The Supabase agent plugin bundles the MCP server and agent skills into a single install for your AI coding agent.'
+sidebar_label: 'Supabase Agent Plugin'
+---
+
+The Supabase agent plugin is a single install that gives your AI coding agent everything it needs to work with Supabase. It bundles the [Supabase MCP server](/docs/guides/getting-started/mcp) and [Supabase agent skills](/docs/guides/getting-started/ai-skills) so your agent can query your database, manage migrations, deploy Edge Functions, and follow Supabase and Postgres best practices — without manual configuration.
+
+## Why use the plugin?
+
+Agent plugins are packages of AI agent extensions. A single plugin can bundle any combination of:
+
+- **MCP servers** — external tool integrations that let your agent interact with services like Supabase
+- **Skills** — procedural knowledge and context your agent loads on demand to work more accurately
+- **Hooks** — event handlers that run at agent lifecycle points (e.g. before or after a tool call)
+- **Agents** — specialized sub-agents with specific personas and tool configurations
+- **Slash commands** — custom commands you can invoke directly in chat
+
+Bundling the [MCP server](/docs/guides/getting-started/mcp) and [agent skills](/docs/guides/getting-started/ai-skills) into a single plugin means you can set up both in one step. You can also install them separately if you prefer. You can install the plugin globally to use it across all your projects, or per project to keep it isolated.
+
+## Installation
+
+Choose your AI coding agent and follow the installation steps:
+
+<AgentPluginsPanel />
+
+## What's included
+
+### Supabase MCP server
+
+The [Supabase MCP server](/docs/guides/getting-started/mcp) connects your AI coding agent directly to your Supabase projects. Once authenticated, your agent can query your database, manage migrations, deploy Edge Functions, and more — see the [full list of available tools](/docs/guides/getting-started/mcp#available-tools).
+
+### Supabase agent skills
+
+Skills provide your agent with Supabase-specific procedural knowledge:
+
+- **`supabase`** — Core guidance for working with Supabase products (Database, Auth, Edge Functions, Storage, Realtime)
+- **`supabase-postgres-best-practices`** — Postgres query optimization, schema design, connection management, and RLS patterns
+
+For a full list of available skills and supported agents, see [Agent Skills](/docs/guides/getting-started/ai-skills).
