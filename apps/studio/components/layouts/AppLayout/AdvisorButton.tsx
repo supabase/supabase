@@ -7,10 +7,12 @@ import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignal
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { useNotificationsV2Query } from '@/data/notifications/notifications-v2-query'
+import { useTrack } from '@/lib/telemetry/track'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const { toggleSidebar, activeSidebar } = useSidebarManagerSnapshot()
+  const track = useTrack()
 
   const { data: lints } = useProjectLintsQuery({ projectRef })
   const { data: signalItems } = useAdvisorSignals({ projectRef })
@@ -36,6 +38,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
 
   const handleClick = () => {
+    track('header_advisor_button_clicked')
     toggleSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
   }
 
