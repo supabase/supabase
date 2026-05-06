@@ -15,6 +15,7 @@ import { ChevronLeft, X as XIcon } from 'lucide-react'
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 import NextImage from 'next/image'
 import Link from 'next/link'
 import { Button } from 'ui'
@@ -24,7 +25,9 @@ import ShareArticleActions from '@/components/Blog/ShareArticleActions'
 import DefaultLayout from '@/components/Layouts/Default'
 import SectionContainer from '@/components/Layouts/SectionContainer'
 import authors from '@/lib/authors.json'
+import { breadcrumbs } from '@/lib/breadcrumbs'
 import { capitalize, isNotNullOrUndefined } from '@/lib/helpers'
+import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 import mdxComponents from '@/lib/mdx/mdxComponents'
 import { mdxSerialize } from '@/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata } from '@/lib/posts'
@@ -221,6 +224,22 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
           },
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(
+              breadcrumbListSchema([
+                ...breadcrumbs.eventsIndex,
+                {
+                  name: event.meta_title ?? event.title,
+                  url: `https://supabase.com/events/${event.slug}`,
+                },
+              ])
+            ),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <div className="flex flex-col w-full bg-alternative border-b border-muted">
           <SectionContainer className="py-2! flex items-start">

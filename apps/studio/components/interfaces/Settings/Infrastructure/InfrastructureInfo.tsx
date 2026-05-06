@@ -1,7 +1,18 @@
 import { useParams } from 'common'
 import Link from 'next/link'
-import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Badge,
+  Button,
+  Input_Shadcn_ as Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
@@ -133,65 +144,78 @@ export const InfrastructureInfo = () => {
                     {isSuccessServiceVersions && (
                       <>
                         {authEnabled && (
-                          <Input
-                            readOnly
-                            disabled
+                          <FormItemLayout
                             label="Auth version"
-                            value={serviceVersions?.gotrue ?? ''}
-                          />
+                            layout="vertical"
+                            isReactForm={false}
+                          >
+                            <Input readOnly disabled value={serviceVersions?.gotrue ?? ''} />
+                          </FormItemLayout>
                         )}
-                        <Input
-                          readOnly
-                          disabled
+                        <FormItemLayout
                           label="PostgREST version"
-                          value={serviceVersions?.postgrest ?? ''}
-                        />
-                        <Input
-                          readOnly
-                          disabled
-                          value={currentPgVersion || serviceVersions?.['supabase-postgres'] || ''}
+                          layout="vertical"
+                          isReactForm={false}
+                        >
+                          <Input readOnly disabled value={serviceVersions?.postgrest ?? ''} />
+                        </FormItemLayout>
+                        <FormItemLayout
                           label="Postgres version"
-                          actions={[
-                            isVisibleReleaseChannel && (
-                              <Tooltip key="release-channel">
-                                <TooltipTrigger>
-                                  <Badge variant="warning" className="mr-1">
-                                    {isVisibleReleaseChannel}
-                                  </Badge>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="w-44 text-center">
-                                  This project uses a {isVisibleReleaseChannel} database version
-                                  release
-                                </TooltipContent>
-                              </Tooltip>
-                            ),
-                            isOrioleDb && (
-                              <Tooltip key="orioledb">
-                                <TooltipTrigger>
-                                  <Badge variant="default" className="mr-1">
-                                    OrioleDB
-                                  </Badge>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="w-44 text-center">
-                                  This project uses OrioleDB
-                                </TooltipContent>
-                              </Tooltip>
-                            ),
-                            isOnLatestVersion && (
-                              <Tooltip key="latest-version">
-                                <TooltipTrigger>
-                                  <Badge variant="success" className="mr-1">
-                                    Latest
-                                  </Badge>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="w-52 text-center">
-                                  Project is on the latest version of Postgres that Supabase
-                                  supports
-                                </TooltipContent>
-                              </Tooltip>
-                            ),
-                          ]}
-                        />
+                          layout="vertical"
+                          isReactForm={false}
+                        >
+                          <InputGroup>
+                            <InputGroupInput
+                              readOnly
+                              disabled
+                              value={
+                                currentPgVersion || serviceVersions?.['supabase-postgres'] || ''
+                              }
+                            />
+                            <InputGroupAddon align="inline-end">
+                              {[
+                                isVisibleReleaseChannel && (
+                                  <Tooltip key="release-channel">
+                                    <TooltipTrigger>
+                                      <Badge variant="warning" className="mr-1">
+                                        {isVisibleReleaseChannel}
+                                      </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom" className="w-44 text-center">
+                                      This project uses a {isVisibleReleaseChannel} database version
+                                      release
+                                    </TooltipContent>
+                                  </Tooltip>
+                                ),
+                                isOrioleDb && (
+                                  <Tooltip key="orioledb">
+                                    <TooltipTrigger>
+                                      <Badge variant="default" className="mr-1">
+                                        OrioleDB
+                                      </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom" className="w-44 text-center">
+                                      This project uses OrioleDB
+                                    </TooltipContent>
+                                  </Tooltip>
+                                ),
+                                isOnLatestVersion && (
+                                  <Tooltip key="latest-version">
+                                    <TooltipTrigger>
+                                      <Badge variant="success" className="mr-1">
+                                        Latest
+                                      </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom" className="w-52 text-center">
+                                      Project is on the latest version of Postgres that Supabase
+                                      supports
+                                    </TooltipContent>
+                                  </Tooltip>
+                                ),
+                              ]}
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </FormItemLayout>
                       </>
                     )}
 

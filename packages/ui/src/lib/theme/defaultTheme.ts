@@ -706,10 +706,11 @@ export default {
           rounded: `rounded-md`,
         },
         pills: {
-          base: `px-3 py-1`,
+          base: `my-px px-3 py-[3px] rounded-md transition-colors active:bg-sidebar-accent/50`,
           normal: `
             font-normal
             border-default
+            hover:bg-sidebar-accent/50
             group-hover:border-foreground-muted`,
           active: `
             font-semibold

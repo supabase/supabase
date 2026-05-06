@@ -21,6 +21,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ManagedBy } from '@/lib/constants/infrastructure'
+import { useTrack } from '@/lib/telemetry/track'
 
 // --- Sub-components ---
 
@@ -140,6 +141,7 @@ export const ProjectDropdown = ({
   const selectedProject = parentProject ?? project
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
+  const track = useTrack()
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
@@ -153,7 +155,12 @@ export const ProjectDropdown = ({
     if (!embedded) return <ShimmeringLoader className="p-2 md:mr-2 md:w-[90px]" />
   }
 
-  const handleSetOpen = embedded ? (_value: boolean) => onClose?.() : setOpen
+  const handleSetOpen = embedded
+    ? (_value: boolean) => onClose?.()
+    : (next: boolean) => {
+        if (next) track('header_project_dropdown_opened')
+        setOpen(next)
+      }
 
   const selectorProps = {
     open,
