@@ -403,10 +403,7 @@ const SchemaExposureOptions = ({
   return (
     <>
       {isError && (
-        <Admonition
-          type="warning"
-          description="An error occurred while fetching Data API settings."
-        />
+        <Admonition type="warning" title="An error occurred while fetching Data API settings." />
       )}
 
       {isSchemaExposed && apiUrl && (

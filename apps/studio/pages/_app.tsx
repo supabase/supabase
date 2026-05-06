@@ -13,8 +13,6 @@ import '@/styles/storage.css'
 import '@/styles/stripe.css'
 import '@/styles/ui.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
-import 'ui/build/css/themes/dark.css'
-import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
@@ -184,12 +182,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   <MetaFaviconsPagesRouter applicationName="Supabase Studio" includeManifest />
                   <TooltipProvider delayDuration={0}>
                     <RouteValidationWrapper>
-                      <ThemeProvider
-                        defaultTheme="system"
-                        themes={['dark', 'light', 'classic-dark']}
-                        enableSystem
-                        disableTransitionOnChange
-                      >
+                      <ThemeProvider>
                         <DevToolbarProvider apiUrl={API_URL}>
                           <AiAssistantStateContextProvider>
                             <CommandProvider>

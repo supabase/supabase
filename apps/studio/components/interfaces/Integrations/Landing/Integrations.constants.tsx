@@ -584,7 +584,11 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
       const startTime = Date.now()
       await installStripeSync({ projectRef, startTime, stripeSecretKey: stripe_api_key as string })
 
-      if (track) track('integration_install_submitted', { integrationName: 'stripe_sync_engine' })
+      if (track)
+        track('integration_install_submitted', {
+          integrationName: 'stripe_sync_engine',
+          method: 'template',
+        })
 
       const queryClient = getQueryClient()
       await queryClient.invalidateQueries({ queryKey: stripeSyncKeys.all })

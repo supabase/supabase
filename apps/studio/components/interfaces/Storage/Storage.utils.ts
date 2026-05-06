@@ -1,9 +1,9 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
 import { difference } from 'lodash'
 import { useRouter } from 'next/router'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
 import type { StoragePolicyFormField } from './Storage.types'
+import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { convertKVStringArrayToJson } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { FDW } from '@/data/fdw/fdws-query'
@@ -21,7 +21,7 @@ const shortHash = (str: string) => {
   return new Uint32Array([hash])[0].toString(36)
 }
 
-export type PoliciesByBucket = { name: string | Symbol; policies: PostgresPolicy[] }[]
+export type PoliciesByBucket = { name: string | Symbol; policies: Policy[] }[]
 
 /**
  * Formats the policies from the objects table in the storage schema
@@ -31,7 +31,7 @@ export type PoliciesByBucket = { name: string | Symbol; policies: PostgresPolicy
  */
 export const formatPoliciesForStorage = (
   buckets: Bucket[],
-  policies: PostgresPolicy[]
+  policies: Policy[]
 ): PoliciesByBucket => {
   if (policies.length === 0) return []
 
@@ -58,7 +58,7 @@ export const UNKNOWN_BUCKET_SYMBOL = createWrappedSymbol('unknown-bucket', 'Unkn
  */
 export const UNGROUPED_POLICY_SYMBOL = createWrappedSymbol('ungrouped-policy', 'Ungrouped')
 
-const formatStoragePolicies = (buckets: Bucket[], policies: PostgresPolicy[]) => {
+const formatStoragePolicies = (buckets: Bucket[], policies: Policy[]) => {
   const availableBuckets = buckets.map((bucket) => bucket.name)
   const formattedPolicies = policies.map((policy) => {
     const { definition: policyDefinition, check: policyCheck } = policy
@@ -93,8 +93,8 @@ export const extractBucketNameFromDefinition = (definition: string | null) => {
   return bucketDefinition ? bucketDefinition.split("'")[1] : null
 }
 
-const groupPoliciesByBucket = (policies: (PostgresPolicy & { bucket: string | Symbol })[]) => {
-  const policiesByBucket = new Map<string | Symbol, PostgresPolicy[]>()
+const groupPoliciesByBucket = (policies: (Policy & { bucket: string | Symbol })[]) => {
+  const policiesByBucket = new Map<string | Symbol, Policy[]>()
   policies.forEach((policy) => {
     if (!policiesByBucket.has(policy.bucket)) {
       policiesByBucket.set(policy.bucket, [])

@@ -3,10 +3,13 @@ import { debounce } from 'lib/helpers'
 import { LayoutGrid, Search, Table2 } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/compat/router'
+import Head from 'next/head'
 import Link from 'next/link'
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
-import { Badge, Button, Checkbox, cn, Input } from 'ui'
+import { Button, Checkbox, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 import {
   FeaturesMatrix,
   productLabel,
@@ -118,6 +121,14 @@ function FeaturesPage() {
           url: '/customers',
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.features)),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <SectionContainer className="py-0! sm:px-0!">
           <div className="border border-muted rounded-xl bg-alternative my-4 px-6 py-8 md:py-10 lg:px-16 lg:py-20 xl:px-20 bg-center bg-cover bg-[url('/images/features/features-cover-light.svg')] dark:bg-[url('/images/features/features-cover-dark.svg')]">
@@ -137,16 +148,19 @@ function FeaturesPage() {
         <SectionContainer className="relative grid md:grid-cols-4 md:gap-4 pt-0!">
           <div className="relative w-full h-full">
             <div className="mb-4 flex flex-col gap-4 sticky top-20">
-              <Input
-                icon={<Search size="14" />}
-                size="small"
-                autoComplete="off"
-                type="search"
-                placeholder="Search features"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="w-full [&_input]:text-base [&_input]:md:text-sm [&_input]:leading-4!"
-              />
+              <InputGroup className="w-full">
+                <InputGroupAddon>
+                  <Search />
+                </InputGroupAddon>
+                <InputGroupInput
+                  size="small"
+                  autoComplete="off"
+                  type="search"
+                  placeholder="Search features"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+              </InputGroup>
               <div className="hidden md:flex flex-col gap-2.5">
                 <div className="flex items-center gap-2 text-foreground-light hover:text-foreground cursor-pointer! hover:cursor-pointer! transition-colors">
                   <Checkbox

@@ -3,7 +3,7 @@ import { expect, Page } from '@playwright/test'
 import { createTable, dropTable, query } from '../utils/db/index.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
-import { waitForTableToLoad } from '../utils/wait-for-response.js'
+import { createApiResponseWaiter, waitForTableToLoad } from '../utils/wait-for-response.js'
 
 const QUEUE_OPERATIONS_KEY = 'supabase-ui-queue-operations'
 const tableNamePrefix = 'pw_queue_table'
@@ -46,8 +46,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -94,8 +100,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -137,8 +149,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -175,8 +193,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -217,8 +241,14 @@ test.describe('Queue Table Operations', () => {
     )
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -262,8 +292,14 @@ test.describe('Queue Table Operations', () => {
     )
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -309,8 +345,14 @@ test.describe('Queue Table Operations', () => {
     )
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -350,8 +392,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -388,8 +436,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -433,8 +487,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -473,8 +533,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -508,8 +574,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -552,8 +624,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -591,8 +669,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -645,8 +729,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -701,8 +791,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName1}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -755,8 +851,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName1}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -799,8 +901,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
@@ -856,8 +964,14 @@ test.describe('Queue Table Operations', () => {
 
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await enableQueueOperations(page)
+    const tableLoadWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=entity-types-public-'
+    )
     await page.reload()
-    await waitForTableToLoad(page, ref)
+    await tableLoadWait
 
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)

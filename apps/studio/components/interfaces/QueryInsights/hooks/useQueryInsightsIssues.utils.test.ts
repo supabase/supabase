@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta'
 import { describe, expect, it, vi } from 'vitest'
 
 import { hasIndexRecommendations } from '../../QueryPerformance/IndexAdvisor/index-advisor.utils'
@@ -9,7 +10,7 @@ vi.mock('../../QueryPerformance/IndexAdvisor/index-advisor.utils', () => ({
 }))
 
 const baseRow: QueryPerformanceRow = {
-  query: 'SELECT * FROM users',
+  query: safeSql`SELECT * FROM users`,
   calls: 10,
   mean_time: 50,
   min_time: 10,

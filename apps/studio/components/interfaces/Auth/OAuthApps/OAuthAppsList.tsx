@@ -13,7 +13,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Table,
   TableBody,
   TableCell,
@@ -231,14 +233,17 @@ export const OAuthAppsList = () => {
         )}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-            <Input
-              placeholder="Search OAuth apps"
-              size="tiny"
-              icon={<Search />}
-              value={filterString}
-              className="w-full lg:w-52"
-              onChange={(e) => setFilterString(e.target.value)}
-            />
+            <InputGroup className="w-full lg:w-52">
+              <InputGroupInput
+                size="tiny"
+                placeholder="Search OAuth apps"
+                value={filterString}
+                onChange={(e) => setFilterString(e.target.value)}
+              />
+              <InputGroupAddon>
+                <Search />
+              </InputGroupAddon>
+            </InputGroup>
             <FilterPopover
               name="Registration Type"
               options={OAUTH_APP_REGISTRATION_TYPE_OPTIONS}
