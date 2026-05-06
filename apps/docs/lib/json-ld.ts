@@ -24,7 +24,7 @@ export function breadcrumbListSchema({ pathname, chain }: BreadcrumbListSchemaIn
   const itemListElement = fullChain.map((crumb, index) => {
     const isLeaf = index === fullChain.length - 1
     const name = crumb.title ?? crumb.name
-    const path = crumb.url ?? (isLeaf ? pathname : undefined)
+    const path = isLeaf ? pathname : crumb.url
 
     const listItem: Record<string, unknown> = {
       '@type': 'ListItem',
