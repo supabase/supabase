@@ -1,8 +1,5 @@
 import { Users } from 'lucide-react'
 import DataGrid, { Column } from 'react-data-grid'
-
-import 'react-data-grid/lib/styles.css'
-
 import { cn } from 'ui'
 
 /**
@@ -24,7 +21,7 @@ export default function DataGridEmptyState() {
   return (
     <div className="h-full w-full flex flex-col relative min-h-[400px] rounded-md border overflow-hidden">
       <DataGrid
-        className="flex-grow border-t-0 bg-dash-canvas"
+        className="grow border-t-0 bg-dash-canvas"
         rowHeight={44}
         headerRowHeight={36}
         columns={columns}
@@ -33,7 +30,7 @@ export default function DataGridEmptyState() {
         rowClass={() => {
           return cn(
             'bg-surface-200 cursor-pointer',
-            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
             '[&>.rdg-cell:first-child>div]:ml-8'
           )
         }}

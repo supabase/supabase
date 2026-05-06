@@ -1,4 +1,3 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { ChevronUp, Search, X } from 'lucide-react'
 import { forwardRef, useEffect, useState, type HTMLAttributes, type ReactNode } from 'react'
@@ -22,6 +21,7 @@ import {
 
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
+import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { type Bucket } from '@/data/storage/buckets-query'
@@ -29,12 +29,12 @@ import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 export type SelectBucketPolicyForAction = {
   addPolicy: (bucketName?: string, table?: string) => void
-  editPolicy: (policy: PostgresPolicy, bucketName?: string, table?: string) => void
-  deletePolicy: (policy: PostgresPolicy) => void
+  editPolicy: (policy: Policy, bucketName?: string, table?: string) => void
+  deletePolicy: (policy: Policy) => void
 }
 
 type BucketsPoliciesProps = {
-  buckets: { bucket: Bucket; policies: PostgresPolicy[] }[]
+  buckets: { bucket: Bucket; policies: Policy[] }[]
   search?: string
   debouncedSearch?: string
   setSearch: (search: string) => void
@@ -131,7 +131,7 @@ export const BucketsPolicies = ({
 }
 
 type BucketsPoliciesVirtualizedListProps = {
-  items: { bucket: Bucket; policies: PostgresPolicy[] }[]
+  items: { bucket: Bucket; policies: Policy[] }[]
   actions: SelectBucketPolicyForAction
   pagination: BucketsPoliciesProps['pagination']
 }

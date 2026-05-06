@@ -1,34 +1,29 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, Trash } from 'lucide-react'
-import { Control } from 'react-hook-form'
-import {
-  Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
-} from 'ui'
+import type { Control, FieldPath, FieldValues } from 'react-hook-form'
+import { Button, FormControl, FormField, FormItem, FormLabel, FormMessage, Input_Shadcn_ } from 'ui'
 
-interface EnumeratedTypeValueRowProps {
-  control: Control<any>
+interface EnumeratedTypeValueRowProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> {
+  control: Control<TFieldValues>
   index: number
   id: string
-  name: string
+  name: TName
   isDisabled?: boolean
   onRemoveValue: () => void
 }
 
-const EnumeratedTypeValueRow = ({
+const EnumeratedTypeValueRow = <TFieldValues extends FieldValues>({
   control,
   index,
   id,
   name,
   isDisabled = false,
   onRemoveValue,
-}: EnumeratedTypeValueRowProps) => {
+}: EnumeratedTypeValueRowProps<TFieldValues>) => {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition } =
     useSortable({
       disabled: isDisabled,
@@ -41,20 +36,20 @@ const EnumeratedTypeValueRow = ({
   }
 
   return (
-    <FormField_Shadcn_
+    <FormField
       control={control}
       name={name}
       render={({ field: inputField }) => (
-        <FormItem_Shadcn_ ref={setNodeRef} style={style}>
-          <FormLabel_Shadcn_ className="sr-only">Value {index}</FormLabel_Shadcn_>
-          <FormControl_Shadcn_>
+        <FormItem ref={setNodeRef} style={style}>
+          <FormLabel className="sr-only">Value {index}</FormLabel>
+          <FormControl>
             <div className="flex items-center space-x-2 space-y-2">
               <button
                 ref={setActivatorNodeRef}
                 {...attributes}
                 {...listeners}
                 className={`opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab ${
-                  isDisabled ? 'text-foreground-lighter !cursor-default' : 'text-foreground'
+                  isDisabled ? 'text-foreground-lighter cursor-default!' : 'text-foreground'
                 }`}
                 type="button"
                 disabled={isDisabled}
@@ -71,9 +66,9 @@ const EnumeratedTypeValueRow = ({
                 onClick={() => onRemoveValue()}
               />
             </div>
-          </FormControl_Shadcn_>
-          <FormMessage_Shadcn_ className="ml-6" />
-        </FormItem_Shadcn_>
+          </FormControl>
+          <FormMessage className="ml-6" />
+        </FormItem>
       )}
     />
   )

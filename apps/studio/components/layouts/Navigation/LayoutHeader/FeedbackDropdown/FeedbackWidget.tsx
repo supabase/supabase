@@ -2,7 +2,7 @@ import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { toPng } from 'html-to-image'
-import { Camera, CircleCheck, HelpCircle, Image as ImageIcon, Upload, X } from 'lucide-react'
+import { Camera, CircleCheck, Image as ImageIcon, Upload, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -251,7 +251,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
                 const blobUrl = URL.createObjectURL(blob)
                 window.open(blobUrl, '_blank')
               }}
-              className="cursor-pointer rounded h-[26px] w-[26px] border border-control relative bg-cover bg-center bg-no-repeat"
+              className="cursor-pointer rounded-sm h-[26px] w-[26px] border border-control relative bg-cover bg-center bg-no-repeat"
             >
               <button
                 className={[

@@ -13,7 +13,6 @@ import {
   unixMicroToIsoTimestamp,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import type { AnalyticsInterval } from '@/data/analytics/constants'
-import { get } from '@/data/fetchers'
 import { analyticsIntervalToGranularity, fetchLogs } from '@/data/reports/report.utils'
 
 type EdgeFunctionReportFilters = {

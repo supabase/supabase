@@ -13,12 +13,17 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormLabel_Shadcn_,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormLabel,
   Input_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
   Separator,
   Sheet,
   SheetClose,
@@ -64,6 +69,9 @@ const FormSchema = z.object({
     .array()
     .min(1, 'At least one redirect URI is required'),
   client_type: z.enum(['public', 'confidential']).default('confidential'),
+  token_endpoint_auth_method: z
+    .enum(['client_secret_basic', 'client_secret_post', 'none'])
+    .default('client_secret_basic'),
   client_id: z.string().optional(),
   client_secret: z.string().optional(),
   logo_uri: z.string().optional(),
@@ -76,6 +84,7 @@ const initialValues = {
   type: 'manual' as const,
   redirect_uris: [{ value: '' }],
   client_type: 'confidential' as const,
+  token_endpoint_auth_method: 'client_secret_basic' as const,
   client_id: '',
   client_secret: '',
   logo_uri: '',
@@ -144,6 +153,11 @@ export const CreateOrUpdateOAuthAppSheet = ({
               ? appToEdit.redirect_uris.map((uri) => ({ value: uri }))
               : [{ value: '' }],
           client_type: appToEdit.client_type,
+          token_endpoint_auth_method:
+            (appToEdit.token_endpoint_auth_method as
+              | 'client_secret_basic'
+              | 'client_secret_post'
+              | 'none') || 'client_secret_basic',
           client_id: appToEdit.client_id,
           client_secret: '****************************************************************',
           logo_uri: appToEdit.logo_uri || undefined,
@@ -164,10 +178,12 @@ export const CreateOrUpdateOAuthAppSheet = ({
     const uploadedLogoUri = data.logo_uri?.trim() ?? ''
 
     if (isEditMode && appToEdit) {
-      const payload: UpdateOAuthClientParams = {
+      const payload: UpdateOAuthClientParams & { token_endpoint_auth_method?: string } = {
         client_name: data.name,
         redirect_uris: validRedirectUris,
         logo_uri: uploadedLogoUri,
+        token_endpoint_auth_method:
+          data.client_type === 'public' ? 'none' : data.token_endpoint_auth_method,
       }
 
       updateOAuthApp({
@@ -177,12 +193,18 @@ export const CreateOrUpdateOAuthAppSheet = ({
         ...payload,
       })
     } else {
-      const payload: CreateOAuthClientParams & { logo_uri?: string; client_type?: string } = {
+      const payload: CreateOAuthClientParams & {
+        logo_uri?: string
+        client_type?: string
+        token_endpoint_auth_method?: string
+      } = {
         client_name: data.name,
         client_uri: '',
         client_type: data.client_type,
         redirect_uris: validRedirectUris,
         logo_uri: uploadedLogoUri || undefined,
+        token_endpoint_auth_method:
+          data.client_type === 'public' ? 'none' : data.token_endpoint_auth_method,
       }
 
       createOAuthApp({
@@ -242,7 +264,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
               <SheetClose
                 className={cn(
                   'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-                  'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                  'focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2',
                   'disabled:pointer-events-none data-[state=open]:bg-secondary',
                   'transition'
                 )}
@@ -255,23 +277,23 @@ export const CreateOrUpdateOAuthAppSheet = ({
               </SheetTitle>
             </div>
           </SheetHeader>
-          <SheetSection className="overflow-auto flex-grow px-0">
-            <Form_Shadcn_ {...form}>
+          <SheetSection className="overflow-auto grow px-0">
+            <Form {...form}>
               <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)} id={FORM_ID}>
                 <div className="px-5 flex items-start justify-between gap-4">
-                  <div className="flex-grow space-y-4">
-                    <FormField_Shadcn_
+                  <div className="grow space-y-4">
+                    <FormField
                       control={form.control}
                       name="name"
                       render={({ field }) => (
                         <FormItemLayout label="Name">
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Input_Shadcn_ {...field} placeholder="My OAuth App" />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="logo_uri"
                       render={({ field }) => (
@@ -279,7 +301,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                           label="Logo"
                           description={`Paste an absolute image URL/path or select one from a public File Storage bucket.`}
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <div className="flex w-full flex-col gap-3">
                               <div className="flex flex-wrap items-center gap-2">
                                 <div
@@ -331,7 +353,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                 </div>
                               </div>
                             </div>
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -344,12 +366,12 @@ export const CreateOrUpdateOAuthAppSheet = ({
                     <div className="px-5">
                       <Panel>
                         <Panel.Content className="space-y-2">
-                          <FormField_Shadcn_
+                          <FormField
                             control={form.control}
                             name="client_id"
                             render={() => (
                               <FormItemLayout label="Client ID">
-                                <FormControl_Shadcn_>
+                                <FormControl>
                                   <Input
                                     copy
                                     readOnly
@@ -358,14 +380,14 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                     onChange={() => {}}
                                     onCopy={() => toast.success('Client ID copied to clipboard')}
                                   />
-                                </FormControl_Shadcn_>
+                                </FormControl>
                               </FormItemLayout>
                             )}
                           />
 
                           {!isPublicClient && (
                             <>
-                              <FormField_Shadcn_
+                              <FormField
                                 control={form.control}
                                 name="client_secret"
                                 render={() => (
@@ -373,7 +395,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                     label="Client Secret"
                                     description="Client secret is hidden for security. Use the regenerate button to create a new one."
                                   >
-                                    <FormControl_Shadcn_>
+                                    <FormControl>
                                       <Input
                                         readOnly
                                         type="password"
@@ -381,7 +403,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                         value="****************************************************************"
                                         onChange={() => {}}
                                       />
-                                    </FormControl_Shadcn_>
+                                    </FormControl>
                                   </FormItemLayout>
                                 )}
                               />
@@ -403,7 +425,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                 )}
 
                 <div className="px-5 gap-2 flex flex-col">
-                  <FormLabel_Shadcn_ className="text-foreground">Redirect URIs</FormLabel_Shadcn_>
+                  <FormLabel className="text-foreground">Redirect URIs</FormLabel>
                   <SingleValueFieldArray
                     control={form.control}
                     name="redirect_uris"
@@ -415,13 +437,13 @@ export const CreateOrUpdateOAuthAppSheet = ({
                     minimumRows={1}
                     rowsClassName="space-y-2"
                   />
-                  <FormDescription_Shadcn_ className="text-foreground-lighter">
+                  <FormDescription className="text-foreground-lighter">
                     URLs where users will be redirected after authentication.
-                  </FormDescription_Shadcn_>
+                  </FormDescription>
                 </div>
 
                 <Separator />
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="client_type"
                   render={({ field }) => (
@@ -441,20 +463,55 @@ export const CreateOrUpdateOAuthAppSheet = ({
                       }
                       className={'px-5'}
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Switch
                           checked={field.value === 'public'}
-                          onCheckedChange={(checked) =>
-                            field.onChange(checked ? 'public' : 'confidential')
-                          }
+                          onCheckedChange={(checked) => {
+                            const newType = checked ? 'public' : 'confidential'
+                            field.onChange(newType)
+                            form.setValue(
+                              'token_endpoint_auth_method',
+                              newType === 'public' ? 'none' : 'client_secret_basic'
+                            )
+                          }}
                           disabled={isEditMode}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
+
+                {form.watch('client_type') === 'confidential' && (
+                  <FormField
+                    control={form.control}
+                    name="token_endpoint_auth_method"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label="Token Endpoint Auth Method"
+                        description="How the client authenticates with the token endpoint. The client secret is included in either the Authorization header or the request body."
+                        className="px-5"
+                      >
+                        <FormControl>
+                          <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger_Shadcn_ className="text-sm">
+                              <SelectValue_Shadcn_ />
+                            </SelectTrigger_Shadcn_>
+                            <SelectContent_Shadcn_>
+                              <SelectItem_Shadcn_ value="client_secret_basic" className="text-sm">
+                                HTTP Basic Auth header (client_secret_basic)
+                              </SelectItem_Shadcn_>
+                              <SelectItem_Shadcn_ value="client_secret_post" className="text-sm">
+                                Request body (client_secret_post)
+                              </SelectItem_Shadcn_>
+                            </SelectContent_Shadcn_>
+                          </Select_Shadcn_>
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                )}
               </form>
-            </Form_Shadcn_>
+            </Form>
           </SheetSection>
           <SheetFooter>
             <Button type="default" disabled={isCreating || isUpdating} onClick={onClose}>

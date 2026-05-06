@@ -109,7 +109,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
           }
           onClick={() => setRevealSecret(!revealSecret)}
         />
-        <div className="flex-grow min-w-0">
+        <div className="grow min-w-0">
           {revealSecret && revealedValue !== undefined ? (
             <Input copy readOnly size="tiny" className="font-mono" value={revealedValue} />
           ) : (

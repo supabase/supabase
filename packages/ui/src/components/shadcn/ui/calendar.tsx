@@ -51,7 +51,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         button_previous: cn(
           buttonVariants({ variant: 'outline' }),
           'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
-          'z-[5]',
+          'z-5',
           'aria-disabled:opacity-25 aria-disabled:hover:opacity-25 aria-disabled:cursor-not-allowed',
           'absolute left-0 top-0',
           button_previous
@@ -59,7 +59,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         button_next: cn(
           buttonVariants({ variant: 'outline' }),
           'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
-          'z-[5]',
+          'z-5',
           'aria-disabled:opacity-25 aria-disabled:hover:opacity-25 aria-disabled:cursor-not-allowed',
           'absolute right-0 top-0',
           button_next

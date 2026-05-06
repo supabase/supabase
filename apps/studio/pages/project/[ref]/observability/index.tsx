@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFeatureFlags, useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { LogoLoader } from 'ui'
 
 import { ObservabilityOverview } from '@/components/interfaces/Observability/ObservabilityOverview'

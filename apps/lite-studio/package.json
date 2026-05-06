@@ -25,12 +25,11 @@
     "@types/node": "^22",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "autoprefixer": "^10.4.27",
     "config": "workspace:*",
-    "postcss": "^8.5.8",
+    "postcss": "catalog:",
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
-    "vite": "catalog:",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite": "^7.3.2",
+    "vite-tsconfig-paths": "catalog:"
   }
 }

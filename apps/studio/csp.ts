@@ -5,6 +5,10 @@ const SUPABASE_URL = process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL
 const GOTRUE_URL = process.env.NEXT_PUBLIC_GOTRUE_URL
   ? new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
   : ''
+const MARKETPLACE_API_URL = process.env.NEXT_PUBLIC_MARKETPLACE_API_URL
+  ? new URL(process.env.NEXT_PUBLIC_MARKETPLACE_API_URL).origin
+  : ''
+
 const SUPABASE_PROJECTS_URL = 'https://*.supabase.co https://*.storage.supabase.co'
 const SUPABASE_PROJECTS_URL_WS = 'wss://*.supabase.co'
 
@@ -85,6 +89,7 @@ export function getCSP() {
     API_URL,
     SUPABASE_URL,
     GOTRUE_URL,
+    MARKETPLACE_API_URL,
     SUPABASE_LOCAL_PROJECTS_URL_WS,
     SUPABASE_PROJECTS_URL,
     SUPABASE_PROJECTS_URL_WS,
@@ -130,6 +135,7 @@ export function getCSP() {
     USERCENTRICS_APP_URL,
     STAPE_URL,
     USERCENTRICS_URLS,
+    MARKETPLACE_API_URL,
     ...(!!NIMBUS_PROD_PROJECTS_URL ? [NIMBUS_PROD_PROJECTS_URL, NIMBUS_PROD_PROJECTS_URL_WS] : []),
   ]
   const STYLE_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]

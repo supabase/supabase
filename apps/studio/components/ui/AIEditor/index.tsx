@@ -4,11 +4,15 @@ import type { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { KeyboardShortcut } from 'ui'
+import { useSetCommandMenuOpen } from 'ui-patterns'
 
 import { DiffEditor } from '../DiffEditor'
 import ResizableAIWidget from './ResizableAIWidget'
+import { getEditorSelectionParts } from './utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { constructHeaders } from '@/data/fetchers'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AIEditorProps {
@@ -21,6 +25,7 @@ interface AIEditorProps {
     projectRef?: string
     connectionString?: string | null
     orgSlug?: string
+    language?: string
   }
   initialPrompt?: string
   readOnly?: boolean
@@ -63,8 +68,17 @@ export const AIEditor = ({
   const monacoRef = useRef<Monaco | null>(null)
   const closeActionDisposableRef = useRef<{ dispose: () => void } | null>(null)
 
+  const isCommandMenuHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
+  const setCommandMenuOpen = useSetCommandMenuOpen()
+
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
+
+  const commandMenuHotkeyEnabledRef = useRef(isCommandMenuHotkeyEnabled)
+  commandMenuHotkeyEnabledRef.current = isCommandMenuHotkeyEnabled
+
+  const setCommandMenuOpenRef = useRef(setCommandMenuOpen)
+  setCommandMenuOpenRef.current = setCommandMenuOpen
 
   const [currentValue, setCurrentValue] = useState(value || defaultValue)
   const [isDiffMode, setIsDiffMode] = useState(false)
@@ -84,7 +98,7 @@ export const AIEditor = ({
 
   const complete = useCallback(
     async (
-      prompt: string,
+      _prompt: string,
       options?: {
         headers?: Record<string, string>
         body?: { completionMetadata?: any }
@@ -249,29 +263,21 @@ export const AIEditor = ({
     editor.addAction({
       id: 'generate-ai',
       label: 'Generate with AI',
-      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyK],
       run: () => {
-        const selection = editor.getSelection()
-        const model = editor.getModel()
-        if (!model || !selection) return
-
-        const allLines = model.getLinesContent()
-        const startLineIndex = selection.startLineNumber - 1
-        const endLineIndex = selection.endLineNumber
-
-        const beforeSelection = allLines.slice(0, startLineIndex).join('\n') + '\n'
-        const selectedText = allLines.slice(startLineIndex, endLineIndex).join('\n')
-        const afterSelection = '\n' + allLines.slice(endLineIndex).join('\n')
-
-        setPromptState({
-          isOpen: true,
-          selection: selectedText,
-          beforeSelection,
-          afterSelection,
-          startLineNumber: selection?.startLineNumber ?? 0,
-          endLineNumber: selection?.endLineNumber ?? 0,
-        })
+        const selectionParts = getEditorSelectionParts(editor)
+        if (!selectionParts) return
+        setPromptState({ isOpen: true, ...selectionParts })
       },
+    })
+
+    // Monaco claims Cmd+K as a chord prefix, which swallows the global command
+    // menu shortcut while the editor is focused. Intercept it here and open the
+    // command menu directly so it works the same inside and outside the editor.
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK, () => {
+      if (commandMenuHotkeyEnabledRef.current) {
+        setCommandMenuOpenRef.current(true)
+      }
     })
 
     if (autoFocus) {
@@ -450,7 +456,7 @@ export const AIEditor = ({
               >
                 Hit{' '}
                 <KeyboardShortcut
-                  keys={['Meta', 'k']}
+                  keys={['Meta', 'Shift', 'k']}
                   variant="inline"
                   className="text-xs text-foreground-lighter"
                 />{' '}

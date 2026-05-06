@@ -4,6 +4,7 @@ import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult } from '@stripe/stripe-js'
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useDebounce } from '@uidotdev/usehooks'
 import { AlertCircle, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -23,34 +24,41 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
 import type { PaymentMethodElementRef } from '../../Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import PaymentMethodSelection from './Subscription/PaymentMethodSelection'
+import { ChargeBreakdown } from '@/components/interfaces/Billing/ChargeBreakdown'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
 import { PaymentConfirmation } from '@/components/interfaces/Billing/Payment/PaymentConfirmation'
 import { NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useOrganizationCreditTopUpMutation } from '@/data/organizations/organization-credit-top-up-mutation'
+import { useCreditTopUpPreview } from '@/data/organizations/organization-credit-top-up-preview'
+import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { subscriptionKeys } from '@/data/subscriptions/keys'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { formatCurrency } from '@/lib/helpers'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 const FORM_ID = 'credit-top-up'
+const MIN_TOP_UP_AMOUNT = 300
+const MAX_TOP_UP_AMOUNT = 2000
 
 const FormSchema = z.object({
   amount: z.coerce
     .number()
-    .gte(300, 'Amount must be between $300 - $2000.')
-    .lte(2000, 'Amount must be between $300 - $2000.')
+    .gte(MIN_TOP_UP_AMOUNT, `Amount must be between $${MIN_TOP_UP_AMOUNT} - $${MAX_TOP_UP_AMOUNT}.`)
+    .lte(MAX_TOP_UP_AMOUNT, `Amount must be between $${MIN_TOP_UP_AMOUNT} - $${MAX_TOP_UP_AMOUNT}.`)
     .int('Amount must be a whole number.'),
   paymentMethod: z.string(),
 })
@@ -87,6 +95,52 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const [topUpModalVisible, setTopUpModalVisible] = useState(false)
   const [useAsDefaultBillingAddress, setUseAsDefaultBillingAddress] = useState(true)
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
+
+  const [latestAddress, setLatestAddress] = useState<CustomerAddress>()
+  const [latestTaxId, setLatestTaxId] = useState<CustomerTaxId | null>()
+
+  const billingAddress = useAsDefaultBillingAddress ? latestAddress : undefined
+  const billingTaxId = useAsDefaultBillingAddress ? latestTaxId : null
+  const debouncedAddress = useDebounce(billingAddress, 1000)
+  const debouncedTaxId = useDebounce(billingTaxId, 1000)
+
+  const watchedAmount = form.watch('amount')
+  const debouncedAmount = useDebounce(watchedAmount, 1000)
+  const parsedAmount = Number(debouncedAmount)
+  const validAmount =
+    !Number.isNaN(parsedAmount) &&
+    Number.isInteger(parsedAmount) &&
+    parsedAmount >= MIN_TOP_UP_AMOUNT &&
+    parsedAmount <= MAX_TOP_UP_AMOUNT
+      ? parsedAmount
+      : undefined
+
+  const isPreviewStale =
+    watchedAmount !== debouncedAmount ||
+    billingAddress !== debouncedAddress ||
+    billingTaxId !== debouncedTaxId
+
+  const handleAddressChange = useCallback((address: CustomerAddress) => {
+    setLatestAddress(address)
+  }, [])
+
+  const handleTaxIdChange = useCallback((taxId: CustomerTaxId | null) => {
+    setLatestTaxId(taxId)
+  }, [])
+
+  const {
+    data: creditPreview,
+    isFetching: creditPreviewIsFetching,
+    isSuccess: creditPreviewInitialized,
+  } = useCreditTopUpPreview(
+    {
+      slug,
+      amount: validAmount,
+      address: debouncedAddress,
+      taxId: debouncedTaxId ?? undefined,
+    },
+    { enabled: topUpModalVisible && !!validAmount }
+  )
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
 
@@ -125,7 +179,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const [paymentIntentSecret, setPaymentIntentSecret] = useState('')
   const [paymentIntentConfirmation, setPaymentIntentConfirmation] = useState<PaymentIntentResult>()
 
-  const onSubmit: SubmitHandler<CreditTopUpForm> = async ({ amount, paymentMethod }) => {
+  const onSubmit: SubmitHandler<CreditTopUpForm> = async ({ amount }) => {
     setPaymentIntentConfirmation(undefined)
 
     const token = await initHcaptcha()
@@ -175,6 +229,8 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
       setCaptchaRef(null)
       setPaymentIntentConfirmation(undefined)
       setPaymentIntentSecret('')
+      setLatestAddress(undefined)
+      setLatestTaxId(null)
     }
   }
 
@@ -224,14 +280,14 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
           size="invisible"
           onOpen={() => {
             // [Joshen] This is to ensure that hCaptcha popup remains clickable
-            if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+            if (document !== undefined) document.body.classList.add('pointer-events-auto!')
           }}
           onClose={() => {
-            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+            if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
           }}
           onVerify={(token) => {
             setCaptchaToken(token)
-            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+            if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
           }}
           onExpire={() => {
             setCaptchaToken(null)
@@ -241,9 +297,9 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
           <DialogTitle>Top Up Credits</DialogTitle>
           <DialogDescription className="space-y-2">
             <p className="prose text-sm">
-              On successful payment, an invoice will be issued and you'll be granted credits.
-              Credits will be applied to future invoices only and are not refundable. The topped up
-              credits do not expire.
+              On successful payment, an invoice will be issued and you'll be granted credits equal
+              to the pre-tax amount. Credits will be applied to future invoices only and are not
+              refundable. The topped up credits do not expire.
             </p>
             <p className="prose text-sm">
               For larger discounted credit packages, please reach out to us via{' '}
@@ -264,10 +320,10 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
         <DialogSectionSeparator />
 
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
             <DialogSection className="flex flex-col gap-2">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="amount"
                 render={({ field }) => (
@@ -277,7 +333,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                 )}
               />
 
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="paymentMethod"
                 render={() => (
@@ -288,6 +344,8 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                     readOnly={executingTopUp || paymentConfirmationLoading}
                     useAsDefaultBillingAddress={useAsDefaultBillingAddress}
                     onUseAsDefaultBillingAddressChange={setUseAsDefaultBillingAddress}
+                    onAddressChange={handleAddressChange}
+                    onTaxIdChange={handleTaxIdChange}
                   />
                 )}
               />
@@ -324,6 +382,40 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
               )}
+
+              {!!validAmount && !creditPreviewInitialized && creditPreviewIsFetching && (
+                <div className="space-y-2 mt-4">
+                  <ShimmeringLoader />
+                  <ShimmeringLoader className="w-3/4" />
+                  <ShimmeringLoader className="w-1/2" />
+                </div>
+              )}
+
+              {creditPreviewInitialized && !!validAmount && (
+                <div className="mt-4">
+                  <ChargeBreakdown
+                    subtotal={creditPreview.amount}
+                    total={creditPreview.total}
+                    tax={
+                      creditPreview.tax
+                        ? {
+                            amount: creditPreview.tax.tax_amount,
+                            percentage: creditPreview.tax.tax_rate_percentage,
+                          }
+                        : undefined
+                    }
+                    taxStatus={creditPreview.tax_status}
+                    isFetching={creditPreviewIsFetching}
+                  />
+                  {creditPreview.tax_status === 'calculated' &&
+                    creditPreview.tax &&
+                    creditPreview.tax.tax_amount > 0 && (
+                      <p className="mt-2 text-xs text-foreground-light">
+                        You'll receive {formatCurrency(creditPreview.amount)} in credits.
+                      </p>
+                    )}
+                </div>
+              )}
             </DialogSection>
 
             {!paymentIntentConfirmation?.paymentIntent && (
@@ -331,14 +423,17 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                 <Button
                   htmlType="submit"
                   type="primary"
-                  loading={executingTopUp || paymentConfirmationLoading}
+                  loading={
+                    form.formState.isSubmitting || executingTopUp || paymentConfirmationLoading
+                  }
+                  disabled={isPreviewStale || creditPreviewIsFetching}
                 >
                   Top Up
                 </Button>
               </DialogFooter>
             )}
           </form>
-        </Form_Shadcn_>
+        </Form>
         {stripePromise && paymentIntentSecret && (
           <Elements stripe={stripePromise} options={options}>
             <PaymentConfirmation

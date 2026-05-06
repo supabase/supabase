@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { UseFormReturn } from 'react-hook-form'
-import { FormControl_Shadcn_, FormField_Shadcn_, Switch } from 'ui'
+import { FormControl, FormField, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
@@ -18,7 +18,7 @@ export const HighAvailabilityInput = ({ form }: HighAvailabilityInputProps) => {
 
   return (
     <Panel.Content>
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="highAvailability"
         render={({ field }) => (
@@ -36,9 +36,9 @@ export const HighAvailabilityInput = ({ form }: HighAvailabilityInputProps) => {
             }
             layout="horizontal"
           >
-            <FormControl_Shadcn_>
+            <FormControl>
               <Switch checked={field.value} onCheckedChange={field.onChange} />
-            </FormControl_Shadcn_>
+            </FormControl>
           </FormItemLayout>
         )}
       />

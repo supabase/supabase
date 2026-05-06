@@ -7,9 +7,9 @@ import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
+  FormControl,
+  FormField,
+  FormItem,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Tooltip,
@@ -39,7 +39,7 @@ export const AdvancedConfiguration = ({
 
   const content = (
     <>
-      <FormField_Shadcn_
+      <FormField
         name="useOrioleDb"
         control={form.control}
         render={({ field }) => (
@@ -47,17 +47,17 @@ export const AdvancedConfiguration = ({
             <FormItemLayout
               layout={layout}
               label="Postgres Type"
-              className="[&>div>label]:!break-normal"
+              className="[&>div>label]:break-normal!"
             >
-              <FormControl_Shadcn_>
+              <FormControl>
                 <RadioGroupStacked
                   // Due to radio group not supporting boolean values
                   // value is converted to boolean
                   onValueChange={(value) => field.onChange(value === 'true')}
                   defaultValue={field.value.toString()}
                 >
-                  <FormItem_Shadcn_ asChild>
-                    <FormControl_Shadcn_>
+                  <FormItem asChild>
+                    <FormControl>
                       <RadioGroupStackedItem
                         value="false"
                         // @ts-ignore
@@ -70,10 +70,10 @@ export const AdvancedConfiguration = ({
                         description="Recommended for production workloads"
                         className="[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2"
                       />
-                    </FormControl_Shadcn_>
-                  </FormItem_Shadcn_>
-                  <FormItem_Shadcn_ asChild>
-                    <FormControl_Shadcn_>
+                    </FormControl>
+                  </FormItem>
+                  <FormItem asChild>
+                    <FormControl>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <RadioGroupStackedItem
@@ -88,7 +88,7 @@ export const AdvancedConfiguration = ({
                             description="Not recommended for production workloads"
                             className={cn(
                               '[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2',
-                              form.getValues('useOrioleDb') ? '!rounded-b-none' : ''
+                              form.getValues('useOrioleDb') ? 'rounded-b-none!' : ''
                             )}
                             disabled={disableOrioleProjectCreation}
                           />
@@ -100,10 +100,10 @@ export const AdvancedConfiguration = ({
                           </TooltipContent>
                         )}
                       </Tooltip>
-                    </FormControl_Shadcn_>
-                  </FormItem_Shadcn_>
+                    </FormControl>
+                  </FormItem>
                 </RadioGroupStacked>
-              </FormControl_Shadcn_>
+              </FormControl>
               {form.getValues('useOrioleDb') && (
                 <Admonition
                   type="warning"
@@ -126,18 +126,16 @@ export const AdvancedConfiguration = ({
 
   const collapsibleContent = (
     <Collapsible_Shadcn_>
-      <CollapsibleTrigger_Shadcn_ className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-[state=open]:text-foreground-light">
+      <CollapsibleTrigger_Shadcn_ className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-open:text-foreground-light">
         Advanced Configuration
         <ChevronRight
           size={16}
           strokeWidth={1}
-          className="mr-2 group-data-[state=open]/advanced-trigger:rotate-90 group-hover/advanced-trigger:text-foreground-light transition"
+          className="mr-2 group-data-open/advanced-trigger:rotate-90 group-hover/advanced-trigger:text-foreground-light transition"
         />
       </CollapsibleTrigger_Shadcn_>
       <CollapsibleContent_Shadcn_
-        className={cn(
-          'pt-5 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
-        )}
+        className={cn('pt-5 data-closed:animate-collapsible-up data-open:animate-collapsible-down')}
       >
         {content}
       </CollapsibleContent_Shadcn_>

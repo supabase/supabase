@@ -3,7 +3,6 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
-  Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +23,7 @@ import { ProfileImage } from '@/components/ui/ProfileImage'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useProfileNameAndPicture } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 export function UserDropdown({
@@ -40,10 +40,15 @@ export function UserDropdown({
   const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
+  const track = useTrack()
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild className={cn('border flex-shrink-0 px-3', triggerClassName)}>
+    <DropdownMenu
+      onOpenChange={(open) => {
+        if (open) track('header_user_dropdown_opened')
+      }}
+    >
+      <DropdownMenuTrigger asChild className={cn('border shrink-0 px-3', triggerClassName)}>
         <ButtonTooltip
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
