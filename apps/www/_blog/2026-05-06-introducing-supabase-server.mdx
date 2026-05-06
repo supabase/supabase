@@ -21,7 +21,7 @@ This is a new package that handles auth verification, client setup, request cont
 
 We anonymously analyzed 25,000 deployed Edge Functions and saw the same pattern everywhere: developers were rebuilding the same setup code over and over just to get to their actual business logic.
 
-Every Supabase Edge Function starts the same way:
+Most functions needed to:
 
 - Create a Supabase client with `SUPABASE_ANON_KEY`
 - Create another admin client with `SUPABASE_SERVICE_ROLE_KEY` that can bypass Row Level Security
@@ -31,7 +31,7 @@ Every Supabase Edge Function starts the same way:
 - Wire up auth context
 - Copy/paste the same `_shared/*.ts` files between functions
 
-With `@supabase/server` just declare who can call your endpoint, and you get a fully initialized context back:
+With `@supabase/server` you just declare who can call your endpoint and get a fully initialized context back:
 
 - User-scoped Supabase client
 - Admin client with service role access
@@ -288,7 +288,7 @@ If you would like to adopt the DX that this package provides, check our [SSR fra
 
 **Does this only support Hono?**
 
-No. `withSupabase` works with any runtime that supports the standard `Request`/`Response` Web API: Edge Functions, Cloudflare Workers, Bun, and more. Hono was the first framework adapter we shipped, and we have already merged a community PR for the H3 adapter. We expect to accept more through our community contributions to adapters.
+No. `withSupabase` works with any runtime that supports the standard `Request`/`Response` Web API: Edge Functions, Cloudflare Workers, Bun, and more. Hono was the first framework adapter we shipped, and we have already merged a community PR for the H3 adapter. We expect to accept more community-contributed adapters.
 
 **Where is the documentation?**
 
@@ -298,7 +298,7 @@ The package ships with full documentation in the [GitHub repo](https://github.co
 
 On the Supabase platform and Local Development (CLI), your Edge Functions will receive the required environment variables to work out of the box (`SUPABASE_PUBLISHABLE_KEYS`, `SUPABASE_SECRET_KEYS`, `SUPABASE_JWKS`).
 
-On local development or self-hosted environments, use the same plural form: `SUPABASE_PUBLISHABLE_KEYS` instead of `SUPABASE_ANON_KEY`, `SUPABASE_SECRET_KEYS` instead of `SUPABASE_SERVICE_ROLE_KEY`.
+In local development or self-hosted environments, use the same plural form: `SUPABASE_PUBLISHABLE_KEYS` instead of `SUPABASE_ANON_KEY`, `SUPABASE_SECRET_KEYS` instead of `SUPABASE_SERVICE_ROLE_KEY`.
 
 Check out the [environment variables documentation](https://github.com/supabase/server/blob/main/docs/environment-variables.md) for more details.
 
@@ -315,12 +315,12 @@ npm install @supabase/server@latest
 npx skills add supabase/server
 ```
 
-The skill gives Claude Code and Cursor full context on the API surface, patterns, and migration paths. From there, you can prompt your way through most tasks.
+The skill gives Claude Code and Cursor full context about the API surface, patterns, and migration paths. From there, you can prompt your way through most tasks.
 
 Migrate existing Edge Functions to the new API keys:
 
 ```
-Analyze all edge functions, and plan a full migration to use
+Analyze all Edge Functions, and plan a full migration to use
 the new API keys with @supabase/server
 ```
 
@@ -334,7 +334,7 @@ endpoints for a todos table, using per-route auth
 Add a protected Edge Function with admin operations:
 
 ```
-Create an edge function that accepts user or secret key auth,
+Create an Edge Function that accepts user or secret key auth,
 reads from a user's profile with RLS, and writes audit logs
 with the admin client
 ```
