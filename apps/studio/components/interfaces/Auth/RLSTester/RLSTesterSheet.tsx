@@ -109,7 +109,7 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
   }
 
   const getDebugPrompt = ({ includeSql = false }: { includeSql?: boolean } = {}) => {
-    const prompt = `Help me fix my RLS policy based on the attached SQL snippet that gave the following error: \n\n${executeSqlError?.message} \n\nEvaluate if the problem might be query first, before checking my RLS policies.`
+    const prompt = `Help me fix my RLS policy based on the attached SQL snippet that gave the following error: \n\n${executeSqlError?.message}\n\nEvaluate if the problem might be query first, before checking my RLS policies.`
     return includeSql ? `${prompt}\n\nSQL Query:\n\`\`\`sql\n${value}\n\`\`\`` : prompt
   }
 
