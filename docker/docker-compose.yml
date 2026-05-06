@@ -448,7 +448,7 @@ services:
       # Legacy symmetric HS256 key
       JWT_SECRET: ${JWT_SECRET}
       # JWKS for token verification (EC public + legacy symmetric).
-      # For Podman, use: JWT_JWKS: ${JWT_JWKS}
+      # For Podman, use: SUPABASE_JWKS: ${JWT_JWKS}
       #SUPABASE_JWKS: ${JWT_JWKS:-{"keys":[]}}
 
       SUPABASE_URL: http://kong:8000
