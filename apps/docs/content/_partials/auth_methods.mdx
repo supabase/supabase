@@ -1,6 +1,6 @@
 The Supabase Auth SDK contains three different functions for authenticating user access to applications:
 
-Summary of the methods
+### Summary of the methods
 
 - Use [`getClaims`](/docs/reference/javascript/auth-getclaims) to protect pages and user data. It validates the token in storage either directly or by calling `getUser` solely for the purpose of checking the result. It doesn't actually use the response.
 - [`getUser`](/docs/reference/javascript/auth-getuser) makes a network call to the project's Auth instance to get the user record, which includes the most up-to-date information about the user at the cost of a network call.
