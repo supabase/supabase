@@ -53,11 +53,13 @@ export const formatUsersData = (users: User[]) => {
         ? 'Anonymous'
         : provider === 'email'
           ? '-'
-          : socialProviders.includes(provider)
-            ? 'Social'
-            : phoneProviders.includes(provider)
-              ? 'Phone'
-              : '-',
+          : provider.startsWith('custom:')
+            ? 'Custom identity provider'
+            : socialProviders.includes(provider)
+              ? 'Social'
+              : phoneProviders.includes(provider)
+                ? 'Phone'
+                : '-',
       // [Joshen] Note that the images might not load due to CSP issues
       img: getAvatarUrl(user),
       name: getDisplayName(user),
@@ -316,7 +318,7 @@ export const formatUserColumns = ({
                       const meta = PROVIDERS_SCHEMAS.find(
                         (y) => ('key' in y && y.key === x) || y.title.toLowerCase() === x
                       )
-                      return meta?.title
+                      return meta?.title ?? x
                     })
                     .join(', ')
                 : value.join(', ')
