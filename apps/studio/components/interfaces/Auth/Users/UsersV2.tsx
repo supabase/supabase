@@ -50,6 +50,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
 import { SortDropdown } from './SortDropdown'
+import { useAuthUsersShortcuts } from './useAuthUsersShortcuts'
 import { UserPanel } from './UserPanel'
 import type { SpecificFilterColumn } from './Users.constants'
 import {
@@ -84,8 +85,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from '@/lib/helpers'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
-import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -495,62 +494,26 @@ export const UsersV2 = () => {
     })
   }
 
-  useShortcut(
-    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
-    () => {
-      searchInputRef.current?.focus()
-      searchInputRef.current?.select()
-    },
-    { label: 'Search users' }
-  )
-
-  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
-    setFilterKeywords('')
-    setFilterUserType('all')
-    setSelectedProviders([])
-  })
-
-  useShortcut(SHORTCUT_IDS.AUTH_USERS_REFRESH, handleRefresh)
-
-  useShortcut(
-    SHORTCUT_IDS.AUTH_USERS_CLEAR_SORT,
-    () => {
-      updateSortByValue('created_at:desc')
-    },
-    { enabled: sortByValue !== 'created_at:desc' }
-  )
-
-  useShortcut(
-    SHORTCUT_IDS.AUTH_USERS_TOGGLE_ALL_SELECTION,
-    () => {
-      if (selectedUsers.size === users.length) {
-        setSelectedUsers(new Set([]))
-      } else {
-        setSelectedUsers(new Set(users.map((u) => u.id)))
-      }
-    },
-    { enabled: users.length > 0 && users.length <= MAX_BULK_DELETE }
-  )
-
-  useShortcut(SHORTCUT_IDS.AUTH_USERS_DELETE_SELECTED, () => setShowDeleteModal(true), {
-    enabled: selectedUsers.size > 0,
-  })
-
-  useShortcut(
-    SHORTCUT_IDS.AUTH_USERS_EXIT_SELECTION,
-    () => {
-      setSelectedUsers(new Set([]))
-      ;(document.activeElement as HTMLElement | null)?.blur()
-    },
-    { enabled: selectedUsers.size > 0 }
-  )
-
-  useShortcut(SHORTCUT_IDS.AUTH_USERS_CREATE_USER, () => setCreateVisible(true), {
-    enabled: canCreateUsers,
-  })
-
-  useShortcut(SHORTCUT_IDS.AUTH_USERS_INVITE_USER, () => setInviteVisible(true), {
-    enabled: canInviteUsers && showSendInvitation,
+  const { onCellKeyDown } = useAuthUsersShortcuts({
+    gridRef,
+    searchInputRef,
+    users,
+    selectedId,
+    selectedUsers,
+    sortByValue,
+    canCreateUsers,
+    canInviteUsers,
+    showSendInvitation,
+    onRefresh: handleRefresh,
+    setSelectedId,
+    setSelectedUsers,
+    setFilterKeywords,
+    setFilterUserType,
+    setSelectedProviders,
+    setSortByValue: updateSortByValue,
+    setShowDeleteModal,
+    setCreateVisible,
+    setInviteVisible,
   })
 
   useEffect(() => {
@@ -888,6 +851,7 @@ export const UsersV2 = () => {
                     toast(`Only up to ${MAX_BULK_DELETE} users can be selected at a time`)
                   } else setSelectedUsers(rows)
                 }}
+                onCellKeyDown={onCellKeyDown}
                 onColumnResize={(idx, width) => saveColumnConfiguration('resize', { idx, width })}
                 onColumnsReorder={(source, target) => {
                   const sourceIdx = columns.findIndex((col) => col.key === source)
