@@ -4,6 +4,7 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import {
   Button,
+  Checkbox,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -15,11 +16,26 @@ import {
 import type { z } from 'zod'
 
 import { submitFormAction } from '../go/actions/submitForm'
-import { formCrmConfigSchema, formFieldSchema } from '../go/schemas'
+import { formCrmConfigSchema, formFieldSchema, type GoFormFieldShowWhen } from '../go/schemas'
 
 /** Input-shape field type — fields with Zod defaults (`half`, `required`) are optional here. */
 export type MarketingFormField = z.input<typeof formFieldSchema>
 export type MarketingFormCrmConfig = z.input<typeof formCrmConfigSchema>
+
+/**
+ * Evaluate a `showWhen` rule against the current form values. All supplied
+ * criteria must pass (AND). Missing values are treated as the empty string.
+ */
+function evaluateShowWhen(showWhen: GoFormFieldShowWhen, values: Record<string, string>): boolean {
+  const value = values[showWhen.field] ?? ''
+  if (showWhen.equals !== undefined && value !== showWhen.equals) return false
+  if (showWhen.notEquals !== undefined && value === showWhen.notEquals) return false
+  if (showWhen.in !== undefined && !showWhen.in.includes(value)) return false
+  if (showWhen.notIn !== undefined && showWhen.notIn.includes(value)) return false
+  if (showWhen.truthy === true && value === '') return false
+  if (showWhen.truthy === false && value !== '') return false
+  return true
+}
 
 export interface MarketingFormProps {
   /** Form fields. The submit handler builds the payload from these by `name`. */
@@ -46,7 +62,7 @@ export interface MarketingFormProps {
 
 type SubmitState = 'idle' | 'loading' | 'success' | 'error'
 
-function FormField({
+function FieldInput({
   field,
   value,
   onChange,
@@ -58,6 +74,7 @@ function FormField({
   switch (field.type) {
     case 'text':
     case 'email':
+    case 'url':
       return (
         <Input_Shadcn_
           type={field.type}
@@ -92,11 +109,46 @@ function FormField({
           </SelectContent_Shadcn_>
         </Select_Shadcn_>
       )
+    case 'checkbox':
+      return null
     default: {
       const _exhaustive: never = field
       return null
     }
   }
+}
+
+function Field({
+  field,
+  value,
+  onChange,
+}: {
+  field: MarketingFormField
+  value: string
+  onChange: (value: string) => void
+}) {
+  if (field.type === 'checkbox') {
+    return (
+      <label className="flex items-start gap-3 cursor-pointer text-sm text-foreground-light leading-relaxed">
+        <Checkbox
+          className="mt-0.5"
+          checked={value === 'true'}
+          onCheckedChange={(checked) => onChange(checked === true ? 'true' : 'false')}
+        />
+        <span>{field.label}</span>
+      </label>
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="text-sm text-foreground font-medium">{field.label}</label>
+      <FieldInput field={field} value={value} onChange={onChange} />
+      {field.description && (
+        <p className="text-xs text-foreground-lighter leading-relaxed">{field.description}</p>
+      )}
+    </div>
+  )
 }
 
 export default function MarketingForm({
@@ -121,12 +173,33 @@ export default function MarketingForm({
     setValues((prev) => ({ ...prev, [name]: value }))
   }
 
+  // Only fields whose `showWhen` (if any) currently passes are rendered or submitted.
+  const visibleFields = fields.filter((f) => !f.showWhen || evaluateShowWhen(f.showWhen, values))
+  const visibleFieldNames = new Set(visibleFields.map((f) => f.name))
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    // Required checkboxes aren't covered by HTML5 validation; check them manually.
+    const uncheckedRequired = visibleFields.filter(
+      (f) => f.type === 'checkbox' && f.required && values[f.name] !== 'true'
+    )
+    if (uncheckedRequired.length > 0) {
+      setSubmitState('error')
+      setErrorMessages(
+        uncheckedRequired.map((f) => `Please confirm: ${f.label.replace(/\*$/, '').trim()}`)
+      )
+      return
+    }
+
+    // Strip values for fields that are currently hidden so stale data doesn't leak.
+    const submittedValues = Object.fromEntries(
+      Object.entries(values).filter(([name]) => visibleFieldNames.has(name))
+    )
+
     if (!crm) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('[marketing/form] No CRM configured — form values:', values)
+        console.log('[marketing/form] No CRM configured — form values:', submittedValues)
       }
       return
     }
@@ -138,7 +211,7 @@ export default function MarketingForm({
     const pageName = typeof document !== 'undefined' ? document.title : undefined
 
     try {
-      const result = await submitFormAction(crm, values, { pageUri, pageName })
+      const result = await submitFormAction(crm, submittedValues, { pageUri, pageName })
 
       if (result.success) {
         if (successRedirect) {
@@ -157,12 +230,14 @@ export default function MarketingForm({
     }
   }
 
-  // Group fields into rows: half-width fields pair up, full-width fields get their own row
+  // Group fields into rows: half-width fields pair up, full-width fields get their own row.
+  // Checkbox fields always take a full row regardless of their `half` flag.
   const rows: MarketingFormField[][] = []
   let pendingHalf: MarketingFormField | null = null
 
-  for (const field of fields) {
-    if (field.half) {
+  for (const field of visibleFields) {
+    const isHalf = field.half && field.type !== 'checkbox'
+    if (isHalf) {
       if (pendingHalf) {
         rows.push([pendingHalf, field])
         pendingHalf = null
@@ -226,14 +301,12 @@ export default function MarketingForm({
             className={row.length > 1 ? 'grid grid-cols-1 sm:grid-cols-2 gap-4' : undefined}
           >
             {row.map((field) => (
-              <div key={field.name} className="flex flex-col gap-2">
-                <label className="text-sm text-foreground font-medium">{field.label}</label>
-                <FormField
-                  field={field}
-                  value={values[field.name] ?? ''}
-                  onChange={(v) => handleChange(field.name, v)}
-                />
-              </div>
+              <Field
+                key={field.name}
+                field={field}
+                value={values[field.name] ?? ''}
+                onChange={(v) => handleChange(field.name, v)}
+              />
             ))}
           </div>
         ))}
