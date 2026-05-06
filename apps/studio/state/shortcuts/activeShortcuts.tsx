@@ -71,19 +71,14 @@ export function ActiveShortcutsProvider({ children }: PropsWithChildren) {
     [activeShortcuts, registerActiveShortcut, unregisterActiveShortcut]
   )
 
-  return (
-    <ActiveShortcutsContext.Provider value={value}>{children}</ActiveShortcutsContext.Provider>
-  )
+  return <ActiveShortcutsContext.Provider value={value}>{children}</ActiveShortcutsContext.Provider>
 }
 
 export function useActiveShortcuts() {
   return useContext(ActiveShortcutsContext).activeShortcuts
 }
 
-export function useRegisterActiveShortcut(
-  definition: ActiveShortcutDefinition,
-  enabled: boolean
-) {
+export function useRegisterActiveShortcut(definition: ActiveShortcutDefinition, enabled: boolean) {
   const { id, label, sequence, referenceGroup } = definition
   const instanceId = useId()
   const { registerActiveShortcut, unregisterActiveShortcut } = useContext(ActiveShortcutsContext)

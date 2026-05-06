@@ -1,5 +1,5 @@
-import { RegistryDefinations } from '../types'
 import { SHORTCUT_REFERENCE_GROUPS } from '../referenceGroups'
+import { RegistryDefinations } from '../types'
 
 /**
  * Contextual chords for jumping between Database sub-pages — `D + <letter>`.

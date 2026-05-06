@@ -13,15 +13,15 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import {
-  SHORTCUT_REFERENCE_GROUPS,
-  SHORTCUT_REFERENCE_GROUP_LABELS,
-  SHORTCUT_REFERENCE_GROUP_ORDER,
-} from '@/state/shortcuts/referenceGroups'
-import {
   useActiveShortcuts,
   type ActiveShortcutDefinition,
 } from '@/state/shortcuts/activeShortcuts'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
+import {
+  SHORTCUT_REFERENCE_GROUP_LABELS,
+  SHORTCUT_REFERENCE_GROUP_ORDER,
+  SHORTCUT_REFERENCE_GROUPS,
+} from '@/state/shortcuts/referenceGroups'
 
 interface ShortcutsReferenceSheetProps {
   open: boolean

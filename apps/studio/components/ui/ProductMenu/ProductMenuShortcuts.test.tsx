@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { ProductMenuShortcuts } from './ProductMenuShortcuts'
 import type { ProductMenuGroup } from './ProductMenu.types'
+import { ProductMenuShortcuts } from './ProductMenuShortcuts'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const { mockPush, mockUseShortcut } = vi.hoisted(() => ({

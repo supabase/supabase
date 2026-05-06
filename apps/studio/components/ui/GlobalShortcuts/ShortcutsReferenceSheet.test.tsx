@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ShortcutsReferenceSheet } from './ShortcutsReferenceSheet'
-import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
 import { useRegisterActiveShortcut } from '@/state/shortcuts/activeShortcuts'
+import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
 import { customRender } from '@/tests/lib/custom-render'
 
 const ACTIVE_SHORTCUT_IDS = [

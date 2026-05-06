@@ -2,8 +2,8 @@ import { render, renderHook, screen, waitFor } from '@testing-library/react'
 import type { ICommand } from 'ui-patterns/CommandMenu/api/types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from './registry'
 import { ActiveShortcutsProvider, useActiveShortcuts } from './activeShortcuts'
+import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from './registry'
 import { useShortcut } from './useShortcut'
 
 const {
@@ -57,13 +57,7 @@ function ActiveShortcutsReader() {
   )
 }
 
-function RegisteredShortcut({
-  enabled = true,
-  label,
-}: {
-  enabled?: boolean
-  label?: string
-}) {
+function RegisteredShortcut({ enabled = true, label }: { enabled?: boolean; label?: string }) {
   useShortcut(SHORTCUT_IDS.NAV_HOME, vi.fn(), { enabled, label })
   return null
 }
