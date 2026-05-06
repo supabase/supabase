@@ -108,13 +108,18 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
     }
   }
 
+  const getDebugPrompt = ({ includeSql = false }: { includeSql?: boolean } = {}) => {
+    const prompt = `Help me fix my RLS policy based on the attached SQL snippet that gave the following error: \n\n${executeSqlError?.message} \n\nEvaluate if the problem might be query first, before checking my RLS policies.`
+    return includeSql ? `${prompt}\n\nSQL Query:\n\`\`\`sql\n${value}\n\`\`\`` : prompt
+  }
+
   const onDebugWithAssistant = () => {
-    console.log({ parseQueryResults })
+    const prompt = getDebugPrompt()
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({
       name: 'Debug RLS policies',
       sqlSnippets: [value],
-      initialInput: `Help me fix my RLS policy based on the attached SQL snippet that gave the following error: \n\n${executeSqlError?.message} \n\nEvaluate if the problem might be query first, before checking my RLS policies.`,
+      initialInput: prompt,
     })
     setOpen(false)
   }
@@ -242,7 +247,7 @@ export const RLSTesterSheet = ({ handleSelectEditPolicy }: RLSTesterSheetProps) 
                       key="ai-assistant"
                       label="Ask Assistant"
                       telemetrySource="rls_tester"
-                      buildPrompt={() => 'asd'}
+                      buildPrompt={() => getDebugPrompt({ includeSql: true })}
                       onOpenAssistant={onDebugWithAssistant}
                     />,
                   ]}
