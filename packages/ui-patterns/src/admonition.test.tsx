@@ -97,6 +97,7 @@ describe('Admonition', () => {
     const alert = screen.getByRole('alert')
     expect(alert).toHaveTextContent('Connection confirmed')
     expect(alert).toHaveTextContent('You can now close this tab.')
+    expect(alert).toHaveClass('bg-brand-400/15')
     expect(alert).toHaveClass('border-brand-400')
     expect(alert.querySelector('svg path')?.getAttribute('d')).toContain('M10.5 19.5')
   })

@@ -124,7 +124,7 @@ const admonitionSVG = cva('', {
   variants: {
     type: {
       default: `[&>svg]:bg-foreground-muted`,
-      success: `bg-brand-400 dark:bg-brand bg-opacity-15 dark:bg-opacity-10 border-brand-400 dark:border-brand-500 [&>svg]:text-white dark:[&>svg]:text-brand-link [&>svg]:bg-brand dark:[&>svg]:bg-brand-500/50`,
+      success: `bg-brand-400/15 dark:bg-brand/10 border-brand-400 dark:border-brand-500 [&>svg]:text-white dark:[&>svg]:text-brand-link [&>svg]:bg-brand dark:[&>svg]:bg-brand-500/50`,
       warning: ``,
       destructive: ``,
     },
