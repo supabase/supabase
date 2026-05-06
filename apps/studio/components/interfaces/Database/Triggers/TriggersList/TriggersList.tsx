@@ -4,7 +4,17 @@ import { DatabaseZap, Search } from 'lucide-react'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import {
+  Card,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -243,16 +253,19 @@ execute function function_name();`
                 onOpenChange={setSchemaSelectorOpen}
               />
             </Shortcut>
-            <Input
-              inputRef={searchInputRef}
-              placeholder="Search for a trigger"
-              size="tiny"
-              icon={<Search />}
-              value={filterString}
-              className="w-full lg:w-52"
-              onChange={(e) => setFilterString(e.target.value)}
-              onKeyDown={onSearchInputEscape(filterString, setFilterString)}
-            />
+            <InputGroup className="w-full lg:w-52">
+              <InputGroupInput
+                ref={searchInputRef}
+                size="tiny"
+                placeholder="Search for a trigger"
+                value={filterString}
+                onChange={(e) => setFilterString(e.target.value)}
+                onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+              />
+              <InputGroupAddon>
+                <Search />
+              </InputGroupAddon>
+            </InputGroup>
             <ReportsSelectFilter
               label="Table"
               options={tables.map((type) => ({ label: type, value: type }))}

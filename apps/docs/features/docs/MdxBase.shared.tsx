@@ -33,6 +33,7 @@ import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
+import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
@@ -45,6 +46,7 @@ const components = {
   Accordion,
   AccordionItem,
   Admonition: AdmonitionWithMargin,
+  AgentPluginsPanel,
   AiPromptsIndex,
   AiSkillsIndex,
   AuthSmsProviderConfig,

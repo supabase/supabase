@@ -5,7 +5,9 @@ import { AlertCircle, Search } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   Card,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   ShadowScrollArea,
   Table,
   TableBody,
@@ -79,16 +81,19 @@ export const Extensions = () => {
   return (
     <>
       <div className="mb-4">
-        <Input
-          inputRef={searchInputRef}
-          size="tiny"
-          placeholder="Search for an extension"
-          value={filterString}
-          onChange={(e) => setFilterString(e.target.value)}
-          onKeyDown={onSearchInputEscape(filterString, setFilterString)}
-          className="w-52"
-          icon={<Search />}
-        />
+        <InputGroup className="w-52">
+          <InputGroupInput
+            ref={searchInputRef}
+            size="tiny"
+            placeholder="Search for an extension"
+            value={filterString}
+            onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+          />
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+        </InputGroup>
       </div>
 
       {isPermissionsLoaded && !canUpdateExtensions && (
@@ -112,8 +117,8 @@ export const Extensions = () => {
                   <TableHead key="description">Description</TableHead>
                   <TableHead key="used-by">Used by</TableHead>
                   <TableHead key="links">Links</TableHead>
-                  {/* 
-                    [Joshen] All these classes are just to make the last column sticky 
+                  {/*
+                    [Joshen] All these classes are just to make the last column sticky
                     I reckon we can pull these out into the Table component where we can declare
                     sticky columns via props, but we can do that if we start to have more tables
                     in the dashboard with sticky columns
