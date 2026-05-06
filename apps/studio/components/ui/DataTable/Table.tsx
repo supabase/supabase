@@ -43,7 +43,7 @@ export const TableBody = forwardRef<
     ref={ref}
     {...props}
     className={cn(
-      'transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:-outline-offset-1 focus-visible:outline-primary',
+      'transition-colors outline-none focus-visible:outline-1 focus-visible:-outline-offset-1 focus-visible:outline-primary',
       className
     )}
   />
