@@ -39,18 +39,29 @@ Just declare who can call your endpoint, and you get a fully initialized context
 - JWT claims
 - Built-in request/auth helpers
 
+
 ```typescript
 import { withSupabase } from '@supabase/server'
 
+// Typical Deno.serve usage
+Deno.serve(
+  withSupabase({ auth: 'user' }, async (req, ctx) => {
+    const { data } = await ctx.supabase.from('todos').select()
+    return Response.json(data)
+  })
+)
+
+// New fetch style handler usage
 export default {
   fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
     const { data } = await ctx.supabase.from('todos').select()
     return Response.json(data)
-  }),
+  })
 }
 ```
 
-> The export-default-fetch pattern works on Edge Functions too as it is supported since Deno v2. You can read more about it [here](https://docs.deno.com/runtime/fundamentals/http_server/#default-fetch-export).
+Note that `export default { fetch }` is equivalent to `Deno.serve(...)`. Both define a request handler. We use `export default` throughout this post because it works across Edge Functions, Workers, and Bun. If you prefer `Deno.serve`, you can keep using it — it's [still supported](https://docs.deno.com/runtime/fundamentals/http_server/#default-fetch-export) on Edge Functions.
+
 
 ## How it works
 
@@ -68,14 +79,12 @@ That includes:
 ```typescript
 import { withSupabase } from 'npm:@supabase/server'
 
-// Typical Deno.serve usage in Edge Functions
-// same functionality as the code above
-Deno.serve(
-  withSupabase({ auth: 'user' }, async (req, ctx) => {
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
     const { data } = await ctx.supabase.from('todos').select()
     return Response.json(data)
-  })
-)
+  }),
+}
 ```
 
 If you need more control over error handling and responses, you can also call `createSupabaseContext` directly:
@@ -124,22 +133,22 @@ You declare who is allowed to call the endpoint, and the package handles verific
 For example, this endpoint allows unauthenticated requests:
 
 ```typescript
-Deno.serve(
-  withSupabase({ auth: 'none' }, async (_req, _ctx) => {
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (_req, _ctx) => {
     return Response.json({ status: 'ok' })
-  })
-)
+  }),
+}
 ```
 
 This endpoint requires a valid user JWT:
 
 ```typescript
-Deno.serve(
-  withSupabase({ auth: 'user' }, async (req, ctx) => {
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
     const { data } = await ctx.supabase.from('todos').select()
     return Response.json(data)
-  })
-)
+  }),
+}
 ```
 If the request does not include a valid user token, the request is rejected before your handler executes.
 
