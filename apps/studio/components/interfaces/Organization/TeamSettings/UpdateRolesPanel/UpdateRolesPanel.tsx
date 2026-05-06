@@ -285,7 +285,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                   const disabledForStripe = isStripeProjectsOrg && isOwnerRole
                                   const disabled = !canAssignRole || disabledForStripe
                                   const disabledReason = disabledForStripe
-                                    ? 'Owner cannot be assigned in Stripe Projects organizations'
+                                    ? 'Cannot be assigned in Stripe Projects organizations'
                                     : !canAssignRole
                                       ? 'Additional permissions required to assign role'
                                       : undefined
