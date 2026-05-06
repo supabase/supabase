@@ -1,5 +1,6 @@
 import type { OptimizedSearchColumns } from '@supabase/pg-meta'
 import { USER_SEARCH_INDEXES } from '@supabase/pg-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
@@ -14,7 +15,13 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
+import {
+  parseAsArrayOf,
+  parseAsBoolean,
+  parseAsString,
+  parseAsStringEnum,
+  useQueryState,
+} from 'nuqs'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
@@ -69,6 +76,7 @@ import { useUserIndexStatusesQuery } from '@/data/auth/user-search-indexes-query
 import { useUsersCountQuery } from '@/data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -76,6 +84,8 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from '@/lib/helpers'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -101,6 +111,7 @@ export const UsersV2 = () => {
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const gridRef = useRef<DataGridHandle>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const xScroll = useRef<number>(0)
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -110,13 +121,24 @@ export const UsersV2 = () => {
     authenticationShowSortByPhone: showSortByPhone,
     authenticationShowUserTypeFilter: showUserTypeFilter,
     authenticationShowEmailPhoneColumns: showEmailPhoneColumns,
+    authenticationShowSendInvitation: showSendInvitation,
   } = useIsFeatureEnabled([
     'authentication:show_provider_filter',
     'authentication:show_sort_by_email',
     'authentication:show_sort_by_phone',
     'authentication:show_user_type_filter',
     'authentication:show_email_phone_columns',
+    'authentication:show_send_invitation',
   ])
+
+  const { can: canCreateUsers } = useAsyncCheckPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'create_user'
+  )
+  const { can: canInviteUsers } = useAsyncCheckPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'invite_user'
+  )
 
   const userTableColumns = useMemo(() => {
     if (showEmailPhoneColumns) return USERS_TABLE_COLUMNS
@@ -142,7 +164,7 @@ export const UsersV2 = () => {
     'userType',
     parseAsStringEnum(['all', 'verified', 'unverified', 'anonymous']).withDefault('all')
   )
-  const [filterKeywords] = useQueryState('keywords', { defaultValue: '' })
+  const [filterKeywords, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
   const [sortByValue, setSortByValue] = useQueryState('sortBy', { defaultValue: 'created_at:desc' })
   const [sortColumn, sortOrder] = sortByValue.split(':')
   const [selectedColumns, setSelectedColumns] = useQueryState(
@@ -156,6 +178,14 @@ export const UsersV2 = () => {
   const [selectedId, setSelectedId] = useQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [, setInviteVisible] = useQueryState(
+    'invite',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [, setCreateVisible] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
   const [improvedSearchDismissed, setImprovedSearchDismissed] = useLocalStorageQuery(
@@ -453,6 +483,76 @@ export const UsersV2 = () => {
     }
   }
 
+  const handleRefresh = () => {
+    refetch()
+    sendEvent({
+      action: 'auth_users_search_submitted',
+      properties: {
+        trigger: 'refresh_button',
+        ...telemetryProps,
+      },
+      groups: telemetryGroups,
+    })
+  }
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search users' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterKeywords('')
+    setFilterUserType('all')
+    setSelectedProviders([])
+  })
+
+  useShortcut(SHORTCUT_IDS.AUTH_USERS_REFRESH, handleRefresh)
+
+  useShortcut(
+    SHORTCUT_IDS.AUTH_USERS_CLEAR_SORT,
+    () => {
+      updateSortByValue('created_at:desc')
+    },
+    { enabled: sortByValue !== 'created_at:desc' }
+  )
+
+  useShortcut(
+    SHORTCUT_IDS.AUTH_USERS_TOGGLE_ALL_SELECTION,
+    () => {
+      if (selectedUsers.size === users.length) {
+        setSelectedUsers(new Set([]))
+      } else {
+        setSelectedUsers(new Set(users.map((u) => u.id)))
+      }
+    },
+    { enabled: users.length > 0 && users.length <= MAX_BULK_DELETE }
+  )
+
+  useShortcut(SHORTCUT_IDS.AUTH_USERS_DELETE_SELECTED, () => setShowDeleteModal(true), {
+    enabled: selectedUsers.size > 0,
+  })
+
+  useShortcut(
+    SHORTCUT_IDS.AUTH_USERS_EXIT_SELECTION,
+    () => {
+      setSelectedUsers(new Set([]))
+      ;(document.activeElement as HTMLElement | null)?.blur()
+    },
+    { enabled: selectedUsers.size > 0 }
+  )
+
+  useShortcut(SHORTCUT_IDS.AUTH_USERS_CREATE_USER, () => setCreateVisible(true), {
+    enabled: canCreateUsers,
+  })
+
+  useShortcut(SHORTCUT_IDS.AUTH_USERS_INVITE_USER, () => setInviteVisible(true), {
+    enabled: canInviteUsers && showSendInvitation,
+  })
+
   useEffect(() => {
     if (
       !isRefetching &&
@@ -578,6 +678,7 @@ export const UsersV2 = () => {
             <>
               <div className="flex flex-wrap items-center gap-2">
                 <UsersSearch
+                  ref={searchInputRef}
                   improvedSearchEnabled={improvedSearchEnabled}
                   telemetryProps={telemetryProps}
                   telemetryGroups={telemetryGroups}
@@ -748,17 +849,7 @@ export const UsersV2 = () => {
                   type="default"
                   className="w-7"
                   loading={isRefetching && !isFetchingNextPage}
-                  onClick={() => {
-                    refetch()
-                    sendEvent({
-                      action: 'auth_users_search_submitted',
-                      properties: {
-                        trigger: 'refresh_button',
-                        ...telemetryProps,
-                      },
-                      groups: telemetryGroups,
-                    })
-                  }}
+                  onClick={handleRefresh}
                   tooltip={{ content: { side: 'bottom', text: 'Refresh' } }}
                 />
                 <AddUserDropdown />
