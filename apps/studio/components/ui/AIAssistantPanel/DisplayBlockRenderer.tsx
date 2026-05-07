@@ -1,6 +1,7 @@
 import { acceptUntrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import type { ToolUIPart } from 'ai'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useRef, useState, type DragEvent, type PropsWithChildren } from 'react'
@@ -35,12 +36,7 @@ interface DisplayBlockRendererProps {
   onError?: (args: { messageId: string; errorText: string }) => void
   onApprove?: () => void
   onDeny?: () => void
-  toolState?:
-    | 'input-streaming'
-    | 'input-available'
-    | 'approval-requested'
-    | 'output-available'
-    | 'output-error'
+  toolState?: ToolUIPart['state']
   isLastPart?: boolean
   isLastMessage?: boolean
   showConfirmFooter?: boolean
