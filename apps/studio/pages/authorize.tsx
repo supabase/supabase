@@ -1,37 +1,38 @@
 import { useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from 'ui'
 
 import {
   API_AUTHORIZATION_MOCK_STATES,
   ApiAuthorizationScreen,
   getApiAuthorizationMockState,
 } from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
+import {
+  ConnectMockMenu,
+  ConnectPreviewToolbar,
+  isTemporaryConnectMockPreviewEnabled,
+} from '@/components/interfaces/Connect/ConnectMockMenu'
 import { withAuth } from '@/hooks/misc/withAuth'
+import { buildStudioPageTitle } from '@/lib/page-title'
 import type { NextPageWithLayout } from '@/types'
 
-const isTemporaryMockPreviewEnabled = () => {
-  if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') return true
-  if (typeof window === 'undefined') return false
-
-  return window.location.hostname.endsWith('.vercel.app')
-}
+const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize API access', brand: 'Supabase' })
 
 const APIAuthorizationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const routerReady = router.isReady
   const { auth_id, organization_slug } = useParams()
-  const mock = isTemporaryMockPreviewEnabled()
+  const mock = isTemporaryConnectMockPreviewEnabled()
     ? getApiAuthorizationMockState(router.query.mock)
     : undefined
+
+  const replaceMockState = (state: (typeof API_AUTHORIZATION_MOCK_STATES)[number]) => {
+    router.replace(
+      { pathname: router.pathname, query: { ...router.query, mock: state } },
+      undefined,
+      { shallow: true }
+    )
+  }
 
   if (!routerReady) {
     return null
@@ -40,34 +41,17 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Authorize API access | Supabase</title>
+        <title>{PAGE_TITLE}</title>
       </Head>
       {mock && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="warning" size="tiny" className="fixed right-3 top-3 z-50 font-mono">
-              mock: {mock}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[240px]">
-            <DropdownMenuRadioGroup
-              value={mock}
-              onValueChange={(value) => {
-                router.replace(
-                  { pathname: router.pathname, query: { ...router.query, mock: value } },
-                  undefined,
-                  { shallow: true }
-                )
-              }}
-            >
-              {API_AUTHORIZATION_MOCK_STATES.map((state) => (
-                <DropdownMenuRadioItem key={state} value={state} className="font-mono text-xs">
-                  {state}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ConnectPreviewToolbar>
+          <ConnectMockMenu
+            state={mock}
+            states={API_AUTHORIZATION_MOCK_STATES}
+            onSelect={replaceMockState}
+            width="w-[240px]"
+          />
+        </ConnectPreviewToolbar>
       )}
       <ApiAuthorizationScreen
         auth_id={auth_id}

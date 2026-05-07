@@ -1,22 +1,31 @@
 import dayjs from 'dayjs'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   Card,
   CardContent,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import { InfoTooltipIcon } from 'ui-patterns/info-tooltip'
 
 import type { ApprovalState, IApprovalFormSchema } from './ApiAuthorization.Schema'
 import {
@@ -61,6 +70,8 @@ export type OrganizationsState =
   | OrganizationsState_NotMember
   | OrganizationsState_Success
 
+const CURSOR_MCP_PUBLISHER_DOMAIN = 'anysphere.cursor-mcp'
+
 export interface ApiAuthorizationMainViewProps {
   approvalState: ApprovalState
   form: UseFormReturn<IApprovalFormSchema>
@@ -82,6 +93,7 @@ export function ApiAuthorizationMainView({
 }: ApiAuthorizationMainViewProps): ReactNode {
   const isExpired = dayjs().isAfter(dayjs(requester.expires_at))
   const showReadyContent = !isExpired && organizations._tag === 'success'
+  const showPublisherInfo = requester.domain === CURSOR_MCP_PUBLISHER_DOMAIN
 
   return (
     <InterstitialLayout
@@ -91,9 +103,15 @@ export function ApiAuthorizationMainView({
           right={<SupabaseLogo />}
         />
       }
-      title={requester.name}
-      description="wants to access your Supabase account"
-      subtitle={<InterstitialMetadataPill>{requester.domain}</InterstitialMetadataPill>}
+      title={`Authorize ${requester.name}`}
+      description="This application wants to access your Supabase account"
+      subtitle={
+        showPublisherInfo ? (
+          <CursorPublisherInfoDialog domain={requester.domain} />
+        ) : (
+          <InterstitialMetadataPill>{requester.domain}</InterstitialMetadataPill>
+        )
+      }
       subtitleClassName="leading-none"
     >
       <div className="px-6 pb-6">
@@ -139,6 +157,42 @@ export function ApiAuthorizationMainView({
         </div>
       </div>
     </InterstitialLayout>
+  )
+}
+
+function CursorPublisherInfoDialog({ domain }: { domain: string }): ReactNode {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            aria-label="About this publisher"
+            className="mx-auto mt-1.5 flex w-fit cursor-pointer items-center gap-1.5 rounded-full border border-muted pl-2 pr-1.5 py-1 font-mono text-[11px] tracking-tight text-foreground-lighter transition-colors hover:border-foreground-muted hover:bg-surface-200 hover:text-foreground-light"
+            onClick={() => setOpen(true)}
+          >
+            <span>{domain}</span>
+            <InfoTooltipIcon className="size-3.5 fill-foreground-muted transition-colors" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="max-w-56 text-xs">
+          Make sure you trust this publisher
+        </TooltipContent>
+      </Tooltip>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>About this publisher</DialogTitle>
+          <DialogDescription>
+            <code className="text-code-inline">anysphere-mcp</code> is the publisher of the Cursor
+            application. Make sure you trust the author and source of this app. After you authorize,
+            it will be able to view or control your organization's projects based on the selected
+            permissions.
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -243,9 +297,7 @@ function OrganizationSelector({
                 Organization
               </p>
               {requestedOrganizationSlug && (
-                <p className="text-xs text-foreground-lighter">
-                  Pre-selected by {requester.name}
-                </p>
+                <p className="text-xs text-foreground-lighter">Pre-selected by {requester.name}</p>
               )}
             </div>
             <FormControl>

@@ -1,0 +1,214 @@
+---
+title: Connect interstitials
+description: Shared layout guidance for focused authorisation, invite, marketplace, CLI, and credit redemption flows.
+---
+
+Connect interstitials are focused, single-card flows that sit outside the main
+Studio shell. Use the shared `InterstitialLayout` family for these surfaces
+instead of building bespoke centered cards, logos, account rows, organisation
+selectors, mock menus, or transition behaviour.
+
+## Use this pattern for
+
+- Partner authorisation and consent, such as OAuth, MCP, Stripe Projects, or similar handoffs.
+- Organisation invites and lightweight account-gated accept flows.
+- Marketplace and billing connection flows, such as AWS Marketplace and credit redemption.
+- CLI or device-code sign-in flows that need a verification code and a single next action.
+- Invalid, loading, error, success, and wrong-account states for these routes.
+
+Do not use this pattern for normal authenticated Studio pages. If the route
+belongs in the Studio navigation, use the standard page layout patterns instead.
+
+## For agents
+
+If you are asked to update `/authorize`, `/join`, `/redeem`,
+`/aws-marketplace-onboarding`, `/cli/login`, Stripe Projects, or another
+short-lived connect flow, start from this pattern and the existing Studio
+helpers. Do not create new local card, logo, account-row, organisation-selector,
+or mock-switcher components unless the shared helper is missing a real state.
+
+## Source of truth
+
+The shared implementation lives in Studio:
+
+```tsx
+import {
+  InterstitialAccountRow,
+  InterstitialExpandableContent,
+  InterstitialLayout,
+  InterstitialMetadataPill,
+  LogoBox,
+  LogoPair,
+  PartnerLogo,
+  SupabaseLogo,
+} from '@/components/layouts/InterstitialLayout'
+```
+
+Mock review controls and organisation selection live beside the connect
+surfaces:
+
+```tsx
+import {
+  ConnectMockMenu,
+  ConnectPreviewToolbar,
+  getConnectMockState,
+  isTemporaryConnectMockPreviewEnabled,
+} from '@/components/interfaces/Connect/ConnectMockMenu'
+import { ConnectOrganizationSelector } from '@/components/interfaces/Connect/ConnectOrganizationSelector'
+```
+
+## Basic shape
+
+Use `InterstitialLayout` for the outer card, then put route-specific content in
+`px-6 pb-6`.
+
+```tsx
+<InterstitialLayout
+  logo={
+    <LogoPair
+      left={<PartnerLogo src="/img/icons/stripe-icon.svg" alt="Stripe" />}
+      right={<SupabaseLogo />}
+    />
+  }
+  title="Stripe Projects"
+  description="wants to connect to Supabase"
+>
+  <div className="px-6 pb-6">
+    <InterstitialAccountRow displayName={displayName} />
+    <Button type="primary" block>
+      Continue
+    </Button>
+  </div>
+</InterstitialLayout>
+```
+
+For first-party Supabase flows, use the Supabase logo by itself.
+
+```tsx
+<InterstitialLayout
+  logo={<SupabaseLogo />}
+  title="Redeem credits"
+  description="Select the organization that should receive these credits."
+>
+  <div className="px-6 pb-6">{children}</div>
+</InterstitialLayout>
+```
+
+## Logos
+
+- Use `SupabaseLogo` for Supabase.
+- Use `LogoPair` when the user is connecting two services.
+- Use `PartnerLogo` for partner icons that should fill the 48px logo box.
+- Use `LogoBox` for custom inset marks, Lucide icons, or partner logos that need their own background.
+- Store new partner icons in `apps/studio/public/img/icons` and reference them from the route.
+
+```tsx
+const AwsLogo = () => (
+  <LogoBox className="border-[#232f3e] bg-[#232f3e]">
+    <img alt="AWS" src="/img/icons/aws-icon.svg" className="w-8" />
+  </LogoBox>
+)
+
+<LogoPair left={<AwsLogo />} right={<SupabaseLogo />} />
+```
+
+## Account row
+
+Use `InterstitialAccountRow` for the signed-in account context. It already uses
+the shared profile image and compact card style.
+
+```tsx
+<InterstitialAccountRow avatarUrl={avatarUrl} displayName={displayName} action={signOutButton} />
+```
+
+Only add a custom `className` when the surface needs a subtle state-specific
+background. Do not recreate the account row locally.
+
+## Organisation selection
+
+Use `ConnectOrganizationSelector` when a connect surface needs users to choose
+an organisation. It reuses `OrganizationCard`, keeps selected/unavailable/create
+states consistent, hides unnecessary project-count queries, and supports
+collapsed overflow.
+
+```tsx
+<ConnectOrganizationSelector
+  organizations={linkableOrganizations}
+  unavailableOrganizations={unavailableOrganizations}
+  selectedSlug={selectedOrgSlug}
+  onSelect={setSelectedOrgSlug}
+  disabled={isSubmitting}
+  getOrganizationDescription={(organization) => `${organization.plan.name} Plan`}
+  getUnavailableOrganizationDescription={(organization) => getUnavailableReason(organization.slug)}
+  createLabel="Create new organization"
+  createDescription="Create and link a new AWS-managed organization."
+  onCreate={() => setShowOrgCreationDialog(true)}
+/>
+```
+
+Do not make a new organisation-card component for these flows. If the selector
+needs a new state, extend `ConnectOrganizationSelector` rather than creating a
+parallel card style.
+
+## Actions and states
+
+- Prefer one full-width primary action.
+- Use a full-width text button only for a secondary action that belongs in the flow.
+- Use `Admonition` for warning, error, note, and success copy.
+- Use `success` only for completed states.
+- Use `ShimmeringLoader` inside the same layout for loading states.
+- Keep error and invalid states inside the card instead of redirecting to `/404` or `/500` when the route has enough context to explain the problem.
+- Use `InterstitialMetadataPill` sparingly. It should clarify an external plan, app, token name, or request identifier that is not already visible in the selected card or body copy.
+
+```tsx
+<Admonition
+  type="warning"
+  title="Wrong account"
+  description="Sign in with the Supabase account that owns this organization, then open the link again."
+/>
+```
+
+## Copy
+
+- Use sentence case.
+- Prefer `sign in` and `sign-in`; avoid `login` in user-facing copy.
+- Name the thing being authorized when it matters, for example `Authorize Supabase CLI`.
+- Keep descriptions short and literal.
+- Use `organization` in UI strings where the product surface already uses that spelling.
+- Avoid explaining the layout, the mock controls, or how to use the page inside the page itself.
+
+## Mock previews
+
+Connect surfaces should expose reviewable mock states in non-production and
+Vercel preview environments only.
+
+```tsx
+const mock =
+  router.isReady && isTemporaryConnectMockPreviewEnabled()
+    ? getConnectMockState(router.query.mock, MOCK_STATES)
+    : undefined
+
+{
+  mock && (
+    <ConnectPreviewToolbar>
+      <ConnectMockMenu state={mock} states={MOCK_STATES} onSelect={replaceMockState} />
+    </ConnectPreviewToolbar>
+  )
+}
+```
+
+Add new surfaces to `CONNECT_SURFACE_OPTIONS` so reviewers can switch between
+connect routes from the top-right preview toolbar.
+
+## Checklist
+
+Before shipping a new connect surface:
+
+- Does it use `InterstitialLayout` instead of a bespoke centered card?
+- Does it use `LogoBox`, `LogoPair`, `PartnerLogo`, or `SupabaseLogo` for branding?
+- Does it use `InterstitialAccountRow` for signed-in context?
+- If organisations are selectable, does it use `ConnectOrganizationSelector` and `OrganizationCard`?
+- Are loading, invalid, error, wrong-account, and success states represented?
+- Are mock states gated with `isTemporaryConnectMockPreviewEnabled`?
+- Is the primary action full-width and singular?
+- Is copy short, sentence-case, and free of `login`?

@@ -71,6 +71,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Connect Interstitials',
+          href: '/docs/ui-patterns/connect-interstitials',
+          items: [],
+        },
+        {
           title: 'Empty States',
           href: '/docs/ui-patterns/empty-states',
           items: [],

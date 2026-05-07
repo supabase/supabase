@@ -1,7 +1,8 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import { Check, ChevronDown, ChevronUp, Info } from 'lucide-react'
+import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Badge, Button, Card, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { InfoTooltipIcon } from 'ui-patterns/info-tooltip'
 
 import { PERMISSIONS_DESCRIPTIONS } from './OAuthApps.constants'
 import { InterstitialExpandableContent, LogoBox } from '@/components/layouts/InterstitialLayout'
@@ -293,7 +294,7 @@ function PermissionDetails({
                             aria-label={`${permission.label} permission details`}
                             className="flex shrink-0 text-foreground-muted transition-colors hover:text-foreground"
                           >
-                            <Info className="size-3.5" strokeWidth={1.75} />
+                            <InfoTooltipIcon className="size-3.5 fill-foreground-muted/75 transition-colors" />
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="right" className="max-w-64 text-xs">

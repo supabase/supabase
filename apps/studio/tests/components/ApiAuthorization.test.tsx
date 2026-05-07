@@ -270,6 +270,28 @@ describe('ApiAuthorizationScreen', () => {
           await screen.findByText('Authorize API access for Test App')
           expect(screen.getByText(/Only continue if you trust this app/)).toBeInTheDocument()
         })
+
+        test('shows publisher context for the Cursor MCP requester', async () => {
+          const user = userEvent.setup()
+          mockBothEndpoints(
+            createMockAuthResponse({
+              name: 'Cursor',
+              domain: 'anysphere.cursor-mcp',
+              registration_type: 'dynamic',
+              scopes: [OAuthScope.PROJECTS_READ],
+            })
+          )
+          renderScreen()
+
+          await screen.findByText('Authorize API access for Cursor')
+          await user.click(screen.getByRole('button', { name: 'About the Cursor publisher' }))
+
+          expect(await screen.findByText('About this publisher')).toBeInTheDocument()
+          expect(screen.getByText(/anysphere-mcp/)).toBeInTheDocument()
+          expect(
+            screen.getByText(/view or control your organization's projects/)
+          ).toBeInTheDocument()
+        })
       })
 
       describe('expiration', () => {

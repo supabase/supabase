@@ -4,7 +4,7 @@ import { Tooltip as _RadixToolpip } from 'radix-ui'
 import { ElementRef, forwardRef } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-const SVG = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>((props, ref) => (
+const InfoTooltipIcon = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>((props, ref) => (
   <svg
     ref={ref}
     xmlns="http://www.w3.org/2000/svg"
@@ -19,6 +19,7 @@ const SVG = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>((props, ref
     />
   </svg>
 ))
+InfoTooltipIcon.displayName = 'InfoTooltipIcon'
 
 const InfoTooltip = forwardRef<
   ElementRef<typeof TooltipContent>,
@@ -31,11 +32,14 @@ const InfoTooltip = forwardRef<
         role="button"
         className="flex [&_svg]:data-[state=delayed-open]:fill-foreground-lighter [&_svg]:data-[state=instant-open]:fill-foreground-lighter"
       >
-        <SVG strokeWidth={2} className="transition-colors fill-foreground-muted w-4 h-4" />
+        <InfoTooltipIcon
+          strokeWidth={2}
+          className="transition-colors fill-foreground-muted w-4 h-4"
+        />
       </TooltipTrigger>
       <TooltipContent {...props} />
     </Tooltip>
   )
 })
 
-export { InfoTooltip }
+export { InfoTooltip, InfoTooltipIcon }
