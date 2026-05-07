@@ -1,5 +1,13 @@
 import { UseFormReturn } from 'react-hook-form'
-import { FormField, Input, Separator, SheetSection } from 'ui'
+import {
+  FormField,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  Separator,
+  SheetSection,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateQueueForm } from './CreateQueueSheet.schema'
@@ -21,12 +29,12 @@ export function PartitionConfigFields({ form }: { form: UseFormReturn<CreateQueu
               description="Number of messages per partition"
               className="gap-1"
             >
-              <Input
-                {...rest}
-                type="number"
-                placeholder="10000"
-                actions={<p className="text-foreground-light pr-2">messages</p>}
-              />
+              <InputGroup>
+                <InputGroupInput {...rest} type="number" placeholder="10000" />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>messages</InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
             </FormItemLayout>
           )}
         />
@@ -39,12 +47,12 @@ export function PartitionConfigFields({ form }: { form: UseFormReturn<CreateQueu
               description="Partitions older than this many messages behind the latest will be dropped"
               className="gap-1"
             >
-              <Input
-                {...rest}
-                type="number"
-                placeholder="100000"
-                actions={<p className="text-foreground-light pr-2">messages</p>}
-              />
+              <InputGroup>
+                <InputGroupInput {...rest} type="number" placeholder="10000" />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>messages</InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
             </FormItemLayout>
           )}
         />

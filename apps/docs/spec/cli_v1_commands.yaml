@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.98.1
+  version: 2.98.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -27,11 +27,11 @@ flags:
       - id: auto
         name: auto
         type: '[ auto | yes | no ]'
-      - id: 'yes'
-        name: 'yes'
+      - id: "yes"
+        name: "yes"
         type: '[ auto | yes | no ]'
-      - id: 'no'
-        name: 'no'
+      - id: "no"
+        name: "no"
         type: '[ auto | yes | no ]'
   - id: create-ticket
     name: --create-ticket
@@ -92,7 +92,7 @@ flags:
     name: --workdir <string>
     description: path to a Supabase project directory
     default_value: ''
-  - id: 'yes'
+  - id: "yes"
     name: --yes
     description: answer yes to all prompts
     default_value: 'false'
@@ -2634,9 +2634,23 @@ commands:
       After creating the function, you can edit it locally and then use `supabase functions serve`  to test it before deploying with `supabase functions deploy`.
     tags: []
     links: []
-    usage: supabase functions new <Function name>
+    usage: supabase functions new <Function name> [flags]
     subcommands: []
-    flags: []
+    flags:
+      - id: auth
+        name: --auth <[ none | apikey | user ]>
+        description: use a specific auth mode
+        default_value: apikey
+        accepted_values:
+          - id: none
+            name: none
+            type: '[ none | apikey | user ]'
+          - id: apikey
+            name: apikey
+            type: '[ none | apikey | user ]'
+          - id: user
+            name: user
+            type: '[ none | apikey | user ]'
   - id: supabase-functions-list
     title: supabase functions list
     summary: List all Functions in Supabase

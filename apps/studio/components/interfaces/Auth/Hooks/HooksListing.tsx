@@ -1,3 +1,4 @@
+import { joinSqlFragments } from '@supabase/pg-meta/src/pg-format'
 import { useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
@@ -50,7 +51,7 @@ export const HooksListing = () => {
         await executeSql({
           projectRef,
           connectionString: project!.connectionString,
-          sql: revokeStatements.join('\n'),
+          sql: joinSqlFragments(revokeStatements, '\n'),
         })
       }
       toast.success(`${selectedHookForDeletion.title} has been deleted.`)

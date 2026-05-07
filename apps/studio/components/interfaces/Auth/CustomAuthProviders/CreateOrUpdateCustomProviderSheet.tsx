@@ -12,7 +12,6 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
@@ -30,6 +29,7 @@ import {
   Switch,
   useWatch,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 

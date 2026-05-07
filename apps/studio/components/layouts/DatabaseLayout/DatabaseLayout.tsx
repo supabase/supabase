@@ -3,6 +3,7 @@ import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { useGenerateDatabaseMenu } from './DatabaseMenu.utils'
+import { DatabaseNavShortcuts } from '@/components/interfaces/DatabaseNavShortcuts'
 import { ProductMenu } from '@/components/ui/ProductMenu'
 import { withAuth } from '@/hooks/misc/withAuth'
 
@@ -26,6 +27,7 @@ const DatabaseLayout = ({ children, title }: PropsWithChildren<DatabaseLayoutPro
       productMenu={<DatabaseProductMenu />}
       isBlocking={false}
     >
+      <DatabaseNavShortcuts />
       {children}
     </ProjectLayout>
   )

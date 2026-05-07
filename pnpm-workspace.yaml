@@ -6,11 +6,11 @@ packages:
 
 catalog:
   '@sentry/nextjs': ^10.26.0
-  '@supabase/auth-js': 2.104.1
-  '@supabase/postgrest-js': 2.104.1
-  '@supabase/realtime-js': 2.104.1
+  '@supabase/auth-js': 2.105.3
+  '@supabase/postgrest-js': 2.105.3
+  '@supabase/realtime-js': 2.105.3
   '@supabase/ssr': 0.10.2
-  '@supabase/supabase-js': 2.104.1
+  '@supabase/supabase-js': 2.105.3
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
@@ -20,6 +20,7 @@ catalog:
   lodash: ^4.18.1
   lodash-es: ^4.18.1
   next: 16.2.3
+  next-themes: ^0.4.6
   postcss: ^8.5.10
   radix-ui: ^1.4.3
   react: ^18.3.0
@@ -64,13 +65,13 @@ onlyBuiltDependencies:
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
-  '@aws-sdk/core>fast-xml-parser': ^4.5.5
   '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
   '@rollup/plugin-terser>serialize-javascript': ^7.0.5
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
+  express-rate-limit>ip-address: ^10.1.1
   esbuild: ^0.25.2
   lodash: 'catalog:'
   lodash-es: 'catalog:'
