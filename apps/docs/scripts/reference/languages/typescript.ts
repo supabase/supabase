@@ -29,6 +29,16 @@ function contentToMd(items: ContentItem[] = []): string {
     .trim()
 }
 
+// Remarks can contain structured markdown (bullet lists, nested items, fenced
+// code blocks) where every newline is meaningful. Skip the soft-wrap collapse
+// and just join the items as-is.
+function rawContentToMd(items: ContentItem[] = []): string {
+  return items
+    .map((c) => c.text)
+    .join('')
+    .trim()
+}
+
 function extractFence(text: string): string {
   const m = text.match(/^```[^\n]*\n([\s\S]*?)\n?```$/)
   return m ? m[1].trim() : text.trim()
@@ -317,7 +327,7 @@ export function processSpec(specDir: string): { categories: SpecCategory[]; conf
       ...(subcategory ? { subcategory } : {}),
       description: contentToMd(decl.comment?.summary ?? []),
       ...(remarkTags.length
-        ? { remarks: remarkTags.map((t) => contentToMd(t.content ?? [])) }
+        ? { remarks: remarkTags.map((t) => rawContentToMd(t.content ?? [])) }
         : {}),
       parameters: (sig.parameters ?? []).map((p: any) => serializeParam(p, targetMap)),
       returnType: serializeType(sig.type, targetMap),
