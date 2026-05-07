@@ -5390,6 +5390,7 @@ export interface components {
         }
       }
       data_api_exposed_schemas?: string[]
+      data_api_revoke_default_privileges?: boolean
       data_api_use_api_schema?: boolean
       db_pass: string
       db_pricing_tier_id?: string
