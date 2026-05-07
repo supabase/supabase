@@ -2139,28 +2139,16 @@ importers:
 
   packages/config:
     dependencies:
-      '@mertasan/tailwindcss-variables':
-        specifier: ^2.2.3
-        version: 2.7.0(autoprefixer@10.4.27(postcss@8.5.10))(postcss@8.5.10)
-      '@radix-ui/colors':
-        specifier: ^0.1.8
-        version: 0.1.9
       '@tailwindcss/forms':
         specifier: ^0.5.11
         version: 0.5.11(tailwindcss@4.2.4)
       '@tailwindcss/typography':
         specifier: ^0.5.19
         version: 0.5.19(tailwindcss@4.2.4)
-      deepmerge:
-        specifier: ^4.2.2
-        version: 4.3.1
-      mini-svg-data-uri:
-        specifier: ^1.4.3
-        version: 1.4.4
-      tailwindcss-radix:
-        specifier: ^2.0.0
-        version: 2.8.0
     devDependencies:
+      '@radix-ui/colors':
+        specifier: ^0.1.8
+        version: 0.1.9
       '@tailwindcss/postcss':
         specifier: ^4.2.4
         version: 4.2.4
@@ -4531,13 +4519,6 @@ packages:
 
   '@mermaid-js/parser@0.6.3':
     resolution: {integrity: sha512-lnjOhe7zyHjc+If7yT4zoedx2vo4sHaTmtkl1+or8BRTnCtDmcTpAjpzDSfCZrshM5bCoz0GyidzadJAH1xobA==}
-
-  '@mertasan/tailwindcss-variables@2.7.0':
-    resolution: {integrity: sha512-rKPhxi/0r6XWP0+OjPmsfrloX/TtQmvONj2Pr3Nl8BNBznQVP3M9sphguDBUDC0AiKYx2xgup3XzAhlIDLPLIA==}
-    engines: {node: '>=12.13.0'}
-    peerDependencies:
-      autoprefixer: ^10.0.2
-      postcss: ^8.5.10
 
   '@mjackson/headers@0.11.1':
     resolution: {integrity: sha512-uXXhd4rtDdDwkqAuGef1nuafkCa1NlTmEc1Jzc0NL4YiA1yON1NFXuqJ3hOuKvNKQwkiDwdD+JJlKVyz4dunFA==}
@@ -16462,9 +16443,6 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders'
 
-  tailwindcss-radix@2.8.0:
-    resolution: {integrity: sha512-1k1UfoIYgVyBl13FKwwoKavjnJ5VEaUClCTAsgz3VLquN4ay/lyaMPzkbqD71sACDs2fRGImytAUlMb4TzOt1A==}
-
   tailwindcss@4.2.4:
     resolution: {integrity: sha512-HhKppgO81FQof5m6TEnuBWCZGgfRAWbaeOaGT00KOy/Pf/j6oUihdvBpA7ltCeAvZpFhW3j0PTclkxsd4IXYDA==}
 
@@ -20475,12 +20453,6 @@ snapshots:
   '@mermaid-js/parser@0.6.3':
     dependencies:
       langium: 3.3.1
-
-  '@mertasan/tailwindcss-variables@2.7.0(autoprefixer@10.4.27(postcss@8.5.10))(postcss@8.5.10)':
-    dependencies:
-      autoprefixer: 10.4.27(postcss@8.5.10)
-      lodash: 4.18.1
-      postcss: 8.5.10
 
   '@mjackson/headers@0.11.1': {}
 
@@ -34810,8 +34782,6 @@ snapshots:
   tailwindcss-animate@1.0.7(tailwindcss@4.2.4):
     dependencies:
       tailwindcss: 4.2.4
-
-  tailwindcss-radix@2.8.0: {}
 
   tailwindcss@4.2.4: {}
 
