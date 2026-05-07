@@ -58,7 +58,7 @@ export const General = () => {
   })
 
   const regionLabel = AVAILABLE_REPLICA_REGIONS.find((region) =>
-    project?.region.includes(region.region)
+    project?.region?.includes(region.region)
   )
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
