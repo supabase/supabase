@@ -106,7 +106,7 @@ jobs:
       - name: 🚀 Run Playwright tests against Vercel Preview
         if: steps.filter.outputs.studio == 'true'
         id: playwright
-        run: pnpm e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: PWTEST_SHARD_WEIGHTS=60:40 pnpm e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
 
       - name: Upload blob report to GitHub Actions Artifacts
         if: always() && steps.filter.outputs.studio == 'true'
