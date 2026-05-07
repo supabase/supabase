@@ -116,7 +116,7 @@ As a prerequisite, you must install a container runtime compatible with Docker A
 
 <Admonition type="caution">
 
-If your local development machine is connected to an untrusted public network, you should create a separate docker network and bind to 127.0.0.1 before starting the local development stack. This restricts network access to only your localhost machine.
+If your local development machine is connected to an untrusted public network, you should create a separate Docker network and bind to 127.0.0.1 before starting the local development stack. This restricts network access to only your localhost machine.
 
 ```sh
 docker network create -o 'com.docker.network.bridge.host_binding_ipv4=127.0.0.1' local-network

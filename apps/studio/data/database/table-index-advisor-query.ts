@@ -1,4 +1,4 @@
-import { getTableIndexAdvisorSql } from '@supabase/pg-meta'
+import { getTableIndexAdvisorSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
@@ -14,7 +14,7 @@ export type TableIndexAdvisorVariables = {
 }
 
 export type IndexAdvisorSuggestion = {
-  query: string
+  query: SafeSqlFragment
   calls: number
   total_time: number
   mean_time: number
@@ -113,7 +113,7 @@ export async function getTableIndexAdvisorSuggestions({
           : 0
 
       return {
-        query: row.query,
+        query: row.query as SafeSqlFragment,
         calls: row.calls,
         total_time: row.total_time,
         mean_time: row.mean_time,

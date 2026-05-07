@@ -2,10 +2,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { isNull, partition } from 'lodash'
 import { AlertCircle, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Card,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   ShadowScrollArea,
   Table,
   TableBody,
@@ -23,11 +25,28 @@ import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const Extensions = () => {
   const { filter } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search extensions' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setFilterString('')
+  })
 
   const { data = [], isPending: isLoading } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -62,14 +81,19 @@ export const Extensions = () => {
   return (
     <>
       <div className="mb-4">
-        <Input
-          size="tiny"
-          placeholder="Search for an extension"
-          value={filterString}
-          onChange={(e) => setFilterString(e.target.value)}
-          className="w-52"
-          icon={<Search />}
-        />
+        <InputGroup className="w-52">
+          <InputGroupInput
+            ref={searchInputRef}
+            size="tiny"
+            placeholder="Search for an extension"
+            value={filterString}
+            onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+          />
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+        </InputGroup>
       </div>
 
       {isPermissionsLoaded && !canUpdateExtensions && (
@@ -93,8 +117,8 @@ export const Extensions = () => {
                   <TableHead key="description">Description</TableHead>
                   <TableHead key="used-by">Used by</TableHead>
                   <TableHead key="links">Links</TableHead>
-                  {/* 
-                    [Joshen] All these classes are just to make the last column sticky 
+                  {/*
+                    [Joshen] All these classes are just to make the last column sticky
                     I reckon we can pull these out into the Table component where we can declare
                     sticky columns via props, but we can do that if we start to have more tables
                     in the dashboard with sticky columns

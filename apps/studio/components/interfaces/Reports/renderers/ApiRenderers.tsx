@@ -381,7 +381,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
     </CollapsibleTrigger_Shadcn_>
     <CollapsibleContent_Shadcn_ className="pt-2">
       {datum.search ? (
-        <pre className={`syntax-highlight overflow-auto rounded-sm bg-surface-100 p-2 text-xs!`}>
+        <pre className="syntax-highlight overflow-auto whitespace-pre-wrap wrap-break-word rounded-sm bg-surface-100 p-2 text-xs! [&_span]:whitespace-pre-wrap!">
           <div
             className="text-wrap"
             dangerouslySetInnerHTML={{

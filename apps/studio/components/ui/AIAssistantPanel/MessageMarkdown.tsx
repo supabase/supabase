@@ -1,3 +1,4 @@
+import { untrustedSql } from '@supabase/pg-meta'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import {
@@ -265,7 +266,7 @@ export const MarkdownPre = ({
             messageId={id}
             toolCallId={toolCallId}
             initialArgs={{
-              sql: cleanContent,
+              sql: untrustedSql(cleanContent),
               label: title,
               isWriteQuery: false,
               view: isChart ? 'chart' : 'table',

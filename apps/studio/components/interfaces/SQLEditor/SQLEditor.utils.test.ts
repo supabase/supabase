@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta'
 import { stripIndent } from 'common-tags'
 import { describe, expect, it, test } from 'vitest'
 
@@ -136,19 +137,19 @@ select * from cities
 // [Joshen] These will just need to test the cases when appendAutoLimit returns true then
 describe('SQLEditor.utils.ts:suffixWithLimit', () => {
   test('Should add the limit param properly if query ends without a semi colon', () => {
-    const sql = 'select * from countries'
+    const sql = safeSql`select * from countries`
     const limit = 100
     const formattedSql = suffixWithLimit(sql, limit)
     expect(formattedSql).toBe('select * from countries limit 100;')
   })
   test('Should add the limit param properly if query ends with a semi colon', () => {
-    const sql = 'select * from countries;'
+    const sql = safeSql`select * from countries;`
     const limit = 100
     const formattedSql = suffixWithLimit(sql, limit)
     expect(formattedSql).toBe('select * from countries limit 100;')
   })
   test('Should add the limit param properly if query ends with multiple semi colon', () => {
-    const sql = 'select * from countries;;;;;;;'
+    const sql = safeSql`select * from countries;;;;;;;`
     const limit = 100
     const formattedSql = suffixWithLimit(sql, limit)
     expect(formattedSql).toBe('select * from countries limit 100;')
@@ -410,6 +411,15 @@ describe('SQLEditor.utils:getCreateTablesMissingRLS', () => {
     const sql = stripIndent`
       create table public.foo (id int8 primary key);
       alter table public.foo enable row level security;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('does not flag when ALTER TABLE IF EXISTS enables RLS', () => {
+    const sql = stripIndent`
+      CREATE TABLE IF NOT EXISTS public."Conversations" (id int8 primary key);
+      ALTER TABLE IF EXISTS public."Conversations" ENABLE ROW LEVEL SECURITY;
+      GRANT ALL ON TABLE public."Conversations" TO postgres, anon, authenticated, service_role;
     `
     expect(getCreateTablesMissingRLS(sql)).toEqual([])
   })

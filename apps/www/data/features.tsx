@@ -419,32 +419,33 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
   },
   {
     title: 'Branching',
-    subtitle: 'Test and preview changes using Supabase Branches.',
+    subtitle: 'Test schema changes without touching production.',
     description: `
-Supabase Branching allows you to create and test changes in separate, temporary environments without affecting your production setup. Branching 2.0 (currently in public alpha) removes the Git requirement—spin up branches directly from the dashboard, CLI, or Management API, with or without GitHub integration.
+Branching without Git is now the default for all Supabase projects. Create a branch directly from the Supabase Dashboard, make schema changes, review the diff, and merge. No Git configuration required. Git-based branching remains fully supported for teams that manage migrations in version control. You can start with dashboard branching and add a Git integration later.
+
+## Two ways to branch
+
+**Dashboard branching (default)**
+Create branches directly from the Supabase Dashboard. Each branch gets its own Postgres instance with your current production schema. Make changes using the SQL Editor or Table Editor, preview the diff, and merge. The whole workflow stays inside Supabase.
+
+**Git-based branching**
+Connect a GitHub repo to your Supabase project. Migrations live in version control, and branches are created automatically when you open a pull request and cleaned up when it closes.
 
 ## Key features
-1. No-Git workflows: Create branches directly from dashboard or CLI without requiring GitHub connection.
-2. Git-based workflow: Optionally integrate with GitHub, creating preview branches for each pull request.
+1. No-Git workflow: Create and merge branches entirely from the dashboard. No GitHub connection needed.
+2. Git-based workflow: Optionally integrate with GitHub for pull request-driven schema reviews.
 3. Isolated environments: Each branch has its own Supabase instance with separate API credentials.
 4. Automatic migrations: Runs new migrations when changes are pushed to the ./supabase/migrations directory.
-5. Data seeding: Preview branches can be seeded with sample data using ./supabase/seed.sql.
+5. Data seeding: Seed branches with sample data using ./supabase/seed.sql.
 6. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
 7. Merge requests: Review schema diffs and merge changes directly in the dashboard.
 
-## Benefits:
-- Risk-free experimentation: Test changes without affecting the production environment.
-- Improved collaboration: Multiple team members can work on different features simultaneously.
-- Streamlined reviews: Facilitate thorough checks of database changes before merging.
-- Rapid iteration: Quickly prototype and validate database-driven features.
-- Flexible workflows: Use Git integration, dashboard creation, or combine both approaches.
-
-## Supabase Branching is valuable for:
-- Agile teams working on multiple features concurrently
-- Projects with complex database schemas requiring careful management
-- Applications undergoing significant refactoring or upgrades
-- CI/CD pipelines integrating database changes
-- Teams preferring no-code or database-first development workflows
+## When to use branching
+- Developers prototyping schema changes who want fast iteration without upfront configuration
+- AI agents that need to create and manage database branches programmatically
+- Teams managing database migrations in Git who want PR-driven schema reviews
+- Projects with complex schemas requiring careful diff review before merging
+- CI/CD pipelines integrating database changes alongside application code
 `,
     icon: GitBranch,
     products: [PRODUCT_SHORTNAMES.DATABASE],

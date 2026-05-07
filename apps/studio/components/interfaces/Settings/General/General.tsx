@@ -1,12 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
   Card,
   CardContent,
@@ -15,8 +11,8 @@ import {
   FormControl,
   FormField,
   Input_Shadcn_,
-  WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -30,6 +26,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { ProjectAccessSection } from './ProjectAccessSection'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectUpdateMutation } from '@/data/projects/project-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -83,23 +80,18 @@ export const General = () => {
         </PageSectionMeta>
         <PageSectionContent>
           {isBranch && (
-            <Alert_Shadcn_ variant="default">
-              <WarningIcon />
-              <AlertTitle_Shadcn_>
-                You are currently on a preview branch of your project
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                Certain settings are not available while you're on a preview branch. To adjust your
-                project settings, you may return to your{' '}
-                <Link
-                  href={`/project/${project?.parent_project_ref}/settings/general`}
-                  className="text-brand"
-                >
-                  main branch
-                </Link>
-                .
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+            <Admonition
+              type="default"
+              className="mb-4"
+              title="You are currently on a preview branch of your project"
+            >
+              Certain settings are not available while you're on a preview branch. To adjust your
+              project settings, you may return to your{' '}
+              <InlineLink href={`/project/${project?.parent_project_ref}/settings/general`}>
+                main branch
+              </InlineLink>
+              .
+            </Admonition>
           )}
 
           {project === undefined ? (

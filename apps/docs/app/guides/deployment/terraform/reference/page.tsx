@@ -352,7 +352,11 @@ const TerraformReferencePage = async () => {
   const editLink = newEditLink('supabase/terraform-provider-supabase')
 
   return (
-    <GuideTemplate meta={meta} editLink={editLink}>
+    <GuideTemplate
+      meta={meta}
+      editLink={editLink}
+      pathname="/guides/deployment/terraform/reference"
+    >
       The Terraform Provider provides access to{' '}
       <Link
         href="https://developer.hashicorp.com/terraform/language/resources"

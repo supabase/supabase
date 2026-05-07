@@ -670,7 +670,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/integrations/partners/{ref}/{listing_id}': {
+  '/platform/integrations/partners/{ref}/{listing_slug}': {
     parameters: {
       query?: never
       header?: never
@@ -2447,6 +2447,24 @@ export interface paths {
     put?: never
     /** Gets project's logs */
     post: operations['LogsController_getProjectLogsViaPost']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/analytics/endpoints/logs.all.otel': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project's logs from the ClickHouse-backed endpoint */
+    get: operations['LogsController_getProjectLogsOtelViaGet']
+    put?: never
+    /** Gets project's logs from the ClickHouse-backed endpoint */
+    post: operations['LogsController_getProjectLogsOtelViaPost']
     delete?: never
     options?: never
     head?: never
@@ -5432,6 +5450,7 @@ export interface components {
         }
       }
       data_api_exposed_schemas?: string[]
+      data_api_revoke_default_privileges?: boolean
       data_api_use_api_schema?: boolean
       db_pass: string
       db_pricing_tier_id?: string
@@ -7568,6 +7587,7 @@ export interface components {
             | 'auth.advanced_auth_settings'
             | 'auth.performance_settings'
             | 'auth.password_hibp'
+            | 'auth.custom_oauth.max_providers'
             | 'backup.retention_days'
             | 'backup.restore_to_new_project'
             | 'function.max_count'
@@ -9894,7 +9914,6 @@ export interface components {
     }
     RestorePhysicalBackupBody: {
       id: number
-      recovery_time_target: string
     }
     RevokeAuthorizedOAuthAppResponse: {
       authorized_at?: string
@@ -13915,8 +13934,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description The id of the listing in the marketplace database */
-        listing_id: string
+        /** @description The slug of the listing in the marketplace database */
+        listing_slug: string
         /** @description Supabase project ref */
         ref: string
       }
@@ -19192,6 +19211,7 @@ export interface operations {
           | 'auth.advanced_auth_settings'
           | 'auth.performance_settings'
           | 'auth.password_hibp'
+          | 'auth.custom_oauth.max_providers'
           | 'backup.retention_days'
           | 'backup.restore_to_new_project'
           | 'function.max_count'
@@ -20090,6 +20110,115 @@ export interface operations {
     }
   }
   LogsController_getProjectLogsViaPost: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GetProjectLogsBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's logs */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  LogsController_getProjectLogsOtelViaGet: {
+    parameters: {
+      query?: {
+        iso_timestamp_end?: string
+        iso_timestamp_start?: string
+        lql?: string
+        sql?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's logs */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  LogsController_getProjectLogsOtelViaPost: {
     parameters: {
       query?: never
       header?: never

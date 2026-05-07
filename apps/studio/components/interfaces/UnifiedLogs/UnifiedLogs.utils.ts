@@ -5,7 +5,7 @@ import { FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 
 export const logEventBus = {
-  listeners: new Map<string, Set<(...args: any[]) => void>>(),
+  listeners: new Map<string, Set<(rowId: string) => void>>(),
 
   on(event: 'selectTraceTab', callback: (rowId: string) => void) {
     if (!this.listeners.has(event)) {

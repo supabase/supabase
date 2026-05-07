@@ -446,22 +446,4 @@ const uiConfig = ui({
   ],
 })
 
-function arrayMergeFn(destinationArray, sourceArray) {
-  return destinationArray.concat(sourceArray).reduce((acc, cur) => {
-    if (acc.includes(cur)) return acc
-    return [...acc, cur]
-  }, [])
-}
-
-/**
- * Merge Supabase UI and Tailwind CSS configurations
- * @param {object} tailwindConfig - Tailwind config object
- * @return {object} new config object
- */
-function wrapper(tailwindConfig) {
-  return deepMerge({ ...tailwindConfig }, uiConfig, {
-    arrayMerge: arrayMergeFn,
-  })
-}
-
-module.exports = wrapper
+module.exports = uiConfig
