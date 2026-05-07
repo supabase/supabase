@@ -80,6 +80,8 @@ const defaultValues = {
 
 /**
  * Using memo for this component because everything rerenders on window focus because of outside fetches
+ * Note: For INSERT command, editor one holds the check expression (not using)
+   Whereas for others: editor one = using, editor two = optional check
  */
 export const PolicyEditorPanel = memo(function ({
   visible,
@@ -184,8 +186,7 @@ export const PolicyEditorPanel = memo(function ({
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     const { name, table, behavior, command, roles } = data
 
-    // For INSERT: editor one holds the check expression (not using)
-    // For others: editor one = using, editor two = optional check
+    // [Joshen] Refer to top note as to why we're using the "USING" section for INSERT
     const usingExpr = command !== 'insert' ? using : undefined
     const checkExpr = command === 'insert' ? using : check
 
@@ -281,8 +282,7 @@ export const PolicyEditorPanel = memo(function ({
           roles: roles.length === 1 && roles[0] === 'public' ? '' : roles.join(', '),
         })
 
-        // For INSERT: editor one holds the check expression (not using)
-        // For others: editor one = using, editor two = optional check
+        // [Joshen] Refer to top note as to why we're using the "USING" section for INSERT
         if (selectedPolicy.definition) {
           setUsing(safeSql`  ${selectedPolicy.definition}`)
         }
@@ -582,8 +582,14 @@ export const PolicyEditorPanel = memo(function ({
                             form.setValue('roles', value.roles.join(', ') ?? '')
 
                             setUsing(safeSql`  ${value.definition}`)
-                            if (value.command === 'insert' && value.check) {
-                              setCheck(safeSql`  ${value.check}`)
+
+                            // [Joshen] Refer to top note as to why we're using the "USING" section for INSERT
+                            if (value.check) {
+                              if (value.command === 'INSERT') {
+                                setUsing(safeSql`  ${value.check}`)
+                              } else {
+                                setCheck(safeSql`  ${value.check}`)
+                              }
                             }
 
                             setRolesFragment(
