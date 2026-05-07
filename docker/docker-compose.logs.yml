@@ -1,11 +1,9 @@
-# Analytics Stack - Optional Logflare + Vector logging pipeline
-#
-# Usage:
-#   docker compose -f docker-compose.yml -f docker-compose.analytics.yml up -d
-#
-# This overlay adds log aggregation and analytics capabilities to Supabase:
+# This override adds log aggregation and analytics capabilities to Supabase:
 #   - Logflare: Log management and event analytics platform
 #   - Vector: High-performance observability data pipeline for logs
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.logs.yml up -d
 
 services:
 
@@ -14,31 +12,16 @@ services:
       analytics:
         condition: service_healthy
     environment:
-      # LOGFLARE_API_KEY is deprecated
-      LOGFLARE_API_KEY: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
-      LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
       LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN}
       LOGFLARE_URL: http://analytics:4000
-      NEXT_PUBLIC_ENABLE_LOGS: "true"
-      ENABLED_FEATURES_LOGS_ALL: true
-      
-      # Comment to use Big Query backend for analytics
-      NEXT_ANALYTICS_BACKEND_PROVIDER: postgres
-      # Uncomment to use Big Query backend for analytics
-      # NEXT_ANALYTICS_BACKEND_PROVIDER: bigquery
+      ENABLED_FEATURES_LOGS_ALL: "true"
 
   analytics:
     container_name: supabase-analytics
     image: supabase/logflare:1.36.1
     restart: unless-stopped
-    # ports:
-    #   - 4000:4000
-    # Uncomment to use Big Query backend for analytics
-    # volumes:
-    #   - type: bind
-    #     source: ${PWD}/gcloud.json
-    #     target: /opt/app/rel/logflare/bin/gcloud.json
-    #     read_only: true
+    #ports:
+    #  - 4000:4000
     healthcheck:
       test:
         [
@@ -63,16 +46,12 @@ services:
       DB_SCHEMA: _analytics
       LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
       LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN}
-      LOGFLARE_SINGLE_TENANT: true
-      LOGFLARE_SUPABASE_MODE: true
+      LOGFLARE_SINGLE_TENANT: "true"
+      LOGFLARE_SUPABASE_MODE: "true"
 
-      # Comment variables to use Big Query backend for analytics
       POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/_supabase
       POSTGRES_BACKEND_SCHEMA: _analytics
       LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
-      # Uncomment to use Big Query backend for analytics
-      # GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
-      # GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
 
   vector:
     container_name: supabase-vector

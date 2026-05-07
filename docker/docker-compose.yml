@@ -53,7 +53,8 @@ services:
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
       AUTH_JWT_SECRET: ${JWT_SECRET}
 
-      ENABLED_FEATURES_LOGS_ALL: false
+      # See: docker-compose.logs.yml
+      ENABLED_FEATURES_LOGS_ALL: "false"
 
       SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
       EDGE_FUNCTIONS_MANAGEMENT_FOLDER: /app/edge-functions
