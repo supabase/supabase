@@ -1,6 +1,5 @@
 import type { OptimizedSearchColumns } from '@supabase/pg-meta'
 import { USER_SEARCH_INDEXES } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
@@ -15,13 +14,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import {
-  parseAsArrayOf,
-  parseAsBoolean,
-  parseAsString,
-  parseAsStringEnum,
-  useQueryState,
-} from 'nuqs'
+import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
@@ -77,7 +70,6 @@ import { useUserIndexStatusesQuery } from '@/data/auth/user-search-indexes-query
 import { useUsersCountQuery } from '@/data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -120,24 +112,13 @@ export const UsersV2 = () => {
     authenticationShowSortByPhone: showSortByPhone,
     authenticationShowUserTypeFilter: showUserTypeFilter,
     authenticationShowEmailPhoneColumns: showEmailPhoneColumns,
-    authenticationShowSendInvitation: showSendInvitation,
   } = useIsFeatureEnabled([
     'authentication:show_provider_filter',
     'authentication:show_sort_by_email',
     'authentication:show_sort_by_phone',
     'authentication:show_user_type_filter',
     'authentication:show_email_phone_columns',
-    'authentication:show_send_invitation',
   ])
-
-  const { can: canCreateUsers } = useAsyncCheckPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'create_user'
-  )
-  const { can: canInviteUsers } = useAsyncCheckPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'invite_user'
-  )
 
   const userTableColumns = useMemo(() => {
     if (showEmailPhoneColumns) return USERS_TABLE_COLUMNS
@@ -163,7 +144,7 @@ export const UsersV2 = () => {
     'userType',
     parseAsStringEnum(['all', 'verified', 'unverified', 'anonymous']).withDefault('all')
   )
-  const [filterKeywords, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
+  const [filterKeywords] = useQueryState('keywords', { defaultValue: '' })
   const [sortByValue, setSortByValue] = useQueryState('sortBy', { defaultValue: 'created_at:desc' })
   const [sortColumn, sortOrder] = sortByValue.split(':')
   const [selectedColumns, setSelectedColumns] = useQueryState(
@@ -177,14 +158,6 @@ export const UsersV2 = () => {
   const [selectedId, setSelectedId] = useQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const [, setInviteVisible] = useQueryState(
-    'invite',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const [, setCreateVisible] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
   const [improvedSearchDismissed, setImprovedSearchDismissed] = useLocalStorageQuery(
@@ -221,7 +194,6 @@ export const UsersV2 = () => {
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
   const [showFreeformWarning, setShowFreeformWarning] = useState(false)
   const [showCreateIndexesModal, setShowCreateIndexesModal] = useState(false)
@@ -494,26 +466,13 @@ export const UsersV2 = () => {
     })
   }
 
-  const { onCellKeyDown } = useAuthUsersShortcuts({
+  const { onCellKeyDown, showDeleteModal, setShowDeleteModal } = useAuthUsersShortcuts({
     gridRef,
     searchInputRef,
     users,
-    selectedId,
     selectedUsers,
-    sortByValue,
-    canCreateUsers,
-    canInviteUsers,
-    showSendInvitation,
-    onRefresh: handleRefresh,
-    setSelectedId,
     setSelectedUsers,
-    setFilterKeywords,
-    setFilterUserType,
-    setSelectedProviders,
-    setSortByValue: updateSortByValue,
-    setShowDeleteModal,
-    setCreateVisible,
-    setInviteVisible,
+    onRefresh: handleRefresh,
   })
 
   useEffect(() => {
@@ -815,7 +774,7 @@ export const UsersV2 = () => {
                   onClick={handleRefresh}
                   tooltip={{ content: { side: 'bottom', text: 'Refresh' } }}
                 />
-                <AddUserDropdown canCreateUsers canInviteUsers />
+                <AddUserDropdown />
               </div>
             </>
           )}

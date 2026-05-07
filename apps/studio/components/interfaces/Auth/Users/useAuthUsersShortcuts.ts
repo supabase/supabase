@@ -1,8 +1,18 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import {
+  parseAsArrayOf,
+  parseAsBoolean,
+  parseAsString,
+  parseAsStringEnum,
+  useQueryState,
+} from 'nuqs'
 import { Dispatch, RefObject, SetStateAction, useEffect, useState } from 'react'
 import type { CellKeyboardEvent, DataGridHandle } from 'react-data-grid'
 
 import { MAX_BULK_DELETE } from './Users.constants'
 import type { User } from '@/data/auth/users-infinite-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -10,22 +20,9 @@ interface UseAuthUsersShortcutsParams {
   gridRef: RefObject<DataGridHandle>
   searchInputRef: RefObject<HTMLInputElement>
   users: User[]
-  selectedId: string | null
   selectedUsers: Set<unknown>
-  sortByValue: string
-  canCreateUsers: boolean
-  canInviteUsers: boolean
-  showSendInvitation: boolean
-  onRefresh: () => void
-  setSelectedId: (value: string | null) => void
   setSelectedUsers: Dispatch<SetStateAction<Set<unknown>>>
-  setFilterKeywords: (value: string) => void
-  setFilterUserType: (value: 'all') => void
-  setSelectedProviders: (value: string[]) => void
-  setSortByValue: (value: string) => void
-  setShowDeleteModal: Dispatch<SetStateAction<boolean>>
-  setCreateVisible: (value: boolean) => void
-  setInviteVisible: (value: boolean) => void
+  onRefresh: () => void
 }
 
 interface GridCellKeyDownArgs {
@@ -36,30 +33,55 @@ interface GridCellKeyDownArgs {
 
 interface UseAuthUsersShortcutsResult {
   onCellKeyDown: (args: GridCellKeyDownArgs, event: CellKeyboardEvent) => void
+  showDeleteModal: boolean
+  setShowDeleteModal: Dispatch<SetStateAction<boolean>>
 }
 
 export function useAuthUsersShortcuts({
   gridRef,
   searchInputRef,
   users,
-  selectedId,
   selectedUsers,
-  sortByValue,
-  canCreateUsers,
-  canInviteUsers,
-  showSendInvitation,
-  onRefresh,
-  setSelectedId,
   setSelectedUsers,
-  setFilterKeywords,
-  setFilterUserType,
-  setSelectedProviders,
-  setSortByValue,
-  setShowDeleteModal,
-  setCreateVisible,
-  setInviteVisible,
+  onRefresh,
 }: UseAuthUsersShortcutsParams): UseAuthUsersShortcutsResult {
   const [hasCellSelected, setHasCellSelected] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+
+  const [selectedId, setSelectedId] = useQueryState(
+    'show',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
+  const [, setFilterUserType] = useQueryState(
+    'userType',
+    parseAsStringEnum(['all', 'verified', 'unverified', 'anonymous']).withDefault('all')
+  )
+  const [, setSelectedProviders] = useQueryState(
+    'providers',
+    parseAsArrayOf(parseAsString, ',').withDefault([])
+  )
+  const [sortByValue, setSortByValue] = useQueryState('sortBy', {
+    defaultValue: 'created_at:desc',
+  })
+  const [, setInviteVisible] = useQueryState(
+    'invite',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [, setCreateVisible] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const { can: canCreateUsers } = useAsyncCheckPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'create_user'
+  )
+  const { can: canInviteUsers } = useAsyncCheckPermissions(
+    PermissionAction.AUTH_EXECUTE,
+    'invite_user'
+  )
+  const showSendInvitation = useIsFeatureEnabled('authentication:show_send_invitation')
 
   useEffect(() => {
     const el = gridRef.current?.element
@@ -158,5 +180,5 @@ export function useAuthUsersShortcuts({
     gridRef.current?.scrollToCell({ idx: 0, rowIdx: args.rowIdx })
   }
 
-  return { onCellKeyDown }
+  return { onCellKeyDown, showDeleteModal, setShowDeleteModal }
 }
