@@ -1,4 +1,4 @@
-import { IS_PLATFORM, useFlag } from 'common'
+import { IS_PLATFORM } from 'common'
 import { BookOpen, Check, ChevronDown, Copy, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
@@ -63,7 +63,12 @@ const LogsQueryPanel = ({
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
   const { logsTemplates } = useIsFeatureEnabled(['logs:templates'])
-  const otelToggleEnabled = useFlag('unifiedLogs') && !!onUseOtelChange
+  // Staff-only debugging affordance: only show on staging/local, never to
+  // enterprise customers running against production.
+  const isStagingOrLocal =
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+  const otelToggleEnabled = isStagingOrLocal && !!onUseOtelChange
 
   const {
     projectAuthAll: authEnabled,
