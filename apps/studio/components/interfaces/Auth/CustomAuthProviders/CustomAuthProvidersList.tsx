@@ -48,6 +48,7 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useOAuthCustomProviderUpdateMutation } from '@/data/oauth-custom-providers/oauth-custom-provider-update-mutation'
 import { useOAuthCustomProvidersQuery } from '@/data/oauth-custom-providers/oauth-custom-providers-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -308,6 +309,7 @@ export const CustomAuthProvidersList = () => {
                 placeholder="Search custom providers"
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
+                onKeyDown={onSearchInputEscape(filterString, setFilterString)}
               />
               <InputGroupAddon>
                 <Search />

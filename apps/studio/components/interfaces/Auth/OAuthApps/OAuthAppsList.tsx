@@ -46,6 +46,7 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useOAuthServerAppDeleteMutation } from '@/data/oauth-server-apps/oauth-server-app-delete-mutation'
 import { useOAuthServerAppRegenerateSecretMutation } from '@/data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppsQuery } from '@/data/oauth-server-apps/oauth-server-apps-query'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -255,6 +256,7 @@ export const OAuthAppsList = () => {
                 placeholder="Search OAuth apps"
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
+                onKeyDown={onSearchInputEscape(filterString, setFilterString)}
               />
               <InputGroupAddon>
                 <Search />

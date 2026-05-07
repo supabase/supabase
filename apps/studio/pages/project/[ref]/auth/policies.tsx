@@ -50,6 +50,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -340,6 +341,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                   const str = e.target.value
                   setSearchString(str)
                 }}
+                onKeyDown={onSearchInputEscape(searchString || '', setSearchString)}
                 icon={<Search size={14} />}
                 actions={
                   searchString ? (
