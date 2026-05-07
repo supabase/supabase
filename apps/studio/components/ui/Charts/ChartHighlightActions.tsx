@@ -12,6 +12,7 @@ import {
 } from 'ui'
 
 import { ChartHighlight } from './useChartHighlight'
+import { useFormatDateTime } from '@/lib/datetime'
 
 export type UpdateDateRange = (from: string, to: string) => void
 
@@ -44,6 +45,7 @@ export const ChartHighlightActions = ({
 }) => {
   const { left: selectedRangeStart, right: selectedRangeEnd, clearHighlight } = chartHighlight ?? {}
   const [isOpen, setIsOpen] = useState(!!chartHighlight?.popoverPosition)
+  const formatChartDate = useFormatDateTime()
 
   useEffect(() => {
     setIsOpen(!!chartHighlight?.popoverPosition && selectedRangeStart !== selectedRangeEnd)
@@ -90,9 +92,9 @@ export const ChartHighlightActions = ({
       />
       <DropdownMenuContent className="flex flex-col gap-1 p-1 w-fit text-left">
         <DropdownMenuLabel className="flex items-center justify-center text-foreground-light font-mono gap-x-2 text-xs">
-          <span>{dayjs(selectedRangeStart).format('MMM D, H:mm')}</span>
+          <span>{formatChartDate(selectedRangeStart!, 'MMM D, H:mm')}</span>
           <ArrowRight size={10} />
-          <span>{dayjs(selectedRangeEnd).format('MMM D, H:mm')}</span>
+          <span>{formatChartDate(selectedRangeEnd!, 'MMM D, H:mm')}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="my-0" />
         {allActions.map((action) => {
