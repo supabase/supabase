@@ -12,13 +12,14 @@
 #   CONFIG="pg17 envoy"      (multiple, quote when there are spaces)
 #
 # Usage:
-#   ./run.sh start            # docker compose up -d --wait
-#   ./run.sh stop             # docker compose down
-#   ./run.sh restart          # stop then start
+#   ./run.sh start            # docker compose -f ... up -d --wait
+#   ./run.sh stop             # docker compose -f ... down
+#   ./run.sh restart          # docker compose -f ... restart
+#   ./run.sh recreate         # stop then start
 #   ./run.sh status           # docker compose ps
 #   ./run.sh logs [service]   # follow logs (all or one service)
 #   ./run.sh pull             # pull images
-#   ./run.sh config           # print resolved CONFIG and compose files
+#   ./run.sh config           # print CONFIG list of the compose files
 #   ./run.sh secrets          # print key passwords and API keys from .env
 #
 
@@ -115,7 +116,7 @@ Commands:
   status             Show service status
   logs [service]     Follow logs (optionally for a single service)
   pull               Pull all images
-  config             Show resolved CONFIG and compose files
+  config             Show CONFIG list of the compose files
   secrets            Show key passwords and API keys from .env
 
 EOF
