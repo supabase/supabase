@@ -8,7 +8,6 @@ import {
   PageSection,
   PageSectionContent,
 } from 'ui-patterns'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { AVAILABLE_REPLICA_REGIONS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { BucketsUpgradePlan } from '@/components/interfaces/Storage/BucketsUpgradePlan'
