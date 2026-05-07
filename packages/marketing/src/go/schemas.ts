@@ -289,15 +289,6 @@ export const quoteSectionSchema = z.object({
   avatar: imageSchema.optional(),
 })
 
-export const hubspotMeetingSectionSchema = z.object({
-  ...sectionBase,
-  type: z.literal('hubspot-meeting'),
-  title: z.string().optional(),
-  description: z.string().optional(),
-  /** The HubSpot meeting link path, e.g. "your-name/meeting-type" */
-  meetingSlug: z.string().min(1),
-})
-
 // ----- Dynamic sections -----
 
 export const goSectionSchema = z.discriminatedUnion('type', [
@@ -312,7 +303,6 @@ export const goSectionSchema = z.discriminatedUnion('type', [
   codeBlockSectionSchema,
   stepsSectionSchema,
   quoteSectionSchema,
-  hubspotMeetingSectionSchema,
 ])
 
 // ----- Page-level schemas -----
@@ -384,7 +374,6 @@ export type GoCodeBlockSection = z.infer<typeof codeBlockSectionSchema>
 export type GoStepItem = z.infer<typeof stepItemSchema>
 export type GoStepsSection = z.infer<typeof stepsSectionSchema>
 export type GoQuoteSection = z.infer<typeof quoteSectionSchema>
-export type GoHubSpotMeetingSection = z.infer<typeof hubspotMeetingSectionSchema>
 export type GoSection = z.infer<typeof goSectionSchema>
 export type GoMetadata = z.infer<typeof metadataSchema>
 

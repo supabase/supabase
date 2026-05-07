@@ -1,4 +1,4 @@
-import { IS_PLATFORM, useFlag } from 'common'
+import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
 import { Check, Copy } from 'lucide-react'
@@ -15,6 +15,7 @@ import {
   type EdgeFunctionsResponse,
 } from '@/data/edge-functions/edge-functions-query'
 import { normalizeFunctionIds } from '@/data/edge-functions/keys'
+import { usePHFlag } from '@/hooks/ui/useFlag'
 import { createNavigationHandler } from '@/lib/navigation'
 
 interface EdgeFunctionsListItemProps {
@@ -26,7 +27,8 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
   const { ref } = useParams()
   const [isCopied, setIsCopied] = useState(false)
 
-  const showLastHourStats = useFlag('edgeFunctionsRequestMetrics')
+  const showEdgeFunctionsRequestMetrics = usePHFlag<boolean>('edgeFunctionsRequestMetrics') === true
+  const showLastHourStats = IS_PLATFORM && showEdgeFunctionsRequestMetrics
 
   const { data: endpoint } = useProjectApiUrl({ projectRef: ref })
   const functionUrl = `${endpoint}/functions/v1/${item.slug}`
@@ -68,7 +70,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       </TableCell>
       <TableCell>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
-          <p title={functionUrl} className="font-mono truncate hidden md:inline max-w-120">
+          <p title={functionUrl} className="font-mono truncate hidden md:inline max-w-[30rem]">
             {functionUrl}
           </p>
           <button

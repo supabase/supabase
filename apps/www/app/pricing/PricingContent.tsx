@@ -1,22 +1,52 @@
+'use client'
+
 import { ArrowDownIcon } from '@heroicons/react/outline'
-import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
-import PricingAddons from '~/components/Pricing/PricingAddons'
-import PricingComputeSection from '~/components/Pricing/PricingComputeSection'
-import PricingDiskSection from '~/components/Pricing/PricingDiskSection'
-import PricingFAQs from '~/components/Pricing/PricingFAQs'
+import PricingPlans from '~/components/Pricing/PricingPlans'
+import { useOrganizations } from '~/data/organizations'
 import { ArrowUpRight } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { usePathname } from 'next/navigation'
+import { useEffect } from 'react'
 import { Button } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
-import HashAnchorScroll from './HashAnchorScroll'
-import PricingComparisonSection from './PricingComparisonSection'
-import PricingPlansSection from './PricingPlansSection'
+const PricingComputeSection = dynamic(() => import('~/components/Pricing/PricingComputeSection'))
+const PricingAddons = dynamic(() => import('~/components/Pricing/PricingAddons'))
+const PricingComparisonTable = dynamic(() => import('~/components/Pricing/PricingComparisonTable'))
+const PricingFAQs = dynamic(() => import('~/components/Pricing/PricingFAQs'))
+const CTABanner = dynamic(() => import('~/components/CTABanner'))
+const PricingDiskSection = dynamic(() => import('~/components/Pricing/PricingDiskSection'))
 
 export default function PricingContent() {
+  const pathname = usePathname()
+
+  // Ability to scroll into pricing sections like storage
+  useEffect(() => {
+    /**
+     * As we render a mobile and a desktop row for each item and just display based on screen size, we cannot navigate by simple id hash
+     * on both mobile and desktop. To handle both cases, we actually need to check screen size
+     */
+
+    const hash = window.location.hash.slice(1)
+    if (!hash) return
+
+    let device = 'desktop'
+    if (window.matchMedia('screen and (max-width: 1024px)').matches) {
+      device = 'mobile'
+    }
+
+    const element = document.querySelector(`#${hash}-${device}`)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [pathname])
+
+  const { isLoading, organizations } = useOrganizations()
+  const hasExistingOrganizations = !isLoading && organizations.length > 0
+
   return (
     <DefaultLayout>
-      <HashAnchorScroll />
       <div className="relative z-10 pt-8 pb-4 xl:py-16">
         <div className="mx-auto max-w-7xl px-8 text-center sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
@@ -31,7 +61,10 @@ export default function PricingContent() {
         </div>
       </div>
 
-      <PricingPlansSection />
+      <PricingPlans
+        organizations={organizations}
+        hasExistingOrganizations={hasExistingOrganizations}
+      />
 
       <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
         <div className="flex justify-center gap-2">
@@ -87,7 +120,10 @@ export default function PricingContent() {
         <PricingAddons />
       </div>
 
-      <PricingComparisonSection />
+      <PricingComparisonTable
+        organizations={organizations}
+        hasExistingOrganizations={hasExistingOrganizations}
+      />
 
       <div id="faq" className="border-t">
         <PricingFAQs />

@@ -1,13 +1,14 @@
 import { Github } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
 
+import { BASE_PATH } from 'lib/constants'
+
+import { useLastSignIn } from 'hooks/misc/useLastSignIn'
+import { captureCriticalError } from 'lib/error-reporting'
+import { auth, buildPathWithParams } from 'lib/gotrue'
+import { Button } from 'ui'
 import { LastSignInWrapper } from './LastSignInWrapper'
-import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
-import { BASE_PATH } from '@/lib/constants'
-import { captureCriticalError } from '@/lib/error-reporting'
-import { auth, buildPathWithParams } from '@/lib/gotrue'
 
 export const SignInWithGitHub = () => {
   const [loading, setLoading] = useState(false)

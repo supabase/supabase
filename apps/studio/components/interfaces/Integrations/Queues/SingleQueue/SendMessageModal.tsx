@@ -1,15 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Form, FormControl, FormField, Input, Modal } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
-import { useDatabaseQueueMessageSendMutation } from '@/data/database-queues/database-queue-messages-send-mutation'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useParams } from 'common'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import { useDatabaseQueueMessageSendMutation } from 'data/database-queues/database-queue-messages-send-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input, Modal } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 interface SendMessageModalProps {
   visible: boolean
@@ -85,13 +85,13 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
       }}
     >
       <Modal.Content className="flex flex-col gap-y-4">
-        <Form {...form}>
+        <Form_Shadcn_ {...form}>
           <form
             id={FORM_ID}
-            className="grow overflow-auto gap-2 flex flex-col"
+            className="flex-grow overflow-auto gap-2 flex flex-col"
             onSubmit={form.handleSubmit(onSubmit)}
           >
-            <FormField
+            <FormField_Shadcn_
               control={form.control}
               name="delay"
               render={({ field: { ref, ...rest } }) => (
@@ -101,38 +101,38 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
                   className="gap-1"
                   description="Time in seconds before the message becomes available for reading."
                 >
-                  <FormControl>
+                  <FormControl_Shadcn_>
                     <Input
                       {...rest}
                       type="number"
                       placeholder="1"
                       actions={<p className="text-foreground-light pr-2">sec</p>}
                     />
-                  </FormControl>
+                  </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
-            <FormField
+            <FormField_Shadcn_
               control={form.control}
               name="payload"
               render={({ field }) => (
                 <FormItemLayout label="Message payload" layout="vertical" className="gap-1">
-                  <FormControl>
+                  <FormControl_Shadcn_>
                     <CodeEditor
                       id="message-payload"
                       language="json"
                       autofocus={false}
-                      className="mb-0! h-32 overflow-hidden rounded-sm border"
+                      className="!mb-0 h-32 overflow-hidden rounded border"
                       onInputChange={(e: string | undefined) => field.onChange(e)}
                       options={{ wordWrap: 'off', contextmenu: false }}
                       value={field.value}
                     />
-                  </FormControl>
+                  </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
           </form>
-        </Form>
+        </Form_Shadcn_>
       </Modal.Content>
     </Modal>
   )

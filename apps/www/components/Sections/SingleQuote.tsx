@@ -1,7 +1,8 @@
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import Link from 'next/link'
-import React, { type FC, type ReactNode } from 'react'
+import React, { FC } from 'react'
 import { cn } from 'ui'
+
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 interface Props {
   id: string
@@ -16,9 +17,9 @@ interface Props {
 type Quote = {
   text: string
   author: string
-  logo?: ReactNode
+  logo?: string | JSX.Element
   role: string
-  avatar?: ReactNode
+  avatar?: string | JSX.Element
   link?: string
 }
 
@@ -47,7 +48,7 @@ const SingleQuote: FC<Props> = ({
       id={sectionId}
       className={cn('flex flex-col items-center text-center gap-8 md:gap-16', className)}
     >
-      <q className="text-2xl max-w-xs md:text-2xl xl:text-4xl md:max-w-(--breakpoint-lg)! w-full">
+      <q className="text-2xl max-w-xs md:text-2xl xl:text-4xl md:!max-w-screen-lg w-full">
         {quote.text}
       </q>
       <MaybeLink href={quote.link}>

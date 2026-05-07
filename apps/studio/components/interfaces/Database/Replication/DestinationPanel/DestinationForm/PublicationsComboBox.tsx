@@ -1,6 +1,8 @@
 import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
+
+import type { ReplicationPublication } from 'data/replication/publications-query'
 import {
   Badge,
   Button,
@@ -17,8 +19,6 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
-
-import type { ReplicationPublication } from '@/data/replication/publications-query'
 
 interface PublicationsComboBoxProps {
   publications: ReplicationPublication[]

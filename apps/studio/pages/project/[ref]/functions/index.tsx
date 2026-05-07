@@ -1,7 +1,29 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
+import { DeployEdgeFunctionButton } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionButton'
+import {
+  EDGE_FUNCTIONS_SORT_VALUES,
+  EdgeFunctionsSort,
+  EdgeFunctionsSortColumn,
+  EdgeFunctionsSortDropdown,
+  EdgeFunctionsSortOrder,
+} from 'components/interfaces/EdgeFunctions/EdgeFunctionsSortDropdown'
+import { EdgeFunctionsListItem } from 'components/interfaces/Functions/EdgeFunctionsListItem'
+import {
+  FunctionsEmptyState,
+  FunctionsInstructionsLocal,
+} from 'components/interfaces/Functions/FunctionsEmptyState'
+import { TerminalInstructionsDialog } from 'components/interfaces/Functions/TerminalInstructionsDialog'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
+import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { usePHFlag } from 'hooks/ui/useFlag'
+import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { ExternalLink, Search, X } from 'lucide-react'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import React, { useMemo } from 'react'
+import type { NextPageWithLayout } from 'types'
 import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -17,31 +39,10 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { DeployEdgeFunctionButton } from '@/components/interfaces/EdgeFunctions/DeployEdgeFunctionButton'
-import {
-  EDGE_FUNCTIONS_SORT_VALUES,
-  EdgeFunctionsSort,
-  EdgeFunctionsSortColumn,
-  EdgeFunctionsSortDropdown,
-  EdgeFunctionsSortOrder,
-} from '@/components/interfaces/EdgeFunctions/EdgeFunctionsSortDropdown'
-import { EdgeFunctionsListItem } from '@/components/interfaces/Functions/EdgeFunctionsListItem'
-import {
-  FunctionsEmptyState,
-  FunctionsInstructionsLocal,
-} from '@/components/interfaces/Functions/FunctionsEmptyState'
-import { TerminalInstructionsDialog } from '@/components/interfaces/Functions/TerminalInstructionsDialog'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
-import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
-import AlertError from '@/components/ui/AlertError'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
-import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
-import type { NextPageWithLayout } from '@/types'
-
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const showLastHourStats = useFlag('edgeFunctionsRequestMetrics')
+  const showEdgeFunctionsRequestMetrics = usePHFlag<boolean>('edgeFunctionsRequestMetrics') === true
+  const showLastHourStats = IS_PLATFORM && showEdgeFunctionsRequestMetrics
 
   const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
   const [sort, setSortQueryParam] = useQueryState(
@@ -163,7 +164,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                               ))
                             ) : (
                               <TableRow>
-                                <TableCell colSpan={showLastHourStats ? 8 : 6}>
+                                <TableCell colSpan={showLastHourStats ? 7 : 5}>
                                   <p className="text-sm text-foreground">No results found</p>
                                   <p className="text-sm text-foreground-light">
                                     Your search for "{search}" did not return any results

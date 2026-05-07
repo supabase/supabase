@@ -29,11 +29,11 @@ import {
   type SortableContextProps,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Slot } from 'radix-ui'
+import { Slot, type SlotProps } from '@radix-ui/react-slot'
 import { createContext, forwardRef, useContext, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Button, cn, type ButtonProps } from 'ui'
 
+import { Button, cn, type ButtonProps } from 'ui'
 import { composeRefs } from '../hooks/useComposedRefs'
 
 const orientationConfig = {
@@ -239,7 +239,7 @@ function useSortableItem() {
   return context
 }
 
-interface SortableItemProps extends Slot.SlotProps {
+interface SortableItemProps extends SlotProps {
   /**
    * The unique identifier of the item.
    * @example "item-1"
@@ -282,7 +282,7 @@ export const SortableItem = forwardRef<HTMLDivElement, SortableItemProps>(
       transition,
     }
 
-    const Comp = asChild ? Slot.Slot : 'div'
+    const Comp = asChild ? Slot : 'div'
 
     return (
       <SortableItemContext.Provider value={context}>

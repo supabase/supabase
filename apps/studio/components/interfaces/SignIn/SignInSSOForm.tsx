@@ -2,16 +2,16 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
-import { BASE_PATH } from '@/lib/constants'
-import { captureCriticalError } from '@/lib/error-reporting'
-import { auth, buildPathWithParams } from '@/lib/gotrue'
+import { useLastSignIn } from 'hooks/misc/useLastSignIn'
+import { BASE_PATH } from 'lib/constants'
+import { captureCriticalError } from 'lib/error-reporting'
+import { auth, buildPathWithParams } from 'lib/gotrue'
+import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -72,15 +72,15 @@ export const SignInSSOForm = () => {
   }
 
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
+        <FormField_Shadcn_
           key="email"
           name="email"
           control={form.control}
           render={({ field }) => (
             <FormItemLayout name="email" label="Email">
-              <FormControl>
+              <FormControl_Shadcn_>
                 <Input_Shadcn_
                   id="email"
                   type="email"
@@ -88,7 +88,7 @@ export const SignInSSOForm = () => {
                   {...field}
                   placeholder="gavin@hooli.com"
                 />
-              </FormControl>
+              </FormControl_Shadcn_>
             </FormItemLayout>
           )}
         />
@@ -111,6 +111,6 @@ export const SignInSSOForm = () => {
           Sign in
         </Button>
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }

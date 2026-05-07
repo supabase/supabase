@@ -1,7 +1,7 @@
 import assert from 'node:assert'
 
-import { assertSelfHosted } from '../util'
 import { FileSystemFunctionsArtifactStore } from './fileSystemStore'
+import { assertSelfHosted } from '../util'
 
 export function getFunctionsArtifactStore() {
   assertSelfHosted()

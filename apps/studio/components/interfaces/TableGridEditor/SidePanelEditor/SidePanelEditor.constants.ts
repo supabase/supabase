@@ -1,5 +1,4 @@
 import { concat, sortBy } from 'lodash'
-
 import type { PostgresDataTypeOption } from './SidePanelEditor.types'
 
 export const NUMERICAL_TYPES = [

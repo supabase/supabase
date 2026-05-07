@@ -12,3 +12,5 @@ const RLS_ACKNOWLEDGED_KEY = 'supabase-acknowledge-rls-warning'
 
 export const rlsAcknowledgedKey = (tableID?: string | number) =>
   `${RLS_ACKNOWLEDGED_KEY}-${String(tableID)}`
+
+export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'

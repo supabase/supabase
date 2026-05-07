@@ -1,4 +1,18 @@
 import { useParams } from 'common'
+import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
+import {
+  ScaffoldContainer,
+  ScaffoldDivider,
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
+import { useProjectServiceVersionsQuery } from 'data/projects/project-service-versions'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
 import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -6,20 +20,6 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import { ReadReplicasWarning, ValidationErrorsWarning } from './UpgradeWarnings'
-import { NoticeBar } from '@/components/interfaces/DiskManagement/ui/NoticeBar'
-import {
-  ScaffoldContainer,
-  ScaffoldDivider,
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
-import { useProjectUpgradeEligibilityQuery } from '@/data/config/project-upgrade-eligibility-query'
-import { useProjectServiceVersionsQuery } from '@/data/projects/project-service-versions'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const InfrastructureInfo = () => {
   const { ref } = useParams()
@@ -88,7 +88,7 @@ export const InfrastructureInfo = () => {
               description="Read replicas is now managed under Replication in the Database section."
               actions={
                 <Button type="default" asChild>
-                  <Link href={`/project/${ref}/database/replication`} className="no-underline!">
+                  <Link href={`/project/${ref}/database/replication`} className="!no-underline">
                     Go to Replication
                   </Link>
                 </Button>

@@ -1,7 +1,7 @@
 'use client'
 
-import { Label as LabelPrimitive, Slot as SlotPrimitive } from 'radix-ui'
-
+import * as LabelPrimitive from '@radix-ui/react-label'
+import { Slot } from '@radix-ui/react-slot'
 import { AnimatePresence, motion } from 'framer-motion'
 import * as React from 'react'
 import {
@@ -15,10 +15,7 @@ import {
 } from 'react-hook-form'
 
 import { cn } from '../../../lib/utils/cn'
-import type { InputProps } from './input'
-import { InputGroupInput, InputGroupTextarea } from './input-group'
 import { Label } from './label'
-import type { TextareaProps } from './textarea'
 
 const Form = FormProvider
 
@@ -79,7 +76,7 @@ const FormItem = React.forwardRef<
 >(({ asChild, ...props }, ref) => {
   const id = React.useId()
 
-  const Comp = asChild ? SlotPrimitive.Slot : 'div'
+  const Comp = asChild ? Slot : 'div'
 
   return (
     <FormItemContext.Provider value={{ id }}>
@@ -115,13 +112,13 @@ const FormLabel = React.forwardRef<
 FormLabel.displayName = 'FormLabel'
 
 const FormControl = React.forwardRef<
-  React.ElementRef<typeof SlotPrimitive.Slot>,
-  React.ComponentPropsWithoutRef<typeof SlotPrimitive.Slot>
+  React.ElementRef<typeof Slot>,
+  React.ComponentPropsWithoutRef<typeof Slot>
 >(({ ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
   return (
-    <SlotPrimitive.Slot
+    <Slot
       ref={ref}
       id={formItemId}
       aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
@@ -182,32 +179,6 @@ const FormMessage = React.forwardRef<
 
 FormMessage.displayName = 'FormMessage'
 
-function FormInputGroupInput(props: InputProps) {
-  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
-
-  return (
-    <InputGroupInput
-      id={formItemId}
-      aria-describedby={!error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`}
-      aria-invalid={!!error}
-      {...props}
-    />
-  )
-}
-
-function FormInputGroupTextArea(props: TextareaProps) {
-  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
-
-  return (
-    <InputGroupTextarea
-      id={formItemId}
-      aria-describedby={!error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`}
-      aria-invalid={!!error}
-      {...props}
-    />
-  )
-}
-
 export {
   Form,
   FormControl,
@@ -217,7 +188,5 @@ export {
   FormLabel,
   FormMessage,
   useFormField,
-  FormInputGroupInput,
-  FormInputGroupTextArea,
   useWatch,
 }

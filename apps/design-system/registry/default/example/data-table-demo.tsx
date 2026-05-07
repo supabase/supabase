@@ -17,7 +17,7 @@ import * as React from 'react'
 import {
   Button,
   Card,
-  Checkbox,
+  Checkbox_Shadcn_,
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -78,7 +78,7 @@ export const columns: ColumnDef<Payment>[] = [
   {
     id: 'select',
     header: ({ table }) => (
-      <Checkbox
+      <Checkbox_Shadcn_
         checked={
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() ? 'indeterminate' : false)
@@ -88,7 +88,7 @@ export const columns: ColumnDef<Payment>[] = [
       />
     ),
     cell: ({ row }) => (
-      <Checkbox
+      <Checkbox_Shadcn_
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"

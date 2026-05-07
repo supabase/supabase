@@ -1,7 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import dayjs from 'dayjs'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { SetStateAction, useEffect, useMemo } from 'react'
@@ -12,28 +19,18 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  Form,
-  FormControl,
-  FormField,
-  FormInputGroupInput,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   InfoIcon,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
+  Input_Shadcn_,
   Modal,
+  PrePostTab,
   WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
-
-import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import { useProjectDiskResizeMutation } from '@/data/config/project-disk-resize-mutation'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL } from '@/lib/constants'
 
 export interface DiskSizeConfigurationProps {
   visible: boolean
@@ -74,7 +71,7 @@ const DiskSizeConfigurationModal = ({
 
   const { mutate: updateProjectUsage, isPending: isUpdatingDiskSize } =
     useProjectDiskResizeMutation({
-      onSuccess: (_res, variables) => {
+      onSuccess: (res, variables) => {
         toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
         hideModal(false)
       },
@@ -183,9 +180,9 @@ const DiskSizeConfigurationModal = ({
                     </Button>
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
-                <Form {...form}>
+                <Form_Shadcn_ {...form}>
                   <form id={formId} onSubmit={form.handleSubmit(handleSubmit)} noValidate>
-                    <FormField
+                    <FormField_Shadcn_
                       control={form.control}
                       name="new-disk-size"
                       disabled={!isAbleToResizeDatabase}
@@ -195,24 +192,21 @@ const DiskSizeConfigurationModal = ({
                           layout="vertical"
                           label="New disk size"
                         >
-                          <FormControl>
-                            <InputGroup>
-                              <FormInputGroupInput
+                          <PrePostTab postTab="GB" className="w-full">
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
                                 {...field}
                                 id="new-disk-size"
                                 type="number"
                                 onChange={(e) => field.onChange(Number(e.target.value))}
                               />
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>GB</InputGroupText>
-                              </InputGroupAddon>
-                            </InputGroup>
-                          </FormControl>
+                            </FormControl_Shadcn_>
+                          </PrePostTab>
                         </FormItemLayout>
                       )}
                     />
                   </form>
-                </Form>
+                </Form_Shadcn_>
               </Modal.Content>
               <Modal.Separator />
               <Modal.Content className="flex space-x-2 justify-end">

@@ -1,12 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { useParams } from 'common'
+import { useCreatePublicationMutation } from 'data/replication/publication-create-mutation'
+import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import {
   Button,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
   Sheet,
   SheetContent,
@@ -18,11 +22,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
-import { z } from 'zod'
-
-import { useCreatePublicationMutation } from '@/data/replication/publication-create-mutation'
-import { useReplicationTablesQuery } from '@/data/replication/tables-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface NewPublicationPanelProps {
   visible: boolean
@@ -32,7 +31,6 @@ interface NewPublicationPanelProps {
 
 export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
   const { mutateAsync: createPublication, isPending: creatingPublication } =
     useCreatePublicationMutation()
   const { data: tables } = useReplicationTablesQuery({
@@ -57,7 +55,6 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!project) return console.error('Project is required')
     if (!sourceId) return console.error('Source id is required')
     try {
       await createPublication({
@@ -68,7 +65,6 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
           const [schema, name] = table.split('.')
           return { schema, name }
         }),
-        connectionString: project.connectionString,
       })
       toast.success('Successfully created publication')
       onClose()
@@ -87,25 +83,25 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
               <SheetTitle>Create a new Publication</SheetTitle>
               <SheetDescription>Replicate table changes to destinations</SheetDescription>
             </SheetHeader>
-            <SheetSection className="grow overflow-auto">
-              <Form {...form}>
+            <SheetSection className="flex-grow overflow-auto">
+              <Form_Shadcn_ {...form}>
                 <form
                   id={formId}
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="flex flex-col gap-y-4"
                 >
-                  <FormField
+                  <FormField_Shadcn_
                     control={form.control}
                     name="name"
                     render={({ field }) => (
                       <FormItemLayout label="Name" layout="vertical">
-                        <FormControl>
+                        <FormControl_Shadcn_>
                           <Input_Shadcn_ {...field} placeholder="Name" />
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
-                  <FormField
+                  <FormField_Shadcn_
                     control={form.control}
                     name="tables"
                     render={({ field }) => (
@@ -113,7 +109,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                         label="Tables"
                         description="Which tables to replicate to destinations"
                       >
-                        <FormControl>
+                        <FormControl_Shadcn_>
                           <MultiSelector
                             values={field.value}
                             onValuesChange={field.onChange}
@@ -137,12 +133,12 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                               </MultiSelector.List>
                             </MultiSelector.Content>
                           </MultiSelector>
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
                 </form>
-              </Form>
+              </Form_Shadcn_>
             </SheetSection>
             <SheetFooter>
               <Button type="default" disabled={creatingPublication} onClick={onClose}>

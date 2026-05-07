@@ -1,36 +1,35 @@
+import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
+import { InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
+import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
+import { getInvoice } from 'data/invoices/invoice-query'
+import { getInvoiceReceipt } from 'data/invoices/invoice-receipt-query'
+import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
+import { useInvoicesQuery } from 'data/invoices/invoices-query'
 import dayjs from 'dayjs'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
+import { formatCurrency } from 'lib/helpers'
 import { ChevronLeft, ChevronRight, FileText, Receipt, ScrollText } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { Organization } from 'types/base'
 import {
   Button,
   Card,
   CardFooter,
-  cn,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import InvoicePayButton from './InvoicePayButton'
-import { InvoiceStatus } from '@/components/interfaces/Billing/Invoices.types'
-import InvoiceStatusBadge from '@/components/interfaces/Billing/InvoiceStatusBadge'
-import AlertError from '@/components/ui/AlertError'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
-import { getInvoice } from '@/data/invoices/invoice-query'
-import { getInvoiceReceipt } from '@/data/invoices/invoice-receipt-query'
-import { useInvoicesCountQuery } from '@/data/invoices/invoices-count-query'
-import { useInvoicesQuery } from '@/data/invoices/invoices-query'
-import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { MANAGED_BY } from '@/lib/constants/infrastructure'
-import { formatCurrency } from '@/lib/helpers'
-import { Organization } from '@/types/base'
 
 const PAGE_LIMIT = 5
 
@@ -53,16 +52,13 @@ export const InvoicesSettings = () => {
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const slug = selectedOrganization?.slug
-  const isPartnerBilledOrganization = isPartnerBillingOrganization(
-    selectedOrganization?.billing_partner
-  )
   const offset = (page - 1) * PAGE_LIMIT
 
   const { data: count, isError: isErrorCount } = useInvoicesCountQuery(
     {
       slug,
     },
-    { enabled: !isPartnerBilledOrganization }
+    { enabled: selectedOrganization?.managed_by === 'supabase' }
   )
   const {
     data,
@@ -75,7 +71,7 @@ export const InvoicesSettings = () => {
       offset,
       limit: PAGE_LIMIT,
     },
-    { enabled: !isPartnerBilledOrganization }
+    { enabled: selectedOrganization?.managed_by === 'supabase' }
   )
   const invoices = data || []
 
@@ -103,7 +99,10 @@ export const InvoicesSettings = () => {
     }
   }
 
-  if (selectedOrganization && isPartnerBilledOrganization) {
+  if (
+    selectedOrganization?.managed_by !== undefined &&
+    selectedOrganization?.managed_by !== 'supabase'
+  ) {
     return (
       <PartnerManagedResource
         managedBy={selectedOrganization?.managed_by}
@@ -149,7 +148,7 @@ export const InvoicesSettings = () => {
             <TableRow className="rounded-b">
               <TableCell
                 colSpan={invoices.length > 0 ? 6 : 5}
-                className="p-0! rounded-b! overflow-hidden"
+                className="!p-0 !rounded-b overflow-hidden"
               >
                 <AlertError
                   className="border-0 rounded-none"

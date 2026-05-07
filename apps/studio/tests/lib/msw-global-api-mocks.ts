@@ -1,6 +1,5 @@
-import { http, HttpResponse } from 'msw'
-
-import { API_URL } from '@/lib/constants'
+import { API_URL } from 'lib/constants'
+import { HttpResponse, http } from 'msw'
 
 export const GlobalAPIMocks = [
   http.get(`${API_URL}/msw/test`, () => {

@@ -1,4 +1,9 @@
 import { useBreakpoint, useParams } from 'common'
+import { OrgCommandItem } from 'components/layouts/AppLayout/OrgCommandItem'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Boxes, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -22,11 +27,6 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { OrgSelectorSheet } from './OrgSelectorSheet'
-import { OrgCommandItem } from '@/components/layouts/AppLayout/OrgCommandItem'
-import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export function OrgSelector() {
   const router = useRouter()
@@ -38,17 +38,15 @@ export function OrgSelector() {
   const [open, setOpen] = useState(false)
 
   const slug = selectedOrganization?.slug
-  const isPlatformOrg = selectedOrganization?.plan?.id === 'platform'
   const selectedOrgInitial = selectedOrganization?.name?.trim().charAt(0).toUpperCase() || 'O'
   const { data: projects } = useOrgProjectsInfiniteQuery(
     { slug, limit: 1 },
-    { enabled: Boolean(slug) && !isPlatformOrg }
+    { enabled: Boolean(slug) }
   )
 
   const numProjects = projects?.pages[0]?.pagination.count
-  const projectsLabel = isPlatformOrg
-    ? 'Platform'
-    : typeof numProjects === 'number'
+  const projectsLabel =
+    typeof numProjects === 'number'
       ? `${numProjects} project${numProjects === 1 ? '' : 's'}`
       : 'No projects'
 
@@ -59,10 +57,10 @@ export function OrgSelector() {
   const triggerButton = (
     <SidebarMenuButton
       size="lg"
-      className="data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground gap-2 h-auto text-left group px-1.5 py-1 touch-manipulation"
+      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-2 h-auto text-left group px-1.5 py-1 touch-manipulation"
       onClick={isMobile ? () => setOpen(true) : undefined}
     >
-      <span className="flex w-8 aspect-square shrink-0 items-center justify-center rounded-sm border bg-surface-100 text-xs font-medium text-foreground-lighter">
+      <span className="flex w-8 aspect-square shrink-0 items-center justify-center rounded border bg-surface-100 text-xs font-medium text-foreground-lighter">
         {selectedOrgInitial}
       </span>
       <div className="flex min-w-0 flex-1 flex-col text-left -mb-0.5">
@@ -78,7 +76,7 @@ export function OrgSelector() {
       </div>
       <ChevronsUpDown
         strokeWidth={1}
-        className="ml-auto text-foreground-light md:hidden md:group-hover:block w-4! h-4!"
+        className="ml-auto text-foreground-light md:hidden md:group-hover:block !w-4 !h-4"
       />
     </SidebarMenuButton>
   )
@@ -86,7 +84,7 @@ export function OrgSelector() {
   if (isMobile) {
     return (
       <>
-        <SidebarMenu className="shrink">
+        <SidebarMenu className="flex-shrink">
           <SidebarMenuItem>
             {isLoadingOrganizations ? <ShimmeringLoader className="p-2 w-[90px]" /> : triggerButton}
           </SidebarMenuItem>

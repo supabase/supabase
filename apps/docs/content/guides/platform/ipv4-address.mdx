@@ -40,16 +40,15 @@ curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/billing/addons" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 
 # Enable IPv4 add-on
-curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/billing/addons" \
+curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/addons" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "addon_variant": "ipv4_default",
     "addon_type": "ipv4"
   }'
 
 # Disable IPv4 add-on
-curl -X DELETE "https://api.supabase.com/v1/projects/$PROJECT_REF/billing/addons/ipv4_default" \
+curl -X DELETE "https://api.supabase.com/v1/projects/$PROJECT_REF/billing/addons/ipv4" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
 

@@ -1,32 +1,29 @@
-import { Check, Copy, Github, MoreVertical, Settings } from 'lucide-react'
+import { Github, MoreVertical, Settings, Copy, Check } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import InlineSVG from 'react-inlinesvg'
-import { toast } from 'sonner'
+import { useState } from 'react'
+
+import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
+import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
+import type { ResourceWarning } from 'data/usage/resource-warnings-query'
+import { BASE_PATH } from 'lib/constants'
+import { createNavigationHandler } from 'lib/navigation'
+import type { Organization } from 'types'
 import {
-  Button,
-  copyToClipboard,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenu,
   TableCell,
   TableRow,
+  Button,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
-
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
-import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
-import PartnerIcon from '@/components/ui/PartnerIcon'
-import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
-import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
-import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
-import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
-import { BASE_PATH } from '@/lib/constants'
-import { MANAGED_BY } from '@/lib/constants/infrastructure'
-import { createNavigationHandler } from '@/lib/navigation'
-import type { Organization } from '@/types'
+import { toast } from 'sonner'
+import { copyToClipboard } from 'ui'
 
 export interface ProjectTableRowProps {
   project: OrgProject
@@ -54,11 +51,6 @@ export const ProjectTableRow = ({
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
-  const projectManagedBy = getManagedByFromOrganizationPartner(
-    undefined,
-    project.integration_source
-  )
-  const hasPartnerIcon = projectManagedBy !== MANAGED_BY.SUPABASE
   const handleNavigation = createNavigationHandler(url, router)
 
   const handleCopyProjectRef = (e: React.SyntheticEvent) => {
@@ -91,7 +83,7 @@ export const ProjectTableRow = ({
                     handleCopyProjectRef(e)
                   }
                 }}
-                className="inline-flex items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded-sm transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-lighter hover:text-foreground-light px-1 -ml-1"
+                className="inline-flex items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-lighter hover:text-foreground-light px-1 -ml-1"
               >
                 {projectRef}
                 {isCopied ? (
@@ -105,7 +97,7 @@ export const ProjectTableRow = ({
                 )}
               </button>
             </div>
-            {(isGithubIntegrated || isVercelIntegrated || hasPartnerIcon) && (
+            {(isGithubIntegrated || isVercelIntegrated) && (
               <div className="flex items-center gap-x-1.5">
                 {isVercelIntegrated && (
                   <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center text-black dark:text-white">
@@ -116,7 +108,6 @@ export const ProjectTableRow = ({
                     />
                   </div>
                 )}
-                <PartnerIcon organization={{ managed_by: projectManagedBy }} />
                 {isGithubIntegrated && (
                   <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md">
                     <div className="w-5 h-5 p-1 flex items-center">
@@ -146,7 +137,6 @@ export const ProjectTableRow = ({
                 projectRef={project.ref}
                 cloudProvider={project.cloud_provider}
                 computeSize={getComputeSize(project)}
-                resourceWarnings={resourceWarnings}
               />
             ) : (
               <span className="text-xs text-foreground-muted">–</span>

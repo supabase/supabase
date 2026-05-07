@@ -1,6 +1,5 @@
 import type { IncomingHttpHeaders } from 'node:http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-
 import {
   commaSeparatedStringIntoArray,
   constructHeaders,
@@ -9,7 +8,7 @@ import {
   zBooleanString,
 } from './apiHelpers'
 
-vi.mock('@/lib/constants', () => ({
+vi.mock('lib/constants', () => ({
   IS_PLATFORM: false,
 }))
 

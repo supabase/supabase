@@ -1,3 +1,4 @@
+import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import {
@@ -30,7 +31,6 @@ import { AssistantSnippetProps } from './AIAssistant.types'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { defaultUrlTransform, wrapPlaceholderUrls } from './Message.utils'
-import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 
 const Streamdown = dynamic<StreamdownProps>(
   () => import('streamdown').then((mod) => mod.Streamdown),
@@ -40,7 +40,7 @@ const Streamdown = dynamic<StreamdownProps>(
 // Streamdown splits ordered lists with complex content (e.g. code blocks) into
 // separate <ol> elements. The `start` attribute preserves semantics for screen
 // readers, while `counterReset` is what actually fixes the visible numbering —
-// the prose config (tailwind.config.ts) uses a custom CSS counter named "item"
+// the prose config (tailwind.config.js) uses a custom CSS counter named "item"
 // with `listStyleType: 'none'`, so the `start` attribute alone has no visual effect.
 export const OrderedList = memo(({ children, start }: { children?: ReactNode; start?: number }) => (
   <ol
@@ -84,7 +84,7 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children?: R
       <DialogTrigger asChild>
         <span
           className={cn(
-            'm-0! text-foreground cursor-pointer transition',
+            '!m-0 text-foreground cursor-pointer transition',
             'underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground-lighter'
           )}
         >
@@ -187,7 +187,7 @@ export function MessageMarkdown({
 export const MarkdownPre = ({
   children,
   id,
-  isLoading: _isLoading,
+  isLoading,
   readOnly,
 }: {
   children: any
@@ -285,7 +285,7 @@ export const MarkdownPre = ({
           value={cleanContent}
           language={language as CodeBlockLang}
           className={cn(
-            'my-4 max-h-96 max-w-none block border rounded-sm bg-transparent! py-3! px-3.5! prose dark:prose-dark text-foreground',
+            'my-4 max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
           )}
         />

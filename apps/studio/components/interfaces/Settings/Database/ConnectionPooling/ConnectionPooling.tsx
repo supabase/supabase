@@ -1,28 +1,40 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { capitalize } from 'lodash'
-import Link from 'next/link'
 import { Fragment, useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import z from 'zod'
+
+import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import { Button } from 'ui'
+import { DocsButton } from 'components/ui/DocsButton'
+import { setValueAsNullableNumber } from 'components/ui/Forms/Form.constants'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { InlineLink } from 'components/ui/InlineLink'
+import Panel from 'components/ui/Panel'
+import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
+import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
+import { usePgbouncerConfigurationUpdateMutation } from 'data/database/pgbouncer-config-update-mutation'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
-  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Badge,
-  Button,
-  Form,
-  FormControl,
-  FormField,
-  FormInputGroupInput,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
+  cn,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
+  PrePostTab,
   Separator,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
   PageSectionAside,
@@ -31,35 +43,17 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { Admonition } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import z from 'zod'
-
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
-import AlertError from '@/components/ui/AlertError'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { FormActions } from '@/components/ui/Forms/FormActions'
-import { InlineLink } from '@/components/ui/InlineLink'
-import Panel from '@/components/ui/Panel'
-import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
-import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
-import { usePgbouncerConfigurationUpdateMutation } from '@/data/database/pgbouncer-config-update-mutation'
-import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL } from '@/lib/constants'
+import Link from 'next/link'
 
 const formId = 'pooling-configuration-form'
 
 const PoolingConfigurationFormSchema = z.object({
-  default_pool_size: z.preprocess(
-    (val) => (val === '' || val === null || val === undefined ? undefined : val),
-    z.coerce.number().optional()
-  ),
-  max_client_conn: z.preprocess(
-    (val) => (val === '' || val === null || val === undefined ? undefined : val),
-    z.coerce.number().optional()
-  ),
+  default_pool_size: z.number().nullable(),
+  max_client_conn: z.number().nullable(),
 })
 
 /**
@@ -110,7 +104,7 @@ export const ConnectionPooling = () => {
     resolver: zodResolver(PoolingConfigurationFormSchema),
     defaultValues: {
       default_pool_size: undefined,
-      max_client_conn: undefined,
+      max_client_conn: null,
     },
   })
   const { default_pool_size } = form.watch()
@@ -241,13 +235,13 @@ export const ConnectionPooling = () => {
                   </div>
                 </div>
                 <Separator className="bg-border -mx-6 w-[calc(100%+3rem)] my-4" />
-                <Form {...form}>
+                <Form_Shadcn_ {...form}>
                   <form
                     id={formId}
                     className="flex flex-col gap-y-4 w-full"
                     onSubmit={form.handleSubmit(onSubmit)}
                   >
-                    <FormField
+                    <FormField_Shadcn_
                       control={form.control}
                       name="default_pool_size"
                       render={({ field }) => (
@@ -263,27 +257,20 @@ export const ConnectionPooling = () => {
                           }
                           className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div>div>div]:min-w-100"
                         >
-                          <FormControl>
-                            <InputGroup>
-                              <FormInputGroupInput
+                          <FormControl_Shadcn_>
+                            <PrePostTab postTab="connections" className="uppercase">
+                              <Input_Shadcn_
                                 {...field}
                                 type="number"
                                 className="w-full"
-                                value={field.value ?? ''}
+                                value={field.value || ''}
                                 placeholder={defaultPoolSize.toString()}
-                                onChange={(event) =>
-                                  field.onChange(
-                                    isNaN(event.target.valueAsNumber)
-                                      ? null
-                                      : event.target.valueAsNumber
-                                  )
-                                }
+                                {...form.register('default_pool_size', {
+                                  setValueAs: setValueAsNullableNumber,
+                                })}
                               />
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>connections</InputGroupText>
-                              </InputGroupAddon>
-                            </InputGroup>
-                          </FormControl>
+                            </PrePostTab>
+                          </FormControl_Shadcn_>
                           {!!maxConnData &&
                             (default_pool_size ?? 15) > maxConnData.maxConnections * 0.8 && (
                               <Alert_Shadcn_ variant="warning" className="mt-2">
@@ -303,9 +290,8 @@ export const ConnectionPooling = () => {
 
                     <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
 
-                    <FormField
+                    <FormField_Shadcn_
                       control={form.control}
-                      disabled
                       name="max_client_conn"
                       render={({ field }) => (
                         <FormItemLayout
@@ -327,32 +313,26 @@ export const ConnectionPooling = () => {
                             </>
                           }
                         >
-                          <FormControl>
-                            <InputGroup>
-                              <FormInputGroupInput
+                          <FormControl_Shadcn_>
+                            <PrePostTab postTab="clients" className="uppercase">
+                              <Input_Shadcn_
                                 {...field}
                                 type="number"
                                 className="w-full"
-                                value={pgbouncerConfig?.max_client_conn ?? ''}
+                                value={pgbouncerConfig?.max_client_conn || ''}
+                                disabled={true}
                                 placeholder={defaultMaxClientConn.toString()}
-                                onChange={(event) =>
-                                  field.onChange(
-                                    isNaN(event.target.valueAsNumber)
-                                      ? null
-                                      : event.target.valueAsNumber
-                                  )
-                                }
+                                {...form.register('max_client_conn', {
+                                  setValueAs: setValueAsNullableNumber,
+                                })}
                               />
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>clients</InputGroupText>
-                              </InputGroupAddon>
-                            </InputGroup>
-                          </FormControl>
+                            </PrePostTab>
+                          </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
                     />
                   </form>
-                </Form>
+                </Form_Shadcn_>
               </>
             )}
           </Panel.Content>

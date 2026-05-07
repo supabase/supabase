@@ -1,10 +1,10 @@
 import * as Sentry from '@sentry/nextjs'
-import { LOCAL_STORAGE_KEYS, PageTelemetry, useUser } from 'common'
 import { useEffect } from 'react'
-import { useConsentToast } from 'ui-patterns/consent'
 
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { API_URL, IS_PLATFORM } from '@/lib/constants'
+import { LOCAL_STORAGE_KEYS, PageTelemetry, useUser } from 'common'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { useConsentToast } from 'ui-patterns/consent'
 
 const getAnonId = async (id: string) => {
   const encoder = new TextEncoder()

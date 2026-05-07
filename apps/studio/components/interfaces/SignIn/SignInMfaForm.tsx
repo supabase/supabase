@@ -3,22 +3,22 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuthError } from 'common'
+import AlertError from 'components/ui/AlertError'
+import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
+import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
+import { useSignOut } from 'lib/auth'
+import { getReturnToPath } from 'lib/gotrue'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Button, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import { SupportLink } from '../Support/SupportLink'
-import AlertError from '@/components/ui/AlertError'
-import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
-import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
-import { useSignOut } from '@/lib/auth'
-import { getReturnToPath } from '@/lib/gotrue'
 
 const schema = z.object({
   code: z.string().min(1, 'MFA Code is required'),
@@ -119,9 +119,9 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
       {isErrorFactors && <AlertError error={factorsError} subject="Failed to retrieve factors" />}
 
       {isSuccessFactors && (
-        <Form {...form}>
+        <Form_Shadcn_ {...form}>
           <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
+            <FormField_Shadcn_
               key="code"
               name="code"
               control={form.control}
@@ -134,7 +134,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                       : null
                   }
                 >
-                  <FormControl>
+                  <FormControl_Shadcn_>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-foreground-light [&_svg]:stroke-[1.5] [&_svg]:h-[20px] [&_svg]:w-[20px]">
                         <Lock />
@@ -152,7 +152,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
                         disabled={isVerifying}
                       />
                     </div>
-                  </FormControl>
+                  </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
@@ -180,7 +180,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
               </Button>
             </div>
           </form>
-        </Form>
+        </Form_Shadcn_>
       )}
 
       <div className="my-8">

@@ -4,6 +4,13 @@ import { ExternalLink } from 'lucide-react'
 import { useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { DatePicker } from 'components/ui/DatePicker'
+import {
+  useAccessTokenCreateMutation,
+  type NewAccessToken,
+} from 'data/access-tokens/access-tokens-create-mutation'
 import {
   Button,
   Dialog,
@@ -13,9 +20,9 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -26,20 +33,12 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { z } from 'zod'
-
 import {
   CUSTOM_EXPIRY_VALUE,
   EXPIRES_AT_OPTIONS,
   NON_EXPIRING_TOKEN_VALUE,
 } from '../AccessToken.constants'
 import { getExpirationDate } from '../AccessToken.utils'
-import { DatePicker } from '@/components/ui/DatePicker'
-import {
-  useAccessTokenCreateMutation,
-  type NewAccessToken,
-} from '@/data/access-tokens/access-tokens-create-mutation'
-import { useTrack } from '@/lib/telemetry/track'
 
 const formId = 'new-access-token-form'
 
@@ -72,7 +71,6 @@ export const NewTokenDialog = ({
     defaultValues: { tokenName: '', expiresAt: EXPIRES_AT_OPTIONS['month'].value },
     mode: 'onChange',
   })
-  const track = useTrack()
   const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
@@ -88,10 +86,6 @@ export const NewTokenDialog = ({
       { name: values.tokenName, scope: tokenScope, expires_at: expiresAt },
       {
         onSuccess: (data) => {
-          track('access_token_created', {
-            tokenType: 'classic',
-            expiryPreset: values.expiresAt || 'never',
-          })
           toast.success('Access token created successfully')
           onCreateToken(data)
           handleClose()
@@ -176,36 +170,36 @@ export const NewTokenDialog = ({
           />
         )}
         <DialogSection className="flex flex-col gap-4">
-          <Form {...form}>
+          <Form_Shadcn_ {...form}>
             <form
               id={formId}
               className="flex flex-col gap-4"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField
+              <FormField_Shadcn_
                 key="tokenName"
                 name="tokenName"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout name="tokenName" label="Name">
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Input_Shadcn_
                         id="tokenName"
                         {...field}
                         placeholder="Provide a name for your token"
                       />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
-              <FormField
+              <FormField_Shadcn_
                 key="expiresAt"
                 name="expiresAt"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout name="expiresAt" label="Expires in">
                     <div className="flex gap-2">
-                      <FormControl className="grow">
+                      <FormControl_Shadcn_ className="flex-grow">
                         <Select_Shadcn_ value={field.value} onValueChange={handleExpiryChange}>
                           <SelectTrigger_Shadcn_>
                             <SelectValue_Shadcn_ placeholder="Expires at" />
@@ -220,7 +214,7 @@ export const NewTokenDialog = ({
                             )}
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl>
+                      </FormControl_Shadcn_>
                       {isCustomExpiry && (
                         <DatePicker
                           selectsRange={false}
@@ -247,7 +241,7 @@ export const NewTokenDialog = ({
                 )}
               />
             </form>
-          </Form>
+          </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
           <Button

@@ -1,16 +1,13 @@
-import { getDatabaseExtensionsSQL } from '@supabase/pg-meta/src'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
-
+import { get, handleError } from 'data/fetchers'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseExtensionsKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type DatabaseExtension = components['schemas']['PostgresExtension'] & {
-  default_version_schema: string | null
-}
+export type DatabaseExtension = components['schemas']['PostgresExtension']
 
 export type DatabaseExtensionsVariables = {
   projectRef?: string
@@ -19,14 +16,30 @@ export type DatabaseExtensionsVariables = {
 
 export async function getDatabaseExtensions(
   { projectRef, connectionString }: DatabaseExtensionsVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ) {
-  const sql = getDatabaseExtensionsSQL()
-  const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['database-extensions'] },
-    signal
-  )
-  return result as DatabaseExtension[]
+  if (!projectRef) throw new Error('projectRef is required')
+
+  let headers = new Headers(headersInit)
+  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+
+  const { data, error } = await get('/platform/pg-meta/{ref}/extensions', {
+    params: {
+      header: {
+        'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
+      },
+      path: {
+        ref: projectRef,
+      },
+    },
+    headers,
+    signal,
+  })
+
+  if (error) handleError(error)
+  return data
 }
 
 export type DatabaseExtensionsData = Awaited<ReturnType<typeof getDatabaseExtensions>>

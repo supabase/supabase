@@ -1,15 +1,31 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
+import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getContentById } from 'data/content/content-id-query'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from 'data/content/content-upsert-mutation'
+import { Snippet } from 'data/content/sql-folders-query'
+import type { SqlSnippet } from 'data/content/sql-snippets-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   AiIconAnimation,
   Button,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
   Modal,
   Textarea,
@@ -18,22 +34,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
-import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { getContentById } from '@/data/content/content-id-query'
-import {
-  UpsertContentPayload,
-  useContentUpsertMutation,
-} from '@/data/content/content-upsert-mutation'
-import { Snippet } from '@/data/content/sql-folders-query'
-import type { SqlSnippet } from '@/data/content/sql-snippets-query'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from '@/lib/constants'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
-import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export interface RenameQueryModalProps {
   snippet?: SqlSnippet | Snippet
@@ -173,17 +173,17 @@ const RenameQueryModal = ({
 
   return (
     <Modal visible={visible} onCancel={handleCancel} hideFooter header="Rename" size="small">
-      <Form {...form}>
+      <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
           <Modal.Content className="space-y-4">
-            <FormField
+            <FormField_Shadcn_
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItemLayout name="name" layout="vertical" label="Name">
-                  <FormControl>
+                  <FormControl_Shadcn_>
                     <Input_Shadcn_ {...field} id="name" />
-                  </FormControl>
+                  </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
@@ -214,12 +214,12 @@ const RenameQueryModal = ({
             </div>
           </Modal.Content>
           <Modal.Content>
-            <FormField
+            <FormField_Shadcn_
               control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItemLayout name="description" layout="vertical" label="Description">
-                  <FormControl>
+                  <FormControl_Shadcn_>
                     <Textarea
                       {...field}
                       id="description"
@@ -227,7 +227,7 @@ const RenameQueryModal = ({
                       placeholder="Describe query"
                       className="resize-none"
                     />
-                  </FormControl>
+                  </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
@@ -242,7 +242,7 @@ const RenameQueryModal = ({
             </Button>
           </Modal.Content>
         </form>
-      </Form>
+      </Form_Shadcn_>
     </Modal>
   )
 }

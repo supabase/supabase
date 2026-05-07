@@ -1,6 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import CopyButton from 'components/ui/CopyButton'
+import { DocsButton } from 'components/ui/DocsButton'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
+import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { useForm } from 'react-hook-form'
 import {
   Button,
@@ -9,22 +17,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
-
-import CopyButton from '@/components/ui/CopyButton'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useCheckCNAMERecordMutation } from '@/data/custom-domains/check-cname-mutation'
-import { useCustomDomainCreateMutation } from '@/data/custom-domains/custom-domains-create-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL } from '@/lib/constants'
 
 const schema = z.object({
   domain: z.string().trim().min(1, 'A value for your custom domain is required'),
@@ -76,7 +75,7 @@ export const CustomDomainsConfigureHostname = () => {
   const isSubmitting = isCheckingRecord || isCreating
 
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onCreateCustomDomain)}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 gap-4">
@@ -85,7 +84,7 @@ export const CustomDomainsConfigureHostname = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <FormField
+              <FormField_Shadcn_
                 control={form.control}
                 name="domain"
                 render={({ field }) => (
@@ -95,14 +94,14 @@ export const CustomDomainsConfigureHostname = () => {
                     description="Enter the subdomain you want to use."
                     className="[&>div]:md:w-1/2"
                   >
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Input_Shadcn_
                         {...field}
                         placeholder="subdomain.example.com"
                         disabled={!canConfigureCustomDomain || isSubmitting}
                         autoComplete="off"
                       />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
@@ -170,6 +169,6 @@ export const CustomDomainsConfigureHostname = () => {
           </p>
         )}
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }

@@ -88,8 +88,4 @@ server {
     location /mcp {
         proxy_pass http://kong_upstream;
     }
-
-    location /sso {
-        proxy_pass http://kong_upstream;
-    }
 }

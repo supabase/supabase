@@ -1,20 +1,21 @@
+import { Lint } from 'data/lint/lint-query'
+import { Notification } from 'data/notifications/notifications-v2-query'
 import { AlertTriangle, ChevronRight, Inbox } from 'lucide-react'
+import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
 import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
 import type { AdvisorItem } from './AdvisorPanel.types'
 import {
   formatItemDate,
-  getAdvisorItemSecondaryText,
-  getAdvisorPanelItemDisplayTitle,
+  getAdvisorItemDisplayTitle,
+  getLintEntityString,
   severityBadgeVariants,
   severityColorClasses,
   severityLabels,
   tabIconMap,
 } from './AdvisorPanel.utils'
 import { EmptyAdvisor } from './EmptyAdvisor'
-import type { Notification } from '@/data/notifications/notifications-v2-query'
-import type { AdvisorSeverity, AdvisorTab } from '@/state/advisor-state'
 
 const NoProjectNotice = () => {
   return (
@@ -70,12 +71,10 @@ export const AdvisorPanelBody = ({
 
   if (isError) {
     return (
-      <div className="h-full mx-4 flex flex-col items-center justify-center gap-y-2">
+      <div className="my-8 mx-4 flex flex-col items-center gap-2">
         <AlertTriangle className="text-destructive" />
-        <div className="flex flex-col items-center justify-center">
-          <h4 className="text-base font-normal text-foreground-light">Error loading advisories</h4>
-          <p className="text-sm text-foreground-lighter">Please try again later.</p>
-        </div>
+        <h2 className="text-base text-foreground-light">Error loading advisories</h2>
+        <p className="text-sm text-foreground-lighter">Please try again later.</p>
       </div>
     )
   }
@@ -99,14 +98,14 @@ export const AdvisorPanelBody = ({
           const isNotification = item.source === 'notification'
           const notification = isNotification ? (item.original as Notification) : null
           const isUnread = notification?.status === 'new'
+          const lint = !isNotification ? (item.original as Lint) : null
 
-          const primaryText = getAdvisorPanelItemDisplayTitle(item)
-          const secondaryText = getAdvisorItemSecondaryText(item)
-          const metadataText =
-            secondaryText ?? (item.createdAt ? formatItemDate(item.createdAt) : undefined)
-          // Date strings (e.g. "a few seconds ago") come from formatItemDate and
-          // need sentence-case capitalisation; entity strings (lint / signal) don't.
-          const metadataCapitalize = secondaryText === undefined && item.createdAt !== undefined
+          // Primary text: issue type for lint items, title for notifications
+          const primaryText = getAdvisorItemDisplayTitle(item)
+
+          // Secondary text: entity for lint items when no date, date for notifications
+          const hasDate = !!item.createdAt
+          const entityString = getLintEntityString(lint)
 
           return (
             <div key={`${item.source}-${item.id}`} className="border-b">
@@ -123,22 +122,24 @@ export const AdvisorPanelBody = ({
                     <SeverityIcon
                       size={16}
                       strokeWidth={1.5}
-                      className={cn('shrink-0', severityClass)}
+                      className={cn('flex-shrink-0', severityClass)}
                     />
                     <div className="text-left flex flex-col gap-0.5 truncate flex-1 min-w-0">
                       <div className="truncate">{primaryText}</div>
-                      {metadataText && (
-                        <div className="flex items-center gap-1 text-xs text-foreground-light">
-                          <span
-                            className={cn('truncate', metadataCapitalize && 'capitalize-sentence')}
-                          >
-                            {metadataText}
-                          </span>
-                        </div>
+                      {hasDate ? (
+                        <span className="text-xs text-foreground-light capitalize-sentence">
+                          {formatItemDate(item.createdAt!)}
+                        </span>
+                      ) : (
+                        entityString && (
+                          <div className="flex items-center gap-1 text-xs text-foreground-light">
+                            <span className="truncate">{entityString}</span>
+                          </div>
+                        )
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     {item.severity === 'critical' && (
                       <Badge variant={severityBadgeVariants[item.severity]}>
                         {severityLabels[item.severity]}
@@ -147,7 +148,7 @@ export const AdvisorPanelBody = ({
                     <ChevronRight
                       size={16}
                       strokeWidth={1.5}
-                      className="shrink-0 text-foreground-lighter"
+                      className="flex-shrink-0 text-foreground-lighter"
                     />
                   </div>
                 </div>

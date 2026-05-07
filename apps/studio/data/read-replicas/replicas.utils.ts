@@ -1,6 +1,5 @@
+import { AVAILABLE_REPLICA_REGIONS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { last } from 'lodash'
-
-import { AVAILABLE_REPLICA_REGIONS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 
 export const formatDatabaseID = (id: string) => last(id.split('-') ?? [])
 

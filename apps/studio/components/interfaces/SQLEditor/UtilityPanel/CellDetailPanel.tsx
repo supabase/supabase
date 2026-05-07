@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import remarkGfm from 'remark-gfm'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from 'ui'
 
-import { Markdown } from '@/components/interfaces/Markdown'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
-import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { Markdown } from 'components/interfaces/Markdown'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from 'ui'
 
 interface CellDetailPanelProps {
   column: string
@@ -58,10 +58,10 @@ export const CellDetailPanel = ({ column, value, visible, onClose }: CellDetailP
             />
           </div>
         ) : (
-          <div className="grow py-4 px-4 bg-default overflow-y-auto">
+          <div className="flex-grow py-4 px-4 bg-default overflow-y-auto">
             <Markdown
               remarkPlugins={[remarkGfm]}
-              className="max-w-full! markdown-body"
+              className="!max-w-full markdown-body"
               content={formattedValue}
             />
           </div>

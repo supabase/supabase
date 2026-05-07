@@ -1,6 +1,4 @@
-import { safeSql } from '../pg-format'
-
-export const POLICIES_SQL = /* SQL */ safeSql`
+export const POLICIES_SQL = /* SQL */ `
 select
   pol.oid :: int8 as id,
   n.nspname as schema,

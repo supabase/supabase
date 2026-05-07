@@ -4,50 +4,49 @@ import { Plus, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import z from 'zod'
+
+import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import SchemaSelector from 'components/ui/SchemaSelector'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
+import { DatabaseFunction } from 'data/database-functions/database-functions-query'
+import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import type { FormSchema } from 'types'
 import {
   Button,
-  cn,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
-  RadioGroupStacked,
-  RadioGroupStackedItem,
+  Radio,
   ScrollArea,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
   Separator,
   Sheet,
   SheetContent,
   SheetFooter,
   SheetSection,
-  Switch,
+  Toggle,
+  cn,
 } from 'ui'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import z from 'zod'
-
 import { convertArgumentTypes, convertConfigParams } from '../Functions.utils'
 import { CreateFunctionConfigParamsSection } from './CreateFunctionConfigParamsSection'
 import { CreateFunctionHeader } from './CreateFunctionHeader'
 import { FunctionEditor } from './FunctionEditor'
-import { POSTGRES_DATA_TYPES } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
-import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import SchemaSelector from '@/components/ui/SchemaSelector'
-import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
-import { useDatabaseFunctionCreateMutation } from '@/data/database-functions/database-functions-create-mutation'
-import { DatabaseFunction } from '@/data/database-functions/database-functions-query'
-import { useDatabaseFunctionUpdateMutation } from '@/data/database-functions/database-functions-update-mutation'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
-import type { FormSchema } from '@/types'
 
 const FORM_ID = 'create-function-sidepanel'
 
@@ -164,19 +163,19 @@ export const CreateFunction = ({
       <SheetContent
         showClose={false}
         size={'default'}
-        className={'p-0 flex flex-row gap-0 min-w-screen! lg:min-w-[600px]!'}
+        className={'p-0 flex flex-row gap-0 !min-w-screen lg:!min-w-[600px]'}
       >
         <div className="flex flex-col grow w-full">
           <CreateFunctionHeader selectedFunction={func?.name} isDuplicating={isDuplicating} />
           <Separator />
-          <Form {...form}>
+          <Form_Shadcn_ {...form}>
             <form
               id={FORM_ID}
-              className="grow overflow-auto"
+              className="flex-grow overflow-auto"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="name"
                   render={({ field }) => (
@@ -185,16 +184,16 @@ export const CreateFunction = ({
                       description="Name will also be used for the function name in postgres"
                       layout="horizontal"
                     >
-                      <FormControl>
+                      <FormControl_Shadcn_>
                         <Input_Shadcn_ {...field} placeholder="Name of function" />
-                      </FormControl>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
               </SheetSection>
               <Separator className={focusedEditor ? 'hidden' : ''} />
               <SheetSection className={focusedEditor ? 'hidden' : 'space-y-4'}>
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="schema"
                   render={({ field }) => (
@@ -203,19 +202,19 @@ export const CreateFunction = ({
                       description="Tables made in the table editor will be in 'public'"
                       layout="horizontal"
                     >
-                      <FormControl>
+                      <FormControl_Shadcn_>
                         <SchemaSelector
                           selectedSchemaName={field.value}
                           excludedSchemas={protectedSchemas?.map((s) => s.name)}
                           size="small"
                           onSelectSchema={(name) => field.onChange(name)}
                         />
-                      </FormControl>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
                 {!isEditing && (
-                  <FormField
+                  <FormField_Shadcn_
                     control={form.control}
                     name="return_type"
                     render={({ field }) => (
@@ -247,25 +246,27 @@ export const CreateFunction = ({
                 <FormFieldArgs readonly={isEditing} />
               </SheetSection>
               <Separator className={focusedEditor ? 'hidden' : ''} />
-              <SheetSection className={`${focusedEditor ? 'h-full' : ''} px-0!`}>
-                <FormField
+              <SheetSection className={`${focusedEditor ? 'h-full' : ''} !px-0`}>
+                <FormField_Shadcn_
                   control={form.control}
                   name="definition"
                   render={({ field }) => (
-                    <FormItem className="space-y-4 flex flex-col h-full">
+                    <FormItem_Shadcn_ className="space-y-4 flex flex-col h-full">
                       <div className="px-content">
-                        <FormLabel className="text-base text-foreground">Definition</FormLabel>
-                        <FormDescription className="text-sm text-foreground-light">
+                        <FormLabel_Shadcn_ className="text-base text-foreground">
+                          Definition
+                        </FormLabel_Shadcn_>
+                        <FormDescription_Shadcn_ className="text-sm text-foreground-light">
                           <p>
                             The language below should be written in <code>{language}</code>.
                           </p>
                           {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
-                        </FormDescription>
+                        </FormDescription_Shadcn_>
                       </div>
                       <div
                         className={cn(
                           'border border-default flex',
-                          focusedEditor ? 'grow ' : 'h-72'
+                          focusedEditor ? 'flex-grow ' : 'h-72'
                         )}
                       >
                         <FunctionEditor
@@ -276,8 +277,8 @@ export const CreateFunction = ({
                         />
                       </div>
 
-                      <FormMessage className="px-content" />
-                    </FormItem>
+                      <FormMessage_Shadcn_ className="px-content" />
+                    </FormItem_Shadcn_>
                   )}
                 />
               </SheetSection>
@@ -287,28 +288,20 @@ export const CreateFunction = ({
               ) : (
                 <>
                   <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                    <div className="space-y-8 rounded-sm bg-studio py-4 px-6 border border-overlay">
-                      <FormItem className="flex flex-row items-center justify-between">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-base">Show advanced settings</FormLabel>
-                          <FormDescription>
-                            These are settings that might be familiar for Postgres developers
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={advancedSettingsShown}
-                            onCheckedChange={(checked) => setAdvancedSettingsShown(checked)}
-                          />
-                        </FormControl>
-                      </FormItem>
+                    <div className="space-y-8 rounded bg-studio py-4 px-6 border border-overlay">
+                      <Toggle
+                        onChange={() => setAdvancedSettingsShown(!advancedSettingsShown)}
+                        label="Show advanced settings"
+                        checked={advancedSettingsShown}
+                        labelOptional="These are settings that might be familiar for Postgres developers"
+                      />
                     </div>
                   </SheetSection>
                   {advancedSettingsShown && (
                     <>
                       <SheetSection className={focusedEditor ? 'hidden' : 'space-y-2 pt-0'}>
                         <FormFieldLanguage />
-                        <FormField
+                        <FormField_Shadcn_
                           control={form.control}
                           name="behavior"
                           render={({ field }) => (
@@ -344,22 +337,26 @@ export const CreateFunction = ({
                       <Separator className={focusedEditor ? 'hidden' : ''} />
                       <SheetSection className={focusedEditor ? 'hidden' : ''}>
                         <h5 className="text-base text-foreground mb-4">Type of Security</h5>
-                        <FormField
+                        <FormField_Shadcn_
                           control={form.control}
                           name="security_definer"
                           render={({ field }) => (
-                            <FormItem>
-                              <FormControl className="col-span-8">
-                                <RadioGroupStacked
-                                  onValueChange={(value) =>
-                                    field.onChange(value == 'SECURITY_DEFINER')
+                            <FormItem_Shadcn_>
+                              <FormControl_Shadcn_ className="col-span-8">
+                                {/* TODO: This RadioGroup imports Formik state, replace it with a clean component */}
+                                <Radio.Group
+                                  type="cards"
+                                  layout="vertical"
+                                  onChange={(event) =>
+                                    field.onChange(event.target.value == 'SECURITY_DEFINER')
                                   }
                                   value={field.value ? 'SECURITY_DEFINER' : 'SECURITY_INVOKER'}
                                 >
-                                  <RadioGroupStackedItem
-                                    value="SECURITY_INVOKER"
+                                  <Radio
                                     id="SECURITY_INVOKER"
                                     label="SECURITY INVOKER"
+                                    value="SECURITY_INVOKER"
+                                    checked={!field.value}
                                     description={
                                       <>
                                         Function is to be executed with the privileges of the user
@@ -367,10 +364,11 @@ export const CreateFunction = ({
                                       </>
                                     }
                                   />
-                                  <RadioGroupStackedItem
-                                    value="SECURITY_DEFINER"
+                                  <Radio
                                     id="SECURITY_DEFINER"
                                     label="SECURITY DEFINER"
+                                    value="SECURITY_DEFINER"
+                                    checked={field.value}
                                     description={
                                       <>
                                         Function is to be executed with the privileges of the user
@@ -378,10 +376,10 @@ export const CreateFunction = ({
                                       </>
                                     }
                                   />
-                                </RadioGroupStacked>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
+                                </Radio.Group>
+                              </FormControl_Shadcn_>
+                              <FormMessage_Shadcn_ />
+                            </FormItem_Shadcn_>
                           )}
                         />
                       </SheetSection>
@@ -390,7 +388,7 @@ export const CreateFunction = ({
                 </>
               )}
             </form>
-          </Form>
+          </Form_Shadcn_>
           <SheetFooter>
             <Button disabled={isCreating || isUpdating} type="default" onClick={confirmOnClose}>
               Cancel
@@ -435,22 +433,22 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
         {fields.map((field, index) => {
           return (
             <div className="flex flex-row space-x-1" key={field.id}>
-              <FormField
+              <FormField_Shadcn_
                 name={`args.${index}.name`}
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
+                  <FormItem_Shadcn_ className="flex-1">
+                    <FormControl_Shadcn_>
                       <Input_Shadcn_ {...field} disabled={readonly} placeholder="argument_name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </FormControl_Shadcn_>
+                    <FormMessage_Shadcn_ />
+                  </FormItem_Shadcn_>
                 )}
               />
-              <FormField
+              <FormField_Shadcn_
                 name={`args.${index}.type`}
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
+                  <FormItem_Shadcn_ className="flex-1">
+                    <FormControl_Shadcn_>
                       {readonly ? (
                         <Input_Shadcn_ value={field.value} disabled readOnly className="h-auto" />
                       ) : (
@@ -475,9 +473,9 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                           </Select_Shadcn_>
                         </>
                       )}
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                    </FormControl_Shadcn_>
+                    <FormMessage_Shadcn_ />
+                  </FormItem_Shadcn_>
                 )}
               />
 
@@ -536,7 +534,7 @@ const FormFieldLanguage = () => {
   }, [enabledExtensions])
 
   return (
-    <FormField
+    <FormField_Shadcn_
       name="language"
       render={({ field }) => (
         <FormItemLayout label="Language" layout="horizontal">

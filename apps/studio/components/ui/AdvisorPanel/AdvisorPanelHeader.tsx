@@ -1,15 +1,14 @@
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { ChevronLeft, X } from 'lucide-react'
 import { Badge } from 'ui'
 
 import type { AdvisorItem } from './AdvisorPanel.types'
 import {
   formatItemDate,
-  getAdvisorItemSecondaryText,
-  getAdvisorPanelItemDisplayTitle,
+  getAdvisorItemDisplayTitle,
   severityBadgeVariants,
   severityLabels,
 } from './AdvisorPanel.utils'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface AdvisorPanelHeaderProps {
   selectedItem: AdvisorItem | undefined
@@ -18,18 +17,7 @@ interface AdvisorPanelHeaderProps {
 }
 
 export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPanelHeaderProps) => {
-  const displayTitle = selectedItem ? getAdvisorPanelItemDisplayTitle(selectedItem) : undefined
-  const secondaryText = selectedItem ? getAdvisorItemSecondaryText(selectedItem) : undefined
-  const metadataText = selectedItem
-    ? (secondaryText ??
-      (selectedItem.createdAt ? formatItemDate(selectedItem.createdAt) : undefined))
-    : undefined
-  // Only capitalize date strings (e.g. "a few seconds ago"); entity strings
-  // like "public.users" must not be case-altered.
-  const metadataCapitalize =
-    selectedItem !== undefined &&
-    secondaryText === undefined &&
-    selectedItem.createdAt !== undefined
+  const displayTitle = selectedItem ? getAdvisorItemDisplayTitle(selectedItem) : undefined
 
   return (
     <div className="border-b px-4 py-3 flex items-center gap-3">
@@ -41,13 +29,11 @@ export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPan
         tooltip={{ content: { side: 'bottom', text: 'Back to list' } }}
       />
       <div className="flex items-center gap-2 overflow-hidden flex-1">
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col gap-0.5">
           <span className="heading-default">{displayTitle}</span>
-          {metadataText && (
-            <span
-              className={`text-xs text-foreground-light${metadataCapitalize ? ' capitalize-sentence' : ''}`}
-            >
-              {metadataText}
+          {selectedItem?.createdAt && (
+            <span className="text-xs text-foreground-light capitalize-sentence">
+              {formatItemDate(selectedItem.createdAt)}
             </span>
           )}
         </div>

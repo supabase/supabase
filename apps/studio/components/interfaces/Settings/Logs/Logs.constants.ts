@@ -1,8 +1,8 @@
-import { IS_PLATFORM } from 'common'
 import dayjs from 'dayjs'
 
+import { DOCS_URL } from 'lib/constants'
 import type { DatetimeHelper, FilterTableSet, LogTemplate } from './Logs.types'
-import { DOCS_URL } from '@/lib/constants'
+import { IS_PLATFORM } from 'common'
 
 export const LOGS_EXPLORER_DOCS_URL = `${DOCS_URL}/guides/platform/logs#querying-with-the-logs-explorer`
 

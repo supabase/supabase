@@ -13,7 +13,6 @@ export type TableNodeData = {
     isIdentity: boolean
     name: string
     format: string
-    description: string
   }[]
 }
 

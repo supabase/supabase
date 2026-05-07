@@ -1,20 +1,21 @@
-import { useParams } from 'common'
+import { useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { useMemo, useState } from 'react'
 
-import { useSupamonitorIndexAdvisor } from './hooks/useSupamonitorIndexAdvisor'
+import { useParams } from 'common'
+import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { getSupamonitorLogsQuery } from './QueryInsights.constants'
-import { QueryInsightsChart } from './QueryInsightsChart/QueryInsightsChart'
-import { QueryInsightsHealth } from './QueryInsightsHealth/QueryInsightsHealth'
-import { QueryInsightsTable } from './QueryInsightsTable/QueryInsightsTable'
 import {
-  aggregateLogsByQuery,
-  filterSystemLogs,
   parseSupamonitorLogs,
+  filterSystemLogs,
   transformLogsToChartData,
+  aggregateLogsByQuery,
 } from './utils/supamonitor.utils'
-import useLogsQuery from '@/hooks/analytics/useLogsQuery'
+
+import { QueryInsightsHealth } from './QueryInsightsHealth/QueryInsightsHealth'
+import { QueryInsightsChart } from './QueryInsightsChart/QueryInsightsChart'
+import { QueryInsightsTable } from './QueryInsightsTable/QueryInsightsTable'
+import { useSupamonitorIndexAdvisor } from './hooks/useSupamonitorIndexAdvisor'
 
 dayjs.extend(utc)
 

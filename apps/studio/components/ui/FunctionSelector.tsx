@@ -1,4 +1,9 @@
 import { useParams } from 'common'
+import {
+  DatabaseFunctionsData,
+  useDatabaseFunctionsQuery,
+} from 'data/database-functions/database-functions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uniqBy } from 'lodash'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
@@ -21,12 +26,6 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
-
-import {
-  DatabaseFunctionsData,
-  useDatabaseFunctionsQuery,
-} from '@/data/database-functions/database-functions-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 type DatabaseFunction = DatabaseFunctionsData[number]
 
@@ -87,7 +86,7 @@ const FunctionSelector = ({
       )}
 
       {showError && isError && (
-        <Alert_Shadcn_ variant="warning" className="px-3! py-3!">
+        <Alert_Shadcn_ variant="warning" className="!px-3 !py-3">
           <AlertTitle_Shadcn_ className="text-xs text-amber-900">
             Failed to load functions
           </AlertTitle_Shadcn_>

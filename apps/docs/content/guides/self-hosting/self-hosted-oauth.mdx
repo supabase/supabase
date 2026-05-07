@@ -15,11 +15,11 @@ You need:
 
 <Admonition type="danger">
 
-HTTPS is required by most OAuth providers - `http://` callback URLs are rejected (except `localhost`). See the HTTPS [how-to guide](/docs/guides/self-hosting/self-hosted-proxy-https) for setup instructions.
+HTTPS is strongly recommended in production. Most OAuth providers reject `http://` callback URLs (except `localhost`).
 
 </Admonition>
 
-Your **OAuth callback URL** should look like the following:
+Your **OAuth callback URL** is built from `API_EXTERNAL_URL`. For example, if `API_EXTERNAL_URL` is `https://<your-domain>`, the callback URL will become:
 
 ```
 https://<your-domain>/auth/v1/callback
@@ -32,7 +32,7 @@ You will have to register this URL with each OAuth provider.
 When a user signs in with an OAuth provider, the following flow occurs:
 
 1. Your app calls `supabase.auth.signInWithOAuth()` and the browser redirects to the Auth service
-2. The API gateway routes the request to the Auth container (`/auth/v1/authorize`)
+2. API gateway (Kong) routes the request to the Auth container (`/auth/v1/authorize`)
 3. Auth redirects the user to the OAuth provider (e.g., Google) for consent
 4. The provider redirects back to `https://<your-domain>/auth/v1/callback`
 5. Auth exchanges the authorization code for tokens and redirects the user to your `SITE_URL` or an allowed redirect URL
@@ -60,7 +60,7 @@ The default `.env.example` and `docker-compose.yml` include commented-out placeh
 
 Uncomment the lines for your provider in `.env` and add your client ID and secret, e.g., for Google:
 
-```sh
+```
 GOOGLE_ENABLED=true
 GOOGLE_CLIENT_ID=your-client-id
 GOOGLE_SECRET=your-client-secret
@@ -72,7 +72,7 @@ GOOGLE_SECRET=your-client-secret
 
 Uncomment the corresponding `GOTRUE_EXTERNAL_` lines in the `auth` service's `environment`:
 
-```yaml name=docker-compose.yml
+```yaml
 auth:
   environment:
     # ... existing variables ...
@@ -104,7 +104,7 @@ curl -H 'apikey: your-anon-key' https://<your-domain>/auth/v1/settings
 
 The response should include your provider under `external`:
 
-```json
+```
 {
   "external": {
     "google": true
@@ -136,13 +136,17 @@ The response should include your provider under `external`:
 9. Under **Authorized redirect URIs**, add: `https://<your-domain>/auth/v1/callback`
 10. Click **Create** and copy the client ID and client secret
 
-```sh name=.env
+**`.env`:**
+
+```
 GOOGLE_ENABLED=true
 GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 GOOGLE_SECRET=your-google-client-secret
 ```
 
-```yaml name=docker-compose.yml
+**`docker-compose.yml`:**
+
+```yaml
 auth:
   environment:
     # ... existing variables ...
@@ -165,13 +169,17 @@ auth:
 5. Click **Register application**
 6. Copy the client ID, generate and copy a client secret
 
-```sh name=.env
+**`.env`:**
+
+```
 GITHUB_ENABLED=true
 GITHUB_CLIENT_ID=your-github-client-id
 GITHUB_SECRET=your-github-client-secret
 ```
 
-```yaml name=docker-compose.yml
+**`docker-compose.yml`:**
+
+```yaml
 auth:
   environment:
     # ... existing variables ...
@@ -198,7 +206,9 @@ auth:
 9. Click on **New client secret** and add a client secret
 10. Copy the secret value (not "secret ID")
 
-```sh name=.env
+**`.env`:**
+
+```
 AZURE_ENABLED=true
 AZURE_CLIENT_ID=your-azure-application-client-id
 AZURE_SECRET=your-azure-client-secret
@@ -206,7 +216,9 @@ AZURE_SECRET=your-azure-client-secret
 # AZURE_URL=https://login.microsoftonline.com/your-tenant-id
 ```
 
-```yaml name=docker-compose.yml
+**`docker-compose.yml`:**
+
+```yaml
 auth:
   environment:
     # ... existing variables ...
@@ -228,13 +240,17 @@ auth:
 2. Create a private key for sign in with Apple
 3. Generate a client secret JWT from your private key. See [Apple Developer documentation](https://developer.apple.com/documentation/accountorganizationaldatasharing/creating-a-client-secret) for details.
 
-```sh name=.env
+**`.env`:**
+
+```
 APPLE_ENABLED=true
 APPLE_CLIENT_ID=com.example.your-services-id
 APPLE_SECRET=your-generated-jwt-client-secret
 ```
 
-```yaml name=docker-compose.yml
+**`docker-compose.yml`:**
+
+```yaml
 auth:
   environment:
     # ... existing variables ...
@@ -265,7 +281,9 @@ Apple uses `response_mode=form_post` for its OAuth flow. The Auth service handle
 7. Under **Valid redirect URIs**, add: `https://<your-domain>/auth/v1/callback`
 8. Save, then go to the **Credentials** tab and copy the **Client secret**
 
-```sh name=.env
+**`.env` variables:**
+
+```
 KEYCLOAK_ENABLED=true
 KEYCLOAK_CLIENT_ID=supabase
 KEYCLOAK_SECRET=your-keycloak-client-secret
@@ -273,7 +291,9 @@ KEYCLOAK_SECRET=your-keycloak-client-secret
 KEYCLOAK_URL=https://keycloak.example.com/realms/myrealm
 ```
 
-```yaml name=docker-compose.yml
+**`docker-compose.yml` passthrough:**
+
+```yaml
 auth:
   environment:
     # ... existing variables ...
@@ -391,11 +411,8 @@ For detailed client-side integration, see [Social Login](/docs/guides/auth/socia
 
 Configuration variables from `.env` are **not** automatically available inside the container unless there's a matching passthrough definition in `docker-compose.yml`. Check, e.g., for:
 
-```yaml name=docker-compose.yml
-auth:
-  environment:
-    # ... existing variables ...
-    GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_ENABLED}
+```
+GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_ENABLED}
 ```
 
 Run `docker compose exec auth env | grep GOTRUE_EXTERNAL` to verify the variables are reaching the container.
@@ -425,11 +442,8 @@ When using Google Sign In on mobile with ID tokens, nonce verification may fail 
 
 To enable it, uncomment the following line in `docker-compose.yml`:
 
-```yaml name=docker-compose.yml
-auth:
-  environment:
-    # ... existing variables ...
-    GOTRUE_EXTERNAL_SKIP_NONCE_CHECK: 'true'
+```
+GOTRUE_EXTERNAL_SKIP_NONCE_CHECK: true
 ```
 
 ### Auth service fails to start

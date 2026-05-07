@@ -36,6 +36,3 @@ yarn-error.log*
 next-env.d.ts
 
 .contentlayer
-
-# Auto-generated on every Vercel build by `pnpm build:llms` -> scripts/build-llms-txt.ts
-public/llms.txt

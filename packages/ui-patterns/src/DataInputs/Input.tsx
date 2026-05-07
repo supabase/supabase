@@ -6,16 +6,12 @@ import React, {
   forwardRef,
   useState,
 } from 'react'
-import {
-  cn,
-  copyToClipboard,
-  Input_Shadcn_,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from 'ui'
+import { Button, cn, copyToClipboard, Input_Shadcn_ } from 'ui'
 import styleHandler from 'ui/src/lib/theme/styleHandler'
+
+import InputIconContainer from '../form/Layout/InputIconContainer'
+
+export const HIDDEN_PLACEHOLDER = '**** **** **** ****'
 
 export interface Props extends Omit<ComponentProps<typeof Input_Shadcn_>, 'onCopy'> {
   copy?: boolean
@@ -69,32 +65,24 @@ const Input = forwardRef<
 
     let inputClasses: string[] = []
     if (size) inputClasses.push(__styles.size[size])
+    if (icon) inputClasses.push(__styles.with_icon[size ?? 'small'])
 
     return (
-      <InputGroup className={containerClassName}>
-        <InputGroupInput
+      <div className={cn('relative group', containerClassName)}>
+        <Input_Shadcn_
           ref={ref}
-          onFocus={(event) => event.target.select()}
           {...props}
           size={size}
           onCopy={onCopy}
-          type={reveal && hidden ? 'password' : props.type}
-          disabled={props.disabled}
+          value={reveal && hidden ? HIDDEN_PLACEHOLDER : props.value}
+          disabled={reveal && hidden ? true : props.disabled}
           className={cn(...inputClasses, props.className)}
-          data-1p-ignore // 1Password
-          data-lpignore="true" // LastPass
-          data-form-type="other" // Dashlane
-          data-bwignore // Bitwarden
         />
-        {icon && <InputGroupAddon align="inline-start">{icon}</InputGroupAddon>}
+        {icon && <InputIconContainer size={size} icon={icon} className={iconContainerClassName} />}
         {copy || actions ? (
-          <InputGroupAddon
-            align="inline-end"
-            // Override defaults
-            className="pr-1 has-[>button]:mr-0 has-[>kbd]:mr-0"
-          >
+          <div className={__styles.actions_container}>
             {copy && !(reveal && hidden) ? (
-              <InputGroupButton
+              <Button
                 size="tiny"
                 type="default"
                 className={cn(showCopyOnHover && 'opacity-0 group-hover:opacity-100 transition')}
@@ -102,17 +90,17 @@ const Input = forwardRef<
                 onClick={() => _onCopy(props.value)}
               >
                 {copyLabel}
-              </InputGroupButton>
+              </Button>
             ) : null}
             {reveal && hidden ? (
-              <InputGroupButton size="tiny" type="default" onClick={onReveal}>
+              <Button size="tiny" type="default" onClick={onReveal}>
                 Reveal
-              </InputGroupButton>
+              </Button>
             ) : null}
             {actions && actions}
-          </InputGroupAddon>
+          </div>
         ) : null}
-      </InputGroup>
+      </div>
     )
   }
 )

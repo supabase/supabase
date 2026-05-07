@@ -1,8 +1,7 @@
-import assert from 'node:assert'
+import apiWrapper from 'lib/api/apiWrapper'
+import { retrieveAnalyticsData } from 'lib/api/self-hosted/logs'
 import { NextApiRequest, NextApiResponse } from 'next'
-
-import apiWrapper from '@/lib/api/apiWrapper'
-import { retrieveAnalyticsData } from '@/lib/api/self-hosted/logs'
+import assert from 'node:assert'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 

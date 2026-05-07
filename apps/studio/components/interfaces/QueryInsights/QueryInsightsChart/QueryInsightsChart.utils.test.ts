@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'vitest'
-
-import { formatTime, isTimeMetric } from './QueryInsightsChart.utils'
+import { describe, it, expect } from 'vitest'
+import { isTimeMetric, formatTime } from './QueryInsightsChart.utils'
 
 describe('isTimeMetric', () => {
   it('returns true for p50 and p95', () => {

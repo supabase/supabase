@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { View, Alert, Image, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Alert, Image, Button } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
-import { appStyles } from '../styles/styles'
 
 interface Props {
   size: number
@@ -14,7 +13,6 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
   const [uploading, setUploading] = useState(false)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const avatarSize = { height: size, width: size }
-  const styles = appStyles
 
   useEffect(() => {
     if (url) downloadImage(url)
@@ -33,8 +31,10 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
       fr.onload = () => {
         setAvatarUrl(fr.result as string)
       }
-    } catch (error: any) {
-      console.log('Error downloading image: ', error.message)
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log('Error downloading image: ', error.message)
+      }
     }
   }
 
@@ -43,45 +43,36 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
       setUploading(true)
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Restrict to only images
-        allowsMultipleSelection: false, // Can only select one image
-        allowsEditing: true, // Allows the user to crop / rotate their photo before uploading it
+        mediaTypes: ['images'],
+        allowsEditing: true,
         quality: 1,
-        exif: false, // We don't want nor need that data.
       })
 
       if (result.canceled || !result.assets || result.assets.length === 0) {
-        console.log('User cancelled image picker.')
         return
       }
 
       const image = result.assets[0]
-      console.log('Got image', image)
-
       if (!image.uri) {
-        throw new Error('No image uri!') // Realistically, this should never happen, but just in case...
+        throw new Error('No image uri!')
       }
 
       const arraybuffer = await fetch(image.uri).then((res) => res.arrayBuffer())
+      const fileExt = image.uri.split('.').pop()?.toLowerCase() ?? 'jpeg'
+      const filePath = `${Math.random()}.${fileExt}`
 
-      const fileExt = image.uri?.split('.').pop()?.toLowerCase() ?? 'jpeg'
-      const path = `${Date.now()}.${fileExt}`
-      const { data, error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(path, arraybuffer, {
-          contentType: image.mimeType ?? 'image/jpeg',
-        })
+      const { error } = await supabase.storage.from('avatars').upload(filePath, arraybuffer, {
+        contentType: image.mimeType ?? 'image/jpeg',
+      })
 
-      if (uploadError) {
-        throw uploadError
+      if (error) {
+        throw error
       }
 
-      onUpload(data.path)
-    } catch (error: any) {
-      if (error) {
+      onUpload(filePath)
+    } catch (error) {
+      if (error instanceof Error) {
         Alert.alert(error.message)
-      } else {
-        throw error
       }
     } finally {
       setUploading(false)
@@ -89,7 +80,7 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
   }
 
   return (
-    <View style={styles.avatarContainer}>
+    <View>
       {avatarUrl ? (
         <Image
           source={{ uri: avatarUrl }}
@@ -100,14 +91,28 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
         <View style={[avatarSize, styles.avatar, styles.noImage]} />
       )}
       <View>
-        <TouchableOpacity
-          style={[styles.button, uploading && styles.buttonDisabled]}
+        <Button
+          title={uploading ? 'Uploading ...' : 'Upload'}
           onPress={uploadAvatar}
           disabled={uploading}
-        >
-          <Text style={styles.buttonText}>{uploading ? 'Uploading ...' : 'Upload'}</Text>
-        </TouchableOpacity>
+        />
       </View>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  avatar: {
+    borderRadius: 5,
+    overflow: 'hidden',
+    maxWidth: '100%',
+  },
+  image: {
+    objectFit: 'cover',
+    paddingTop: 0,
+  },
+  noImage: {
+    backgroundColor: '#333',
+    borderRadius: 5,
+  },
+})

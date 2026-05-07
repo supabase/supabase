@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
+import { executeSql } from 'data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
-import { filterProtectedSchemaIndexAdvisorResult } from '@/components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { filterProtectedSchemaIndexAdvisorResult } from 'components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
 
 export type GetIndexAdvisorResultVariables = {
   projectRef?: string
@@ -77,20 +77,16 @@ export const useGetIndexAdvisorResult = <TData = GetIndexAdvisorResultData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<GetIndexAdvisorResultData, GetIndexAdvisorResultError, TData> = {}
-) => {
-  const formattedQuery = (query ?? '').trim().toLowerCase()
-  const isValidQueryForIndexing =
-    formattedQuery.startsWith('select') || formattedQuery.startsWith('with pgrst_source')
-
-  return useQuery<GetIndexAdvisorResultData, GetIndexAdvisorResultError, TData>({
+) =>
+  useQuery<GetIndexAdvisorResultData, GetIndexAdvisorResultError, TData>({
     queryKey: databaseKeys.indexAdvisorFromQuery(projectRef, query),
     queryFn: () => getIndexAdvisorResult({ projectRef, connectionString, query }),
     retry: false,
     enabled:
-      enabled &&
-      typeof projectRef !== 'undefined' &&
-      typeof query !== 'undefined' &&
-      isValidQueryForIndexing,
+      (enabled &&
+        typeof projectRef !== 'undefined' &&
+        typeof query !== 'undefined' &&
+        (query.startsWith('select') || query.startsWith('SELECT'))) ||
+      (typeof query === 'string' && query.trim().toLowerCase().startsWith('with pgrst_source')),
     ...options,
   })
-}

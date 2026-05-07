@@ -1,34 +1,29 @@
+import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
+import { checkHasNonPositiveValues, formatLogTick } from 'components/ui/QueryBlock/QueryBlock.utils'
+import { AnalyticsInterval } from 'data/analytics/constants'
+import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
+import {
+  InfraMonitoringAttribute,
+  useInfraMonitoringAttributesQuery,
+} from 'data/analytics/infra-monitoring-query'
+import {
+  ProjectDailyStatsAttribute,
+  useProjectDailyStatsQuery,
+} from 'data/analytics/project-daily-stats-query'
 import dayjs from 'dayjs'
+import { METRICS } from 'lib/constants/metrics'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import type { Dashboards } from 'types'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, WarningIcon } from 'ui'
 
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
-import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
-import {
-  checkHasNonPositiveValues,
-  computeYAxisWidth,
-  formatLogTick,
-  formatYAxisTick,
-} from '@/components/ui/QueryBlock/QueryBlock.utils'
-import { AnalyticsInterval } from '@/data/analytics/constants'
-import { mapMultiResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
-import {
-  InfraMonitoringAttribute,
-  useInfraMonitoringAttributesQuery,
-} from '@/data/analytics/infra-monitoring-query'
-import {
-  ProjectDailyStatsAttribute,
-  useProjectDailyStatsQuery,
-} from '@/data/analytics/project-daily-stats-query'
-import { METRICS } from '@/lib/constants/metrics'
-import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
-import type { Dashboards } from '@/types'
 
 interface ChartBlockProps {
   label: string
@@ -178,11 +173,6 @@ export const ChartBlock = ({
 
   const effectiveLogScale = logScale && !hasNonPositiveValues
 
-  const yAxisWidth = computeYAxisWidth(data, metricLabel, {
-    isLogScale: effectiveLogScale,
-    isPercentage,
-  })
-
   const getInitialHighlightedValue = useCallback(() => {
     if (!chartData?.data?.length) return undefined
     const lastDataPoint = chartData.data[chartData.data.length - 1]
@@ -253,19 +243,19 @@ export const ChartBlock = ({
       }
     >
       {loading ? (
-        <div className="flex grow w-full flex-col items-center justify-center gap-y-2 px-4">
+        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2 px-4">
           <Loader2 size={18} className="animate-spin text-border-strong" />
           <p className="text-xs text-foreground-lighter text-center">Loading data for {label}</p>
         </div>
       ) : chartData === undefined ? (
-        <div className="flex grow w-full flex-col items-center justify-center gap-y-2 px-4">
+        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2 px-4">
           <WarningIcon />
           <p className="text-xs text-foreground-lighter text-center">
             Unable to load data for {label}
           </p>
         </div>
       ) : data.length === 0 ? (
-        <div className="flex grow w-full flex-col items-center justify-center gap-y-2">
+        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2">
           <NoDataPlaceholder
             size="small"
             className="border-0"
@@ -308,13 +298,13 @@ export const ChartBlock = ({
                   scale={effectiveLogScale ? 'log' : 'auto'}
                   domain={effectiveLogScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
                   allowDataOverflow={effectiveLogScale}
-                  width={yAxisWidth}
-                  tickFormatter={effectiveLogScale ? formatLogTick : formatYAxisTick}
+                  width={effectiveLogScale ? 52 : undefined}
+                  tickFormatter={effectiveLogScale ? formatLogTick : undefined}
                 />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
-                      className="min-w-[200px]"
+                      className="w-[200px]"
                       labelSuffix={isPercentage ? '%' : ''}
                       labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
                     />
@@ -336,12 +326,13 @@ export const ChartBlock = ({
                   scale={effectiveLogScale ? 'log' : 'auto'}
                   domain={effectiveLogScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
                   allowDataOverflow={effectiveLogScale}
-                  width={yAxisWidth}
-                  tickFormatter={effectiveLogScale ? formatLogTick : formatYAxisTick}
+                  width={effectiveLogScale ? 52 : undefined}
+                  tickFormatter={effectiveLogScale ? formatLogTick : undefined}
                 />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
+                      className="w-[200px]"
                       labelSuffix={chartData?.format === '%' ? '%' : ''}
                       labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
                     />

@@ -1,9 +1,11 @@
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { Control, ControllerRenderProps } from 'react-hook-form'
+
+import { DatePicker } from 'components/ui/DatePicker'
 import {
-  FormControl,
-  FormField,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -13,14 +15,12 @@ import {
   WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
 import {
   CUSTOM_EXPIRY_VALUE,
   EXPIRES_AT_OPTIONS,
   NON_EXPIRING_TOKEN_VALUE,
 } from '../../AccessToken.constants'
 import { type TokenFormValues } from '../../AccessToken.schemas'
-import { DatePicker } from '@/components/ui/DatePicker'
 
 interface BasicInfoProps {
   control: Control<TokenFormValues>
@@ -65,31 +65,31 @@ export const BasicInfo = ({
 
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">
-      <FormField
+      <FormField_Shadcn_
         key="tokenName"
         name="tokenName"
         control={control}
         render={({ field }) => (
           <FormItemLayout name="tokenName" label="Name">
-            <FormControl>
+            <FormControl_Shadcn_>
               <Input_Shadcn_
                 id="tokenName"
                 {...field}
                 placeholder="Provide a name for your token"
               />
-            </FormControl>
+            </FormControl_Shadcn_>
           </FormItemLayout>
         )}
       />
 
-      <FormField
+      <FormField_Shadcn_
         key="expiresAt"
         name="expiresAt"
         control={control}
         render={({ field }) => (
           <FormItemLayout name="expiresAt" label="Expires in">
             <div className="flex gap-2">
-              <FormControl className="grow">
+              <FormControl_Shadcn_ className="flex-grow">
                 <Select_Shadcn_
                   value={field.value}
                   onValueChange={(value) => handleExpiryChange(value, field)}
@@ -107,7 +107,7 @@ export const BasicInfo = ({
                     )}
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
-              </FormControl>
+              </FormControl_Shadcn_>
               {isCustomSelected && (
                 <DatePicker
                   selectsRange={false}

@@ -1,12 +1,11 @@
+import { DiskAttributesData } from 'data/config/disk-attributes-query'
+import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import {
   DISK_LIMITS,
   DISK_PRICING,
   DiskType,
   PLAN_DETAILS,
 } from '../DiskManagement/ui/DiskManagement.constants'
-import { DiskAttributesData } from '@/data/config/disk-attributes-query'
-import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
-import { estimateRestoreTimeFromSizeGb } from '@/lib/restore-estimate'
 
 // Ref: https://supabase.com/docs/guides/platform/compute-and-disk
 const maxDiskForCompute = new Map([
@@ -62,5 +61,6 @@ export const estimateDiskCost = (disk: DiskAttributesData['attributes']) => {
 }
 
 export const estimateRestoreTime = (disk: DiskAttributesData['attributes']) => {
-  return estimateRestoreTimeFromSizeGb(disk.size_gb)
+  // This is interpolated from real restore time
+  return (720 / 21000) * disk.size_gb + 3
 }

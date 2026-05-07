@@ -2,7 +2,6 @@ import { useParams } from 'common'
 
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { getStatusName } from './Pipeline.utils'
-import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
@@ -27,9 +26,13 @@ export const useDestinationInformation = ({ id }: { id?: number | null }) => {
     projectRef,
     destinationId: id,
   })
-  const destinationType: DestinationType | undefined = getReplicationDestinationType(
-    destination?.config as Record<string, unknown> | undefined
-  )
+  const destinationType: DestinationType | undefined = !destination
+    ? undefined
+    : 'big_query' in destination.config
+      ? 'BigQuery'
+      : 'iceberg' in destination.config
+        ? 'Analytics Bucket'
+        : undefined
 
   const {
     data: pipelinesData,

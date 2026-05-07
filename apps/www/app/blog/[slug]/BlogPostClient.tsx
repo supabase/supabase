@@ -1,8 +1,13 @@
-import BlogPostAnchorEffect from './BlogPostAnchorEffect'
-import BlogPostRenderer from '@/components/Blog/BlogPostRenderer'
+'use client'
+
+import dynamic from 'next/dynamic'
+
+import useActiveAnchors from '@/hooks/useActiveAnchors'
 import authors from '@/lib/authors.json'
 import { isNotNullOrUndefined } from '@/lib/helpers'
 import type { Blog, BlogData, PostReturnType, ProcessedBlogData } from '@/types/post'
+
+const BlogPostRenderer = dynamic(() => import('@/components/Blog/BlogPostRenderer'))
 
 type BlogPostPageProps = {
   prevPost: PostReturnType | null
@@ -12,7 +17,14 @@ type BlogPostPageProps = {
   isDraftMode: boolean
 }
 
+// Note: convertRichTextToMarkdown is now imported from the shared utility
+
 export default function BlogPostClient(props: BlogPostPageProps) {
+  const isDraftMode = props.isDraftMode
+
+  // Enable scroll-to-anchor functionality and TOC highlighting
+  useActiveAnchors()
+
   const blogMetaData = props.blog
 
   const blogAuthors = (blogMetaData.author ?? '')
@@ -26,16 +38,13 @@ export default function BlogPostClient(props: BlogPostPageProps) {
     .filter(isNotNullOrUndefined)
 
   return (
-    <>
-      <BlogPostAnchorEffect />
-      <BlogPostRenderer
-        blog={props.blog as ProcessedBlogData}
-        blogMetaData={blogMetaData as ProcessedBlogData}
-        isDraftMode={props.isDraftMode}
-        prevPost={props.prevPost}
-        nextPost={props.nextPost}
-        authors={blogAuthors}
-      />
-    </>
+    <BlogPostRenderer
+      blog={props.blog as ProcessedBlogData}
+      blogMetaData={blogMetaData as ProcessedBlogData}
+      isDraftMode={isDraftMode}
+      prevPost={props.prevPost}
+      nextPost={props.nextPost}
+      authors={blogAuthors}
+    />
   )
 }

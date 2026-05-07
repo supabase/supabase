@@ -1,13 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { useFormContext } from 'react-hook-form'
-import { FormLabel, SheetSection } from 'ui'
-import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 
+import { useParams } from 'common'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { FormLabel_Shadcn_, SheetSection } from 'ui'
+import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 import { buildEdgeFunctionHeaderAddActions } from '@/components/interfaces/Functions/httpHeaderAddActions'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface HTTPHeaderFieldsSectionProps {
   variant: 'edge_function' | 'http_request'
@@ -36,7 +36,7 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
 
   return (
     <SheetSection>
-      <FormLabel>HTTP Headers</FormLabel>
+      <FormLabel_Shadcn_>HTTP Headers</FormLabel_Shadcn_>
       <KeyValueFieldArray
         control={form.control}
         name="values.httpHeaders"

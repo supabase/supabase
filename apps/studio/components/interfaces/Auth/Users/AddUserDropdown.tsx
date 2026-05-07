@@ -1,13 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Mail, UserPlus } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
-import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const AddUserDropdown = () => {
   const showSendInvitation = useIsFeatureEnabled('authentication:show_send_invitation')
@@ -56,7 +56,7 @@ export const AddUserDropdown = () => {
           )}
 
           <DropdownMenuItemTooltip
-            className="space-x-2 pointer-events-auto!"
+            className="space-x-2 !pointer-events-auto"
             disabled={!canCreateUsers}
             onClick={() => {
               if (canCreateUsers) setCreateVisible(true)

@@ -1,5 +1,4 @@
 import { LoaderCircle, RefreshCcw } from 'lucide-react'
-
 import { ButtonTooltip } from '../ButtonTooltip'
 
 interface RefreshButtonProps {

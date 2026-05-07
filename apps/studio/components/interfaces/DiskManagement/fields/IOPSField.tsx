@@ -1,15 +1,10 @@
-import { useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
-import {
-  Button,
-  FormControl,
-  FormField,
-  FormInputGroupInput,
-  InputGroup,
-  InputGroupAddon,
-} from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { InputVariants } from '@ui/components/shadcn/ui/input'
+import { useParams } from 'common'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { Button, cn, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import {
   calculateComputeSizeRequiredForIops,
@@ -20,7 +15,8 @@ import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import { ComputeSizeRecommendationSection } from '../ui/ComputeSizeRecommendationSection'
 import { DiskType, RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 } from '../ui/DiskManagement.constants'
 import { DiskManagementIOPSReadReplicas } from '../ui/DiskManagementReadReplicas'
-import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
+import FormMessage from '../ui/FormMessage'
+import { InputPostTab } from '../ui/InputPostTab'
 
 type IOPSFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -35,7 +31,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
   const watchedComputeSize = watch('computeSize')
   const watchedIOPS = watch('provisionedIOPS') ?? 0
 
-  const { isError } = useDiskAttributesQuery({ projectRef })
+  const { isPending: isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
 
   const iopsPrice = calculateIOPSPrice({
     oldStorageType: formState.defaultValues?.storageType as DiskType,
@@ -48,7 +44,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
     RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(watchedComputeSize) && watchedStorageType === 'gp3'
 
   return (
-    <FormField
+    <FormField_Shadcn_
       control={control}
       name="provisionedIOPS"
       render={({ field }) => {
@@ -104,23 +100,32 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
               </>
             }
           >
-            <FormControl className="max-w-32">
-              <InputGroup>
-                <FormInputGroupInput
-                  type="number"
-                  {...field}
-                  value={field.value}
-                  disabled={disableInput || disableIopsInput || isError}
-                  onChange={(e) => {
-                    setValue('provisionedIOPS', e.target.valueAsNumber, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    })
-                  }}
-                />
-                <InputGroupAddon align="inline-end">IOPS</InputGroupAddon>
-              </InputGroup>
-            </FormControl>
+            <InputPostTab label="IOPS">
+              {isLoading ? (
+                <div
+                  className={cn(InputVariants({ size: 'small' }), 'w-32 font-mono rounded-r-none')}
+                >
+                  <Skeleton className="w-10 h-4" />
+                </div>
+              ) : (
+                <FormControl_Shadcn_>
+                  <Input_Shadcn_
+                    type="number"
+                    className="flex-grow font-mono rounded-r-none max-w-32"
+                    {...field}
+                    value={field.value}
+                    disabled={disableInput || disableIopsInput || isError}
+                    onChange={(e) => {
+                      setValue('provisionedIOPS', e.target.valueAsNumber, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }}
+                  />
+                </FormControl_Shadcn_>
+              )}
+            </InputPostTab>
+            {error && <FormMessage type="error" message={error.message} />}
           </FormItemLayout>
         )
       }}

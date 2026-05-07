@@ -1,5 +1,4 @@
 import { Dialog, DialogContent, DialogHeader, DialogSectionSeparator, DialogTitle } from 'ui'
-
 import { BUCKET_TYPES } from '../Storage.constants'
 import { CreateAnalyticsBucketForm } from './CreateAnalyticsBucketForm'
 

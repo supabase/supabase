@@ -1,8 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import z from 'zod'
+
+import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
+import { InlineLinkClassName } from 'components/ui/InlineLink'
+import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -13,8 +20,8 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form,
-  FormField,
+  Form_Shadcn_,
+  FormField_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -25,15 +32,8 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import z from 'zod'
-
 import { getAnalyticsBucketFDWServerName } from './AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
-import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL } from '@/lib/constants'
 
 export const UpdateForeignSchemaDialog = ({
   namespace,
@@ -94,7 +94,7 @@ export const UpdateForeignSchemaDialog = ({
         <Button type="default">Update schema tables</Button>
       </DialogTrigger>
       <DialogContent size="medium" aria-describedby={undefined}>
-        <Form {...form}>
+        <Form_Shadcn_ {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
               <DialogTitle>Update schema to expose foreign tables</DialogTitle>
@@ -123,7 +123,7 @@ export const UpdateForeignSchemaDialog = ({
               </p>
 
               {schemasAssociatedWithNamespace.length > 1 ? (
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="schema"
                   render={({ field }) => (
@@ -155,7 +155,7 @@ export const UpdateForeignSchemaDialog = ({
                 </p>
               )}
             </DialogSection>
-            <DialogFooter className="justify-between!">
+            <DialogFooter className="!justify-between">
               <DocsButton href={`${DOCS_URL}/guides/storage/analytics/query-with-postgres`} />
               <div className="flex items-center gap-x-2">
                 <Button type="default" disabled={isUpdating} onClick={() => setIsOpen(false)}>
@@ -167,7 +167,7 @@ export const UpdateForeignSchemaDialog = ({
               </div>
             </DialogFooter>
           </form>
-        </Form>
+        </Form_Shadcn_>
       </DialogContent>
     </Dialog>
   )

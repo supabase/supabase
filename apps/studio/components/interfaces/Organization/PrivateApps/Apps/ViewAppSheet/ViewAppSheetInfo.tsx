@@ -6,15 +6,14 @@ import {
   Badge,
   Card,
   CardContent,
-  copyToClipboard,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  copyToClipboard,
 } from 'ui'
-
 import type { Installation, PrivateApp } from '../../PrivateAppsContext'
 
 interface ViewAppSheetInfoProps {
@@ -38,7 +37,7 @@ function CopyableId({ id, label }: { id: string; label: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="inline-flex items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded-sm transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-light px-1 -ml-1"
+      className="inline-flex items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-light px-1 -ml-1"
     >
       <span className="truncate">{id}</span>
       {isCopied ? (

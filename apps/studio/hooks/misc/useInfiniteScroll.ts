@@ -1,6 +1,5 @@
+import { isAtBottom } from 'lib/helpers'
 import { UIEvent, useCallback, useRef } from 'react'
-
-import { isAtBottom } from '@/lib/helpers'
 
 interface UseInfiniteScrollOptions {
   isLoading?: boolean

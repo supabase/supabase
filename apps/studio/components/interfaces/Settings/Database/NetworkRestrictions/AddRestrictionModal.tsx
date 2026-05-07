@@ -1,14 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import InformationBox from 'components/ui/InformationBox'
+import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
+import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import { DOCS_URL } from 'lib/constants'
 import { HelpCircle } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
   Modal,
   Tooltip,
@@ -19,10 +23,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { checkIfPrivate, getAddressEndRange, normalize } from './NetworkRestrictions.utils'
-import InformationBox from '@/components/ui/InformationBox'
-import { useNetworkRestrictionsQuery } from '@/data/network-restrictions/network-restrictions-query'
-import { useNetworkRestrictionsApplyMutation } from '@/data/network-restrictions/network-retrictions-apply-mutation'
-import { DOCS_URL } from '@/lib/constants'
 
 const IPV4_MAX_CIDR_BLOCK_SIZE = 32
 const IPV6_MAX_CIDR_BLOCK_SIZE = 128
@@ -147,7 +147,7 @@ const AddRestrictionModal = ({
       onCancel={onClose}
       header={`Add a new ${type} restriction`}
     >
-      <Form {...form}>
+      <Form_Shadcn_ {...form}>
         <Modal.Content className="space-y-4">
           <p className="text-sm text-foreground-light">
             This will add an IP address range to a list of allowed ranges that can access your
@@ -166,20 +166,20 @@ const AddRestrictionModal = ({
             className="flex space-x-4"
           >
             <div className="w-[55%]">
-              <FormField
+              <FormField_Shadcn_
                 control={form.control}
                 name="ipAddress"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label={`${type} address`}>
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Input_Shadcn_ {...field} placeholder={type === 'IPv4' ? '0.0.0.0' : '::0'} />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
             </div>
-            <div className="grow">
-              <FormField
+            <div className="flex-grow">
+              <FormField_Shadcn_
                 control={form.control}
                 name="cidrBlockSize"
                 render={({ field }) => (
@@ -203,7 +203,7 @@ const AddRestrictionModal = ({
                       </div>
                     }
                   >
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Input_Shadcn_
                         {...field}
                         type="number"
@@ -216,7 +216,7 @@ const AddRestrictionModal = ({
                             : IPV6_MAX_CIDR_BLOCK_SIZE.toString()
                         }
                       />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
@@ -257,7 +257,7 @@ const AddRestrictionModal = ({
             Save restriction
           </Button>
         </Modal.Content>
-      </Form>
+      </Form_Shadcn_>
     </Modal>
   )
 }

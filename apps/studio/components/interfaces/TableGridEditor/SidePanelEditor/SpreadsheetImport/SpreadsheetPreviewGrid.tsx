@@ -8,14 +8,12 @@ interface SpreadsheetPreviewGridProps {
   headers: string[]
   rows?: any[]
   height?: number
-  emptyStringAsNullHeaders?: string[]
 }
 
 const SpreadsheetPreviewGrid = ({
   headers = [],
   rows = [],
   height,
-  emptyStringAsNullHeaders = headers,
 }: SpreadsheetPreviewGridProps) => {
   const previewHeaders = headers.slice(0, MAX_HEADERS)
   const previewRows = rows.slice(0, MAX_ROWS)
@@ -41,24 +39,17 @@ const SpreadsheetPreviewGrid = ({
             </div>
           ),
           renderCell: ({ row }: { row: any }) => {
-            const value = row[header]
-            const isEmptyString = value === ''
-            const isNullValue =
-              value === null ||
-              value === undefined ||
-              (isEmptyString && emptyStringAsNullHeaders.includes(header))
+            const isEmpty = !row[header]
             return (
-              <span
-                className={cn('text-sm flex items-center', isNullValue && 'text-foreground-light')}
-              >
-                {isNullValue ? 'NULL' : value}
+              <span className={cn('text-sm flex items-center', isEmpty && 'text-foreground-light')}>
+                {isEmpty ? 'NULL' : row[header]}
               </span>
             )
           },
         }
       })}
       rows={previewRows}
-      className="border-l! border-r!"
+      className="!border-l !border-r"
       style={{ height: height || `${34 + 34 * (previewRows.length || 1)}px` }}
     />
   )

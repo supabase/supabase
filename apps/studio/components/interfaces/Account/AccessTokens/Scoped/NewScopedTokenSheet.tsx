@@ -3,39 +3,38 @@ import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+
+import {
+  useAccessTokenCreateMutation,
+  type NewScopedAccessToken,
+  type ScopedAccessTokenCreateVariables,
+} from 'data/scoped-access-tokens/scoped-access-token-create-mutation'
 import {
   Button,
-  Form,
+  Form_Shadcn_,
   ScrollArea,
   Separator,
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-
+import { BasicInfo } from './Form/BasicInfo'
+import { Permissions } from './Form/Permissions/Permissions'
+import { ResourceAccess } from './Form/ResourceAccess/ResourceAccess'
 import {
   CUSTOM_EXPIRY_VALUE,
   EXPIRES_AT_OPTIONS,
   type ScopedAccessTokenPermission,
 } from '../AccessToken.constants'
-import { TokenSchema, type TokenFormValues } from '../AccessToken.schemas'
-import { getExpirationDate, mapPermissionToFGA } from '../AccessToken.utils'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
-import { BasicInfo } from './Form/BasicInfo'
-import { Permissions } from './Form/Permissions/Permissions'
-import { ResourceAccess } from './Form/ResourceAccess/ResourceAccess'
-import {
-  useAccessTokenCreateMutation,
-  type NewScopedAccessToken,
-  type ScopedAccessTokenCreateVariables,
-} from '@/data/scoped-access-tokens/scoped-access-token-create-mutation'
-import { useTrack } from '@/lib/telemetry/track'
+import { mapPermissionToFGA, getExpirationDate } from '../AccessToken.utils'
+import { TokenSchema, type TokenFormValues } from '../AccessToken.schemas'
 
 export interface NewScopedTokenSheetProps {
   visible: boolean
@@ -66,7 +65,6 @@ export const NewScopedTokenSheet = ({
     },
     mode: 'onChange',
   })
-  const track = useTrack()
   const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
   const resourceAccess = form.watch('resourceAccess')
@@ -177,12 +175,6 @@ export const NewScopedTokenSheet = ({
 
     createAccessToken(finalPayload, {
       onSuccess: (data) => {
-        track('access_token_created', {
-          tokenType: 'scoped',
-          expiryPreset: values.expiresAt || 'never',
-          resourceAccess: values.resourceAccess,
-          permissionCount: permissions.length,
-        })
         toast.success('Access token created successfully')
         onCreateToken(data)
         handleClose()
@@ -247,7 +239,7 @@ export const NewScopedTokenSheet = ({
       <SheetContent
         showClose={false}
         size="default"
-        className="min-w-[600px]! flex flex-col h-full gap-0"
+        className="!min-w-[600px] flex flex-col h-full gap-0"
       >
         <SheetHeader>
           <SheetTitle>
@@ -287,7 +279,7 @@ export const NewScopedTokenSheet = ({
               </div>
             )}
 
-            <Form {...form}>
+            <Form_Shadcn_ {...form}>
               <div className="flex flex-col gap-0 overflow-visible">
                 <BasicInfo
                   control={form.control}
@@ -309,10 +301,10 @@ export const NewScopedTokenSheet = ({
                   setResourceSearchOpen={setResourceSearchOpen}
                 />
               </div>
-            </Form>
+            </Form_Shadcn_>
           </div>
         </ScrollArea>
-        <SheetFooter className="justify-end! w-full mt-auto py-4 border-t">
+        <SheetFooter className="!justify-end w-full mt-auto py-4 border-t">
           <div className="flex gap-2">
             <Button type="default" disabled={isPending} onClick={handleClose}>
               Cancel

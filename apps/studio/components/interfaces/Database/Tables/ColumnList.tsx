@@ -1,6 +1,15 @@
 import { PostgresColumn } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { noop } from 'lodash'
 import {
   Braces,
@@ -18,7 +27,7 @@ import {
   Trash,
   Type,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import {
   Button,
   Card,
@@ -48,15 +57,6 @@ import {
   getUniqueIndexColumnNames,
 } from './ColumnList.utils'
 import { ConstraintToken } from './ConstraintToken'
-import AlertError from '@/components/ui/AlertError'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
-import { NoSearchResults } from '@/components/ui/NoSearchResults'
-import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
-import { isTableLike } from '@/data/table-editor/table-editor-types'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
 const getColumnTypeAffordancePresentation = (column: PostgresColumn) => {
   const { kind, label } = getColumnTypeAffordance(column.format)
@@ -190,7 +190,7 @@ export const ColumnList = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-0 px-0!" />
+                <TableHead className="w-0 !px-0" />
 
                 <TableHead
                   className={cn(columns.length === 0 ? 'text-foreground-muted' : undefined)}
@@ -312,7 +312,7 @@ export const ColumnList = ({
 
                   return (
                     <TableRow key={column.name}>
-                      <TableCell className="w-0 pl-5! pr-1!">
+                      <TableCell className="w-0 !pl-5 !pr-1">
                         <Tooltip>
                           <TooltipTrigger asChild className="cursor-default" aria-label={typeLabel}>
                             <div className="flex w-4 justify-center">{TypeIcon}</div>

@@ -5,8 +5,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { useGenerateSettingsMenu } from './SettingsMenu.utils'
 import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
-vi.mock('@/lib/constants', async () => {
-  const actual = await vi.importActual<Record<string, unknown>>('@/lib/constants')
+vi.mock('lib/constants', async () => {
+  const actual = await vi.importActual<Record<string, unknown>>('lib/constants')
   return {
     ...actual,
     IS_PLATFORM: true,
@@ -67,25 +67,26 @@ describe('useGenerateSettingsMenu', () => {
     expect(hasMembers).toBe(false)
   })
 
-  it('includes dashboard in configuration when flag is enabled', () => {
+  it('includes dashboard preferences when flag is enabled', () => {
     vi.mocked(useFlag).mockReturnValue(true)
 
     const { result } = renderHook(() => useGenerateSettingsMenu())
-    const configurationGroup = result.current.find((group) => group.title === 'Configuration')
-    const hasDashboardPreferences = configurationGroup?.items.some(
-      (item) => item.name === 'Dashboard' && item.url === '/project/project-ref/settings/dashboard'
+    const preferencesGroup = result.current.find((group) => group.title === 'Preferences')
+    const hasDashboardPreferences = preferencesGroup?.items.some(
+      (item) =>
+        item.name === 'Dashboard preferences' &&
+        item.url === '/project/project-ref/settings/preferences'
     )
 
     expect(hasDashboardPreferences).toBe(true)
-    expect(result.current.find((group) => group.title === 'Preferences')).toBeUndefined()
   })
 
-  it('hides dashboard in configuration when flag is disabled', () => {
+  it('hides dashboard preferences when flag is disabled', () => {
     vi.mocked(useFlag).mockReturnValue(false)
 
     const { result } = renderHook(() => useGenerateSettingsMenu())
-    const configurationGroup = result.current.find((group) => group.title === 'Configuration')
+    const preferencesGroup = result.current.find((group) => group.title === 'Preferences')
 
-    expect(configurationGroup?.items.some((item) => item.name === 'Dashboard')).toBe(false)
+    expect(preferencesGroup).toBeUndefined()
   })
 })

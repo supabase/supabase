@@ -1,9 +1,8 @@
-'use client'
-
-import pricingFaq from '~/data/PricingFAQ.json'
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Accordion } from 'ui'
+
+import pricingFaq from '~/data/PricingFAQ.json'
 
 const PricingFAQs = () => {
   return (
@@ -26,9 +25,9 @@ const PricingFAQs = () => {
                     header={<span className="text-foreground">{faq.question}</span>}
                     id={`faq--${i.toString()}`}
                   >
-                    <div className="prose text-foreground-lighter">
-                      <ReactMarkdown>{faq.answer}</ReactMarkdown>
-                    </div>
+                    <ReactMarkdown className="text-foreground-lighter prose">
+                      {faq.answer}
+                    </ReactMarkdown>
                   </Accordion.Item>
                 </div>
               )

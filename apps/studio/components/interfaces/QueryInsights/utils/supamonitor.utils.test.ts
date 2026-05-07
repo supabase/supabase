@@ -1,11 +1,10 @@
-import { describe, expect, it } from 'vitest'
-
-import type { ParsedLogEntry } from '../QueryInsights.types'
+import { describe, it, expect } from 'vitest'
 import {
-  aggregateLogsByQuery,
   parseSupamonitorLogs,
   transformLogsToChartData,
+  aggregateLogsByQuery,
 } from './supamonitor.utils'
+import type { ParsedLogEntry } from '../QueryInsights.types'
 
 const makeSampleLog = (overrides: Partial<ParsedLogEntry> = {}): any => ({
   timestamp: '2025-01-01T00:00:00Z',

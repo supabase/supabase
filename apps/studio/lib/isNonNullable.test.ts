@@ -1,5 +1,4 @@
-import { describe, expect, it } from 'vitest'
-
+import { describe, it, expect } from 'vitest'
 import { isNonNullable } from './isNonNullable.js'
 
 describe(`isNonNullable`, () => {

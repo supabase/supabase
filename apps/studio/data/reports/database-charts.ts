@@ -1,10 +1,11 @@
-import { compactNumberFormatter } from '@/components/ui/Charts/Charts.utils'
-import { ReportAttributes } from '@/components/ui/Charts/ComposedChart.utils'
-import { DiskAttributesData } from '@/data/config/disk-attributes-query'
-import { MaxConnectionsData } from '@/data/database/max-connections-query'
-import { Project } from '@/data/projects/project-detail-query'
-import { DOCS_URL } from '@/lib/constants'
-import { formatBytes } from '@/lib/helpers'
+import { compactNumberFormatter } from 'components/ui/Charts/Charts.utils'
+import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
+import { DOCS_URL } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
+
+import { DiskAttributesData } from '../config/disk-attributes-query'
+import { MaxConnectionsData } from '../database/max-connections-query'
+import { Project } from '../projects/project-detail-query'
 
 export const getReportAttributesV2: (
   entitledFeatures: string[],
@@ -15,7 +16,7 @@ export const getReportAttributesV2: (
   isSpendCapEnabled?: boolean
 ) => ReportAttributes[] = (
   entitledFeatures,
-  _project,
+  project,
   diskConfig,
   maxConnections,
   pgBouncerMaxConnections,
@@ -202,6 +203,8 @@ export const getReportAttributesV2: (
       label: 'Disk throughput',
       docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput`,
       syncId: 'database-reports',
+      entitlement: 'disk_throughput',
+      requiredPlan: 'Team',
       hide: false,
       showTooltip: true,
       format: 'bytes-per-second',
@@ -454,7 +457,7 @@ export const getReportAttributesV2: (
                 strokeDasharray: '4 2',
                 label: 'Spend cap enabled',
                 value: diskConfig?.attributes?.size_gb! * 1024 * 1024 * 1024,
-                className: '[&_line]:stroke-yellow-800! [&_line]:opacity-100!',
+                className: '[&_line]:!stroke-yellow-800 [&_line]:!opacity-100',
                 opacity: 1,
               }
             : {
@@ -462,7 +465,7 @@ export const getReportAttributesV2: (
                 provider: 'reference-line',
                 isReferenceLine: true,
                 label: '90% - Disk resize threshold',
-                className: '[&_line]:stroke-yellow-800!',
+                className: '[&_line]:!stroke-yellow-800',
                 value: diskConfig?.attributes?.size_gb! * 1024 * 1024 * 1024 * 0.9,
               }),
       ],

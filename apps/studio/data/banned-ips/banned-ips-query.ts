@@ -1,13 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
-import { IS_PLATFORM } from 'common'
 
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { BannedIPKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-type BannedIPVariables = { projectRef?: string }
+export type BannedIPVariables = {
+  projectRef?: string
+}
 
-export async function getBannedIPs({ projectRef }: BannedIPVariables, signal: AbortSignal) {
+export type BannedIPsData = BannedIPVariables[]
+export type BannedIPsError = ResponseError
+
+export async function getBannedIPs({ projectRef }: BannedIPVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post(`/v1/projects/{ref}/network-bans/retrieve`, {
@@ -29,9 +33,6 @@ export const useBannedIPsQuery = <TData = IPData>(
   useQuery<IPData, IPError, TData>({
     queryKey: BannedIPKeys.list(projectRef),
     queryFn: ({ signal }) => getBannedIPs({ projectRef }, signal),
-    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
-    retry: false,
-    refetchOnWindowFocus: false,
-    staleTime: 60_000,
+    enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })

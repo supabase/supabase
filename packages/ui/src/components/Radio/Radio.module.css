@@ -1,0 +1,109 @@
+/* .sbui-radio-fieldset {
+  @apply border-none p-0 m-0;
+} */
+
+.sbui-radio-container {
+  @apply relative cursor-pointer flex p-0 py-2 border-none;
+}
+
+/* .sbui-radio-container--card {
+  @apply p-4 border border-solid border-gray-200 dark:border-gray-500;
+} */
+
+.sbui-radio-container--card--active {
+  @apply bg-brand-100 bg-opacity-20 border-brand-200 z-10;
+}
+
+/* .sbui-radio-container--card:first-child {
+  @apply rounded-tl-md rounded-tr-md;
+}
+
+.sbui-radio-container--card:last-child {
+  @apply rounded-bl-md rounded-br-md;
+} */
+
+.sbui-radio-label {
+  @apply flex flex-row cursor-pointer;
+}
+
+.sbui-radio-label-text {
+  @apply block text-sm font-medium dark:text-white;
+}
+
+.sbui-radio-label-text .sbui-radio__label-text-before,
+.sbui-radio-label-text .sbui-radio__label-text-after {
+  @apply text-gray-400 dark:text-gray-300;
+}
+
+.sbui-radio-label-description {
+  @apply block text-sm text-gray-400 dark:text-gray-300;
+}
+
+/* .sbui-radio {
+  @apply h-4 w-4 ml-0 mr-3.5 rounded-2xl border border-solid transition-all;
+
+  @apply text-brand-600 cursor-pointer border-gray-500;
+  @apply focus:ring-brand-300 hover:border-brand-400 focus:outline-none;
+
+  @apply dark:bg-transparent dark:hover:border-brand-400;
+} */
+
+/* .sbui-radio:checked {
+  border-color: transparent;
+  background-color: currentColor;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.sbui-radio:checked {
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+} */
+
+/* .sbui-radio {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  background-origin: border-box;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  flex-shrink: 0;
+} */
+
+.sbui-radio-group-contents {
+  @apply dark:bg-transparent rounded-md -space-y-px;
+}
+
+/*
+  Label sizes
+*/
+
+.sbui-radio-container--tiny .sbui-radio-label,
+.sbui-radio-container--tiny .sbui-radio-label-text,
+.sbui-radio-container--tiny .sbui-radio-label-description {
+  @apply text-xs;
+}
+.sbui-radio-container--small .sbui-radio-label,
+.sbui-radio-container--small .sbui-radio-label-text,
+.sbui-radio-container--small .sbui-radio-label-description {
+  @apply text-sm;
+}
+.sbui-radio-container--medium .sbui-radio-label,
+.sbui-radio-container--medium .sbui-radio-label-text,
+.sbui-radio-container--medium .sbui-radio-label-description {
+  @apply text-sm;
+}
+.sbui-radio-container--large .sbui-radio-label,
+.sbui-radio-container--large .sbui-radio-label-text,
+.sbui-radio-container--large .sbui-radio-label-description {
+  @apply text-base;
+}
+.sbui-radio-container--xlarge .sbui-radio-label,
+.sbui-radio-container--xlarge .sbui-radio-label-text,
+.sbui-radio-container--xlarge .sbui-radio-label-description {
+  @apply text-base;
+}

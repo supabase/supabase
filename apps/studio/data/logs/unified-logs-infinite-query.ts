@@ -1,13 +1,13 @@
 import { InfiniteData, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 
-import { logsKeys } from './keys'
-import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { getUnifiedLogsQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import {
   PageParam,
   QuerySearchParamsType,
-} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+} from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
+import { logsKeys } from './keys'
 
 const LOGS_PAGE_LIMIT = 50
 type LogLevel = 'success' | 'warning' | 'error'
@@ -79,17 +79,23 @@ export async function getUnifiedLogs(
   const cursorValue = pageParam?.cursor
   const cursorDirection = pageParam?.direction
 
+  let timestampStart: string
   let timestampEnd: string
 
   if (cursorDirection === 'prev') {
     // Live mode: fetch logs newer than the cursor
+    timestampStart = cursorValue
+      ? new Date(Number(cursorValue) / 1000).toISOString()
+      : isoTimestampStart
     timestampEnd = new Date().toISOString()
   } else if (cursorDirection === 'next') {
     // Regular pagination: fetch logs older than the cursor
+    timestampStart = isoTimestampStart
     timestampEnd = cursorValue
       ? new Date(Number(cursorValue) / 1000).toISOString()
       : isoTimestampEnd
   } else {
+    timestampStart = isoTimestampStart
     timestampEnd = isoTimestampEnd
   }
 

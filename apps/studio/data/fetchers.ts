@@ -1,14 +1,14 @@
 import * as Sentry from '@sentry/nextjs'
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { getAccessToken, IS_PLATFORM } from 'common'
+import { API_URL } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
 import createClient from 'openapi-fetch'
+import { ResponseError } from 'types'
+import { UnknownAPIResponseError } from 'types/api-errors'
 
 import type { paths } from './api'
 import { ERROR_PATTERNS } from './error-patterns'
-import { API_URL } from '@/lib/constants'
-import { uuidv4 } from '@/lib/helpers'
-import { ResponseError } from '@/types'
-import { UnknownAPIResponseError } from '@/types/api-errors'
 import { ErrorMetadata } from '@/types/base'
 
 // generated from openapi-typescript
@@ -172,10 +172,6 @@ export const handleError = (error: unknown, options: HandleErrorOptions = {}): n
       'metadata' in error && typeof error.metadata === 'object' && !!error.metadata
         ? (error.metadata as ErrorMetadata)
         : undefined
-    const formattedError =
-      'formattedError' in error && typeof error.formattedError === 'string'
-        ? error.formattedError
-        : undefined
 
     if (errorMessage) {
       const matched = ERROR_PATTERNS.find(({ pattern }) => pattern.test(errorMessage))
@@ -186,8 +182,7 @@ export const handleError = (error: unknown, options: HandleErrorOptions = {}): n
             requestId,
             retryAfter,
             requestPathname,
-            metadata,
-            formattedError
+            metadata
           )
         : new UnknownAPIResponseError(
             errorMessage,
@@ -195,8 +190,7 @@ export const handleError = (error: unknown, options: HandleErrorOptions = {}): n
             requestId,
             retryAfter,
             requestPathname,
-            metadata,
-            formattedError
+            metadata
           )
     }
   }

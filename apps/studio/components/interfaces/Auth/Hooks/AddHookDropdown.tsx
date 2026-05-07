@@ -1,7 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
-import { useMemo } from 'react'
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   DropdownMenu,
@@ -11,15 +15,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-
-import { Hook, HOOK_DEFINITION_TITLE, HOOKS_DEFINITIONS } from './hooks.constants'
+import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, isValidHook } from './hooks.utils'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useMemo } from 'react'
 
 interface AddHookDropdownProps {
   buttonText?: string

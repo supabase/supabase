@@ -1,7 +1,7 @@
-import { components } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
+import { components } from 'api-types'
+import apiWrapper from 'lib/api/apiWrapper'
 
 type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
   protocol?: string
@@ -24,7 +24,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
+const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const response = [
     {
       name: 'anon',

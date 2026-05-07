@@ -1,10 +1,10 @@
-import { useParams } from 'common'
 import { useMemo } from 'react'
+
+import { useParams } from 'common'
+import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import { orderSectionFirst, useQuery, useRegisterCommands } from 'ui-patterns/CommandMenu'
-
-import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 const QUERY_PERFORMANCE_COMMAND_ID = 'nav-reports-query-performance'
 

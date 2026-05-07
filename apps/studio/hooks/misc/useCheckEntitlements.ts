@@ -1,27 +1,33 @@
-import { useCallback, useMemo } from 'react'
-
-import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import type {
   Entitlement,
   EntitlementConfig,
   EntitlementType,
   FeatureKey,
-} from '@/data/entitlements/entitlements-query'
-import { useEntitlementsQuery } from '@/data/entitlements/entitlements-query'
-import { IS_PLATFORM } from '@/lib/constants'
+} from 'data/entitlements/entitlements-query'
+import { useEntitlementsQuery } from 'data/entitlements/entitlements-query'
+import { IS_PLATFORM } from 'lib/constants'
+import { useCallback, useMemo } from 'react'
+import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 
 function isNumericConfig(
-  _config: EntitlementConfig,
+  config: EntitlementConfig,
   type: EntitlementType
-): _config is { enabled: boolean; unlimited: boolean; value: number } {
+): config is { enabled: boolean; unlimited: boolean; value: number } {
   return type === 'numeric'
 }
 
 function isSetConfig(
-  _config: EntitlementConfig,
+  config: EntitlementConfig,
   type: EntitlementType
-): _config is { enabled: boolean; set: string[] } {
+): config is { enabled: boolean; set: string[] } {
   return type === 'set'
+}
+
+function isBooleanConfig(
+  config: EntitlementConfig,
+  type: EntitlementType
+): config is { enabled: boolean } {
+  return type === 'boolean'
 }
 
 function getEntitlementNumericValue(entitlement: Entitlement | null): number | undefined {

@@ -1,9 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
 import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as z from 'zod'
+
+import { useParams } from 'common'
+import { useCreateThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-create-mutation'
 import {
   Button,
   Dialog,
@@ -12,16 +15,13 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
-  Form,
-  FormControl,
-  FormField,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import * as z from 'zod'
-
-import { useCreateThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-create-mutation'
 
 interface CreateFirebaseAuthIntegrationProps {
   visible: boolean
@@ -98,10 +98,10 @@ export const CreateFirebaseAuthIntegrationDialog = ({
 
         <Separator />
         <DialogSection>
-          <Form {...form}>
+          <Form_Shadcn_ {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {/* Enabled flag can't be changed for now because there's no update API call for integrations */}
-              {/* <FormField
+              {/* <FormField_Shadcn_
               key="enabled"
               control={form.control}
               name="enabled"
@@ -111,13 +111,13 @@ export const CreateFirebaseAuthIntegrationDialog = ({
                   label={`Enable Firebase Auth Connection`}
                   layout="flex"
                 >
-                  <FormControl>
+                  <FormControl_Shadcn_>
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       disabled={field.disabled}
                     />
-                  </FormControl>
+                  </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
@@ -127,20 +127,20 @@ export const CreateFirebaseAuthIntegrationDialog = ({
                 This will enable a JWT token from a specific Firebase project to access data from
                 this Supabase project.
               </p>
-              <FormField
+              <FormField_Shadcn_
                 key="firebaseProjectId"
                 control={form.control}
                 name="firebaseProjectId"
                 render={({ field }) => (
                   <FormItemLayout label="Firebase Auth Project ID">
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Input_Shadcn_ {...field} />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form>
+          </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
           {!isCreating && (

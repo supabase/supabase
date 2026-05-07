@@ -1,5 +1,4 @@
-import { describe, expect, it } from 'vitest'
-
+import { describe, it, expect } from 'vitest'
 import { getHealthLevel } from './QueryInsightsHealth.utils'
 
 describe('getHealthLevel', () => {

@@ -1,8 +1,7 @@
-import { Activity, BookOpen, Database, Gauge, Wrench } from 'lucide-react'
-import Link from 'next/link'
-import { Badge, Button, Card, CardDescription, CardHeader } from 'ui'
-
 import { WhatWillILearn } from '@/components/what-will-i-learn'
+import Link from 'next/link'
+import { Activity, BookOpen, Database, Gauge, Wrench } from 'lucide-react'
+import { Badge, Button, Card, CardDescription, CardHeader } from 'ui'
 
 // Horizontal grid line component
 const HorizontalGridLine = () => <div className="col-span-12 h-px bg-border/30" />
@@ -92,15 +91,13 @@ export default function Home() {
                         <Card key={course.id} className="hover:border-primary/30 transition-colors">
                           <CardHeader>
                             <div className="flex items-start gap-4">
-                              <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center shrink-0">
+                              <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center flex-shrink-0">
                                 <Icon className="w-5 h-5 text-brand-500" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-4 mb-2">
-                                  <h3 className="text-lg text-foreground font-bold">
-                                    {course.title}
-                                  </h3>
-                                  <Badge variant="secondary" className="shrink-0">
+                                  <h3 className="text-lg font-bold">{course.title}</h3>
+                                  <Badge variant="secondary" className="flex-shrink-0">
                                     {course.level}
                                   </Badge>
                                 </div>
@@ -108,7 +105,7 @@ export default function Home() {
                                   {course.description}
                                 </CardDescription>
                                 <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2 text-sm text-foreground-muted">
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                     <BookOpen className="w-4 h-4" />
                                     <span className="text-foreground-lighter">
                                       {course.chapters} chapters

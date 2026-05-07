@@ -1,18 +1,18 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
 
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
-import { useDpaRequestMutation } from '@/data/documents/dpa-request-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useProfile } from '@/lib/profile'
+} from 'components/layouts/Scaffold'
+import { InlineLink } from 'components/ui/InlineLink'
+import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
+import { useDpaRequestMutation } from 'data/documents/dpa-request-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useProfile } from 'lib/profile'
+import { Button } from 'ui'
 
 export const DPA = () => {
   const { profile } = useProfile()

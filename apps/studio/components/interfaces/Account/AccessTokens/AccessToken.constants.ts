@@ -1,5 +1,5 @@
-import { permissions } from '@supabase/shared-types'
 import { components } from 'api-types'
+import { permissions } from '@supabase/shared-types'
 
 export type ScopedAccessTokenPermission =
   components['schemas']['CreateScopedAccessTokenBody']['permissions'][number]

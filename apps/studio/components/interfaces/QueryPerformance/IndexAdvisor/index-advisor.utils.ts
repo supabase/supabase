@@ -1,9 +1,10 @@
 import { toast } from 'sonner'
 
-import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
-import { GetIndexAdvisorResultResponse } from '@/data/database/retrieve-index-advisor-result-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
+import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
+import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
+import { executeSql } from 'data/sql/execute-sql-query'
+
+import { INTERNAL_SCHEMAS } from 'hooks/useProtectedSchemas'
 
 /**
  * Gets the required extensions for index advisor
@@ -27,18 +28,16 @@ export function calculateImprovement(
   costBefore: number | undefined,
   costAfter: number | undefined
 ): number {
-  if (costBefore === undefined || costAfter === undefined) {
+  if (
+    costBefore === undefined ||
+    costAfter === undefined ||
+    costBefore <= 0 ||
+    costBefore <= costAfter
+  ) {
     return 0
   }
 
-  const before = Number(costBefore)
-  const after = Number(costAfter)
-
-  if (before <= 0 || before <= after) {
-    return 0
-  }
-
-  return ((before - after) / before) * 100
+  return ((costBefore - costAfter) / costBefore) * 100
 }
 
 interface CreateIndexParams {

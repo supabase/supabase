@@ -2,10 +2,23 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Form, FormControl, FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from 'components/layouts/Scaffold'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
+import NoPermission from 'components/ui/NoPermission'
+import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
+import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { FormMessage, Input_Shadcn_ } from 'ui'
+import { FormMessage_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import {
@@ -15,20 +28,6 @@ import {
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
 import { z } from 'zod'
-
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
-import { FormActions } from '@/components/ui/Forms/FormActions'
-import { FormPanel } from '@/components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
-import NoPermission from '@/components/ui/NoPermission'
-import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
-import { useOrganizationUpdateMutation } from '@/data/organizations/organization-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const FORM_ID = 'org-billing-email'
 const formSchema = z.object({
@@ -117,7 +116,7 @@ const BillingEmail = () => {
             <form id={FORM_ID} onSubmit={form.handleSubmit(onUpdateOrganizationEmail)}>
               <FormPanel
                 footer={
-                  <div className="flex py-4 px-8">
+                  <div className="flex py-4 px-card">
                     <FormActions
                       form={FORM_ID}
                       isSubmitting={isUpdating}
@@ -133,7 +132,7 @@ const BillingEmail = () => {
                   </div>
                 }
               >
-                <FormSection className="px-8!">
+                <FormSection>
                   <FormSectionContent fullWidth loading={loadingBillingCustomer}>
                     <FormField
                       control={form.control}
@@ -148,7 +147,7 @@ const BillingEmail = () => {
                               disabled={!canUpdateOrganization}
                             />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage_Shadcn_ />
                         </FormItemLayout>
                       )}
                     />
@@ -188,7 +187,7 @@ const BillingEmail = () => {
                           {Array.isArray(additionalEmailsError) &&
                             additionalEmailsError.length > 0 && (
                               <div className="flex flex-col gap-y-1 mt-2">
-                                {additionalEmailsError.map((_x, idx) => (
+                                {additionalEmailsError.map((x, idx) => (
                                   <p
                                     key={`email-error-${idx}`}
                                     className="text-sm text-destructive"

@@ -1,5 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Edit, MoreVertical, Trash } from 'lucide-react'
+
+import CopyButton from 'components/ui/CopyButton'
+import type { OAuthApp } from 'data/oauth/oauth-apps-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   DropdownMenu,
@@ -14,10 +18,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
-
-import CopyButton from '@/components/ui/CopyButton'
-import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export interface OAuthAppRowProps {
   app: OAuthApp
@@ -76,7 +76,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
                 <DropdownMenuItem
                   key="edit"
                   disabled={!canUpdateOAuthApps}
-                  className="space-x-2 pointer-events-auto!"
+                  className="space-x-2 !pointer-events-auto"
                   onClick={() => {
                     if (canUpdateOAuthApps) onSelectEdit()
                   }}
@@ -96,7 +96,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
               <TooltipTrigger asChild>
                 <DropdownMenuItem
                   disabled={!canDeleteOAuthApps}
-                  className="space-x-2 pointer-events-auto!"
+                  className="space-x-2 !pointer-events-auto"
                   key="delete"
                   onClick={() => {
                     if (canDeleteOAuthApps) onSelectDelete()

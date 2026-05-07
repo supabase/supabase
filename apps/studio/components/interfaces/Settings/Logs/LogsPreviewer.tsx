@@ -1,8 +1,20 @@
 import { useParams } from 'common'
+import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
+import LoadingOpacity from 'components/ui/LoadingOpacity'
+import ShimmerLine from 'components/ui/ShimmerLine'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import dayjs from 'dayjs'
+import useLogsPreview from 'hooks/analytics/useLogsPreview'
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
+import useSingleLog from 'hooks/analytics/useSingleLog'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { Rewind } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Button } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
@@ -17,18 +29,6 @@ import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.
 import { maybeShowUpgradePromptIfNotEntitled } from './Logs.utils'
 import { LogTable } from './LogTable'
 import UpgradePrompt from './UpgradePrompt'
-import PreviewFilterPanel from '@/components/interfaces/Settings/Logs/PreviewFilterPanel'
-import LoadingOpacity from '@/components/ui/LoadingOpacity'
-import ShimmerLine from '@/components/ui/ShimmerLine'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import useLogsPreview from '@/hooks/analytics/useLogsPreview'
-import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
-import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
-import useSingleLog from '@/hooks/analytics/useSingleLog'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useUpgradePrompt } from '@/hooks/misc/useUpgradePrompt'
-import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 /**
  * Calculates the appropriate time range for bar click filtering based on the current time range duration.
@@ -329,7 +329,7 @@ export const LogsPreviewer = ({
           )}
         </div>
       </div>
-      <div className="relative flex flex-col grow flex-1 overflow-auto">
+      <div className="relative flex flex-col flex-grow flex-1 overflow-auto">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable

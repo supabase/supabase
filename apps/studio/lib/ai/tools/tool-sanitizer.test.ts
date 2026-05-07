@@ -1,6 +1,5 @@
 import type { ToolUIPart } from 'ai'
 import { describe, expect, test } from 'vitest'
-
 // End of third-party imports
 
 import { prepareMessagesForAPI } from '../message-utils'

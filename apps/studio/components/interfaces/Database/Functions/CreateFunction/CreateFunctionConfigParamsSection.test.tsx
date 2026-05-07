@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
-import { Form } from 'ui'
 import { describe, expect, it } from 'vitest'
+
+import { Form_Shadcn_ } from 'ui'
 
 import { CreateFunctionConfigParamsSection } from './CreateFunctionConfigParamsSection'
 
@@ -18,9 +19,9 @@ const CreateFunctionConfigParamsHarness = () => {
   })
 
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <CreateFunctionConfigParamsSection />
-    </Form>
+    </Form_Shadcn_>
   )
 }
 

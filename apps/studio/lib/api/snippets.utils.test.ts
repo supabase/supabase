@@ -1,7 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { generateDeterministicUuid } from './snippets.browser'
 import {
   createFolder,
@@ -16,20 +15,8 @@ import {
   type Snippet,
 } from './snippets.utils'
 
-// Mock fs/promises — explicit factory required since Vitest 4 automocking
-// doesn't create mock functions for getter-based exports on Node built-ins.
-vi.mock('fs/promises', () => ({
-  default: {
-    access: vi.fn(),
-    mkdir: vi.fn(),
-    readdir: vi.fn(),
-    readFile: vi.fn(),
-    writeFile: vi.fn(),
-    unlink: vi.fn(),
-    rm: vi.fn(),
-    stat: vi.fn(),
-  },
-}))
+// Mock fs/promises
+vi.mock('fs/promises')
 const mockedFS = vi.mocked(fs)
 
 // Mock SNIPPETS_DIR from constants

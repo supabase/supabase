@@ -72,7 +72,7 @@ const DocsAiPage = () => {
       className={cn(
         'flex flex-col',
         !isBelowSm &&
-          '**:[[cmdk-input-wrapper]]:border-b-0 **:[[cmdk-input-wrapper]]:border-t **:[[cmdk-input-wrapper]]:border-solid [&_[cmdk-input-wrapper]]:border-bg-control'
+          '[&_[cmdk-input-wrapper]]:border-b-0 [&_[cmdk-input-wrapper]]:border-t [&_[cmdk-input-wrapper]]:border-solid [&_[cmdk-input-wrapper]]:border-bg-control'
       )}
     >
       <CommandHeader>
@@ -87,7 +87,7 @@ const DocsAiPage = () => {
           />
         )}
       </CommandHeader>
-      <div className={cn('grow min-h-0 overflow-auto')}>
+      <div className={cn('flex-grow min-h-0 overflow-auto')}>
         {!hasError && messages.length > 0 && <AiMessages messages={messages} />}
         {!hasError && messages.length === 0 && <EmptyState handleSubmit={handleSubmit} />}
         {hasError && <ErrorState handleReset={handleReset} />}
@@ -157,7 +157,7 @@ function PromptInput({
     <CommandInput
       className={cn(
         'w-full h-11',
-        'border-none outline-hidden bg-transparent rounded-none rounded-t-md px-4 py-7',
+        'border-none outline-none bg-transparent rounded-none rounded-t-md px-4 py-7',
         'flex',
         'text-base text-foreground-light',
         'focus:ring-0 focus:shadow-none focus:ring-transparent',
@@ -198,8 +198,8 @@ function AiMessages({ messages }: { messages: Array<Message> }) {
       <CommandList_Shadcn_ />
       <div
         className={cn(
-          'grow min-h-0 overflow-auto p-4',
-          'grid gap-6 md:grid-cols-[max-content_1fr] grid-rows-[max-content]'
+          'flex-grow min-h-0 overflow-auto p-4',
+          'grid gap-6 md:grid-cols-[max-content,1fr] grid-rows-[max-content]'
         )}
       >
         {messages.map((message, index) => {
@@ -211,7 +211,7 @@ function AiMessages({ messages }: { messages: Array<Message> }) {
                     <div
                       className={cn(
                         'w-7 h-7',
-                        'border border-muted bg-background shadow-xs rounded-full',
+                        'border border-muted bg-background shadow-sm rounded-full',
                         'flex items-center justify-center',
                         'text-foreground-lighter'
                       )}
@@ -243,19 +243,18 @@ function AiMessages({ messages }: { messages: Array<Message> }) {
                   </div>
                   <div>
                     {message.status === MessageStatus.Pending && (
-                      <span className="inline-block h-lh w-[0.8lh] mt-1 bg-border-strong animate-bounce" />
+                      <span className="inline-block h-[1lh] w-[0.8lh] mt-1 bg-border-strong animate-bounce" />
                     )}
-                    <div className="prose dark:prose-dark wrap-break-word">
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          ...markdownComponents,
-                          a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" />,
-                        }}
-                      >
-                        {message.content}
-                      </ReactMarkdown>
-                    </div>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        ...markdownComponents,
+                        a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" />,
+                      }}
+                      className="prose dark:prose-dark break-words"
+                    >
+                      {message.content}
+                    </ReactMarkdown>
                     {message.sources && message.sources.length > 0 && (
                       <div className="mt-4 pt-4 border-t border-border-muted">
                         <p className="text-sm text-foreground-muted mb-2">Sources:</p>
@@ -294,8 +293,8 @@ function EmptyState({ handleSubmit }: { handleSubmit: (message: string) => void 
         heading="Examples"
         className={cn(
           'text-border-strong',
-          '**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5',
-          '**:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted'
+          '[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5',
+          '[&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted'
         )}
       >
         {questions.map((question) => {

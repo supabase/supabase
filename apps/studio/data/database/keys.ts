@@ -1,4 +1,4 @@
-import { sqlKeys } from '@/data/sql/keys'
+import { sqlKeys } from '../sql/keys'
 
 export const databaseKeys = {
   schemas: (projectRef: string | undefined) => ['projects', projectRef, 'schemas'] as const,
@@ -17,8 +17,8 @@ export const databaseKeys = {
     ['projects', projectRef, 'entity-definitions', schemas] as const,
   tableDefinition: (projectRef: string | undefined, id?: number) =>
     ['projects', projectRef, 'table-definition', id] as const,
-  viewDefinition: (projectRef: string | undefined, id?: number, includeCreateStatement?: boolean) =>
-    ['projects', projectRef, 'view-definition', id, includeCreateStatement ?? false] as const,
+  viewDefinition: (projectRef: string | undefined, id?: number) =>
+    ['projects', projectRef, 'view-definition', id] as const,
   backups: (projectRef: string | undefined) =>
     ['projects', projectRef, 'database', 'backups'] as const,
   poolingConfiguration: (projectRef: string | undefined) =>

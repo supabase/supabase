@@ -4,13 +4,12 @@
  * for http response codes
  */
 
-import dayjs from 'dayjs'
-import { AlertCircle, Info } from 'lucide-react'
+import CopyButton from 'components/ui/CopyButton'
 import React from 'react'
-import { cn } from 'ui'
-
 import { isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
-import CopyButton from '@/components/ui/CopyButton'
+import { AlertCircle, Info } from 'lucide-react'
+import dayjs from 'dayjs'
+import { cn } from 'ui'
 
 export const RowLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
@@ -153,10 +152,10 @@ export const SeverityFormatter = ({
     case 'ERROR':
       return (
         <Layout className="gap-1">
-          <div className=" p-0.5 rounded-sm text-red-900!">
+          <div className=" p-0.5 rounded !text-red-900">
             <AlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="text-red-900! block! titlecase">{text}</span>
+          <span className="!text-red-900 !block titlecase">{text}</span>
         </Layout>
       )
       break
@@ -166,10 +165,10 @@ export const SeverityFormatter = ({
     case 'DEBUG':
       return (
         <Layout className="gap-1">
-          <div className=" p-0.5 rounded-sm text-blue-900!">
+          <div className=" p-0.5 rounded !text-blue-900">
             <AlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="text-blue-900! block! titlecase">{text}</span>
+          <span className="!text-blue-900 !block titlecase">{text}</span>
         </Layout>
       )
       break
@@ -177,10 +176,10 @@ export const SeverityFormatter = ({
     case 'LOG':
       return (
         <Layout className="gap-1">
-          <div className=" p-0.5 rounded-sm text-blue-900!">
+          <div className=" p-0.5 rounded !text-blue-900">
             <Info size={14} strokeWidth={2} />
           </div>
-          <span className="text-blue-900! block! titlecase">{text}</span>
+          <span className="!text-blue-900 !block titlecase">{text}</span>
         </Layout>
       )
       break
@@ -188,10 +187,10 @@ export const SeverityFormatter = ({
     case 'WARNING':
       return (
         <Layout className="gap-1">
-          <div className=" p-0.5 rounded-sm text-amber-900!">
+          <div className=" p-0.5 rounded !text-amber-900">
             <AlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="text-amber-900! block! titlecase">{text}</span>
+          <span className="!text-amber-900 !block titlecase">{text}</span>
         </Layout>
       )
       break
@@ -200,7 +199,7 @@ export const SeverityFormatter = ({
     default:
       return (
         <Layout>
-          <div className="relative rounded-sm px-2 py-1 text-center h-6 flex justify-center items-center bg-surface-100">
+          <div className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center bg-surface-100">
             <label className="block font-mono text-sm text-foreground-lighter">{text}</label>
           </div>
         </Layout>

@@ -3,9 +3,7 @@ import { useContext } from 'react'
 import { ThemeContext } from './../../components/ThemeProvider/ThemeProvider'
 import defaultTheme from './../theme/defaultTheme'
 
-type Keys = keyof typeof defaultTheme
-
-export default function styleHandler(target: Keys) {
+export default function styleHandler(target: string) {
   let {
     theme: { [target]: __styles },
   }: any = useContext(ThemeContext)

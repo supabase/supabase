@@ -1,6 +1,7 @@
+import type { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import type { Dictionary } from 'types'
+
 import { GridForeignKey } from './base'
-import type { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
-import type { Dictionary } from '@/types'
 
 export interface SupaColumn {
   readonly dataType: string

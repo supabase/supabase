@@ -1,6 +1,7 @@
 import { ChevronRight, Loader } from 'lucide-react'
 import Link from 'next/link'
 import React, { cloneElement, PropsWithChildren } from 'react'
+
 import { cn } from 'ui'
 
 interface CardButtonProps {
@@ -145,7 +146,7 @@ const CardButton = ({
             <div className="w-full">{children && children}</div>
           </div>
         )}
-        {footer && <div className="w-full mt-auto!">{footer}</div>}
+        {footer && <div className="w-full !mt-auto">{footer}</div>}
       </div>
       {isLink && (
         <div

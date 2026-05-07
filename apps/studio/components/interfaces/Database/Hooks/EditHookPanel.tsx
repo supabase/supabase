@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { keyword } from '@supabase/pg-meta'
 import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
 import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
@@ -8,7 +7,7 @@ import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, SidePanel } from 'ui'
+import { Button, Form_Shadcn_, SidePanel } from 'ui'
 
 import { FormSchema, WebhookFormValues } from './EditHookPanel.constants'
 import { FormContents } from './FormContents'
@@ -239,7 +238,7 @@ export const EditHookPanel = () => {
         )
 
       // replacer function with JSON.stringify to handle quotes properly
-      const stringifiedParameters = JSON.stringify(parameters, (_key, value) => {
+      const stringifiedParameters = JSON.stringify(parameters, (key, value) => {
         if (typeof value === 'string') {
           // Return the raw string without any additional escaping
           return value
@@ -276,11 +275,7 @@ export const EditHookPanel = () => {
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           originalTrigger: selectedHook,
-          updatedTrigger: {
-            ...payload,
-            enabled_mode: 'ORIGIN',
-            events: payload.events.map(keyword),
-          },
+          updatedTrigger: { ...payload, enabled_mode: 'ORIGIN' },
         })
       }
     } catch (error) {
@@ -339,11 +334,11 @@ export const EditHookPanel = () => {
           </div>
         }
       >
-        <Form {...form}>
+        <Form_Shadcn_ {...form}>
           <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
             <FormContents form={form} selectedHook={selectedHook} />
           </form>
-        </Form>
+        </Form_Shadcn_>
       </SidePanel>
       <DiscardChangesConfirmationDialog {...modalProps} />
     </>

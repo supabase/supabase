@@ -1,12 +1,11 @@
 import type { JwtPayload } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-import { apiAuthenticate } from './apiAuthenticate'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { ResponseError } from 'types'
 import apiWrapper from './apiWrapper'
-import { ResponseError } from '@/types'
+import { apiAuthenticate } from './apiAuthenticate'
 
-vi.mock('@/lib/constants', () => ({
+vi.mock('lib/constants', () => ({
   IS_PLATFORM: true,
   API_URL: 'https://api.example.com',
 }))

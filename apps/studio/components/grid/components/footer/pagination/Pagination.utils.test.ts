@@ -1,5 +1,4 @@
-import { describe, expect, test } from 'vitest'
-
+import { describe, test, expect } from 'vitest'
 import { formatEstimatedCount } from './Pagination.utils'
 
 describe('formatEstimatedCount', () => {

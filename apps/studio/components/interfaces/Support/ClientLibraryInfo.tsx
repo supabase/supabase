@@ -1,14 +1,15 @@
-// End of third-party imports
-
-import { CLIENT_LIBRARIES } from 'common/constants'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
+// End of third-party imports
+
+import { CLIENT_LIBRARIES } from 'common/constants'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   Button,
   cn,
-  FormControl,
-  FormField,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -17,10 +18,8 @@ import {
   SelectValue_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface ClientLibraryInfoProps {
   form: UseFormReturn<SupportFormValues>
@@ -36,12 +35,12 @@ export function ClientLibraryInfo({ form, category, library }: ClientLibraryInfo
 
   return (
     <div className="flex flex-col gap-y-1">
-      <FormField
+      <FormField_Shadcn_
         name="library"
         control={form.control}
         render={({ field }) => (
           <FormItemLayout layout="vertical" label="Which library are you having issues with">
-            <FormControl>
+            <FormControl_Shadcn_>
               <Select_Shadcn_ {...field} defaultValue={field.value} onValueChange={field.onChange}>
                 <SelectTrigger_Shadcn_ className="w-full" aria-label="Select a library">
                   <SelectValue_Shadcn_ placeholder="Select a library" />
@@ -56,7 +55,7 @@ export function ClientLibraryInfo({ form, category, library }: ClientLibraryInfo
                   </SelectGroup_Shadcn_>
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
-            </FormControl>
+            </FormControl_Shadcn_>
           </FormItemLayout>
         )}
       />
@@ -87,7 +86,7 @@ const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
           return (
             <div
               key={lib.name}
-              className="w-[230px] min-w-[230px] min-h-[128px] rounded-sm border border-control bg-surface-100 space-y-3 px-4 py-3"
+              className="w-[230px] min-w-[230px] min-h-[128px] rounded border border-control bg-surface-100 space-y-3 px-4 py-3"
             >
               <div className="space-y-1">
                 <p className="text-sm">{lib.name}</p>
@@ -107,7 +106,7 @@ const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
         })}
         <div
           className={cn(
-            'px-4 py-3 rounded-sm border border-control bg-surface-100',
+            'px-4 py-3 rounded border border-control bg-surface-100',
             'w-[230px] min-w-[230px] min-h-[128px] flex flex-col justify-between space-y-3'
           )}
         >

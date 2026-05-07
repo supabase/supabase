@@ -1,8 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
 import { useEffect, useRef, useState } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { useParams } from 'common'
+import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
+import {
+  convertFromBytes,
+  convertToBytes,
+} from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useBucketUpdateMutation } from 'data/storage/bucket-update-mutation'
+import { Bucket } from 'data/storage/buckets-query'
+import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -12,32 +24,20 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form,
-  FormControl,
-  FormField,
-  FormMessage,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormMessage_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { z } from 'zod'
-
-import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
-import {
-  convertFromBytes,
-  convertToBytes,
-} from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
-import { useBucketUpdateMutation } from '@/data/storage/bucket-update-mutation'
-import { Bucket } from '@/data/storage/buckets-query'
-import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 export interface EditBucketModalProps {
   visible: boolean
@@ -202,10 +202,10 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
         <DialogSectionSeparator />
 
-        <Form {...form}>
+        <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <DialogSection className="space-y-6">
-              <FormField
+              <FormField_Shadcn_
                 key="name"
                 name="name"
                 control={form.control}
@@ -216,15 +216,15 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                     label="Bucket name"
                     labelOptional="Cannot be changed after creation"
                   >
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Input_Shadcn_ id="name" {...field} disabled />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
 
               <div className="flex flex-col gap-y-3">
-                <FormField
+                <FormField_Shadcn_
                   key="public"
                   name="public"
                   control={form.control}
@@ -236,14 +236,14 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                       description="Allow anyone to read objects without authorization"
                       layout="flex"
                     >
-                      <FormControl>
+                      <FormControl_Shadcn_>
                         <Switch
                           id="public"
                           size="large"
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
-                      </FormControl>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
@@ -260,11 +260,11 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
                         {isMakingBucketPrivate && (
                           <>
-                            <p className="mb-2 leading-normal!">
+                            <p className="mb-2 !leading-normal">
                               All objects in your bucket will only accessible via signed URLs, or
                               downloaded with the right authorization headers.
                             </p>
-                            <p className="leading-normal!">
+                            <p className="!leading-normal">
                               Assets cached in the CDN may still be publicly accessible. You can
                               consider{' '}
                               <InlineLink
@@ -286,7 +286,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
             <DialogSectionSeparator />
 
             <DialogSection className="space-y-2">
-              <FormField
+              <FormField_Shadcn_
                 key="has_file_size_limit"
                 name="has_file_size_limit"
                 control={form.control}
@@ -297,20 +297,20 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                     description="Prevent uploading of files larger than a specified limit"
                     layout="flex"
                   >
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Switch
                         id="has_file_size_limit"
                         size="large"
                         checked={field.value}
                         onCheckedChange={field.onChange}
                       />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
               {hasFileSizeLimit && (
                 <div>
-                  <FormField
+                  <FormField_Shadcn_
                     key="formatted_size_limit"
                     name="formatted_size_limit"
                     control={form.control}
@@ -322,7 +322,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                       >
                         <div className="grid grid-cols-12 gap-x-2">
                           <div className="col-span-8">
-                            <FormControl>
+                            <FormControl_Shadcn_>
                               <Input_Shadcn_
                                 id="formatted_size_limit"
                                 aria-label="File size limit"
@@ -331,7 +331,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                                 placeholder="0"
                                 {...field}
                               />
-                            </FormControl>
+                            </FormControl_Shadcn_>
                           </div>
                           <div className="col-span-4">
                             <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
@@ -352,7 +352,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                     )}
                   />
                   {formattedSizeLimitError?.message === 'exceed_global_limit' && (
-                    <FormMessage className="mt-2">
+                    <FormMessage_Shadcn_ className="mt-2">
                       Exceeds global limit of {formattedGlobalUploadLimit}. Increase limit in{' '}
                       <InlineLink
                         className="text-destructive decoration-destructive-500 hover:decoration-destructive"
@@ -362,7 +362,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                         Storage Settings
                       </InlineLink>{' '}
                       first.
-                    </FormMessage>
+                    </FormMessage_Shadcn_>
                   )}
 
                   {IS_PLATFORM && (
@@ -391,17 +391,17 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                 description="Allow only certain types of files to be uploaded"
                 layout="flex"
               >
-                <FormControl>
+                <FormControl_Shadcn_>
                   <Switch
                     id="has_allowed_mime_types"
                     size="large"
                     checked={hasAllowedMimeTypes}
                     onCheckedChange={setHasAllowedMimeTypes}
                   />
-                </FormControl>
+                </FormControl_Shadcn_>
               </FormItemLayout>
               {hasAllowedMimeTypes && (
-                <FormField
+                <FormField_Shadcn_
                   key="allowed_mime_types"
                   name="allowed_mime_types"
                   control={form.control}
@@ -412,20 +412,20 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                       labelOptional="Comma separated values"
                       description="Wildcards are allowed, e.g. image/*."
                     >
-                      <FormControl>
+                      <FormControl_Shadcn_>
                         <Input_Shadcn_
                           id="allowed_mime_types"
                           {...field}
                           placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
                         />
-                      </FormControl>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
               )}
             </DialogSection>
           </form>
-        </Form>
+        </Form_Shadcn_>
 
         <DialogFooter>
           <Button type="default" disabled={isUpdating} onClick={closeModal}>

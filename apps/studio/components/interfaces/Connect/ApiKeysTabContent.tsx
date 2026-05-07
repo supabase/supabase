@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { AlertCircle, ExternalLink, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
@@ -7,7 +8,6 @@ import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import type { projectKeys } from './Connect.types'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 function KeyRow({ label, value }: { label: ReactNode; value: string }) {
   return (

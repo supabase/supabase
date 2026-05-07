@@ -1,4 +1,4 @@
-import { remarkCodeHike, type CodeHikeConfig } from '@code-hike/mdx'
+import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import { CH } from '@code-hike/mdx/components'
 import { ChevronLeft, ExternalLink } from 'lucide-react'
 import { type GetStaticPaths, type GetStaticProps } from 'next'
@@ -7,23 +7,22 @@ import { serialize } from 'next-mdx-remote/serialize'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, type Dispatch, type SetStateAction } from 'react'
+import { type Dispatch, type SetStateAction, useState } from 'react'
 import remarkGfm from 'remark-gfm'
-
 import 'swiper/css'
+import { Swiper, SwiperSlide } from 'swiper/react'
+
+import { useBreakpoint } from 'common'
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
 import type { Partner } from '~/types/partners'
-import { useBreakpoint } from 'common'
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
-import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
-
 import Error404 from '../../404'
 
 /**
@@ -80,7 +79,7 @@ function Partner({
           visible
           onCancel={() => setFocusedImage(null)}
           size="xxlarge"
-          className="w-full outline-hidden"
+          className="w-full outline-none"
         >
           <Image
             layout="responsive"
@@ -109,7 +108,7 @@ function Partner({
                 layout="fixed"
                 width={56}
                 height={56}
-                className="bg-surface-200 shrink-f0 h-14 w-14 rounded-full"
+                className="bg-surface-200 flex-shrink-f0 h-14 w-14 rounded-full"
                 src={partner.logo}
                 alt={partner.title}
               />
@@ -119,10 +118,10 @@ function Partner({
             </div>
 
             <div
-              className="bg-linear-to-t from-background-alternative to-background border-b p-6 [&_.swiper-container]:overflow-visible"
+              className="bg-gradient-to-t from-background-alternative to-background border-b p-6 [&_.swiper-container]:overflow-visible"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
-              <SectionContainer className="py-0! px-3! lg:px-12! xl:p-0! mx-auto max-w-5xl">
+              <SectionContainer className="!py-0 !px-3 lg:!px-12 xl:!p-0 mx-auto max-w-5xl">
                 <Swiper
                   initialSlide={0}
                   spaceBetween={20}
@@ -196,7 +195,7 @@ function Partner({
               {!isNarrow && <PartnerDetails partner={partner} />}
             </div>
             {partner.call_to_action_link && (
-              <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-xs max-w-5xl mx-auto mt-12">
+              <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl font-medium self-center">
                     Get started with {partner.title} and Supabase.

@@ -1,10 +1,10 @@
-import { ReportConfig } from './reports.types'
-import type { AnalyticsData, AnalyticsInterval } from '@/data/analytics/constants'
-import { mapResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
+import type { AnalyticsData, AnalyticsInterval } from 'data/analytics/constants'
+import { mapResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
 import {
   getInfraMonitoringAttributes,
   InfraMonitoringAttribute,
-} from '@/data/analytics/infra-monitoring-query'
+} from 'data/analytics/infra-monitoring-query'
+import { ReportConfig } from './reports.types'
 
 async function runInfraMonitoringQuery(
   projectRef: string,

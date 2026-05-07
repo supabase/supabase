@@ -1,6 +1,8 @@
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { FilterIcon } from 'lucide-react'
-import { VisuallyHidden } from 'radix-ui'
 import { useRef } from 'react'
+
+import { useHotKey } from 'hooks/ui/useHotKey'
 import {
   Button,
   Drawer,
@@ -15,34 +17,26 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import { Kbd } from '../primitives/Kbd'
 import { DataTableFilterControls } from './DataTableFilterControls'
-import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export function DataTableFilterControlsDrawer() {
   const triggerButtonRef = useRef<HTMLButtonElement>(null)
   const isMobile = useMediaQuery('(max-width: 640px)')
 
-  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => {
+  useHotKey(() => {
     triggerButtonRef.current?.click()
-  })
+  }, 'b')
 
   return (
     <Drawer>
       <Tooltip>
         <TooltipTrigger asChild>
           <DrawerTrigger asChild>
-            <Button
-              size="tiny"
-              type="text"
-              icon={<FilterIcon />}
-              className="w-[26px]"
-              ref={isMobile ? triggerButtonRef : null}
-              aria-label="Open filters"
-            />
+            <Button className="h-9 w-9" ref={isMobile ? triggerButtonRef : null}>
+              <FilterIcon className="w-4 h-4" />
+            </Button>
           </DrawerTrigger>
         </TooltipTrigger>
         <TooltipContent side="right">
@@ -56,12 +50,12 @@ export function DataTableFilterControlsDrawer() {
         </TooltipContent>
       </Tooltip>
       <DrawerContent className="max-h-[calc(100dvh-4rem)]">
-        <VisuallyHidden.VisuallyHidden>
+        <VisuallyHidden>
           <DrawerHeader>
             <DrawerTitle>Filters</DrawerTitle>
             <DrawerDescription>Adjust your table filters</DrawerDescription>
           </DrawerHeader>
-        </VisuallyHidden.VisuallyHidden>
+        </VisuallyHidden>
         <div className="px-4 flex-1 overflow-y-auto">
           <DataTableFilterControls />
         </div>

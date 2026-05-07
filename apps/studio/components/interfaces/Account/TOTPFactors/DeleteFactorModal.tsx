@@ -1,11 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { toast } from 'sonner'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { organizationKeys } from '@/data/organizations/keys'
-import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { organizationKeys } from 'data/organizations/keys'
+import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface DeleteFactorModalProps {
   visible: boolean

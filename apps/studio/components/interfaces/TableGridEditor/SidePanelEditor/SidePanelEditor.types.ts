@@ -1,7 +1,6 @@
 import type { PostgresRelationship } from '@supabase/postgres-meta'
-
-import { CreateColumnBody } from '@/data/database-columns/database-column-create-mutation'
-import { UpdateColumnBody } from '@/data/database-columns/database-column-update-mutation'
+import { CreateColumnBody } from 'data/database-columns/database-column-create-mutation'
+import { UpdateColumnBody } from 'data/database-columns/database-column-update-mutation'
 
 export interface CreateColumnPayload extends CreateColumnBody {}
 

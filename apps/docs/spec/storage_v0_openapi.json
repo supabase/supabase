@@ -740,7 +740,6 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "minProperties": 1,
                 "properties": {
                   "public": { "type": "boolean", "example": false },
                   "file_size_limit": {
@@ -754,12 +753,7 @@
                     "nullable": true,
                     "items": { "type": "string", "example": ["image/png", "image/jpg"] }
                   }
-                },
-                "anyOf": [
-                  { "required": ["public"] },
-                  { "required": ["file_size_limit"] },
-                  { "required": ["allowed_mime_types"] }
-                ]
+                }
               }
             }
           }
@@ -997,7 +991,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
+            "schema": { "type": "string", "enum": ["origin", "avif"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -1284,7 +1278,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
+            "schema": { "type": "string", "enum": ["origin", "avif"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -1451,7 +1445,7 @@
                       "height": { "type": "integer", "minimum": 0, "example": 100 },
                       "width": { "type": "integer", "minimum": 0, "example": 100 },
                       "resize": { "type": "string", "enum": ["cover", "contain", "fill"] },
-                      "format": { "type": "string", "enum": ["origin", "avif", "webp"] },
+                      "format": { "type": "string", "enum": ["origin", "avif"] },
                       "quality": { "type": "integer", "minimum": 20, "maximum": 100 }
                     }
                   }
@@ -1654,7 +1648,7 @@
                     "type": "object",
                     "properties": {
                       "error": {
-                        "type": ["null", "string"],
+                        "error": ["string", "null"],
                         "example": "Either the object does not exist or you do not have access to it"
                       },
                       "path": { "type": "string", "example": "folder/cat.png" },
@@ -1924,7 +1918,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
+            "schema": { "type": "string", "enum": ["origin", "avif"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -1991,7 +1985,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
+            "schema": { "type": "string", "enum": ["origin", "avif"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2061,7 +2055,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
+            "schema": { "type": "string", "enum": ["origin", "avif"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2122,7 +2116,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
+            "schema": { "type": "string", "enum": ["origin", "avif"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2338,7 +2332,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
+            "schema": { "type": "string", "enum": ["origin", "avif"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2401,7 +2395,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
+            "schema": { "type": "string", "enum": ["origin", "avif"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2463,7 +2457,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
+            "schema": { "type": "string", "enum": ["origin", "avif"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2530,7 +2524,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
+            "schema": { "type": "string", "enum": ["origin", "avif"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2685,7 +2679,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
+            "schema": { "type": "string", "enum": ["origin", "avif"] },
             "in": "query",
             "name": "format",
             "required": false
@@ -2752,7 +2746,7 @@
             "required": false
           },
           {
-            "schema": { "type": "string", "enum": ["origin", "avif", "webp"] },
+            "schema": { "type": "string", "enum": ["origin", "avif"] },
             "in": "query",
             "name": "format",
             "required": false

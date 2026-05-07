@@ -1,6 +1,5 @@
-import { LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
+import { mergeRefs, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { XIcon } from 'lucide-react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import {
@@ -12,9 +11,6 @@ import {
   type ReactNode,
 } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   cn,
   LogoLoader,
   ResizableHandle,
@@ -39,23 +35,15 @@ import { ResizingState } from './ResizingState'
 import RestartingState from './RestartingState'
 import { RestoreFailedState } from './RestoreFailedState'
 import { RestoringState } from './RestoringState'
-import { UnhealthyState } from './UnhealthyState'
 import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
-import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
-import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ResourceExhaustionWarningBanner } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
-import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
 import { useAppStateSnapshot } from '@/state/app-state'
@@ -86,21 +74,6 @@ const routesToIgnorePostgrestConnection = [
   '/project/[ref]/database/settings',
   '/project/[ref]/reports',
 ]
-
-const DEFAULT_PROJECT_INTEGRATION_BANNER_DISMISS_KEY =
-  LOCAL_STORAGE_KEYS.PROJECT_INTEGRATION_BANNER_DISMISSED('unknown', 'unknown')
-
-function getProjectIntegrationBannerDismissKey({
-  projectRef,
-  integrationSource,
-}: {
-  projectRef?: string
-  integrationSource?: string | null
-}) {
-  if (!projectRef || !integrationSource) return DEFAULT_PROJECT_INTEGRATION_BANNER_DISMISS_KEY
-
-  return LOCAL_STORAGE_KEYS.PROJECT_INTEGRATION_BANNER_DISMISSED(projectRef, integrationSource)
-}
 
 export interface ProjectLayoutProps {
   isLoading?: boolean
@@ -137,32 +110,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const router = useRouter()
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
-    const { addBanner, dismissBanner } = useBannerStack()
-    const { data: resourceWarnings } = useResourceWarningsQuery({
-      slug: selectedOrganization?.slug,
-    })
-    const projectResourceWarnings = resourceWarnings?.find(
-      (w) => w.project === selectedProject?.ref
-    )
-    const isComputeNearExhaustion =
-      !!projectResourceWarnings?.cpu_exhaustion ||
-      !!projectResourceWarnings?.memory_and_swap_exhaustion ||
-      !!projectResourceWarnings?.disk_space_exhaustion ||
-      !!projectResourceWarnings?.disk_io_exhaustion
-    const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
-    const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
-    const [isFreeMicroUpgradeBannerDismissed] = useLocalStorageQuery(
-      LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
-      false
-    )
-    const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
-      useLocalStorageQuery(
-        getProjectIntegrationBannerDismissKey({
-          projectRef: selectedProject?.ref,
-          integrationSource: selectedProject?.integration_source,
-        }),
-        false
-      )
     const { showSidebar } = useAppStateSnapshot()
     const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
 
@@ -205,31 +152,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       router.pathname.includes('/project/[ref]/functions') ||
       router.pathname.includes('/project/[ref]/logs')
     const showPausedState = isPaused && !ignorePausedState
-    const showStripeProjectBanner =
-      selectedProject?.integration_source === 'stripe_projects' &&
-      !isProjectIntegrationBannerDismissed
-
-    useEffect(() => {
-      if (!selectedProject?.ref) return
-      const isProjectHomepage = router.pathname === '/project/[ref]'
-      if (isProjectHomepage && showUpgradeBanner && !isFreeMicroUpgradeBannerDismissed) {
-        addBanner({
-          id: BANNER_ID.FREE_MICRO_UPGRADE,
-          isDismissed: false,
-          content: <BannerFreeMicroUpgrade />,
-          priority: 2,
-        })
-      } else {
-        dismissBanner(BANNER_ID.FREE_MICRO_UPGRADE)
-      }
-    }, [
-      router.pathname,
-      selectedProject?.ref,
-      showUpgradeBanner,
-      isFreeMicroUpgradeBannerDismissed,
-      addBanner,
-      dismissBanner,
-    ])
 
     useLayoutEffect(() => {
       const unregister = registerOpenMenu(() => {
@@ -298,34 +220,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
                 ref={combinedRef}
               >
-                {showStripeProjectBanner && (
-                  <Alert_Shadcn_
-                    variant="default"
-                    className="flex items-center gap-4 border-t-0 border-x-0 rounded-none"
-                  >
-                    <PartnerIcon
-                      organization={{ managed_by: MANAGED_BY.STRIPE_PROJECTS }}
-                      showTooltip={false}
-                      size="medium"
-                    />
-                    <div className="flex-1">
-                      <AlertTitle_Shadcn_>This project is connected to Stripe</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        Changes made here may affect your connected Stripe project.
-                      </AlertDescription_Shadcn_>
-                    </div>
-                    <ButtonTooltip
-                      type="text"
-                      icon={<XIcon size={14} />}
-                      className="h-7 w-7 p-0"
-                      onClick={() => setIsProjectIntegrationBannerDismissed(true)}
-                      aria-label="Dismiss project integration banner"
-                      tooltip={{ content: { text: 'Dismiss' } }}
-                    />
-                  </Alert_Shadcn_>
-                )}
                 {showPausedState ? (
-                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center px-4">
+                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
                     <div className="w-full">
                       <ProjectPausedState product={product} />
                     </div>
@@ -418,13 +314,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     selectedProject?.status === PROJECT_STATUS.UNKNOWN
   const isProjectPausing = selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
-  const isProjectUnhealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_UNHEALTHY
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
-
-  const ignoreUnhealthyState =
-    isHomePage ||
-    router.pathname.includes('/project/[ref]/settings') ||
-    router.pathname.includes('/project/[ref]/logs')
 
   const shouldRedirectToHomeForBuilding = isProjectBuilding && requiresDbConnection && !isHomePage
 
@@ -463,10 +353,6 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   if (isProjectPauseFailed) {
     return <PauseFailedState />
-  }
-
-  if (isProjectUnhealthy && !ignoreUnhealthyState) {
-    return <UnhealthyState />
   }
 
   if (requiresPostgrestConnection && isProjectOffline) {

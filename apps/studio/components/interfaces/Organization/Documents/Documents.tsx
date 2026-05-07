@@ -1,21 +1,20 @@
-import { Fragment } from 'react'
-
-import { CustomDocument } from './CustomDocument'
-import { DPA } from './DPA'
-import { HIPAA } from './HIPAA'
-import { ISO27001 } from './ISO27001'
-import { SecurityQuestionnaire } from './SecurityQuestionnaire'
-import { SOC2 } from './SOC2'
-import { TIA } from './TIA'
-import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
   ScaffoldSection,
   ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
-import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+} from 'components/layouts/Scaffold'
+import { InlineLinkClassName } from 'components/ui/InlineLink'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { Fragment } from 'react'
+
+import { CustomDocument } from './CustomDocument'
+import { DPA } from './DPA'
+import { HIPAA } from './HIPAA'
+import { SecurityQuestionnaire } from './SecurityQuestionnaire'
+import { SOC2 } from './SOC2'
+import { TIA } from './TIA'
 
 export const Documents = () => {
   const { organizationLegalDocuments } = useCustomContent(['organization:legal_documents'])
@@ -47,12 +46,6 @@ export const Documents = () => {
 
       <ScaffoldContainer id="soc2" className="px-6 xl:px-10">
         <SOC2 />
-      </ScaffoldContainer>
-
-      <ScaffoldDivider />
-
-      <ScaffoldContainer id="iso27001" className="px-6 xl:px-10">
-        <ISO27001 />
       </ScaffoldContainer>
 
       <ScaffoldDivider />

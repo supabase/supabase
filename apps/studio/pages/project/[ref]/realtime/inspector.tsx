@@ -1,7 +1,8 @@
-import { RealtimeInspector } from '@/components/interfaces/Realtime/Inspector'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
-import RealtimeLayout from '@/components/layouts/RealtimeLayout/RealtimeLayout'
-import type { NextPageWithLayout } from '@/types'
+import type { NextPageWithLayout } from 'types'
+
+import { RealtimeInspector } from 'components/interfaces/Realtime/Inspector'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import RealtimeLayout from 'components/layouts/RealtimeLayout/RealtimeLayout'
 
 export const InspectorPage: NextPageWithLayout = () => {
   return <RealtimeInspector />

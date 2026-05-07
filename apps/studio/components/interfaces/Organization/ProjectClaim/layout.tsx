@@ -1,10 +1,9 @@
+import { UserDropdown } from 'components/interfaces/UserDropdown'
+import { FeedbackDropdown } from 'components/layouts/Navigation/LayoutHeader/FeedbackDropdown/FeedbackDropdown'
+import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
 import { PropsWithChildren, ReactNode } from 'react'
 import { cn, Separator } from 'ui'
-
-import { UserDropdown } from '@/components/interfaces/UserDropdown'
-import { FeedbackDropdown } from '@/components/layouts/Navigation/LayoutHeader/FeedbackDropdown/FeedbackDropdown'
-import { BASE_PATH } from '@/lib/constants'
 
 export const ProjectClaimLayout = ({
   children,
@@ -35,7 +34,7 @@ export const ProjectClaimLayout = ({
       <Separator />
       <div
         className={cn(
-          'overflow-y-auto max-h-[calc(100vh-70px)] flex justify-center grow',
+          'overflow-y-auto max-h-[calc(100vh-70px)] flex justify-center flex-grow',
           className
         )}
       >

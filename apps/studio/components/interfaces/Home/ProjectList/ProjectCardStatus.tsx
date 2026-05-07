@@ -1,10 +1,10 @@
 import { AlertTriangle, Info, PauseCircle, RefreshCcw } from 'lucide-react'
-import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
+import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
+import type { ResourceWarning } from 'data/usage/resource-warnings-query'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InferredProjectStatus } from './ProjectCard.utils'
-import { RESOURCE_WARNING_MESSAGES } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
-import { getWarningContent } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
-import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
 
 export interface ProjectCardWarningsProps {
   resourceWarnings?: ResourceWarning
@@ -17,6 +17,8 @@ export const ProjectCardStatus = ({
   projectStatus,
   renderMode = 'alert',
 }: ProjectCardWarningsProps) => {
+  const showResourceExhaustionWarnings = false
+
   // [Terry] temp to remove auth_restricted_email_sending property from resourceWarnings
   // set auth_restricted_email_sending from 'warning' to null so it doesn't show up in the warning banner
   // [Joshen] Can remove this eventually once the auth email thing is resolved (Nov 2024)
@@ -68,7 +70,9 @@ export const ProjectCardStatus = ({
         return renderMode === 'badge' ? 'Pause Failed' : 'Project pause failed'
     }
 
-    if (!resourceWarnings) return undefined
+    if (!resourceWarnings) {
+      return renderMode === 'badge' && projectStatus === 'isHealthy' ? 'Active' : undefined
+    }
 
     // If none of the paused/restoring states match, proceed with the default logic
     return activeWarnings.length > 1
@@ -98,7 +102,7 @@ export const ProjectCardStatus = ({
     if (!resourceWarnings) return undefined
 
     // If none of the paused/restoring states match, proceed with the default logic
-    return activeWarnings.length > 1
+    return activeWarnings.length > 1 && showResourceExhaustionWarnings
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.cardContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].description
@@ -163,7 +167,7 @@ export const ProjectCardStatus = ({
   if (!alertTitle) return null
 
   return (
-    <div role="alert" className={cn('w-full p-5 pb-5 flex flex-row gap-x-2 items-center')}>
+    <div role="alert" className={cn('w-full p-5 pb-[1.25rem] flex flex-row gap-x-2 items-center')}>
       {/* Icon */}
       <div
         className={cn(

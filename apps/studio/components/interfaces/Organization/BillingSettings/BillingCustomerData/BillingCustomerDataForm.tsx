@@ -1,11 +1,5 @@
-import { AddressElement } from '@stripe/react-stripe-js'
-import type {
-  StripeAddressElement,
-  StripeAddressElementChangeEvent,
-  StripeAddressElementOptions,
-} from '@stripe/stripe-js'
 import { Check, ChevronsUpDown, Info, X } from 'lucide-react'
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
@@ -16,9 +10,9 @@ import {
   CommandInput_Shadcn_ as CommandInput,
   CommandItem_Shadcn_ as CommandItem,
   CommandList_Shadcn_ as CommandList,
-  FormControl,
-  FormField,
-  FormMessage,
+  FormControl_Shadcn_ as FormControl,
+  FormField_Shadcn_ as FormField,
+  FormMessage_Shadcn_ as FormMessage,
   Input_Shadcn_ as Input,
   Popover_Shadcn_ as Popover,
   PopoverContent_Shadcn_ as PopoverContent,
@@ -30,46 +24,47 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { COUNTRIES } from './BillingAddress.constants'
 import { TAX_IDS } from './TaxID.constants'
 
 interface BillingCustomerDataFormProps {
-  form: UseFormReturn<TaxIdFormValues>
+  form: UseFormReturn<BillingCustomerDataFormValues>
   disabled?: boolean
   className?: string
-  addressOptions: StripeAddressElementOptions
-  resetKey: number
-  onAddressChange: (evt: StripeAddressElementChangeEvent) => void
-  onAddressReady?: (element: StripeAddressElement) => void
-  addressCountry?: string
 }
 
-export const TaxIdSchema = z.object({
+// Define the expected form values structure and validation schema
+export const BillingCustomerDataSchema = z.object({
+  billing_name: z.string().min(3, 'Name must be at least 3 letters long'),
+  line1: z.string().trim().min(3, 'Address line 1 is required'),
+  line2: z.string().optional(),
+  city: z.string().trim().min(2, 'City is required'),
+  state: z.string().trim(),
+  postal_code: z.string().trim().min(1, 'Postal code is required'),
+  country: z.string().trim().min(1, 'Country is required'),
   tax_id_type: z.string(),
   tax_id_value: z.string(),
   tax_id_name: z.string(),
 })
 
-export type TaxIdFormValues = z.infer<typeof TaxIdSchema>
+export type BillingCustomerDataFormValues = z.infer<typeof BillingCustomerDataSchema>
 
 export const BillingCustomerDataForm = ({
   form,
   disabled = false,
   className,
-  addressOptions,
-  resetKey,
-  onAddressChange,
-  onAddressReady,
-  addressCountry,
 }: BillingCustomerDataFormProps) => {
+  const [showCountriesPopover, setShowCountriesPopover] = useState(false)
   const [showTaxIDsPopover, setShowTaxIDsPopover] = useState(false)
+  const countryListboxId = useId()
   const taxIdListboxId = useId()
 
   const onSelectTaxIdType = (name: string) => {
     const selectedTaxIdOption = TAX_IDS.find((option) => option.name === name)
     if (!selectedTaxIdOption) return
-    form.setValue('tax_id_type', selectedTaxIdOption.type, { shouldDirty: true })
-    form.setValue('tax_id_value', '', { shouldDirty: true })
-    form.setValue('tax_id_name', name, { shouldDirty: true })
+    form.setValue('tax_id_type', selectedTaxIdOption.type)
+    form.setValue('tax_id_value', '')
+    form.setValue('tax_id_name', name)
   }
 
   const onRemoveTaxId = () => {
@@ -78,45 +73,178 @@ export const BillingCustomerDataForm = ({
     form.setValue('tax_id_value', '', { shouldDirty: true })
   }
 
-  const { tax_id_name } = form.watch()
+  const { tax_id_name, country } = form.watch()
   const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
 
   const availableTaxIds = useMemo(() => {
-    return TAX_IDS.filter((taxId) => !addressCountry || taxId.countryIso2 === addressCountry).sort(
-      (a, b) => a.country.localeCompare(b.country)
+    return TAX_IDS.filter((taxId) => !country || taxId.countryIso2 === country).sort((a, b) =>
+      a.country.localeCompare(b.country)
     )
-  }, [addressCountry])
-
-  // Clear tax ID fields when the billing country changes so a stale tax ID
-  // from the previous country doesn't persist under the new one.
-  const prevCountryRef = useRef(addressCountry)
-  useEffect(() => {
-    if (!addressCountry) return
-
-    const isCountryChange =
-      prevCountryRef.current !== undefined && prevCountryRef.current !== addressCountry
-    prevCountryRef.current = addressCountry
-
-    if (isCountryChange) {
-      form.setValue('tax_id_type', '', { shouldDirty: true })
-      form.setValue('tax_id_value', '', { shouldDirty: true })
-      form.setValue('tax_id_name', '', { shouldDirty: true })
-    }
-  }, [addressCountry, form])
+  }, [country])
 
   return (
     <div className={cn('flex flex-col space-y-4', className)}>
-      <div className={cn('relative', disabled && 'opacity-50')}>
-        <AddressElement
-          key={`billing-address-${resetKey}`}
-          options={addressOptions}
-          onChange={onAddressChange}
-          onReady={onAddressReady}
+      <FormField
+        control={form.control}
+        name="billing_name"
+        render={({ field }) => (
+          <FormItemLayout hideMessage label="Name">
+            <FormControl>
+              <Input {...field} disabled={disabled} />
+            </FormControl>
+            <FormMessage />
+          </FormItemLayout>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="line1"
+        render={({ field }) => (
+          <FormItemLayout hideMessage label="Address line 1">
+            <FormControl>
+              <Input {...field} placeholder="123 Main Street" disabled={disabled} />
+            </FormControl>
+            <FormMessage />
+          </FormItemLayout>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="line2"
+        render={({ field }) => (
+          <FormItemLayout hideMessage label="Address line 2 (optional)">
+            <FormControl>
+              <Input
+                {...field}
+                placeholder="Apartment, suite, unit, building, floor, etc."
+                disabled={disabled}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItemLayout>
+        )}
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          control={form.control}
+          name="country"
+          render={({ field }) => (
+            <FormItemLayout hideMessage label="Country">
+              <Popover open={showCountriesPopover} onOpenChange={setShowCountriesPopover}>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      type="default"
+                      role="combobox"
+                      size="medium"
+                      disabled={disabled}
+                      aria-expanded={showCountriesPopover}
+                      aria-controls={countryListboxId}
+                      className={cn(
+                        'w-full justify-between h-[34px]',
+                        !field.value && 'text-muted'
+                      )}
+                      iconRight={
+                        <ChevronsUpDown
+                          className="ml-2 h-4 w-4 shrink-0 opacity-50"
+                          strokeWidth={1.5}
+                        />
+                      }
+                    >
+                      {field.value
+                        ? COUNTRIES.find((country) => country.code === field.value)?.name ||
+                          'Select country'
+                        : 'Select country'}
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent
+                  id={countryListboxId}
+                  sameWidthAsTrigger
+                  className="p-0"
+                  align="start"
+                >
+                  <Command>
+                    <CommandInput placeholder="Search country..." />
+                    <CommandList>
+                      <CommandEmpty>No country found.</CommandEmpty>
+                      <CommandGroup>
+                        {COUNTRIES.map((country) => (
+                          <CommandItem
+                            key={country.code}
+                            value={country.name}
+                            onSelect={() => {
+                              form.setValue('country', country.code, {
+                                shouldDirty: true,
+                                shouldTouch: true,
+                                shouldValidate: true,
+                              })
+                              setShowCountriesPopover(false)
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                'mr-2 h-4 w-4',
+                                field.value === country.code ? 'opacity-100' : 'opacity-0'
+                              )}
+                            />
+                            {country.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItemLayout>
+          )}
         />
-        {disabled && <div className="absolute inset-0 z-10 cursor-not-allowed" />}
+        <FormField
+          control={form.control}
+          name="postal_code"
+          render={({ field }) => (
+            <FormItemLayout hideMessage label="Postal code">
+              <FormControl>
+                <Input {...field} placeholder="12345" disabled={disabled} />
+              </FormControl>
+              <FormMessage />
+            </FormItemLayout>
+          )}
+        />
       </div>
 
-      <div className={cn('grid grid-cols-2 gap-x-6 w-full items-end', disabled && 'opacity-50')}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          control={form.control}
+          name="city"
+          render={({ field }) => (
+            <FormItemLayout hideMessage label="City">
+              <FormControl>
+                <Input {...field} disabled={disabled} />
+              </FormControl>
+              <FormMessage />
+            </FormItemLayout>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="state"
+          render={({ field }) => (
+            <FormItemLayout hideMessage label="State / Province">
+              <FormControl>
+                <Input {...field} disabled={disabled} />
+              </FormControl>
+              <FormMessage />
+            </FormItemLayout>
+          )}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-x-2 w-full items-end">
         <FormField
           name="tax_id_name"
           control={form.control}
@@ -220,13 +348,7 @@ export const BillingCustomerDataForm = ({
               )}
             />
 
-            <Button
-              type="text"
-              className="px-1"
-              icon={<X />}
-              disabled={disabled}
-              onClick={() => onRemoveTaxId()}
-            />
+            <Button type="text" className="px-1" icon={<X />} onClick={() => onRemoveTaxId()} />
           </div>
         )}
       </div>

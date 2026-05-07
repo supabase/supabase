@@ -1,3 +1,4 @@
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { ArrowDownNarrowWide, ArrowDownWideNarrow } from 'lucide-react'
 import {
   Button,
@@ -10,8 +11,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from 'ui'
-
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface SortDropdownProps {
   specificFilterColumn: string

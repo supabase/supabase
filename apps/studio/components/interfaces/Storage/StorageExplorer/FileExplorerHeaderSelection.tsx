@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download, Move, Trash2, X } from 'lucide-react'
-import { Button } from 'ui'
 
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { Button } from 'ui'
 
 export const FileExplorerHeaderSelection = () => {
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
@@ -19,7 +19,7 @@ export const FileExplorerHeaderSelection = () => {
   } = useStorageExplorerStateSnapshot()
 
   return (
-    <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-400 px-2 py-1 shadow-sm in-data-[theme*=dark]:bg-brand-500">
+    <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-400 px-2 py-1 shadow [[data-theme*=dark]_&]:bg-brand-500">
       <Button
         icon={<X size={16} strokeWidth={2} />}
         type="text"

@@ -1,6 +1,4 @@
-import { safeSql } from '../pg-format'
-
-export const CONFIG_SQL = /* SQL */ safeSql`
+export const CONFIG_SQL = /* SQL */ `
 SELECT
   name,
   setting,

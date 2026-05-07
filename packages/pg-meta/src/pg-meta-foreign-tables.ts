@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { coalesceRowsToArray, filterByList } from './helpers'
-import { ident, literal, safeSql, type SafeSqlFragment } from './pg-format'
+import { ident, literal } from './pg-format'
 import { pgColumnArrayZod } from './pg-meta-columns'
 import { COLUMNS_SQL } from './sql/columns'
 import { FOREIGN_TABLES_SQL } from './sql/foreign-tables'
@@ -47,7 +47,7 @@ export function list<T extends boolean | undefined = true>(
     includeColumns?: T
   } = {} as any
 ): {
-  sql: SafeSqlFragment
+  sql: string
   zod: z.ZodType<ForeignTableBasedOnIncludeColumns<T>[]>
 } {
   let sql = generateEnrichedForeignTablesSql({ includeColumns })
@@ -57,13 +57,13 @@ export function list<T extends boolean | undefined = true>(
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
   if (filter) {
-    sql = safeSql`${sql} where schema ${filter}`
+    sql += ` where schema ${filter}`
   }
   if (limit) {
-    sql = safeSql`${sql} limit ${literal(limit)}`
+    sql += ` limit ${limit}`
   }
   if (offset) {
-    sql = safeSql`${sql} offset ${literal(offset)}`
+    sql += ` offset ${offset}`
   }
   return {
     sql,
@@ -73,37 +73,33 @@ export function list<T extends boolean | undefined = true>(
 
 type ForeignTableIdentifier = Pick<PGForeignTable, 'id'> | Pick<PGForeignTable, 'name' | 'schema'>
 
-function getIdentifierWhereClause(identifier: ForeignTableIdentifier): SafeSqlFragment {
+function getIdentifierWhereClause(identifier: ForeignTableIdentifier): string {
   if ('id' in identifier && identifier.id) {
-    return safeSql`${ident('id')} = ${literal(identifier.id)}`
+    return `${ident('id')} = ${literal(identifier.id)}`
   }
   if ('name' in identifier && identifier.name && identifier.schema) {
-    return safeSql`${ident('name')} = ${literal(identifier.name)} and ${ident('schema')} = ${literal(identifier.schema)}`
+    return `${ident('name')} = ${literal(identifier.name)} and ${ident('schema')} = ${literal(identifier.schema)}`
   }
   throw new Error('Must provide either id or name and schema')
 }
 
 export function retrieve(identifier: ForeignTableIdentifier): {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgForeignTableOptionalZod
 } {
-  const sql = safeSql`${generateEnrichedForeignTablesSql({ includeColumns: true })} where ${getIdentifierWhereClause(identifier)};`
+  const sql = `${generateEnrichedForeignTablesSql({ includeColumns: true })} where ${getIdentifierWhereClause(identifier)};`
   return {
     sql,
     zod: pgForeignTableOptionalZod,
   }
 }
 
-const generateEnrichedForeignTablesSql = ({
-  includeColumns,
-}: {
-  includeColumns?: boolean
-}) => safeSql`
+const generateEnrichedForeignTablesSql = ({ includeColumns }: { includeColumns?: boolean }) => `
 with foreign_tables as (${FOREIGN_TABLES_SQL})
-  ${includeColumns ? safeSql`, columns as (${COLUMNS_SQL})` : safeSql``}
+  ${includeColumns ? `, columns as (${COLUMNS_SQL})` : ''}
 select
   *
-  ${includeColumns ? safeSql`, ${coalesceRowsToArray('columns', safeSql`columns.table_id = foreign_tables.id`)}` : safeSql``}
+  ${includeColumns ? `, ${coalesceRowsToArray('columns', 'columns.table_id = foreign_tables.id')}` : ''}
 from foreign_tables`
 
 export default {

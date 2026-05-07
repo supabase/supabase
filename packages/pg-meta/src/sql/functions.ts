@@ -1,6 +1,4 @@
-import { safeSql } from '../pg-format'
-
-export const FUNCTIONS_SQL = /* SQL */ safeSql`
+export const FUNCTIONS_SQL = /* SQL */ `
 -- CTE with sane arg_modes, arg_names, and arg_types.
 -- All three are always of the same length.
 -- All three include all args, including OUT and TABLE args.

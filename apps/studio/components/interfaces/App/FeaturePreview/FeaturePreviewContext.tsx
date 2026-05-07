@@ -1,4 +1,5 @@
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { EMPTY_OBJ } from 'lib/void'
 import { noop } from 'lodash'
 import { useQueryState } from 'nuqs'
 import {
@@ -12,9 +13,7 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
-import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
-import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
   flags: { [key: string]: boolean }
@@ -40,14 +39,10 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
     setFlags(
       featurePreviews.reduce((a, b) => {
         const defaultOptIn = b.isDefaultOptIn
-        try {
-          const localStorageValue = window.localStorage.getItem(b.key)
-          return {
-            ...a,
-            [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
-          }
-        } catch {
-          return { ...a, [b.key]: defaultOptIn }
+        const localStorageValue = localStorage.getItem(b.key)
+        return {
+          ...a,
+          [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
         }
       }, {})
     )
@@ -62,12 +57,8 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
   const value = {
     flags,
     onUpdateFlag: (key: string, value: boolean) => {
-      try {
-        if (typeof window !== 'undefined' && window.localStorage) {
-          window.localStorage.setItem(key, value ? 'true' : 'false')
-        }
-      } catch {
-        // Silently fail in restricted storage modes (e.g. Safari private browsing)
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(key, value.toString())
       }
       const updatedFlags = { ...flags, [key]: value }
       setFlags(updatedFlags)
@@ -79,6 +70,11 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
 
 // Helpers
 
+export const useIsAPIDocsSidePanelEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]
+}
+
 export const useIsColumnLevelPrivilegesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
@@ -86,20 +82,19 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 
 export const useUnifiedLogsPreview = () => {
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
-  const { hasLoaded: flagsHaveLoaded } = useContext(FeatureFlagContext)
   const unifiedLogsEnabled = useFlag('unifiedLogs')
 
-  const { isEligible: isEnterpriseOrSupabaseOrg, isLoading: isOrgLoading } =
-    useIsEnterpriseOrSupabaseOrg()
-
-  const isLoading = !flagsHaveLoaded || isOrgLoading
-  const isEligible = unifiedLogsEnabled && isEnterpriseOrSupabaseOrg
   const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
 
-  return { isEnabled, isEligible, isLoading, enable, disable }
+  return { isEnabled, enable, disable }
+}
+
+export const useIsBranching2Enabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
 }
 
 export const useIsPgDeltaDiffEnabled = () => {
@@ -111,6 +106,11 @@ export const useIsPgDeltaDiffEnabled = () => {
 export const useIsAdvisorRulesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
+}
+
+export const useIsQueueOperationsEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]
 }
 
 export const useIsPlatformWebhooksEnabled = () => {
@@ -125,9 +125,16 @@ export const useIsJitDbAccessEnabled = () => {
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
-export const useIsRLSTesterEnabled = () => {
+export const useIsTableFilterBarEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]
+}
+
+export const useIsFloatingMobileToolbarEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
+
+  return showFloatingMobileToolbar && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR]
 }
 
 export const useFeaturePreviewModal = () => {

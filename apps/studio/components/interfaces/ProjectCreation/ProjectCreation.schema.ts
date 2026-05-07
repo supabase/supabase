@@ -1,6 +1,5 @@
+import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import { z } from 'zod'
-
-import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from '@/lib/constants'
 
 export const FormSchema = z
   .object({
@@ -34,28 +33,18 @@ export const FormSchema = z
     dbPassStrengthWarning: z.string().default(''),
     instanceSize: z.string().optional(),
     dataApi: z.boolean(),
-    dataApiDefaultPrivileges: z.boolean(),
     enableRlsEventTrigger: z.boolean(),
     postgresVersionSelection: z.string(),
     useOrioleDb: z.boolean(),
   })
-  .superRefine(
-    ({ dbPassStrength, dbPassStrengthWarning, highAvailability, cloudProvider }, ctx) => {
-      if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['dbPass'],
-          message: dbPassStrengthWarning || 'Password not secure enough',
-        })
-      }
-      if (highAvailability && cloudProvider !== 'AWS_K8S') {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['cloudProvider'],
-          message: 'High availability is only supported on AWS (Revamped)',
-        })
-      }
+  .superRefine(({ dbPassStrength, dbPassStrengthWarning }, ctx) => {
+    if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['dbPass'],
+        message: dbPassStrengthWarning || 'Password not secure enough',
+      })
     }
-  )
+  })
 
 export type CreateProjectForm = z.infer<typeof FormSchema>

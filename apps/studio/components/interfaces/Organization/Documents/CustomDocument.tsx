@@ -1,13 +1,12 @@
-import { ExternalLink } from 'lucide-react'
-import { Button } from 'ui'
-
 import {
   ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
-import { CustomContentTypes } from '@/hooks/custom-content/CustomContent.types'
+} from 'components/layouts/Scaffold'
+import { CustomContentTypes } from 'hooks/custom-content/CustomContent.types'
+import { ExternalLink } from 'lucide-react'
+import { Button } from 'ui'
 
 interface CustomDocumentProps {
   doc: CustomContentTypes['organizationLegalDocuments'][number]

@@ -1,5 +1,3 @@
-import { components } from 'api-types'
-import dayjs from 'dayjs'
 import { motion } from 'framer-motion'
 import {
   CircleArrowDown,
@@ -11,6 +9,11 @@ import {
   Timer,
   Trash2,
 } from 'lucide-react'
+
+import { components } from 'api-types'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
+import dayjs from 'dayjs'
 import {
   Badge,
   Button,
@@ -23,11 +26,8 @@ import {
   TableRow,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
-
 import { AlgorithmHoverCard } from '../algorithm-hover-card'
 import { statusColors, statusLabels } from '../jwt.constants'
-import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
-import { JWTSigningKey } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
 
 interface SigningKeyRowProps {
   signingKey: components['schemas']['SigningKeyResponse']
@@ -78,9 +78,9 @@ export const SigningKeyRow = ({
           )}
         >
           {signingKey.status === 'standby' ? (
-            <Timer className="shrink-0" size={14} />
+            <Timer className="flex-shrink-0" size={14} />
           ) : (
-            <Key className="shrink-0" size={14} />
+            <Key className="flex-shrink-0" size={14} />
           )}
           <span className="truncate text-xs">{statusLabels[signingKey.status]}</span>
         </Badge>
@@ -90,7 +90,7 @@ export const SigningKeyRow = ({
       <div className="min-w-0 flex">
         <Badge
           className={cn(
-            'bg-default-200/100 border-foreground-muted',
+            'bg-opacity-100 bg-200 border-foreground-muted',
             'rounded-l-none',
             'gap-2 py-2 h-6 min-w-0 overflow-hidden flex items-center flex-1'
           )}

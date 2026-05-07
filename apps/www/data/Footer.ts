@@ -6,10 +6,6 @@ const footerData = [
     title: 'Product',
     links: [
       {
-        text: 'Pricing',
-        url: '/pricing',
-      },
-      {
         text: 'Database',
         url: '/database',
       },
@@ -38,8 +34,8 @@ const footerData = [
         url: '/modules/cron',
       },
       {
-        text: 'Feature Catalog',
-        url: '/features',
+        text: 'Pricing',
+        url: '/pricing',
       },
       {
         text: 'Launch Week',
@@ -121,21 +117,8 @@ const footerData = [
         url: '/changelog',
       },
       {
-        text: 'RSS',
-        url: '/rss.xml',
-      },
-    ],
-  },
-  {
-    title: 'Community',
-    links: [
-      {
-        text: 'Events & Webinars',
-        url: '/events',
-      },
-      {
-        text: 'SupaSquad',
-        url: '/supasquad',
+        text: 'Careers',
+        url: '/careers',
       },
       {
         text: 'Contributing',
@@ -146,8 +129,16 @@ const footerData = [
         url: '/open-source',
       },
       {
+        text: 'SupaSquad',
+        url: '/supasquad',
+      },
+      {
         text: 'DevTo',
         url: 'https://dev.to/supabase',
+      },
+      {
+        text: 'RSS',
+        url: '/rss.xml',
       },
     ],
   },
@@ -157,10 +148,6 @@ const footerData = [
       {
         text: 'Company',
         url: '/company',
-      },
-      {
-        text: 'Careers',
-        url: '/careers',
       },
       {
         text: 'General Availability',

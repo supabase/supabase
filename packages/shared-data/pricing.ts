@@ -75,7 +75,6 @@ export type FeatureKey =
   | 'security.logDrain'
   | 'security.metricsEndpoint'
   | 'security.soc2'
-  | 'security.iso27001'
   | 'security.hipaa'
   | 'security.privateLink'
   | 'security.sso'
@@ -622,17 +621,6 @@ export const pricing: Pricing = {
       {
         key: 'security.soc2',
         title: 'SOC2',
-        plans: {
-          free: false,
-          pro: false,
-          team: true,
-          enterprise: true,
-        },
-        usage_based: false,
-      },
-      {
-        key: 'security.iso27001',
-        title: 'ISO 27001',
         plans: {
           free: false,
           pro: false,

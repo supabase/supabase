@@ -1,8 +1,7 @@
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
 import { AlertCircle } from 'lucide-react'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
-
-import { InlineLink } from '@/components/ui/InlineLink'
 
 interface DataApiDisabledStateProps {
   description: string

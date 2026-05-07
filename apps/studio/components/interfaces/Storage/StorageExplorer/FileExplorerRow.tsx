@@ -1,5 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { FilesBucket as FilesBucketIcon } from 'icons'
+import { formatBytes } from 'lib/helpers'
 import { find, isEmpty, isEqual } from 'lodash'
 import {
   AlertCircle,
@@ -17,6 +19,8 @@ import {
   Trash2,
 } from 'lucide-react'
 import type { CSSProperties } from 'react'
+import { useContextMenu } from 'react-contexify'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Checkbox,
   cn,
@@ -35,19 +39,16 @@ import {
 } from 'ui'
 
 import {
+  CONTEXT_MENU_KEYS,
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
   STORAGE_VIEWS,
   URL_EXPIRY_DURATION,
 } from '../Storage.constants'
 import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
-import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyPathToFolder } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { formatBytes } from '@/lib/helpers'
-import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const RowIcon = ({
   view,
@@ -126,8 +127,8 @@ export const FileExplorerRow = ({
     downloadFolder,
     selectRangeItems,
   } = useStorageExplorerStateSnapshot()
+  const { show } = useContextMenu()
   const { onCopyUrl } = useCopyUrl()
-  const ctx = useFileExplorerContextMenu()
 
   const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
@@ -271,6 +272,18 @@ export const FileExplorerRow = ({
   const createdAt = item.created_at ? new Date(item.created_at).toLocaleString() : '-'
   const updatedAt = item.updated_at ? new Date(item.updated_at).toLocaleString() : '-'
 
+  const displayMenu = (event: any, rowType: STORAGE_ROW_TYPES) => {
+    show(event, {
+      id:
+        rowType === STORAGE_ROW_TYPES.FILE
+          ? CONTEXT_MENU_KEYS.STORAGE_ITEM
+          : CONTEXT_MENU_KEYS.STORAGE_FOLDER,
+      props: {
+        item: itemWithColumnIndex,
+      },
+    })
+  }
+
   const nameWidth =
     view === STORAGE_VIEWS.LIST && item.isCorrupted
       ? `calc(100% - 60px)`
@@ -288,12 +301,17 @@ export const FileExplorerRow = ({
     <div
       style={style}
       className="h-full border-b border-default"
-      onContextMenu={(e) => ctx?.onRowContextMenu(e, rowOptions)}
+      onContextMenu={(event) => {
+        event.stopPropagation()
+        item.type === STORAGE_ROW_TYPES.FILE
+          ? displayMenu(event, STORAGE_ROW_TYPES.FILE)
+          : displayMenu(event, STORAGE_ROW_TYPES.FOLDER)
+      }}
     >
       <div
         className={cn(
           'storage-row group flex h-full items-center px-2.5',
-          'hover:bg-panel-footer-light in-data-[theme*=dark]:hover:bg-panel-footer-dark',
+          'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
           `${isOpened ? 'bg-selection' : ''}`,
           `${isSelected ? 'bg-selection' : ''}`,
           `${isPreviewed ? 'bg-selection hover:bg-selection' : ''}`,
@@ -333,15 +351,15 @@ export const FileExplorerRow = ({
               </div>
             )}
             <Checkbox
-              className={`${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
+              label={''}
+              className={`w-full ${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
                 isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
               }`}
               checked={isSelected}
-              // use onClick instead of onCheckedChange to handle shift-key selection
-              onClick={(event) => {
-                onCheckItem(event.nativeEvent.shiftKey)
+              onChange={(event) => {
+                event.stopPropagation()
+                onCheckItem((event.nativeEvent as KeyboardEvent).shiftKey)
               }}
-              aria-label="Check to select this item"
             />
           </div>
           <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>
@@ -370,7 +388,7 @@ export const FileExplorerRow = ({
 
         <div
           className={`flex items-center justify-end ${
-            view === STORAGE_VIEWS.LIST ? 'grow' : 'w-[10%]'
+            view === STORAGE_VIEWS.LIST ? 'flex-grow' : 'w-[10%]'
           }`}
           onClick={(event) =>
             // Stops click event from this div, to resolve an issue with menu item's click event triggering unexpected row select

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
+import { ident, literal } from './pg-format'
 import { ROLES_SQL } from './sql/roles'
 
 const pgRoleZod = z.object({
@@ -32,10 +32,10 @@ function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgRoleArrayZod
 } {
-  let sql = safeSql`
+  let sql = `
 with
   roles as (${ROLES_SQL})
 select
@@ -54,13 +54,13 @@ where
     // ERROR:  role name "pg_myrole" is reserved
     // DETAIL:  Role names starting with "pg_" are reserved.
     // ```
-    sql = safeSql`${sql} and not pg_catalog.starts_with(name, 'pg_')`
+    sql += ` and not pg_catalog.starts_with(name, 'pg_')`
   }
   if (limit) {
-    sql = safeSql`${sql} limit ${literal(limit)}`
+    sql += ` limit ${limit}`
   }
   if (offset) {
-    sql = safeSql`${sql} offset ${literal(offset)}`
+    sql += ` offset ${offset}`
   }
   return {
     sql,
@@ -70,20 +70,20 @@ where
 
 type RoleIdentifier = Pick<PGRole, 'id'> | Pick<PGRole, 'name'>
 
-function getIdentifierWhereClause(identifier: RoleIdentifier): SafeSqlFragment {
+function getIdentifierWhereClause(identifier: RoleIdentifier) {
   if ('id' in identifier && identifier.id) {
-    return safeSql`${ident('id')} = ${literal(identifier.id)}`
+    return `${ident('id')} = ${literal(identifier.id)}`
   } else if ('name' in identifier && identifier.name) {
-    return safeSql`${ident('name')} = ${literal(identifier.name)}`
+    return `${ident('name')} = ${literal(identifier.name)}`
   }
   throw new Error('Must provide either id or name')
 }
 
 function retrieve(identifier: RoleIdentifier): {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgRoleOptionalZod
 } {
-  const sql = safeSql`with roles as (${ROLES_SQL}) select * from roles where ${getIdentifierWhereClause(identifier)};`
+  const sql = `with roles as (${ROLES_SQL}) select * from roles where ${getIdentifierWhereClause(identifier)};`
   return {
     sql,
     zod: pgRoleOptionalZod,
@@ -102,9 +102,9 @@ type RoleCreateParams = {
   connectionLimit?: number
   password?: string
   validUntil?: string
-  memberOf?: Array<string>
-  members?: Array<string>
-  admins?: Array<string>
+  memberOf?: string[]
+  members?: string[]
+  admins?: string[]
   config?: Record<string, string>
 }
 function create({
@@ -123,29 +123,26 @@ function create({
   members = [],
   admins = [],
   config = {},
-}: RoleCreateParams): { sql: SafeSqlFragment } {
-  const sql = safeSql`
+}: RoleCreateParams): { sql: string } {
+  const sql = `
 create role ${ident(name)}
-  ${isSuperuser ? safeSql`superuser` : safeSql``}
-  ${canCreateDb ? safeSql`createdb` : safeSql``}
-  ${canCreateRole ? safeSql`createrole` : safeSql``}
-  ${inheritRole ? safeSql`` : safeSql`noinherit`}
-  ${canLogin ? safeSql`login` : safeSql``}
-  ${isReplicationRole ? safeSql`replication` : safeSql``}
-  ${canBypassRls ? safeSql`bypassrls` : safeSql``}
-  connection limit ${literal(connectionLimit)}
-  ${password === undefined ? safeSql`` : safeSql`password ${literal(password)}`}
-  ${validUntil === undefined ? safeSql`` : safeSql`valid until ${literal(validUntil)}`}
-  ${memberOf.length === 0 ? safeSql`` : safeSql`in role ${joinSqlFragments(memberOf.map(ident), ',')}`}
-  ${members.length === 0 ? safeSql`` : safeSql`role ${joinSqlFragments(members.map(ident), ',')}`}
-  ${admins.length === 0 ? safeSql`` : safeSql`admin ${joinSqlFragments(admins.map(ident), ',')}`}
+  ${isSuperuser ? 'superuser' : ''}
+  ${canCreateDb ? 'createdb' : ''}
+  ${canCreateRole ? 'createrole' : ''}
+  ${inheritRole ? '' : 'noinherit'}
+  ${canLogin ? 'login' : ''}
+  ${isReplicationRole ? 'replication' : ''}
+  ${canBypassRls ? 'bypassrls' : ''}
+  connection limit ${connectionLimit}
+  ${password === undefined ? '' : `password ${literal(password)}`}
+  ${validUntil === undefined ? '' : `valid until ${literal(validUntil)}`}
+  ${memberOf.length === 0 ? '' : `in role ${memberOf.map(ident).join(',')}`}
+  ${members.length === 0 ? '' : `role ${members.map(ident).join(',')}`}
+  ${admins.length === 0 ? '' : `admin ${admins.map(ident).join(',')}`}
   ;
-${joinSqlFragments(
-  Object.entries(config).map(
-    ([param, value]) => safeSql`alter role ${ident(name)} set ${ident(param)} = ${literal(value)};`
-  ),
-  '\n'
-)}
+${Object.entries(config)
+  .map(([param, value]) => `alter role ${ident(name)} set ${ident(param)} = ${literal(value)};`)
+  .join('\n')}
 `
   return { sql }
 }
@@ -163,7 +160,7 @@ type RoleUpdateParams = {
   password?: string
   validUntil?: string
 }
-function update(identifier: RoleIdentifier, params: RoleUpdateParams): { sql: SafeSqlFragment } {
+function update(identifier: RoleIdentifier, params: RoleUpdateParams): { sql: string } {
   const {
     name: newName,
     isSuperuser,
@@ -177,7 +174,7 @@ function update(identifier: RoleIdentifier, params: RoleUpdateParams): { sql: Sa
     password,
     validUntil,
   } = params
-  const sql = safeSql`
+  const sql = `
 do $$
 declare
   old record;
@@ -189,22 +186,22 @@ begin
   end if;
 
   execute(format('alter role %I
-    ${isSuperuser === undefined ? safeSql`` : isSuperuser ? safeSql`superuser` : safeSql`nosuperuser`}
-    ${canCreateDb === undefined ? safeSql`` : canCreateDb ? safeSql`createdb` : safeSql`nocreatedb`}
-    ${canCreateRole === undefined ? safeSql`` : canCreateRole ? safeSql`createrole` : safeSql`nocreaterole`}
-    ${inheritRole === undefined ? safeSql`` : inheritRole ? safeSql`inherit` : safeSql`noinherit`}
-    ${canLogin === undefined ? safeSql`` : canLogin ? safeSql`login` : safeSql`nologin`}
-    ${isReplicationRole === undefined ? safeSql`` : isReplicationRole ? safeSql`replication` : safeSql`noreplication`}
-    ${canBypassRls === undefined ? safeSql`` : canBypassRls ? safeSql`bypassrls` : safeSql`nobypassrls`}
-    ${connectionLimit === undefined ? safeSql`` : safeSql`connection limit ${literal(connectionLimit)}`}
-    ${password === undefined ? safeSql`` : safeSql`password ${literal(password)}`}
-    ${validUntil === undefined ? safeSql`` : safeSql`valid until %L`}
-  ', old.name${validUntil === undefined ? safeSql`` : safeSql`, ${literal(validUntil)}`}));
+    ${isSuperuser === undefined ? '' : isSuperuser ? 'superuser' : 'nosuperuser'}
+    ${canCreateDb === undefined ? '' : canCreateDb ? 'createdb' : 'nocreatedb'}
+    ${canCreateRole === undefined ? '' : canCreateRole ? 'createrole' : 'nocreaterole'}
+    ${inheritRole === undefined ? '' : inheritRole ? 'inherit' : 'noinherit'}
+    ${canLogin === undefined ? '' : canLogin ? 'login' : 'nologin'}
+    ${isReplicationRole === undefined ? '' : isReplicationRole ? 'replication' : 'noreplication'}
+    ${canBypassRls === undefined ? '' : canBypassRls ? 'bypassrls' : 'nobypassrls'}
+    ${connectionLimit === undefined ? '' : `connection limit ${connectionLimit}`}
+    ${password === undefined ? '' : `password ${literal(password)}`}
+    ${validUntil === undefined ? '' : `valid until %L`}
+  ', old.name${validUntil === undefined ? '' : `, ${literal(validUntil)}`}));
 
   ${
     newName === undefined
-      ? safeSql``
-      : safeSql`
+      ? ''
+      : `
   -- Using the same name in the rename clause gives an error, so only do it if the new name is different.
   if ${literal(newName)} != old.name then
     execute(format('alter role %I rename to %I;', old.name, ${literal(newName)}));
@@ -223,8 +220,8 @@ type RoleRemoveParams = {
 function remove(
   identifier: RoleIdentifier,
   { ifExists = false }: RoleRemoveParams = {}
-): { sql: SafeSqlFragment } {
-  const sql = safeSql`
+): { sql: string } {
+  const sql = `
 do $$
 declare
   old record;
@@ -235,7 +232,7 @@ begin
     raise exception 'Cannot find role with id %', id;
   end if;
 
-  execute(format('drop role ${ifExists ? safeSql`if exists` : safeSql``} %I;', old.name));
+  execute(format('drop role ${ifExists ? 'if exists' : ''} %I;', old.name));
 end
 $$;
 `

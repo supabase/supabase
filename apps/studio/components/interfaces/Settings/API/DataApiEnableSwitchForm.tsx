@@ -1,5 +1,13 @@
 import type { UseFormReturn } from 'react-hook-form'
-import { CardContent, CardFooter, Form, FormControl, FormField, FormItem, Switch } from 'ui'
+import {
+  CardContent,
+  CardFooter,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  Switch,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DataApiDisabledAlert } from './DataApiDisabledAlert'
@@ -26,31 +34,31 @@ export const DataApiEnableSwitchForm = ({
   const watchedEnabled = form.watch('enableDataApi')
 
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
         <CardContent>
-          <FormField
+          <FormField_Shadcn_
             control={form.control}
             name="enableDataApi"
             render={({ field }) => (
-              <FormItem className="space-y-4">
+              <FormItem_Shadcn_ className="space-y-4">
                 <FormItemLayout
                   layout="flex-row-reverse"
                   label="Enable Data API"
                   description="When enabled you will be able to use any Supabase client library and PostgREST endpoints with any schema configured in the Settings tab."
                 >
-                  <FormControl>
+                  <FormControl_Shadcn_>
                     <Switch
                       size="large"
                       disabled={disabled}
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
-                  </FormControl>
+                  </FormControl_Shadcn_>
                 </FormItemLayout>
 
                 {!watchedEnabled && <DataApiDisabledAlert />}
-              </FormItem>
+              </FormItem_Shadcn_>
             )}
           />
         </CardContent>
@@ -65,6 +73,6 @@ export const DataApiEnableSwitchForm = ({
           />
         </CardFooter>
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }

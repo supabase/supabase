@@ -1,7 +1,6 @@
-import { useMemo } from 'react'
-
-import type { ConnectMode } from './Connect.types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useMemo } from 'react'
+import type { ConnectMode } from './Connect.types'
 
 export function useAvailableConnectModes(): ConnectMode[] {
   const {

@@ -1,3 +1,5 @@
+import type { Branch } from 'data/branches/branches-query'
+import { useTrack } from 'lib/telemetry/track'
 import { ListTree, MessageCircle, Plus } from 'lucide-react'
 import Link from 'next/link'
 import {
@@ -14,8 +16,6 @@ import {
 } from 'ui'
 
 import { BranchLink } from './BranchLink'
-import type { Branch } from '@/data/branches/branches-query'
-import { useTrack } from '@/lib/telemetry/track'
 
 const BRANCHING_GITHUB_DISCUSSION_LINK = 'https://github.com/orgs/supabase/discussions/18937'
 
@@ -98,7 +98,7 @@ export function BranchDropdownCommandContent({
         {isBranchingEnabled && (
           <CommandInput_Shadcn_ placeholder="Find branch..." wrapperClassName="shrink-0 border-b" />
         )}
-        <CommandList_Shadcn_ className="flex flex-col flex-1 p-1 min-h-0 overflow-y-auto max-h-none!">
+        <CommandList_Shadcn_ className="flex flex-col flex-1 p-1 min-h-0 overflow-y-auto !max-h-none">
           {isBranchingEnabled && <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>}
           <CommandGroup_Shadcn_ className="min-h-0">
             {branchList.map((branch) => (

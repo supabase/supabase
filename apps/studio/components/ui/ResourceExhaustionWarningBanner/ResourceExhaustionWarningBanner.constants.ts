@@ -1,4 +1,4 @@
-import { DOCS_URL } from '@/lib/constants'
+import { DOCS_URL } from 'lib/constants'
 
 interface ResourceWarningMessage {
   // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/api')
@@ -14,13 +14,10 @@ interface ResourceWarningMessage {
   }
   docsUrl?: string
   buttonText?: string
-  aiPrompt?: string
   metric: string | null
 }
 
-type ResourceWarningMessages = Record<string, ResourceWarningMessage>
-
-export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
+export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> = {
   is_readonly_mode_enabled: {
     bannerContent: {
       warning: {
@@ -47,7 +44,7 @@ export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
       },
     },
     docsUrl: `${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`,
-    buttonText: 'Manage disk',
+    buttonText: 'Learn more',
     metric: 'read_only',
   },
   disk_io_exhaustion: {
@@ -56,12 +53,12 @@ export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
         title:
           'Your project is about to deplete its Disk IO Budget, and may become unresponsive once fully exhausted',
         description:
-          'Upgrade your compute or use the AI Assistant to identify and optimize disk-intensive queries.',
+          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
       },
       critical: {
         title: 'Your project has depleted its Disk IO Budget, and may become unresponsive',
         description:
-          'Upgrade your compute or use the AI Assistant to identify and optimize disk-intensive queries.',
+          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
       },
     },
     cardContent: {
@@ -75,9 +72,7 @@ export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
       },
     },
     docsUrl: `${DOCS_URL}/guides/troubleshooting/exhaust-disk-io`,
-    buttonText: 'Upgrade compute',
-    aiPrompt:
-      'My database is running out of Disk IO budget. Can you query pg_stat_statements to find the top queries by shared blocks read and written, identify which are causing the most disk I/O, and suggest specific optimizations to reduce disk usage?',
+    buttonText: 'Learn more',
     metric: 'disk_io',
   },
   disk_space_exhaustion: {
@@ -113,12 +108,12 @@ export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
       warning: {
         title: 'Your project is currently facing high CPU usage, and its performance is affected',
         description:
-          'Upgrade your compute or use the AI Assistant to identify and optimize CPU-intensive queries.',
+          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
       },
       critical: {
         title: "Your project's CPU usage is at 100% and its performance is affected",
         description:
-          'Upgrade your compute or use the AI Assistant to identify and optimize CPU-intensive queries.',
+          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
       },
     },
     cardContent: {
@@ -132,9 +127,7 @@ export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
       },
     },
     docsUrl: `${DOCS_URL}/guides/troubleshooting/high-cpu-usage`,
-    buttonText: 'Upgrade compute',
-    aiPrompt:
-      'My database is experiencing high CPU usage. Can you query pg_stat_statements to find the top queries by total execution time and mean execution time, identify which are most CPU-intensive, and suggest specific optimizations such as missing indexes or query rewrites to reduce CPU load?',
+    buttonText: 'Learn more',
     metric: 'cpu',
   },
   memory_and_swap_exhaustion: {
@@ -143,12 +136,12 @@ export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
         title:
           'Your project is currently facing high memory usage, and its performance is affected',
         description:
-          'Upgrade your compute or use the AI Assistant to identify and optimize memory-intensive queries.',
+          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
       },
       critical: {
         title: "Your project's memory usage is at 100%, and its performance is affected",
         description:
-          'Upgrade your compute or use the AI Assistant to identify and optimize memory-intensive queries.',
+          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
       },
     },
     cardContent: {
@@ -162,9 +155,7 @@ export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
       },
     },
     docsUrl: `${DOCS_URL}/guides/troubleshooting/exhaust-ram`,
-    buttonText: 'Upgrade compute',
-    aiPrompt:
-      'My database is experiencing high memory and swap usage. Can you query pg_stat_statements to find the top queries by shared buffer hits and rows returned, identify which queries are putting the most pressure on memory, and suggest optimizations to reduce memory consumption?',
+    buttonText: 'Learn more',
     metric: 'ram',
   },
   auth_rate_limit_exhaustion: {
@@ -201,12 +192,12 @@ export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
         title:
           'Your project is currently exhausting multiple resources, and its performance is affected',
         description:
-          'Upgrade your compute or use the AI Assistant to identify and optimize the most expensive queries.',
+          "Check which resources are reaching their threshold on your project's usage page.",
       },
       critical: {
         title: 'Your project has exhausted multiple resources, and its performance is affected',
         description:
-          'Upgrade your compute or use the AI Assistant to identify and optimize the most expensive queries.',
+          "Check which resources have reached their threshold on your project's usage page.",
       },
     },
     cardContent: {
@@ -221,8 +212,6 @@ export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
     },
     docsUrl: undefined,
     buttonText: 'Check usage',
-    aiPrompt:
-      'My database is exhausting multiple resources (CPU, memory, and/or disk IO). Can you query pg_stat_statements to identify the most expensive queries overall, and suggest which optimizations would have the biggest impact on reducing resource consumption?',
     metric: null,
   },
 }

@@ -1,21 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Pencil, ThumbsDown, ThumbsUp, Trash2 } from 'lucide-react'
-import { useEffect, useState, type PropsWithChildren } from 'react'
+import { type PropsWithChildren, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+
 import {
   Button,
   cn,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   TextArea_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import * as z from 'zod'
-
 import { ButtonTooltip } from '../ButtonTooltip'
 
 export function MessageActions({
@@ -37,7 +37,7 @@ function MessageActionsEdit({ onClick, tooltip }: { onClick: () => void; tooltip
       type="text"
       icon={<Pencil size={14} strokeWidth={1.5} />}
       onClick={onClick}
-      className="text-foreground-light hover:text-foreground p-1 rounded-sm"
+      className="text-foreground-light hover:text-foreground p-1 rounded"
       aria-label={tooltip}
       tooltip={{
         content: {
@@ -57,7 +57,7 @@ function MessageActionsDelete({ onClick }: { onClick: () => void }) {
       icon={<Trash2 size={14} strokeWidth={1.5} />}
       tooltip={{ content: { side: 'bottom', text: 'Delete message' } }}
       onClick={onClick}
-      className="text-foreground-light hover:text-foreground p-1 rounded-sm"
+      className="text-foreground-light hover:text-foreground p-1 rounded"
       title="Delete message"
       aria-label="Delete message"
     />
@@ -90,10 +90,7 @@ function MessageActionsThumbsUp({
         />
       }
       onClick={onClick}
-      className={cn(
-        'p-1 rounded-sm transition-colors',
-        disabled && 'opacity-50 pointer-events-none'
-      )}
+      className={cn('p-1 rounded transition-colors', disabled && 'opacity-50 pointer-events-none')}
       title="Good response"
       aria-label="Good response"
     />
@@ -158,7 +155,7 @@ function MessageActionsThumbsDown({
           disabled={disabled}
           onClick={() => !disabled && setOpen(true)}
           className={cn(
-            'p-1 rounded-sm transition-colors',
+            'p-1 rounded transition-colors',
             disabled && 'opacity-50 pointer-events-none'
           )}
           title="Bad response"
@@ -179,14 +176,14 @@ function MessageActionsThumbsDown({
         {form.formState.isSubmitSuccessful ? (
           <p className="text-sm">We appreciate your feedback!</p>
         ) : (
-          <Form {...form}>
+          <Form_Shadcn_ {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-              <FormField
+              <FormField_Shadcn_
                 control={form.control}
                 name="reason"
                 render={({ field }) => (
                   <FormItemLayout label="What went wrong?" labelOptional="optional">
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <TextArea_Shadcn_
                         placeholder="Describe why the response was not helpful..."
                         autoComplete="off"
@@ -194,7 +191,7 @@ function MessageActionsThumbsDown({
                         autoFocus
                         {...field}
                       />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
@@ -204,7 +201,7 @@ function MessageActionsThumbsDown({
                 </Button>
               </div>
             </form>
-          </Form>
+          </Form_Shadcn_>
         )}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>

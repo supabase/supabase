@@ -1,8 +1,21 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { IS_PLATFORM, useParams } from 'common'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { EdgeFunctionTesterSheet } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
+import { APIDocsButton } from 'components/ui/APIDocsButton'
+import { DocsButton } from 'components/ui/DocsButton'
+import NoPermission from 'components/ui/NoPermission'
+import { useProjectApiUrl } from 'data/config/project-endpoint-query'
+import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
+import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { withAuth } from 'hooks/misc/withAuth'
+import { DOCS_URL } from 'lib/constants'
 import { Clock, Download, FileArchive, Send } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -39,18 +52,7 @@ import {
 
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
-import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
 import CopyButton from '@/components/ui/CopyButton'
-import { DocsButton } from '@/components/ui/DocsButton'
-import NoPermission from '@/components/ui/NoPermission'
-import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
-import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { withAuth } from '@/hooks/misc/withAuth'
-import { DOCS_URL } from '@/lib/constants'
 
 dayjs.extend(relativeTime)
 
@@ -67,6 +69,7 @@ const EdgeFunctionDetailsLayout = ({
   const { functionSlug, ref } = useParams()
   const { mutate: sendEvent } = useSendEventMutation()
 
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { isLoading, can: canReadFunctions } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
     '*'
@@ -271,7 +274,7 @@ const EdgeFunctionDetailsLayout = ({
           <PageHeaderMeta>
             <PageHeaderSummary>
               <PageHeaderTitle>{functionSlug ? name : 'Edge Functions'}</PageHeaderTitle>
-              <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-sm!">
+              <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 !text-sm">
                 <div className="flex items-center gap-x-2">
                   <span className="flex items-center gap-2">{functionUrl}</span>
                   <CopyButton iconOnly type="text" text={functionUrl} />
@@ -329,6 +332,16 @@ const EdgeFunctionDetailsLayout = ({
 
             <PageHeaderAside>
               <div className="flex items-center space-x-2">
+                {isNewAPIDocsEnabled && (
+                  <APIDocsButton
+                    section={
+                      functionSlug !== undefined
+                        ? ['edge-functions', functionSlug]
+                        : ['edge-functions']
+                    }
+                    source="edge-functions"
+                  />
+                )}
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
                 <Popover_Shadcn_>
                   <PopoverTrigger_Shadcn_ asChild>
@@ -350,7 +363,7 @@ const EdgeFunctionDetailsLayout = ({
                             value={`supabase functions download ${functionSlug}`}
                           />
                         </div>
-                        <Separator className="bg-border-overlay!" />
+                        <Separator className="!bg-border-overlay" />
                       </>
                     )}
                     <div className="py-2 px-1">

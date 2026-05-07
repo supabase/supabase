@@ -1,6 +1,5 @@
 import { useParams } from 'common'
-
-import { useProjectLintsQuery } from '@/data/lint/lint-query'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
 
 /**
  * Hook to fetch and filter project lints

@@ -1,9 +1,8 @@
-import { useMemo } from 'react'
-
 import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
-} from '@/components/interfaces/Settings/Logs/Logs.utils'
+} from 'components/interfaces/Settings/Logs/Logs.utils'
+import { useMemo } from 'react'
 
 /**
  * Convenience hook for converting timeseries timestamp from unix microsecond to iso

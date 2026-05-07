@@ -2,14 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { coalesceRowsToArray, filterByList } from './helpers'
-import {
-  ident,
-  joinSqlFragments,
-  keyword,
-  literal,
-  safeSql,
-  type SafeSqlFragment,
-} from './pg-format'
+import { ident, literal } from './pg-format'
 import { pgColumnArrayZod } from './pg-meta-columns'
 import { COLUMNS_SQL } from './sql/columns'
 import { TABLES_SQL } from './sql/tables'
@@ -62,12 +55,12 @@ type TableBasedOnIncludeColumns<T extends boolean | undefined> = T extends true
 
 type TableIdentifier = Pick<PGTable, 'id'> | Pick<PGTable, 'name' | 'schema'>
 
-function getIdentifierWhereClause(identifier: TableIdentifier): SafeSqlFragment {
+function getIdentifierWhereClause(identifier: TableIdentifier): string {
   if ('id' in identifier && identifier.id) {
-    return safeSql`${ident('id')} = ${literal(identifier.id)}`
+    return `${ident('id')} = ${literal(identifier.id)}`
   }
   if ('name' in identifier && identifier.name && identifier.schema) {
-    return safeSql`${ident('name')} = ${literal(identifier.name)} and ${ident('schema')} = ${literal(identifier.schema)}`
+    return `${ident('name')} = ${literal(identifier.name)} and ${ident('schema')} = ${literal(identifier.schema)}`
   }
   throw new Error('Must provide either id or name and schema')
 }
@@ -89,7 +82,7 @@ function list<T extends boolean | undefined = true>(
     includeColumns?: T
   } = {} as any
 ): {
-  sql: SafeSqlFragment
+  sql: string
   zod: z.ZodType<TableBasedOnIncludeColumns<T>[]>
 } {
   let sql = generateEnrichedTablesSql({ includeColumns })
@@ -99,13 +92,13 @@ function list<T extends boolean | undefined = true>(
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
   if (filter) {
-    sql = safeSql`${sql} where schema ${filter}`
+    sql += ` where schema ${filter}`
   }
   if (limit) {
-    sql = safeSql`${sql} limit ${literal(limit)}`
+    sql += ` limit ${limit}`
   }
   if (offset) {
-    sql = safeSql`${sql} offset ${literal(offset)}`
+    sql += ` offset ${offset}`
   }
   return {
     sql,
@@ -114,12 +107,12 @@ function list<T extends boolean | undefined = true>(
 }
 
 function retrieve(identifier: TableIdentifier): {
-  sql: SafeSqlFragment
+  sql: string
   zod: z.ZodType<TableWithColumns>
 } {
   let whereClause = getIdentifierWhereClause(identifier)
 
-  const sql = safeSql`${generateEnrichedTablesSql({ includeColumns: true })} where ${whereClause};`
+  const sql = `${generateEnrichedTablesSql({ includeColumns: true })} where ${whereClause};`
   return {
     sql,
     zod: pgTableZod,
@@ -129,19 +122,19 @@ function retrieve(identifier: TableIdentifier): {
 function remove(
   table: Pick<PGTable, 'name' | 'schema'>,
   { cascade = false } = {}
-): { sql: SafeSqlFragment } {
-  const sql = safeSql`DROP TABLE ${ident(table.schema)}.${ident(table.name)} ${
-    cascade ? safeSql`CASCADE` : safeSql`RESTRICT`
+): { sql: string } {
+  const sql = `DROP TABLE ${ident(table.schema)}.${ident(table.name)} ${
+    cascade ? 'CASCADE' : 'RESTRICT'
   };`
   return { sql }
 }
 
-const generateEnrichedTablesSql = ({ includeColumns }: { includeColumns?: boolean }) => safeSql`
+const generateEnrichedTablesSql = ({ includeColumns }: { includeColumns?: boolean }) => `
   with tables as (${TABLES_SQL})
-  ${includeColumns ? safeSql`, columns as (${COLUMNS_SQL})` : safeSql``}
+  ${includeColumns ? `, columns as (${COLUMNS_SQL})` : ''}
   select
     *
-    ${includeColumns ? safeSql`, ${coalesceRowsToArray('columns', safeSql`columns.table_id = tables.id`)}` : safeSql``}
+    ${includeColumns ? `, ${coalesceRowsToArray('columns', 'columns.table_id = tables.id')}` : ''}
   from tables`
 
 type TableCreateParams = {
@@ -152,19 +145,19 @@ type TableCreateParams = {
 }
 
 function create({ name, schema = 'public', comment, no_transaction = false }: TableCreateParams): {
-  sql: SafeSqlFragment
+  sql: string
 } {
-  const tableSql = safeSql`CREATE TABLE ${ident(schema)}.${ident(name)} ();`
+  const tableSql = `CREATE TABLE ${ident(schema)}.${ident(name)} ();`
   const commentSql =
     comment != undefined
-      ? safeSql`COMMENT ON TABLE ${ident(schema)}.${ident(name)} IS ${literal(comment)};`
-      : safeSql``
+      ? `COMMENT ON TABLE ${ident(schema)}.${ident(name)} IS ${literal(comment)};`
+      : ''
 
   if (no_transaction) {
-    const sql = safeSql`${tableSql} ${commentSql}`
+    const sql = `${tableSql} ${commentSql}`
     return { sql }
   }
-  const sql = safeSql`BEGIN; ${tableSql} ${commentSql} COMMIT;`
+  const sql = `BEGIN; ${tableSql} ${commentSql} COMMIT;`
   return { sql }
 }
 
@@ -191,43 +184,39 @@ function update(
     primary_keys,
     comment,
   }: TableUpdateParams
-): { sql: SafeSqlFragment } {
-  const alter = safeSql`ALTER TABLE ${ident(old.schema)}.${ident(old.name)}`
-  const schemaSql =
-    schema === undefined ? safeSql`` : safeSql`${alter} SET SCHEMA ${ident(schema)};`
-  let nameSql = safeSql``
+): { sql: string } {
+  const alter = `ALTER TABLE ${ident(old.schema)}.${ident(old.name)}`
+  const schemaSql = schema === undefined ? '' : `${alter} SET SCHEMA ${ident(schema)};`
+  let nameSql = ''
   if (name !== undefined && name !== old.name) {
     const currentSchema = schema === undefined ? old.schema : schema
-    nameSql = safeSql`ALTER TABLE ${ident(currentSchema)}.${ident(old.name)} RENAME TO ${ident(name)};`
+    nameSql = `ALTER TABLE ${ident(currentSchema)}.${ident(old.name)} RENAME TO ${ident(name)};`
   }
-  let enableRls = safeSql``
+  let enableRls = ''
   if (rls_enabled !== undefined) {
-    const enable = safeSql`${alter} ENABLE ROW LEVEL SECURITY;`
-    const disable = safeSql`${alter} DISABLE ROW LEVEL SECURITY;`
+    const enable = `${alter} ENABLE ROW LEVEL SECURITY;`
+    const disable = `${alter} DISABLE ROW LEVEL SECURITY;`
     enableRls = rls_enabled ? enable : disable
   }
-  let forceRls = safeSql``
+  let forceRls = ''
   if (rls_forced !== undefined) {
-    const enable = safeSql`${alter} FORCE ROW LEVEL SECURITY;`
-    const disable = safeSql`${alter} NO FORCE ROW LEVEL SECURITY;`
+    const enable = `${alter} FORCE ROW LEVEL SECURITY;`
+    const disable = `${alter} NO FORCE ROW LEVEL SECURITY;`
     forceRls = rls_forced ? enable : disable
   }
-  let replicaSql = safeSql``
+  let replicaSql = ''
   if (replica_identity === undefined) {
     // skip
   } else if (replica_identity === 'INDEX') {
-    if (!replica_identity_index) {
-      throw new Error('replica_identity_index is required when replica_identity is INDEX')
-    }
-    replicaSql = safeSql`${alter} REPLICA IDENTITY USING INDEX ${ident(replica_identity_index)};`
+    replicaSql = `${alter} REPLICA IDENTITY USING INDEX ${replica_identity_index};`
   } else {
-    replicaSql = safeSql`${alter} REPLICA IDENTITY ${keyword(replica_identity)};`
+    replicaSql = `${alter} REPLICA IDENTITY ${replica_identity};`
   }
-  let primaryKeysSql = safeSql``
+  let primaryKeysSql = ''
   if (primary_keys === undefined) {
     // skip
   } else {
-    primaryKeysSql = safeSql`${primaryKeysSql}
+    primaryKeysSql += `
 DO $$
 DECLARE
   r record;
@@ -246,19 +235,18 @@ $$;
     if (primary_keys.length === 0) {
       // skip
     } else {
-      primaryKeysSql = safeSql`${primaryKeysSql} ${alter} ADD PRIMARY KEY (${joinSqlFragments(
-        primary_keys.map((x) => ident(x.name)),
-        ','
-      )});`
+      primaryKeysSql += `${alter} ADD PRIMARY KEY (${primary_keys
+        .map((x) => ident(x.name))
+        .join(',')});`
     }
   }
   const commentSql =
     comment == undefined
-      ? safeSql``
-      : safeSql`COMMENT ON TABLE ${ident(old.schema)}.${ident(old.name)} IS ${literal(comment)};`
+      ? ''
+      : `COMMENT ON TABLE ${ident(old.schema)}.${ident(old.name)} IS ${literal(comment)};`
 
   // nameSql must be last, right below schemaSql
-  const sql = safeSql`
+  const sql = `
 BEGIN;
   ${enableRls}
   ${forceRls}

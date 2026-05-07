@@ -1,9 +1,8 @@
+import { useHotKey } from 'hooks/ui/useHotKey'
+import { getModKeyLabel } from 'lib/helpers'
 import { noop } from 'lodash'
-import { PropsWithChildren, useCallback, useState } from 'react'
-import { Button, KeyboardShortcut } from 'ui'
-
-import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { PropsWithChildren, useCallback, useMemo, useState } from 'react'
+import { Button } from 'ui'
 
 interface ActionBarProps {
   loading?: boolean
@@ -30,6 +29,7 @@ export const ActionBar = ({
   visible = true,
 }: PropsWithChildren<ActionBarProps>) => {
   const [isRunning, setIsRunning] = useState(false)
+  const modKeyLabel = useMemo(() => getModKeyLabel(), [])
 
   const onSelectApply = useCallback(async () => {
     const applyCallback = () => new Promise((resolve) => applyFunction?.(resolve))
@@ -38,20 +38,36 @@ export const ActionBar = ({
     setIsRunning(false)
   }, [applyFunction])
 
-  const handleSave = useCallback(() => {
-    if (isRunning || loading || disableApply || hideApply) return
+  const handleSave = useCallback(
+    (event: KeyboardEvent) => {
+      // Don't trigger if already running/loading, or if apply is disabled/hidden
+      if (isRunning || loading || disableApply || hideApply) return
 
-    if (formId) {
-      const form = document.getElementById(formId) as HTMLFormElement | null
-      if (form) {
-        form.requestSubmit()
+      // Don't trigger if the user is in a textarea (allow multi-line entry)
+      // unless they explicitly press CMD+Enter
+      const activeElement = document.activeElement
+      const isTextarea = activeElement?.tagName === 'TEXTAREA'
+
+      // If in a textarea and this is just an Enter key (not CMD+Enter), don't submit
+      if (isTextarea && !event.metaKey && !event.ctrlKey) return
+
+      event.preventDefault()
+      event.stopPropagation()
+
+      if (formId) {
+        // Form-based submission - programmatically submit the form
+        const form = document.getElementById(formId) as HTMLFormElement | null
+        if (form) {
+          form.requestSubmit()
+        }
+      } else if (applyFunction) {
+        onSelectApply()
       }
-    } else if (applyFunction) {
-      onSelectApply()
-    }
-  }, [isRunning, loading, disableApply, hideApply, formId, applyFunction, onSelectApply])
+    },
+    [isRunning, loading, disableApply, hideApply, formId, applyFunction, onSelectApply]
+  )
 
-  useShortcut(SHORTCUT_IDS.ACTION_BAR_SAVE, handleSave, { enabled: visible })
+  useHotKey(handleSave, 'Enter', { enabled: visible })
 
   return (
     <div className="flex w-full items-center gap-3 border-t border-default px-3 py-4">
@@ -73,13 +89,9 @@ export const ActionBar = ({
             onClick={onSelectApply}
             disabled={disableApply || isRunning || loading}
             loading={isRunning || loading}
-            iconRight={
-              isRunning || loading ? undefined : (
-                <KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />
-              )
-            }
           >
-            {applyButtonLabel}
+            <span>{applyButtonLabel}</span>
+            <span className="ml-2 text-xs text-foreground-lighter">{modKeyLabel}↵</span>
           </Button>
         ) : !hideApply ? (
           // New solution, when using the Form component, loading is handled by the Form itself
@@ -90,11 +102,9 @@ export const ActionBar = ({
             data-testid="action-bar-save-row"
             htmlType="submit"
             form={formId}
-            iconRight={
-              loading ? undefined : <KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />
-            }
           >
-            {applyButtonLabel}
+            <span>{applyButtonLabel}</span>
+            <span className="ml-2 text-xs text-foreground-lighter">{modKeyLabel}↵</span>
           </Button>
         ) : (
           <div />

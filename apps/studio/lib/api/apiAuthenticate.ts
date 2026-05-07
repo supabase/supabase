@@ -1,8 +1,7 @@
 import type { JwtPayload } from '@supabase/supabase-js'
+import { getUserClaims } from 'lib/gotrue'
 import type { NextApiRequest, NextApiResponse } from 'next'
-
-import { getUserClaims } from '@/lib/gotrue'
-import type { ResponseError } from '@/types'
+import type { ResponseError } from 'types'
 
 /**
  * Use this method on api routes to check if user is authenticated and having required permissions.

@@ -12,13 +12,13 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -61,17 +61,17 @@ export default function ComboboxForm() {
   }
 
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
+        <FormField_Shadcn_
           control={form.control}
           name="language"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Language</FormLabel>
+            <FormItem_Shadcn_ className="flex flex-col">
+              <FormLabel_Shadcn_>Language</FormLabel_Shadcn_>
               <Popover_Shadcn_>
                 <PopoverTrigger_Shadcn_ asChild>
-                  <FormControl>
+                  <FormControl_Shadcn_>
                     <Button
                       type="default"
                       role="combobox"
@@ -91,7 +91,7 @@ export default function ComboboxForm() {
                         ? languages.find((language) => language.value === field.value)?.label
                         : 'Select language'}
                     </Button>
-                  </FormControl>
+                  </FormControl_Shadcn_>
                 </PopoverTrigger_Shadcn_>
                 <PopoverContent_Shadcn_ className="w-[200px] p-0">
                   <Command_Shadcn_>
@@ -121,17 +121,17 @@ export default function ComboboxForm() {
                   </Command_Shadcn_>
                 </PopoverContent_Shadcn_>
               </Popover_Shadcn_>
-              <FormDescription>
+              <FormDescription_Shadcn_>
                 This is the language that will be used in the dashboard.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
+              </FormDescription_Shadcn_>
+              <FormMessage_Shadcn_ />
+            </FormItem_Shadcn_>
           )}
         />
         <Button htmlType="submit" type="secondary" size="small">
           Submit
         </Button>
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }

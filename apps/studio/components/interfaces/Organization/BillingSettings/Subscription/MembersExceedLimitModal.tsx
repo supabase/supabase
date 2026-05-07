@@ -1,7 +1,6 @@
+import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Modal } from 'ui'
-
-import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export interface MembersExceedLimitModalProps {
   visible: boolean

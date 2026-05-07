@@ -1,11 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
 
 import { useOperationQueueActions } from './useOperationQueueActions'
-import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { useHotKey } from '@/hooks/ui/useHotKey'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 /**
@@ -29,36 +28,44 @@ export function useOperationQueueShortcuts() {
   const hasOperations = snap.hasPendingOperations
   const isEnabled = isQueueOperationsEnabled && hasOperations
 
-  useShortcut(
-    SHORTCUT_IDS.OPERATION_QUEUE_SAVE,
-    () => {
+  useHotKey(
+    (event) => {
+      event.preventDefault()
+      event.stopPropagation()
       if (!isSaving && hasOperations) {
         handleSave()
       }
     },
+    's',
     { enabled: isEnabled }
   )
 
-  useShortcut(
-    SHORTCUT_IDS.OPERATION_QUEUE_TOGGLE,
-    () => {
+  useHotKey(
+    (event) => {
+      event.preventDefault()
+      event.stopPropagation()
       snap.toggleViewOperationQueue()
     },
+    '.',
     { enabled: isEnabled }
   )
 
-  useShortcut(
-    SHORTCUT_IDS.OPERATION_QUEUE_UNDO,
-    () => {
+  useHotKey(
+    (event) => {
+      event.preventDefault()
+      event.stopPropagation()
+
       const tableIdLatestOperation = snap.operationQueue.operations.at(-1)?.tableId
       snap.undoLatestOperation()
 
+      // Invalidate the query to revert the optimistic update
       if (project && tableIdLatestOperation) {
         queryClient.invalidateQueries({
           queryKey: tableRowKeys.tableRowsAndCount(project.ref, tableIdLatestOperation),
         })
       }
     },
+    'z',
     { enabled: isEnabled }
   )
 }

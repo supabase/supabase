@@ -1,11 +1,10 @@
+import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 import { Code } from 'lucide-react'
 import Link from 'next/link'
 import type { DragEvent, ReactNode } from 'react'
 import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
-
-import { ReportBlockContainer } from '@/components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 
 interface EdgeFunctionBlockProps {
   /** Title of the EdgeFunctionBlock */
@@ -144,7 +143,7 @@ export const EdgeFunctionBlock = ({
           value={code}
           language={'typescript' as CodeBlockLang}
           className={cn(
-            'max-w-none block bg-transparent! py-3! px-3.5! prose dark:prose-dark border-0 text-foreground rounded-none! w-full',
+            'max-w-none block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 text-foreground !rounded-none w-full',
             '[&>code]:m-0 [&>code>span]:text-foreground'
           )}
         />

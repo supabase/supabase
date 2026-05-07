@@ -1,4 +1,13 @@
 import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import SchemaSelector from 'components/ui/SchemaSelector'
+import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
+import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/indexes-query'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { sortBy } from 'lodash'
 import { AlertCircle, Search, Trash } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -21,17 +30,8 @@ import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringL
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { CreateIndexSidePanel } from './CreateIndexSidePanel'
-import AlertError from '@/components/ui/AlertError'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
-import SchemaSelector from '@/components/ui/SchemaSelector'
-import { useDatabaseIndexDeleteMutation } from '@/data/database-indexes/index-delete-mutation'
-import { useIndexesQuery, type DatabaseIndex } from '@/data/database-indexes/indexes-query'
-import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
-export const Indexes = () => {
+const Indexes = () => {
   const { data: project } = useSelectedProjectQuery()
   const { schema: urlSchema, table } = useParams()
 
@@ -132,7 +132,7 @@ export const Indexes = () => {
           <div className="flex items-center gap-2 flex-wrap">
             {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
             {isErrorSchemas && (
-              <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded-sm flex items-center space-x-2">
+              <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
                 <AlertCircle strokeWidth={2} size={16} />
                 <p>Failed to load schemas</p>
               </div>
@@ -157,7 +157,7 @@ export const Indexes = () => {
 
             {!isSchemaLocked && (
               <Button
-                className="ml-auto grow lg:grow-0"
+                className="ml-auto flex-grow lg:flex-grow-0"
                 type="primary"
                 onClick={() => setShowCreateIndex(true)}
                 disabled={!isSuccessSchemas}
@@ -278,8 +278,7 @@ export const Indexes = () => {
         visible={!!selectedIndexToDelete}
         title={
           <>
-            Confirm to delete index{' '}
-            <code className="text-code-inline">{selectedIndexToDelete?.name}</code>
+            Confirm to delete index <code className="text-sm">{selectedIndexToDelete?.name}</code>
           </>
         }
         confirmLabel="Confirm delete"
@@ -293,7 +292,6 @@ export const Indexes = () => {
           description:
             'Deleting an index that is still in use will cause queries to slow down, and in some cases causing significant performance issues.',
         }}
-        className="pt-0"
       >
         <ul className="mt-4 space-y-5">
           <li className="flex gap-3">
@@ -313,3 +311,5 @@ export const Indexes = () => {
     </>
   )
 }
+
+export default Indexes

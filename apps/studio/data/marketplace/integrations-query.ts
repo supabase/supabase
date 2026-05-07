@@ -1,15 +1,14 @@
 import { queryOptions } from '@tanstack/react-query'
-import { createMarketplaceClient } from 'common/marketplace-client'
+import { handleError } from 'data/fetchers'
 
 import { marketplaceIntegrationsKeys } from './keys'
-import { handleError } from '@/data/fetchers'
+import { createMarketplaceClient } from './marketplace-client'
 
 async function getMarketplaceIntegrations() {
-  const marketplaceClient = createMarketplaceClient()
-  const { data, error } = await marketplaceClient
-    .from('listings')
-    .select('*')
-    .is('publish_dashboard', true)
+  const client = createMarketplaceClient()
+  const { data, error } = await client
+    .from('items')
+    .select('*, categories:category_items(...categories(slug, title))')
 
   if (error) handleError(error)
   return data ?? []

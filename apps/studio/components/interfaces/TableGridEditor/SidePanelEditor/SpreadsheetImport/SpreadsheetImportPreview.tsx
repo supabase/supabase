@@ -1,5 +1,6 @@
 import { AlertCircle, ArrowRight, ChevronDown, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
+
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -11,7 +12,6 @@ import {
   SidePanel,
   WarningIcon,
 } from 'ui'
-
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 import SpreadsheetPreviewGrid from './SpreadsheetPreviewGrid'
 
@@ -24,7 +24,6 @@ interface SpreadsheetImportPreviewProps {
   errors?: any[]
   selectedHeaders: string[]
   incompatibleHeaders: string[]
-  emptyStringAsNullHeaders: string[]
 }
 
 export const SpreadsheetImportPreview = ({
@@ -33,7 +32,6 @@ export const SpreadsheetImportPreview = ({
   errors = [],
   selectedHeaders,
   incompatibleHeaders,
-  emptyStringAsNullHeaders,
 }: SpreadsheetImportPreviewProps) => {
   const [expandPreview, setExpandPreview] = useState(false)
   const [expandedErrors, setExpandedErrors] = useState<string[]>([])
@@ -114,12 +112,7 @@ export const SpreadsheetImportPreview = ({
           </div>
           <div className="mb-4">
             {previewHeaders.length > 0 && previewRows.length > 0 ? (
-              <SpreadsheetPreviewGrid
-                height={350}
-                headers={previewHeaders}
-                rows={previewRows}
-                emptyStringAsNullHeaders={emptyStringAsNullHeaders}
-              />
+              <SpreadsheetPreviewGrid height={350} headers={previewHeaders} rows={previewRows} />
             ) : (
               <div className="flex items-center justify-center py-4 border border-control rounded-md space-x-2">
                 <AlertCircle size={16} strokeWidth={1.5} className="text-foreground-light" />
@@ -176,7 +169,7 @@ export const SpreadsheetImportPreview = ({
                           {errorData !== undefined ? (
                             <button
                               type="button"
-                              className="flex items-center space-x-2 cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
+                              className="flex items-center space-x-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                               onClick={() => onSelectExpandError(key)}
                               aria-expanded={isExpanded}
                               aria-controls={`${key}-panel`}
@@ -225,7 +218,6 @@ export const SpreadsheetImportPreview = ({
                             <SpreadsheetPreviewGrid
                               headers={spreadsheetData.headers}
                               rows={[errorData]}
-                              emptyStringAsNullHeaders={emptyStringAsNullHeaders}
                             />
                           )}
                         </li>

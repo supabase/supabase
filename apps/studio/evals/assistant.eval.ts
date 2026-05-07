@@ -1,5 +1,9 @@
 import assert from 'node:assert'
 import { Eval } from 'braintrust'
+import { getModel } from 'lib/ai/model'
+import { DEFAULT_ASSISTANT_BASE_MODEL_ID, getAssistantModelEntry } from 'lib/ai/model.utils'
+import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
+import { getMockTools } from 'lib/ai/tools/mock-tools'
 
 import { dataset } from './dataset'
 import { buildAssistantEvalOutput } from './output'
@@ -9,15 +13,10 @@ import {
   correctnessScorer,
   docsFaithfulnessScorer,
   goalCompletionScorer,
-  knowledgeUsageScorer,
   toolUsageScorer,
   urlValidityScorer,
 } from './scorer'
 import { sqlIdentifierQuotingScorer, sqlSyntaxScorer } from './scorer-wasm'
-import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
-import { getModel } from '@/lib/ai/model'
-import { DEFAULT_ASSISTANT_BASE_MODEL_ID, getAssistantModelEntry } from '@/lib/ai/model.utils'
-import { getMockTools } from '@/lib/ai/tools/mock-tools'
 
 assert(process.env.BRAINTRUST_PROJECT_ID, 'BRAINTRUST_PROJECT_ID is not set')
 assert(process.env.OPENAI_API_KEY, 'OPENAI_API_KEY is not set')
@@ -50,7 +49,6 @@ Eval('Assistant', {
   },
   scores: [
     toolUsageScorer,
-    knowledgeUsageScorer,
     sqlSyntaxScorer,
     sqlIdentifierQuotingScorer,
     goalCompletionScorer,

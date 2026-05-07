@@ -1,5 +1,4 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-
 import { useLocalStorage } from './useLocalStorage'
 
 export type LastSignInType = 'github' | 'email' | 'sso' | null

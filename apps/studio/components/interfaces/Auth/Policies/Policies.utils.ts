@@ -1,5 +1,8 @@
 import { ident } from '@supabase/pg-meta/src/pg-format'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
+import { generateSqlPolicy } from 'data/ai/sql-policy-mutation'
+import type { CreatePolicyBody } from 'data/database-policies/database-policy-create-mutation'
+import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { has, isEmpty, isEqual } from 'lodash'
 
 import {
@@ -8,9 +11,6 @@ import {
   PostgresPolicyCreatePayload,
   PostgresPolicyUpdatePayload,
 } from './Policies.types'
-import { generateSqlPolicy } from '@/data/ai/sql-policy-mutation'
-import type { CreatePolicyBody } from '@/data/database-policies/database-policy-create-mutation'
-import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
 
 /**
  * Returns an array of SQL statements that will preview in the review step of the policy editor

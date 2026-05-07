@@ -1,12 +1,11 @@
-// End of third-party imports
-
-import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
-import { FormControl, FormField, Input_Shadcn_ } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+// End of third-party imports
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DocsSuggestions } from './DocsSuggestions'
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
@@ -29,14 +28,14 @@ export function SubjectAndSuggestionsInfo({
 }: SubjectAndSuggestionsInfoProps) {
   return (
     <div className={'flex flex-col gap-y-2'}>
-      <FormField
+      <FormField_Shadcn_
         name="subject"
         control={form.control}
         render={({ field }) => (
           <FormItemLayout layout="vertical" label="Subject">
-            <FormControl>
+            <FormControl_Shadcn_>
               <Input_Shadcn_ {...field} placeholder="Summary of the problem you have" />
-            </FormControl>
+            </FormControl_Shadcn_>
           </FormItemLayout>
         )}
       />

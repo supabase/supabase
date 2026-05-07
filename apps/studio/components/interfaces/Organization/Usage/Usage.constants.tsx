@@ -1,11 +1,9 @@
-import { ReactNode } from 'react'
+import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/Billing/Billing.constants'
+import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
+import type { OrgUsageResponse } from 'data/usage/org-usage-query'
+import { DOCS_URL } from 'lib/constants'
 import { Admonition } from 'ui-patterns'
-
-import { USAGE_APPROACHING_THRESHOLD } from '@/components/interfaces/Billing/Billing.constants'
-import { EgressType, PricingMetric } from '@/data/analytics/org-daily-stats-query'
-import type { OrgSubscription } from '@/data/subscriptions/types'
-import type { OrgUsageResponse } from '@/data/usage/org-usage-query'
-import { DOCS_URL } from '@/lib/constants'
 
 export const COLOR_MAP = {
   white: { bar: 'fill-foreground', marker: 'bg-foreground' },
@@ -61,7 +59,7 @@ export interface CategoryAttribute {
   chartPrefix?: 'Max' | 'Average' | 'Cumulative'
   chartSuffix?: string
   chartDescription: string
-  additionalInfo?: (usage?: OrgUsageResponse) => ReactNode | null
+  additionalInfo?: (usage?: OrgUsageResponse) => JSX.Element | null
 }
 
 export type CategoryMetaKey = 'egress' | 'sizeCount' | 'activity' | 'compute' | 'logs'

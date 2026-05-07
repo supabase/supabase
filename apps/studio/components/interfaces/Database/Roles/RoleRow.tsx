@@ -1,4 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
+import type { PgRole } from 'data/database-roles/database-roles-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { ChevronUp, MoreVertical, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
@@ -11,18 +14,15 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { ROLE_PERMISSIONS } from './Roles.constants'
-import { useDatabaseRoleUpdateMutation } from '@/data/database-roles/database-role-update-mutation'
-import type { PgRole } from '@/data/database-roles/database-roles-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface RoleRowProps {
   role: PgRole
@@ -103,17 +103,17 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         'data-open:border-strong',
         'data-open:pb-px col-span-12 mx-auto',
         '-space-y-px overflow-hidden',
-        'border border-t-0 first:border-t first:mt-0! hover:border-t hover:-mt-px shadow-sm transition hover:z-50',
+        'border border-t-0 first:border-t first:!mt-0 hover:border-t hover:-mt-[1px] shadow transition hover:z-50',
         'first:rounded-tl first:rounded-tr',
         'last:rounded-bl last:rounded-br'
       )}
     >
-      <div className={cn('flex items-center relative', !disabled && 'pr-(--card-padding-x)')}>
+      <div className={cn('flex items-center relative', !disabled && 'pr-[--card-padding-x]')}>
         <Collapsible.Trigger asChild>
           <button
             id={`collapsible-trigger-${role.id}`}
             type="button"
-            className="group flex w-full items-center justify-between rounded-sm py-3 px-card text-foreground"
+            className="group flex w-full items-center justify-between rounded py-3 px-card text-foreground"
             onClick={(event) => {
               event.preventDefault()
               event.stopPropagation()
@@ -177,7 +177,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         )}
       </div>
       <Collapsible.Content>
-        <Form {...form}>
+        <Form_Shadcn_ {...form}>
           <form
             id={formId}
             onSubmit={form.handleSubmit(onSaveChanges)}
@@ -186,7 +186,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             <div className="py-4 space-y-[9px]">
               {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[]).map(
                 (permission) => (
-                  <FormField
+                  <FormField_Shadcn_
                     key={permission}
                     control={form.control}
                     name={permission}
@@ -197,14 +197,14 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
                         layout="flex"
                         label={ROLE_PERMISSIONS[permission].description}
                       >
-                        <FormControl>
+                        <FormControl_Shadcn_>
                           <Switch
                             id={`${role.id}-${permission}`}
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
                           />
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
@@ -227,7 +227,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               </div>
             )}
           </form>
-        </Form>
+        </Form_Shadcn_>
       </Collapsible.Content>
     </Collapsible>
   )

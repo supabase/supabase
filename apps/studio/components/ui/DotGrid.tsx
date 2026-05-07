@@ -52,11 +52,12 @@ export const DotGrid = ({ rows, columns, count }: DotGridProps) => {
         aria-label={`Grid of ${rows * columns} dots, ${count} highlighted`}
       >
         {Array.from({ length: rows * columns }).map((_, index) => {
+          const isHighlighted = index < count
           return (
             <motion.div
               key={index}
               variants={item}
-              className={`w-px h-px rounded-full bg-foreground`}
+              className={`w-[1px] h-[1px] rounded-full bg-foreground`}
             />
           )
         })}

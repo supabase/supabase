@@ -17,19 +17,13 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import {
-  PageSection,
-  PageSectionContent,
-  PageSectionMeta,
-  PageSectionSummary,
-  PageSectionTitle,
-} from 'ui-patterns/PageSection'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
@@ -86,17 +80,11 @@ export const DashboardPreferences = () => {
 
   return (
     <PageSection>
-      <PageSectionMeta>
-        <PageSectionSummary>
-          <PageSectionTitle id="queries">Queries</PageSectionTitle>
-        </PageSectionSummary>
-      </PageSectionMeta>
-
       <PageSectionContent className="flex flex-col gap-y-4">
         {/* [Joshen] Ideally we're able to persist this for all users in the project, but will need support in our middleware */}
         <Admonition
           type="note"
-          title="These preferences control only your experience in the dashboard. Other members of this project will not be affected"
+          title="Preferences currently do not affect other members of this project"
         />
 
         {isLoading ? (
@@ -106,11 +94,11 @@ export const DashboardPreferences = () => {
             </CardContent>
           </Card>
         ) : (
-          <Form {...form}>
+          <Form_Shadcn_ {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <Card>
                 <CardContent>
-                  <FormField
+                  <FormField_Shadcn_
                     control={form.control}
                     name="defaultDatabase"
                     render={({ field }) => (
@@ -129,7 +117,7 @@ export const DashboardPreferences = () => {
                         {isPending ? (
                           <ShimmeringLoader />
                         ) : (
-                          <FormControl>
+                          <FormControl_Shadcn_>
                             {/* [Joshen] Need to disable unhealthy replicas */}
                             <DatabaseSelector
                               isForm
@@ -139,7 +127,7 @@ export const DashboardPreferences = () => {
                                 field.onChange(id === projectRef ? undefined : id)
                               }
                             />
-                          </FormControl>
+                          </FormControl_Shadcn_>
                         )}
                       </FormItemLayout>
                     )}
@@ -161,7 +149,7 @@ export const DashboardPreferences = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form>
+          </Form_Shadcn_>
         )}
       </PageSectionContent>
     </PageSection>

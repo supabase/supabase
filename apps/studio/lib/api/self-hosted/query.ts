@@ -1,9 +1,8 @@
 import * as Sentry from '@sentry/nextjs'
-
+import { PG_META_URL } from 'lib/constants/index'
 import { constructHeaders } from '../apiHelpers'
-import { databaseErrorSchema, PgMetaDatabaseError, WrappedResult } from './types'
+import { PgMetaDatabaseError, databaseErrorSchema, WrappedResult } from './types'
 import { assertSelfHosted, encryptString, getConnectionString } from './util'
-import { PG_META_URL } from '@/lib/constants/index'
 
 export type QueryOptions = {
   query: string

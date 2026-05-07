@@ -1,12 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, Webhook } from 'lucide-react'
-import { Badge, copyToClipboard, Input } from 'ui'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { DOCS_URL } from 'lib/constants'
+import { Badge, Input, copyToClipboard } from 'ui'
 import { Hook } from './hooks.constants'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { DOCS_URL } from '@/lib/constants'
 
 interface HookCardProps {
   hook: Hook
@@ -17,11 +17,11 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
   const { can: canUpdateAuthHook } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
 
   return (
-    <div className="bg-surface-100 border-default overflow-hidden border shadow-sm px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
-      <div>
+    <div className="bg-surface-100 border-default overflow-hidden border shadow px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
+      <div className="">
         <Webhook size={21} strokeWidth="1" />
       </div>
-      <div className="flex flex-col grow overflow-y-auto w-full">
+      <div className="flex flex-col flex-0 overflow-y-auto w-full">
         <span className="text-sm text-foreground">{hook.title}</span>
         <span className="text-sm text-foreground-lighter">{hook.subtitle}</span>
         <div className="text-sm flex flex-row space-x-5 py-4">
@@ -112,7 +112,7 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
           <DocsButton href={`${DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`} />
         </div>
       </div>
-      <div>
+      <div className="flex-1">
         {hook.enabled ? (
           <Badge className="space-x-1" variant="success">
             <div className="h-3.5 w-3.5 bg-brand rounded-full flex justify-center items-center">

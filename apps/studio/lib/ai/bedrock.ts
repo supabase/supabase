@@ -1,11 +1,10 @@
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
+import { LanguageModel } from 'ai'
 import { createCredentialChain, fromNodeProviderChain } from '@aws-sdk/credential-providers'
 import { CredentialsProviderError } from '@smithy/property-provider'
 import { awsCredentialsProvider } from '@vercel/functions/oidc'
-import { LanguageModel } from 'ai'
-
-import { BedrockModel } from './model.utils'
 import { selectWeightedKey } from './util'
+import { BedrockModel } from './model.utils'
 
 const credentialProvider = createCredentialChain(
   // Vercel OIDC provider will be used for staging/production

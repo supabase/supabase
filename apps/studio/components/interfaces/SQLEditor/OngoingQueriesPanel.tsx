@@ -1,8 +1,18 @@
 import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useQueryAbortMutation } from 'data/sql/abort-query-mutation'
+import { useOngoingQueriesQuery } from 'data/sql/ongoing-queries-query'
 import dayjs from 'dayjs'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useUrlState } from 'hooks/ui/useUrlState'
+import { IS_PLATFORM } from 'lib/constants'
 import { RefreshCw, StopCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useAppStateSnapshot } from 'state/app-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import type { ResponseError } from 'types'
 import {
   Button,
   cn,
@@ -18,17 +28,6 @@ import {
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-
-import AlertError from '@/components/ui/AlertError'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useQueryAbortMutation } from '@/data/sql/abort-query-mutation'
-import { useOngoingQueriesQuery } from '@/data/sql/ongoing-queries-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useUrlState } from '@/hooks/ui/useUrlState'
-import { IS_PLATFORM } from '@/lib/constants'
-import { useAppStateSnapshot } from '@/state/app-state'
-import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
-import type { ResponseError } from '@/types'
 
 export const OngoingQueriesPanel = () => {
   const [_, setParams] = useUrlState({ replace: true })
@@ -140,7 +139,7 @@ export const OngoingQueriesPanel = () => {
                     language="sql"
                     className={cn(
                       'max-w-none max-h-52 w-full',
-                      'bg-transparent! py-3! px-3.5! prose dark:prose-dark',
+                      '!bg-transparent !py-3 !px-3.5 prose dark:prose-dark',
                       '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
                     )}
                   />

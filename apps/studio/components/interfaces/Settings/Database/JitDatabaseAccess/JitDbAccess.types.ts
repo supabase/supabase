@@ -23,17 +23,14 @@ export type JitRoleOption = {
   label: string
 }
 
-export type JitIpRangeDraft = {
-  value: string
-}
-
 export type JitRoleGrantDraft = {
   roleId: string
   enabled: boolean
   expiryMode: JitExpiryMode
   hasExpiry: boolean
   expiry: string
-  ipRanges: JitIpRangeDraft[]
+  hasIpRestriction: boolean
+  ipRanges: string
 }
 
 export type JitUserRuleDraft = {

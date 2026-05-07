@@ -1,6 +1,21 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSection,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import DateRangePicker from 'components/ui/DateRangePicker'
+import NoPermission from 'components/ui/NoPermission'
+import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
+import { useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import dayjs from 'dayjs'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { Check, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useQueryState } from 'nuqs'
@@ -17,21 +32,6 @@ import Egress from './Egress'
 import OrgLogUsage from './OrgLogUsage'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
-import {
-  ScaffoldContainer,
-  ScaffoldHeader,
-  ScaffoldSection,
-  ScaffoldTitle,
-} from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
-import DateRangePicker from '@/components/ui/DateRangePicker'
-import NoPermission from '@/components/ui/NoPermission'
-import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
-import { useOrgDailyStatsQuery } from '@/data/analytics/org-daily-stats-query'
-import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
 
 export const Usage = () => {
   const { slug } = useParams()
@@ -120,7 +120,7 @@ export const Usage = () => {
           <ScaffoldTitle>Usage</ScaffoldTitle>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <div className="sticky top-0 border-b bg-sidebar z-1">
+      <div className="sticky top-0 border-b bg-sidebar z-[1]">
         <ScaffoldContainer>
           <div className="py-4 flex items-center space-x-4">
             {isLoadingSubscription || isLoadingPermissions ? (
@@ -153,7 +153,7 @@ export const Usage = () => {
                     loading={isLoadingSubscription}
                     currentBillingPeriodStart={subscription?.current_period_start}
                     currentBillingPeriodEnd={subscription?.current_period_end}
-                    className="w-48!"
+                    className="!w-48"
                   />
 
                   <OrganizationProjectSelector

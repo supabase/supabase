@@ -1,11 +1,11 @@
 import { ChevronRight, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
-import { Card, CardContent, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, Card, CardContent, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import { ButtonTooltip } from '../../ui/ButtonTooltip'
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
-import type { ServiceKey } from './ObservabilityOverview.utils'
+import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
 
 type ServiceConfig = {
   key: ServiceKey
@@ -24,10 +24,13 @@ type ServiceData = {
   isLoading: boolean
 }
 
+type IntervalKey = '1hr' | '1day' | '7day'
+
 export type ServiceHealthTableProps = {
   services: ServiceConfig[]
   serviceData: Record<string, ServiceData>
-  onBarClick: (logsUrl: string) => (datum: LogsBarChartDatum) => void
+  onBarClick: (serviceKey: string, logsUrl: string) => (datum: LogsBarChartDatum) => void
+  interval: IntervalKey
   datetimeFormat: string
 }
 
@@ -40,6 +43,41 @@ const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
   postgrest: 'Auto-generated REST API for your database',
 }
 
+const getStatusLabel = (status: 'healthy' | 'error' | 'unknown'): string => {
+  switch (status) {
+    case 'healthy':
+      return 'Healthy'
+    case 'error':
+      return 'Unhealthy'
+    case 'unknown':
+      return 'Unknown'
+  }
+}
+
+const getStatusTooltip = (status: 'healthy' | 'error' | 'unknown'): string => {
+  switch (status) {
+    case 'healthy':
+      return 'Error rate is below 1%'
+    case 'error':
+      return 'Error rate is 1% or higher'
+    case 'unknown':
+      return 'Insufficient data (fewer than 100 requests)'
+  }
+}
+
+const getStatusVariant = (
+  status: 'healthy' | 'error' | 'unknown'
+): 'success' | 'warning' | 'destructive' | 'default' => {
+  switch (status) {
+    case 'healthy':
+      return 'success'
+    case 'error':
+      return 'destructive'
+    case 'unknown':
+      return 'default'
+  }
+}
+
 type ServiceRowProps = {
   service: ServiceConfig
   data: ServiceData
@@ -48,6 +86,11 @@ type ServiceRowProps = {
 }
 
 const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowProps) => {
+  const { status } = getHealthStatus(data.errorRate, data.total)
+  const statusLabel = getStatusLabel(status)
+  const statusVariant = getStatusVariant(status)
+  const statusTooltip = getStatusTooltip(status)
+
   const errorRate = data.total > 0 ? data.errorRate : 0
   const warningRate = data.total > 0 ? (data.warningCount / data.total) * 100 : 0
 
@@ -76,6 +119,14 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
           </Tooltip>
         </div>
         <div className="flex items-center gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge variant={statusVariant}>{statusLabel}</Badge>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>{statusTooltip}</p>
+            </TooltipContent>
+          </Tooltip>
           <ButtonTooltip
             type="text"
             size="tiny"
@@ -155,7 +206,7 @@ export const ServiceHealthTable = ({
                 key={service.key}
                 service={service}
                 data={data}
-                onBarClick={onBarClick(service.logsUrl)}
+                onBarClick={onBarClick(service.key, service.logsUrl)}
                 datetimeFormat={datetimeFormat}
               />
             )

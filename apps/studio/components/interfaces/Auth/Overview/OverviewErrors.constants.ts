@@ -1,6 +1,5 @@
 import dayjs from 'dayjs'
-
-import { fetchLogs } from '@/data/reports/report.utils'
+import { fetchLogs } from 'data/reports/report.utils'
 
 export type ResponseErrorRow = {
   method: string

@@ -31,15 +31,15 @@ export function JitDbAccessDeleteDialog({
     <AlertDialog open={!!user} onOpenChange={(open) => !open && !isDeleting && onClose()}>
       <AlertDialogContent size="medium">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete temporary access rule</AlertDialogTitle>
+          <AlertDialogTitle>Delete JIT access rule</AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="space-y-2 text-sm">
               <p>
-                Remove the temporary access rule for{' '}
+                Remove the JIT access rule for{' '}
                 <strong className="text-foreground">{userDisplayName}</strong>?
               </p>
               <p>
-                This revokes any assigned database roles for this member and removes their temporary
+                This revokes any assigned database roles for this member and removes their JIT
                 access configuration.
               </p>
             </div>

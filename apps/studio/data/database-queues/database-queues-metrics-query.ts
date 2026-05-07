@@ -1,10 +1,9 @@
-import { ident, literal } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
+import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
+import { executeSql } from 'data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
-import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabaseQueuesMetricsVariables = {
   projectRef?: string
@@ -24,7 +23,7 @@ const preciseMetricsSqlQuery = (queueName: string) => {
   SELECT
     COUNT(*) AS row_count
   FROM
-    "pgmq".${ident('q_' + queueName)};
+    "pgmq"."q_${queueName}";
 `
 }
 
@@ -35,7 +34,7 @@ const estimateMetricsSqlQuery = (queueName: string) => {
     from
   pg_class
     where
-  relname = ${literal('q_' + queueName)}
+  relname = 'q_${queueName}'
   and relnamespace = 'pgmq'::regnamespace;
 `
 }

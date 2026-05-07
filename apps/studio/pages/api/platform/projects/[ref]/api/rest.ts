@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-
-import apiWrapper from '@/lib/api/apiWrapper'
+import apiWrapper from 'lib/api/apiWrapper'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -18,7 +17,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGet = async (_req: NextApiRequest, res: NextApiResponse) => {
+const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/`, {
     method: 'GET',
     headers: {
@@ -34,6 +33,6 @@ const handleGet = async (_req: NextApiRequest, res: NextApiResponse) => {
   return res.status(500).json({ error: { message: 'Internal Server Error' } })
 }
 
-const handleHead = async (_req: NextApiRequest, res: NextApiResponse) => {
+const handleHead = async (req: NextApiRequest, res: NextApiResponse) => {
   res.status(200).end()
 }

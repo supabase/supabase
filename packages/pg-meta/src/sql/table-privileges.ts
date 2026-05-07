@@ -1,6 +1,4 @@
-import { safeSql } from '../pg-format'
-
-export const TABLE_PRIVILEGES_SQL = /* SQL */ safeSql`
+export const TABLE_PRIVILEGES_SQL = /* SQL */ `
 -- Despite the name \`table_privileges\`, this includes other kinds of relations:
 -- views, matviews, etc. "Relation privileges" just doesn't roll off the tongue.
 --

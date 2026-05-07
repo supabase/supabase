@@ -1,6 +1,7 @@
-import type { UseQueryResult } from '@tanstack/react-query'
-import dayjs from 'dayjs'
 import { useMemo } from 'react'
+import type { UseQueryResult } from '@tanstack/react-query'
+
+import dayjs from 'dayjs'
 
 import type { AnalyticsData, AnalyticsInterval, DataPoint } from './constants'
 import type {
@@ -9,8 +10,8 @@ import type {
   InfraMonitoringSingleResponse,
 } from './infra-monitoring-query'
 import {
-  InfraMonitoringError,
   InfraMonitoringMultiData,
+  InfraMonitoringError,
   useInfraMonitoringAttributesQuery,
 } from './infra-monitoring-query'
 

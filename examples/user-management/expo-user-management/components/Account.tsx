@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { View, Alert, TextInput, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Alert } from 'react-native'
+import { Button, Input } from '@rneui/themed'
 import Avatar from './Avatar'
-import { appStyles } from '../styles/styles'
 
 export default function Account({ userId, email }: { userId: string; email?: string }) {
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState('')
   const [website, setWebsite] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
-  const styles = appStyles
 
   useEffect(() => {
     if (userId) getProfile()
@@ -67,15 +66,17 @@ export default function Account({ userId, email }: { userId: string; email?: str
       if (error) {
         throw error
       }
-    } catch (error: any) {
-      Alert.alert(error.message)
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert(error.message)
+      }
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <View style={styles.container}>
+    <View>
       <View>
         <Avatar
           size={200}
@@ -87,46 +88,41 @@ export default function Account({ userId, email }: { userId: string; email?: str
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          value={email ?? ''}
-          editable={false}
-          selectTextOnFocus={false}
-          style={[styles.input, styles.inputDisabled]}
-        />
+        <Input label="Email" value={email} disabled />
       </View>
       <View style={styles.verticallySpaced}>
-        <Text style={styles.label}>Username</Text>
-        <TextInput
-          value={username || ''}
-          onChangeText={(text) => setUsername(text)}
-          style={styles.input}
-        />
+        <Input label="Username" value={username || ''} onChangeText={(text) => setUsername(text)} />
       </View>
       <View style={styles.verticallySpaced}>
-        <Text style={styles.label}>Website</Text>
-        <TextInput
-          value={website || ''}
-          onChangeText={(text) => setWebsite(text)}
-          style={styles.input}
-        />
+        <Input label="Website" value={website || ''} onChangeText={(text) => setWebsite(text)} />
       </View>
 
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
+        <Button
+          title={loading ? 'Loading ...' : 'Update'}
           onPress={() => updateProfile({ username, website, avatar_url: avatarUrl })}
           disabled={loading}
-        >
-          <Text style={styles.buttonText}>{loading ? 'Loading ...' : 'Update'}</Text>
-        </TouchableOpacity>
+        />
       </View>
 
       <View style={styles.verticallySpaced}>
-        <TouchableOpacity style={styles.button} onPress={() => supabase.auth.signOut()}>
-          <Text style={styles.buttonText}>Sign Out</Text>
-        </TouchableOpacity>
+        <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
       </View>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 40,
+    padding: 12,
+  },
+  verticallySpaced: {
+    paddingTop: 4,
+    paddingBottom: 4,
+    alignSelf: 'stretch',
+  },
+  mt20: {
+    marginTop: 20,
+  },
+})

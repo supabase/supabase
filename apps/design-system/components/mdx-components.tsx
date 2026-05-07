@@ -92,7 +92,10 @@ const components = {
     />
   ),
   p: ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-    <p className={cn('leading-7 not-first:mt-6 text-foreground-light', className)} {...props} />
+    <p
+      className={cn('leading-7 [&:not(:first-child)]:mt-6 text-foreground-light', className)}
+      {...props}
+    />
   ),
   ul: ({ className, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
     <ul className={cn('my-6 ml-6 list-disc', className)} {...props} />
@@ -124,7 +127,7 @@ const components = {
   th: ({ className, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => (
     <th
       className={cn(
-        'border px-4 py-2 text-left font-normal [[align=center]]:text-center [[align=right]]:text-right',
+        'border px-4 py-2 text-left font-normal [&[align=center]]:text-center [&[align=right]]:text-right',
         className
       )}
       {...props}
@@ -133,7 +136,7 @@ const components = {
   td: ({ className, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => (
     <td
       className={cn(
-        'border text-foreground-light px-4 py-2 text-left [[align=center]]:text-center [[align=right]]:text-right',
+        'border text-foreground-light px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right',
         className
       )}
       {...props}
@@ -196,7 +199,7 @@ const components = {
   code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
     <code
       className={cn(
-        'relative rounded-sm bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm',
+        'relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm',
         className
       )}
       {...props}
@@ -258,7 +261,7 @@ const components = {
   LinkedCard: ({ className, ...props }: React.ComponentProps<typeof Link>) => (
     <Link
       className={cn(
-        'flex w-full flex-col items-center rounded-xl border bg-card p-6 text-card-foreground shadow-sm transition-colors hover:bg-muted/50 sm:p-10',
+        'flex w-full flex-col items-center rounded-xl border bg-card p-6 text-card-foreground shadow transition-colors hover:bg-muted/50 sm:p-10',
         className
       )}
       {...props}

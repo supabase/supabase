@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
-import { Form } from 'ui'
 import { describe, expect, it } from 'vitest'
+
+import { Form_Shadcn_ } from 'ui'
 
 import { type WebhookFormValues } from './EditHookPanel.constants'
 import { HTTPParameters } from './HTTPParameters'
@@ -23,9 +24,9 @@ const HTTPParametersHarness = () => {
   })
 
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <HTTPParameters form={form} />
-    </Form>
+    </Form_Shadcn_>
   )
 }
 

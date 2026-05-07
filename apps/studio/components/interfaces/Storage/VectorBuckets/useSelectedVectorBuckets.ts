@@ -1,6 +1,5 @@
 import { useParams } from 'common'
-
-import { useVectorBucketsQuery } from '@/data/storage/vector-buckets-query'
+import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
 
 export const useSelectedVectorBucket = () => {
   const { ref: projectRef, bucketId } = useParams()

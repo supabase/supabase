@@ -1,11 +1,4 @@
-import {
-  ident,
-  joinSqlFragments,
-  keyword,
-  literal,
-  safeSql,
-  type SafeSqlFragment,
-} from '../../../pg-format'
+import { ident, literal } from '../../../pg-format'
 import { prefixToUUID, stringRange } from './get-users-common'
 import { OptimizedSearchColumns } from './get-users-types'
 
@@ -48,7 +41,7 @@ export const getPaginatedUsersSQL = ({
   cursor,
 
   improvedSearchEnabled = false,
-}: getPaginatedUsersSQLProps): SafeSqlFragment => {
+}: getPaginatedUsersSQLProps) => {
   if (improvedSearchEnabled) {
     return getImprovedPaginatedUsersSQL({
       column: column ?? 'email',
@@ -66,21 +59,21 @@ export const getPaginatedUsersSQL = ({
   const offset = page * limit
   const hasValidKeywords = keywords && keywords !== ''
 
-  const conditions: SafeSqlFragment[] = []
+  const conditions: string[] = []
 
   if (hasValidKeywords) {
     const pattern = `%${keywords}%`
     conditions.push(
-      safeSql`id::text like ${literal(pattern)} or email like ${literal(pattern)} or phone like ${literal(pattern)} or raw_user_meta_data->>'full_name' ilike ${literal(pattern)} or raw_user_meta_data->>'first_name' ilike ${literal(pattern)} or raw_user_meta_data->>'last_name' ilike ${literal(pattern)} or raw_user_meta_data->>'display_name' ilike ${literal(pattern)}`
+      `id::text like ${literal(pattern)} or email like ${literal(pattern)} or phone like ${literal(pattern)} or raw_user_meta_data->>'full_name' ilike ${literal(pattern)} or raw_user_meta_data->>'first_name' ilike ${literal(pattern)} or raw_user_meta_data->>'last_name' ilike ${literal(pattern)} or raw_user_meta_data->>'display_name' ilike ${literal(pattern)}`
     )
   }
 
   if (verified === 'verified') {
-    conditions.push(safeSql`email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL`)
+    conditions.push(`email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL`)
   } else if (verified === 'anonymous') {
-    conditions.push(safeSql`is_anonymous is true`)
+    conditions.push(`is_anonymous is true`)
   } else if (verified === 'unverified') {
-    conditions.push(safeSql`email_confirmed_at IS NULL AND phone_confirmed_at IS NULL`)
+    conditions.push(`email_confirmed_at IS NULL AND phone_confirmed_at IS NULL`)
   }
 
   if (providers && providers.length > 0) {
@@ -88,57 +81,48 @@ export const getPaginatedUsersSQL = ({
     // JFYI in case we do eventually run into performance issues here when filtering for SAML provider
     if (providers.includes('saml 2.0')) {
       conditions.push(
-        safeSql`(select jsonb_agg(case when value ~ '^sso' then 'sso' else value end) from jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${joinSqlFragments(
-          providers.map((p) => literal(p === 'saml 2.0' ? 'sso' : p)),
-          ', '
-        )}]`
+        `(select jsonb_agg(case when value ~ '^sso' then 'sso' else value end) from jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${providers.map((p) => literal(p === 'saml 2.0' ? 'sso' : p)).join(', ')}]`.trim()
       )
     } else {
       conditions.push(
-        safeSql`(raw_app_meta_data->>'providers')::jsonb ?| array[${joinSqlFragments(
-          providers.map((p) => literal(p)),
-          ', '
-        )}]`
+        `(raw_app_meta_data->>'providers')::jsonb ?| array[${providers.map((p) => literal(p)).join(', ')}]`
       )
     }
   }
 
-  const combinedConditions = joinSqlFragments(
-    conditions.map((x) => safeSql`(${x})`),
-    ' and '
-  )
-  const sortOn = keyword(sort) ?? safeSql`created_at`
-  const sortOrder = keyword(order) ?? safeSql`desc`
+  const combinedConditions = conditions.map((x) => `(${x})`).join(' and ')
+  const sortOn = sort ?? 'created_at'
+  const sortOrder = order ?? 'desc'
 
-  let whereStatement = safeSql`${conditions.length > 0 ? safeSql` where ${combinedConditions}` : safeSql``}
+  let whereStatement = `${conditions.length > 0 ? ` where ${combinedConditions}` : ''}
     order by
       ${ident(sortOn)} ${sortOrder} nulls last
     limit
-      ${literal(limit)}
+      ${limit}
     offset
-      ${literal(offset)}
+      ${offset}
   `
 
   // DON'T TOUCH THESE QUERIES. ONE CHARACTER OFF AND DISASTER.
-  const firstOperator = startAt ? safeSql`>` : safeSql`>=`
+  const firstOperator = startAt ? '>' : '>='
 
   if (column === 'email') {
     const range = stringRange(keywords ?? '')
 
-    whereStatement = safeSql`where lower(email) ${firstOperator} ${literal(startAt ? startAt : range[0])} ${range[1] ? safeSql`and lower(email) < ${literal(range[1])}` : safeSql``} and instance_id = '00000000-0000-0000-0000-000000000000'::uuid order by instance_id, lower(email) asc limit ${literal(limit)}`
+    whereStatement = `where lower(email) ${firstOperator} ${literal(startAt ? startAt : range[0])} ${range[1] ? `and lower(email) < ${literal(range[1])}` : ''} and instance_id = '00000000-0000-0000-0000-000000000000'::uuid order by instance_id, lower(email) asc limit ${limit}`
   } else if (column === 'phone') {
     const range = stringRange(keywords ?? '')
-    whereStatement = safeSql`where phone ${firstOperator} ${literal(startAt ? startAt : range[0])} ${range[1] ? safeSql`and phone < ${literal(range[1])}` : safeSql``} order by phone asc limit ${literal(limit)}`
+    whereStatement = `where phone ${firstOperator} ${literal(startAt ? startAt : range[0])} ${range[1] ? `and phone < ${literal(range[1])}` : ''} order by phone asc limit ${limit}`
   } else if (column === 'id') {
     const isMatchingUUIDValue = prefixToUUID(keywords ?? '', false) === keywords
     if (isMatchingUUIDValue) {
-      whereStatement = safeSql`where id = ${literal(keywords)} order by id asc limit ${literal(limit)}`
+      whereStatement = `where id = ${literal(keywords)} order by id asc limit ${limit}`
     } else {
-      whereStatement = safeSql`where id ${firstOperator} ${literal(startAt ? startAt : prefixToUUID(keywords ?? '', false))} and id < ${literal(prefixToUUID(keywords ?? '', true))} order by id asc limit ${literal(limit)}`
+      whereStatement = `where id ${firstOperator} ${literal(startAt ? startAt : prefixToUUID(keywords ?? '', false))} and id < ${literal(prefixToUUID(keywords ?? '', true))} order by id asc limit ${limit}`
     }
   }
 
-  let usersData = safeSql`
+  let usersData = `
     select
       auth.users.id,
       auth.users.email,
@@ -158,7 +142,8 @@ export const getPaginatedUsersSQL = ({
       auth.users
     ${whereStatement}`
 
-  let usersQuery = safeSql`with
+  let usersQuery = `
+with
   users_data as (${usersData})
 select
   *,
@@ -174,7 +159,8 @@ select
     '{}'::text[]
   ) as providers
 from
-  users_data;`
+  users_data;
+  `.trim()
 
   return usersQuery
 }
@@ -199,10 +185,10 @@ export const getImprovedPaginatedUsersSQL = ({
   order,
   cursor,
   limit = DEFAULT_LIMIT,
-}: getPaginatedUsersSQLProps): SafeSqlFragment => {
+}: getPaginatedUsersSQLProps) => {
   const hasValidKeywords = keywords && keywords !== ''
 
-  const conditions: SafeSqlFragment[] = []
+  const conditions: string[] = []
 
   // Column-specific search condition
   if (hasValidKeywords) {
@@ -210,91 +196,82 @@ export const getImprovedPaginatedUsersSQL = ({
       // Use btree index with prefix matching
       const range = stringRange(keywords)
       if (range[1]) {
-        conditions.push(safeSql`email >= ${literal(range[0])} AND email < ${literal(range[1])}`)
+        conditions.push(`email >= ${literal(range[0])} AND email < ${literal(range[1])}`)
       } else {
-        conditions.push(safeSql`email >= ${literal(range[0])}`)
+        conditions.push(`email >= ${literal(range[0])}`)
       }
     } else if (column === 'phone') {
       // Use btree index with prefix matching
       const range = stringRange(keywords)
       if (range[1]) {
-        conditions.push(safeSql`phone >= ${literal(range[0])} AND phone < ${literal(range[1])}`)
+        conditions.push(`phone >= ${literal(range[0])} AND phone < ${literal(range[1])}`)
       } else {
-        conditions.push(safeSql`phone >= ${literal(range[0])}`)
+        conditions.push(`phone >= ${literal(range[0])}`)
       }
     } else if (column === 'id') {
       // Exact match on UUID
-      conditions.push(safeSql`id = ${literal(keywords)}`)
+      conditions.push(`id = ${literal(keywords)}`)
     } else if (column === 'name') {
       // Use btree index with prefix matching on raw_user_meta_data->>'name'
       const range = stringRange(keywords)
       if (range[1]) {
         conditions.push(
-          safeSql`raw_user_meta_data->>'name' >= ${literal(range[0])} AND raw_user_meta_data->>'name' < ${literal(range[1])}`
+          `raw_user_meta_data->>'name' >= ${literal(range[0])} AND raw_user_meta_data->>'name' < ${literal(range[1])}`
         )
       } else {
-        conditions.push(safeSql`raw_user_meta_data->>'name' >= ${literal(range[0])}`)
+        conditions.push(`raw_user_meta_data->>'name' >= ${literal(range[0])}`)
       }
     }
   }
 
   // Verified filter
   if (verified === 'verified') {
-    conditions.push(safeSql`(email_confirmed_at IS NOT NULL OR phone_confirmed_at IS NOT NULL)`)
+    conditions.push(`(email_confirmed_at IS NOT NULL OR phone_confirmed_at IS NOT NULL)`)
   } else if (verified === 'anonymous') {
-    conditions.push(safeSql`is_anonymous IS TRUE`)
+    conditions.push(`is_anonymous IS TRUE`)
   } else if (verified === 'unverified') {
-    conditions.push(safeSql`(email_confirmed_at IS NULL AND phone_confirmed_at IS NULL)`)
+    conditions.push(`(email_confirmed_at IS NULL AND phone_confirmed_at IS NULL)`)
   }
 
   // Providers filter
   if (providers && providers.length > 0) {
     if (providers.includes('saml 2.0')) {
       conditions.push(
-        safeSql`(SELECT jsonb_agg(CASE WHEN value ~ '^sso' THEN 'sso' ELSE value END) FROM jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${joinSqlFragments(
-          providers.map((p) => literal(p === 'saml 2.0' ? 'sso' : p)),
-          ', '
-        )}]`
+        `(SELECT jsonb_agg(CASE WHEN value ~ '^sso' THEN 'sso' ELSE value END) FROM jsonb_array_elements_text((raw_app_meta_data ->> 'providers')::jsonb)) ?| array[${providers.map((p) => literal(p === 'saml 2.0' ? 'sso' : p)).join(', ')}]`
       )
     } else {
       conditions.push(
-        safeSql`(raw_app_meta_data->>'providers')::jsonb ?| array[${joinSqlFragments(
-          providers.map((p) => literal(p)),
-          ', '
-        )}]`
+        `(raw_app_meta_data->>'providers')::jsonb ?| array[${providers.map((p) => literal(p)).join(', ')}]`
       )
     }
   }
 
-  const sortOn = keyword(sort) ?? safeSql`created_at`
-  const sortOrder = keyword(order) ?? safeSql`desc`
+  const sortOn = sort ?? 'created_at'
+  const sortOrder = order ?? 'desc'
 
   // Cursor-based pagination: fetch rows after the cursor position
   if (cursor) {
-    const operator = sortOrder === 'desc' ? safeSql`<` : safeSql`>`
+    const operator = sortOrder === 'desc' ? '<' : '>'
     // When sorting by id, no need for a composite cursor since id is already unique
     if (sortOn === 'id') {
-      conditions.push(safeSql`id ${operator} ${literal(cursor.id)}::uuid`)
+      conditions.push(`id ${operator} ${literal(cursor.id)}::uuid`)
     } else {
       conditions.push(
-        safeSql`(${ident(sortOn)}, id) ${operator} (${literal(cursor.sort)}, ${literal(cursor.id)}::uuid)`
+        `(${ident(sortOn)}, id) ${operator} (${literal(cursor.sort)}, ${literal(cursor.id)}::uuid)`
       )
     }
   }
 
-  const combinedConditions = joinSqlFragments(
-    conditions.map((x) => safeSql`(${x})`),
-    ' AND '
-  )
-  const whereClause = conditions.length > 0 ? safeSql`WHERE ${combinedConditions}` : safeSql``
+  const combinedConditions = conditions.map((x) => `(${x})`).join(' AND ')
+  const whereClause = conditions.length > 0 ? `WHERE ${combinedConditions}` : ''
 
   // Order by sort column, with id as tie breaker (unless already sorting by id)
   const orderByClause =
     sortOn === 'id'
-      ? safeSql`${ident(sortOn)} ${sortOrder}`
-      : safeSql`${ident(sortOn)} ${sortOrder}, id ${sortOrder}`
+      ? `${ident(sortOn)} ${sortOrder}`
+      : `${ident(sortOn)} ${sortOrder}, id ${sortOrder}`
 
-  const usersData = safeSql`
+  const usersData = `
     SELECT
       auth.users.id,
       auth.users.email,
@@ -315,9 +292,10 @@ export const getImprovedPaginatedUsersSQL = ({
     ORDER BY
       ${orderByClause}
     LIMIT
-      ${literal(limit)}`
+      ${limit}`
 
-  const usersQuery = safeSql`WITH
+  const usersQuery = `
+WITH
   users_data AS (${usersData})
 SELECT
   *,
@@ -333,7 +311,7 @@ SELECT
     '{}'::text[]
   ) AS providers
 FROM
-  users_data;`
+  users_data;`.trim()
 
   return usersQuery
 }

@@ -1,12 +1,26 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import {
+  Constraint,
+  CONSTRAINT_TYPE,
+  useTableConstraintsQuery,
+} from 'data/database/constraints-query'
+import {
+  ForeignKeyConstraint,
+  useForeignKeyConstraintsQuery,
+} from 'data/database/foreign-key-constraints-query'
+import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { DOCS_URL } from 'lib/constants'
 import { isEmpty, noop } from 'lodash'
 import { ExternalLink, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import {
   Button,
-  Checkbox,
+  Checkbox_Shadcn_,
   cn,
   DialogSectionSeparator,
   Sheet,
@@ -45,24 +59,6 @@ import {
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
 import { HeaderTitle } from './HeaderTitle'
-import {
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from '@/components/ui/Forms/FormSection'
-import {
-  Constraint,
-  CONSTRAINT_TYPE,
-  useTableConstraintsQuery,
-} from '@/data/database/constraints-query'
-import {
-  ForeignKeyConstraint,
-  useForeignKeyConstraintsQuery,
-} from '@/data/database/foreign-key-constraints-query'
-import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
-import { DOCS_URL } from '@/lib/constants'
 
 export interface ColumnEditorProps {
   column?: Readonly<PostgresColumn>
@@ -244,11 +240,11 @@ export const ColumnEditor = ({
           </SheetTitle>
         </SheetHeader>
 
-        <SheetSection className="overflow-auto grow p-0">
+        <SheetSection className="overflow-auto flex-grow p-0">
           <FormSection
-            header={<FormSectionLabel className="lg:col-span-4!">General</FormSectionLabel>}
+            header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}
           >
-            <FormSectionContent loading={false} className="lg:col-span-8!">
+            <FormSectionContent loading={false} className="lg:!col-span-8">
               <FormItemLayout
                 isReactForm={false}
                 id="name"
@@ -291,7 +287,7 @@ export const ColumnEditor = ({
           <FormSection
             header={
               <FormSectionLabel
-                className="lg:col-span-4!"
+                className="lg:!col-span-4"
                 description={
                   <div className="space-y-2">
                     <Button asChild type="default" icon={<Plus />}>
@@ -319,7 +315,7 @@ export const ColumnEditor = ({
               </FormSectionLabel>
             }
           >
-            <FormSectionContent loading={false} className="lg:col-span-8!">
+            <FormSectionContent loading={false} className="lg:!col-span-8">
               <ColumnType
                 showRecommendation
                 value={columnFields?.format ?? ''}
@@ -344,7 +340,7 @@ export const ColumnEditor = ({
                       id="isIdentity"
                       description="Automatically assign a sequential unique number to the column"
                     >
-                      <Checkbox
+                      <Checkbox_Shadcn_
                         id="isIdentity"
                         checked={columnFields.isIdentity}
                         onCheckedChange={() => {
@@ -363,7 +359,7 @@ export const ColumnEditor = ({
                       label="Define as Array"
                       description="Allow column to be defined as variable-length multidimensional arrays"
                     >
-                      <Checkbox
+                      <Checkbox_Shadcn_
                         id="isArray"
                         checked={columnFields.isArray}
                         onCheckedChange={() => {
@@ -387,9 +383,9 @@ export const ColumnEditor = ({
           <SidePanel.Separator />
 
           <FormSection
-            header={<FormSectionLabel className="lg:col-span-4!">Foreign Keys</FormSectionLabel>}
+            header={<FormSectionLabel className="lg:!col-span-4">Foreign Keys</FormSectionLabel>}
           >
-            <FormSectionContent loading={false} className="lg:col-span-8!">
+            <FormSectionContent loading={false} className="lg:!col-span-8">
               <ColumnForeignKey
                 tableId={selectedTable.id}
                 column={columnFields}
@@ -408,9 +404,9 @@ export const ColumnEditor = ({
           </FormSection>
           <SidePanel.Separator />
           <FormSection
-            header={<FormSectionLabel className="lg:col-span-4!">Constraints</FormSectionLabel>}
+            header={<FormSectionLabel className="lg:!col-span-4">Constraints</FormSectionLabel>}
           >
-            <FormSectionContent loading={false} className="lg:col-span-8!">
+            <FormSectionContent loading={false} className="lg:!col-span-8">
               <FormItemLayout
                 isReactForm={false}
                 layout="flex"
@@ -494,7 +490,7 @@ export const ColumnEditor = ({
           </FormSection>
         </SheetSection>
 
-        <SheetFooter className="justify-between! [&>div]:p-0 [&>div]:border-t-0">
+        <SheetFooter className="!justify-between [&>div]:p-0 [&>div]:border-t-0">
           <ActionBar
             backButtonLabel="Cancel"
             applyButtonLabel="Save"

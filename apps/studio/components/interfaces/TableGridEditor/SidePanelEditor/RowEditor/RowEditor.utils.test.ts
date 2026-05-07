@@ -1,13 +1,12 @@
-import { describe, expect, it, vi } from 'vitest'
-
-import { RowField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
+import { RowField } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import {
   convertByteaToHex,
   generateRowObjectFromFields,
   isValueTruncated,
   parseValue,
   validateFields,
-} from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+} from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { describe, expect, it, vi } from 'vitest'
 
 describe('parseValue', () => {
   it('should return null when originalValue is null', () => {
@@ -109,7 +108,7 @@ describe('generateRowObjectFromFields', () => {
       {
         id: '1',
         name: 'id',
-        value: undefined,
+        value: '',
         comment: '',
         defaultValue: null,
         format: 'int8',
@@ -121,7 +120,7 @@ describe('generateRowObjectFromFields', () => {
       {
         id: '2',
         name: 'time_not_null',
-        value: undefined,
+        value: '',
         comment: '',
         defaultValue: 'now()',
         format: 'timestamptz',
@@ -133,7 +132,7 @@ describe('generateRowObjectFromFields', () => {
       {
         id: '3',
         name: 'time_nullable',
-        value: undefined,
+        value: '',
         comment: '',
         defaultValue: 'now()',
         format: 'timestamptz',
@@ -143,7 +142,7 @@ describe('generateRowObjectFromFields', () => {
         isPrimaryKey: false,
       },
     ]
-    const result = generateRowObjectFromFields({ fields: sampleRowFields })
+    const result = generateRowObjectFromFields(sampleRowFields)
     expect(result).toEqual({})
   })
   it('should discern EMPTY values for text', () => {
@@ -151,7 +150,7 @@ describe('generateRowObjectFromFields', () => {
       {
         id: '1',
         name: 'id',
-        value: undefined,
+        value: '',
         comment: '',
         defaultValue: null,
         format: 'int8',
@@ -173,7 +172,7 @@ describe('generateRowObjectFromFields', () => {
         isPrimaryKey: false,
       },
     ]
-    const result = generateRowObjectFromFields({ fields: sampleRowFields })
+    const result = generateRowObjectFromFields(sampleRowFields)
     expect(result).toEqual({ name: '' })
   })
   it('should discern NULL values for text', () => {
@@ -181,7 +180,7 @@ describe('generateRowObjectFromFields', () => {
       {
         id: '1',
         name: 'id',
-        value: undefined,
+        value: '',
         comment: '',
         defaultValue: null,
         format: 'int8',
@@ -203,15 +202,15 @@ describe('generateRowObjectFromFields', () => {
         isPrimaryKey: false,
       },
     ]
-    const result = generateRowObjectFromFields({ fields: sampleRowFields })
-    expect(result).toEqual({ name: null })
+    const result = generateRowObjectFromFields(sampleRowFields)
+    expect(result).toEqual({})
   })
   it('should discern NULL values for booleans', () => {
     const sampleRowFields: RowField[] = [
       {
         id: '1',
         name: 'id',
-        value: undefined,
+        value: '',
         comment: '',
         defaultValue: null,
         format: 'int8',
@@ -233,8 +232,8 @@ describe('generateRowObjectFromFields', () => {
         isPrimaryKey: false,
       },
     ]
-    const result = generateRowObjectFromFields({ fields: sampleRowFields })
-    expect(result).toEqual({ 'bool-test': null })
+    const result = generateRowObjectFromFields(sampleRowFields)
+    expect(result).toEqual({})
   })
 })
 
@@ -528,7 +527,7 @@ describe('generateRowObjectFromFields - additional cases', () => {
         value: '["tag1", "tag2"]',
       }),
     ]
-    expect(generateRowObjectFromFields({ fields })).toEqual({ tags: ['tag1', 'tag2'] })
+    expect(generateRowObjectFromFields(fields)).toEqual({ tags: ['tag1', 'tag2'] })
   })
 
   it('should handle null array fields', () => {
@@ -539,18 +538,7 @@ describe('generateRowObjectFromFields - additional cases', () => {
         value: null,
       }),
     ]
-    expect(generateRowObjectFromFields({ fields })).toEqual({ tags: null })
-  })
-
-  it('should handle undefined array fields', () => {
-    const fields: RowField[] = [
-      createField({
-        name: 'tags',
-        format: '_text',
-        value: undefined,
-      }),
-    ]
-    expect(generateRowObjectFromFields({ fields })).toEqual({})
+    expect(generateRowObjectFromFields(fields)).toEqual({})
   })
 
   it('should handle JSON fields', () => {
@@ -561,7 +549,7 @@ describe('generateRowObjectFromFields - additional cases', () => {
         value: '{"key": "value"}',
       }),
     ]
-    expect(generateRowObjectFromFields({ fields })).toEqual({ metadata: { key: 'value' } })
+    expect(generateRowObjectFromFields(fields)).toEqual({ metadata: { key: 'value' } })
   })
 
   it('should handle JSON fields with object values', () => {
@@ -572,7 +560,7 @@ describe('generateRowObjectFromFields - additional cases', () => {
         value: { key: 'value' } as any,
       }),
     ]
-    expect(generateRowObjectFromFields({ fields })).toEqual({ metadata: { key: 'value' } })
+    expect(generateRowObjectFromFields(fields)).toEqual({ metadata: { key: 'value' } })
   })
 
   it('should handle boolean true/false/null', () => {
@@ -593,9 +581,9 @@ describe('generateRowObjectFromFields - additional cases', () => {
         value: 'null',
       }),
     ]
-    // Null values are kept (explicit NULL), only undefined values are omitted
-    const result = generateRowObjectFromFields({ fields })
-    expect(result).toEqual({ active: true, deleted: false, optional: null })
+    // By default, null values are omitted unless includeNullProperties is true
+    const result = generateRowObjectFromFields(fields)
+    expect(result).toEqual({ active: true, deleted: false })
   })
 
   it('should handle boolean true/false/null with includeNullProperties', () => {
@@ -616,19 +604,19 @@ describe('generateRowObjectFromFields - additional cases', () => {
         value: 'null',
       }),
     ]
-    const result = generateRowObjectFromFields({ fields, includeUndefinedValues: true })
+    const result = generateRowObjectFromFields(fields, true)
     expect(result).toEqual({ active: true, deleted: false, optional: null })
   })
 
-  it('should handle boolean with undefined value', () => {
+  it('should handle boolean with empty value', () => {
     const fields: RowField[] = [
       createField({
         name: 'active',
         format: 'bool',
-        value: undefined,
+        value: '',
       }),
     ]
-    const result = generateRowObjectFromFields({ fields })
+    const result = generateRowObjectFromFields(fields)
     expect(result).toEqual({})
   })
 
@@ -640,7 +628,7 @@ describe('generateRowObjectFromFields - additional cases', () => {
         value: '2023-12-01T10:30:45',
       }),
     ]
-    const result: any = generateRowObjectFromFields({ fields })
+    const result: any = generateRowObjectFromFields(fields)
     expect(result.created_at).toBeDefined()
     expect(typeof result.created_at).toBe('string')
   })
@@ -653,49 +641,15 @@ describe('generateRowObjectFromFields - additional cases', () => {
         value: '2023-12-01T10:30',
       }),
     ]
-    const result: any = generateRowObjectFromFields({ fields })
+    const result: any = generateRowObjectFromFields(fields)
     expect(result.created_at).toBeDefined()
     expect(typeof result.created_at).toBe('string')
   })
 
-  it('should include undefined properties when includeUndefinedValues is true', () => {
+  it('should include null properties when includeNullProperties is true', () => {
     const fields: RowField[] = [
       createField({
         name: 'optional_field',
-        format: 'text',
-        value: undefined,
-      }),
-      createField({
-        name: 'active_field',
-        format: 'text',
-        value: 'value',
-      }),
-    ]
-    const result = generateRowObjectFromFields({ fields, includeUndefinedValues: true })
-    expect(result).toEqual({ optional_field: undefined, active_field: 'value' })
-  })
-
-  it('should omit undefined properties by default', () => {
-    const fields: RowField[] = [
-      createField({
-        name: 'optional_field',
-        format: 'text',
-        value: undefined,
-      }),
-      createField({
-        name: 'active_field',
-        format: 'text',
-        value: 'value',
-      }),
-    ]
-    const result = generateRowObjectFromFields({ fields })
-    expect(result).toEqual({ active_field: 'value' })
-  })
-
-  it('should keep null properties (explicit NULL) even when includeUndefinedValues is false', () => {
-    const fields: RowField[] = [
-      createField({
-        name: 'nullable_field',
         format: 'text',
         value: null,
       }),
@@ -705,8 +659,25 @@ describe('generateRowObjectFromFields - additional cases', () => {
         value: 'value',
       }),
     ]
-    const result = generateRowObjectFromFields({ fields })
-    expect(result).toEqual({ nullable_field: null, active_field: 'value' })
+    const result = generateRowObjectFromFields(fields, true)
+    expect(result).toEqual({ optional_field: null, active_field: 'value' })
+  })
+
+  it('should omit null properties when includeNullProperties is false', () => {
+    const fields: RowField[] = [
+      createField({
+        name: 'optional_field',
+        format: 'text',
+        value: null,
+      }),
+      createField({
+        name: 'active_field',
+        format: 'text',
+        value: 'value',
+      }),
+    ]
+    const result = generateRowObjectFromFields(fields, false)
+    expect(result).toEqual({ active_field: 'value' })
   })
 
   it('should preserve empty strings for text types', () => {
@@ -722,24 +693,24 @@ describe('generateRowObjectFromFields - additional cases', () => {
         value: '',
       }),
     ]
-    const result = generateRowObjectFromFields({ fields })
+    const result = generateRowObjectFromFields(fields)
     expect(result).toEqual({ description: '', title: '' })
   })
 
-  it('should omit undefined values for non-text types', () => {
+  it('should convert empty values to null for non-text types', () => {
     const fields: RowField[] = [
       createField({
         name: 'count',
         format: 'int4',
-        value: undefined,
+        value: '',
       }),
       createField({
         name: 'price',
         format: 'numeric',
-        value: undefined,
+        value: '',
       }),
     ]
-    const result = generateRowObjectFromFields({ fields })
+    const result = generateRowObjectFromFields(fields)
     expect(result).toEqual({})
   })
 })

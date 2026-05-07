@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   update-docs:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
@@ -55,7 +55,7 @@ jobs:
         working-directory: apps/docs
         run: |
           echo "Generating new typespec snapshot for review..."
-          npx vitest run --update --dir features/docs
+          npx vitest run --update ./features/docs/Reference.typeSpec.test.ts
 
       - name: Generate token
         id: app-token

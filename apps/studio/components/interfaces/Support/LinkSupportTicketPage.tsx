@@ -2,9 +2,9 @@ import { Check, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
 import { Button, cn, DialogSectionSeparator } from 'ui'
 import { Admonition } from 'ui-patterns'
-
 import { LinkSupportTicketForm } from './LinkSupportTicketForm'
 
 export function LinkSupportTicketPage() {
@@ -38,7 +38,7 @@ function LinkSupportTicketPageContent() {
   return (
     <div
       className={cn(
-        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md border-default'
+        'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md border-default'
       )}
     >
       {isSuccess ? (

@@ -1,14 +1,13 @@
 import { X } from 'lucide-react'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { useHotKey } from 'hooks/ui/useHotKey'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Kbd } from './primitives/Kbd'
 import { useDataTable } from './providers/DataTableProvider'
-import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export function DataTableResetButton() {
   const { table } = useDataTable()
-  useShortcut(SHORTCUT_IDS.DATA_TABLE_RESET_FILTERS, () => table.resetColumnFilters())
+  useHotKey(() => table.resetColumnFilters(), 'Escape')
 
   return (
     <Tooltip>

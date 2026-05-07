@@ -1,11 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
+import { DATETIME_FORMAT } from 'lib/constants'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
   Modal,
   Select_Shadcn_,
@@ -18,8 +20,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { useCopyUrl } from './useCopyUrl'
-import { DATETIME_FORMAT } from '@/lib/constants'
-import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 const unitMap = {
   days: 3600 * 24,
@@ -81,7 +81,7 @@ export const CustomExpiryModal = () => {
       confirmText="Get URL"
       onCancel={handleClose}
     >
-      <Form {...form}>
+      <Form_Shadcn_ {...form}>
         <Modal.Content>
           <p className="text-sm text-foreground-light mb-4">
             Enter the duration for which the URL will be valid for:
@@ -92,13 +92,13 @@ export const CustomExpiryModal = () => {
             noValidate
             className="flex items-start space-x-2"
           >
-            <div className="grow">
-              <FormField
+            <div className="flex-grow">
+              <FormField_Shadcn_
                 control={form.control}
                 name="expiresIn"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Duration">
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Input_Shadcn_
                         {...field}
                         type="number"
@@ -108,18 +108,18 @@ export const CustomExpiryModal = () => {
                           )
                         }}
                       />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
             </div>
             <div>
-              <FormField
+              <FormField_Shadcn_
                 control={form.control}
                 name="units"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Units">
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger_Shadcn_>
                           <SelectValue_Shadcn_ aria-label="Units" placeholder="Select an option" />
@@ -131,7 +131,7 @@ export const CustomExpiryModal = () => {
                           <SelectItem_Shadcn_ value="years">years</SelectItem_Shadcn_>
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
@@ -158,7 +158,7 @@ export const CustomExpiryModal = () => {
             Get signed URL
           </Button>
         </Modal.Content>
-      </Form>
+      </Form_Shadcn_>
     </Modal>
   )
 }

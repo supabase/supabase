@@ -1,5 +1,8 @@
 import { ChevronLeft, Code } from 'lucide-react'
 import { useMemo, useState, type PropsWithChildren, type ReactNode } from 'react'
+
+import { DocsButton } from 'components/ui/DocsButton'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -10,11 +13,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
 } from 'ui'
-
+import { useIsAPIDocsSidePanelEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { navigateToSection } from './Content/Content.utils'
 import { DOCS_RESOURCE_CONTENT } from './ProjectAPIDocs.constants'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { useAppStateSnapshot } from '@/state/app-state'
 
 type DocsResourceContentItem = (typeof DOCS_RESOURCE_CONTENT)[keyof typeof DOCS_RESOURCE_CONTENT]
 
@@ -89,6 +90,8 @@ type NavTitleProps = {
 }
 
 const NavTitle = ({ title, category }: NavTitleProps) => {
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+
   const snap = useAppStateSnapshot()
   const handleBack = () => {
     snap.setActiveDocsSection([category])
@@ -96,7 +99,9 @@ const NavTitle = ({ title, category }: NavTitleProps) => {
 
   return (
     <div className="flex items-center space-x-2 mb-2">
-      <Button type="text" icon={<ChevronLeft />} className="px-1" onClick={handleBack} />
+      {isNewAPIDocsEnabled && (
+        <Button type="text" icon={<ChevronLeft />} className="px-1" onClick={handleBack} />
+      )}
       <p className="text-sm text-foreground-light capitalize">{title}</p>
     </div>
   )
@@ -174,14 +179,14 @@ const MoreInformation = ({ docsUrl }: MoreInformationProps) => {
         <p className="text-xs">Unable to find what you're looking for?</p>
       </AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="space-y-1">
-        <p className="text-xs leading-normal!">
+        <p className="text-xs !leading-normal">
           The API methods shown here are only the commonly used ones to get you started building
           quickly.
         </p>
-        <p className="text-xs leading-normal!">
+        <p className="text-xs !leading-normal">
           Head over to our docs site for the full API documentation.
         </p>
-        <DocsButton className="mt-2!" href={docsUrl} />
+        <DocsButton className="!mt-2" href={docsUrl} />
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )

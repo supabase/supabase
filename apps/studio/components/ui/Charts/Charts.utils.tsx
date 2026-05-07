@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { useMemo, type FC, type ReactElement } from 'react'
+import { FC, PropsWithChildren, useMemo } from 'react'
 import { ResponsiveContainer } from 'recharts'
 
 import { DateTimeFormats } from './Charts.constants'
@@ -232,7 +232,7 @@ export const useChartSize = (
   }
 ) => {
   const minHeight = sizeMap[size]
-  const Container: FC<{ children: ReactElement; className?: string }> = useMemo(
+  const Container: FC<PropsWithChildren & { className?: string }> = useMemo(
     () =>
       ({ className, children }) => (
         <ResponsiveContainer
@@ -241,7 +241,7 @@ export const useChartSize = (
           minHeight={minHeight}
           width="100%"
         >
-          {children}
+          {children as JSX.Element}
         </ResponsiveContainer>
       ),
     [size]

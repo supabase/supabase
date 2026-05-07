@@ -1,20 +1,20 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, Checkbox } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
-import type { SupaRow } from '@/components/grid/types'
-import { useDatabaseColumnDeleteMutation } from '@/data/database-columns/database-column-delete-mutation'
-import { TableLike } from '@/data/table-editor/table-editor-types'
-import { useTableRowDeleteAllMutation } from '@/data/table-rows/table-row-delete-all-mutation'
-import { useTableRowDeleteMutation } from '@/data/table-rows/table-row-delete-mutation'
-import { useTableRowTruncateMutation } from '@/data/table-rows/table-row-truncate-mutation'
-import { useTableDeleteMutation } from '@/data/tables/table-delete-mutation'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
-import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import type { SupaRow } from 'components/grid/types'
+import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
+import { TableLike } from 'data/table-editor/table-editor-types'
+import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
+import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
+import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
+import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export type DeleteConfirmationDialogsProps = {
   selectedTable?: TableLike
@@ -27,7 +27,7 @@ const DeleteConfirmationDialogs = ({
 }: DeleteConfirmationDialogsProps) => {
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
-  const { filters, setFilters } = useTableFilter()
+  const { filters, onApplyFilters } = useTableFilter()
 
   const removeDeletedColumnFromFiltersAndSorts = ({
     columnName,
@@ -37,7 +37,7 @@ const DeleteConfirmationDialogs = ({
     schema?: string
     columnName: string
   }) => {
-    setFilters(filters.filter((filter) => filter.column !== columnName))
+    onApplyFilters(filters.filter((filter) => filter.column !== columnName))
   }
 
   const { mutate: deleteColumn } = useDatabaseColumnDeleteMutation({
@@ -216,24 +216,12 @@ const DeleteConfirmationDialogs = ({
           <p className="text-sm text-foreground-light">
             Are you sure you want to delete the selected column? This action cannot be undone.
           </p>
-          <div className="items-top flex space-x-2">
-            <Checkbox
-              id="checkbox-cascade"
-              checked={isDeleteWithCascade}
-              onCheckedChange={() => snap.toggleConfirmationIsWithCascade()}
-            />
-            <div className="grid gap-1.5 leading-none">
-              <label
-                htmlFor="checkbox-cascade"
-                className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Drop column with cascade?
-              </label>
-              <p className="text-sm text-foreground-muted">
-                Deletes the column and its dependent objects
-              </p>
-            </div>
-          </div>
+          <Checkbox
+            label="Drop column with cascade?"
+            description="Deletes the column and its dependent objects"
+            checked={isDeleteWithCascade}
+            onChange={() => snap.toggleConfirmationIsWithCascade()}
+          />
           {isDeleteWithCascade && (
             <Alert_Shadcn_
               variant="warning"
@@ -264,7 +252,7 @@ const DeleteConfirmationDialogs = ({
         size="small"
         visible={snap.confirmationDialog?.type === 'table'}
         title={
-          <span className="wrap-break-word">{`Confirm deletion of table "${selectedTable?.name}"`}</span>
+          <span className="break-words">{`Confirm deletion of table "${selectedTable?.name}"`}</span>
         }
         confirmLabel="Delete"
         confirmLabelLoading="Deleting"
@@ -277,24 +265,12 @@ const DeleteConfirmationDialogs = ({
           <p className="text-sm text-foreground-light">
             Are you sure you want to delete the selected table? This action cannot be undone.
           </p>
-          <div className="items-top flex space-x-2">
-            <Checkbox
-              id="checkbox-cascade"
-              checked={isDeleteWithCascade}
-              onCheckedChange={() => snap.toggleConfirmationIsWithCascade(!isDeleteWithCascade)}
-            />
-            <div className="grid gap-1.5 leading-none">
-              <label
-                htmlFor="checkbox-cascade"
-                className="text-sm text-foreground-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Drop table with cascade?
-              </label>
-              <p className="text-sm text-foreground-muted">
-                Deletes the table and its dependent objects
-              </p>
-            </div>
-          </div>
+          <Checkbox
+            label="Drop table with cascade?"
+            description="Deletes the table and its dependent objects"
+            checked={isDeleteWithCascade}
+            onChange={() => snap.toggleConfirmationIsWithCascade(!isDeleteWithCascade)}
+          />
           {isDeleteWithCascade && (
             <Alert_Shadcn_ variant="warning">
               <AlertTitle_Shadcn_>
@@ -325,7 +301,7 @@ const DeleteConfirmationDialogs = ({
         size="small"
         visible={snap.confirmationDialog?.type === 'row'}
         title={
-          <p className="wrap-break-word">
+          <p className="break-words">
             <span>Confirm to delete the selected row</span>
             <span>{numRows > 1 && 's'}</span>
           </p>

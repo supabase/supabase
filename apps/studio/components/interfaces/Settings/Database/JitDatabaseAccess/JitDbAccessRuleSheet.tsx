@@ -1,14 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
+import { DOCS_URL } from 'lib/constants'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   ScrollArea,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -36,20 +38,18 @@ import {
   createDraft,
   draftFromRule,
   getAssignableJitRoleOptions,
-  getInvalidIpRangeRows,
+  getInvalidCidrs,
   mapJitMembersToUserRules,
   serializeDraftRolesForGrantMutation,
 } from './JitDbAccess.utils'
 import { JitDbAccessRoleGrantFields } from './JitDbAccessRoleGrantFields'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { InlineLink } from '@/components/ui/InlineLink'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useJitDbAccessGrantMutation } from '@/data/jit-db-access/jit-db-access-grant-mutation'
 import { useJitDbAccessMembersQuery } from '@/data/jit-db-access/jit-db-access-members-query'
 import { useProjectMembersQuery } from '@/data/projects/project-members-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { DOCS_URL } from '@/lib/constants'
 
 const grantSchema = z.object({
   roleId: z.string(),
@@ -57,13 +57,14 @@ const grantSchema = z.object({
   expiryMode: z.custom<JitExpiryMode>(),
   hasExpiry: z.boolean(),
   expiry: z.string(),
-  ipRanges: z.array(z.object({ value: z.string() })),
+  hasIpRestriction: z.boolean(),
+  ipRanges: z.string(),
 })
 
 function createJitRuleSchema(mode: SheetMode, membersWithRules: Set<string>) {
   return z
     .object({
-      memberId: z.string().min(1, 'Select a member for this temporary access rule.'),
+      memberId: z.string().min(1, 'Select a member for this JIT access rule.'),
       grants: z.array(grantSchema),
     })
     .superRefine((data, ctx) => {
@@ -72,12 +73,12 @@ function createJitRuleSchema(mode: SheetMode, membersWithRules: Set<string>) {
           code: z.ZodIssueCode.custom,
           path: ['memberId'],
           message:
-            'This member already has a temporary access rule. Edit their existing rule from the list.',
+            'This member already has a JIT access rule. Edit their existing rule from the list.',
         })
       }
 
-      const enabledGrantCount = data.grants.filter((g) => g.enabled).length
-      if (enabledGrantCount === 0) {
+      const enabledGrants = data.grants.filter((g) => g.enabled)
+      if (enabledGrants.length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['grants'],
@@ -86,22 +87,19 @@ function createJitRuleSchema(mode: SheetMode, membersWithRules: Set<string>) {
         return
       }
 
-      data.grants.forEach((grant, grantIndex) => {
-        if (!grant.enabled) return
-
-        const invalidCidrs = new Set(getInvalidIpRangeRows(grant.ipRanges))
-
-        grant.ipRanges.forEach((ipRange, ipRangeIndex) => {
-          const value = ipRange.value.trim()
-          if (value.length === 0 || !invalidCidrs.has(value)) return
-
+      for (const grant of enabledGrants) {
+        const invalidCidrs = getInvalidCidrs(grant.ipRanges)
+        if (invalidCidrs.length > 0) {
+          const preview = invalidCidrs.slice(0, 3).join(', ')
+          const overflow = invalidCidrs.length > 3
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            path: ['grants', grantIndex, 'ipRanges', ipRangeIndex, 'value'],
-            message: 'Please enter a valid CIDR range',
+            path: ['grants'],
+            message: `Invalid CIDR range${invalidCidrs.length > 1 ? 's' : ''} for role "${grant.roleId}": ${preview}${overflow ? ', ...' : ''}`,
           })
-        })
-      })
+          break
+        }
+      }
     })
 }
 
@@ -223,26 +221,26 @@ export function JitDbAccessRuleSheet({
         <SheetContent
           showClose={false}
           size="default"
-          className="flex h-full w-full max-w-full flex-col gap-0 sm:w-[560px]! sm:max-w-[560px]"
+          className="flex h-full w-full max-w-full flex-col gap-0 sm:!w-[560px] sm:max-w-[560px]"
         >
           <SheetHeader>
             <SheetTitle>
-              {mode === 'edit' ? 'Edit temporary access rule' : 'New temporary access rule'}
+              {mode === 'edit' ? 'Edit JIT access rule' : 'New JIT access rule'}
             </SheetTitle>
             <SheetDescription className="sr-only">
-              Configure which database roles a user can request with temporary access.
+              Configure which database roles a user can request with JIT access.
             </SheetDescription>
           </SheetHeader>
 
-          <Form {...form}>
+          <Form_Shadcn_ {...form}>
             <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
               <div className="space-y-8 px-5 py-6 sm:px-6">
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="memberId"
                   render={({ field }) => (
                     <FormItemLayout layout="vertical" label="Member">
-                      <FormControl>
+                      <FormControl_Shadcn_>
                         <Select_Shadcn_
                           value={field.value}
                           disabled={
@@ -270,19 +268,19 @@ export function JitDbAccessRuleSheet({
                             ))}
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl>
+                      </FormControl_Shadcn_>
 
                       {mode === 'add' && availableMembersForAddCount === 0 && (
                         <p className="mt-2 text-foreground-lighter">
-                          All project members already have temporary access rules. Edit an existing
-                          rule from the table above.
+                          All project members already have JIT access rules. Edit an existing rule
+                          from the table above.
                         </p>
                       )}
                     </FormItemLayout>
                   )}
                 />
 
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="grants"
                   render={() => (
@@ -313,8 +311,6 @@ export function JitDbAccessRuleSheet({
                           {grants.map((grant, index) => (
                             <div key={grant.roleId} className={index > 0 ? 'border-t' : ''}>
                               <JitDbAccessRoleGrantFields
-                                control={form.control}
-                                grantIndex={index}
                                 role={{ id: grant.roleId, label: grant.roleId }}
                                 grant={grant}
                                 onChange={(next) => updateGrant(grant.roleId, () => next)}
@@ -328,7 +324,7 @@ export function JitDbAccessRuleSheet({
                 />
               </div>
             </ScrollArea>
-          </Form>
+          </Form_Shadcn_>
 
           <SheetFooter className="mt-auto w-full border-t py-4">
             <Button type="default" onClick={confirmOnClose} disabled={isSubmitting}>

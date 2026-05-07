@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Button, Form, FormControl, FormField, Switch } from 'ui'
+import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Switch } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -24,9 +24,9 @@ export default function FormItemLayoutDemo() {
     // action('form form.handleSubmit(onSubmit)')(values)
   }
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <form className="w-96 flex flex-col gap-3" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
+        <FormField_Shadcn_
           control={form.control}
           name="functionName"
           render={({ field }) => (
@@ -36,9 +36,9 @@ export default function FormItemLayoutDemo() {
               labelOptional="Optional"
               beforeLabel={<InfoTooltip side="top">Added before the label</InfoTooltip>}
             >
-              <FormControl>
+              <FormControl_Shadcn_>
                 <Input placeholder="Name of function" {...field} />
-              </FormControl>
+              </FormControl_Shadcn_>
             </FormItemLayout>
           )}
         />
@@ -46,6 +46,6 @@ export default function FormItemLayoutDemo() {
           Submit
         </Button>
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }

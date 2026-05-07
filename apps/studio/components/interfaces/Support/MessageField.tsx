@@ -1,10 +1,9 @@
 import type { UseFormReturn } from 'react-hook-form'
 // End of third-party imports
 
-import { FormControl, FormField, TextArea_Shadcn_ } from 'ui'
+import { FormControl_Shadcn_, FormField_Shadcn_, TextArea_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
 import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'
 import { IPV4_MIGRATION_STRINGS } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
@@ -16,7 +15,7 @@ interface MessageFieldProps {
 
 export function MessageField({ form, originalError }: MessageFieldProps) {
   return (
-    <FormField
+    <FormField_Shadcn_
       name="message"
       control={form.control}
       render={({ field }) => (
@@ -30,14 +29,14 @@ export function MessageField({ form, originalError }: MessageFieldProps) {
             )
           }
         >
-          <FormControl>
+          <FormControl_Shadcn_>
             <TextArea_Shadcn_
               {...field}
               rows={4}
               maxLength={5000}
               placeholder="Describe the issue you’re facing, along with any relevant information. Please be as detailed and specific as possible."
             />
-          </FormControl>
+          </FormControl_Shadcn_>
           {originalError && (
             <Admonition
               showIcon={false}

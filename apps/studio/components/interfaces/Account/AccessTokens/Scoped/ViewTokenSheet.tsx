@@ -1,13 +1,10 @@
 import dayjs from 'dayjs'
-import { useMemo } from 'react'
 import {
-  Card,
-  CardContent,
-  cn,
-  ScrollArea,
   Sheet,
   SheetContent,
   SheetHeader,
+  ScrollArea,
+  cn,
   Table,
   TableBody,
   TableCell,
@@ -15,13 +12,14 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns/TimestampInfo'
-
+import { useScopedAccessTokenQuery } from 'data/scoped-access-tokens/scoped-access-token-query'
+import { DocsButton } from 'components/ui/DocsButton'
+import { Card, CardContent } from 'ui'
 import { ACCESS_TOKEN_RESOURCES } from '../AccessToken.constants'
+import { useMemo } from 'react'
 import { formatAccessText, getRealAccess } from '../AccessToken.utils'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { useScopedAccessTokenQuery } from '@/data/scoped-access-tokens/scoped-access-token-query'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 interface ViewTokenSheetProps {
   visible: boolean
@@ -102,7 +100,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
         <SheetContent
           showClose={false}
           size="default"
-          className="min-w-[600px]! flex flex-col h-full gap-0"
+          className="!min-w-[600px] flex flex-col h-full gap-0"
         >
           <SheetHeader
             className={cn('flex flex-row justify-between gap-x-4 items-center border-b')}

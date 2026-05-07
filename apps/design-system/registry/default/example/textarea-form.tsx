@@ -5,13 +5,13 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
   Textarea,
 } from 'ui'
 import { z } from 'zod'
@@ -43,32 +43,32 @@ export default function TextareaForm() {
   }
 
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-        <FormField
+        <FormField_Shadcn_
           control={form.control}
           name="bio"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Bio</FormLabel>
-              <FormControl>
+            <FormItem_Shadcn_>
+              <FormLabel_Shadcn_>Bio</FormLabel_Shadcn_>
+              <FormControl_Shadcn_>
                 <Textarea
                   placeholder="Tell us a little bit about yourself"
                   className="resize-none"
                   {...field}
                 />
-              </FormControl>
-              <FormDescription>
+              </FormControl_Shadcn_>
+              <FormDescription_Shadcn_>
                 You can <span>@mention</span> other users and organizations.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
+              </FormDescription_Shadcn_>
+              <FormMessage_Shadcn_ />
+            </FormItem_Shadcn_>
           )}
         />
         <Button htmlType="submit" type="alternative">
           Submit
         </Button>
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }

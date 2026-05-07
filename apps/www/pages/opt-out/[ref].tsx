@@ -9,9 +9,9 @@ import { useForm } from 'react-hook-form'
 import {
   Button,
   cn,
-  Form,
-  FormField,
-  FormMessage,
+  Form_Shadcn_,
+  FormField_Shadcn_,
+  FormMessage_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -134,7 +134,7 @@ export default function OptOutPage() {
       <OptOutLayout>
         <div>
           <span className="label">Opt out</span>
-          <h2 className="h4 m-0!">Receive an unexpected email from Supabase?</h2>
+          <h2 className="h4 !m-0">Receive an unexpected email from Supabase?</h2>
           <p className="text-foreground-light">Please report it here so we can investigate.</p>
         </div>
 
@@ -145,11 +145,11 @@ export default function OptOutPage() {
           </Admonition>
         )}
 
-        <Form {...form}>
+        <Form_Shadcn_ {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="gap-2 max-w-xs flex flex-col">
             <input hidden value={form.getValues('ref')} readOnly {...register('ref')} />
             <input hidden {...register('captchaToken')} />
-            <FormField
+            <FormField_Shadcn_
               name="reason"
               control={form.control}
               render={({ field }) => (
@@ -230,7 +230,7 @@ export default function OptOutPage() {
             <Button htmlType="submit" size="small" disabled={submissionType === 'success'}>
               Report spam
             </Button>
-            <FormMessage
+            <FormMessage_Shadcn_
               className={cn(
                 'border-l pl-3',
                 submissionType === 'error'
@@ -239,9 +239,9 @@ export default function OptOutPage() {
               )}
             >
               {formMessage}
-            </FormMessage>
+            </FormMessage_Shadcn_>
           </form>
-        </Form>
+        </Form_Shadcn_>
       </OptOutLayout>
     </>
   )

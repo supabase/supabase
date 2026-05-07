@@ -10,38 +10,6 @@ export interface PgFormatConfig {
   pattern: PgFormatConfigPattern
 }
 
-/**
- * A branded string type representing a SQL fragment that is safe to compose
- * into queries.
- * Values of this type are either:
- * - Static strings in source code (no interpolation)
- * - Outputs of `ident()`, `literal()`, or `keyword()` (properly escaped or
- *   validated)
- * - Compositions via `safeSql` template tag (enforces SafeSqlFragment-only
- *   interpolations)
- * - Compositions via `joinFragments` (enforces SafeSqlFragment inputs)
- *
- * Never cast arbitrary strings to this type — use ident/literal/keyword/safeSql
- * instead.
- */
-export type SafeSqlFragment = string & { readonly __safeSqlFragmentBrand: never }
-
-export type SqlFragmentSeparator =
-  | ','
-  | ', '
-  | ';\n'
-  | ' and '
-  | ' AND '
-  | ' or '
-  | ' OR '
-  | ' union all '
-  | ' union '
-  | ' UNION ALL '
-  | ' UNION '
-  | '\n'
-  | '\n\n'
-  | ' '
-
 const FMT_PATTERN_CONFIG: PgFormatConfigPattern = {
   ident: 'I',
   literal: 'L',
@@ -74,15 +42,15 @@ function arrayToList(useSpace: boolean, array: unknown[], formatter: (value: unk
 
 // Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
 // eslint-disable-next-line radar/cognitive-complexity
-export function ident(value?: unknown): SafeSqlFragment {
+export function ident(value?: unknown): string {
   if (value === undefined || value === null) {
     throw new Error('SQL identifier cannot be null or undefined')
   } else if (value === false) {
-    return '"f"' as SafeSqlFragment
+    return '"f"'
   } else if (value === true) {
-    return '"t"' as SafeSqlFragment
+    return '"t"'
   } else if (value instanceof Date) {
-    return `"${formatDate(value.toISOString())}"` as SafeSqlFragment
+    return `"${formatDate(value.toISOString())}"`
   } else if (Array.isArray(value)) {
     const temporary: string[] = []
     for (const element of value) {
@@ -94,7 +62,7 @@ export function ident(value?: unknown): SafeSqlFragment {
         temporary.push(ident(element))
       }
     }
-    return temporary.toString() as SafeSqlFragment
+    return temporary.toString()
   } else if (value === Object(value)) {
     throw new Error('SQL identifier cannot be an object')
   }
@@ -103,7 +71,7 @@ export function ident(value?: unknown): SafeSqlFragment {
 
   // do not quote a valid, unquoted identifier
   if (/^[_a-z][\d$_a-z]*$/.test(tident) === true && isReserved(tident) === false) {
-    return tident as SafeSqlFragment
+    return tident
   }
 
   let quoted = '"'
@@ -114,42 +82,42 @@ export function ident(value?: unknown): SafeSqlFragment {
 
   quoted += '"'
 
-  return quoted as SafeSqlFragment
+  return quoted
 }
 
 // Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
 // eslint-disable-next-line radar/cognitive-complexity
-export function literal(value?: unknown): SafeSqlFragment {
+export function literal(value?: unknown): string {
   let tliteral = ''
   let explicitCast: string | undefined
 
   if (value === undefined || value === null) {
-    return 'NULL' as SafeSqlFragment
+    return 'NULL'
   }
   if (typeof value === 'bigint') {
-    return BigInt(value).toString() as SafeSqlFragment
+    return BigInt(value).toString()
   }
   if (value === Number.POSITIVE_INFINITY) {
-    return "'Infinity'" as SafeSqlFragment
+    return "'Infinity'"
   }
   if (value === Number.NEGATIVE_INFINITY) {
-    return "'-Infinity'" as SafeSqlFragment
+    return "'-Infinity'"
   }
   if (Number.isNaN(value)) {
-    return "'NaN'" as SafeSqlFragment
+    return "'NaN'"
   }
   if (typeof value === 'number') {
     // Test must be AFTER other special case number tests
-    return Number(value).toString() as SafeSqlFragment
+    return Number(value).toString()
   }
   if (value === false) {
-    return "'f'" as SafeSqlFragment
+    return "'f'"
   }
   if (value === true) {
-    return "'t'" as SafeSqlFragment
+    return "'t'"
   }
   if (value instanceof Date) {
-    return `'${formatDate(value.toISOString())}'` as SafeSqlFragment
+    return `'${formatDate(value.toISOString())}'`
   }
   if (Array.isArray(value)) {
     const temporary: string[] = []
@@ -160,7 +128,7 @@ export function literal(value?: unknown): SafeSqlFragment {
         temporary.push(literal(element))
       }
     }
-    return temporary.toString() as SafeSqlFragment
+    return temporary.toString()
   }
   if (value === Object(value)) {
     explicitCast = 'jsonb'
@@ -193,21 +161,7 @@ export function literal(value?: unknown): SafeSqlFragment {
     quoted += `::${explicitCast}`
   }
 
-  return quoted as SafeSqlFragment
-}
-
-/**
- * Marks SQL keywords (e.g., 'BEFORE', 'instead of') as safe for interpolation.
- * Only letters, numbers, underscores, and spaces are allowed, to prevent
- * injection.
- */
-export function keyword(value: string): SafeSqlFragment {
-  if (!/^[A-Za-z][A-Za-z0-9_ ]*$/.test(value)) {
-    throw new Error(
-      `Not a valid keyword: "${value}". Only letters, numbers, underscores, and spaces are permitted.`
-    )
-  }
-  return value as SafeSqlFragment
+  return quoted
 }
 
 // eslint-disable-next-line radar/cognitive-complexity
@@ -311,30 +265,4 @@ export function withArray(fmt: string, parameters: unknown[]): string {
 
 export function format(fmt: string, ...arguments_: unknown[]): string {
   return withArray(fmt, arguments_)
-}
-
-/**
- * Tagged template literal for composing SQL fragments safely.
- * Only accepts SafeSqlFragment interpolations — plain strings are rejected at
- * compile time.
- */
-export function safeSql(
-  strings: TemplateStringsArray,
-  ...interpolated: Array<SafeSqlFragment>
-): SafeSqlFragment {
-  return strings.reduce(
-    (result, string, i) => result + string + (interpolated[i] ?? ''),
-    ''
-  ) as SafeSqlFragment
-}
-
-/**
- * Joins an array of already-safe SQL fragments with a fixed structural
- * separator.
- */
-export function joinSqlFragments(
-  fragments: Array<SafeSqlFragment>,
-  separator: SqlFragmentSeparator
-): SafeSqlFragment {
-  return fragments.join(separator) as SafeSqlFragment
 }

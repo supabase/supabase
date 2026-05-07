@@ -1,11 +1,10 @@
-import { describe, expect, test } from 'vitest'
-
-import { TAX_IDS } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
+import { TAX_IDS } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
 import {
   getEffectiveTaxCountry,
   resolveStoredTaxId,
   sanitizeTaxIdValue,
-} from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.utils'
+} from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.utils'
+import { describe, test, expect } from 'vitest'
 
 /**
  * We're sanitizing EU tax ids. Stripe expects a prefixed tax id (ATU12345678),

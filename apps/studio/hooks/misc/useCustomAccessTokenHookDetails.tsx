@@ -1,7 +1,6 @@
+import { extractMethod } from 'components/interfaces/Auth/Hooks/hooks.utils'
+import { AuthConfigResponse, useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useMemo } from 'react'
-
-import { extractMethod } from '@/components/interfaces/Auth/Hooks/hooks.utils'
-import { AuthConfigResponse, useAuthConfigQuery } from '@/data/auth/auth-config-query'
 
 function authConfigToCustomAccessTokenHookDetails(authConfig?: AuthConfigResponse) {
   if (!authConfig || !authConfig.HOOK_CUSTOM_ACCESS_TOKEN_ENABLED) {

@@ -1,5 +1,7 @@
 import { Check, ChevronDown, Edit, Plus, Trash, X } from 'lucide-react'
 import { useState } from 'react'
+
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Button,
   cn,
@@ -16,8 +18,6 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
-
-import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 
 interface AIAssistantChatSelectorProps {
   disabled?: boolean
@@ -157,7 +157,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                         <>
                           <Check
                             className={cn(
-                              'mr-2 h-4 w-4 shrink-0',
+                              'mr-2 h-4 w-4 flex-shrink-0',
                               snap.activeChatId === id ? 'opacity-100' : 'opacity-0'
                             )}
                           />

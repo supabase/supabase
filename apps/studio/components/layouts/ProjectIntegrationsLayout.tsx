@@ -1,17 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useFeatureFlags, useFlag, useParams } from 'common'
+import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { ProjectLayout } from 'components/layouts/ProjectLayout'
+import AlertError from 'components/ui/AlertError'
+import { ProductMenuItem } from 'components/ui/ProductMenu/ProductMenuItem'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { withAuth } from 'hooks/misc/withAuth'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 import { Menu, Separator } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
-import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { ProjectLayout } from '@/components/layouts/ProjectLayout'
-import AlertError from '@/components/ui/AlertError'
-import { ProductMenuItem } from '@/components/ui/ProductMenu/ProductMenuItem'
 import { marketplaceCategoriesQueryOptions } from '@/data/marketplace/integration-categories-query'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { withAuth } from '@/hooks/misc/withAuth'
 
 /**
  * Layout component for the Integrations section
@@ -85,8 +85,8 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
       items: [],
     },
     ...categories.map((category) => ({
-      name: category.name ?? '',
-      key: category.slug ?? '',
+      name: category.title,
+      key: category.slug,
       url: `/project/${ref}/integrations?category=${category.slug}`,
       items: [],
     })),
@@ -125,7 +125,7 @@ const InstalledIntegrationsMenu = ({ page }: { page: string }) => {
     key: `integrations/${integration.id}`,
     url: `/project/${ref}/integrations/${integration.id}/overview`,
     icon: (
-      <div className="relative w-6 h-6 bg-white border rounded-sm flex items-center justify-center">
+      <div className="relative w-6 h-6 bg-white border rounded flex items-center justify-center">
         {integration.icon({ className: 'p-1' })}
       </div>
     ),

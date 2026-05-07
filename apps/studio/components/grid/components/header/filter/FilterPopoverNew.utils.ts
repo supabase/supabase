@@ -1,14 +1,13 @@
-import { format } from 'date-fns'
-import type { FilterProperty, OperatorDefinition } from 'ui-patterns'
-
-import type { Filter, SupaColumn } from '@/components/grid/types'
+import type { Filter, SupaColumn } from 'components/grid/types'
 import {
   isBoolColumn,
   isDateColumn,
   isDateTimeColumn,
   isEnumColumn,
   isTimeColumn,
-} from '@/components/grid/utils/types'
+} from 'components/grid/utils/types'
+import { format } from 'date-fns'
+import type { FilterProperty, OperatorDefinition } from 'ui-patterns'
 
 // Check if column is a date/datetime/time type
 function isDateLikeColumn(column: SupaColumn): boolean {

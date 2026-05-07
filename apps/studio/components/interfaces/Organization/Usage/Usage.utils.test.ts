@@ -1,8 +1,7 @@
-import { describe, expect, it } from 'vitest'
-
+import { describe, it, expect } from 'vitest'
 import { dailyUsageToDataPoints } from './Usage.utils'
-import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
-import type { OrgDailyUsageResponse } from '@/data/analytics/org-daily-stats-query'
+import { PricingMetric } from 'data/analytics/org-daily-stats-query'
+import type { OrgDailyUsageResponse } from 'data/analytics/org-daily-stats-query'
 
 describe('dailyUsageToDataPoints', () => {
   it('returns empty array when dailyUsage is undefined', () => {

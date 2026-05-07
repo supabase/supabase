@@ -1,17 +1,16 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useResetPasswordMutation } from 'data/misc/reset-password-mutation'
+import { BASE_PATH } from 'lib/constants'
+import { auth } from 'lib/gotrue'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
+import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
-
-import { useResetPasswordMutation } from '@/data/misc/reset-password-mutation'
-import { BASE_PATH } from '@/lib/constants'
-import { auth } from '@/lib/gotrue'
 
 const forgotPasswordSchema = z.object({
   email: z.string().min(1, 'Please provide an email address').email('Must be a valid email'),
@@ -73,7 +72,7 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
   }
 
   return (
-    <Form {...codeForm}>
+    <Form_Shadcn_ {...codeForm}>
       <form
         id="code-input-form"
         className="flex flex-col pt-4 space-y-4"
@@ -84,19 +83,19 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
           title="Check your email for a reset code"
           description="You'll receive an email if an account associated with the email address exists"
         />
-        <FormField
+        <FormField_Shadcn_
           control={codeForm.control}
           name="code"
           render={({ field }) => (
             <FormItemLayout label="Code">
-              <FormControl>
+              <FormControl_Shadcn_>
                 <Input_Shadcn_
                   {...field}
                   placeholder="123456"
                   autoComplete="off"
                   disabled={isLoading}
                 />
-              </FormControl>
+              </FormControl_Shadcn_>
             </FormItemLayout>
           )}
         />
@@ -107,7 +106,7 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
           Confirm reset code
         </Button>
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }
 
@@ -150,18 +149,18 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
   }
 
   return (
-    <Form {...forgotPasswordForm}>
+    <Form_Shadcn_ {...forgotPasswordForm}>
       <form
         id="forgot-password-form"
         className="flex flex-col pt-4 space-y-4"
         onSubmit={forgotPasswordForm.handleSubmit(onForgotPassword)}
       >
-        <FormField
+        <FormField_Shadcn_
           control={forgotPasswordForm.control}
           name="email"
           render={({ field }) => (
             <FormItemLayout label="Email">
-              <FormControl>
+              <FormControl_Shadcn_>
                 <Input_Shadcn_
                   {...field}
                   type="email"
@@ -169,7 +168,7 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
                   disabled={isPending}
                   autoComplete="email"
                 />
-              </FormControl>
+              </FormControl_Shadcn_>
             </FormItemLayout>
           )}
         />
@@ -201,6 +200,6 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
           Send reset code
         </Button>
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }

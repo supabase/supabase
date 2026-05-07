@@ -1,23 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import dayjs from 'dayjs'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-
-import { UpcomingInvoice } from './UpcomingInvoice'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+} from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import NoPermission from 'components/ui/NoPermission'
+import SparkBar from 'components/ui/SparkBar'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import dayjs from 'dayjs'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from 'lib/constants/infrastructure'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { UpcomingInvoice } from './UpcomingInvoice'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
-import SparkBar from '@/components/ui/SparkBar'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { MANAGED_BY } from '@/lib/constants/infrastructure'
 
 const BillingBreakdown = () => {
   const { slug: orgSlug } = useParams()
@@ -58,7 +58,7 @@ const BillingBreakdown = () => {
                 barClass="bg-foreground"
                 labelBottom={`${billingCycleStart.format('MMMM DD')} - ${billingCycleEnd.format('MMMM DD')}`}
                 bgClass="bg-surface-300"
-                labelBottomClass="text-foreground-light! p-1 m-0"
+                labelBottomClass="!text-foreground-light p-1 m-0"
                 labelTop={
                   subscription
                     ? `${daysToCycleEnd} ${daysToCycleEnd === 1 ? 'day' : 'days'} left`

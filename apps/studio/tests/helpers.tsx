@@ -2,11 +2,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, getByText, render as originalRender, screen } from '@testing-library/react'
 import type React from 'react'
 import { useState } from 'react'
-import { TooltipProvider } from 'ui'
-import { CommandProvider } from 'ui-patterns/CommandMenu'
 
-import { ProjectInfoInfinite } from '@/data/projects/projects-infinite-query'
-import type { Organization } from '@/types'
+// End of third-party imports
+
+import { ProjectInfoInfinite } from 'data/projects/projects-infinite-query'
+import type { Organization } from 'types'
+import { TooltipProvider } from 'ui'
 
 interface SelectorOptions {
   container?: HTMLElement
@@ -55,7 +56,6 @@ export const createMockOrganization = (details: Partial<Organization>): Organiza
     is_owner: true,
     billing_email: 'billing@example.com',
     billing_partner: null,
-    integration_source: null,
     usage_billing_enabled: false,
     stripe_customer_id: 'stripe-1',
     subscription_id: 'subscription-1',
@@ -108,9 +108,7 @@ const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) =
 
   return (
     <TooltipProvider>
-      <QueryClientProvider client={queryClient}>
-        <CommandProvider openKey="">{children}</CommandProvider>
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </TooltipProvider>
   )
 }

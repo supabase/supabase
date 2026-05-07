@@ -1,7 +1,6 @@
 import { useParams } from 'common'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-
-import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 
 export const LoadingState = () => {
   const { ref } = useParams()

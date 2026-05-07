@@ -1,4 +1,10 @@
 import { useParams } from 'common'
+import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvider'
+import {
+  ServiceFlowType,
+  useUnifiedLogInspectionQuery,
+} from 'data/logs/unified-log-inspection-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useState } from 'react'
 import {
   cn,
@@ -25,12 +31,6 @@ import {
 import { ServiceFlowHeader } from './ServiceFlow/components/ServiceFlowHeader'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
-import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
-import {
-  ServiceFlowType,
-  useUnifiedLogInspectionQuery,
-} from '@/data/logs/unified-log-inspection-query'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface ServiceFlowPanelProps {
   selectedRow: ColumnSchema
@@ -89,10 +89,17 @@ export function ServiceFlowPanel({
         <ResizableHandle withHandle className="z-10" />
         <ResizablePanel
           id="log-sidepanel"
-          defaultSize={45}
-          minSize={400}
-          maxSize={400}
-          className={cn('bg-dash-sidebar border-t')}
+          minSize={448}
+          maxSize={720}
+          className={cn(
+            'bg-dash-sidebar',
+            'z-40',
+            'border-l fixed right-0 top-0 bottom-0',
+            'md:absolute md:h-auto',
+            // ' md:w-3/4',
+            'xl:z-[1]',
+            'xl:relative xl:border-l-0'
+          )}
         >
           <div className="h-full overflow-auto">
             {/* Service Flow Header with navigation */}
@@ -212,7 +219,7 @@ export function ServiceFlowPanel({
                   </TabsContent>
                 )}
 
-                <TabsContent value="raw-json" className="grow overflow-auto">
+                <TabsContent value="raw-json" className="flex-grow overflow-auto">
                   {isLoading && shouldShowServiceFlow && (
                     <div className="flex items-center gap-3 text-foreground-light p-3 bg-surface-100 border-b border-border">
                       <Skeleton className="h-4 w-4 rounded-full animate-pulse" />
@@ -221,7 +228,7 @@ export function ServiceFlowPanel({
                   )}
                   <CodeBlock
                     language="json"
-                    className="max-h-[800px] overflow-auto border-none rounded-none [&_pre]:leading-tight! [&_code]:leading-tight!"
+                    className="max-h-[800px] overflow-auto border-none rounded-none [&_pre]:!leading-tight [&_code]:!leading-tight"
                   >
                     {JSON.stringify(formattedJsonData, null, 2)}
                   </CodeBlock>

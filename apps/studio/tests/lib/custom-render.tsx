@@ -1,12 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, renderHook, type RenderOptions } from '@testing-library/react'
+import { type RenderOptions, render, renderHook } from '@testing-library/react'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
-import { TooltipProvider } from 'ui'
-import { CommandProvider } from 'ui-patterns/CommandMenu'
-
 // End of third-party imports
 
-import { ProfileContext, type ProfileContextType } from '@/lib/profile'
+import { ProfileContext, type ProfileContextType } from 'lib/profile'
+import { TooltipProvider } from 'ui'
 
 type AdapterProps = Partial<Parameters<typeof NuqsTestingAdapter>[0]>
 
@@ -34,9 +32,7 @@ const CustomWrapper = ({
   const content = (
     <QueryClientProvider client={_queryClient}>
       <NuqsTestingAdapter {...nuqs}>
-        <TooltipProvider>
-          <CommandProvider openKey="">{children}</CommandProvider>
-        </TooltipProvider>
+        <TooltipProvider>{children}</TooltipProvider>
       </NuqsTestingAdapter>
     </QueryClientProvider>
   )

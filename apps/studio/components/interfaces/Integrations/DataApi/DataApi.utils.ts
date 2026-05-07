@@ -5,8 +5,7 @@ import { snakeToCamel } from '@/lib/helpers'
 
 /**
  * Resolves the API endpoint URL based on the selected database, custom domain
- * status, and load balancer configuration. The returned URL is normalized to
- * end with `/rest/v1/` to match the Data API base path documented elsewhere.
+ * status, and load balancer configuration.
  */
 export function getApiEndpoint({
   selectedDatabaseId,
@@ -24,20 +23,14 @@ export function getApiEndpoint({
   const loadBalancerSelected = selectedDatabaseId === 'load-balancer'
 
   if (selectedDatabaseId === projectRef && !!resolvedEndpoint) {
-    return withDataApiPath(resolvedEndpoint)
+    return resolvedEndpoint
   }
 
   if (loadBalancerSelected) {
-    return withDataApiPath(loadBalancers?.[0]?.endpoint)
+    return loadBalancers?.[0]?.endpoint ?? ''
   }
 
-  return withDataApiPath(selectedDatabase?.restUrl)
-}
-
-function withDataApiPath(url: string | undefined): string {
-  if (!url) return ''
-  const trimmed = url.replace(/\/+$/, '')
-  return /\/rest\/v1$/.test(trimmed) ? `${trimmed}/` : `${trimmed}/rest/v1/`
+  return selectedDatabase?.restUrl ?? ''
 }
 
 export type EnrichedEntity = { id: string; displayName: string; camelCase: string }

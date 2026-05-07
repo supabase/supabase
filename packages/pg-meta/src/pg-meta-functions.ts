@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
+import { ident, literal } from './pg-format'
 import { FUNCTIONS_SQL } from './sql/functions'
 
 export const pgFunctionZod = z.object({
@@ -55,10 +55,10 @@ export function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgFunctionArrayZod
 } {
-  let sql = safeSql`
+  let sql = /* SQL */ `
     with f as (
       ${FUNCTIONS_SQL}
     )
@@ -72,13 +72,13 @@ export function list({
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
   if (filter) {
-    sql = safeSql`${sql} where schema ${filter}`
+    sql += ` where schema ${filter}`
   }
   if (limit) {
-    sql = safeSql`${sql} limit ${literal(limit)}`
+    sql = `${sql} limit ${limit}`
   }
   if (offset) {
-    sql = safeSql`${sql} offset ${literal(offset)}`
+    sql = `${sql} offset ${offset}`
   }
 
   return {
@@ -88,7 +88,7 @@ export function list({
 }
 
 type FunctionsRetrieveReturn = {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgFunctionOptionalZod
 }
 
@@ -114,7 +114,7 @@ export function retrieve({
   args?: string[]
 }): FunctionsRetrieveReturn {
   if (id) {
-    const sql = safeSql`
+    const sql = /* SQL */ `
       with f as (
         ${FUNCTIONS_SQL}
       )
@@ -127,8 +127,16 @@ export function retrieve({
       zod: pgFunctionOptionalZod,
     }
   } else if (name && schema && args) {
-    const argsFragment = args.length
-      ? safeSql`(
+    const sql = /* SQL */ `with f as (
+      ${FUNCTIONS_SQL}
+    )
+    select
+      f.*
+    from f join pg_proc as p on id = p.oid where schema = ${literal(
+      schema
+    )} and name = ${literal(name)} and p.proargtypes::text = ${
+      args.length
+        ? /* SQL */ `(
           select string_agg(type_oid::text, ' ') from (
             select (
               split_args.arr[
@@ -140,20 +148,15 @@ export function retrieve({
             ) as type_oid from (
               select string_to_array(
                 unnest(
-                  array[${joinSqlFragments(args.map(literal), ',')}]
+                  array[${args.map(literal)}]
                 ),
                 ' '
               ) as arr
             ) as split_args
           ) args
         )`
-      : literal('')
-    const sql = safeSql`with f as (
-      ${FUNCTIONS_SQL}
-    )
-    select
-      f.*
-    from f join pg_proc as p on id = p.oid where schema = ${literal(schema)} and name = ${literal(name)} and p.proargtypes::text = ${argsFragment}`
+        : literal('')
+    }`
 
     return {
       sql,

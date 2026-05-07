@@ -9,9 +9,9 @@ import {
   NUMERICAL_TYPES,
   OTHER_DATA_TYPES,
   TEXT_TYPES,
-  TIME_TYPES,
   TIMESTAMP_TYPES,
-} from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+  TIME_TYPES,
+} from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 
 export const NATIVE_POSTGRES_TYPES = [
   ...NUMERICAL_TYPES,

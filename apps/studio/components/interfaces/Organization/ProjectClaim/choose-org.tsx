@@ -1,5 +1,6 @@
+import { OrganizationSelector } from 'components/ui/org-selector'
+
 import { ProjectClaimLayout } from './layout'
-import { OrganizationSelector } from '@/components/ui/org-selector'
 
 export interface ProjectClaimChooseOrgProps {
   onChoose: (orgSlug: string) => void

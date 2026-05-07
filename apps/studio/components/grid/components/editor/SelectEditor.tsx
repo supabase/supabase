@@ -1,19 +1,12 @@
 import type { RenderEditCellProps } from 'react-data-grid'
-import {
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-} from 'ui'
+import { Select } from 'ui'
 
 interface SelectEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
   TRow,
   TSummaryRow
 > {
   isNullable?: boolean
-  options: { label: string; value: string }[]
+  options: { label: string; _value: string }[]
 }
 
 export function SelectEditor<TRow, TSummaryRow = unknown>({
@@ -26,11 +19,11 @@ export function SelectEditor<TRow, TSummaryRow = unknown>({
 }: SelectEditorProps<TRow, TSummaryRow>) {
   const value = row[column.key as keyof TRow] as unknown as string
 
-  function onChange(value: string) {
-    if (!value || value == '') {
+  function onChange(event: any) {
+    if (!event.target.value || event.target.value == '') {
       onRowChange({ ...row, [column.key]: null }, true)
     } else {
-      onRowChange({ ...row, [column.key]: value }, true)
+      onRowChange({ ...row, [column.key]: event.target.value }, true)
     }
   }
 
@@ -39,20 +32,24 @@ export function SelectEditor<TRow, TSummaryRow = unknown>({
   }
 
   return (
-    <Select_Shadcn_ name="select-editor" defaultValue={value ?? ''} onValueChange={onChange}>
-      <SelectTrigger_Shadcn_ onBlur={onBlur} style={{ width: `${column.width}px` }}>
-        <SelectValue_Shadcn_ id="select-editor" placeholder="NULL" />
-      </SelectTrigger_Shadcn_>
-      <SelectContent_Shadcn_>
-        <SelectGroup_Shadcn_>
-          {isNullable ? <SelectItem_Shadcn_ value={null as any}>NULL</SelectItem_Shadcn_> : null}
-          {options.map(({ label, value }) => (
-            <SelectItem_Shadcn_ key={value} value={value}>
-              {label}
-            </SelectItem_Shadcn_>
-          ))}
-        </SelectGroup_Shadcn_>
-      </SelectContent_Shadcn_>
-    </Select_Shadcn_>
+    <Select
+      autoFocus
+      id="select-editor"
+      name="select-editor"
+      size="small"
+      defaultValue={value ?? ''}
+      className="sb-grid-select-editor !gap-2"
+      style={{ width: `${column.width}px` }}
+      // @ts-ignore
+      onChange={onChange}
+      onBlur={onBlur}
+    >
+      {isNullable && <Select.Option value="">NULL</Select.Option>}
+      {options.map(({ label, _value }) => (
+        <Select.Option key={_value} value={_value} selected={_value === value}>
+          {label}
+        </Select.Option>
+      ))}
+    </Select>
   )
 }

@@ -1,9 +1,8 @@
 'use client'
 
+import { useTrack } from 'lib/telemetry/track'
 import { ReactNode } from 'react'
 import { Accordion_Shadcn_ as Accordion, cn } from 'ui'
-
-import { useTrack } from '@/lib/telemetry/track'
 
 interface TroubleshootingAccordionProps {
   children: ReactNode

@@ -1,8 +1,7 @@
+import { describe, it, expect } from 'vitest'
+import { formatTimestamp } from './Reports.utils'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { describe, expect, it } from 'vitest'
-
-import { formatTimestamp } from './Reports.utils'
 
 dayjs.extend(utc)
 

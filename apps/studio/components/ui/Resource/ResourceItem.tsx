@@ -1,5 +1,6 @@
 import { ChevronRight, MoreVertical } from 'lucide-react'
 import { forwardRef, HTMLAttributes, ReactNode } from 'react'
+
 import {
   Button,
   CardContent,
@@ -30,7 +31,7 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
         ref={ref}
         className={cn(
           'flex items-center justify-between text-sm gap-4',
-          'border-b-0!',
+          '!border-b-0',
           onClick && 'cursor-pointer transition-colors duration-150 hover:bg-surface-200',
           className
         )}

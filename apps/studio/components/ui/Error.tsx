@@ -1,8 +1,7 @@
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { Button } from 'ui'
-
-import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 
 export default function EmptyPageState({ error }: any) {
   useEffect(() => {

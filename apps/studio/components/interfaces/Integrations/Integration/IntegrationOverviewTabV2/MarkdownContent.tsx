@@ -1,6 +1,5 @@
+import { Markdown } from 'components/interfaces/Markdown'
 import { useEffect, useState } from 'react'
-
-import { Markdown } from '@/components/interfaces/Markdown'
 
 interface MarkdownContentProps {
   content: string | null | undefined
@@ -17,7 +16,7 @@ export const MarkdownContent = ({
 
   useEffect(() => {
     if (!!integrationId && !content) {
-      import(`@/static-data/integrations/${integrationId}/overview.md`)
+      import(`static-data/integrations/${integrationId}/overview.md`)
         .then((module) => setLocalContent(String(module.default)))
         .catch((error) => console.error('Error loading markdown:', error))
     }

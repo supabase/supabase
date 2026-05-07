@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react'
-
 // TODO: we could type the value(!) especially when using enums
 export type Option = {
   label: string
@@ -20,7 +18,7 @@ export type Input = {
 
 export type Checkbox = {
   type: 'checkbox'
-  component?: (props: Option) => ReactNode
+  component?: (props: Option) => JSX.Element | null
   options?: Option[]
 }
 

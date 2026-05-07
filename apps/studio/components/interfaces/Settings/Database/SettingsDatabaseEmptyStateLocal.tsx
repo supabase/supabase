@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader } from 'ui'
-
-import { DocsButton } from '@/components/ui/DocsButton'
-import { DOCS_URL } from '@/lib/constants'
+import { DOCS_URL } from 'lib/constants'
+import { DocsButton } from 'components/ui/DocsButton'
 
 export function SettingsDatabaseEmptyStateLocal() {
   return (

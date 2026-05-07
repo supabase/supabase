@@ -43,7 +43,16 @@ interface ItemProps {
   style?: React.CSSProperties
 }
 
-export function Item({ children, icon, active, onClick, style }: ItemProps) {
+export function Item({
+  children,
+  icon,
+  active,
+  rounded,
+  onClick,
+  doNotCloseOverlay = false,
+  showActiveBar = false,
+  style,
+}: ItemProps) {
   const __styles = styleHandler('menu')
 
   const { type } = useMenuContext()
@@ -75,7 +84,7 @@ export function Item({ children, icon, active, onClick, style }: ItemProps) {
   return (
     <li
       role="menuitem"
-      className={cn('outline-hidden', classes)}
+      className={cn('outline-none', classes)}
       style={style}
       onClick={onClick}
       aria-current={active ? 'page' : undefined}

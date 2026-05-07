@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormMessage_Shadcn_,
   Input_Shadcn_,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
@@ -79,24 +79,24 @@ export const SSOMetadata = ({
             </TabsTrigger_Shadcn_>
           </TabsList_Shadcn_>
           <TabsContent_Shadcn_ value="url">
-            <FormField
+            <FormField_Shadcn_
               name="metadataXmlUrl"
               render={({ field }) => (
-                <FormItem>
-                  <FormControl>
+                <FormItem_Shadcn_>
+                  <FormControl_Shadcn_>
                     <Input_Shadcn_
                       {...field}
                       placeholder="https://example.com/metadata.xml"
                       autoComplete="off"
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  </FormControl_Shadcn_>
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
               )}
             />
           </TabsContent_Shadcn_>
           <TabsContent_Shadcn_ value="file">
-            <FormField
+            <FormField_Shadcn_
               name="metadataXmlUrl"
               render={() => (
                 <div className="flex flex-col gap-2 max-w-md">
@@ -117,7 +117,7 @@ export const SSOMetadata = ({
                     </Button>
                     {fileName && <span className="text-xs text-foreground-light">{fileName}</span>}
                   </div>
-                  <FormMessage />
+                  <FormMessage_Shadcn_ />
                 </div>
               )}
             />

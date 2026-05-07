@@ -1,10 +1,9 @@
+import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
 import { CriticalIcon } from 'ui'
-
 import { isValidRetryPolicy } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
 import { RetryCountdown } from './RetryCountdown'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 
 interface ErroredTableDetailsProps {
   table: ReplicationPipelineTableStatus
@@ -38,7 +37,7 @@ export const ErroredTableDetails = ({ table }: ErroredTableDetailsProps) => {
             This error requires manual intervention from our{' '}
             <InlineLink
               className="text-foreground-lighter hover:text-foreground"
-              href={`/support?projectRef=${projectRef}&category=dashboard_bug&subject=Database%20replication%20error&error=${encodeURIComponent(state.reason ?? '')}`}
+              href={`/support?projectRef=${projectRef}&category=dashboard_bug&subject=Database%20replication%20error&error=${state.reason}`}
             >
               support
             </InlineLink>

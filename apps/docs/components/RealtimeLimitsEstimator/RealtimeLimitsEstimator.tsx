@@ -1,16 +1,7 @@
-import throughputTable from '~/data/realtime/throughput.json'
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
-import {
-  Button,
-  Collapsible,
-  Label_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-} from 'ui'
+import { Button, Collapsible, Select } from 'ui'
+import throughputTable from '~/data/realtime/throughput.json'
 
 export default function RealtimeLimitsEstimater({}) {
   const findTableValue = ({ computeAddOn, filters, rls, concurrency }) => {
@@ -32,28 +23,29 @@ export default function RealtimeLimitsEstimater({}) {
 
   const [expandPreview, setExpandPreview] = useState(false)
 
-  const handleComputeAddOnSelection = (val) => {
+  const handleComputeAddOnSelection = (e) => {
+    const val = e.target.value
     setComputeAddOn(val)
     setConcurrency(500)
     setLimits(findTableValue({ computeAddOn: val, filters, rls, concurrency: 500 }))
   }
 
-  const handleFiltersSelection = (value) => {
-    const val = value.toLowerCase() === 'true'
+  const handleFiltersSelection = (e) => {
+    const val = e.target.value.toLowerCase() === 'true'
     setFilters(val)
     setConcurrency(500)
     setLimits(findTableValue({ computeAddOn, filters: val, rls, concurrency: 500 }))
   }
 
-  const handleRLSSelection = (value) => {
-    const val = value.toLowerCase() === 'true'
+  const handleRLSSelection = (e) => {
+    const val = e.target.value.toLowerCase() === 'true'
     setRLS(val)
     setConcurrency(500)
     setLimits(findTableValue({ computeAddOn, filters, rls: val, concurrency: 500 }))
   }
 
-  const handleConcurrencySelection = (value) => {
-    const val = parseInt(value)
+  const handleConcurrencySelection = (e) => {
+    const val = parseInt(e.target.value)
     setConcurrency(val)
     setLimits(findTableValue({ computeAddOn, filters, rls, concurrency: val }))
   }
@@ -63,64 +55,51 @@ export default function RealtimeLimitsEstimater({}) {
       <h4>Set your expected parameters</h4>
       <div className="grid mb-8 gap-y-8 gap-x-8 grid-cols-2 xl:grid-cols-4">
         <div>
-          <Label_Shadcn_ htmlFor="computeAddOn">Compute:</Label_Shadcn_>
-          <Select_Shadcn_ onValueChange={handleComputeAddOnSelection} value={computeAddOn}>
-            <SelectTrigger_Shadcn_ id="computeAddOn">
-              <SelectValue_Shadcn_ className="font-mono" />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectItem_Shadcn_ value="micro">Micro</SelectItem_Shadcn_>
-              <SelectItem_Shadcn_ value="small">Small to medium</SelectItem_Shadcn_>
-              <SelectItem_Shadcn_ value="large">Large to 16XL</SelectItem_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+          <label htmlFor="computeAddOn">Compute:</label>
+          <Select id="computeAddOn" className="font-mono" onChange={handleComputeAddOnSelection}>
+            <Select.Option value="micro">Micro</Select.Option>
+            <Select.Option value="small">Small to medium</Select.Option>
+            <Select.Option value="large">Large to 16XL</Select.Option>
+          </Select>
         </div>
+
         <div>
-          <Label_Shadcn_ htmlFor="filters">Filters:</Label_Shadcn_>
-          <Select_Shadcn_
-            onValueChange={handleFiltersSelection}
-            value={filters.toString()}
-            disabled
+          <label htmlFor="filters">Filters:</label>
+          <Select
+            id="filters"
+            className="font-mono"
+            disabled={true}
+            onChange={handleFiltersSelection}
           >
-            <SelectTrigger_Shadcn_ id="filters">
-              <SelectValue_Shadcn_ className="font-mono" />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectItem_Shadcn_ value="false">No</SelectItem_Shadcn_>
-              <SelectItem_Shadcn_ value="true">Yes</SelectItem_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+            <Select.Option value="false">No</Select.Option>
+            <Select.Option value="true">Yes</Select.Option>
+          </Select>
         </div>
+
         <div>
-          <Label_Shadcn_ htmlFor="rls">RLS:</Label_Shadcn_>
-          <Select_Shadcn_ onValueChange={handleRLSSelection} value={rls.toString()}>
-            <SelectTrigger_Shadcn_ id="rls">
-              <SelectValue_Shadcn_ className="font-mono" />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectItem_Shadcn_ value="false">No</SelectItem_Shadcn_>
-              <SelectItem_Shadcn_ value="true">Yes</SelectItem_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+          <label htmlFor="rls">RLS:</label>
+          <Select id="rls" className="font-mono" onChange={handleRLSSelection}>
+            <Select.Option value="false">No</Select.Option>
+            <Select.Option value="true">Yes</Select.Option>
+          </Select>
         </div>
+
         <div>
-          <Label_Shadcn_ htmlFor="concurrency">Connected clients:</Label_Shadcn_>
-          <Select_Shadcn_ onValueChange={handleConcurrencySelection} value={concurrency.toString()}>
-            <SelectTrigger_Shadcn_ id="concurrency">
-              <SelectValue_Shadcn_ className="font-mono" />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              {throughputTable
-                .filter(
-                  (l) => l.computeAddOn === computeAddOn && l.filters === filters && l.rls === rls
-                )
-                .map((l) => (
-                  <SelectItem_Shadcn_ key={l.concurrency} value={l.concurrency.toString()}>
-                    {Intl.NumberFormat().format(l.concurrency)}
-                  </SelectItem_Shadcn_>
-                ))}
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+          <label htmlFor="concurrency">Connected clients:</label>
+          <Select id="concurrency" className="font-mono" onChange={handleConcurrencySelection}>
+            {throughputTable
+              .filter(
+                (l) => l.computeAddOn === computeAddOn && l.filters === filters && l.rls === rls
+              )
+              .map((l) => (
+                <Select.Option
+                  value={l.concurrency.toString()}
+                  selected={l.concurrency === concurrency}
+                >
+                  {Intl.NumberFormat().format(l.concurrency)}
+                </Select.Option>
+              ))}
+          </Select>
         </div>
       </div>
 

@@ -1,27 +1,27 @@
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
+
+import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signing-key-create-mutation'
+import { JWTAlgorithm } from 'data/jwt-signing-keys/jwt-signing-keys-query'
+import { stringToBase64URL } from 'lib/base64url'
 import {
   Badge,
   Button,
-  Checkbox,
+  Checkbox_Shadcn_,
   DialogFooter,
   DialogHeader,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
   Label_Shadcn_,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
   Textarea,
 } from 'ui'
-
-import { useJWTSigningKeyCreateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-create-mutation'
-import { JWTAlgorithm } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
-import { stringToBase64URL } from '@/lib/base64url'
 
 const RSA_JWK_REQUIRED_PROPERTIES = ['kty', 'n', 'e', 'p', 'q', 'd', 'dq', 'dp', 'qi']
 const EC_JWK_REQUIRED_PROPERTIES = ['kty', 'crv', 'x', 'y', 'd']
@@ -187,7 +187,11 @@ export const CreateKeyDialog = ({
         </div>
         <div className="flex flex-col gap-4">
           <Label_Shadcn_ htmlFor="byok" className="flex items-center gap-x-2">
-            <Checkbox id="byok" checked={isBYOK} onCheckedChange={(value) => setBYOK(!!value)} />
+            <Checkbox_Shadcn_
+              id="byok"
+              checked={isBYOK}
+              onCheckedChange={(value) => setBYOK(!!value)}
+            />
             {newKeyAlgorithm === 'HS256'
               ? 'Import an existing secret'
               : 'Import an existing private key'}
@@ -216,7 +220,7 @@ export const CreateKeyDialog = ({
           {isBYOK && newKeyAlgorithm === 'HS256' && (
             <>
               <Label_Shadcn_ htmlFor="base64" className="flex items-center gap-x-2">
-                <Checkbox
+                <Checkbox_Shadcn_
                   id="base64"
                   checked={isBase64}
                   onCheckedChange={(value) => setBase64(!!value)}

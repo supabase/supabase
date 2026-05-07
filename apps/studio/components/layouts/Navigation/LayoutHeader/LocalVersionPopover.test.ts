@@ -1,5 +1,4 @@
 import { describe, expect, test } from 'vitest'
-
 import { semverGte, semverLte } from './LocalVersionPopover.utils'
 
 describe('LocalVersionPopover.utils:semverLte', () => {

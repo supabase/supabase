@@ -66,7 +66,7 @@ export const generateDocsMenu = (
       ],
     },
     {
-      title: 'Functions',
+      title: 'Stored Procedures',
       items: [
         {
           name: 'Introduction',

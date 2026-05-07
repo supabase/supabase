@@ -1,10 +1,9 @@
 import { Skeleton } from '@ui/components/shadcn/ui/skeleton'
-
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
+} from 'components/layouts/Scaffold'
 
 const AwsMarketplaceOnboardingPlaceholder = () => {
   return (

@@ -1,5 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
+import { ProjectSecret } from 'data/secrets/secrets-query'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -7,9 +11,9 @@ import { useLatest } from 'react-use'
 import { toast } from 'sonner'
 import {
   Button,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input,
   Input_Shadcn_,
   Sheet,
@@ -21,11 +25,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
-
-import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { useSecretsCreateMutation } from '@/data/secrets/secrets-create-mutation'
-import { ProjectSecret } from '@/data/secrets/secrets-query'
-import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 const FORM_ID = 'edit-secret-sidepanel'
 
@@ -80,34 +79,34 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
 
   return (
     <Sheet open={visible} onOpenChange={handleOpenChange}>
-      <SheetContent size="default" className={'min-w-screen! lg:min-w-[600px]! flex flex-col'}>
+      <SheetContent size="default" className={'!min-w-screen lg:!min-w-[600px] flex flex-col'}>
         <SheetHeader className="py-3 flex flex-row gap-3 items-center">
           <SheetTitle>Edit secret</SheetTitle>
         </SheetHeader>
 
         <SheetSection className="h-full">
-          <Form {...form}>
+          <Form_Shadcn_ {...form}>
             <form
               id={FORM_ID}
               className="flex flex-col gap-y-4"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField
+              <FormField_Shadcn_
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItemLayout label="Name" layout="horizontal">
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Input_Shadcn_
                         {...field}
                         readOnly
-                        className="text-foreground-light! cursor-not-allowed"
+                        className="!text-foreground-light cursor-not-allowed"
                       />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
-              <FormField
+              <FormField_Shadcn_
                 control={form.control}
                 name="value"
                 render={({ field }) => (
@@ -116,7 +115,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
                     layout="horizontal"
                     description="Secrets can’t be retrieved once saved. Enter a new value to overwrite the existing value."
                   >
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Input
                         {...field}
                         type={showSecretValue ? 'text' : 'password'}
@@ -136,12 +135,12 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
                           </div>
                         }
                       />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form>
+          </Form_Shadcn_>
         </SheetSection>
 
         <SheetFooter>

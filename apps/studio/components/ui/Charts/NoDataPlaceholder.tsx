@@ -1,6 +1,6 @@
 import { BarChart2 } from 'lucide-react'
-import { cn } from 'ui'
 
+import { cn } from 'ui'
 import { ChartHeader } from './ChartHeader'
 import { useChartSize } from './Charts.utils'
 
@@ -41,7 +41,7 @@ const NoDataPlaceholder = ({
       )}
       <div
         className={cn(
-          'border-control flex grow w-full flex-col items-center justify-center space-y-2 border border-dashed text-center',
+          'border-control flex flex-grow w-full flex-col items-center justify-center space-y-2 border border-dashed text-center',
           isFullHeight && 'h-full',
           className
         )}

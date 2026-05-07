@@ -1,10 +1,10 @@
-import { useParams } from 'common/hooks'
-import { HTMLMotionProps, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { ReactNode } from 'react'
-import { Button, cn } from 'ui'
+import { motion, HTMLMotionProps } from 'framer-motion'
 
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useParams } from 'common/hooks'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { Button, cn } from 'ui'
 
 // Base props common to all feature banners
 interface BaseFeatureBannerProps extends HTMLMotionProps<'div'> {

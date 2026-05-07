@@ -1,4 +1,6 @@
 import { useParams } from 'common'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PropsWithChildren, ReactNode } from 'react'
 import { Badge, Card, CardContent, cn, Separator } from 'ui'
 
@@ -6,8 +8,6 @@ import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { BuiltBySection } from './BuildBySection'
 import { MarkdownContent } from './MarkdownContent'
 import { MissingExtensionAlert } from './MissingExtensionAlert'
-import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export interface IntegrationOverviewTabProps {
   actions?: ReactNode
@@ -16,7 +16,6 @@ export interface IntegrationOverviewTabProps {
   hideRequiredExtensionsSection?: boolean
 }
 
-/** [Joshen] This will eventually get replaced by IntegrationOverviewTabV2 */
 export const IntegrationOverviewTab = ({
   actions,
   alert,
@@ -106,12 +105,10 @@ export const IntegrationOverviewTab = ({
 
       {!!actions && (
         <div
-          aria-disabled={hasToInstallExtensions && !hideRequiredExtensionsSection}
+          aria-disabled={hasToInstallExtensions}
           className={cn(
             'px-10 max-w-4xl',
-            hasToInstallExtensions &&
-              !hideRequiredExtensionsSection &&
-              'opacity-25 [&_button]:pointer-events-none'
+            hasToInstallExtensions && 'opacity-25 [&_button]:pointer-events-none'
           )}
         >
           {actions}

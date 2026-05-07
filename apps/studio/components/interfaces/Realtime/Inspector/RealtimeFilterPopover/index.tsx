@@ -1,31 +1,31 @@
-import { useParams } from 'common'
 import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useParams } from 'common'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
-  cn,
   IconBroadcast,
   IconDatabaseChanges,
   IconPresence,
   Input,
-  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Switch,
+  Popover_Shadcn_,
+  Toggle,
+  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL } from '@/lib/constants'
 
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig
@@ -96,18 +96,18 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
               <div className="flex gap-2.5 items-center">
                 <IconPresence
                   size="xlarge"
-                  className="bg-foreground rounded-sm text-background-muted"
+                  className="bg-foreground rounded text-background-muted"
                 />
                 <label htmlFor="toggle-presence" className="text-sm">
                   Presence
                 </label>
               </div>
-              <Switch
+              <Toggle
                 id="toggle-presence"
-                size="small"
+                size="tiny"
                 checked={tempConfig.enablePresence}
-                onCheckedChange={(checked) =>
-                  setTempConfig((current) => ({ ...current, enablePresence: checked }))
+                onChange={() =>
+                  setTempConfig({ ...tempConfig, enablePresence: !tempConfig.enablePresence })
                 }
               />
             </div>
@@ -120,18 +120,18 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
               <div className="flex gap-2.5 items-center">
                 <IconBroadcast
                   size="xlarge"
-                  className="bg-foreground rounded-sm text-background-muted"
+                  className="bg-foreground rounded text-background-muted"
                 />
                 <label htmlFor="toggle-broadcast" className="text-sm">
                   Broadcast
                 </label>
               </div>
-              <Switch
+              <Toggle
                 id="toggle-broadcast"
-                size="small"
+                size="tiny"
                 checked={tempConfig.enableBroadcast}
-                onCheckedChange={(checked) =>
-                  setTempConfig((current) => ({ ...current, enableBroadcast: checked }))
+                onChange={() =>
+                  setTempConfig({ ...tempConfig, enableBroadcast: !tempConfig.enableBroadcast })
                 }
               />
             </div>
@@ -145,7 +145,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                 <IconDatabaseChanges
                   size="xlarge"
                   className={cn(
-                    'rounded-sm text-background-muted',
+                    'rounded text-background-muted',
                     config.enableDbChanges ? 'bg-foreground' : 'bg-foreground-lighter'
                   )}
                 />
@@ -156,13 +156,13 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                   Database changes
                 </label>
               </div>
-              <Switch
+              <Toggle
                 id="toggle-db-changes"
-                size="small"
+                size="tiny"
                 checked={tempConfig.enableDbChanges}
                 disabled={!config.enableDbChanges}
-                onCheckedChange={(checked) =>
-                  setTempConfig((current) => ({ ...current, enableDbChanges: checked }))
+                onChange={() =>
+                  setTempConfig({ ...tempConfig, enableDbChanges: !tempConfig.enableDbChanges })
                 }
               />
             </div>
@@ -204,7 +204,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                   <p className="w-[60px] flex justify-end text-sm">AND</p>
                   <Input
                     size="tiny"
-                    className="grow"
+                    className="flex-grow"
                     placeholder="body=eq.hey"
                     value={tempConfig.filter}
                     onChange={(v) => setTempConfig({ ...tempConfig, filter: v.target.value })}

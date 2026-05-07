@@ -229,7 +229,7 @@ const monokaiCustomTheme = {
   },
 }
 
-// CodeHike theme based on the colors from code-hike.css
+// CodeHike theme based on the colors from code-hike.scss
 const codeHikeTheme = {
   dark: {
     hljs: {

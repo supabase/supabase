@@ -1,7 +1,13 @@
 import { UseFormReturn } from 'react-hook-form'
+
+import { InlineLink } from 'components/ui/InlineLink'
+import Panel from 'components/ui/Panel'
+import { instanceSizeSpecs } from 'data/projects/new-project.constants'
+import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
+import { DOCS_URL } from 'lib/constants'
 import { CloudProvider } from 'shared-data'
 import {
-  FormField,
+  FormField_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -11,14 +17,8 @@ import {
 } from 'ui'
 import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
 import { sizes } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
-import { InlineLink } from '@/components/ui/InlineLink'
-import Panel from '@/components/ui/Panel'
-import { instanceSizeSpecs } from '@/data/projects/new-project.constants'
-import { getCloudProviderArchitecture } from '@/lib/cloudprovider-utils'
-import { DOCS_URL } from '@/lib/constants'
 
 interface ComputeSizeSelectorProps {
   form: UseFormReturn<CreateProjectForm>
@@ -27,7 +27,7 @@ interface ComputeSizeSelectorProps {
 export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
   return (
     <Panel.Content>
-      <FormField
+      <FormField_Shadcn_
         control={form.control}
         name="instanceSize"
         render={({ field }) => (

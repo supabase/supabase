@@ -1,6 +1,11 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
+import { useDebounce } from 'use-debounce'
+
+import { useSqlCronGenerateMutation } from 'data/ai/sql-cron-mutation'
+import { useCronTimezoneQuery } from 'data/database-cron-jobs/database-cron-timezone-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Accordion_Shadcn_,
   AccordionContent_Shadcn_,
@@ -8,24 +13,19 @@ import {
   AccordionTrigger_Shadcn_,
   Button,
   cn,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
   Input_Shadcn_,
   SheetSection,
   Switch,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { useDebounce } from 'use-debounce'
-
 import { formatScheduleString, getScheduleMessage } from '../CronJobs.utils'
 import CronSyntaxChart from '../CronSyntaxChart'
 import { type CreateCronJobForm } from './CreateCronJobSheet.constants'
-import { useSqlCronGenerateMutation } from '@/data/ai/sql-cron-mutation'
-import { useCronTimezoneQuery } from '@/data/database-cron-jobs/database-cron-timezone-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface CronJobScheduleSectionProps {
   form: UseFormReturn<CreateCronJobForm>
@@ -75,14 +75,14 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
 
   return (
     <SheetSection>
-      <FormField
+      <FormField_Shadcn_
         control={form.control}
         name="schedule"
         render={({ field }) => {
           return (
-            <FormItem className="flex flex-col gap-1">
+            <FormItem_Shadcn_ className="flex flex-col gap-1">
               <div className="flex flex-row justify-between">
-                <FormLabel>Schedule</FormLabel>
+                <FormLabel_Shadcn_>Schedule</FormLabel_Shadcn_>
                 <span className="text-foreground-lighter text-xs">
                   {useNaturalLanguage
                     ? 'Describe your schedule in words'
@@ -90,7 +90,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                 </span>
               </div>
 
-              <FormControl>
+              <FormControl_Shadcn_>
                 {useNaturalLanguage ? (
                   <Input
                     value={inputValue}
@@ -114,8 +114,8 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                     }}
                   />
                 )}
-              </FormControl>
-              <FormMessage />
+              </FormControl_Shadcn_>
+              <FormMessage_Shadcn_ />
               <div className="flex flex-col gap-y-4 mt-3 mb-2">
                 <div className="flex items-center gap-2">
                   <Switch
@@ -154,13 +154,13 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                     <AccordionTrigger_Shadcn_ className="text-xs text-foreground-light font-normal gap-2 justify-start py-1 ">
                       View syntax chart
                     </AccordionTrigger_Shadcn_>
-                    <AccordionContent_Shadcn_ asChild className="pb-0!">
+                    <AccordionContent_Shadcn_ asChild className="!pb-0">
                       <CronSyntaxChart />
                     </AccordionContent_Shadcn_>
                   </AccordionItem_Shadcn_>
                 </Accordion_Shadcn_>
               </div>
-              <div className="bg-surface-100 p-4 rounded-sm grid gap-y-4 border">
+              <div className="bg-surface-100 p-4 rounded grid gap-y-4 border">
                 <h4 className="text-sm text-foreground">
                   Schedule {timezone ? `(${timezone})` : ''}
                 </h4>
@@ -187,7 +187,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                   </span>
                 )}
               </div>
-            </FormItem>
+            </FormItem_Shadcn_>
           )
         }}
       />

@@ -1,9 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as z from 'zod'
+
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { NO_PROJECT_MARKER } from 'components/interfaces/Support/SupportForm.utils'
+import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProfile } from 'lib/profile'
 import {
   Button,
   Dialog,
@@ -14,20 +20,14 @@ import {
   DialogSection,
   DialogTitle,
   DialogTrigger,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
   Separator,
 } from 'ui'
-import * as z from 'zod'
-
-import { NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
-import { useSendSupportTicketMutation } from '@/data/feedback/support-ticket-send'
-import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useProfile } from '@/lib/profile'
 
 const setDeletionRequestFlag = () => {
   const expiryDate = new Date()
@@ -110,7 +110,7 @@ export const DeleteAccountButton = () => {
           Request to delete account
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[500px]!">
+      <DialogContent className="!w-[500px]">
         <DialogHeader>
           {(organizations ?? []).length > 0 ? (
             <>
@@ -150,23 +150,23 @@ export const DeleteAccountButton = () => {
                 </DialogFooter>
               </>
             ) : (
-              <Form {...form}>
+              <Form_Shadcn_ {...form}>
                 <form
                   id="account-deletion-request"
                   onSubmit={form.handleSubmit(() => onConfirmDelete())}
                 >
                   <DialogSection>
-                    <FormField
+                    <FormField_Shadcn_
                       name="account"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
+                        <FormItem_Shadcn_>
+                          <FormLabel_Shadcn_>
                             Please type{' '}
                             <span className="font-bold">{profile?.primary_email ?? ''}</span> to
                             confirm
-                          </FormLabel>
-                          <FormControl>
+                          </FormLabel_Shadcn_>
+                          <FormControl_Shadcn_>
                             <Input_Shadcn_
                               autoFocus
                               {...field}
@@ -174,8 +174,8 @@ export const DeleteAccountButton = () => {
                               disabled={isPending}
                               placeholder="Enter the account above"
                             />
-                          </FormControl>
-                        </FormItem>
+                          </FormControl_Shadcn_>
+                        </FormItem_Shadcn_>
                       )}
                     />
                   </DialogSection>
@@ -193,7 +193,7 @@ export const DeleteAccountButton = () => {
                     </Button>
                   </DialogFooter>
                 </form>
-              </Form>
+              </Form_Shadcn_>
             )}
           </>
         )}

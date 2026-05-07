@@ -1,15 +1,15 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
-import Link from 'next/link'
-import React from 'react'
-import { Badge, Button } from 'ui'
-
 import { BannerCard } from '../BannerCard'
+import { useTrack } from 'lib/telemetry/track'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { Badge } from 'ui'
+import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
+import React from 'react'
+import { Button } from 'ui'
+import Link from 'next/link'
+import { DOCS_URL } from 'lib/constants'
 import { useBannerStack } from '../BannerStackProvider'
-import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { DOCS_URL } from '@/lib/constants'
-import { useTrack } from '@/lib/telemetry/track'
 
 export const BannerMetricsAPI = () => {
   const { ref } = useParams()

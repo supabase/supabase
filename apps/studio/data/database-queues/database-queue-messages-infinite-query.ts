@@ -1,14 +1,13 @@
-import { literal } from '@supabase/pg-meta/src/pg-format'
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { last } from 'lodash'
 
+import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
+import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { DATE_FORMAT } from 'lib/constants'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
-import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
-import { QUEUE_MESSAGE_TYPE } from '@/components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import { DATE_FORMAT } from '@/lib/constants'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 export type DatabaseQueueVariables = {
   projectRef?: string
@@ -68,7 +67,7 @@ export async function getDatabaseQueue({
         ${[queueQuery, archivedQuery].filter(Boolean).join(' UNION ALL ')}
       ) AS combined`
   if (afterTimestamp) {
-    query += ` WHERE enqueued_at > ${literal(afterTimestamp)}`
+    query += ` WHERE enqueued_at > '${afterTimestamp}'`
   }
 
   const { result } = await executeSql({
@@ -110,7 +109,7 @@ export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
     enabled: enabled && typeof projectRef !== 'undefined',
     initialPageParam: undefined,
     getNextPageParam(lastPage) {
-      const hasNextPage = lastPage.length >= QUEUE_MESSAGES_PAGE_SIZE
+      const hasNextPage = lastPage.length <= QUEUE_MESSAGES_PAGE_SIZE
       if (!hasNextPage) return undefined
       return last(lastPage)?.enqueued_at
     },

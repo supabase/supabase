@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { enrichLintsQuery, safeSql } from '../../../src'
+import { enrichLintsQuery } from '../../../src'
 
 describe('enrichLintsQuery', () => {
-  const dummyQuery = safeSql`SELECT 1`
+  const dummyQuery = 'SELECT 1'
 
   it('should include SET LOCAL pgrst.db_schemas when exposedSchemas is provided', () => {
     const result = enrichLintsQuery(dummyQuery, 'public, storage')

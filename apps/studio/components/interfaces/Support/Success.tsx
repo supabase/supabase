@@ -1,10 +1,9 @@
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useProfile } from 'lib/profile'
 import { Check, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { Button, IconDiscord, Separator } from 'ui'
-
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
-import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
-import { useProfile } from '@/lib/profile'
 
 interface SuccessProps {
   sentCategory?: string
@@ -51,7 +50,7 @@ export const Success = ({
       </div>
       {categoriesToShowAdditionalResources.includes(sentCategory) && (
         <>
-          <div className="my-10! w-full">
+          <div className="!my-10 w-full">
             <Separator />
           </div>
           <div className="flex flex-col items-center px-12 space-y-2 text-center">
@@ -72,7 +71,7 @@ export const Success = ({
           </Button>
         </>
       )}
-      <div className="mt-10! w-full">
+      <div className="!mt-10 w-full">
         <Separator />
       </div>
       <div className="w-full pb-4 px-4 flex items-center justify-end">

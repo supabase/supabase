@@ -1,4 +1,5 @@
 import { PropsWithChildren } from 'react'
+
 import { Button, cn } from 'ui'
 
 interface ConfirmFooterProps {
@@ -23,7 +24,7 @@ export const ConfirmFooter = ({
       className={cn(
         'flex items-center justify-between py-2 pr-2 pl-4 text-xs text-foreground',
         'relative border border-t-0 overflow-hidden rounded-b-lg bg-border shadow-inset gap-3',
-        'bg-linear-to-r from-background-surface-75 to-background-surface-200'
+        'bg-gradient-to-r from-background-surface-75 to-background-surface-200'
       )}
     >
       <div className="flex-1 relative z-10">{message}</div>

@@ -1,6 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
+import ReportHeader from 'components/interfaces/Reports/ReportHeader'
+import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import { ChartIntervalDropdown } from 'components/ui/Logs/ChartIntervalDropdown'
+import { CHART_INTERVALS } from 'components/ui/Logs/logs.utils'
 import dayjs from 'dayjs'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useMemo, useState } from 'react'
@@ -11,12 +17,6 @@ import { useObservabilityOverviewData } from './ObservabilityOverview.utils'
 import { ObservabilityOverviewFooter } from './ObservabilityOverviewFooter'
 import { ServiceHealthTable } from './ServiceHealthTable'
 import { useSlowQueriesCount } from './useSlowQueriesCount'
-import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
-import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
-import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
-import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 type ChartIntervalKey = '1hr' | '1day' | '7day'
 
@@ -112,21 +112,25 @@ export const ObservabilityOverview = () => {
 
   const dbServiceData = overviewData.services.db
 
-  // Navigate to the log view scoped to the clicked bar's bucket window
+  // Creates a 1-hour time window for the clicked bar for log filtering
   const handleBarClick = useCallback(
-    (logsUrl: string) => (datum: any) => {
+    (serviceKey: string, logsUrl: string) => (datum: any) => {
       if (!datum?.timestamp) return
 
-      // datum.timestamp is already the UTC-truncated bucket boundary from timestamp_trunc(),
-      // so use it directly to avoid local-timezone startOf() misalignment (e.g. UTC+5:30).
-      const unit = interval === '1hr' ? 'minute' : 'hour'
-      const start = datum.timestamp
-      const end = dayjs.utc(datum.timestamp).add(1, unit).toISOString()
+      const datumTimestamp = dayjs(datum.timestamp)
+      // Round down to the start of the hour
+      const start = datumTimestamp.startOf('hour').toISOString()
+      // Add 1 hour to get the end of the hour
+      const end = datumTimestamp.startOf('hour').add(1, 'hour').toISOString()
 
-      const queryParams = new URLSearchParams({ its: start, ite: end })
+      const queryParams = new URLSearchParams({
+        its: start,
+        ite: end,
+      })
+
       router.push(`${logsUrl}?${queryParams.toString()}`)
     },
-    [router, interval]
+    [router]
   )
 
   return (
@@ -177,6 +181,7 @@ export const ObservabilityOverview = () => {
           }))}
           serviceData={overviewData.services}
           onBarClick={handleBarClick}
+          interval={interval}
           datetimeFormat={datetimeFormat}
         />
       </div>

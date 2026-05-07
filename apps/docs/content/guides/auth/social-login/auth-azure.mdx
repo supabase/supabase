@@ -163,8 +163,7 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/a
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
 
 // ---cut---
 async function signInWithAzure() {
@@ -226,8 +225,7 @@ When your user signs out, call [signOut()](/docs/reference/javascript/auth-signo
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
 
 // ---cut---
 async function signOut() {
@@ -277,8 +275,7 @@ Azure OAuth2.0 doesn't return the `provider_refresh_token` by default. If you ne
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
 
 // ---cut---
 async function signInWithAzure() {

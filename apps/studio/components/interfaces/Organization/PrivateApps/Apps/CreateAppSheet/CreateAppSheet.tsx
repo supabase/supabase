@@ -1,10 +1,15 @@
 import type { components } from 'api-types'
+import { usePlatformAppCreateMutation } from 'data/platform-apps/platform-app-create-mutation'
+import { usePlatformAppDeleteMutation } from 'data/platform-apps/platform-app-delete-mutation'
+import { usePlatformAppInstallationCreateMutation } from 'data/platform-apps/platform-app-installation-create-mutation'
+import { usePlatformAppSigningKeyCreateMutation } from 'data/platform-apps/platform-app-signing-key-create-mutation'
+import { useCopyToClipboard } from 'hooks/ui/useCopyToClipboard'
 import { Copy, Download, Key, Plus, RotateCcw, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox,
+  Checkbox_Shadcn_,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -30,11 +35,6 @@ import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import { usePrivateApps } from '../../PrivateAppsContext'
 import { PERMISSIONS } from '../Apps.constants'
 import { CreateAppSheetStep } from './CreateAppSheetStep'
-import { usePlatformAppCreateMutation } from '@/data/platform-apps/platform-app-create-mutation'
-import { usePlatformAppDeleteMutation } from '@/data/platform-apps/platform-app-delete-mutation'
-import { usePlatformAppInstallationCreateMutation } from '@/data/platform-apps/platform-app-installation-create-mutation'
-import { usePlatformAppSigningKeyCreateMutation } from '@/data/platform-apps/platform-app-signing-key-create-mutation'
-import { useCopyToClipboard } from '@/hooks/ui/useCopyToClipboard'
 
 type CreatePlatformAppResponse = components['schemas']['CreatePlatformAppResponse']
 type CreatePlatformAppSigningKeyResponse =
@@ -142,7 +142,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
         <SheetContent
           showClose={false}
           size="default"
-          className="min-w-[600px]! flex flex-col h-full gap-0"
+          className="!min-w-[600px] flex flex-col h-full gap-0"
         >
           <SheetHeader>
             <SheetTitle>Create private app</SheetTitle>
@@ -220,7 +220,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                                       className="text-foreground"
                                     >
                                       <div className="flex items-center gap-3 w-full">
-                                        <Checkbox
+                                        <Checkbox_Shadcn_
                                           checked={selectedPermissions.includes(perm.id)}
                                           onCheckedChange={() => toggle(perm.id)}
                                           onClick={(e) => e.stopPropagation()}
@@ -347,10 +347,10 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                         readOnly
                         value={generatedKey.private_key}
                         rows={8}
-                        className="w-full rounded-md border border-control bg-surface-200 px-3 py-2 text-xs font-mono resize-none focus:outline-hidden"
+                        className="w-full rounded-md border border-control bg-surface-200 px-3 py-2 text-xs font-mono resize-none focus:outline-none"
                       />
                       <label className="flex items-center gap-3 cursor-pointer bg-warning-200 border border-warning-400 rounded-md px-3 py-2">
-                        <Checkbox
+                        <Checkbox_Shadcn_
                           id="key-copied"
                           checked={keyCopied}
                           onCheckedChange={(v) => setKeyCopied(Boolean(v))}
@@ -366,7 +366,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
             </div>
           </ScrollArea>
 
-          <SheetFooter className="justify-end! w-full mt-auto py-4 border-t">
+          <SheetFooter className="!justify-end w-full mt-auto py-4 border-t">
             <div className="flex gap-2">
               <Button type="default" onClick={handleRequestClose} disabled={isLoading}>
                 Cancel

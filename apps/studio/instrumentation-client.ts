@@ -5,9 +5,8 @@
 import * as Sentry from '@sentry/nextjs'
 import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
-
-import { MIRRORED_BREADCRUMBS } from '@/lib/breadcrumbs'
-import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from '@/lib/sanitize'
+import { MIRRORED_BREADCRUMBS } from 'lib/breadcrumbs'
+import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from 'lib/sanitize'
 
 const DEFAULT_ERROR_SAMPLE_RATE = 1.0
 const LOW_PRIORITY_ERROR_SAMPLE_RATE = 0.01
@@ -97,7 +96,7 @@ Sentry.init({
   debug: false,
 
   // Enable performance monitoring
-  tracesSampleRate: 0.02,
+  tracesSampleRate: 1.0, // Capture 100% of transactions for performance monitoring
 
   integrations: (() => {
     const thirdPartyErrorFilterIntegration = (Sentry as any).thirdPartyErrorFilterIntegration
@@ -105,7 +104,7 @@ Sentry.init({
 
     // Tag errors whose stack trace only contains third-party frames (browser extensions,
     // injected scripts, etc.). This uses build-time code annotation via the applicationKey
-    // in next.config.ts to reliably distinguish our code from third-party code.
+    // in next.config.js to reliably distinguish our code from third-party code.
     // We use 'apply-tag' instead of 'drop' so that beforeSend can exempt error boundary
     // crashes — these may originate in third-party code but are caused by first-party bugs.
     return [
@@ -269,7 +268,6 @@ Sentry.init({
 
     // === Browser extensions & Google Translate DOM manipulation ===
     'Node.insertBefore: Child to insert before is not a child of this node',
-    'Node.removeChild: The node to be removed is not a child of this node',
     "NotFoundError: Failed to execute 'removeChild' on 'Node'",
     "NotFoundError: Failed to execute 'insertBefore' on 'Node'",
     'NotFoundError: The object can not be found here.',
@@ -281,7 +279,6 @@ Sentry.init({
     // === Non-Error throws (extensions, third-party libs throwing strings/objects) ===
     'Non-Error exception captured',
     'Non-Error promise rejection captured',
-    /^Object captured as exception with keys:/,
 
     // === Cross-origin script errors (no useful info) ===
     'Script error.',
@@ -295,11 +292,6 @@ Sentry.init({
 
     // === Web crawler / bot errors ===
     'instantSearchSDKJSBridgeClearHighlight',
-
-    // === Third-party library race conditions ===
-    // cmdk: useSyncExternalStore subscribe called before store context is available
-    "Cannot read properties of undefined (reading 'subscribe')",
-    "undefined is not an object (evaluating 't.subscribe')",
 
     // === Misc known noise ===
     'r.default.setDefaultLevel is not a function',

@@ -3,18 +3,29 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as z from 'zod'
+
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import NoPermission from 'components/ui/NoPermission'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
-  Form,
-  FormControl,
-  FormField,
-  FormInputGroupInput,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  PrePostTab,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -23,19 +34,6 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import * as z from 'zod'
-
-import { ScaffoldSection, ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
-import NoPermission from '@/components/ui/NoPermission'
-import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
-import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
-import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from '@/lib/constants'
 
 const FormSchema = z.object({
   API_MAX_REQUEST_DURATION: z.coerce
@@ -45,23 +43,6 @@ const FormSchema = z.object({
   DB_MAX_POOL_SIZE: z.coerce.number().min(1),
   DB_MAX_POOL_SIZE_UNIT: z.enum(['percent', 'connections']),
 })
-
-export const DatabaseFormSchema = z
-  .object({
-    DB_MAX_POOL_SIZE: z.coerce.number().min(1),
-    DB_MAX_POOL_SIZE_UNIT: z.enum(['percent', 'connections']),
-  })
-  .superRefine((data, ctx) => {
-    if (data.DB_MAX_POOL_SIZE_UNIT === 'percent') {
-      if (data.DB_MAX_POOL_SIZE < 1 || data.DB_MAX_POOL_SIZE > 100) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['DB_MAX_POOL_SIZE'],
-          message: 'Percentage must be between 1 and 100',
-        })
-      }
-    }
-  })
 
 export const PerformanceSettingsForm = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -94,7 +75,7 @@ export const PerformanceSettingsForm = () => {
 
   const promptUpgrade = IS_PLATFORM && !isLoadingEntitlement && !hasAccessToPerformance
 
-  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig, isPending: isSaving } = useAuthConfigUpdateMutation()
 
   const requestDurationForm = useForm({
     resolver: zodResolver(
@@ -104,7 +85,12 @@ export const PerformanceSettingsForm = () => {
   })
 
   const databaseForm = useForm({
-    resolver: zodResolver(DatabaseFormSchema),
+    resolver: zodResolver(
+      z.object({
+        DB_MAX_POOL_SIZE: FormSchema.shape.DB_MAX_POOL_SIZE,
+        DB_MAX_POOL_SIZE_UNIT: FormSchema.shape.DB_MAX_POOL_SIZE_UNIT,
+      })
+    ),
     defaultValues: {
       DB_MAX_POOL_SIZE: 10,
       DB_MAX_POOL_SIZE_UNIT: 'connections',
@@ -147,7 +133,7 @@ export const PerformanceSettingsForm = () => {
     updateAuthConfig(
       { projectRef: project?.ref, config },
       {
-        onError: () => {
+        onError: (error) => {
           setIsUpdatingDatabaseForm(false)
         },
         onSuccess: () => {
@@ -219,11 +205,11 @@ export const PerformanceSettingsForm = () => {
       <ScaffoldSection isFullWidth>
         <ScaffoldSectionTitle className="mb-4">Request duration</ScaffoldSectionTitle>
 
-        <Form {...requestDurationForm}>
+        <Form_Shadcn_ {...requestDurationForm}>
           <form onSubmit={requestDurationForm.handleSubmit(onSubmitRequestDurationForm)}>
             <Card>
               <CardContent className="pt-6">
-                <FormField
+                <FormField_Shadcn_
                   control={requestDurationForm.control}
                   name="API_MAX_REQUEST_DURATION"
                   render={({ field }) => (
@@ -238,22 +224,19 @@ export const PerformanceSettingsForm = () => {
                       }
                     >
                       <div className="flex flex-col gap-2">
-                        <div className="relative">
-                          <FormControl>
-                            <InputGroup>
-                              <FormInputGroupInput
+                        <FormControl_Shadcn_>
+                          <div className="relative">
+                            <PrePostTab postTab="seconds">
+                              <Input_Shadcn_
                                 type="number"
                                 min={5}
                                 max={30}
                                 {...field}
                                 disabled={!canUpdateConfig || promptUpgrade}
                               />
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>seconds</InputGroupText>
-                              </InputGroupAddon>
-                            </InputGroup>
-                          </FormControl>
-                        </div>
+                            </PrePostTab>
+                          </div>
+                        </FormControl_Shadcn_>
 
                         <p className="text-xs text-right text-foreground-muted">
                           10+ seconds recommended
@@ -286,17 +269,17 @@ export const PerformanceSettingsForm = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form>
+        </Form_Shadcn_>
       </ScaffoldSection>
 
       <ScaffoldSection isFullWidth>
         <ScaffoldSectionTitle className="mb-4">Connection management</ScaffoldSectionTitle>
 
-        <Form {...databaseForm}>
+        <Form_Shadcn_ {...databaseForm}>
           <form onSubmit={databaseForm.handleSubmit(onSubmitDatabaseForm)} className="space-y-4">
             <Card>
               <CardContent className="pt-6 flex flex-col gap-4">
-                <FormField
+                <FormField_Shadcn_
                   control={databaseForm.control}
                   name="DB_MAX_POOL_SIZE_UNIT"
                   render={({ field }) => (
@@ -311,7 +294,7 @@ export const PerformanceSettingsForm = () => {
                         </p>
                       }
                     >
-                      <FormControl>
+                      <FormControl_Shadcn_>
                         <Select_Shadcn_
                           value={field.value}
                           onValueChange={(value) => {
@@ -357,13 +340,13 @@ export const PerformanceSettingsForm = () => {
                             </SelectItem_Shadcn_>
                           </SelectContent_Shadcn_>
                         </Select_Shadcn_>
-                      </FormControl>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField
+                <FormField_Shadcn_
                   control={databaseForm.control}
                   name="DB_MAX_POOL_SIZE"
                   render={({ field }) => (
@@ -380,38 +363,39 @@ export const PerformanceSettingsForm = () => {
                         </p>
                       }
                     >
-                      <div className="flex flex-col gap-2">
-                        <div className="relative">
-                          <FormControl>
-                            <InputGroup>
-                              <FormInputGroupInput
+                      <FormControl_Shadcn_>
+                        <div className="flex flex-col gap-2">
+                          <div className="relative">
+                            <PrePostTab postTab={chosenUnit === 'percent' ? '%' : 'connections'}>
+                              <Input_Shadcn_
                                 type="number"
                                 {...field}
+                                min={3}
+                                max={
+                                  chosenUnit === 'percent'
+                                    ? 80
+                                    : Math.floor(maxConnectionLimit * 0.8)
+                                }
                                 disabled={!canUpdateConfig || promptUpgrade}
                               />
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>
-                                  {chosenUnit === 'percent' ? '%' : 'connections'}
-                                </InputGroupText>
-                              </InputGroupAddon>
-                            </InputGroup>
-                          </FormControl>
+                            </PrePostTab>
+                          </div>
+                          {isLoadingMaxConns ? (
+                            <ShimmeringLoader className="py-2 w-16 ml-auto" />
+                          ) : (
+                            <p className="text-xs text-right text-foreground-muted">
+                              <span className="text-foreground-light">
+                                {chosenUnit === 'percent'
+                                  ? Math.floor(
+                                      maxConnectionLimit * (Math.min(100, field.value!) / 100)
+                                    ).toString()
+                                  : Math.min(maxConnectionLimit, field.value!)}
+                              </span>{' '}
+                              / {maxConnectionLimit}
+                            </p>
+                          )}
                         </div>
-                        {isLoadingMaxConns ? (
-                          <ShimmeringLoader className="py-2 w-16 ml-auto" />
-                        ) : (
-                          <p className="text-xs text-right text-foreground-muted">
-                            <span className="text-foreground-light">
-                              {chosenUnit === 'percent'
-                                ? Math.floor(
-                                    maxConnectionLimit * (Math.min(100, field.value!) / 100)
-                                  ).toString()
-                                : Math.min(maxConnectionLimit, field.value!)}
-                            </span>{' '}
-                            / {maxConnectionLimit}
-                          </p>
-                        )}
-                      </div>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
@@ -436,7 +420,7 @@ export const PerformanceSettingsForm = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form>
+        </Form_Shadcn_>
       </ScaffoldSection>
     </>
   )

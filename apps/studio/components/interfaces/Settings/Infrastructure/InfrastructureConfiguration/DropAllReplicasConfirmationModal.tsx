@@ -1,11 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
 import { toast } from 'sonner'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { replicaKeys } from '@/data/read-replicas/keys'
-import { useReadReplicaRemoveMutation } from '@/data/read-replicas/replica-remove-mutation'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useParams } from 'common'
+import { replicaKeys } from 'data/read-replicas/keys'
+import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface DropAllReplicasConfirmationModalProps {
   visible: boolean

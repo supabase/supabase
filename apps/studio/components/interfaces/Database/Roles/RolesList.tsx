@@ -1,4 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
+import { SparkBar } from 'components/ui/SparkBar'
+import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
+import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -12,14 +19,7 @@ import { CreateRolePanel } from './CreateRolePanel'
 import { RoleRow } from './RoleRow'
 import { RoleRowSkeleton } from './RoleRowSkeleton'
 import { SUPABASE_ROLES } from './Roles.constants'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { NoSearchResults } from '@/components/ui/NoSearchResults'
-import { SparkBar } from '@/components/ui/SparkBar'
 import { useDatabaseRoleDeleteMutation } from '@/data/database-roles/database-role-delete-mutation'
-import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
-import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
@@ -138,7 +138,7 @@ export const RolesList = () => {
             >
               All roles
             </button>
-            <div className="h-full w-px border-r border-strong"></div>
+            <div className="h-full w-[1px] border-r border-strong"></div>
             <button
               className={cn(
                 'text-xs w-[80px] h-full text-center rounded-r-full flex items-center justify-center transition',

@@ -1,6 +1,9 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useFlag } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Calendar, PartyPopper } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -17,8 +20,8 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form,
-  FormField,
+  Form_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
   Separator,
 } from 'ui'
@@ -26,13 +29,10 @@ import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import { getTotalCreditBalanceCents } from './helpers'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLatest } from '@/hooks/misc/useLatest'
 
 const FORM_ID = 'credit-code-redemption'
@@ -53,6 +53,7 @@ export const CreditCodeRedemption = ({
   onClose?: () => void
 }) => {
   const router = useRouter()
+  const redeemCodeEnabled = useFlag('redeemCodeEnabled')
   const [codeRedemptionModalVisible, setCodeRedemptionModalVisible] = useState(
     modalVisible || false
   )
@@ -60,12 +61,6 @@ export const CreditCodeRedemption = ({
   const { data: org, isLoading: isOrgLoading } = useOrganizationQuery({ slug })
   const { data: customerProfile, isLoading: isCustomerProfileLoading } =
     useOrganizationCustomerProfileQuery({ slug })
-  const combinedCreditBalanceCents = customerProfile
-    ? getTotalCreditBalanceCents({
-        customerBalance: customerProfile.balance,
-        prepaidCreditsBalance: customerProfile.prepaid_credits_balance,
-      })
-    : undefined
 
   const { can: canRedeemCode, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -152,6 +147,8 @@ export const CreditCodeRedemption = ({
     }
   }, [codeRedemptionModalVisible, initHcaptchaRef])
 
+  if (!redeemCodeEnabled) return null
+
   return (
     <Dialog open={codeRedemptionModalVisible} onOpenChange={onCodeRedemptionDialogVisibilityChange}>
       {!modalVisible && (
@@ -182,14 +179,14 @@ export const CreditCodeRedemption = ({
           size="invisible"
           onOpen={() => {
             // [Joshen] This is to ensure that hCaptcha popup remains clickable
-            if (document !== undefined) document.body.classList.add('pointer-events-auto!')
+            if (document !== undefined) document.body.classList.add('!pointer-events-auto')
           }}
           onClose={() => {
-            if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
+            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
           }}
           onVerify={(token) => {
             captchaTokenRef.current = token
-            if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
+            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
           }}
           onExpire={() => {
             captchaTokenRef.current = null
@@ -258,7 +255,7 @@ export const CreditCodeRedemption = ({
 
             <DialogSectionSeparator />
 
-            <Form {...form}>
+            <Form_Shadcn_ {...form}>
               {isOrgLoading || isCustomerProfileLoading || !isPermissionsLoaded ? (
                 <div className="p-6 space-y-4">
                   <ShimmeringLoader />
@@ -270,7 +267,7 @@ export const CreditCodeRedemption = ({
               ) : (
                 <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
                   <DialogSection className="flex flex-col gap-2">
-                    <FormField
+                    <FormField_Shadcn_
                       control={form.control}
                       name="code"
                       render={({ field }) => (
@@ -289,12 +286,12 @@ export const CreditCodeRedemption = ({
                       )}
                     />
 
-                    {combinedCreditBalanceCents !== undefined && combinedCreditBalanceCents > 0 && (
+                    {customerProfile && customerProfile.balance < 0 && (
                       <div className="flex w-full justify-between items-center">
                         <span className="text-sm">Current Balance</span>
                         <div className="flex items-center gap-x-1">
                           <p className="opacity-50 text-sm">$</p>
-                          <p className="text-2xl">{combinedCreditBalanceCents / 100}</p>
+                          <p className="text-2xl">{customerProfile.balance / -100}</p>
                           <p className="opacity-50 text-sm">/credits</p>
                         </div>
                       </div>
@@ -343,7 +340,7 @@ export const CreditCodeRedemption = ({
                   </DialogFooter>
                 </form>
               )}
-            </Form>
+            </Form_Shadcn_>
           </>
         )}
       </DialogContent>

@@ -2,23 +2,23 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { AuthError } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
-import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
+import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
+import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useLastSignIn } from 'hooks/misc/useLastSignIn'
+import { captureCriticalError } from 'lib/error-reporting'
+import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
+import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { LastSignInWrapper } from './LastSignInWrapper'
-import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
-import { getMfaAuthenticatorAssuranceLevel } from '@/data/profile/mfa-authenticator-assurance-level-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
-import { captureCriticalError } from '@/lib/error-reporting'
-import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
+import { Eye, EyeOff } from 'lucide-react'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -119,15 +119,15 @@ export const SignInForm = () => {
   }
 
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
+        <FormField_Shadcn_
           key="email"
           name="email"
           control={form.control}
           render={({ field }) => (
             <FormItemLayout name="email" label="Email">
-              <FormControl>
+              <FormControl_Shadcn_>
                 <Input_Shadcn_
                   id="email"
                   type="email"
@@ -136,19 +136,19 @@ export const SignInForm = () => {
                   placeholder="you@example.com"
                   disabled={isSubmitting}
                 />
-              </FormControl>
+              </FormControl_Shadcn_>
             </FormItemLayout>
           )}
         />
 
         <div className="relative">
-          <FormField
+          <FormField_Shadcn_
             key="password"
             name="password"
             control={form.control}
             render={({ field }) => (
               <FormItemLayout name="password" label="Password">
-                <FormControl>
+                <FormControl_Shadcn_>
                   <div className="relative">
                     <Input_Shadcn_
                       id="password"
@@ -169,7 +169,7 @@ export const SignInForm = () => {
                       onClick={() => setPasswordHidden((prev) => !prev)}
                     />
                   </div>
-                </FormControl>
+                </FormControl_Shadcn_>
               </FormItemLayout>
             )}
           />
@@ -203,6 +203,6 @@ export const SignInForm = () => {
           </Button>
         </LastSignInWrapper>
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }

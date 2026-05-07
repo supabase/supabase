@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-
 import type { QueryPerformanceRow } from '../../QueryPerformance/QueryPerformance.types'
 
 export const useQueryInsightsMetrics = (data: QueryPerformanceRow[]) => {

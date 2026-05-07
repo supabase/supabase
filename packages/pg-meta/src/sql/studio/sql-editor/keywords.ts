@@ -1,5 +1,7 @@
-import { safeSql, type SafeSqlFragment } from '../../../pg-format'
+export const getKeywordsSql = () => {
+  const sql = /* SQL */ `
+SELECT word FROM pg_get_keywords();
+`.trim()
 
-export const getKeywordsSql = (): SafeSqlFragment => {
-  return safeSql`SELECT word FROM pg_get_keywords();`
+  return sql
 }

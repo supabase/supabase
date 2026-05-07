@@ -1,6 +1,8 @@
 import dayjs from 'dayjs'
 import { ChevronDown } from 'lucide-react'
 import { ReactNode, useEffect, useState } from 'react'
+
+import { DATE_FORMAT } from 'lib/constants'
 import {
   Button,
   cn,
@@ -11,8 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-
-import { DATE_FORMAT } from '@/lib/constants'
 
 /**
  * There's timestamp rounding that kicks in if there are more than 50 data points

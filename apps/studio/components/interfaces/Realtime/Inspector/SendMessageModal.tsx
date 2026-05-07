@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Input, Modal } from 'ui'
 
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
-import { tryParseJson } from '@/lib/helpers'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import { tryParseJson } from 'lib/helpers'
+import { Input, Modal } from 'ui'
 
 interface SendMessageModalProps {
   visible: boolean
@@ -51,7 +51,7 @@ export const SendMessageModal = ({
         <Input
           label="Message name"
           size="small"
-          className="grow"
+          className="flex-grow"
           value={values.message}
           onChange={(v) => setValues({ ...values, message: v.target.value })}
         />
@@ -60,7 +60,7 @@ export const SendMessageModal = ({
           <CodeEditor
             id="message-payload"
             language="json"
-            className="mb-0! h-32 overflow-hidden rounded-sm border"
+            className="!mb-0 h-32 overflow-hidden rounded border"
             onInputChange={(e: string | undefined) => setValues({ ...values, payload: e ?? '{}' })}
             options={{ wordWrap: 'off', contextmenu: false }}
             value={values.payload}

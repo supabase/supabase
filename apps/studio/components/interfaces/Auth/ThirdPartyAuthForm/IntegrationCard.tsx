@@ -1,7 +1,9 @@
 import { Check } from 'lucide-react'
 import Image from 'next/image'
-import { Badge, Button } from 'ui'
 
+import { ThirdPartyAuthIntegration } from 'data/third-party-auth/integrations-query'
+import { DOCS_URL } from 'lib/constants'
+import { Badge, Button } from 'ui'
 import { AWS_IDP_REGIONS } from './AwsRegionSelector'
 import {
   getIntegrationType,
@@ -9,8 +11,6 @@ import {
   getIntegrationTypeLabel,
   INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
-import { ThirdPartyAuthIntegration } from '@/data/third-party-auth/integrations-query'
-import { DOCS_URL } from '@/lib/constants'
 
 interface IntegrationCardProps {
   integration: ThirdPartyAuthIntegration
@@ -187,7 +187,7 @@ export const IntegrationCard = ({
 
   return (
     <>
-      <div className="bg-surface-100 border overflow-hidden shadow-sm px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
+      <div className="bg-surface-100 border overflow-hidden shadow px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
         <div className="py-1">
           <Image src={getIntegrationTypeIcon(type)} width={21} height={21} alt={`${type} icon`} />
         </div>

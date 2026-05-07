@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
-import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, StyleSheet, View } from 'react-native'
 import { supabase } from '../lib/supabase'
-import { appStyles } from '../styles/styles'
+import { Button, Input } from '@rneui/themed'
 
 export default function Auth() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const styles = appStyles
 
   async function signInWithEmail() {
     setLoading(true)
+    console.log({ email, password })
     const { error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
@@ -32,46 +32,49 @@ export default function Auth() {
   }
 
   return (
-    <View style={styles.container}>
+    <View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Text style={styles.label}>Email</Text>
-        <TextInput
+        <Input
+          label="Email"
+          leftIcon={{ type: 'font-awesome', name: 'envelope' }}
           onChangeText={(text) => setEmail(text)}
           value={email}
           placeholder="email@address.com"
-          autoCapitalize="none"
-          style={styles.input}
+          autoCapitalize={'none'}
         />
       </View>
       <View style={styles.verticallySpaced}>
-        <Text style={styles.label}>Password</Text>
-        <TextInput
+        <Input
+          label="Password"
+          leftIcon={{ type: 'font-awesome', name: 'lock' }}
           onChangeText={(text) => setPassword(text)}
           value={password}
           secureTextEntry={true}
           placeholder="Password"
-          autoCapitalize="none"
-          style={styles.input}
+          autoCapitalize={'none'}
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={() => signInWithEmail()}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>Sign in</Text>
-        </TouchableOpacity>
+        <Button title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
       </View>
       <View style={styles.verticallySpaced}>
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={() => signUpWithEmail()}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>Sign up</Text>
-        </TouchableOpacity>
+        <Button title="Sign up" disabled={loading} onPress={() => signUpWithEmail()} />
       </View>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 40,
+    padding: 12,
+  },
+  verticallySpaced: {
+    paddingTop: 4,
+    paddingBottom: 4,
+    alignSelf: 'stretch',
+  },
+  mt20: {
+    marginTop: 20,
+  },
+})

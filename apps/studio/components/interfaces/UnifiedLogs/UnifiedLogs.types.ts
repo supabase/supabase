@@ -1,5 +1,4 @@
-import type { inferParserType } from 'nuqs'
-import type { ReactNode } from 'react'
+import { type inferParserType } from 'nuqs'
 
 import { LOG_TYPES, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 
@@ -51,7 +50,7 @@ export type SheetField<TData, TMeta = Record<string, unknown>> = {
         totalRowsFetched: number
       } & TMeta
     }
-  ) => ReactNode
+  ) => JSX.Element | null | string
   condition?: (props: TData) => boolean
   className?: string
   skeletonClassName?: string

@@ -1,7 +1,6 @@
 import { TextSearch } from 'lucide-react'
 import { Button } from 'ui'
-
-import type { AdvisorTab } from '@/state/advisor-state'
+import { AdvisorTab } from 'state/advisor-state'
 
 interface EmptyAdvisorProps {
   activeTab: AdvisorTab
@@ -41,11 +40,11 @@ export const EmptyAdvisor = ({ activeTab, hasFilters, onClearFilters }: EmptyAdv
   }
 
   return (
-    <div className="h-full px-6 flex flex-col items-center justify-center w-full gap-y-2">
+    <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">
       <TextSearch className="text-foreground-muted" strokeWidth={1} />
-      <div className="flex flex-col items-center gap-y-0.5 text-center">
-        <h3 className="heading-default">{getHeading()}</h3>
-        <p className="text-foreground-light text-sm text-balance">{getMessage()}</p>
+      <div className="text-center">
+        <p className="heading-default">{getHeading()}</p>
+        <p className="text-foreground-light text-sm">{getMessage()}</p>
       </div>
       {hasFilters && (
         <Button type="outline" onClick={onClearFilters}>

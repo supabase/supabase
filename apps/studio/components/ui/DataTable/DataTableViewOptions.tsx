@@ -1,7 +1,7 @@
 import { GripVertical, Settings2 } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
 import {
-  Checkbox,
+  Checkbox_Shadcn_,
   Command_Shadcn_ as Command,
   CommandEmpty_Shadcn_ as CommandEmpty,
   CommandGroup_Shadcn_ as CommandGroup,
@@ -74,7 +74,7 @@ export function DataTableViewOptions() {
                         className="capitalize p-1"
                         disabled={drag}
                       >
-                        <Checkbox checked={column.getIsVisible()} className="mr-2" />
+                        <Checkbox_Shadcn_ checked={column.getIsVisible()} className="mr-2" />
                         <span>{(column.columnDef.meta as any)?.label || column.id}</span>
                         {enableColumnOrdering && !search ? (
                           <SortableDragHandle

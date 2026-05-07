@@ -1,8 +1,15 @@
+import { AlertCircle, HelpCircle } from 'lucide-react'
+
 import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
+import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
+import { DOCS_URL } from 'lib/constants'
+import { useProfile } from 'lib/profile'
 import { partition } from 'lodash'
-import { AlertCircle } from 'lucide-react'
 import { useMemo } from 'react'
 import {
+  Button,
   Card,
   Loading,
   Table,
@@ -12,15 +19,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-
 import { MemberRow } from './MemberRow'
-import AlertError from '@/components/ui/AlertError'
-import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
-import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
-import { useProfile } from '@/lib/profile'
 
 export interface MembersViewProps {
   searchString: string
@@ -93,7 +98,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
       )}
 
       {isSuccessMembers && (
-        <div className="rounded-sm w-full overflow-hidden overflow-x-scroll">
+        <div className="rounded w-full overflow-hidden overflow-x-scroll">
           <Card>
             <Loading active={!filteredMembers}>
               <Table>
@@ -111,7 +116,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                     ...(isSuccessRoles && isSuccessMembers && !isOrgScopedRole
                       ? [
                           <TableRow key="project-scope-notice">
-                            <TableCell colSpan={12} className="p-0!">
+                            <TableCell colSpan={12} className="!p-0">
                               <Admonition
                                 type="note"
                                 title="You have limited visibility in this organization"

@@ -1,5 +1,3 @@
-@reference './globals.css';
-
 .dark [data-theme='light'] {
   display: none;
 }

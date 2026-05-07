@@ -1,4 +1,5 @@
 import { useState } from 'react'
+
 import {
   Button,
   Dialog,
@@ -10,9 +11,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
 
-import { INTERNAL_SCHEMAS, useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { INTERNAL_SCHEMAS, useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { Admonition } from 'ui-patterns'
 
 export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
   return (
@@ -33,7 +34,7 @@ export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
             </code>
           ))}
         </div>
-        <p className="text-sm mt-4!">
+        <p className="text-sm !mt-4">
           These schemas are critical to the functionality of your Supabase project and hence we
           highly recommend not altering them.
         </p>

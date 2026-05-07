@@ -1,9 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
+import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Eye, EyeOff } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
+import type { VaultSecret } from 'types'
 import {
   Button,
   Dialog,
@@ -13,20 +17,16 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
-import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
-import { useVaultSecretUpdateMutation } from '@/data/vault/vault-secret-update-mutation'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import type { VaultSecret } from '@/types'
 
 const SecretSchema = z.object({
   name: z.string().min(1, 'Please provide a name for your secret'),
@@ -131,26 +131,26 @@ export const EditSecretModal = () => {
         ) : (
           <>
             <DialogSection>
-              <Form {...form}>
+              <Form_Shadcn_ {...form}>
                 <form
                   id={formId}
                   className="flex flex-col gap-4"
                   autoComplete="off"
                   onSubmit={form.handleSubmit(onSubmit)}
                 >
-                  <FormField
+                  <FormField_Shadcn_
                     key="name"
                     name="name"
                     control={form.control}
                     render={({ field }) => (
                       <FormItemLayout name="name" label="Name">
-                        <FormControl>
+                        <FormControl_Shadcn_>
                           <Input_Shadcn_ id="name" {...field} />
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
-                  <FormField
+                  <FormField_Shadcn_
                     key="description"
                     name="description"
                     control={form.control}
@@ -160,19 +160,19 @@ export const EditSecretModal = () => {
                         label="Description"
                         labelOptional="Optional"
                       >
-                        <FormControl>
+                        <FormControl_Shadcn_>
                           <Input_Shadcn_ id="description" {...field} data-lpignore="true" />
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
-                  <FormField
+                  <FormField_Shadcn_
                     key="secret"
                     name="secret"
                     control={form.control}
                     render={({ field }) => (
                       <FormItemLayout name="secret" label="Secret value">
-                        <FormControl>
+                        <FormControl_Shadcn_>
                           <div className="relative">
                             <Input_Shadcn_
                               id="secret"
@@ -191,12 +191,12 @@ export const EditSecretModal = () => {
                               onClick={() => setShowSecretValue(!showSecretValue)}
                             />
                           </div>
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
                 </form>
-              </Form>
+              </Form_Shadcn_>
             </DialogSection>
             <DialogFooter>
               <Button

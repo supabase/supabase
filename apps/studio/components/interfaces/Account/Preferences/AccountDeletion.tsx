@@ -1,4 +1,4 @@
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, CriticalIcon } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, CriticalIcon } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -7,7 +7,6 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-
 import { DeleteAccountButton } from './DeleteAccountButton'
 
 export const AccountDeletion = () => {

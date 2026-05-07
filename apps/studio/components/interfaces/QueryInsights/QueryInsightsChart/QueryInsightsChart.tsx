@@ -1,5 +1,3 @@
-import { Loader2 } from 'lucide-react'
-import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
 import {
   Area,
@@ -10,12 +8,13 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { cn, Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
-
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, cn } from 'ui'
+import { Loader2 } from 'lucide-react'
 import type { ChartDataPoint } from '../QueryInsights.types'
-import { CHART_TABS, CHART_TYPE, LEGEND_ITEMS, SEL_COLOR } from './QueryInsightsChart.constants'
-import { formatTime } from './QueryInsightsChart.utils'
+import { useTheme } from 'next-themes'
 import { QueryInsightsChartTooltip } from './QueryInsightsChartTooltip'
+import { CHART_TABS, LEGEND_ITEMS, CHART_TYPE, SEL_COLOR } from './QueryInsightsChart.constants'
+import { formatTime } from './QueryInsightsChart.utils'
 
 interface QueryInsightsChartProps {
   chartData: ChartDataPoint[]
@@ -85,12 +84,12 @@ export const QueryInsightsChart = ({
   return (
     <div className="bg-surface-100 border-b min-h-[320px]">
       <Tabs_Shadcn_ value={selectedMetric} onValueChange={setSelectedMetric} className="w-full">
-        <TabsList_Shadcn_ className="flex justify-start rounded-none gap-x-4 border-b mt-0! pt-0 px-6">
+        <TabsList_Shadcn_ className="flex justify-start rounded-none gap-x-4 border-b !mt-0 pt-0 px-6">
           {CHART_TABS.map((tab) => (
             <TabsTrigger_Shadcn_
               key={tab.id}
               value={tab.id}
-              className="flex items-center gap-2 text-xs py-3 border-b font-mono uppercase"
+              className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
             >
               {tab.label}
             </TabsTrigger_Shadcn_>
@@ -134,7 +133,7 @@ export const QueryInsightsChart = ({
               >
                 <span
                   className={cn(
-                    'h-1.5 w-1.5 rounded-xs transition-opacity',
+                    'h-1.5 w-1.5 rounded-sm transition-opacity',
                     hiddenSeries.has(selDataKey) && 'opacity-30'
                   )}
                   style={{ backgroundColor: SEL_COLOR }}

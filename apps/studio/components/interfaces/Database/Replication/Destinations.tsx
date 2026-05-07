@@ -1,17 +1,20 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { MoreVertical, Plus, Search, X } from 'lucide-react'
+import { AlertError } from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
+import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
+import { replicationKeys } from 'data/replication/keys'
+import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
+import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
+import { DOCS_URL } from 'lib/constants'
+import { Plus, Search, X } from 'lucide-react'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Card,
   CardContent,
   cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
   Table,
   TableBody,
   TableCell,
@@ -26,24 +29,11 @@ import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConf
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
-import { DisableExternalReplicationDialog } from './DisableExternalReplicationDialog'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
-import {
-  useIsETLBigQueryPrivateAlpha,
-  useIsETLDucklakePrivateAlpha,
-  useIsETLIcebergPrivateAlpha,
-} from './useIsETLPrivateAlpha'
-import { AlertError } from '@/components/ui/AlertError'
-import { DocsButton } from '@/components/ui/DocsButton'
+import { useIsETLBigQueryPrivateAlpha, useIsETLIcebergPrivateAlpha } from './useIsETLPrivateAlpha'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
-import { replicationKeys } from '@/data/replication/keys'
-import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
-import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from '@/lib/constants'
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
@@ -51,7 +41,6 @@ export const Destinations = () => {
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
-  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const newDestinationDefaultType = infrastructureReadReplicas
@@ -60,15 +49,11 @@ export const Destinations = () => {
       ? 'BigQuery'
       : etlEnableIceberg
         ? 'Analytics Bucket'
-        : etlEnableDucklake
-          ? 'DuckLake'
-          : null
+        : null
 
   const prefetchedRef = useRef(false)
   const [filterString, setFilterString] = useState<string>('')
   const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
-  const [showDisableExternalReplicationDialog, setShowDisableExternalReplicationDialog] =
-    useState(false)
 
   const [_, setDestinationType] = useQueryState(
     'destinationType',
@@ -76,7 +61,6 @@ export const Destinations = () => {
       'Read Replica',
       'BigQuery',
       'Analytics Bucket',
-      'DuckLake',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
@@ -118,30 +102,9 @@ export const Destinations = () => {
   const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery({
     projectRef,
   })
-  const pipelines = pipelinesData?.pipelines ?? []
-
-  const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
-    projectRef,
-  })
-  const externalReplicationSource = useMemo(
-    () => sourcesData?.sources.find((source) => source.name === projectRef),
-    [projectRef, sourcesData?.sources]
-  )
-  const canDisableExternalReplication =
-    isSourcesSuccess &&
-    isDestinationsSuccess &&
-    isPipelinesSuccess &&
-    !!externalReplicationSource &&
-    destinations.length === 0 &&
-    pipelines.length === 0
 
   const isLoading = isDestinationsLoading || isDatabasesLoading
   const hasErrorsFetchingData = isDestinationsError || isDatabasesError
-
-  const openDestinationPanel = () => {
-    if (!newDestinationDefaultType) return
-    setDestinationType(newDestinationDefaultType)
-  }
 
   useEffect(() => {
     if (
@@ -213,23 +176,11 @@ export const Destinations = () => {
               type="default"
               icon={<Plus />}
               disabled={!newDestinationDefaultType}
-              onClick={openDestinationPanel}
+              onClick={() => setDestinationType(newDestinationDefaultType)}
             >
               Add destination
             </Button>
             <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
-            {canDisableExternalReplication && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button type="default" icon={<MoreVertical />} className="w-7" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52">
-                  <DropdownMenuItem onClick={() => setShowDisableExternalReplicationDialog(true)}>
-                    Disable external replication
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
           </div>
         </div>
       </div>
@@ -313,8 +264,7 @@ export const Destinations = () => {
               </p>
               <Button
                 icon={<Plus />}
-                disabled={!newDestinationDefaultType}
-                onClick={openDestinationPanel}
+                onClick={() => setDestinationType('Read Replica')}
                 className="mt-4"
               >
                 Add destination
@@ -325,11 +275,6 @@ export const Destinations = () => {
       </div>
 
       <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
-
-      <DisableExternalReplicationDialog
-        open={showDisableExternalReplicationDialog}
-        setOpen={setShowDisableExternalReplicationDialog}
-      />
     </>
   )
 }

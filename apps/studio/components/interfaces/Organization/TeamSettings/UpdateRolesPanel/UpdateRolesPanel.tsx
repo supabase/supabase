@@ -1,4 +1,14 @@
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
+import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
+import { OrganizationMember } from 'data/organizations/organization-members-query'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { isEqual } from 'lodash'
 import { ChevronDown, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -34,19 +44,6 @@ import {
   formatMemberRoleToProjectRoleConfiguration,
   ProjectRoleConfiguration,
 } from './UpdateRolesPanel.utils'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
-import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
-import { OrganizationMember } from '@/data/organizations/organization-members-query'
-import { usePermissionsQuery } from '@/data/permissions/permissions-query'
-import {
-  OrgProject,
-  useOrgProjectsInfiniteQuery,
-} from '@/data/projects/org-projects-infinite-query'
-import { useHasAccessToProjectLevelPermissions } from '@/data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from '@/lib/constants'
 
 interface UpdateRolesPanelProps {
   visible: boolean
@@ -217,7 +214,10 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                           ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`
                           : `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`}
                       </span>
-                      <ChevronDown size={14} className="transition group-data-open:-rotate-180" />
+                      <ChevronDown
+                        size={14}
+                        className="transition group-data-[state=open]:-rotate-180"
+                      />
                     </CollapsibleTrigger_Shadcn_>
                     <CollapsibleContent_Shadcn_ className="text-foreground-light text-sm px-4">
                       <p>
@@ -348,7 +348,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               )}
             </SheetSection>
 
-            <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
+            <SheetFooter className="flex items-center !justify-end px-5 py-4 w-full border-t">
               <Button type="default" disabled={false} onClick={() => onClose()}>
                 Cancel
               </Button>

@@ -1,12 +1,16 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import BarChart from 'components/ui/Charts/BarChart'
+import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import dayjs from 'dayjs'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { ArrowUpDown, X } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import {
   Badge,
   Button,
-  Checkbox,
+  Checkbox_Shadcn_,
   Label_Shadcn_,
   ResizableHandle,
   ResizablePanel,
@@ -21,11 +25,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import BarChart from '@/components/ui/Charts/BarChart'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 type Results = { rows: readonly any[] }
 
@@ -133,7 +132,7 @@ export const ChartConfig = ({
   }
 
   return (
-    <ResizablePanelGroup orientation="horizontal" className="grow h-full">
+    <ResizablePanelGroup orientation="horizontal" className="flex-grow h-full">
       <ResizablePanel className="p-4 h-full" defaultSize="75">
         {!hasConfig ? (
           <ResizablePanel className="p-4 h-full" defaultSize="75">
@@ -176,7 +175,7 @@ export const ChartConfig = ({
       <ResizablePanel
         defaultSize="25"
         minSize="15"
-        className="px-3 py-3 space-y-4 overflow-y-auto!"
+        className="px-3 py-3 space-y-4 !overflow-y-auto"
       >
         <div className="flex justify-between items-center h-5">
           <h2 className="text-sm text-foreground-lighter">Chart options</h2>
@@ -217,7 +216,7 @@ export const ChartConfig = ({
               <Badge variant="success">New</Badge>
               <p className="text-xs">Add this chart to custom reports</p>
             </div>
-            <p className="text-xs text-foreground-light mt-1!">
+            <p className="text-xs text-foreground-light !mt-1">
               SQL snippets can now be added and saved to your custom reports. Try it out now!
             </p>
             <Button asChild size="tiny" type="default" className="mt-1">
@@ -269,7 +268,7 @@ export const ChartConfig = ({
         </div>
         <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
           <Label_Shadcn_ className="" htmlFor="cumulative">
-            <Checkbox
+            <Checkbox_Shadcn_
               id="cumulative"
               name="cumulative"
               checked={config.cumulative}
@@ -279,7 +278,7 @@ export const ChartConfig = ({
           </Label_Shadcn_>
 
           <Label_Shadcn_ htmlFor="showLabels">
-            <Checkbox
+            <Checkbox_Shadcn_
               id="showLabels"
               name="showLabels"
               checked={config.showLabels}
@@ -289,7 +288,7 @@ export const ChartConfig = ({
           </Label_Shadcn_>
 
           <Label_Shadcn_ htmlFor="showGrid">
-            <Checkbox
+            <Checkbox_Shadcn_
               id="showGrid"
               name="showGrid"
               checked={config.showGrid}

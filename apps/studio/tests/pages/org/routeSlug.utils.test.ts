@@ -1,6 +1,5 @@
+import { buildOrgUrl } from 'components/interfaces/Organization/Organization.utils'
 import { describe, expect, test } from 'vitest'
-
-import { buildOrgUrl } from '@/components/interfaces/Organization/Organization.utils'
 
 describe('buildOrgUrl', () => {
   describe('when slug is undefined (bare /org/_ route)', () => {

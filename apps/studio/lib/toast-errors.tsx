@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useSonner } from 'sonner'
-
-import { useTrack } from '@/lib/telemetry/track'
+import { useTrack } from 'lib/telemetry/track'
 
 export const ToastErrorTracker = () => {
   const track = useTrack()

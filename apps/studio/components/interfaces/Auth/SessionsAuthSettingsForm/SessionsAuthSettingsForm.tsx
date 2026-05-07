@@ -1,21 +1,29 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as z from 'zod'
+
+import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import NoPermission from 'components/ui/NoPermission'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
-  Form,
-  FormControl,
-  FormField,
-  FormInputGroupInput,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
+  PrePostTab,
   Switch,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -27,16 +35,6 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import * as z from 'zod'
-
-import AlertError from '@/components/ui/AlertError'
-import NoPermission from '@/components/ui/NoPermission'
-import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
-import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { IS_PLATFORM } from '@/lib/constants'
 
 function HoursOrNeverText({ value }: { value: number }) {
   if (value === 0) {
@@ -203,14 +201,14 @@ export const SessionsAuthSettingsForm = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form {...refreshTokenForm}>
+          <Form_Shadcn_ {...refreshTokenForm}>
             <form
               onSubmit={refreshTokenForm.handleSubmit(onSubmitRefreshTokens)}
               className="space-y-4"
             >
               <Card>
                 <CardContent>
-                  <FormField
+                  <FormField_Shadcn_
                     control={refreshTokenForm.control}
                     name="REFRESH_TOKEN_ROTATION_ENABLED"
                     render={({ field }) => (
@@ -219,19 +217,19 @@ export const SessionsAuthSettingsForm = () => {
                         label="Detect and revoke potentially compromised refresh tokens"
                         description="Prevent replay attacks from potentially compromised refresh tokens."
                       >
-                        <FormControl>
+                        <FormControl_Shadcn_>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig}
                           />
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
                 <CardContent>
-                  <FormField
+                  <FormField_Shadcn_
                     control={refreshTokenForm.control}
                     name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
                     render={({ field }) => (
@@ -240,19 +238,16 @@ export const SessionsAuthSettingsForm = () => {
                         label="Refresh token reuse interval"
                         description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
                       >
-                        <FormControl className="w-full">
-                          <InputGroup>
-                            <FormInputGroupInput
+                        <FormControl_Shadcn_ className="w-full">
+                          <PrePostTab postTab="seconds">
+                            <Input_Shadcn_
                               type="number"
                               min={0}
                               {...field}
                               disabled={!canUpdateConfig}
                             />
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>seconds</InputGroupText>
-                            </InputGroupAddon>
-                          </InputGroup>
-                        </FormControl>
+                          </PrePostTab>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
@@ -278,7 +273,7 @@ export const SessionsAuthSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form>
+          </Form_Shadcn_>
         </PageSectionContent>
       </PageSection>
 
@@ -289,14 +284,14 @@ export const SessionsAuthSettingsForm = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form {...userSessionsForm}>
+          <Form_Shadcn_ {...userSessionsForm}>
             <form
               onSubmit={userSessionsForm.handleSubmit(onSubmitUserSessions)}
               className="space-y-4"
             >
               <Card>
                 <CardContent>
-                  <FormField
+                  <FormField_Shadcn_
                     control={userSessionsForm.control}
                     name="SESSIONS_SINGLE_PER_USER"
                     render={({ field }) => (
@@ -305,20 +300,20 @@ export const SessionsAuthSettingsForm = () => {
                         label="Enforce single session per user"
                         description="If enabled, all but a user's most recently active session will be terminated."
                       >
-                        <FormControl>
+                        <FormControl_Shadcn_>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
                           />
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
 
                 <CardContent>
-                  <FormField
+                  <FormField_Shadcn_
                     control={userSessionsForm.control}
                     name="SESSIONS_TIMEBOX"
                     render={({ field }) => (
@@ -327,28 +322,23 @@ export const SessionsAuthSettingsForm = () => {
                         label="Time-box user sessions"
                         description="The amount of time before a user is forced to sign in again. Use 0 for never."
                       >
-                        <FormControl className="w-full">
-                          <InputGroup>
-                            <FormInputGroupInput
+                        <FormControl_Shadcn_ className="w-full">
+                          <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
+                            <Input_Shadcn_
                               type="number"
                               min={0}
                               {...field}
                               disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
                             />
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>
-                                <HoursOrNeverText value={field.value || 0} />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                          </InputGroup>
-                        </FormControl>
+                          </PrePostTab>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
 
                 <CardContent>
-                  <FormField
+                  <FormField_Shadcn_
                     control={userSessionsForm.control}
                     name="SESSIONS_INACTIVITY_TIMEOUT"
                     render={({ field }) => (
@@ -357,21 +347,16 @@ export const SessionsAuthSettingsForm = () => {
                         label="Inactivity timeout"
                         description="The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never."
                       >
-                        <FormControl className="w-full">
-                          <InputGroup>
-                            <FormInputGroupInput
+                        <FormControl_Shadcn_ className="w-full">
+                          <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
+                            <Input_Shadcn_
                               type="number"
                               {...field}
                               className="flex-1"
                               disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
                             />
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>
-                                <HoursOrNeverText value={field.value || 0} />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                          </InputGroup>
-                        </FormControl>
+                          </PrePostTab>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
@@ -408,7 +393,7 @@ export const SessionsAuthSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form>
+          </Form_Shadcn_>
         </PageSectionContent>
       </PageSection>
     </>

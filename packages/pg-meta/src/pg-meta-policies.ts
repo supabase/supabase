@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import { ident, literal, safeSql, type SafeSqlFragment } from './pg-format'
+import { ident, literal } from './pg-format'
 import { POLICIES_SQL } from './sql/policies'
 
 const pgPolicyZod = z.object({
@@ -30,11 +30,11 @@ export type PGPolicy = z.infer<typeof pgPolicyZod>
 
 type PolicyIdentifier = Pick<PGPolicy, 'id'> | Pick<PGPolicy, 'name' | 'schema' | 'table'>
 
-function getIdentifierWhereClause(identifier: PolicyIdentifier): SafeSqlFragment {
+function getIdentifierWhereClause(identifier: PolicyIdentifier): string {
   if ('id' in identifier && identifier.id) {
-    return safeSql`id = ${literal(identifier.id)}`
+    return `id = ${literal(identifier.id)}`
   } else if ('name' in identifier && identifier.name && identifier.schema && identifier.table) {
-    return safeSql`name = ${literal(identifier.name)} AND schema = ${literal(identifier.schema)} AND table = ${literal(identifier.table)}`
+    return `name = ${literal(identifier.name)} AND schema = ${literal(identifier.schema)} AND table = ${literal(identifier.table)}`
   }
   throw new Error('Must provide either id or name, schema and table')
 }
@@ -52,10 +52,10 @@ function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgPolicyArrayZod
 } {
-  let sql = safeSql`
+  let sql = `
     with policies as (${POLICIES_SQL})
     select *
     from policies
@@ -66,13 +66,13 @@ function list({
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
   if (filter) {
-    sql = safeSql`${sql}where schema ${filter}`
+    sql += `where schema ${filter}`
   }
   if (limit) {
-    sql = safeSql`${sql} limit ${literal(limit)}`
+    sql += ` limit ${limit}`
   }
   if (offset) {
-    sql = safeSql`${sql} offset ${literal(offset)}`
+    sql += ` offset ${offset}`
   }
   return {
     sql,
@@ -81,10 +81,10 @@ function list({
 }
 
 function retrieve(identifier: PolicyIdentifier): {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgPolicyOptionalZod
 } {
-  const sql = safeSql`with policies as (${POLICIES_SQL}) select * from policies where ${getIdentifierWhereClause(identifier)};`
+  const sql = `with policies as (${POLICIES_SQL}) select * from policies where ${getIdentifierWhereClause(identifier)};`
   return {
     sql,
     zod: pgPolicyOptionalZod,
@@ -147,8 +147,10 @@ function update(
   return { sql }
 }
 
-function remove(identifier: Pick<PGPolicy, 'name' | 'schema' | 'table'>): { sql: SafeSqlFragment } {
-  const sql = safeSql`DROP POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(identifier.table)};`
+function remove(identifier: Pick<PGPolicy, 'name' | 'schema' | 'table'>): { sql: string } {
+  const sql = `DROP POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(
+    identifier.table
+  )};`
   return { sql }
 }
 

@@ -10,17 +10,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 { "type": "string", "format": "uuid", "deprecated": true }
               ]
@@ -57,17 +55,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 { "type": "string", "format": "uuid", "deprecated": true }
               ]
@@ -108,17 +104,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 { "type": "string", "format": "uuid", "deprecated": true }
               ]
@@ -129,7 +123,7 @@
             "required": false,
             "in": "query",
             "description": "If set to false, schedule deletion with 1-hour grace period (only when soft deletion is enabled).",
-            "schema": { "default": "true", "example": false, "type": "boolean" }
+            "schema": { "default": "true", "type": "boolean" }
           }
         ],
         "responses": {
@@ -164,17 +158,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 { "type": "string", "format": "uuid", "deprecated": true }
               ]
@@ -219,17 +211,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 { "type": "string", "format": "uuid", "deprecated": true }
               ]
@@ -274,17 +264,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 { "type": "string", "format": "uuid", "deprecated": true }
               ]
@@ -329,17 +317,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 { "type": "string", "format": "uuid", "deprecated": true }
               ]
@@ -378,17 +364,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 { "type": "string", "format": "uuid", "deprecated": true }
               ]
@@ -398,14 +382,14 @@
             "name": "included_schemas",
             "required": false,
             "in": "query",
-            "schema": { "example": "public,auth", "type": "string" }
+            "schema": { "type": "string" }
           },
           {
             "name": "pgdelta",
             "required": false,
             "in": "query",
             "description": "Use pg-delta instead of Migra for diffing when true",
-            "schema": { "example": false, "type": "boolean" }
+            "schema": { "type": "boolean" }
           }
         ],
         "responses": {
@@ -429,7 +413,7 @@
     },
     "/v1/projects": {
       "get": {
-        "description": "Returns a list of all projects you've previously created.",
+        "description": "Returns a list of all projects you've previously created.\n\nUse `/v1/organizations/{slug}/projects` instead when possible to get more precise results and pagination support.",
         "operationId": "v1-list-all-projects",
         "parameters": [],
         "responses": {
@@ -443,10 +427,7 @@
                 }
               }
             }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
+          }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["projects_read"] }],
         "summary": "List all projects",
@@ -470,10 +451,7 @@
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/V1ProjectResponse" } }
             }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
+          }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["organization_projects_create"] }],
         "summary": "Create a project",
@@ -492,7 +470,7 @@
             "required": true,
             "in": "query",
             "description": "Slug of your organization",
-            "schema": { "example": "tsrqponmlkjihgfedcba", "type": "string" }
+            "schema": { "type": "string" }
           },
           {
             "name": "continent",
@@ -511,6 +489,7 @@
             "in": "query",
             "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
             "schema": {
+              "example": "nano",
               "type": "string",
               "enum": [
                 "nano",
@@ -569,9 +548,6 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Unexpected error listing organizations" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["organizations_read"] }],
@@ -601,9 +577,6 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Unexpected error creating an organization" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["organizations_create"] }],
@@ -620,68 +593,46 @@
             "name": "client_id",
             "required": true,
             "in": "query",
-            "schema": {
-              "format": "uuid",
-              "example": "66666666-6666-4666-8666-666666666666",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           },
           {
             "name": "response_type",
             "required": true,
             "in": "query",
-            "schema": {
-              "example": "code",
-              "type": "string",
-              "enum": ["code", "token", "id_token token"]
-            }
+            "schema": { "type": "string", "enum": ["code", "token", "id_token token"] }
           },
           {
             "name": "redirect_uri",
             "required": true,
             "in": "query",
-            "schema": { "example": "https://app.acme.com/auth/callback", "type": "string" }
+            "schema": { "type": "string" }
           },
-          {
-            "name": "scope",
-            "required": false,
-            "in": "query",
-            "schema": { "example": "projects:read projects:write", "type": "string" }
-          },
-          {
-            "name": "state",
-            "required": false,
-            "in": "query",
-            "schema": { "example": "st_9f4d3a206b2e4a7e8c91", "type": "string" }
-          },
+          { "name": "scope", "required": false, "in": "query", "schema": { "type": "string" } },
+          { "name": "state", "required": false, "in": "query", "schema": { "type": "string" } },
           {
             "name": "response_mode",
             "required": false,
             "in": "query",
-            "schema": { "example": "query", "type": "string" }
+            "schema": { "type": "string" }
           },
           {
             "name": "code_challenge",
             "required": false,
             "in": "query",
-            "schema": { "example": "Z_P4EKbGwIkA01e3Y5fp4tMCvn_Ae5nUw7qY7XwkTrQ", "type": "string" }
+            "schema": { "type": "string" }
           },
           {
             "name": "code_challenge_method",
             "required": false,
             "in": "query",
-            "schema": { "example": "S256", "type": "string", "enum": ["plain", "sha256", "S256"] }
+            "schema": { "type": "string", "enum": ["plain", "sha256", "S256"] }
           },
           {
             "name": "organization_slug",
             "required": false,
             "in": "query",
             "description": "Organization slug",
-            "schema": {
-              "pattern": "^[\\w-]+$",
-              "example": "tsrqponmlkjihgfedcba",
-              "type": "string"
-            }
+            "schema": { "pattern": "^[\\w-]+$", "type": "string" }
           },
           {
             "name": "resource",
@@ -755,71 +706,47 @@
             "required": true,
             "in": "query",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "client_id",
             "required": true,
             "in": "query",
-            "schema": {
-              "format": "uuid",
-              "example": "66666666-6666-4666-8666-666666666666",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           },
           {
             "name": "response_type",
             "required": true,
             "in": "query",
-            "schema": {
-              "example": "code",
-              "type": "string",
-              "enum": ["code", "token", "id_token token"]
-            }
+            "schema": { "type": "string", "enum": ["code", "token", "id_token token"] }
           },
           {
             "name": "redirect_uri",
             "required": true,
             "in": "query",
-            "schema": { "example": "https://app.acme.com/auth/callback", "type": "string" }
+            "schema": { "type": "string" }
           },
-          {
-            "name": "state",
-            "required": false,
-            "in": "query",
-            "schema": { "example": "st_9f4d3a206b2e4a7e8c91", "type": "string" }
-          },
+          { "name": "state", "required": false, "in": "query", "schema": { "type": "string" } },
           {
             "name": "response_mode",
             "required": false,
             "in": "query",
-            "schema": { "example": "query", "type": "string" }
+            "schema": { "type": "string" }
           },
           {
             "name": "code_challenge",
             "required": false,
             "in": "query",
-            "schema": { "example": "Z_P4EKbGwIkA01e3Y5fp4tMCvn_Ae5nUw7qY7XwkTrQ", "type": "string" }
+            "schema": { "type": "string" }
           },
           {
             "name": "code_challenge_method",
             "required": false,
             "in": "query",
-            "schema": { "example": "S256", "type": "string", "enum": ["plain", "sha256", "S256"] }
+            "schema": { "type": "string", "enum": ["plain", "sha256", "S256"] }
           }
         ],
-        "responses": {
-          "204": { "description": "" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
-        },
+        "responses": { "204": { "description": "" } },
         "security": [
           { "bearer": [] },
           { "fga_permissions": ["organization_admin_write", "project_admin_write"] }
@@ -838,13 +765,7 @@
             "required": false,
             "in": "query",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           { "name": "cursor", "required": false, "in": "query", "schema": { "type": "string" } },
           {
@@ -873,9 +794,6 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/SnippetList" } }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to list user's SQL snippets" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["snippets_read"] }],
@@ -894,11 +812,7 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "format": "uuid",
-              "example": "44444444-4444-4444-8444-444444444444",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           }
         ],
         "responses": {
@@ -908,9 +822,6 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/SnippetResponse" } }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve SQL snippet" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["snippets_read"] }],
@@ -919,24 +830,6 @@
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
         "x-endpoint-owners": ["management-api"],
         "x-oauth-scope": "database:read"
-      }
-    },
-    "/v1/profile": {
-      "get": {
-        "operationId": "v1-get-profile",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/V1ProfileResponse" } }
-            }
-          }
-        },
-        "security": [{ "bearer": [] }],
-        "summary": "Gets the user's profile",
-        "tags": ["Profile"],
-        "x-endpoint-owners": ["management-api"]
       }
     },
     "/v1/projects/{ref}/actions": {
@@ -949,25 +842,19 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "offset",
             "required": false,
             "in": "query",
-            "schema": { "minimum": 0, "example": 0, "type": "number" }
+            "schema": { "minimum": 0, "type": "number" }
           },
           {
             "name": "limit",
             "required": false,
             "in": "query",
-            "schema": { "minimum": 10, "example": 20, "type": "number" }
+            "schema": { "minimum": 10, "type": "number" }
           }
         ],
         "responses": {
@@ -1000,13 +887,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -1041,20 +922,14 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "run_id",
             "required": true,
             "in": "path",
             "description": "Action Run ID",
-            "schema": { "example": "run_01hq3q9m7y5q7e4a7x2c8m1p4n", "type": "string" }
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
@@ -1087,20 +962,14 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "run_id",
             "required": true,
             "in": "path",
             "description": "Action Run ID",
-            "schema": { "example": "run_01hq3q9m7y5q7e4a7x2c8m1p4n", "type": "string" }
+            "schema": { "type": "string" }
           }
         ],
         "requestBody": {
@@ -1141,20 +1010,14 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "run_id",
             "required": true,
             "in": "path",
             "description": "Action Run ID",
-            "schema": { "example": "run_01hq3q9m7y5q7e4a7x2c8m1p4n", "type": "string" }
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
@@ -1184,20 +1047,14 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "reveal",
             "required": false,
             "in": "query",
             "description": "Boolean string, true or false",
-            "schema": { "example": true, "type": "boolean" }
+            "schema": { "type": "boolean" }
           }
         ],
         "responses": {
@@ -1231,20 +1088,14 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "reveal",
             "required": false,
             "in": "query",
             "description": "Boolean string, true or false",
-            "schema": { "example": true, "type": "boolean" }
+            "schema": { "type": "boolean" }
           }
         ],
         "requestBody": {
@@ -1281,13 +1132,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -1318,20 +1163,14 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "enabled",
             "required": true,
             "in": "query",
             "description": "Boolean string, true or false",
-            "schema": { "example": true, "type": "boolean" }
+            "schema": { "type": "boolean" }
           }
         ],
         "responses": {
@@ -1364,30 +1203,20 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "format": "uuid",
-              "example": "22222222-2222-4222-8222-222222222222",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           },
           {
             "name": "reveal",
             "required": false,
             "in": "query",
             "description": "Boolean string, true or false",
-            "schema": { "example": true, "type": "boolean" }
+            "schema": { "type": "boolean" }
           }
         ],
         "requestBody": {
@@ -1422,30 +1251,20 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "format": "uuid",
-              "example": "22222222-2222-4222-8222-222222222222",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           },
           {
             "name": "reveal",
             "required": false,
             "in": "query",
             "description": "Boolean string, true or false",
-            "schema": { "example": true, "type": "boolean" }
+            "schema": { "type": "boolean" }
           }
         ],
         "responses": {
@@ -1474,44 +1293,29 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "format": "uuid",
-              "example": "22222222-2222-4222-8222-222222222222",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           },
           {
             "name": "reveal",
             "required": false,
             "in": "query",
             "description": "Boolean string, true or false",
-            "schema": { "example": true, "type": "boolean" }
+            "schema": { "type": "boolean" }
           },
           {
             "name": "was_compromised",
             "required": false,
             "in": "query",
             "description": "Boolean string, true or false",
-            "schema": { "example": false, "type": "boolean" }
+            "schema": { "type": "boolean" }
           },
-          {
-            "name": "reason",
-            "required": false,
-            "in": "query",
-            "schema": { "example": "rotating_key", "type": "string" }
-          }
+          { "name": "reason", "required": false, "in": "query", "schema": { "type": "string" } }
         ],
         "responses": {
           "200": {
@@ -1542,13 +1346,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -1563,6 +1361,9 @@
               }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve database branches" }
         },
         "security": [
@@ -1585,13 +1386,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -1607,6 +1402,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to create database branch" }
         },
         "security": [
@@ -1629,13 +1427,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -1663,20 +1455,9 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
-          {
-            "name": "name",
-            "required": true,
-            "in": "path",
-            "schema": { "example": "preview-login-page", "type": "string" }
-          }
+          { "name": "name", "required": true, "in": "path", "schema": { "type": "string" } }
         ],
         "responses": {
           "200": {
@@ -1685,6 +1466,9 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/BranchResponse" } }
             }
           },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to fetch database branch" }
         },
         "security": [
@@ -1708,13 +1492,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -1746,13 +1524,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -1779,13 +1551,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -1827,13 +1593,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -1867,13 +1627,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -1907,13 +1661,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -1926,10 +1674,10 @@
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to retrieve project's temporary access configuration." }
+          "500": { "description": "Failed to retrieve project's JIT access config" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_read"] }],
-        "summary": "[Beta] Get project's temporary access configuration.",
+        "summary": "[Beta] Get project's just-in-time access configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
         "x-endpoint-owners": ["security", "management-api"],
@@ -1943,13 +1691,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -1970,10 +1712,10 @@
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to update project's temporary access configuration." }
+          "500": { "description": "Failed to update project's just-in-time access configuration." }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
-        "summary": "[Beta] Update project's temporary access configuration.",
+        "summary": "[Beta] Update project's just-in-time access configuration.",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["security", "management-api"],
@@ -1989,13 +1731,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -2029,13 +1765,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -2069,13 +1799,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -2110,13 +1834,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -2151,13 +1869,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -2202,13 +1914,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -2253,13 +1959,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -2291,13 +1991,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -2339,13 +2033,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -2377,13 +2065,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -2425,13 +2107,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -2463,13 +2139,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -2500,13 +2170,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -2547,13 +2211,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -2589,13 +2247,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -2627,13 +2279,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -2666,13 +2312,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -2704,13 +2344,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -2752,20 +2386,14 @@
             "name": "included_schemas",
             "required": false,
             "in": "query",
-            "schema": { "default": "public", "example": "public,auth", "type": "string" }
+            "schema": { "default": "public", "type": "string" }
           },
           {
             "name": "ref",
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -2799,13 +2427,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -2837,13 +2459,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -2870,13 +2486,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -2916,13 +2526,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -2962,13 +2566,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -3011,13 +2609,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -3054,19 +2646,13 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "tracking_id",
             "required": false,
             "in": "query",
-            "schema": { "example": "9f4d3a20-6b2e-4a7e-8c91-1d5f3e7a2b4c", "type": "string" }
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
@@ -3103,13 +2689,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -3143,13 +2723,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -3176,13 +2750,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -3215,13 +2783,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -3254,20 +2816,13 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "services",
             "required": true,
             "in": "query",
             "schema": {
-              "example": ["auth", "rest"],
               "type": "array",
               "items": {
                 "type": "string",
@@ -3288,7 +2843,7 @@
             "name": "timeout_ms",
             "required": false,
             "in": "query",
-            "schema": { "minimum": 0, "maximum": 10000, "example": 2000, "type": "integer" }
+            "schema": { "minimum": 0, "maximum": 10000, "type": "integer" }
           }
         ],
         "responses": {
@@ -3325,13 +2880,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -3362,13 +2911,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -3401,13 +2944,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -3446,13 +2983,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -3484,24 +3015,14 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "format": "uuid",
-              "example": "33333333-3333-4333-8333-333333333333",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           },
           {
             "name": "ref",
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -3529,24 +3050,14 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "format": "uuid",
-              "example": "33333333-3333-4333-8333-333333333333",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           },
           {
             "name": "ref",
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -3576,24 +3087,14 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "format": "uuid",
-              "example": "33333333-3333-4333-8333-333333333333",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           },
           {
             "name": "ref",
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -3634,13 +3135,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -3672,13 +3167,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -3723,13 +3212,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -3766,13 +3249,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -3808,23 +3285,13 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "tpa_id",
             "required": true,
             "in": "path",
-            "schema": {
-              "format": "uuid",
-              "example": "88888888-8888-4888-8888-888888888888",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           }
         ],
         "responses": {
@@ -3853,23 +3320,13 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "tpa_id",
             "required": true,
             "in": "path",
-            "schema": {
-              "format": "uuid",
-              "example": "88888888-8888-4888-8888-888888888888",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           }
         ],
         "responses": {
@@ -3900,13 +3357,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -3932,13 +3383,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -3971,13 +3416,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -4003,13 +3442,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -4036,13 +3469,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -4073,13 +3500,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -4113,20 +3534,13 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "addon_variant",
             "required": true,
             "in": "path",
             "schema": {
-              "example": "pitr_7",
               "oneOf": [
                 {
                   "type": "string",
@@ -4180,13 +3594,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -4216,13 +3624,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -4255,13 +3657,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -4291,13 +3687,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -4332,19 +3722,13 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "lint_type",
             "required": false,
             "in": "query",
-            "schema": { "example": "sql", "type": "string", "enum": ["sql"] }
+            "schema": { "type": "string", "enum": ["sql"] }
           }
         ],
         "responses": {
@@ -4378,13 +3762,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "sql",
@@ -4397,13 +3775,13 @@
             "name": "iso_timestamp_start",
             "required": false,
             "in": "query",
-            "schema": { "format": "date-time", "example": "2025-03-01T00:00:00Z", "type": "string" }
+            "schema": { "format": "date-time", "type": "string" }
           },
           {
             "name": "iso_timestamp_end",
             "required": false,
             "in": "query",
-            "schema": { "format": "date-time", "example": "2025-03-01T23:59:59Z", "type": "string" }
+            "schema": { "format": "date-time", "type": "string" }
           }
         ],
         "responses": {
@@ -4434,20 +3812,13 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "interval",
             "required": false,
             "in": "query",
             "schema": {
-              "example": "1day",
               "type": "string",
               "enum": ["15min", "30min", "1hr", "3hr", "1day", "3day", "7day"]
             }
@@ -4482,13 +3853,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -4520,30 +3885,15 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "interval",
             "required": true,
             "in": "query",
-            "schema": {
-              "example": "1hr",
-              "type": "string",
-              "enum": ["15min", "1hr", "3hr", "1day"]
-            }
+            "schema": { "type": "string", "enum": ["15min", "1hr", "3hr", "1day"] }
           },
-          {
-            "name": "function_id",
-            "required": true,
-            "in": "query",
-            "schema": { "example": "3c078cce-ad70-4148-9f37-4da362789053", "type": "string" }
-          }
+          { "name": "function_id", "required": true, "in": "query", "schema": { "type": "string" } }
         ],
         "responses": {
           "200": {
@@ -4572,13 +3922,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -4616,13 +3960,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -4657,13 +3995,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -4681,7 +4013,7 @@
           "500": { "description": "Failed to list database migrations" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_read"] }],
-        "summary": "List applied migration versions",
+        "summary": "[Beta] List applied migration versions",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4696,13 +4028,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "Idempotency-Key",
@@ -4728,7 +4054,7 @@
           "500": { "description": "Failed to apply database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
-        "summary": "Apply a database migration",
+        "summary": "[Beta] Apply a database migration",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4743,13 +4069,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "Idempotency-Key",
@@ -4775,7 +4095,7 @@
           "500": { "description": "Failed to upsert database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
-        "summary": "Upsert a database migration without applying",
+        "summary": "[Beta] Upsert a database migration without applying",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4790,20 +4110,14 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "gte",
             "required": true,
             "in": "query",
             "description": "Rollback migrations greater or equal to this version",
-            "schema": { "pattern": "^\\d+$", "example": "20250312000000", "type": "string" }
+            "schema": { "pattern": "^\\d+$", "type": "string" }
           }
         ],
         "responses": {
@@ -4814,7 +4128,7 @@
           "500": { "description": "Failed to rollback database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
-        "summary": "Rollback database migrations and remove them from history table",
+        "summary": "[Beta] Rollback database migrations and remove them from history table",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4831,19 +4145,13 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "version",
             "required": true,
             "in": "path",
-            "schema": { "pattern": "^\\d+$", "example": "20250312000000", "type": "string" }
+            "schema": { "pattern": "^\\d+$", "type": "string" }
           }
         ],
         "responses": {
@@ -4861,7 +4169,7 @@
           "500": { "description": "Failed to get database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_read"] }],
-        "summary": "Fetch an existing entry from migration history",
+        "summary": "[Beta] Fetch an existing entry from migration history",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4876,19 +4184,13 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "version",
             "required": true,
             "in": "path",
-            "schema": { "pattern": "^\\d+$", "example": "20250312000000", "type": "string" }
+            "schema": { "pattern": "^\\d+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -4907,7 +4209,7 @@
           "500": { "description": "Failed to patch database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
-        "summary": "Patch an existing entry in migration history",
+        "summary": "[Beta] Patch an existing entry in migration history",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4923,13 +4225,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -4967,13 +4263,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -5006,13 +4296,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -5041,13 +4325,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -5080,13 +4358,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -5111,7 +4383,7 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update database password" }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["database_config_write"] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_write"] }],
         "summary": "Updates the database password",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
@@ -5129,13 +4401,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -5166,13 +4432,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -5213,13 +4473,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -5256,13 +4510,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -5295,23 +4543,13 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "user_id",
             "required": true,
             "in": "path",
-            "schema": {
-              "format": "uuid",
-              "example": "55555555-5555-4555-8555-555555555555",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           }
         ],
         "responses": {
@@ -5337,13 +4575,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "schema",
@@ -5381,13 +4613,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -5424,60 +4650,46 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "slug",
             "required": false,
             "in": "query",
-            "schema": { "pattern": "^[A-Za-z0-9_-]+$", "example": "hello-world", "type": "string" }
+            "schema": { "pattern": "^[A-Za-z0-9_-]+$", "type": "string" }
           },
-          {
-            "name": "name",
-            "required": false,
-            "in": "query",
-            "schema": { "example": "Hello World", "type": "string" }
-          },
+          { "name": "name", "required": false, "in": "query", "schema": { "type": "string" } },
           {
             "name": "verify_jwt",
             "required": false,
             "in": "query",
             "description": "Boolean string, true or false",
-            "schema": { "example": true, "type": "boolean" }
+            "schema": { "type": "boolean" }
           },
           {
             "name": "import_map",
             "required": false,
             "in": "query",
             "description": "Boolean string, true or false",
-            "schema": { "example": false, "type": "boolean" }
+            "schema": { "type": "boolean" }
           },
           {
             "name": "entrypoint_path",
             "required": false,
             "in": "query",
-            "schema": { "example": "index.ts", "type": "string" }
+            "schema": { "type": "string" }
           },
           {
             "name": "import_map_path",
             "required": false,
             "in": "query",
-            "schema": { "example": "import_map.json", "type": "string" }
+            "schema": { "type": "string" }
           },
           {
             "name": "ezbr_sha256",
             "required": false,
             "in": "query",
-            "schema": {
-              "example": "44c691990518d25498f0fd80cf6631ecf2b58eb9c5eb2a087dd1688f2904dac7",
-              "type": "string"
-            }
+            "schema": { "type": "string" }
           }
         ],
         "requestBody": {
@@ -5520,13 +4732,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -5570,30 +4776,20 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "slug",
             "required": false,
             "in": "query",
-            "schema": {
-              "pattern": "^[A-Za-z][A-Za-z0-9_-]*$",
-              "example": "hello-world",
-              "type": "string"
-            }
+            "schema": { "pattern": "^[A-Za-z][A-Za-z0-9_-]*$", "type": "string" }
           },
           {
             "name": "bundleOnly",
             "required": false,
             "in": "query",
             "description": "Boolean string, true or false",
-            "schema": { "example": false, "type": "boolean" }
+            "schema": { "type": "boolean" }
           }
         ],
         "requestBody": {
@@ -5637,20 +4833,14 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "function_slug",
             "required": true,
             "in": "path",
             "description": "Function slug",
-            "schema": { "pattern": "^[A-Za-z0-9_-]+$", "example": "hello-world", "type": "string" }
+            "schema": { "pattern": "^[A-Za-z0-9_-]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -5683,67 +4873,53 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "function_slug",
             "required": true,
             "in": "path",
             "description": "Function slug",
-            "schema": { "pattern": "^[A-Za-z0-9_-]+$", "example": "hello-world", "type": "string" }
+            "schema": { "pattern": "^[A-Za-z0-9_-]+$", "type": "string" }
           },
           {
             "name": "slug",
             "required": false,
             "in": "query",
-            "schema": { "pattern": "^[A-Za-z0-9_-]+$", "example": "hello-world", "type": "string" }
+            "schema": { "pattern": "^[A-Za-z0-9_-]+$", "type": "string" }
           },
-          {
-            "name": "name",
-            "required": false,
-            "in": "query",
-            "schema": { "example": "Hello World", "type": "string" }
-          },
+          { "name": "name", "required": false, "in": "query", "schema": { "type": "string" } },
           {
             "name": "verify_jwt",
             "required": false,
             "in": "query",
             "description": "Boolean string, true or false",
-            "schema": { "example": true, "type": "boolean" }
+            "schema": { "type": "boolean" }
           },
           {
             "name": "import_map",
             "required": false,
             "in": "query",
             "description": "Boolean string, true or false",
-            "schema": { "example": false, "type": "boolean" }
+            "schema": { "type": "boolean" }
           },
           {
             "name": "entrypoint_path",
             "required": false,
             "in": "query",
-            "schema": { "example": "index.ts", "type": "string" }
+            "schema": { "type": "string" }
           },
           {
             "name": "import_map_path",
             "required": false,
             "in": "query",
-            "schema": { "example": "import_map.json", "type": "string" }
+            "schema": { "type": "string" }
           },
           {
             "name": "ezbr_sha256",
             "required": false,
             "in": "query",
-            "schema": {
-              "example": "44c691990518d25498f0fd80cf6631ecf2b58eb9c5eb2a087dd1688f2904dac7",
-              "type": "string"
-            }
+            "schema": { "type": "string" }
           }
         ],
         "requestBody": {
@@ -5785,20 +4961,14 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "function_slug",
             "required": true,
             "in": "path",
             "description": "Function slug",
-            "schema": { "pattern": "^[A-Za-z0-9_-]+$", "example": "hello-world", "type": "string" }
+            "schema": { "pattern": "^[A-Za-z0-9_-]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -5826,20 +4996,14 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "function_slug",
             "required": true,
             "in": "path",
             "description": "Function slug",
-            "schema": { "pattern": "^[A-Za-z0-9_-]+$", "example": "hello-world", "type": "string" }
+            "schema": { "pattern": "^[A-Za-z0-9_-]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -5871,13 +5035,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -5914,13 +5072,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -5948,13 +5100,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -5985,13 +5131,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -6023,13 +5163,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -6061,13 +5195,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -6097,13 +5225,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -6136,13 +5258,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -6176,13 +5292,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -6217,13 +5327,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -6265,13 +5369,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -6303,13 +5401,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -6351,13 +5443,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -6386,13 +5472,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -6424,13 +5504,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -6455,13 +5529,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -6499,13 +5567,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -6539,23 +5601,13 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "provider_id",
             "required": true,
             "in": "path",
-            "schema": {
-              "format": "uuid",
-              "example": "77777777-7777-4777-8777-777777777777",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           }
         ],
         "responses": {
@@ -6589,23 +5641,13 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "provider_id",
             "required": true,
             "in": "path",
-            "schema": {
-              "format": "uuid",
-              "example": "77777777-7777-4777-8777-777777777777",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           }
         ],
         "requestBody": {
@@ -6645,23 +5687,13 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "provider_id",
             "required": true,
             "in": "path",
-            "schema": {
-              "format": "uuid",
-              "example": "77777777-7777-4777-8777-777777777777",
-              "type": "string"
-            }
+            "schema": { "format": "uuid", "type": "string" }
           }
         ],
         "responses": {
@@ -6697,13 +5729,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -6735,13 +5761,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -6773,13 +5793,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -6819,13 +5833,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           },
           {
             "name": "name",
@@ -6866,13 +5874,7 @@
             "required": true,
             "in": "path",
             "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
-              "type": "string"
-            }
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
           }
         ],
         "requestBody": {
@@ -6896,44 +5898,6 @@
         "x-oauth-scope": "database:write"
       }
     },
-    "/v1/organizations/{slug}/entitlements": {
-      "get": {
-        "description": "Returns the entitlements available to the organization based on their plan and any overrides.",
-        "operationId": "v1-get-organization-entitlements",
-        "parameters": [
-          {
-            "name": "slug",
-            "required": true,
-            "in": "path",
-            "description": "Organization slug",
-            "schema": {
-              "pattern": "^[\\w-]+$",
-              "example": "tsrqponmlkjihgfedcba",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/V1ListEntitlementsResponse" }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" }
-        },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["organization_admin_read"] }],
-        "summary": "Get entitlements for an organization",
-        "tags": ["Organizations"],
-        "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
-        "x-endpoint-owners": ["billing"],
-        "x-oauth-scope": "organizations:read"
-      }
-    },
     "/v1/organizations/{slug}/members": {
       "get": {
         "operationId": "v1-list-organization-members",
@@ -6943,11 +5907,7 @@
             "required": true,
             "in": "path",
             "description": "Organization slug",
-            "schema": {
-              "pattern": "^[\\w-]+$",
-              "example": "tsrqponmlkjihgfedcba",
-              "type": "string"
-            }
+            "schema": { "pattern": "^[\\w-]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -6980,11 +5940,7 @@
             "required": true,
             "in": "path",
             "description": "Organization slug",
-            "schema": {
-              "pattern": "^[\\w-]+$",
-              "example": "tsrqponmlkjihgfedcba",
-              "type": "string"
-            }
+            "schema": { "pattern": "^[\\w-]+$", "type": "string" }
           }
         ],
         "responses": {
@@ -7017,18 +5973,9 @@
             "required": true,
             "in": "path",
             "description": "Organization slug",
-            "schema": {
-              "pattern": "^[\\w-]+$",
-              "example": "tsrqponmlkjihgfedcba",
-              "type": "string"
-            }
+            "schema": { "pattern": "^[\\w-]+$", "type": "string" }
           },
-          {
-            "name": "token",
-            "required": true,
-            "in": "path",
-            "schema": { "example": "0123456789abcdef0123456789abcdef01234567", "type": "string" }
-          }
+          { "name": "token", "required": true, "in": "path", "schema": { "type": "string" } }
         ],
         "responses": {
           "200": {
@@ -7057,18 +6004,9 @@
             "required": true,
             "in": "path",
             "description": "Organization slug",
-            "schema": {
-              "pattern": "^[\\w-]+$",
-              "example": "tsrqponmlkjihgfedcba",
-              "type": "string"
-            }
+            "schema": { "pattern": "^[\\w-]+$", "type": "string" }
           },
-          {
-            "name": "token",
-            "required": true,
-            "in": "path",
-            "schema": { "example": "0123456789abcdef0123456789abcdef01234567", "type": "string" }
-          }
+          { "name": "token", "required": true, "in": "path", "schema": { "type": "string" } }
         ],
         "responses": {
           "204": { "description": "" },
@@ -7093,38 +6031,28 @@
             "required": true,
             "in": "path",
             "description": "Organization slug",
-            "schema": {
-              "pattern": "^[\\w-]+$",
-              "example": "tsrqponmlkjihgfedcba",
-              "type": "string"
-            }
+            "schema": { "pattern": "^[\\w-]+$", "type": "string" }
           },
           {
             "name": "offset",
             "required": false,
             "in": "query",
             "description": "Number of projects to skip",
-            "schema": { "minimum": 0, "default": 0, "example": 0, "type": "integer" }
+            "schema": { "minimum": 0, "default": 0, "type": "integer" }
           },
           {
             "name": "limit",
             "required": false,
             "in": "query",
             "description": "Number of projects to return per page",
-            "schema": {
-              "minimum": 1,
-              "maximum": 100,
-              "default": 100,
-              "example": 20,
-              "type": "integer"
-            }
+            "schema": { "minimum": 1, "maximum": 100, "default": 100, "type": "integer" }
           },
           {
             "name": "search",
             "required": false,
             "in": "query",
             "description": "Search projects by name",
-            "schema": { "example": "acme", "type": "string" }
+            "schema": { "type": "string" }
           },
           {
             "name": "sort",
@@ -7133,7 +6061,6 @@
             "description": "Sort order for projects",
             "schema": {
               "default": "name_asc",
-              "example": "created_desc",
               "type": "string",
               "enum": ["name_asc", "name_desc", "created_asc", "created_desc"]
             }
@@ -7143,7 +6070,7 @@
             "required": false,
             "in": "query",
             "description": "A comma-separated list of project statuses to filter by.\n\nThe following values are supported: `ACTIVE_HEALTHY`, `INACTIVE`.",
-            "schema": { "example": "ACTIVE_HEALTHY,INACTIVE", "type": "string" }
+            "schema": { "example": "?statuses=ACTIVE_HEALTHY,INACTIVE", "type": "string" }
           }
         ],
         "responses": {
@@ -7155,17 +6082,12 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to retrieve projects" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["organization_projects_read"] }],
         "summary": "Gets all projects for the given organization",
         "tags": ["Projects"],
-        "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
-        "x-endpoint-owners": ["management-api"],
-        "x-oauth-scope": "projects:read"
+        "x-endpoint-owners": ["management-api"]
       }
     }
   },
@@ -7269,13 +6191,6 @@
             "format": "uri",
             "description": "HTTP endpoint to receive branch status updates."
           }
-        },
-        "example": {
-          "branch_name": "preview-login-page",
-          "git_branch": "feature/login-page",
-          "persistent": true,
-          "request_review": true,
-          "notify_url": "https://example.com/webhooks/branches"
         }
       },
       "BranchResponse": {
@@ -7352,8 +6267,7 @@
       },
       "BranchActionBody": {
         "type": "object",
-        "properties": { "migration_version": { "type": "string" } },
-        "example": { "migration_version": "20250312000000" }
+        "properties": { "migration_version": { "type": "string" } }
       },
       "BranchUpdateResponse": {
         "type": "object",
@@ -7368,6 +6282,92 @@
         "properties": { "message": { "type": "string", "enum": ["Branch restoration initiated"] } },
         "required": ["message"]
       },
+      "V1ListProjectsPaginatedResponse": {
+        "type": "object",
+        "properties": {
+          "projects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "number" },
+                "cloud_provider": { "type": "string" },
+                "inserted_at": { "type": "string", "nullable": true },
+                "name": { "type": "string" },
+                "organization_id": { "type": "number" },
+                "organization_slug": { "type": "string" },
+                "ref": { "type": "string" },
+                "region": { "type": "string" },
+                "status": { "type": "string" },
+                "subscription_id": { "type": "string", "nullable": true },
+                "is_branch_enabled": { "type": "boolean" },
+                "is_physical_backups_enabled": { "type": "boolean", "nullable": true },
+                "preview_branch_refs": { "type": "array", "items": { "type": "string" } },
+                "disk_volume_size_gb": { "type": "number" },
+                "infra_compute_size": {
+                  "type": "string",
+                  "enum": [
+                    "pico",
+                    "nano",
+                    "micro",
+                    "small",
+                    "medium",
+                    "large",
+                    "xlarge",
+                    "2xlarge",
+                    "4xlarge",
+                    "8xlarge",
+                    "12xlarge",
+                    "16xlarge",
+                    "24xlarge",
+                    "24xlarge_optimized_memory",
+                    "24xlarge_optimized_cpu",
+                    "24xlarge_high_memory",
+                    "48xlarge",
+                    "48xlarge_optimized_memory",
+                    "48xlarge_optimized_cpu",
+                    "48xlarge_high_memory"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "cloud_provider",
+                "inserted_at",
+                "name",
+                "organization_id",
+                "organization_slug",
+                "ref",
+                "region",
+                "status",
+                "subscription_id",
+                "is_branch_enabled",
+                "is_physical_backups_enabled",
+                "preview_branch_refs"
+              ]
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "number",
+                "description": "Total number of projects. Use this to calculate the total number of pages."
+              },
+              "limit": {
+                "type": "number",
+                "description": "Maximum number of projects per page (actual number may be less)"
+              },
+              "offset": {
+                "type": "number",
+                "description": "Number of projects skipped in this response"
+              }
+            },
+            "required": ["count", "limit", "offset"]
+          }
+        },
+        "required": ["projects", "pagination"]
+      },
       "V1ProjectWithDatabaseResponse": {
         "type": "object",
         "properties": {
@@ -7381,8 +6381,7 @@
             "minLength": 20,
             "maxLength": 20,
             "pattern": "^[a-z]+$",
-            "description": "Project ref",
-            "example": "abcdefghijklmnopqrst"
+            "description": "Project ref"
           },
           "organization_id": {
             "type": "string",
@@ -7392,12 +6391,19 @@
           "organization_slug": {
             "type": "string",
             "pattern": "^[\\w-]+$",
-            "description": "Organization slug",
-            "example": "tsrqponmlkjihgfedcba"
+            "description": "Organization slug"
           },
           "name": { "type": "string", "description": "Name of your project" },
-          "region": { "type": "string", "description": "Region of your project" },
-          "created_at": { "type": "string", "description": "Creation timestamp" },
+          "region": {
+            "type": "string",
+            "description": "Region of your project",
+            "example": "us-east-1"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp",
+            "example": "2023-03-29T16:32:59Z"
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -7454,8 +6460,7 @@
           "organization_slug": {
             "type": "string",
             "pattern": "^[\\w-]+$",
-            "description": "Organization slug",
-            "example": "tsrqponmlkjihgfedcba"
+            "description": "Organization slug"
           },
           "plan": {
             "type": "string",
@@ -7466,6 +6471,7 @@
           "region": {
             "type": "string",
             "description": "Region you want your server to reside in. Use region_selection instead.",
+            "example": "us-east-1",
             "deprecated": true,
             "enum": [
               "us-east-1",
@@ -7530,13 +6536,15 @@
                   "code": {
                     "type": "string",
                     "enum": ["americas", "emea", "apac"],
-                    "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint."
+                    "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
+                    "example": "apac"
                   }
                 },
                 "required": ["type", "code"]
               }
             ],
-            "description": "Region selection. Only one of region or region_selection can be specified."
+            "description": "Region selection. Only one of region or region_selection can be specified.",
+            "example": "{ type: 'smartGroup', code: 'americas' }"
           },
           "kps_enabled": {
             "type": "boolean",
@@ -7545,6 +6553,7 @@
           },
           "desired_instance_size": {
             "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
+            "example": "nano",
             "type": "string",
             "enum": [
               "nano",
@@ -7571,18 +6580,13 @@
           "template_url": {
             "type": "string",
             "format": "uri",
-            "description": "Template URL used to create the project from the CLI."
+            "description": "Template URL used to create the project from the CLI.",
+            "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
           }
         },
         "required": ["db_pass", "name", "organization_slug"],
         "additionalProperties": false,
-        "hideDefinitions": ["release_channel", "postgres_engine"],
-        "example": {
-          "db_pass": "correct-horse-battery-staple",
-          "name": "acme-prod",
-          "organization_slug": "tsrqponmlkjihgfedcba",
-          "region": "us-east-1"
-        }
+        "hideDefinitions": ["release_channel", "postgres_engine"]
       },
       "V1ProjectResponse": {
         "type": "object",
@@ -7597,8 +6601,7 @@
             "minLength": 20,
             "maxLength": 20,
             "pattern": "^[a-z]+$",
-            "description": "Project ref",
-            "example": "abcdefghijklmnopqrst"
+            "description": "Project ref"
           },
           "organization_id": {
             "type": "string",
@@ -7608,12 +6611,19 @@
           "organization_slug": {
             "type": "string",
             "pattern": "^[\\w-]+$",
-            "description": "Organization slug",
-            "example": "tsrqponmlkjihgfedcba"
+            "description": "Organization slug"
           },
           "name": { "type": "string", "description": "Name of your project" },
-          "region": { "type": "string", "description": "Region of your project" },
-          "created_at": { "type": "string", "description": "Creation timestamp" },
+          "region": {
+            "type": "string",
+            "description": "Region of your project",
+            "example": "us-east-1"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp",
+            "example": "2023-03-29T16:32:59Z"
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -7771,12 +6781,7 @@
             "description": "Deprecated: Use `slug` instead.",
             "deprecated": true
           },
-          "slug": {
-            "type": "string",
-            "pattern": "^[\\w-]+$",
-            "description": "Organization slug",
-            "example": "tsrqponmlkjihgfedcba"
-          },
+          "slug": { "type": "string", "pattern": "^[\\w-]+$", "description": "Organization slug" },
           "name": { "type": "string" }
         },
         "required": ["id", "slug", "name"]
@@ -7785,8 +6790,7 @@
         "type": "object",
         "properties": { "name": { "type": "string", "maxLength": 256 } },
         "required": ["name"],
-        "additionalProperties": false,
-        "example": { "name": "Acme" }
+        "additionalProperties": false
       },
       "OAuthTokenBody": {
         "type": "object",
@@ -7805,16 +6809,7 @@
           },
           "scope": { "type": "string" }
         },
-        "additionalProperties": false,
-        "example": {
-          "grant_type": "authorization_code",
-          "client_id": "66666666-6666-4666-8666-666666666666",
-          "client_secret": "sb_secret_live_example_9f4d3a206b2e4a7e8c91",
-          "code": "oauth_code_9f4d3a206b2e4a7e8c91",
-          "code_verifier": "qW0Z6d9pQnW0mL1dK1q9wFq6Yz2nV5rA8jT3mP7sH4c",
-          "redirect_uri": "https://app.acme.com/auth/callback",
-          "scope": "projects:read projects:write"
-        }
+        "additionalProperties": false
       },
       "OAuthTokenResponse": {
         "type": "object",
@@ -7835,12 +6830,7 @@
           "refresh_token": { "type": "string" }
         },
         "required": ["client_id", "client_secret", "refresh_token"],
-        "additionalProperties": false,
-        "example": {
-          "client_id": "66666666-6666-4666-8666-666666666666",
-          "client_secret": "sb_secret_live_example_9f4d3a206b2e4a7e8c91",
-          "refresh_token": "oauth_refresh_9f4d3a206b2e4a7e8c91"
-        }
+        "additionalProperties": false
       },
       "SnippetList": {
         "type": "object",
@@ -7947,15 +6937,6 @@
           "favorite",
           "content"
         ]
-      },
-      "V1ProfileResponse": {
-        "type": "object",
-        "properties": {
-          "gotrue_id": { "type": "string" },
-          "primary_email": { "type": "string" },
-          "username": { "type": "string" }
-        },
-        "required": ["gotrue_id", "primary_email", "username"]
       },
       "ListActionRunResponse": {
         "type": "array",
@@ -8087,12 +7068,6 @@
             "type": "string",
             "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
           }
-        },
-        "example": {
-          "clone": "RUNNING",
-          "configure": "RUNNING",
-          "migrate": "RUNNING",
-          "deploy": "CREATED"
         }
       },
       "UpdateRunStatusResponse": {
@@ -8138,8 +7113,7 @@
           "description": { "type": "string", "nullable": true },
           "secret_jwt_template": { "type": "object", "additionalProperties": {}, "nullable": true }
         },
-        "required": ["type", "name"],
-        "example": { "type": "secret", "name": "ci_secret_key", "description": "CI deploy key" }
+        "required": ["type", "name"]
       },
       "UpdateApiKeyBody": {
         "type": "object",
@@ -8152,8 +7126,7 @@
           },
           "description": { "type": "string", "nullable": true },
           "secret_jwt_template": { "type": "object", "additionalProperties": {}, "nullable": true }
-        },
-        "example": { "name": "ci_secret_key_rotated", "description": "Rotated after March release" }
+        }
       },
       "CreateBranchBody": {
         "type": "object",
@@ -8206,14 +7179,7 @@
             "description": "HTTP endpoint to receive branch status updates."
           }
         },
-        "required": ["branch_name"],
-        "example": {
-          "branch_name": "preview-login-page",
-          "git_branch": "feature/login-page",
-          "persistent": true,
-          "with_data": false,
-          "notify_url": "https://example.com/webhooks/branches"
-        }
+        "required": ["branch_name"]
       },
       "UpdateCustomHostnameResponse": {
         "type": "object",
@@ -8303,8 +7269,7 @@
       "UpdateCustomHostnameBody": {
         "type": "object",
         "properties": { "custom_hostname": { "type": "string", "maxLength": 253, "minLength": 1 } },
-        "required": ["custom_hostname"],
-        "example": { "custom_hostname": "docs.example.com" }
+        "required": ["custom_hostname"]
       },
       "JitAccessResponse": {
         "type": "object",
@@ -8347,9 +7312,10 @@
       },
       "JitAccessRequestRequest": {
         "type": "object",
-        "properties": { "state": { "type": "string", "enum": ["enabled", "disabled"] } },
-        "required": ["state"],
-        "example": { "state": "enabled" }
+        "properties": {
+          "state": { "type": "string", "enum": ["enabled", "disabled", "unavailable"] }
+        },
+        "required": ["state"]
       },
       "NetworkBanResponse": {
         "type": "object",
@@ -8391,8 +7357,7 @@
           },
           "identifier": { "type": "string" }
         },
-        "required": ["ipv4_addresses"],
-        "example": { "ipv4_addresses": ["203.0.113.10"], "requester_ip": false }
+        "required": ["ipv4_addresses"]
       },
       "NetworkRestrictionsResponse": {
         "type": "object",
@@ -8412,10 +7377,6 @@
               "dbAllowedCidrs": { "type": "array", "items": { "type": "string" } },
               "dbAllowedCidrsV6": { "type": "array", "items": { "type": "string" } }
             },
-            "example": {
-              "dbAllowedCidrs": ["203.0.113.0/24"],
-              "dbAllowedCidrsV6": ["2001:db8::/32"]
-            },
             "description": "Populated when a new config has been received, but not registered as successfully applied to a project."
           },
           "status": { "type": "string", "enum": ["stored", "applied"] },
@@ -8429,8 +7390,7 @@
         "properties": {
           "dbAllowedCidrs": { "type": "array", "items": { "type": "string" } },
           "dbAllowedCidrsV6": { "type": "array", "items": { "type": "string" } }
-        },
-        "example": { "dbAllowedCidrs": ["203.0.113.0/24"], "dbAllowedCidrsV6": ["2001:db8::/32"] }
+        }
       },
       "NetworkRestrictionsPatchRequest": {
         "type": "object",
@@ -8449,10 +7409,6 @@
               "dbAllowedCidrsV6": { "type": "array", "items": { "type": "string" } }
             }
           }
-        },
-        "example": {
-          "add": { "dbAllowedCidrs": ["203.0.113.0/24"] },
-          "remove": { "dbAllowedCidrs": ["198.51.100.0/24"] }
         }
       },
       "NetworkRestrictionsV2Response": {
@@ -8507,8 +7463,7 @@
       "UpdatePgsodiumConfigBody": {
         "type": "object",
         "properties": { "root_key": { "type": "string" } },
-        "required": ["root_key"],
-        "example": { "root_key": "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=" }
+        "required": ["root_key"]
       },
       "PostgrestConfigWithJWTSecretResponse": {
         "type": "object",
@@ -8532,8 +7487,7 @@
           "db_schema": { "type": "string" },
           "max_rows": { "type": "integer", "minimum": 0, "maximum": 1000000 },
           "db_pool": { "type": "integer", "minimum": 0, "maximum": 1000 }
-        },
-        "example": { "db_schema": "public,storage", "db_pool": 20, "max_rows": 1000 }
+        }
       },
       "V1PostgrestConfigResponse": {
         "type": "object",
@@ -8561,8 +7515,7 @@
       "V1UpdateProjectBody": {
         "type": "object",
         "properties": { "name": { "type": "string", "minLength": 1, "maxLength": 256 } },
-        "required": ["name"],
-        "example": { "name": "Acme Platform" }
+        "required": ["name"]
       },
       "SecretResponse": {
         "type": "object",
@@ -8582,22 +7535,15 @@
               "type": "string",
               "maxLength": 256,
               "pattern": "^(?!SUPABASE_).*",
-              "description": "Secret name must not start with the SUPABASE_ prefix."
+              "description": "Secret name must not start with the SUPABASE_ prefix.",
+              "example": "string"
             },
             "value": { "type": "string", "maxLength": 24576 }
           },
           "required": ["name", "value"]
-        },
-        "example": [
-          { "name": "OPENAI_API_KEY", "value": "sk-example-secret" },
-          { "name": "STRIPE_WEBHOOK_SECRET", "value": "whsec_example" }
-        ]
+        }
       },
-      "DeleteSecretsBody": {
-        "type": "array",
-        "items": { "type": "string" },
-        "example": ["OPENAI_API_KEY"]
-      },
+      "DeleteSecretsBody": { "type": "array", "items": { "type": "string" } },
       "SslEnforcementResponse": {
         "type": "object",
         "properties": {
@@ -8619,8 +7565,7 @@
             "required": ["database"]
           }
         },
-        "required": ["requestedConfig"],
-        "example": { "requestedConfig": { "database": true } }
+        "required": ["requestedConfig"]
       },
       "TypescriptResponse": {
         "type": "object",
@@ -8638,8 +7583,7 @@
       "VanitySubdomainBody": {
         "type": "object",
         "properties": { "vanity_subdomain": { "type": "string", "maxLength": 63 } },
-        "required": ["vanity_subdomain"],
-        "example": { "vanity_subdomain": "acme-prod" }
+        "required": ["vanity_subdomain"]
       },
       "SubdomainAvailabilityResponse": {
         "type": "object",
@@ -8660,8 +7604,7 @@
             "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           }
         },
-        "required": ["target_version"],
-        "example": { "target_version": "17", "release_channel": "ga" }
+        "required": ["target_version"]
       },
       "ProjectUpgradeInitiateResponse": {
         "type": "object",
@@ -8898,17 +7841,16 @@
               "ap-south-1",
               "sa-east-1"
             ],
-            "description": "Region you want your read replica to reside in"
+            "description": "Region you want your read replica to reside in",
+            "example": "us-east-1"
           }
         },
-        "required": ["read_replica_region"],
-        "example": { "read_replica_region": "us-west-1" }
+        "required": ["read_replica_region"]
       },
       "RemoveReadReplicaBody": {
         "type": "object",
         "properties": { "database_identifier": { "type": "string" } },
-        "required": ["database_identifier"],
-        "example": { "database_identifier": "abcdefghijklmnopqrst-rr-us-west-1-abcde" }
+        "required": ["database_identifier"]
       },
       "V1ServiceHealthResponse": {
         "type": "object",
@@ -9089,8 +8031,7 @@
           }
         },
         "required": ["algorithm"],
-        "additionalProperties": false,
-        "example": { "algorithm": "RS256", "status": "standby" }
+        "additionalProperties": false
       },
       "SigningKeysResponse": {
         "type": "object",
@@ -9127,8 +8068,7 @@
           }
         },
         "required": ["status"],
-        "additionalProperties": false,
-        "example": { "status": "standby" }
+        "additionalProperties": false
       },
       "AuthConfigResponse": {
         "type": "object",
@@ -9336,10 +8276,6 @@
           "mfa_phone_verify_enabled": { "type": "boolean", "nullable": true },
           "mfa_web_authn_enroll_enabled": { "type": "boolean", "nullable": true },
           "mfa_web_authn_verify_enabled": { "type": "boolean", "nullable": true },
-          "passkey_enabled": { "type": "boolean" },
-          "webauthn_rp_display_name": { "type": "string", "nullable": true },
-          "webauthn_rp_id": { "type": "string", "nullable": true },
-          "webauthn_rp_origins": { "type": "string", "nullable": true },
           "mfa_phone_otp_length": { "type": "integer" },
           "mfa_phone_template": { "type": "string", "nullable": true },
           "mfa_phone_max_frequency": { "type": "integer", "nullable": true },
@@ -9383,10 +8319,10 @@
             "type": "boolean",
             "nullable": true
           },
-          "sessions_inactivity_timeout": { "type": "number", "nullable": true },
+          "sessions_inactivity_timeout": { "type": "integer", "nullable": true },
           "sessions_single_per_user": { "type": "boolean", "nullable": true },
           "sessions_tags": { "type": "string", "nullable": true },
-          "sessions_timebox": { "type": "number", "nullable": true },
+          "sessions_timebox": { "type": "integer", "nullable": true },
           "site_url": { "type": "string", "nullable": true },
           "sms_autoconfirm": { "type": "boolean", "nullable": true },
           "sms_max_frequency": { "type": "integer", "nullable": true },
@@ -9595,10 +8531,6 @@
           "mfa_phone_verify_enabled",
           "mfa_web_authn_enroll_enabled",
           "mfa_web_authn_verify_enabled",
-          "passkey_enabled",
-          "webauthn_rp_display_name",
-          "webauthn_rp_id",
-          "webauthn_rp_origins",
           "mfa_phone_otp_length",
           "mfa_phone_template",
           "mfa_phone_max_frequency",
@@ -9774,8 +8706,8 @@
             "nullable": true
           },
           "security_captcha_secret": { "type": "string", "nullable": true },
-          "sessions_timebox": { "type": "number", "minimum": 0, "nullable": true },
-          "sessions_inactivity_timeout": { "type": "number", "minimum": 0, "nullable": true },
+          "sessions_timebox": { "type": "integer", "minimum": 0, "nullable": true },
+          "sessions_inactivity_timeout": { "type": "integer", "minimum": 0, "nullable": true },
           "sessions_single_per_user": { "type": "boolean", "nullable": true },
           "sessions_tags": {
             "type": "string",
@@ -10020,10 +8952,6 @@
           "mfa_totp_verify_enabled": { "type": "boolean", "nullable": true },
           "mfa_web_authn_enroll_enabled": { "type": "boolean", "nullable": true },
           "mfa_web_authn_verify_enabled": { "type": "boolean", "nullable": true },
-          "passkey_enabled": { "type": "boolean" },
-          "webauthn_rp_display_name": { "type": "string", "nullable": true },
-          "webauthn_rp_id": { "type": "string", "nullable": true },
-          "webauthn_rp_origins": { "type": "string", "nullable": true },
           "mfa_phone_enroll_enabled": { "type": "boolean", "nullable": true },
           "mfa_phone_verify_enabled": { "type": "boolean", "nullable": true },
           "mfa_phone_max_frequency": {
@@ -10045,11 +8973,6 @@
           "oauth_server_allow_dynamic_registration": { "type": "boolean", "nullable": true },
           "oauth_server_authorization_path": { "type": "string", "nullable": true },
           "custom_oauth_enabled": { "type": "boolean" }
-        },
-        "example": {
-          "site_url": "https://app.example.com",
-          "disable_signup": false,
-          "jwt_exp": 3600
         }
       },
       "CreateThirdPartyAuthBody": {
@@ -10058,10 +8981,6 @@
           "oidc_issuer_url": { "type": "string" },
           "jwks_url": { "type": "string" },
           "custom_jwks": {}
-        },
-        "example": {
-          "oidc_issuer_url": "https://login.acme.com",
-          "jwks_url": "https://login.acme.com/.well-known/jwks.json"
         }
       },
       "ThirdPartyAuth": {
@@ -10303,8 +9222,7 @@
             ]
           }
         },
-        "required": ["addon_variant", "addon_type"],
-        "example": { "addon_variant": "pitr_7", "addon_type": "pitr" }
+        "required": ["addon_variant", "addon_type"]
       },
       "ProjectClaimTokenResponse": {
         "type": "object",
@@ -10542,8 +9460,7 @@
       "CreateRoleBody": {
         "type": "object",
         "properties": { "read_only": { "type": "boolean" } },
-        "required": ["read_only"],
-        "example": { "read_only": true }
+        "required": ["read_only"]
       },
       "CreateRoleResponse": {
         "type": "object",
@@ -10577,12 +9494,7 @@
           "name": { "type": "string" },
           "rollback": { "type": "string" }
         },
-        "required": ["query"],
-        "example": {
-          "query": "create table public.widgets(id bigint primary key);",
-          "name": "create_widgets_table",
-          "rollback": "drop table if exists public.widgets;"
-        }
+        "required": ["query"]
       },
       "V1UpsertMigrationBody": {
         "type": "object",
@@ -10591,12 +9503,7 @@
           "name": { "type": "string" },
           "rollback": { "type": "string" }
         },
-        "required": ["query"],
-        "example": {
-          "query": "create table public.widgets(id bigint primary key);",
-          "name": "create_widgets_table",
-          "rollback": "drop table if exists public.widgets;"
-        }
+        "required": ["query"]
       },
       "V1GetMigrationResponse": {
         "type": "object",
@@ -10612,11 +9519,7 @@
       },
       "V1PatchMigrationBody": {
         "type": "object",
-        "properties": { "name": { "type": "string" }, "rollback": { "type": "string" } },
-        "example": {
-          "name": "create_widgets_table",
-          "rollback": "drop table if exists public.widgets;"
-        }
+        "properties": { "name": { "type": "string" }, "rollback": { "type": "string" } }
       },
       "V1RunQueryBody": {
         "type": "object",
@@ -10625,8 +9528,7 @@
           "parameters": { "type": "array", "items": {} },
           "read_only": { "type": "boolean" }
         },
-        "required": ["query"],
-        "example": { "query": "select * from pg_stat_activity limit 1;", "read_only": true }
+        "required": ["query"]
       },
       "V1ReadOnlyQueryBody": {
         "type": "object",
@@ -10634,8 +9536,7 @@
           "query": { "type": "string", "minLength": 1 },
           "parameters": { "type": "array", "items": {} }
         },
-        "required": ["query"],
-        "example": { "query": "select * from pg_stat_activity limit 1;" }
+        "required": ["query"]
       },
       "GetProjectDbMetadataResponse": {
         "type": "object",
@@ -10666,8 +9567,7 @@
       "V1UpdatePasswordBody": {
         "type": "object",
         "properties": { "password": { "type": "string", "minLength": 4 } },
-        "required": ["password"],
-        "example": { "password": "correct-horse-battery-staple" }
+        "required": ["password"]
       },
       "V1UpdatePasswordResponse": {
         "type": "object",
@@ -10680,8 +9580,7 @@
           "role": { "type": "string", "minLength": 1 },
           "rhost": { "type": "string", "minLength": 1 }
         },
-        "required": ["role", "rhost"],
-        "example": { "role": "postgres", "rhost": "203.0.113.10" }
+        "required": ["role", "rhost"]
       },
       "JitAuthorizeAccessResponse": {
         "type": "object",
@@ -10804,17 +9703,7 @@
             }
           }
         },
-        "required": ["user_id", "roles"],
-        "example": {
-          "user_id": "55555555-5555-4555-8555-555555555555",
-          "roles": [
-            {
-              "role": "postgres",
-              "expires_at": 1740787200,
-              "allowed_networks": { "allowed_cidrs": [{ "cidr": "203.0.113.0/24" }] }
-            }
-          ]
-        }
+        "required": ["user_id", "roles"]
       },
       "FunctionResponse": {
         "type": "object",
@@ -10842,13 +9731,7 @@
           "body": { "type": "string" },
           "verify_jwt": { "type": "boolean" }
         },
-        "required": ["slug", "name", "body"],
-        "example": {
-          "slug": "hello-world",
-          "name": "Hello World",
-          "body": "Deno.serve(() => new Response('Hello, world!'))",
-          "verify_jwt": true
-        }
+        "required": ["slug", "name", "body"]
       },
       "BulkUpdateFunctionBody": {
         "type": "array",
@@ -10868,18 +9751,7 @@
             "ezbr_sha256": { "type": "string" }
           },
           "required": ["id", "slug", "name", "status", "version"]
-        },
-        "example": [
-          {
-            "id": "3c078cce-ad70-4148-9f37-4da362789053",
-            "slug": "hello-world",
-            "name": "Hello World",
-            "status": "ACTIVE",
-            "version": 2,
-            "verify_jwt": true,
-            "entrypoint_path": "index.ts"
-          }
-        ]
+        }
       },
       "BulkUpdateFunctionResponse": {
         "type": "object",
@@ -10924,11 +9796,7 @@
             "required": ["entrypoint_path"]
           }
         },
-        "required": ["metadata"],
-        "example": {
-          "file": ["./supabase/functions/hello-world/index.ts"],
-          "metadata": { "entrypoint_path": "index.ts", "verify_jwt": true, "name": "Hello World" }
-        }
+        "required": ["metadata"]
       },
       "DeployFunctionResponse": {
         "type": "object",
@@ -10973,11 +9841,6 @@
           "name": { "type": "string" },
           "body": { "type": "string" },
           "verify_jwt": { "type": "boolean" }
-        },
-        "example": {
-          "name": "Hello World",
-          "body": "Deno.serve(() => new Response('Hello again!'))",
-          "verify_jwt": true
         }
       },
       "V1StorageBucketResponse": {
@@ -11050,10 +9913,7 @@
             ]
           }
         },
-        "required": ["attributes"],
-        "example": {
-          "attributes": { "type": "gp3", "size_gb": 100, "iops": 3000, "throughput_mibps": 125 }
-        }
+        "required": ["attributes"]
       },
       "DiskUtilMetricsResponse": {
         "type": "object",
@@ -11211,11 +10071,7 @@
             "required": ["upstreamTarget"]
           }
         },
-        "additionalProperties": false,
-        "example": {
-          "fileSizeLimit": 10485760,
-          "features": { "imageTransformation": { "enabled": true } }
-        }
+        "additionalProperties": false
       },
       "V1PgbouncerConfigResponse": {
         "type": "object",
@@ -11276,8 +10132,7 @@
             "enum": ["transaction", "session"],
             "description": "Dedicated pooler mode for the project"
           }
-        },
-        "example": { "default_pool_size": 25, "pool_mode": "transaction" }
+        }
       },
       "UpdateSupavisorConfigResponse": {
         "type": "object",
@@ -11371,13 +10226,7 @@
           "hot_standby_feedback": { "type": "boolean" },
           "restart_database": { "type": "boolean" }
         },
-        "additionalProperties": false,
-        "example": {
-          "max_connections": 120,
-          "shared_buffers": "256MB",
-          "work_mem": "4MB",
-          "statement_timeout": "60000ms"
-        }
+        "additionalProperties": false
       },
       "RealtimeConfigResponse": {
         "type": "object",
@@ -11525,12 +10374,7 @@
           },
           "presence_enabled": { "type": "boolean", "description": "Whether to enable presence" }
         },
-        "additionalProperties": false,
-        "example": {
-          "private_only": false,
-          "max_concurrent_users": 1000,
-          "max_channels_per_client": 100
-        }
+        "additionalProperties": false
       },
       "CreateProviderBody": {
         "type": "object",
@@ -11578,19 +10422,7 @@
             ]
           }
         },
-        "required": ["type"],
-        "example": {
-          "type": "saml",
-          "metadata_url": "https://sso.acme.com/metadata.xml",
-          "domains": ["acme.com"],
-          "attribute_mapping": {
-            "keys": {
-              "email": { "name": "email" },
-              "first_name": { "name": "first_name" },
-              "last_name": { "name": "last_name" }
-            }
-          }
-        }
+        "required": ["type"]
       },
       "CreateProviderResponse": {
         "type": "object",
@@ -11839,10 +10671,6 @@
               "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
             ]
           }
-        },
-        "example": {
-          "metadata_url": "https://sso.acme.com/metadata.xml",
-          "domains": ["acme.com", "contractors.acme.com"]
         }
       },
       "UpdateProviderResponse": {
@@ -12013,14 +10841,12 @@
         "properties": {
           "recovery_time_target_unix": { "type": "integer", "minimum": 0, "format": "int64" }
         },
-        "required": ["recovery_time_target_unix"],
-        "example": { "recovery_time_target_unix": 1740787200 }
+        "required": ["recovery_time_target_unix"]
       },
       "V1RestorePointPostBody": {
         "type": "object",
         "properties": { "name": { "type": "string", "maxLength": 20 } },
-        "required": ["name"],
-        "example": { "name": "before-upgrade" }
+        "required": ["name"]
       },
       "V1RestorePointResponse": {
         "type": "object",
@@ -12034,121 +10860,7 @@
       "V1UndoBody": {
         "type": "object",
         "properties": { "name": { "type": "string", "maxLength": 20 } },
-        "required": ["name"],
-        "example": { "name": "before-upgrade" }
-      },
-      "V1ListEntitlementsResponse": {
-        "type": "object",
-        "properties": {
-          "entitlements": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "feature": {
-                  "type": "object",
-                  "properties": {
-                    "key": {
-                      "type": "string",
-                      "enum": [
-                        "instances.compute_update_available_sizes",
-                        "instances.read_replicas",
-                        "instances.disk_modifications",
-                        "instances.high_availability",
-                        "instances.orioledb",
-                        "replication.etl",
-                        "storage.max_file_size",
-                        "storage.max_file_size.configurable",
-                        "storage.image_transformations",
-                        "storage.vector_buckets",
-                        "storage.iceberg_catalog",
-                        "security.audit_logs_days",
-                        "security.questionnaire",
-                        "security.soc2_report",
-                        "security.iso27001_certificate",
-                        "security.private_link",
-                        "security.enforce_mfa",
-                        "log.retention_days",
-                        "custom_domain",
-                        "vanity_subdomain",
-                        "ipv4",
-                        "pitr.available_variants",
-                        "log_drains",
-                        "branching_limit",
-                        "branching_persistent",
-                        "auth.mfa_phone",
-                        "auth.mfa_web_authn",
-                        "auth.mfa_enhanced_security",
-                        "auth.hooks",
-                        "auth.platform.sso",
-                        "auth.custom_jwt_template",
-                        "auth.saml_2",
-                        "auth.user_sessions",
-                        "auth.leaked_password_protection",
-                        "auth.advanced_auth_settings",
-                        "auth.performance_settings",
-                        "auth.password_hibp",
-                        "backup.retention_days",
-                        "backup.restore_to_new_project",
-                        "function.max_count",
-                        "function.size_limit_mb",
-                        "realtime.max_concurrent_users",
-                        "realtime.max_events_per_second",
-                        "realtime.max_joins_per_second",
-                        "realtime.max_channels_per_client",
-                        "realtime.max_bytes_per_second",
-                        "realtime.max_presence_events_per_second",
-                        "realtime.max_payload_size_in_kb",
-                        "project_scoped_roles",
-                        "security.member_roles",
-                        "project_pausing",
-                        "project_cloning",
-                        "project_restore_after_expiry",
-                        "assistant.advance_model",
-                        "integrations.github_connections",
-                        "dedicated_pooler",
-                        "observability.dashboard_advanced_metrics"
-                      ]
-                    },
-                    "type": { "type": "string", "enum": ["boolean", "numeric", "set"] }
-                  },
-                  "required": ["key", "type"]
-                },
-                "hasAccess": { "type": "boolean" },
-                "type": { "type": "string", "enum": ["boolean", "numeric", "set"] },
-                "config": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": { "enabled": { "type": "boolean" } },
-                      "required": ["enabled"]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "enabled": { "type": "boolean" },
-                        "value": { "type": "number" },
-                        "unlimited": { "type": "boolean" },
-                        "unit": { "type": "string" }
-                      },
-                      "required": ["enabled", "value", "unlimited", "unit"]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "enabled": { "type": "boolean" },
-                        "set": { "type": "array", "items": { "type": "string" } }
-                      },
-                      "required": ["enabled", "set"]
-                    }
-                  ]
-                }
-              },
-              "required": ["feature", "hasAccess", "type", "config"]
-            }
-          }
-        },
-        "required": ["entitlements"]
+        "required": ["name"]
       },
       "V1OrganizationMemberResponse": {
         "type": "object",

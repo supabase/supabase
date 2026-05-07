@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-
 import { ExplainHeader } from './ExplainVisualizer.Header'
 import { ExplainNodeRow } from './ExplainVisualizer.NodeRow'
 import { calculateMaxDuration, calculateSummary, createNodeTree } from './ExplainVisualizer.parser'

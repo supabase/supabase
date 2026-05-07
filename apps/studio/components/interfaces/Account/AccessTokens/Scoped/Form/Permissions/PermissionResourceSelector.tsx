@@ -1,8 +1,9 @@
+import { ACCESS_TOKEN_RESOURCES } from 'components/interfaces/Account/AccessTokens/AccessToken.constants'
 import { Key, Plus } from 'lucide-react'
 import { Path, PathValue } from 'react-hook-form'
 import {
   Button,
-  Checkbox,
+  Checkbox_Shadcn_,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -21,7 +22,6 @@ import {
   PermissionsFormValues,
 } from './Permissions.types'
 import { togglePermissionResource } from './Permissions.utils'
-import { ACCESS_TOKEN_RESOURCES } from '@/components/interfaces/Account/AccessTokens/AccessToken.constants'
 
 export const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
   open,
@@ -65,7 +65,7 @@ export const PermissionResourceSelector = <TFormValues extends PermissionsFormVa
                       className="text-foreground"
                     >
                       <div className="flex items-center gap-3 w-full">
-                        <Checkbox
+                        <Checkbox_Shadcn_
                           checked={isChecked}
                           onCheckedChange={() => handleToggleResource(resource)}
                           onClick={(e) => e.stopPropagation()}

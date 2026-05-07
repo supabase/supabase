@@ -1,3 +1,6 @@
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { GitBranchIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -13,10 +16,6 @@ import {
   Button,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface OutOfDateNoticeProps {
   isBranchOutOfDateMigrations: boolean
@@ -35,7 +34,9 @@ export const OutOfDateNotice = ({
   isBranchOutOfDateMigrations,
   missingMigrationsCount,
   hasMissingFunctions,
+  missingFunctionsCount,
   hasOutOfDateFunctions,
+  outOfDateFunctionsCount,
   hasEdgeFunctionModifications,
   modifiedFunctionsCount,
   isPushing,

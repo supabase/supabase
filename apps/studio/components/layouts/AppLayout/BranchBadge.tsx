@@ -1,6 +1,5 @@
+import type { Branch } from 'data/branches/branches-query'
 import { Badge } from 'ui'
-
-import type { Branch } from '@/data/branches/branches-query'
 
 interface BranchBadgeProps {
   branch: Branch | undefined
@@ -10,7 +9,7 @@ interface BranchBadgeProps {
 export function BranchBadge({ branch, isBranchingEnabled }: BranchBadgeProps) {
   if (!isBranchingEnabled) {
     return (
-      <Badge variant="warning" className="mt-px">
+      <Badge variant="warning" className="mt-[1px]">
         Production
       </Badge>
     )
@@ -18,7 +17,7 @@ export function BranchBadge({ branch, isBranchingEnabled }: BranchBadgeProps) {
 
   if (branch?.is_default) {
     return (
-      <Badge variant="warning" className="mt-px">
+      <Badge variant="warning" className="mt-[1px]">
         Production
       </Badge>
     )
@@ -26,14 +25,14 @@ export function BranchBadge({ branch, isBranchingEnabled }: BranchBadgeProps) {
 
   if (branch?.persistent) {
     return (
-      <Badge variant="success" className="mt-px">
+      <Badge variant="success" className="mt-[1px]">
         Persistent
       </Badge>
     )
   }
 
   return (
-    <Badge variant="success" className="mt-px">
+    <Badge variant="success" className="mt-[1px]">
       Preview
     </Badge>
   )

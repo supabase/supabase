@@ -1,7 +1,7 @@
-import { useParams } from 'common'
 import { useEffect } from 'react'
 
-import { useGitHubAuthorizationCreateMutation } from '@/data/integrations/github-authorization-create-mutation'
+import { useParams } from 'common'
+import { useGitHubAuthorizationCreateMutation } from 'data/integrations/github-authorization-create-mutation'
 
 const GitHubIntegrationAuthorize = () => {
   const { code, state, setup_action } = useParams()

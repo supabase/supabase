@@ -1,6 +1,18 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
+import { ResourceItem } from 'components/ui/Resource/ResourceItem'
+import type { components } from 'data/api'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useProjectApiUrl } from 'data/config/project-endpoint-query'
+import { useHasEntitlementAccess } from 'hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
+import { BASE_PATH } from 'lib/constants'
 import { Check } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useQueryState } from 'nuqs'
@@ -10,7 +22,8 @@ import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import {
   Button,
-  Form,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -26,18 +39,6 @@ import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
-import { Markdown } from '@/components/interfaces/Markdown'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
-import type { components } from '@/data/api'
-import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
-import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useHasEntitlementAccess } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
-import { BASE_PATH } from '@/lib/constants'
 
 interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
@@ -88,12 +89,6 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     (config: components['schemas']['GoTrueConfigResponse']) => {
       const values: { [x: string]: string | boolean } = {}
       Object.keys(provider.properties).forEach((key) => {
-        // This ensures the default value is visibly selected
-        if (key === 'PASSWORD_REQUIRED_CHARACTERS' && config.PASSWORD_REQUIRED_CHARACTERS === '') {
-          values[key] = NO_REQUIRED_CHARACTERS
-          return
-        }
-
         const isDoubleNegative = doubleNegativeKeys.includes(key)
         if (provider.title === 'SAML 2.0') {
           const configValue = (config as any)[key]
@@ -116,12 +111,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   )
 
   const INITIAL_VALUES = useMemo(() => {
-    // This check will always be true but let us avoid adding an eslint disable comment on unused memo dependencies
-    // which could hide real issues in the future.
-    // Adding the provider in the memo dependencies ensures the INITIAL_VALUES is properly applied
-    if (!provider) return
     return getValuesForProvider(config)
-  }, [config, getValuesForProvider, provider])
+  }, [config, getValuesForProvider])
 
   const onSubmit = (values: any) => {
     const payload = { ...values }
@@ -164,8 +155,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const form = useForm({
     defaultValues: INITIAL_VALUES,
-    resolver: zodResolver(provider.validationSchema),
-    shouldUnregister: false,
+    resolver: yupResolver(provider.validationSchema),
+    shouldUnregister: true,
   })
 
   useEffect(() => {
@@ -216,11 +207,11 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
             />
             <SheetTitle>{provider.title}</SheetTitle>
           </SheetHeader>
-          <Form {...form}>
+          <Form_Shadcn_ {...form}>
             <form
               id={formId}
               name={formId}
-              className="overflow-y-auto grow px-0"
+              className="overflow-y-auto flex-grow px-0"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <AuthAlert
@@ -240,7 +231,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                     name={x}
                     properties={provider.properties[x]}
                     control={form.control}
-                    readOnly={shouldDisableField(x) || !canUpdateConfig}
+                    disabled={shouldDisableField(x) || !canUpdateConfig}
                     hasAccess={hasAccess}
                   />
                 )
@@ -273,7 +264,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                 </SheetSection>
               )}
             </form>
-          </Form>
+          </Form_Shadcn_>
           <SheetFooter className="shrink-0">
             <div className="flex items-center justify-between w-full">
               <DocsButton href={provider.link} />

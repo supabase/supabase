@@ -1,6 +1,6 @@
 'use client'
 
-import { Dialog } from 'radix-ui'
+import * as Dialog from '@radix-ui/react-dialog'
 import React from 'react'
 
 import { Button } from '../../components/Button/Button'

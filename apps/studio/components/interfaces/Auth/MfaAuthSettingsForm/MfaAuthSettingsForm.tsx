@@ -1,29 +1,34 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import NoPermission from 'components/ui/NoPermission'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { IS_PLATFORM } from 'lib/constants'
 import { useEffect, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
   AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
   CardFooter,
-  Form,
-  FormControl,
-  FormField,
-  FormInputGroupInput,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Select_Shadcn_,
+  PrePostTab,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
   Switch,
   WarningIcon,
 } from 'ui'
@@ -37,17 +42,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import * as z from 'zod'
-
-import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
-import AlertError from '@/components/ui/AlertError'
-import NoPermission from '@/components/ui/NoPermission'
-import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
-import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { IS_PLATFORM } from '@/lib/constants'
+import { boolean, number, object, string } from 'yup'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
@@ -76,37 +71,24 @@ const MfaStatusToState = (status: (typeof MFAFactorSelectionOptions)[number]['va
       : { verifyEnabled: false, enrollEnabled: false }
 }
 
-const totpSchema = z.object({
-  MFA_TOTP: z.string().min(1, 'Required'),
-  MFA_MAX_ENROLLED_FACTORS: z.preprocess(
-    (val) => (val === '' || val == null ? undefined : val),
-    z.coerce
-      .number({ required_error: 'Required', invalid_type_error: 'Required' })
-      .min(0, 'Must be a value 0 or larger')
-      .max(30, 'Must be a value no greater than 30')
-  ),
+const totpSchema = object({
+  MFA_TOTP: string().required(),
+  MFA_MAX_ENROLLED_FACTORS: number()
+    .min(0, 'Must be a value 0 or larger')
+    .max(30, 'Must be a value no greater than 30'),
 })
 
-type TotpFormValues = z.infer<typeof totpSchema>
-
-const phoneSchema = z.object({
-  MFA_PHONE: z.string().min(1, 'Required'),
-  MFA_PHONE_OTP_LENGTH: z.preprocess(
-    (val) => (val === '' || val == null ? undefined : val),
-    z.coerce
-      .number({ required_error: 'Required', invalid_type_error: 'Required' })
-      .min(6, 'Must be a value 6 or larger')
-      .max(30, 'must be a value no greater than 30')
-  ),
-  MFA_PHONE_TEMPLATE: z.string().min(1, 'Required'),
+const phoneSchema = object({
+  MFA_PHONE: string().required(),
+  MFA_PHONE_OTP_LENGTH: number()
+    .min(6, 'Must be a value 6 or larger')
+    .max(30, 'must be a value no greater than 30'),
+  MFA_PHONE_TEMPLATE: string().required('SMS template is required.'),
 })
 
-type PhoneFormValues = z.infer<typeof phoneSchema>
-
-const securitySchema = z.object({
-  MFA_ALLOW_LOW_AAL: z.boolean({ required_error: 'Required' }),
+const securitySchema = object({
+  MFA_ALLOW_LOW_AAL: boolean().required(),
 })
-type SecurityFormValues = z.infer<typeof securitySchema>
 
 export const MfaAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
@@ -152,37 +134,34 @@ export const MfaAuthSettingsForm = () => {
   const hasValidMFAPhoneProvider = authConfig?.EXTERNAL_PHONE_ENABLED === true
   const hasValidMFAProvider = hasValidMFAPhoneProvider || sendSMSHookIsEnabled
 
-  const totpForm = useForm<TotpFormValues>({
-    resolver: zodResolver(totpSchema),
+  const totpForm = useForm({
+    resolver: yupResolver(totpSchema),
     defaultValues: {
       MFA_TOTP: 'Enabled',
       MFA_MAX_ENROLLED_FACTORS: 10,
     },
   })
-  const { reset: resetTotpForm } = totpForm
 
-  const phoneForm = useForm<PhoneFormValues>({
-    resolver: zodResolver(phoneSchema),
+  const phoneForm = useForm({
+    resolver: yupResolver(phoneSchema),
     defaultValues: {
       MFA_PHONE: 'Disabled',
       MFA_PHONE_OTP_LENGTH: 6,
       MFA_PHONE_TEMPLATE: 'Your code is {{ .Code }}',
     },
   })
-  const { reset: resetPhoneForm } = phoneForm
 
-  const securityForm = useForm<SecurityFormValues>({
-    resolver: zodResolver(securitySchema),
+  const securityForm = useForm({
+    resolver: yupResolver(securitySchema),
     defaultValues: {
       MFA_ALLOW_LOW_AAL: false,
     },
   })
-  const { reset: resetSecurityForm } = securityForm
 
   useEffect(() => {
     if (authConfig) {
       if (!isUpdatingTotpForm) {
-        resetTotpForm({
+        totpForm.reset({
           MFA_TOTP:
             determineMFAStatus(
               authConfig?.MFA_TOTP_VERIFY_ENABLED ?? true,
@@ -193,7 +172,7 @@ export const MfaAuthSettingsForm = () => {
       }
 
       if (!isUpdatingPhoneForm) {
-        resetPhoneForm({
+        phoneForm.reset({
           MFA_PHONE:
             determineMFAStatus(
               authConfig?.MFA_PHONE_VERIFY_ENABLED || false,
@@ -205,30 +184,23 @@ export const MfaAuthSettingsForm = () => {
       }
 
       if (!isUpdatingSecurityForm) {
-        resetSecurityForm({
+        securityForm.reset({
           MFA_ALLOW_LOW_AAL: authConfig?.MFA_ALLOW_LOW_AAL ?? true,
         })
       }
     }
-  }, [
-    authConfig,
-    isUpdatingTotpForm,
-    isUpdatingPhoneForm,
-    isUpdatingSecurityForm,
-    resetTotpForm,
-    resetPhoneForm,
-    resetSecurityForm,
-  ])
+  }, [authConfig, isUpdatingTotpForm, isUpdatingPhoneForm, isUpdatingSecurityForm])
 
-  const onSubmitTotpForm: SubmitHandler<TotpFormValues> = (values) => {
+  const onSubmitTotpForm = (values: any) => {
     const { verifyEnabled: MFA_TOTP_VERIFY_ENABLED, enrollEnabled: MFA_TOTP_ENROLL_ENABLED } =
       MfaStatusToState(values.MFA_TOTP)
 
     const payload = {
-      MFA_MAX_ENROLLED_FACTORS: values.MFA_MAX_ENROLLED_FACTORS,
+      ...values,
       MFA_TOTP_ENROLL_ENABLED,
       MFA_TOTP_VERIFY_ENABLED,
     }
+    delete payload.MFA_TOTP
 
     setIsUpdatingTotpForm(true)
 
@@ -247,40 +219,39 @@ export const MfaAuthSettingsForm = () => {
     )
   }
 
-  const onSubmitSecurityForm: SubmitHandler<SecurityFormValues> = (values) => {
+  const onSubmitSecurityForm = (values: any) => {
+    const payload = { ...values }
+
     setIsUpdatingSecurityForm(true)
 
     updateAuthConfig(
-      { projectRef: projectRef!, config: values },
+      { projectRef: projectRef!, config: payload },
       {
         onError: (error) => {
-          toast.error(`Failed to update enhanced MFA security settings: ${error?.message}`)
+          toast.error(`Failed to update phone MFA settings: ${error?.message}`)
           setIsUpdatingSecurityForm(false)
         },
         onSuccess: () => {
-          toast.success('Successfully updated enhanced MFA security settings')
+          toast.success('Successfully updated phone MFA settings')
           setIsUpdatingSecurityForm(false)
         },
       }
     )
   }
 
-  const onSubmitPhoneForm: SubmitHandler<PhoneFormValues> = (values) => {
-    let payload: Record<string, string | number | boolean> = {
-      MFA_PHONE_OTP_LENGTH: values.MFA_PHONE_OTP_LENGTH,
-      MFA_PHONE_TEMPLATE: values.MFA_PHONE_TEMPLATE,
-    }
+  const onSubmitPhoneForm = (values: any) => {
+    let payload = { ...values }
 
     if (hasAccessToMFA) {
       const { verifyEnabled: MFA_PHONE_VERIFY_ENABLED, enrollEnabled: MFA_PHONE_ENROLL_ENABLED } =
         MfaStatusToState(values.MFA_PHONE)
       payload = {
-        MFA_PHONE_OTP_LENGTH: values.MFA_PHONE_OTP_LENGTH,
-        MFA_PHONE_TEMPLATE: values.MFA_PHONE_TEMPLATE,
+        ...payload,
         MFA_PHONE_ENROLL_ENABLED,
         MFA_PHONE_VERIFY_ENABLED,
       }
     }
+    delete payload.MFA_PHONE
 
     setIsUpdatingPhoneForm(true)
 
@@ -351,11 +322,11 @@ export const MfaAuthSettingsForm = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form {...totpForm}>
+          <Form_Shadcn_ {...totpForm}>
             <form onSubmit={totpForm.handleSubmit(onSubmitTotpForm)} className="space-y-4">
               <Card>
                 <CardContent>
-                  <FormField
+                  <FormField_Shadcn_
                     control={totpForm.control}
                     name="MFA_TOTP"
                     render={({ field }) => (
@@ -364,7 +335,7 @@ export const MfaAuthSettingsForm = () => {
                         label="TOTP (App Authenticator)"
                         description="Control use of TOTP (App Authenticator) factors"
                       >
-                        <FormControl>
+                        <FormControl_Shadcn_>
                           <Select_Shadcn_
                             value={field.value}
                             onValueChange={field.onChange}
@@ -381,14 +352,14 @@ export const MfaAuthSettingsForm = () => {
                               ))}
                             </SelectContent_Shadcn_>
                           </Select_Shadcn_>
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
 
                 <CardContent>
-                  <FormField
+                  <FormField_Shadcn_
                     control={totpForm.control}
                     name="MFA_MAX_ENROLLED_FACTORS"
                     render={({ field }) => (
@@ -397,24 +368,17 @@ export const MfaAuthSettingsForm = () => {
                         label="Maximum number of per-user MFA factors"
                         description="How many MFA factors can be enrolled at once per user."
                       >
-                        <FormControl>
-                          <InputGroup>
-                            <FormInputGroupInput
+                        <FormControl_Shadcn_>
+                          <PrePostTab postTab="factors">
+                            <Input_Shadcn_
                               type="number"
                               min={0}
                               max={30}
                               {...field}
                               disabled={!canUpdateConfig}
-                              data-1p-ignore // 1Password
-                              data-lpignore="true" // LastPass
-                              data-form-type="other" // Dashlane
-                              data-bwignore // Bitwarden
                             />
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>factors</InputGroupText>
-                            </InputGroupAddon>
-                          </InputGroup>
-                        </FormControl>
+                          </PrePostTab>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
@@ -437,7 +401,7 @@ export const MfaAuthSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form>
+          </Form_Shadcn_>
         </PageSectionContent>
       </PageSection>
 
@@ -448,7 +412,7 @@ export const MfaAuthSettingsForm = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form {...phoneForm}>
+          <Form_Shadcn_ {...phoneForm}>
             <form
               onSubmit={(e) => {
                 e.preventDefault()
@@ -457,7 +421,7 @@ export const MfaAuthSettingsForm = () => {
             >
               <Card>
                 <CardContent>
-                  <FormField
+                  <FormField_Shadcn_
                     control={phoneForm.control}
                     name="MFA_PHONE"
                     render={({ field }) => (
@@ -466,7 +430,7 @@ export const MfaAuthSettingsForm = () => {
                         label="Phone"
                         description="Control use of phone factors"
                       >
-                        <FormControl>
+                        <FormControl_Shadcn_>
                           <Select_Shadcn_
                             value={field.value}
                             onValueChange={field.onChange}
@@ -483,7 +447,7 @@ export const MfaAuthSettingsForm = () => {
                               ))}
                             </SelectContent_Shadcn_>
                           </Select_Shadcn_>
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
@@ -499,7 +463,7 @@ export const MfaAuthSettingsForm = () => {
                 </CardContent>
 
                 <CardContent>
-                  <FormField
+                  <FormField_Shadcn_
                     control={phoneForm.control}
                     name="MFA_PHONE_OTP_LENGTH"
                     render={({ field }) => (
@@ -508,31 +472,22 @@ export const MfaAuthSettingsForm = () => {
                         label="Phone OTP Length"
                         description="Number of digits in OTP"
                       >
-                        <FormControl>
-                          <InputGroup>
-                            <FormInputGroupInput
-                              type="number"
-                              min={6}
-                              max={30}
-                              {...field}
-                              disabled={!canUpdateConfig || !hasAccessToMFA}
-                              data-1p-ignore // 1Password
-                              data-lpignore="true" // LastPass
-                              data-form-type="other" // Dashlane
-                              data-bwignore // Bitwarden
-                            />
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>digits</InputGroupText>
-                            </InputGroupAddon>
-                          </InputGroup>
-                        </FormControl>
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_
+                            type="number"
+                            min={6}
+                            max={30}
+                            {...field}
+                            disabled={!canUpdateConfig || !hasAccessToMFA}
+                          />
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
 
                 <CardContent>
-                  <FormField
+                  <FormField_Shadcn_
                     control={phoneForm.control}
                     name="MFA_PHONE_TEMPLATE"
                     render={({ field }) => (
@@ -541,17 +496,13 @@ export const MfaAuthSettingsForm = () => {
                         label="Phone verification message"
                         description="To format the OTP code use `{{ .Code }}`"
                       >
-                        <FormControl>
+                        <FormControl_Shadcn_>
                           <Input_Shadcn_
                             type="text"
                             {...field}
                             disabled={!canUpdateConfig || !hasAccessToMFA}
-                            data-1p-ignore // 1Password
-                            data-lpignore="true" // LastPass
-                            data-form-type="other" // Dashlane
-                            data-bwignore // Bitwarden
                           />
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
@@ -589,7 +540,7 @@ export const MfaAuthSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form>
+          </Form_Shadcn_>
         </PageSectionContent>
       </PageSection>
 
@@ -611,7 +562,6 @@ export const MfaAuthSettingsForm = () => {
           Billing will start immediately upon enabling this add-on, regardless of whether your
           customers are using SMS MFA.
         </p>
-        <TaxDisclaimer className="mt-2" />
       </ConfirmationModal>
 
       <PageSection>
@@ -621,11 +571,11 @@ export const MfaAuthSettingsForm = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form {...securityForm}>
+          <Form_Shadcn_ {...securityForm}>
             <form onSubmit={securityForm.handleSubmit(onSubmitSecurityForm)}>
               <Card>
                 <CardContent>
-                  <FormField
+                  <FormField_Shadcn_
                     control={securityForm.control}
                     name="MFA_ALLOW_LOW_AAL"
                     render={({ field }) => (
@@ -634,13 +584,13 @@ export const MfaAuthSettingsForm = () => {
                         label="Limit duration of AAL1 sessions"
                         description="A user's session will be terminated unless they verify one of their factors within 15 minutes of initial sign in. Recommendation: ON"
                       >
-                        <FormControl>
+                        <FormControl_Shadcn_>
                           <Switch
                             checked={!field.value}
                             onCheckedChange={(value) => field.onChange(!value)}
                             disabled={!canUpdateConfig || !hasAccessToEnhanceSecurity}
                           />
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
@@ -668,14 +618,14 @@ export const MfaAuthSettingsForm = () => {
                     disabled={
                       !canUpdateConfig || isUpdatingSecurityForm || !securityForm.formState.isDirty
                     }
-                    loading={isUpdatingSecurityForm}
+                    loading={isUpdatingPhoneForm}
                   >
                     Save changes
                   </Button>
                 </CardFooter>
               </Card>
             </form>
-          </Form>
+          </Form_Shadcn_>
         </PageSectionContent>
       </PageSection>
     </>

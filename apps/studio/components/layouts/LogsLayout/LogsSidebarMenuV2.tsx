@@ -1,4 +1,17 @@
 import { IS_PLATFORM, useFlag, useParams } from 'common'
+import {
+  useFeaturePreviewModal,
+  useUnifiedLogsPreview,
+} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
+import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
+import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
+import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useContentQuery } from 'data/content/content-query'
+import { useReplicationSourcesQuery } from 'data/replication/sources-query'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -21,19 +34,6 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
-import {
-  useFeaturePreviewModal,
-  useUnifiedLogsPreview,
-} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
-import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
-import SavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
-import { LogsSidebarItem } from '@/components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useContentQuery } from '@/data/content/content-query'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 const SupaIcon = ({ className }: { className?: string }) => {
   return (
@@ -63,7 +63,7 @@ export function SidebarCollapsible({
 }) {
   return (
     <Collapsible_Shadcn_ defaultOpen={defaultOpen}>
-      <CollapsibleTrigger_Shadcn_ className="flex items-center gap-x-2 px-4 [&[data-state=open]>svg]:rotate-90! pb-2">
+      <CollapsibleTrigger_Shadcn_ className="flex items-center gap-x-2 px-4 [&[data-state=open]>svg]:!rotate-90 pb-2">
         <ChevronRight
           size={16}
           className={'text-foreground-light transition-transform duration-200'}
@@ -82,7 +82,7 @@ export function LogsSidebarMenuV2() {
 
   const unifiedLogsFlagEnabled = useFlag('unifiedLogs')
   const { selectFeaturePreview } = useFeaturePreviewModal()
-  const { enable: enableUnifiedLogs, isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
+  const { enable: enableUnifiedLogs } = useUnifiedLogsPreview()
 
   const [searchText, setSearchText] = useState('')
 
@@ -247,7 +247,7 @@ export function LogsSidebarMenuV2() {
           }
         />
       )}
-      {isUnifiedLogsEligible && (
+      {unifiedLogsFlagEnabled && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
           title="Introducing unified logs"
@@ -279,7 +279,7 @@ export function LogsSidebarMenuV2() {
 
       <div
         className={cn(
-          'flex gap-x-2 items-center sticky top-0 bg-background-200 z-1 px-4',
+          'flex gap-x-2 items-center sticky top-0 bg-background-200 z-[1] px-4',
           !templatesEnabled ? 'pt-4' : 'py-4'
         )}
       >

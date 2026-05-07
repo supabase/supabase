@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   clampPosition,
-  getNextPosition,
   getToolbarStyle,
+  getNextPosition,
   isMenuContent,
   shouldShowMenuButton,
 } from './FloatingMobileToolbar.utils'

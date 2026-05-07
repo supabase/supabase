@@ -1,15 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
-import { useRouter } from 'next/router'
 // import { useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as z from 'zod'
+
+import { useParams } from 'common'
+import { useLintRuleCreateMutation } from 'data/lint/create-lint-rule-mutation'
+import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useRouter } from 'next/router'
 import {
   Button,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -30,14 +35,9 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import * as z from 'zod'
-
 import { LintInfo } from '../Linter/Linter.constants'
 import { lintInfoMap } from '../Linter/Linter.utils'
 import { generateRuleDescription } from './AdvisorRules.utils'
-import { useLintRuleCreateMutation } from '@/data/lint/create-lint-rule-mutation'
-import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface CreateRuleSheetProps {
   lint?: LintInfo
@@ -126,14 +126,14 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
         <SheetHeader className="shrink-0 flex items-center gap-4">
           <SheetTitle>Create a rule for "{lint?.title}"</SheetTitle>
         </SheetHeader>
-        <SheetSection className="overflow-auto grow px-0">
-          <Form {...form}>
+        <SheetSection className="overflow-auto flex-grow px-0">
+          <Form_Shadcn_ {...form}>
             <form
               id={formId}
               className="flex flex-col gap-y-4"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <FormField
+              <FormField_Shadcn_
                 name="is_disabled"
                 control={form.control}
                 render={({ field }) => (
@@ -145,13 +145,13 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
                   >
                     <Tooltip>
                       <TooltipTrigger type="button">
-                        <FormControl>
+                        <FormControl_Shadcn_>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={field.disabled || assigned_to === 'all'}
                           />
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </TooltipTrigger>
                       {assigned_to === 'all' && (
                         <TooltipContent side="bottom" className="w-72">
@@ -168,7 +168,7 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
 
               <Separator />
 
-              <FormField
+              <FormField_Shadcn_
                 name="assigned_to"
                 control={form.control}
                 render={({ field }) => (
@@ -210,7 +210,7 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
 
               <Separator />
 
-              <FormField
+              <FormField_Shadcn_
                 name="note"
                 control={form.control}
                 render={({ field }) => (
@@ -220,18 +220,18 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
                     label="Description"
                     labelOptional="Optional"
                   >
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Input.TextArea
                         {...field}
                         className="[&>div>div>div>textarea]:text-sm"
                         placeholder="e.g Describe why this rule is being set"
                       />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
             </form>
-          </Form>
+          </Form_Shadcn_>
         </SheetSection>
         <SheetFooter>
           <Button disabled={isCreating} type="default" onClick={() => onOpenChange(false)}>

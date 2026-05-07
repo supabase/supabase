@@ -52,7 +52,7 @@ test.describe('Database', () => {
 
       // downloads schema diagram when export is triggered
       const downloadPromise = page.waitForEvent('download')
-      await page.getByRole('button', { name: 'Export options' }).click()
+      await page.getByRole('button', { name: 'Download Schema' }).click()
       await page.getByRole('menuitem', { name: 'Download as PNG' }).click()
       const download = await downloadPromise
       expect(download.suggestedFilename()).toContain('.png')
@@ -100,8 +100,6 @@ test.describe('Database', () => {
       const dialog = page.getByRole('dialog')
       await expect(dialog).toBeVisible()
       await expect(dialog.getByText('timestamptz')).toBeVisible()
-      // FIXME: For some reason, the dialog is not stable and rerenders, sometimes preventing the description to be filled
-      await page.waitForTimeout(500)
       await page.getByLabel('Description').fill('Bazinga')
       await page.getByRole('button', { name: 'Save' }).click()
       await expect(page.getByText(`Successfully updated ${databaseTableName}!`)).toBeVisible()
@@ -113,6 +111,8 @@ test.describe('Database', () => {
       await editTableMenuItem.press('Enter')
       await expect(editTableMenuItem).not.toBeVisible()
       await expect(page.getByRole('dialog')).toBeVisible()
+      // FIXME: For some reason, the dialog is not stable and rerenders, sometimes preventing the description to be filled
+      await page.waitForTimeout(500)
       await expect(page.getByLabel('Description')).toHaveValue('Bazinga')
       await page.getByRole('button', { name: 'Cancel' }).click()
       await expect(page.getByRole('dialog')).not.toBeVisible()
@@ -651,26 +651,16 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
-      const indexWait = waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-public')
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/indexes?schema=public`))
 
       // Wait for database indexes to be populated
-      await indexWait
+      await waitForApiResponse(page, 'pg-meta', ref, 'query?key=indexes-public')
 
       // create new index
       await page.getByRole('button', { name: 'Create index' }).click()
       await page.getByRole('button', { name: 'Choose a table' }).click()
-
-      const columnsWait = waitForApiResponse(
-        page,
-        'pg-meta',
-        ref,
-        `query?key=table-columns-public-${databaseTableName}`
-      )
       await page.getByRole('option', { name: databaseTableName, exact: true }).click()
-      await columnsWait
-
-      await page.getByRole('combobox', { name: 'Select up to 32 columns' }).click()
+      await page.getByText('Choose which columns to create an index on').click()
       await page.getByRole('option', { name: databaseColumnName }).click()
       await page.getByRole('button', { name: 'Create index' }).click()
       await expect(
@@ -768,267 +758,6 @@ test.describe('Database', () => {
   })
 })
 
-test.describe('Database Extensions', () => {
-  test.describe.configure({ mode: 'serial' })
-
-  const EXTENSION_NAME = 'pgtap'
-
-  test('can enable an extension', async ({ page, ref }) => {
-    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
-
-    const extensionsWait = createApiResponseWaiter(
-      page,
-      'pg-meta',
-      ref,
-      'query?key=database-extensions'
-    )
-    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
-    await extensionsWait
-
-    await page.getByPlaceholder('Search for an extension').fill(EXTENSION_NAME)
-
-    const row = page.getByRole('row').filter({ hasText: EXTENSION_NAME }).first()
-    await expect(row, 'Extension row should be visible').toBeVisible()
-
-    await row.getByRole('switch').click()
-
-    const dialog = page.getByRole('dialog')
-    await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
-    await expect(
-      dialog.getByText(`Enable ${EXTENSION_NAME}`),
-      'Dialog title should match extension name'
-    ).toBeVisible()
-
-    const enableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=extension-create')
-    const refetchWait = createApiResponseWaiter(
-      page,
-      'pg-meta',
-      ref,
-      'query?key=database-extensions'
-    )
-    await dialog.getByRole('button', { name: 'Enable extension' }).click()
-    await enableWait
-    await refetchWait
-
-    await expect(
-      page.getByText(`Extension "${EXTENSION_NAME}" is now enabled`),
-      'Success toast should appear after enabling extension'
-    ).toBeVisible({ timeout: 15000 })
-
-    await expect(
-      row.getByRole('switch'),
-      'Extension switch should be checked after enabling'
-    ).toBeChecked()
-  })
-
-  test('can disable an extension', async ({ page, ref }) => {
-    const extensionsWait = createApiResponseWaiter(
-      page,
-      'pg-meta',
-      ref,
-      'query?key=database-extensions'
-    )
-    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
-    await extensionsWait
-
-    await page.getByPlaceholder('Search for an extension').fill(EXTENSION_NAME)
-
-    const row = page.getByRole('row').filter({ hasText: EXTENSION_NAME }).first()
-    await expect(row, 'Extension row should be visible').toBeVisible()
-
-    await row.getByRole('switch').click()
-
-    const dialog = page.getByRole('dialog')
-    await expect(dialog, 'Disable confirmation dialog should be visible').toBeVisible()
-    await expect(
-      dialog.getByText('Confirm to disable extension'),
-      'Dialog title should be correct'
-    ).toBeVisible()
-
-    const disableWait = createApiResponseWaiter(
-      page,
-      'pg-meta',
-      ref,
-      `query?key=extension-delete-${EXTENSION_NAME}`
-    )
-    const refetchWait = createApiResponseWaiter(
-      page,
-      'pg-meta',
-      ref,
-      'query?key=database-extensions'
-    )
-    await page.getByRole('button', { name: 'Disable' }).click()
-    await disableWait
-    await refetchWait
-
-    await expect(
-      page.getByText(`${EXTENSION_NAME} is off.`),
-      'Success toast should appear after disabling extension'
-    ).toBeVisible({ timeout: 15000 })
-
-    await expect(
-      row.getByRole('switch'),
-      'Extension switch should be unchecked after disabling'
-    ).not.toBeChecked()
-  })
-
-  test('can enable an extension in a different existing schema', async ({ page, ref }) => {
-    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
-
-    const extensionsWait = createApiResponseWaiter(
-      page,
-      'pg-meta',
-      ref,
-      'query?key=database-extensions'
-    )
-    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
-    await extensionsWait
-
-    await page.getByPlaceholder('Search for an extension').fill(EXTENSION_NAME)
-
-    const row = page.getByRole('row').filter({ hasText: EXTENSION_NAME }).first()
-    await expect(row, 'Extension row should be visible').toBeVisible()
-    await row.getByRole('switch').click()
-
-    const dialog = page.getByRole('dialog')
-    await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
-
-    // Change schema to 'public'
-    await dialog.getByRole('combobox').click()
-    await page.getByRole('option', { name: 'public', exact: true }).click()
-
-    const enableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=extension-create')
-    const refetchWait = createApiResponseWaiter(
-      page,
-      'pg-meta',
-      ref,
-      'query?key=database-extensions'
-    )
-    await dialog.getByRole('button', { name: 'Enable extension' }).click()
-    await enableWait
-    await refetchWait
-
-    await expect(
-      page.getByText(`Extension "${EXTENSION_NAME}" is now enabled`),
-      'Success toast should appear after enabling in public schema'
-    ).toBeVisible({ timeout: 15000 })
-
-    await expect(
-      row.getByRole('switch'),
-      'Extension switch should be checked after enabling in public schema'
-    ).toBeChecked()
-
-    // Cleanup
-    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
-  })
-
-  test('can enable an extension in a new schema', async ({ page, ref }) => {
-    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
-
-    const extensionsWait = createApiResponseWaiter(
-      page,
-      'pg-meta',
-      ref,
-      'query?key=database-extensions'
-    )
-    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
-    await extensionsWait
-
-    await page.getByPlaceholder('Search for an extension').fill(EXTENSION_NAME)
-
-    const row = page.getByRole('row').filter({ hasText: EXTENSION_NAME }).first()
-    await expect(row, 'Extension row should be visible').toBeVisible()
-    await row.getByRole('switch').click()
-
-    const dialog = page.getByRole('dialog')
-    await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
-
-    // Select 'Create a new schema pgtap'
-    await dialog.getByRole('combobox').click()
-    await page.getByRole('option', { name: /Create a new schema/ }).click()
-
-    const enableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=extension-create')
-    const refetchWait = createApiResponseWaiter(
-      page,
-      'pg-meta',
-      ref,
-      'query?key=database-extensions'
-    )
-    await dialog.getByRole('button', { name: 'Enable extension' }).click()
-    await enableWait
-    await refetchWait
-
-    await expect(
-      page.getByText(`Extension "${EXTENSION_NAME}" is now enabled`),
-      'Success toast should appear after enabling in new schema'
-    ).toBeVisible({ timeout: 15000 })
-
-    await expect(
-      row.getByRole('switch'),
-      'Extension switch should be checked after enabling in new schema'
-    ).toBeChecked()
-
-    // Note: the created schema is owned by supabase_admin and cannot be dropped
-    // by the test query helper (runs as postgres). The schema is left empty after
-    // the extension is dropped and will be reused on subsequent runs via
-    // CREATE SCHEMA IF NOT EXISTS in the enable SQL.
-    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
-  })
-
-  test('cannot change the schema for extensions with a fixed default schema', async ({
-    page,
-    ref,
-  }) => {
-    const FIXED_SCHEMA_EXTENSION = 'pgmq'
-    const FIXED_SCHEMA = 'pgmq'
-
-    await query(`DROP EXTENSION IF EXISTS ${FIXED_SCHEMA_EXTENSION} CASCADE;`)
-
-    const extensionsWait = createApiResponseWaiter(
-      page,
-      'pg-meta',
-      ref,
-      'query?key=database-extensions'
-    )
-    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
-    await extensionsWait
-
-    await page.getByPlaceholder('Search for an extension').fill(FIXED_SCHEMA_EXTENSION)
-
-    const row = page.getByRole('row').filter({ hasText: FIXED_SCHEMA_EXTENSION }).first()
-    await expect(row, 'Extension row should be visible').toBeVisible()
-    await row.getByRole('switch').click()
-
-    const dialog = page.getByRole('dialog')
-    await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
-
-    // Schema selector (combobox) should NOT be present for fixed-schema extensions
-    await expect(
-      dialog.getByRole('combobox'),
-      'Schema selector should not be present for extensions with a fixed default schema'
-    ).not.toBeVisible()
-
-    // A disabled input showing the fixed schema should be present instead
-    const schemaInput = dialog.getByRole('textbox')
-    await expect(schemaInput, 'Fixed schema input should be visible').toBeVisible()
-    await expect(schemaInput, 'Fixed schema input should be disabled').toBeDisabled()
-    await expect(
-      schemaInput,
-      'Fixed schema input should display the required schema name'
-    ).toHaveValue(FIXED_SCHEMA)
-
-    // Helper text confirming the schema is required
-    await expect(
-      dialog.getByText(`Extension must be installed in the "${FIXED_SCHEMA}" schema.`),
-      'Helper text should indicate the schema is required'
-    ).toBeVisible()
-
-    // Cancel without enabling
-    await dialog.getByRole('button', { name: 'Cancel' }).click()
-    await expect(dialog, 'Dialog should be closed after canceling').not.toBeVisible()
-  })
-})
-
 test.describe('Database Enumerated Types', () => {
   test('actions works as expected', async ({ page, ref }) => {
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/types?schema=public`))
@@ -1061,31 +790,12 @@ test.describe('Database Enumerated Types', () => {
     const databaseEnumValue1Name = 'pw_database_value1'
     const databaseEnumValue2Name = 'pw_database_value2'
     const databaseEnumValue3Name = 'pw_database_value3'
-    const quotedEnumName = 'pw_database_enum_"quoted"'
-    const updatedQuotedEnumName = 'pw_database_enum_"updated"'
-    const quotedEnumValue1Name = 'pw_database_value_"double"'
-    const quotedEnumValue2Name = `pw_database_value's_apostrophe`
-    const quotedEnumValue3Name = `pw_database_value_"combo"'s`
-    const quotedEnumTypes = [quotedEnumName, updatedQuotedEnumName].map(
-      (name) => `public."${name.replaceAll('"', '""')}"`
-    )
 
-    await using _ = await withSetupCleanup(
-      async () => {
-        for (const typeName of quotedEnumTypes) {
-          await query(`drop type if exists ${typeName};`)
-        }
-      },
-      async () => {
-        for (const typeName of quotedEnumTypes) {
-          await query(`drop type if exists ${typeName};`)
-        }
-      }
-    )
-
+    const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=schemas')
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/types?schema=public`))
 
-    await page.waitForLoadState('networkidle')
+    // Wait for database roles list to be populated
+    await wait
 
     // if enum exists, delete it.
     if ((await page.getByRole('cell', { name: databaseEnumName, exact: true }).count()) > 0) {
@@ -1132,41 +842,6 @@ test.describe('Database Enumerated Types', () => {
     await page.getByRole('heading', { name: 'Confirm to delete enumerated' }).click()
     await page.getByRole('button', { name: 'Confirm delete' }).click()
     await expect(page.getByText(`Successfully deleted type "${databaseEnumName}"`)).toBeVisible({
-      timeout: 50000,
-    })
-
-    await page.getByRole('button', { name: 'Create type' }).click()
-    await page.getByRole('textbox', { name: 'Name' }).fill(quotedEnumName)
-    await page.locator('input[name="values.0.value"]').fill(quotedEnumValue1Name)
-    await page.getByRole('button', { name: 'Add value' }).click()
-    await page.locator('input[name="values.1.value"]').fill(quotedEnumValue2Name)
-    const quotedEnumCreateWait = createApiResponseWaiter(page, 'pg-meta', ref, 'types')
-    await page.getByRole('button', { name: 'Create type' }).click()
-
-    await quotedEnumCreateWait
-    const quotedEnumRow = page.getByRole('row', { name: `${quotedEnumName}` })
-    await expect(quotedEnumRow).toContainText(quotedEnumName)
-    await expect(quotedEnumRow).toContainText(`${quotedEnumValue1Name}, ${quotedEnumValue2Name}`)
-
-    await quotedEnumRow.getByRole('button').click()
-    await page.getByRole('menuitem', { name: 'Update type' }).click()
-    await page.getByRole('textbox', { name: 'Name' }).fill(updatedQuotedEnumName)
-    await page.getByRole('button', { name: 'Add value' }).click()
-    await page.locator('input[name="values.2.updatedValue"]').fill(quotedEnumValue3Name)
-    await page.getByRole('button', { name: 'Update type' }).click()
-    const updatedQuotedEnumRow = page.getByRole('row', { name: `${updatedQuotedEnumName}` })
-    await expect(updatedQuotedEnumRow).toContainText(updatedQuotedEnumName)
-    await expect(updatedQuotedEnumRow).toContainText(
-      `${quotedEnumValue1Name}, ${quotedEnumValue2Name}, ${quotedEnumValue3Name}`
-    )
-
-    await updatedQuotedEnumRow.getByRole('button').click()
-    await page.getByRole('menuitem', { name: 'Delete type' }).click()
-    await page.getByRole('heading', { name: 'Confirm to delete enumerated' }).click()
-    await page.getByRole('button', { name: 'Confirm delete' }).click()
-    await expect(
-      page.getByText(`Successfully deleted type "${updatedQuotedEnumName}"`)
-    ).toBeVisible({
       timeout: 50000,
     })
   })

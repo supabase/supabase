@@ -1,6 +1,7 @@
-import { User } from 'icons'
 import Image from 'next/image'
 import { ReactNode, useState } from 'react'
+
+import { User } from 'icons'
 import { cn } from 'ui'
 
 interface ProfileImageProps {

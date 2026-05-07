@@ -2,6 +2,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
+import { useProjectCloneMutation } from 'data/projects/clone-mutation'
+import { useCloneBackupsQuery } from 'data/projects/clone-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
+import { generateStrongPassword } from 'lib/project'
 import {
   Button,
   Dialog,
@@ -11,23 +19,15 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { z } from 'zod'
-
 import { AdditionalMonthlySpend } from './AdditionalMonthlySpend'
 import { NewProjectPrice } from './RestoreToNewProject.utils'
-import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
-import { useProjectCloneMutation } from '@/data/projects/clone-mutation'
-import { useCloneBackupsQuery } from '@/data/projects/clone-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
-import { generateStrongPassword } from '@/lib/project'
 
 interface CreateNewProjectDialogProps {
   open: boolean
@@ -102,7 +102,7 @@ export const CreateNewProjectDialog = ({
             This process will create a new project and restore your database to it.
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
+        <Form_Shadcn_ {...form}>
           <form
             id={'create-new-project-form'}
             onSubmit={form.handleSubmit((data) => {
@@ -134,23 +134,23 @@ export const CreateNewProjectDialog = ({
             })}
           >
             <DialogSection className="pb-6 space-y-4 text-sm">
-              <FormField
+              <FormField_Shadcn_
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItemLayout label="New Project Name">
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Input_Shadcn_ placeholder="Enter a name" type="text" {...field} />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
-              <FormField
+              <FormField_Shadcn_
                 control={form.control}
                 name="password"
                 render={({ field }) => (
                   <FormItemLayout>
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Input
                         id="db-password"
                         label="Database password"
@@ -175,7 +175,7 @@ export const CreateNewProjectDialog = ({
                           />
                         }
                       />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
@@ -190,7 +190,7 @@ export const CreateNewProjectDialog = ({
               </Button>
             </DialogFooter>
           </form>
-        </Form>
+        </Form_Shadcn_>
       </DialogContent>
     </Dialog>
   )

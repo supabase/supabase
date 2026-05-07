@@ -1,6 +1,4 @@
-import { safeSql } from '../pg-format'
-
-export const TRIGGERS_SQL = /* SQL */ safeSql`
+export const TRIGGERS_SQL = /* SQL */ `
 SELECT
   pg_t.oid AS id,
   pg_t.tgrelid AS table_id,

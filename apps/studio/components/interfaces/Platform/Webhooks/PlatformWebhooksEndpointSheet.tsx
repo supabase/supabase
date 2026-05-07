@@ -1,5 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronDown } from 'lucide-react'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
+import { ChevronDown, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -8,11 +11,11 @@ import {
   AccordionItem_Shadcn_ as AccordionItem,
   AccordionTrigger_Shadcn_ as AccordionTrigger,
   Button,
-  Checkbox,
+  Checkbox_Shadcn_ as Checkbox,
   cn,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_ as InputField,
   Label_Shadcn_ as Label,
   Separator,
@@ -28,10 +31,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
-import {
-  getKeyValueFieldArrayValidationIssues,
-  stripEmptyKeyValueFieldArrayRows,
-} from 'ui-patterns/form/KeyValueFieldArray/validation'
 import * as z from 'zod'
 
 import type {
@@ -40,9 +39,6 @@ import type {
   WebhookScope,
 } from './PlatformWebhooks.types'
 import { generateWebhookEndpointName } from './PlatformWebhooks.utils'
-import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 
 const endpointFormSchema = z
@@ -74,20 +70,6 @@ const endpointFormSchema = z
         path: ['eventTypes'],
       })
     }
-
-    getKeyValueFieldArrayValidationIssues({
-      rows: data.customHeaders,
-      keyFieldName: 'key',
-      valueFieldName: 'value',
-      keyRequiredMessage: 'Header name is required',
-      valueRequiredMessage: 'Header value is required',
-    }).forEach((issue) => {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: issue.message,
-        path: ['customHeaders', ...issue.path],
-      })
-    })
   })
 
 export type EndpointFormValues = z.infer<typeof endpointFormSchema>
@@ -142,11 +124,7 @@ export const toEndpointPayload = (values: EndpointFormValues): UpsertWebhookEndp
   description: values.description,
   enabled: values.enabled,
   eventTypes: toEventTypes(values),
-  customHeaders: stripEmptyKeyValueFieldArrayRows({
-    rows: values.customHeaders,
-    keyFieldName: 'key',
-    valueFieldName: 'value',
-  }),
+  customHeaders: values.customHeaders,
 })
 
 interface EndpointSheetProps {
@@ -263,15 +241,15 @@ export const PlatformWebhooksEndpointSheet = ({
           </SheetDescription>
         </SheetHeader>
         <Separator />
-        <SheetSection className="overflow-auto grow px-0 py-0">
-          <Form {...form}>
+        <SheetSection className="overflow-auto flex-grow px-0 py-0">
+          <Form_Shadcn_ {...form}>
             <form
               id="platform-webhook-endpoint-form"
               className="space-y-5 py-5"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <div className="px-5 space-y-5">
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="name"
                   render={({ field }) => (
@@ -285,29 +263,29 @@ export const PlatformWebhooksEndpointSheet = ({
                       layout="vertical"
                       className="gap-1"
                     >
-                      <FormControl>
+                      <FormControl_Shadcn_>
                         <InputField {...field} placeholder="winged-envelope" maxLength={64} />
-                      </FormControl>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
 
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="url"
                   render={({ field }) => (
                     <FormItemLayout label="Endpoint URL" layout="vertical" className="gap-1">
-                      <FormControl>
+                      <FormControl_Shadcn_>
                         <InputField
                           {...field}
                           placeholder="https://api.example.com/webhooks/supabase"
                         />
-                      </FormControl>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
 
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="description"
                   render={({ field }) => (
@@ -320,20 +298,20 @@ export const PlatformWebhooksEndpointSheet = ({
                       layout="vertical"
                       className="gap-1"
                     >
-                      <FormControl>
+                      <FormControl_Shadcn_>
                         <Textarea
                           {...field}
                           rows={4}
                           placeholder="Optional description for this endpoint"
                           className="resize-none"
                         />
-                      </FormControl>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
 
                 {mode === 'edit' && (
-                  <FormField
+                  <FormField_Shadcn_
                     control={form.control}
                     name="enabled"
                     render={({ field }) => {
@@ -350,13 +328,13 @@ export const PlatformWebhooksEndpointSheet = ({
                                 Disabled endpoints won’t receive deliveries
                               </p>
                             </div>
-                            <FormControl>
+                            <FormControl_Shadcn_>
                               <Switch
                                 id={enabledId}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                               />
-                            </FormControl>
+                            </FormControl_Shadcn_>
                           </Label>
                         </div>
                       )
@@ -368,7 +346,7 @@ export const PlatformWebhooksEndpointSheet = ({
               <Separator />
 
               <div className="px-5 space-y-3">
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="eventTypes"
                   render={({ field, fieldState }) => {
@@ -401,7 +379,7 @@ export const PlatformWebhooksEndpointSheet = ({
                         layout="vertical"
                         className="gap-2"
                       >
-                        <FormField
+                        <FormField_Shadcn_
                           control={form.control}
                           name="subscribeAll"
                           render={({ field }) => {
@@ -415,7 +393,7 @@ export const PlatformWebhooksEndpointSheet = ({
                                     field.value ? 'bg-surface-100' : 'bg-surface-200'
                                   )}
                                 >
-                                  <FormControl>
+                                  <FormControl_Shadcn_>
                                     <Checkbox
                                       id={subscribeAllId}
                                       checked={field.value}
@@ -437,7 +415,7 @@ export const PlatformWebhooksEndpointSheet = ({
                                         })
                                       }}
                                     />
-                                  </FormControl>
+                                  </FormControl_Shadcn_>
                                   <span className="text-sm text-foreground">
                                     Subscribe to all events{' '}
                                     <code className="text-code-inline">(*)</code>
@@ -448,7 +426,7 @@ export const PlatformWebhooksEndpointSheet = ({
                           }}
                         />
 
-                        <FormControl>
+                        <FormControl_Shadcn_>
                           <Accordion
                             type="multiple"
                             value={openEventGroups}
@@ -505,7 +483,7 @@ export const PlatformWebhooksEndpointSheet = ({
                                             {allSelected ? 'Clear all' : 'Select all'}
                                           </span>
                                         )}
-                                        <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-open:rotate-180" />
+                                        <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                                       </div>
                                     </div>
                                   </AccordionTrigger>
@@ -547,7 +525,7 @@ export const PlatformWebhooksEndpointSheet = ({
                               )
                             })}
                           </Accordion>
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )
                   }}
@@ -580,7 +558,7 @@ export const PlatformWebhooksEndpointSheet = ({
                 </FormItemLayout>
               </div>
             </form>
-          </Form>
+          </Form_Shadcn_>
         </SheetSection>
         <SheetFooter>
           <Button type="default" onClick={confirmOnClose}>

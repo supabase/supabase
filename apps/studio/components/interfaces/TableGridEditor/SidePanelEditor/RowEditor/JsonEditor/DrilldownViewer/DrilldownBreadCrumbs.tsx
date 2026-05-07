@@ -1,5 +1,5 @@
 import { last } from 'lodash'
-import { ChevronRight, Home } from 'lucide-react'
+import { Home, ChevronRight } from 'lucide-react'
 
 interface DrilldownBreadCrumbsProps {
   breadcrumbs: string[]

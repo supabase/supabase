@@ -1,8 +1,9 @@
 import '@code-hike/mdx/styles.css'
-import 'config/code-hike.css'
+import 'config/code-hike.scss'
 import 'ui-patterns/ShimmeringLoader/index.css'
-import '../styles/main.css'
-import '../styles/prism-okaidia.css'
+import '../styles/main.scss'
+import '../styles/new-docs.scss'
+import '../styles/prism-okaidia.scss'
 
 import { GlobalProviders } from '~/features/app.providers'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'

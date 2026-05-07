@@ -1,40 +1,16 @@
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, cn, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
+
+import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { ProjectDetail } from 'data/projects/project-detail-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
+import { INSTANCE_MICRO_SPECS } from 'lib/constants'
+import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-
-import { getAvailableComputeOptions } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
-import { ProjectDetail } from '@/data/projects/project-detail-query'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
-import { ResourceWarning } from '@/data/usage/resource-warnings-query'
-import { getCloudProviderArchitecture } from '@/lib/cloudprovider-utils'
-import { useTrack } from '@/lib/telemetry/track'
-
-export const ChevronsUpAnimated = () => (
-  <svg
-    width={10}
-    height={10}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline
-      points="17 18 12 13 7 18"
-      className="animate-chevron-up"
-      style={{ animationDelay: '0s' }}
-    />
-    <polyline
-      points="17 11 12 6 7 11"
-      className="animate-chevron-up"
-      style={{ animationDelay: '0.3s' }}
-    />
-  </svg>
-)
 
 const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {
   return (
@@ -50,8 +26,6 @@ interface ComputeBadgeWrapperProps {
   projectRef?: string
   cloudProvider?: string
   computeSize?: ProjectDetail['infra_compute_size']
-  resourceWarnings?: ResourceWarning
-  badgeClassName?: string
 }
 
 export const ComputeBadgeWrapper = ({
@@ -59,8 +33,6 @@ export const ComputeBadgeWrapper = ({
   projectRef,
   cloudProvider,
   computeSize,
-  resourceWarnings,
-  badgeClassName,
 }: ComputeBadgeWrapperProps) => {
   // handles the state of the hover card
   // once open it will fetch the addons
@@ -74,14 +46,23 @@ export const ComputeBadgeWrapper = ({
     { projectRef },
     { enabled: open }
   )
+  const selectedAddons = addons?.selected_addons ?? []
 
-  // Derive cores/memory from the same source as the badge (infra_compute_size) by looking up
-  // the matching variant in available_addons. Sourcing from selected_addons can drift out of
-  // sync with infra_compute_size and produce a card that contradicts its own badge.
-  const computeOptions = getAvailableComputeOptions(addons?.available_addons ?? [], cloudProvider)
-  const meta = computeOptions.find((variant) => variant.identifier === `ci_${computeSize}`)?.meta
+  const { computeInstance } = getAddons(selectedAddons)
+  const computeInstanceMeta = computeInstance?.variant?.meta
 
-  const highestComputeAvailable = computeOptions[computeOptions.length - 1]?.identifier
+  const meta = (
+    computeInstanceMeta === undefined && computeSize === 'micro'
+      ? INSTANCE_MICRO_SPECS
+      : computeInstanceMeta
+  ) as ProjectAddonVariantMeta
+
+  const availableCompute = addons?.available_addons.find(
+    (addon) => addon.name === 'Compute Instance'
+  )?.variants
+
+  const highestComputeAvailable = availableCompute?.[availableCompute.length - 1].identifier
+
   const isHighestCompute = computeSize === highestComputeAvailable?.replace('ci_', '')
 
   const { data, isPending: isLoadingSubscriptions } = useOrgSubscriptionQuery(
@@ -90,14 +71,6 @@ export const ComputeBadgeWrapper = ({
   )
 
   const isEligibleForFreeUpgrade = data?.plan.id !== 'free' && computeSize === 'nano'
-  const isComputeNearExhaustion =
-    !!resourceWarnings?.cpu_exhaustion ||
-    !!resourceWarnings?.memory_and_swap_exhaustion ||
-    !!resourceWarnings?.disk_space_exhaustion ||
-    !!resourceWarnings?.disk_io_exhaustion
-  const showUpgradeGlow = isEligibleForFreeUpgrade && isComputeNearExhaustion
-
-  const track = useTrack()
 
   const isLoading = isLoadingAddons || isLoadingSubscriptions
 
@@ -106,25 +79,8 @@ export const ComputeBadgeWrapper = ({
   return (
     <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
       <HoverCardTrigger asChild className="group" onClick={(e) => e.stopPropagation()}>
-        <div className={cn('flex items-center', showUpgradeGlow && 'animate-badge-pulse')}>
-          <div
-            className={cn(
-              'flex',
-              showUpgradeGlow && 'relative inline-flex overflow-hidden rounded-sm'
-            )}
-          >
-            <ComputeBadge
-              infraComputeSize={computeSize}
-              icon={showUpgradeGlow && <ChevronsUpAnimated />}
-              className={cn(
-                showUpgradeGlow && 'text-brand-600 border-brand-500 bg-brand/10 gap-1',
-                badgeClassName
-              )}
-            />
-            {showUpgradeGlow && (
-              <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-linear-to-br from-transparent via-brand/20 to-transparent blur-md" />
-            )}
-          </div>
+        <div className="flex items-center">
+          <ComputeBadge infraComputeSize={computeSize} />
         </div>
       </HoverCardTrigger>
       <HoverCardContent
@@ -150,12 +106,7 @@ export const ComputeBadgeWrapper = ({
             ) : (
               <>
                 <div className="flex flex-col gap-1">
-                  {computeSize === 'nano' ? (
-                    <>
-                      <Row label="CPU" stat="Shared" />
-                      <Row label="Memory" stat="Up to 0.5 GB" />
-                    </>
-                  ) : meta !== undefined ? (
+                  {meta !== undefined ? (
                     <>
                       <Row
                         label="CPU"
@@ -163,7 +114,13 @@ export const ComputeBadgeWrapper = ({
                       />
                       <Row label="Memory" stat={`${meta.memory_gb ?? '-'} GB`} />
                     </>
-                  ) : null}
+                  ) : (
+                    <>
+                      {/* meta is only undefined for nano sized compute */}
+                      <Row label="CPU" stat="Shared" />
+                      <Row label="Memory" stat="Up to 0.5 GB" />
+                    </>
+                  )}
                 </div>
               </>
             )}
@@ -186,21 +143,7 @@ export const ComputeBadgeWrapper = ({
                 </p>
               </div>
               <div>
-                <Button
-                  asChild
-                  type="default"
-                  htmlType="button"
-                  role="button"
-                  onClick={() => {
-                    track('compute_badge_upgrade_clicked', {
-                      computeSize: computeSize ?? 'unknown',
-                      planId: data?.plan.id ?? 'unknown',
-                      upgradeType: isEligibleForFreeUpgrade
-                        ? 'free_micro_upgrade'
-                        : 'compute_upgrade',
-                    })
-                  }}
-                >
+                <Button asChild type="default" htmlType="button" role="button">
                   <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
                     Upgrade compute
                   </Link>

@@ -1,11 +1,15 @@
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, Link, Plus, Settings, X } from 'lucide-react'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
+import { Link, Menu, Plus, Settings, X } from 'lucide-react'
 import { useState } from 'react'
+import { DraggableProvidedDragHandleProps } from 'react-beautiful-dnd'
 import {
   Badge,
   Button,
   Checkbox,
+  Checkbox_Shadcn_,
   cn,
   Command_Shadcn_,
   CommandGroup_Shadcn_,
@@ -26,10 +30,6 @@ import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { checkIfRelationChanged } from './ForeignKeysManagement/ForeignKeysManagement.utils'
-import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
-import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { EMPTY_ARR, EMPTY_OBJ } from '@/lib/void'
 
 /**
  * [Joshen] For context:
@@ -56,6 +56,7 @@ interface ColumnProps {
   isNewRecord: boolean
   hasForeignKeys: boolean
   hasImportContent: boolean
+  dragHandleProps?: DraggableProvidedDragHandleProps | null
   onUpdateColumn: (changes: Partial<ColumnField>) => void
   onRemoveColumn: () => void
   onEditForeignKey: (relation?: ForeignKey) => void
@@ -68,6 +69,7 @@ export const Column = ({
   isNewRecord = false,
   hasForeignKeys = false,
   hasImportContent = false,
+  dragHandleProps,
   onUpdateColumn,
   onRemoveColumn,
   onEditForeignKey,
@@ -106,28 +108,12 @@ export const Column = ({
     .map((r) => getRelationStatus(r))
     .some((x) => x !== undefined)
 
-  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition } =
-    useSortable({
-      id: column.id,
-    })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
-
   return (
-    <div className="flex w-full items-center" ref={setNodeRef} style={style}>
+    <div className="flex w-full items-center">
       <div className={`w-[5%] ${!isNewRecord ? 'hidden' : ''}`}>
-        <button
-          ref={setActivatorNodeRef}
-          {...attributes}
-          {...listeners}
-          className="opacity-50 hover:opacity-100 disabled:hover:opacity-50 transition cursor-grab text-foreground"
-          type="button"
-        >
-          <GripVertical size={16} strokeWidth={1.5} />
-        </button>
+        <div className="cursor-drag" {...dragHandleProps}>
+          <Menu strokeWidth={1} size={16} />
+        </div>
       </div>
       <div className="w-[25%]">
         <div className="flex w-[95%] items-center justify-between">
@@ -269,7 +255,7 @@ export const Column = ({
             size="small"
             value={column.defaultValue ?? ''}
             disabled={column.format.includes('int') && column.isIdentity}
-            className={`rounded-sm bg-surface-100 lg:gap-0 ${
+            className={`rounded bg-surface-100 lg:gap-0 ${
               column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
             }`}
             suggestions={suggestions}
@@ -284,9 +270,9 @@ export const Column = ({
       </div>
       <div className="w-[10%]">
         <Checkbox
-          aria-label="Check to make this column a primary key"
+          label=""
           checked={column.isPrimaryKey}
-          onCheckedChange={() => {
+          onChange={() => {
             const updatedValue = !column.isPrimaryKey
             onUpdateColumn({
               isPrimaryKey: updatedValue,
@@ -326,7 +312,7 @@ export const Column = ({
                     label="Is Nullable"
                     description="Specify if the column can assume a NULL value if no value is provided"
                   >
-                    <Checkbox
+                    <Checkbox_Shadcn_
                       id="isNullable"
                       checked={column.isNullable}
                       onCheckedChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
@@ -341,7 +327,7 @@ export const Column = ({
                     label="Is Unique"
                     description="Enforce if values in the column should be unique across rows"
                   >
-                    <Checkbox
+                    <Checkbox_Shadcn_
                       id="isUnique"
                       checked={column.isUnique}
                       onCheckedChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
@@ -356,7 +342,7 @@ export const Column = ({
                     label="Is Identity"
                     description="Automatically assign a sequential unique number to the column"
                   >
-                    <Checkbox
+                    <Checkbox_Shadcn_
                       id="isIdentity"
                       checked={column.isIdentity}
                       onCheckedChange={() => {
@@ -375,7 +361,7 @@ export const Column = ({
                     label="Define as Array"
                     description="Define your column as a variable-length multidimensional array"
                   >
-                    <Checkbox
+                    <Checkbox_Shadcn_
                       id="defineAsArray"
                       checked={column.isArray}
                       onCheckedChange={() => {

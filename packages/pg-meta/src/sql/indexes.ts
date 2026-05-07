@@ -1,6 +1,4 @@
-import { safeSql } from '../pg-format'
-
-export const INDEXES_SQL = /* SQL */ safeSql`
+export const INDEXES_SQL = /* SQL */ `
   SELECT
     idx.indexrelid::int8 AS id,
     idx.indrelid::int8 AS table_id,

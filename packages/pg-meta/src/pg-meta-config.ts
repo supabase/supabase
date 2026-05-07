@@ -1,6 +1,5 @@
 import { z } from 'zod'
 
-import { literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { CONFIG_SQL } from './sql/config'
 
 const pgConfigZod = z.object({
@@ -34,15 +33,15 @@ function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgConfigArrayZod
 } {
   let sql = CONFIG_SQL
   if (limit) {
-    sql = safeSql`${sql} LIMIT ${literal(limit)}`
+    sql += ` LIMIT ${limit}`
   }
   if (offset) {
-    sql = safeSql`${sql} OFFSET ${literal(offset)}`
+    sql += ` OFFSET ${offset}`
   }
   return {
     sql,

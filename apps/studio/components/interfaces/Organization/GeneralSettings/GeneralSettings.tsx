@@ -1,3 +1,5 @@
+import { NoProjectsOnPaidOrgInfo } from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
   PageSection,
   PageSectionContent,
@@ -5,12 +7,10 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { OrganizationDeletePanel } from './OrganizationDeletePanel'
 
 import { DataPrivacyForm } from './DataPrivacyForm'
-import { OrganizationDeletePanel } from './OrganizationDeletePanel'
 import { OrganizationDetailsForm } from './OrganizationDetailsForm'
-import { NoProjectsOnPaidOrgInfo } from '@/components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const GeneralSettings = () => {
   const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')

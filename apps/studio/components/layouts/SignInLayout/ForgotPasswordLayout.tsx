@@ -1,10 +1,9 @@
+import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { cn } from 'ui'
-
-import { BASE_PATH } from '@/lib/constants'
 
 type ForgotPasswordLayoutProps = {
   heading?: string
@@ -33,7 +32,7 @@ const ForgotPasswordLayout = ({
     >
       <div className="sticky top-0 mx-auto w-full max-w-7xl px-8 pt-6 sm:px-6 lg:px-8">
         <nav className="relative flex items-center justify-between sm:h-10">
-          <div className="flex shrink-0 grow items-center lg:grow-0">
+          <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
               <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/organizations'}>
                 <Image

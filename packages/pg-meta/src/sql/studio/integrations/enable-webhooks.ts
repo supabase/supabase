@@ -1,19 +1,17 @@
 // Copied over from Management API here:
 // https://github.com/supabase/infrastructure/blob/develop/api/apps/mgmt-api/src/common/projects/project-database-webhooks.service.ts#L58
 
-import { safeSql, type SafeSqlFragment } from '../../../pg-format'
-
-export const getCheckWebhooksEnabledSQL = (): SafeSqlFragment =>
-  safeSql`
+export const getCheckWebhooksEnabledSQL = () =>
+  `
 SELECT EXISTS (
   SELECT 1
   FROM information_schema.schemata
   WHERE schema_name = 'supabase_functions'
 ) AS schema_exists;
-`
+`.trim()
 
-export const getEnableWebhooksSQL = (): SafeSqlFragment =>
-  safeSql`
+export const getEnableWebhooksSQL = () =>
+  `
 BEGIN;
   DO
   $$
@@ -260,4 +258,4 @@ BEGIN;
   GRANT EXECUTE ON FUNCTION supabase_functions.http_request() TO postgres, anon, authenticated, service_role;
 
   COMMIT;
-`
+`.trim()

@@ -7,5 +7,4 @@ export const COMMAND_MENU_SECTIONS = {
   SQL: 'SQL Editor',
   DATABASE: 'Database',
   INTEGRATIONS: 'Integrations',
-  SHORTCUTS: 'Shortcuts',
 } as const

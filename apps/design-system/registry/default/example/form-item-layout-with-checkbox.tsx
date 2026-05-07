@@ -1,6 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Badge, Button, Checkbox, Form, FormControl, FormField } from 'ui'
+import {
+  Badge,
+  Button,
+  Checkbox_Shadcn_,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -22,9 +29,9 @@ export default function FormItemLayoutDemo() {
     // action('form form.handleSubmit(onSubmit)')(values)
   }
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <form className="w-96 flex flex-col gap-3" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
+        <FormField_Shadcn_
           control={form.control}
           name="consistent_settings"
           render={({ field }) => (
@@ -33,9 +40,9 @@ export default function FormItemLayoutDemo() {
               description="This is your public display name."
               layout="flex"
             >
-              <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-              </FormControl>
+              <FormControl_Shadcn_>
+                <Checkbox_Shadcn_ checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl_Shadcn_>
             </FormItemLayout>
           )}
         />
@@ -43,6 +50,6 @@ export default function FormItemLayoutDemo() {
           Submit
         </Button>
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }

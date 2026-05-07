@@ -1,5 +1,4 @@
 import { cn } from 'ui'
-
 import { LEVELS } from '../DataTable.constants'
 import { getLevelColor } from '../DataTable.utils'
 

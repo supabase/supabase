@@ -1,5 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
+import { useSecretsQuery } from 'data/secrets/secrets-query'
 import { Eye, EyeOff, MinusCircle } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
@@ -11,19 +13,17 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
+  Form_Shadcn_,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import z from 'zod'
 
 import { DuplicateSecretWarningModal } from './DuplicateSecretWarningModal'
-import { useSecretsCreateMutation } from '@/data/secrets/secrets-create-mutation'
-import { useSecretsQuery } from '@/data/secrets/secrets-query'
 
 type SecretPair = {
   name: string
@@ -55,7 +55,7 @@ const removeWrappingQuotes = (str: string): string => {
   return str
 }
 
-export const AddNewSecretForm = () => {
+const AddNewSecretForm = () => {
   const { ref: projectRef } = useParams()
   const [visibleSecrets, setVisibleSecrets] = useState<Set<string>>(new Set())
   const [duplicateSecretName, setDuplicateSecretName] = useState<string>('')
@@ -198,7 +198,7 @@ export const AddNewSecretForm = () => {
 
   return (
     <>
-      <Form {...form}>
+      <Form_Shadcn_ {...form}>
         <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
             <CardHeader>
@@ -207,13 +207,13 @@ export const AddNewSecretForm = () => {
             <CardContent>
               {fields.map((fieldItem, index) => (
                 <div key={fieldItem.id} className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4">
-                  <FormField
+                  <FormField_Shadcn_
                     control={form.control}
                     name={`secrets.${index}.name`}
                     render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
+                      <FormItem_Shadcn_ className="w-full">
+                        <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
+                        <FormControl_Shadcn_>
                           <Input
                             {...field}
                             placeholder="e.g. CLIENT_KEY"
@@ -223,18 +223,18 @@ export const AddNewSecretForm = () => {
                             data-bwignore
                             onPaste={(e) => handlePaste(e.nativeEvent)}
                           />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                        </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
+                      </FormItem_Shadcn_>
                     )}
                   />
-                  <FormField
+                  <FormField_Shadcn_
                     control={form.control}
                     name={`secrets.${index}.value`}
                     render={({ field }) => (
-                      <FormItem className="w-full relative">
-                        <FormLabel>Value</FormLabel>
-                        <FormControl>
+                      <FormItem_Shadcn_ className="w-full relative">
+                        <FormLabel_Shadcn_>Value</FormLabel_Shadcn_>
+                        <FormControl_Shadcn_>
                           <Input
                             {...field}
                             type={isSecretVisible(fieldItem.id) ? 'text' : 'password'}
@@ -253,9 +253,9 @@ export const AddNewSecretForm = () => {
                               </div>
                             }
                           />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                        </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
+                      </FormItem_Shadcn_>
                     )}
                   />
 
@@ -284,7 +284,7 @@ export const AddNewSecretForm = () => {
             </CardFooter>
           </Card>
         </form>
-      </Form>
+      </Form_Shadcn_>
       <DuplicateSecretWarningModal
         visible={!!duplicateSecretName}
         onCancel={handleCancelDuplicate}
@@ -295,3 +295,5 @@ export const AddNewSecretForm = () => {
     </>
   )
 }
+
+export default AddNewSecretForm

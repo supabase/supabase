@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.95.4
+  version: 2.84.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -275,41 +275,6 @@ commands:
         name: --local
         description: Runs pgTAP tests on the local database.
         default_value: 'true'
-  - id: supabase-telemetry
-    title: supabase telemetry
-    summary: Manage CLI telemetry settings
-    tags:
-      - local-dev
-    links: []
-    subcommands:
-      - supabase-telemetry-disable
-      - supabase-telemetry-enable
-      - supabase-telemetry-status
-    flags: []
-  - id: supabase-telemetry-status
-    title: supabase telemetry status
-    summary: Show CLI telemetry status
-    tags: []
-    links: []
-    usage: supabase telemetry status
-    subcommands: []
-    flags: []
-  - id: supabase-telemetry-enable
-    title: supabase telemetry enable
-    summary: Enable CLI telemetry
-    tags: []
-    links: []
-    usage: supabase telemetry enable
-    subcommands: []
-    flags: []
-  - id: supabase-telemetry-disable
-    title: supabase telemetry disable
-    summary: Disable CLI telemetry
-    tags: []
-    links: []
-    usage: supabase telemetry disable
-    subcommands: []
-    flags: []
   - id: supabase-storage
     title: supabase storage
     summary: Manage Supabase Storage objects
@@ -2925,7 +2890,7 @@ commands:
           Reset local database to match migrations first? (local data will be lost) [y/N] y
           Resetting database...
           ...
-          Declarative schema written to supabase/database
+          Declarative schema written to supabase/declarative
           Finished supabase db schema declarative generate.
     tags: []
     links: []
@@ -3197,8 +3162,6 @@ commands:
       Optionally, a new row can be inserted into the migration history table to reflect the current state of the remote database.
 
       If no entries exist in the migration history table, `pg_dump` will be used to capture all contents of the remote schemas you have created. Otherwise, this command will only diff schema changes against the remote database, similar to running `db diff --linked`.
-
-      Pass `--diff-engine pg-delta` to keep the migration-file `db pull` workflow while using pg-delta for the shadow diff step. Pass `--use-pg-delta` to switch to the declarative pg-delta export workflow instead.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -3242,17 +3205,6 @@ commands:
         description: |
           Pulls from the database specified by the connection string (must be percent-encoded).
         default_value: ''
-      - id: diff-engine
-        name: --diff-engine <[ migra | pg-delta ]>
-        description: Diff engine to use for migration-style db pull.
-        default_value: migra
-        accepted_values:
-          - id: migra
-            name: migra
-            type: '[ migra | pg-delta ]'
-          - id: pg-delta
-            name: pg-delta
-            type: '[ migra | pg-delta ]'
       - id: linked
         name: --linked
         description: Pulls from the linked project.

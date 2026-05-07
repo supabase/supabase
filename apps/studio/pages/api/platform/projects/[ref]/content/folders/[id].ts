@@ -1,8 +1,8 @@
 import { paths } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
-import { getFolders, getSnippets } from '@/lib/api/snippets.utils'
+import apiWrapper from 'lib/api/apiWrapper'
+import { getFolders, getSnippets } from 'lib/api/snippets.utils'
 
 const wrappedHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -45,7 +45,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetRespons
 type PatchResponseData =
   paths['/platform/projects/{ref}/content/folders/{id}']['patch']['responses']['200']['content']
 
-const handlePatch = async (_req: NextApiRequest, res: NextApiResponse<PatchResponseData>) => {
+const handlePatch = async (req: NextApiRequest, res: NextApiResponse<PatchResponseData>) => {
   // Platform specific endpoint
   return res.status(200).json({} as never)
 }

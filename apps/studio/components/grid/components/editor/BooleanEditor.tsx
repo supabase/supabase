@@ -1,12 +1,5 @@
 import type { RenderEditCellProps } from 'react-data-grid'
-import {
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-} from 'ui'
+import { Select } from 'ui'
 
 interface Props<TRow, TSummaryRow = unknown> extends RenderEditCellProps<TRow, TSummaryRow> {
   isNullable?: boolean
@@ -22,7 +15,8 @@ export const BooleanEditor = <TRow, TSummaryRow = unknown>({
   const value = row[column.key as keyof TRow] as unknown as string
 
   const onBlur = () => onClose(false)
-  const onChange = (value: string) => {
+  const onChange = (event: any) => {
+    const value = event.target.value
     if (value === 'null') {
       onRowChange({ ...row, [column.key]: null }, true)
     } else {
@@ -31,21 +25,19 @@ export const BooleanEditor = <TRow, TSummaryRow = unknown>({
   }
 
   return (
-    <Select_Shadcn_
+    <Select
+      autoFocus
+      id="boolean-editor"
       name="boolean-editor"
+      size="small"
+      onBlur={onBlur}
+      onChange={onChange}
       defaultValue={value === null || value === undefined ? 'null' : value.toString()}
-      onValueChange={onChange}
+      style={{ width: `${column.width}px` }}
     >
-      <SelectTrigger_Shadcn_ onBlur={onBlur} style={{ width: `${column.width}px` }}>
-        <SelectValue_Shadcn_ id="boolean-editor" />
-      </SelectTrigger_Shadcn_>
-      <SelectContent_Shadcn_>
-        <SelectGroup_Shadcn_>
-          <SelectItem_Shadcn_ value="true">TRUE</SelectItem_Shadcn_>
-          <SelectItem_Shadcn_ value="false">FALSE</SelectItem_Shadcn_>
-          {isNullable ? <SelectItem_Shadcn_ value="null">NULL</SelectItem_Shadcn_> : null}
-        </SelectGroup_Shadcn_>
-      </SelectContent_Shadcn_>
-    </Select_Shadcn_>
+      <Select.Option value="true">TRUE</Select.Option>
+      <Select.Option value="false">FALSE</Select.Option>
+      {isNullable && <Select.Option value="null">NULL</Select.Option>}
+    </Select>
   )
 }

@@ -1,5 +1,8 @@
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
+import { FDWTable } from 'data/fdw/fdws-query'
 import { SqlEditor } from 'icons'
+import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 import {
   Button,
@@ -14,10 +17,6 @@ import {
   DialogTrigger,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
-
-import { DocsButton } from '@/components/ui/DocsButton'
-import { FDWTable } from '@/data/fdw/fdws-query'
-import { DOCS_URL } from '@/lib/constants'
 
 interface InsertDataDialogProps {
   table: string
@@ -62,7 +61,7 @@ values (
 
         <DialogSectionSeparator />
 
-        <DialogSection className="p-0!">
+        <DialogSection className="!p-0">
           <CodeBlock
             hideLineNumbers
             wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3 [&>pre]:rounded-none [&>pre]:border-0')}

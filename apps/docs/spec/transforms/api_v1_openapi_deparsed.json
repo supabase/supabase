@@ -75,17 +75,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 {
                   "type": "string",
@@ -201,17 +199,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 {
                   "type": "string",
@@ -262,13 +258,6 @@
                     "format": "uri",
                     "description": "HTTP endpoint to receive branch status updates."
                   }
-                },
-                "example": {
-                  "branch_name": "preview-login-page",
-                  "git_branch": "feature/login-page",
-                  "persistent": true,
-                  "request_review": true,
-                  "notify_url": "https://example.com/webhooks/branches"
                 }
               }
             }
@@ -418,17 +407,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 {
                   "type": "string",
@@ -445,7 +432,6 @@
             "description": "If set to false, schedule deletion with 1-hour grace period (only when soft deletion is enabled).",
             "schema": {
               "default": "true",
-              "example": false,
               "type": "boolean"
             }
           }
@@ -504,17 +490,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 {
                   "type": "string",
@@ -535,9 +519,6 @@
                   "migration_version": {
                     "type": "string"
                   }
-                },
-                "example": {
-                  "migration_version": "20250312000000"
                 }
               }
             }
@@ -600,17 +581,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 {
                   "type": "string",
@@ -631,9 +610,6 @@
                   "migration_version": {
                     "type": "string"
                   }
-                },
-                "example": {
-                  "migration_version": "20250312000000"
                 }
               }
             }
@@ -696,17 +672,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 {
                   "type": "string",
@@ -727,9 +701,6 @@
                   "migration_version": {
                     "type": "string"
                   }
-                },
-                "example": {
-                  "migration_version": "20250312000000"
                 }
               }
             }
@@ -792,17 +763,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 {
                   "type": "string",
@@ -867,17 +836,15 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ref or deprecated branch ID",
+            "description": "Branch ID",
             "schema": {
-              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref",
-                  "example": "abcdefghijklmnopqrst"
+                  "description": "Project ref"
                 },
                 {
                   "type": "string",
@@ -892,7 +859,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "public,auth",
               "type": "string"
             }
           },
@@ -902,7 +868,6 @@
             "in": "query",
             "description": "Use pg-delta instead of Migra for diffing when true",
             "schema": {
-              "example": false,
               "type": "boolean"
             }
           }
@@ -947,7 +912,7 @@
     },
     "/v1/projects": {
       "get": {
-        "description": "Returns a list of all projects you've previously created.",
+        "description": "Returns a list of all projects you've previously created.\n\nUse `/v1/organizations/{slug}/projects` instead when possible to get more precise results and pagination support.",
         "operationId": "v1-list-all-projects",
         "parameters": [],
         "responses": {
@@ -970,8 +935,7 @@
                         "minLength": 20,
                         "maxLength": 20,
                         "pattern": "^[a-z]+$",
-                        "description": "Project ref",
-                        "example": "abcdefghijklmnopqrst"
+                        "description": "Project ref"
                       },
                       "organization_id": {
                         "type": "string",
@@ -981,8 +945,7 @@
                       "organization_slug": {
                         "type": "string",
                         "pattern": "^[\\w-]+$",
-                        "description": "Organization slug",
-                        "example": "tsrqponmlkjihgfedcba"
+                        "description": "Organization slug"
                       },
                       "name": {
                         "type": "string",
@@ -990,11 +953,13 @@
                       },
                       "region": {
                         "type": "string",
-                        "description": "Region of your project"
+                        "description": "Region of your project",
+                        "example": "us-east-1"
                       },
                       "created_at": {
                         "type": "string",
-                        "description": "Creation timestamp"
+                        "description": "Creation timestamp",
+                        "example": "2023-03-29T16:32:59Z"
                       },
                       "status": {
                         "type": "string",
@@ -1054,15 +1019,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden action"
-          },
-          "429": {
-            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -1111,8 +1067,7 @@
                   "organization_slug": {
                     "type": "string",
                     "pattern": "^[\\w-]+$",
-                    "description": "Organization slug",
-                    "example": "tsrqponmlkjihgfedcba"
+                    "description": "Organization slug"
                   },
                   "plan": {
                     "type": "string",
@@ -1123,6 +1078,7 @@
                   "region": {
                     "type": "string",
                     "description": "Region you want your server to reside in. Use region_selection instead.",
+                    "example": "us-east-1",
                     "deprecated": true,
                     "enum": [
                       "us-east-1",
@@ -1195,13 +1151,15 @@
                           "code": {
                             "type": "string",
                             "enum": ["americas", "emea", "apac"],
-                            "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint."
+                            "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
+                            "example": "apac"
                           }
                         },
                         "required": ["type", "code"]
                       }
                     ],
-                    "description": "Region selection. Only one of region or region_selection can be specified."
+                    "description": "Region selection. Only one of region or region_selection can be specified.",
+                    "example": "{ type: 'smartGroup', code: 'americas' }"
                   },
                   "kps_enabled": {
                     "type": "boolean",
@@ -1210,6 +1168,7 @@
                   },
                   "desired_instance_size": {
                     "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
+                    "example": "nano",
                     "type": "string",
                     "enum": [
                       "nano",
@@ -1236,18 +1195,13 @@
                   "template_url": {
                     "type": "string",
                     "format": "uri",
-                    "description": "Template URL used to create the project from the CLI."
+                    "description": "Template URL used to create the project from the CLI.",
+                    "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
                   }
                 },
                 "required": ["db_pass", "name", "organization_slug"],
                 "additionalProperties": false,
-                "hideDefinitions": ["release_channel", "postgres_engine"],
-                "example": {
-                  "db_pass": "correct-horse-battery-staple",
-                  "name": "acme-prod",
-                  "organization_slug": "tsrqponmlkjihgfedcba",
-                  "region": "us-east-1"
-                }
+                "hideDefinitions": ["release_channel", "postgres_engine"]
               }
             }
           }
@@ -1270,8 +1224,7 @@
                       "minLength": 20,
                       "maxLength": 20,
                       "pattern": "^[a-z]+$",
-                      "description": "Project ref",
-                      "example": "abcdefghijklmnopqrst"
+                      "description": "Project ref"
                     },
                     "organization_id": {
                       "type": "string",
@@ -1281,8 +1234,7 @@
                     "organization_slug": {
                       "type": "string",
                       "pattern": "^[\\w-]+$",
-                      "description": "Organization slug",
-                      "example": "tsrqponmlkjihgfedcba"
+                      "description": "Organization slug"
                     },
                     "name": {
                       "type": "string",
@@ -1290,11 +1242,13 @@
                     },
                     "region": {
                       "type": "string",
-                      "description": "Region of your project"
+                      "description": "Region of your project",
+                      "example": "us-east-1"
                     },
                     "created_at": {
                       "type": "string",
-                      "description": "Creation timestamp"
+                      "description": "Creation timestamp",
+                      "example": "2023-03-29T16:32:59Z"
                     },
                     "status": {
                       "type": "string",
@@ -1330,15 +1284,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden action"
-          },
-          "429": {
-            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -1371,7 +1316,6 @@
             "in": "query",
             "description": "Slug of your organization",
             "schema": {
-              "example": "tsrqponmlkjihgfedcba",
               "type": "string"
             }
           },
@@ -1392,6 +1336,7 @@
             "in": "query",
             "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
             "schema": {
+              "example": "nano",
               "type": "string",
               "enum": [
                 "nano",
@@ -1615,8 +1560,7 @@
                       "slug": {
                         "type": "string",
                         "pattern": "^[\\w-]+$",
-                        "description": "Organization slug",
-                        "example": "tsrqponmlkjihgfedcba"
+                        "description": "Organization slug"
                       },
                       "name": {
                         "type": "string"
@@ -1627,15 +1571,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden action"
-          },
-          "429": {
-            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Unexpected error listing organizations"
@@ -1676,10 +1611,7 @@
                   }
                 },
                 "required": ["name"],
-                "additionalProperties": false,
-                "example": {
-                  "name": "Acme"
-                }
+                "additionalProperties": false
               }
             }
           }
@@ -1700,8 +1632,7 @@
                     "slug": {
                       "type": "string",
                       "pattern": "^[\\w-]+$",
-                      "description": "Organization slug",
-                      "example": "tsrqponmlkjihgfedcba"
+                      "description": "Organization slug"
                     },
                     "name": {
                       "type": "string"
@@ -1711,15 +1642,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden action"
-          },
-          "429": {
-            "description": "Rate limit exceeded"
           },
           "500": {
             "description": "Unexpected error creating an organization"
@@ -1748,7 +1670,6 @@
             "in": "query",
             "schema": {
               "format": "uuid",
-              "example": "66666666-6666-4666-8666-666666666666",
               "type": "string"
             }
           },
@@ -1757,7 +1678,6 @@
             "required": true,
             "in": "query",
             "schema": {
-              "example": "code",
               "type": "string",
               "enum": ["code", "token", "id_token token"]
             }
@@ -1767,7 +1687,6 @@
             "required": true,
             "in": "query",
             "schema": {
-              "example": "https://app.acme.com/auth/callback",
               "type": "string"
             }
           },
@@ -1776,7 +1695,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "projects:read projects:write",
               "type": "string"
             }
           },
@@ -1785,7 +1703,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "st_9f4d3a206b2e4a7e8c91",
               "type": "string"
             }
           },
@@ -1794,7 +1711,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "query",
               "type": "string"
             }
           },
@@ -1803,7 +1719,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "Z_P4EKbGwIkA01e3Y5fp4tMCvn_Ae5nUw7qY7XwkTrQ",
               "type": "string"
             }
           },
@@ -1812,7 +1727,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "S256",
               "type": "string",
               "enum": ["plain", "sha256", "S256"]
             }
@@ -1824,7 +1738,6 @@
             "description": "Organization slug",
             "schema": {
               "pattern": "^[\\w-]+$",
-              "example": "tsrqponmlkjihgfedcba",
               "type": "string"
             }
           },
@@ -1897,16 +1810,7 @@
                     "type": "string"
                   }
                 },
-                "additionalProperties": false,
-                "example": {
-                  "grant_type": "authorization_code",
-                  "client_id": "66666666-6666-4666-8666-666666666666",
-                  "client_secret": "sb_secret_live_example_9f4d3a206b2e4a7e8c91",
-                  "code": "oauth_code_9f4d3a206b2e4a7e8c91",
-                  "code_verifier": "qW0Z6d9pQnW0mL1dK1q9wFq6Yz2nV5rA8jT3mP7sH4c",
-                  "redirect_uri": "https://app.acme.com/auth/callback",
-                  "scope": "projects:read projects:write"
-                }
+                "additionalProperties": false
               }
             }
           }
@@ -1973,12 +1877,7 @@
                   }
                 },
                 "required": ["client_id", "client_secret", "refresh_token"],
-                "additionalProperties": false,
-                "example": {
-                  "client_id": "66666666-6666-4666-8666-666666666666",
-                  "client_secret": "sb_secret_live_example_9f4d3a206b2e4a7e8c91",
-                  "refresh_token": "oauth_refresh_9f4d3a206b2e4a7e8c91"
-                }
+                "additionalProperties": false
               }
             }
           }
@@ -2012,7 +1911,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -2022,7 +1920,6 @@
             "in": "query",
             "schema": {
               "format": "uuid",
-              "example": "66666666-6666-4666-8666-666666666666",
               "type": "string"
             }
           },
@@ -2031,7 +1928,6 @@
             "required": true,
             "in": "query",
             "schema": {
-              "example": "code",
               "type": "string",
               "enum": ["code", "token", "id_token token"]
             }
@@ -2041,7 +1937,6 @@
             "required": true,
             "in": "query",
             "schema": {
-              "example": "https://app.acme.com/auth/callback",
               "type": "string"
             }
           },
@@ -2050,7 +1945,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "st_9f4d3a206b2e4a7e8c91",
               "type": "string"
             }
           },
@@ -2059,7 +1953,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "query",
               "type": "string"
             }
           },
@@ -2068,7 +1961,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "Z_P4EKbGwIkA01e3Y5fp4tMCvn_Ae5nUw7qY7XwkTrQ",
               "type": "string"
             }
           },
@@ -2077,7 +1969,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "S256",
               "type": "string",
               "enum": ["plain", "sha256", "S256"]
             }
@@ -2086,15 +1977,6 @@
         "responses": {
           "204": {
             "description": ""
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden action"
-          },
-          "429": {
-            "description": "Rate limit exceeded"
           }
         },
         "security": [
@@ -2123,7 +2005,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -2265,15 +2146,6 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden action"
-          },
-          "429": {
-            "description": "Rate limit exceeded"
-          },
           "500": {
             "description": "Failed to list user's SQL snippets"
           }
@@ -2308,7 +2180,6 @@
             "in": "path",
             "schema": {
               "format": "uuid",
-              "example": "44444444-4444-4444-8444-444444444444",
               "type": "string"
             }
           }
@@ -2420,15 +2291,6 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden action"
-          },
-          "429": {
-            "description": "Rate limit exceeded"
-          },
           "500": {
             "description": "Failed to retrieve SQL snippet"
           }
@@ -2453,44 +2315,6 @@
         "x-oauth-scope": "database:read"
       }
     },
-    "/v1/profile": {
-      "get": {
-        "operationId": "v1-get-profile",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "gotrue_id": {
-                      "type": "string"
-                    },
-                    "primary_email": {
-                      "type": "string"
-                    },
-                    "username": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["gotrue_id", "primary_email", "username"]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Gets the user's profile",
-        "tags": ["Profile"],
-        "x-endpoint-owners": ["management-api"]
-      }
-    },
     "/v1/projects/{ref}/actions": {
       "get": {
         "description": "Returns a paginated list of action runs of the specified project.",
@@ -2505,7 +2329,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -2515,7 +2338,6 @@
             "in": "query",
             "schema": {
               "minimum": 0,
-              "example": 0,
               "type": "number"
             }
           },
@@ -2525,7 +2347,6 @@
             "in": "query",
             "schema": {
               "minimum": 10,
-              "example": 20,
               "type": "number"
             }
           }
@@ -2662,7 +2483,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -2727,7 +2547,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -2737,7 +2556,6 @@
             "in": "path",
             "description": "Action Run ID",
             "schema": {
-              "example": "run_01hq3q9m7y5q7e4a7x2c8m1p4n",
               "type": "string"
             }
           }
@@ -2873,7 +2691,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -2883,7 +2700,6 @@
             "in": "path",
             "description": "Action Run ID",
             "schema": {
-              "example": "run_01hq3q9m7y5q7e4a7x2c8m1p4n",
               "type": "string"
             }
           }
@@ -2979,12 +2795,6 @@
                       "RUNNING"
                     ]
                   }
-                },
-                "example": {
-                  "clone": "RUNNING",
-                  "configure": "RUNNING",
-                  "migrate": "RUNNING",
-                  "deploy": "CREATED"
                 }
               }
             }
@@ -3055,7 +2865,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -3065,7 +2874,6 @@
             "in": "path",
             "description": "Action Run ID",
             "schema": {
-              "example": "run_01hq3q9m7y5q7e4a7x2c8m1p4n",
               "type": "string"
             }
           }
@@ -3127,7 +2935,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -3137,7 +2944,6 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
-              "example": true,
               "type": "boolean"
             }
           }
@@ -3243,7 +3049,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -3253,7 +3058,6 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
-              "example": true,
               "type": "boolean"
             }
           }
@@ -3285,12 +3089,7 @@
                     "nullable": true
                   }
                 },
-                "required": ["type", "name"],
-                "example": {
-                  "type": "secret",
-                  "name": "ci_secret_key",
-                  "description": "CI deploy key"
-                }
+                "required": ["type", "name"]
               }
             }
           }
@@ -3395,7 +3194,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -3458,7 +3256,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -3468,7 +3265,6 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
-              "example": true,
               "type": "boolean"
             }
           }
@@ -3533,7 +3329,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -3543,7 +3338,6 @@
             "in": "path",
             "schema": {
               "format": "uuid",
-              "example": "22222222-2222-4222-8222-222222222222",
               "type": "string"
             }
           },
@@ -3553,7 +3347,6 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
-              "example": true,
               "type": "boolean"
             }
           }
@@ -3580,10 +3373,6 @@
                     "additionalProperties": {},
                     "nullable": true
                   }
-                },
-                "example": {
-                  "name": "ci_secret_key_rotated",
-                  "description": "Rotated after March release"
                 }
               }
             }
@@ -3687,7 +3476,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -3697,7 +3485,6 @@
             "in": "path",
             "schema": {
               "format": "uuid",
-              "example": "22222222-2222-4222-8222-222222222222",
               "type": "string"
             }
           },
@@ -3707,7 +3494,6 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
-              "example": true,
               "type": "boolean"
             }
           }
@@ -3810,7 +3596,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -3820,7 +3605,6 @@
             "in": "path",
             "schema": {
               "format": "uuid",
-              "example": "22222222-2222-4222-8222-222222222222",
               "type": "string"
             }
           },
@@ -3830,7 +3614,6 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
-              "example": true,
               "type": "boolean"
             }
           },
@@ -3840,7 +3623,6 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
-              "example": false,
               "type": "boolean"
             }
           },
@@ -3849,7 +3631,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "rotating_key",
               "type": "string"
             }
           }
@@ -3955,7 +3736,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -4073,6 +3853,15 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
           "500": {
             "description": "Failed to retrieve database branches"
           }
@@ -4112,7 +3901,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -4190,14 +3978,7 @@
                     "description": "HTTP endpoint to receive branch status updates."
                   }
                 },
-                "required": ["branch_name"],
-                "example": {
-                  "branch_name": "preview-login-page",
-                  "git_branch": "feature/login-page",
-                  "persistent": true,
-                  "with_data": false,
-                  "notify_url": "https://example.com/webhooks/branches"
-                }
+                "required": ["branch_name"]
               }
             }
           }
@@ -4312,6 +4093,15 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
           "500": {
             "description": "Failed to create database branch"
           }
@@ -4351,7 +4141,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -4407,7 +4196,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -4416,7 +4204,6 @@
             "required": true,
             "in": "path",
             "schema": {
-              "example": "preview-login-page",
               "type": "string"
             }
           }
@@ -4531,6 +4318,15 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
           "500": {
             "description": "Failed to fetch database branch"
           }
@@ -4571,7 +4367,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -4750,7 +4545,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -4805,7 +4599,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -4823,10 +4616,7 @@
                     "minLength": 1
                   }
                 },
-                "required": ["custom_hostname"],
-                "example": {
-                  "custom_hostname": "docs.example.com"
-                }
+                "required": ["custom_hostname"]
               }
             }
           }
@@ -5007,7 +4797,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5188,7 +4977,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5369,7 +5157,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5447,7 +5234,7 @@
             "description": "Rate limit exceeded"
           },
           "500": {
-            "description": "Failed to retrieve project's temporary access configuration."
+            "description": "Failed to retrieve project's JIT access config"
           }
         },
         "security": [
@@ -5458,7 +5245,7 @@
             "fga_permissions": ["project_admin_read"]
           }
         ],
-        "summary": "[Beta] Get project's temporary access configuration.",
+        "summary": "[Beta] Get project's just-in-time access configuration.",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -5481,7 +5268,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5495,13 +5281,10 @@
                 "properties": {
                   "state": {
                     "type": "string",
-                    "enum": ["enabled", "disabled"]
+                    "enum": ["enabled", "disabled", "unavailable"]
                   }
                 },
-                "required": ["state"],
-                "example": {
-                  "state": "enabled"
-                }
+                "required": ["state"]
               }
             }
           }
@@ -5579,7 +5362,7 @@
             "description": "Rate limit exceeded"
           },
           "500": {
-            "description": "Failed to update project's temporary access configuration."
+            "description": "Failed to update project's just-in-time access configuration."
           }
         },
         "security": [
@@ -5590,7 +5373,7 @@
             "fga_permissions": ["project_admin_write"]
           }
         ],
-        "summary": "[Beta] Update project's temporary access configuration.",
+        "summary": "[Beta] Update project's just-in-time access configuration.",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -5615,7 +5398,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5686,7 +5468,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5769,7 +5550,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5797,11 +5577,7 @@
                     "type": "string"
                   }
                 },
-                "required": ["ipv4_addresses"],
-                "example": {
-                  "ipv4_addresses": ["203.0.113.10"],
-                  "requester_ip": false
-                }
+                "required": ["ipv4_addresses"]
               }
             }
           }
@@ -5856,7 +5632,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5906,10 +5681,6 @@
                             "type": "string"
                           }
                         }
-                      },
-                      "example": {
-                        "dbAllowedCidrs": ["203.0.113.0/24"],
-                        "dbAllowedCidrsV6": ["2001:db8::/32"]
                       },
                       "description": "Populated when a new config has been received, but not registered as successfully applied to a project."
                     },
@@ -5975,7 +5746,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6020,14 +5790,6 @@
                         }
                       }
                     }
-                  }
-                },
-                "example": {
-                  "add": {
-                    "dbAllowedCidrs": ["203.0.113.0/24"]
-                  },
-                  "remove": {
-                    "dbAllowedCidrs": ["198.51.100.0/24"]
                   }
                 }
               }
@@ -6154,7 +5916,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6178,10 +5939,6 @@
                       "type": "string"
                     }
                   }
-                },
-                "example": {
-                  "dbAllowedCidrs": ["203.0.113.0/24"],
-                  "dbAllowedCidrsV6": ["2001:db8::/32"]
                 }
               }
             }
@@ -6232,10 +5989,6 @@
                             "type": "string"
                           }
                         }
-                      },
-                      "example": {
-                        "dbAllowedCidrs": ["203.0.113.0/24"],
-                        "dbAllowedCidrsV6": ["2001:db8::/32"]
                       },
                       "description": "Populated when a new config has been received, but not registered as successfully applied to a project."
                     },
@@ -6303,7 +6056,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6369,7 +6121,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6385,10 +6136,7 @@
                     "type": "string"
                   }
                 },
-                "required": ["root_key"],
-                "example": {
-                  "root_key": "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
-                }
+                "required": ["root_key"]
               }
             }
           }
@@ -6456,7 +6204,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6536,7 +6283,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6564,11 +6310,6 @@
                     "minimum": 0,
                     "maximum": 1000
                   }
-                },
-                "example": {
-                  "db_schema": "public,storage",
-                  "db_pool": 20,
-                  "max_rows": 1000
                 }
               }
             }
@@ -6648,7 +6389,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6671,8 +6411,7 @@
                       "minLength": 20,
                       "maxLength": 20,
                       "pattern": "^[a-z]+$",
-                      "description": "Project ref",
-                      "example": "abcdefghijklmnopqrst"
+                      "description": "Project ref"
                     },
                     "organization_id": {
                       "type": "string",
@@ -6682,8 +6421,7 @@
                     "organization_slug": {
                       "type": "string",
                       "pattern": "^[\\w-]+$",
-                      "description": "Organization slug",
-                      "example": "tsrqponmlkjihgfedcba"
+                      "description": "Organization slug"
                     },
                     "name": {
                       "type": "string",
@@ -6691,11 +6429,13 @@
                     },
                     "region": {
                       "type": "string",
-                      "description": "Region of your project"
+                      "description": "Region of your project",
+                      "example": "us-east-1"
                     },
                     "created_at": {
                       "type": "string",
-                      "description": "Creation timestamp"
+                      "description": "Creation timestamp",
+                      "example": "2023-03-29T16:32:59Z"
                     },
                     "status": {
                       "type": "string",
@@ -6799,7 +6539,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6868,7 +6607,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6886,10 +6624,7 @@
                     "maxLength": 256
                   }
                 },
-                "required": ["name"],
-                "example": {
-                  "name": "Acme Platform"
-                }
+                "required": ["name"]
               }
             }
           }
@@ -6964,7 +6699,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7040,7 +6774,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7058,7 +6791,8 @@
                       "type": "string",
                       "maxLength": 256,
                       "pattern": "^(?!SUPABASE_).*",
-                      "description": "Secret name must not start with the SUPABASE_ prefix."
+                      "description": "Secret name must not start with the SUPABASE_ prefix.",
+                      "example": "string"
                     },
                     "value": {
                       "type": "string",
@@ -7066,17 +6800,7 @@
                     }
                   },
                   "required": ["name", "value"]
-                },
-                "example": [
-                  {
-                    "name": "OPENAI_API_KEY",
-                    "value": "sk-example-secret"
-                  },
-                  {
-                    "name": "STRIPE_WEBHOOK_SECRET",
-                    "value": "whsec_example"
-                  }
-                ]
+                }
               }
             }
           }
@@ -7130,7 +6854,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7143,8 +6866,7 @@
                 "type": "array",
                 "items": {
                   "type": "string"
-                },
-                "example": ["OPENAI_API_KEY"]
+                }
               }
             }
           }
@@ -7199,7 +6921,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7274,7 +6995,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7296,12 +7016,7 @@
                     "required": ["database"]
                   }
                 },
-                "required": ["requestedConfig"],
-                "example": {
-                  "requestedConfig": {
-                    "database": true
-                  }
-                }
+                "required": ["requestedConfig"]
               }
             }
           }
@@ -7376,7 +7091,6 @@
             "in": "query",
             "schema": {
               "default": "public",
-              "example": "public,auth",
               "type": "string"
             }
           },
@@ -7389,7 +7103,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7457,7 +7170,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7528,7 +7240,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7583,7 +7294,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7600,10 +7310,7 @@
                     "maxLength": 63
                   }
                 },
-                "required": ["vanity_subdomain"],
-                "example": {
-                  "vanity_subdomain": "acme-prod"
-                }
+                "required": ["vanity_subdomain"]
               }
             }
           }
@@ -7671,7 +7378,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7688,10 +7394,7 @@
                     "maxLength": 63
                   }
                 },
-                "required": ["vanity_subdomain"],
-                "example": {
-                  "vanity_subdomain": "acme-prod"
-                }
+                "required": ["vanity_subdomain"]
               }
             }
           }
@@ -7759,7 +7462,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7779,11 +7481,7 @@
                     "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                   }
                 },
-                "required": ["target_version"],
-                "example": {
-                  "target_version": "17",
-                  "release_channel": "ga"
-                }
+                "required": ["target_version"]
               }
             }
           }
@@ -7851,7 +7549,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -8136,7 +7833,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -8145,7 +7841,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "9f4d3a20-6b2e-4a7e-8c91-1d5f3e7a2b4c",
               "type": "string"
             }
           }
@@ -8259,7 +7954,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -8333,7 +8027,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -8388,7 +8081,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -8422,13 +8114,11 @@
                       "ap-south-1",
                       "sa-east-1"
                     ],
-                    "description": "Region you want your read replica to reside in"
+                    "description": "Region you want your read replica to reside in",
+                    "example": "us-east-1"
                   }
                 },
-                "required": ["read_replica_region"],
-                "example": {
-                  "read_replica_region": "us-west-1"
-                }
+                "required": ["read_replica_region"]
               }
             }
           }
@@ -8476,7 +8166,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -8492,10 +8181,7 @@
                     "type": "string"
                   }
                 },
-                "required": ["database_identifier"],
-                "example": {
-                  "database_identifier": "abcdefghijklmnopqrst-rr-us-west-1-abcde"
-                }
+                "required": ["database_identifier"]
               }
             }
           }
@@ -8543,7 +8229,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -8552,7 +8237,6 @@
             "required": true,
             "in": "query",
             "schema": {
-              "example": ["auth", "rest"],
               "type": "array",
               "items": {
                 "type": "string",
@@ -8576,7 +8260,6 @@
             "schema": {
               "minimum": 0,
               "maximum": 10000,
-              "example": 2000,
               "type": "integer"
             }
           }
@@ -8723,7 +8406,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -8807,7 +8489,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -8893,7 +8574,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -9118,11 +8798,7 @@
                   }
                 },
                 "required": ["algorithm"],
-                "additionalProperties": false,
-                "example": {
-                  "algorithm": "RS256",
-                  "status": "standby"
-                }
+                "additionalProperties": false
               }
             }
           }
@@ -9206,7 +8882,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -9299,7 +8974,6 @@
             "in": "path",
             "schema": {
               "format": "uuid",
-              "example": "33333333-3333-4333-8333-333333333333",
               "type": "string"
             }
           },
@@ -9312,7 +8986,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -9386,7 +9059,6 @@
             "in": "path",
             "schema": {
               "format": "uuid",
-              "example": "33333333-3333-4333-8333-333333333333",
               "type": "string"
             }
           },
@@ -9399,7 +9071,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -9480,7 +9151,6 @@
             "in": "path",
             "schema": {
               "format": "uuid",
-              "example": "33333333-3333-4333-8333-333333333333",
               "type": "string"
             }
           },
@@ -9493,7 +9163,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -9511,10 +9180,7 @@
                   }
                 },
                 "required": ["status"],
-                "additionalProperties": false,
-                "example": {
-                  "status": "standby"
-                }
+                "additionalProperties": false
               }
             }
           }
@@ -9600,7 +9266,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -10277,21 +9942,6 @@
                       "type": "boolean",
                       "nullable": true
                     },
-                    "passkey_enabled": {
-                      "type": "boolean"
-                    },
-                    "webauthn_rp_display_name": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "webauthn_rp_id": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "webauthn_rp_origins": {
-                      "type": "string",
-                      "nullable": true
-                    },
                     "mfa_phone_otp_length": {
                       "type": "integer"
                     },
@@ -10407,7 +10057,7 @@
                       "nullable": true
                     },
                     "sessions_inactivity_timeout": {
-                      "type": "number",
+                      "type": "integer",
                       "nullable": true
                     },
                     "sessions_single_per_user": {
@@ -10419,7 +10069,7 @@
                       "nullable": true
                     },
                     "sessions_timebox": {
-                      "type": "number",
+                      "type": "integer",
                       "nullable": true
                     },
                     "site_url": {
@@ -10732,10 +10382,6 @@
                     "mfa_phone_verify_enabled",
                     "mfa_web_authn_enroll_enabled",
                     "mfa_web_authn_verify_enabled",
-                    "passkey_enabled",
-                    "webauthn_rp_display_name",
-                    "webauthn_rp_id",
-                    "webauthn_rp_origins",
                     "mfa_phone_otp_length",
                     "mfa_phone_template",
                     "mfa_phone_max_frequency",
@@ -10852,7 +10498,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -11099,12 +10744,12 @@
                     "nullable": true
                   },
                   "sessions_timebox": {
-                    "type": "number",
+                    "type": "integer",
                     "minimum": 0,
                     "nullable": true
                   },
                   "sessions_inactivity_timeout": {
-                    "type": "number",
+                    "type": "integer",
                     "minimum": 0,
                     "nullable": true
                   },
@@ -11789,21 +11434,6 @@
                     "type": "boolean",
                     "nullable": true
                   },
-                  "passkey_enabled": {
-                    "type": "boolean"
-                  },
-                  "webauthn_rp_display_name": {
-                    "type": "string",
-                    "nullable": true
-                  },
-                  "webauthn_rp_id": {
-                    "type": "string",
-                    "nullable": true
-                  },
-                  "webauthn_rp_origins": {
-                    "type": "string",
-                    "nullable": true
-                  },
                   "mfa_phone_enroll_enabled": {
                     "type": "boolean",
                     "nullable": true
@@ -11851,11 +11481,6 @@
                   "custom_oauth_enabled": {
                     "type": "boolean"
                   }
-                },
-                "example": {
-                  "site_url": "https://app.example.com",
-                  "disable_signup": false,
-                  "jwt_exp": 3600
                 }
               }
             }
@@ -12533,21 +12158,6 @@
                       "type": "boolean",
                       "nullable": true
                     },
-                    "passkey_enabled": {
-                      "type": "boolean"
-                    },
-                    "webauthn_rp_display_name": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "webauthn_rp_id": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "webauthn_rp_origins": {
-                      "type": "string",
-                      "nullable": true
-                    },
                     "mfa_phone_otp_length": {
                       "type": "integer"
                     },
@@ -12663,7 +12273,7 @@
                       "nullable": true
                     },
                     "sessions_inactivity_timeout": {
-                      "type": "number",
+                      "type": "integer",
                       "nullable": true
                     },
                     "sessions_single_per_user": {
@@ -12675,7 +12285,7 @@
                       "nullable": true
                     },
                     "sessions_timebox": {
-                      "type": "number",
+                      "type": "integer",
                       "nullable": true
                     },
                     "site_url": {
@@ -12988,10 +12598,6 @@
                     "mfa_phone_verify_enabled",
                     "mfa_web_authn_enroll_enabled",
                     "mfa_web_authn_verify_enabled",
-                    "passkey_enabled",
-                    "webauthn_rp_display_name",
-                    "webauthn_rp_id",
-                    "webauthn_rp_origins",
                     "mfa_phone_otp_length",
                     "mfa_phone_template",
                     "mfa_phone_max_frequency",
@@ -13110,7 +12716,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13129,10 +12734,6 @@
                     "type": "string"
                   },
                   "custom_jwks": {}
-                },
-                "example": {
-                  "oidc_issuer_url": "https://login.acme.com",
-                  "jwks_url": "https://login.acme.com/.well-known/jwks.json"
                 }
               }
             }
@@ -13224,7 +12825,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13320,7 +12920,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -13330,7 +12929,6 @@
             "in": "path",
             "schema": {
               "format": "uuid",
-              "example": "88888888-8888-4888-8888-888888888888",
               "type": "string"
             }
           }
@@ -13421,7 +13019,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -13431,7 +13028,6 @@
             "in": "path",
             "schema": {
               "format": "uuid",
-              "example": "88888888-8888-4888-8888-888888888888",
               "type": "string"
             }
           }
@@ -13524,7 +13120,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13576,7 +13171,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13656,7 +13250,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13708,7 +13301,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13761,7 +13353,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -14032,7 +13623,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -14096,11 +13686,7 @@
                     ]
                   }
                 },
-                "required": ["addon_variant", "addon_type"],
-                "example": {
-                  "addon_variant": "pitr_7",
-                  "addon_type": "pitr"
-                }
+                "required": ["addon_variant", "addon_type"]
               }
             }
           }
@@ -14149,7 +13735,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -14158,7 +13743,6 @@
             "required": true,
             "in": "path",
             "schema": {
-              "example": "pitr_7",
               "oneOf": [
                 {
                   "type": "string",
@@ -14242,7 +13826,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -14309,7 +13892,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -14379,7 +13961,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -14427,7 +14008,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -14608,7 +14188,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -14617,7 +14196,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "sql",
               "type": "string",
               "enum": ["sql"]
             }
@@ -14798,7 +14376,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -14817,7 +14394,6 @@
             "in": "query",
             "schema": {
               "format": "date-time",
-              "example": "2025-03-01T00:00:00Z",
               "type": "string"
             }
           },
@@ -14827,7 +14403,6 @@
             "in": "query",
             "schema": {
               "format": "date-time",
-              "example": "2025-03-01T23:59:59Z",
               "type": "string"
             }
           }
@@ -14944,7 +14519,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -14953,7 +14527,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "1day",
               "type": "string",
               "enum": ["15min", "30min", "1hr", "3hr", "1day", "3day", "7day"]
             }
@@ -15094,7 +14667,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -15215,7 +14787,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -15224,7 +14795,6 @@
             "required": true,
             "in": "query",
             "schema": {
-              "example": "1hr",
               "type": "string",
               "enum": ["15min", "1hr", "3hr", "1day"]
             }
@@ -15234,7 +14804,6 @@
             "required": true,
             "in": "query",
             "schema": {
-              "example": "3c078cce-ad70-4148-9f37-4da362789053",
               "type": "string"
             }
           }
@@ -15347,7 +14916,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -15363,10 +14931,7 @@
                     "type": "boolean"
                   }
                 },
-                "required": ["read_only"],
-                "example": {
-                  "read_only": true
-                }
+                "required": ["read_only"]
               }
             }
           }
@@ -15442,7 +15007,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -15512,7 +15076,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -15562,7 +15125,7 @@
             "fga_permissions": ["database_migrations_read"]
           }
         ],
-        "summary": "List applied migration versions",
+        "summary": "[Beta] List applied migration versions",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15586,7 +15149,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -15618,12 +15180,7 @@
                     "type": "string"
                   }
                 },
-                "required": ["query"],
-                "example": {
-                  "query": "create table public.widgets(id bigint primary key);",
-                  "name": "create_widgets_table",
-                  "rollback": "drop table if exists public.widgets;"
-                }
+                "required": ["query"]
               }
             }
           }
@@ -15653,7 +15210,7 @@
             "fga_permissions": ["database_migrations_write"]
           }
         ],
-        "summary": "Apply a database migration",
+        "summary": "[Beta] Apply a database migration",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15677,7 +15234,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -15709,12 +15265,7 @@
                     "type": "string"
                   }
                 },
-                "required": ["query"],
-                "example": {
-                  "query": "create table public.widgets(id bigint primary key);",
-                  "name": "create_widgets_table",
-                  "rollback": "drop table if exists public.widgets;"
-                }
+                "required": ["query"]
               }
             }
           }
@@ -15744,7 +15295,7 @@
             "fga_permissions": ["database_migrations_write"]
           }
         ],
-        "summary": "Upsert a database migration without applying",
+        "summary": "[Beta] Upsert a database migration without applying",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15768,7 +15319,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -15779,7 +15329,6 @@
             "description": "Rollback migrations greater or equal to this version",
             "schema": {
               "pattern": "^\\d+$",
-              "example": "20250312000000",
               "type": "string"
             }
           }
@@ -15809,7 +15358,7 @@
             "fga_permissions": ["database_migrations_write"]
           }
         ],
-        "summary": "Rollback database migrations and remove them from history table",
+        "summary": "[Beta] Rollback database migrations and remove them from history table",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15835,7 +15384,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -15845,7 +15393,6 @@
             "in": "path",
             "schema": {
               "pattern": "^\\d+$",
-              "example": "20250312000000",
               "type": "string"
             }
           }
@@ -15910,7 +15457,7 @@
             "fga_permissions": ["database_migrations_read"]
           }
         ],
-        "summary": "Fetch an existing entry from migration history",
+        "summary": "[Beta] Fetch an existing entry from migration history",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15934,7 +15481,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -15944,7 +15490,6 @@
             "in": "path",
             "schema": {
               "pattern": "^\\d+$",
-              "example": "20250312000000",
               "type": "string"
             }
           }
@@ -15962,10 +15507,6 @@
                   "rollback": {
                     "type": "string"
                   }
-                },
-                "example": {
-                  "name": "create_widgets_table",
-                  "rollback": "drop table if exists public.widgets;"
                 }
               }
             }
@@ -15996,7 +15537,7 @@
             "fga_permissions": ["database_migrations_write"]
           }
         ],
-        "summary": "Patch an existing entry in migration history",
+        "summary": "[Beta] Patch an existing entry in migration history",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -16021,7 +15562,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -16045,11 +15585,7 @@
                     "type": "boolean"
                   }
                 },
-                "required": ["query"],
-                "example": {
-                  "query": "select * from pg_stat_activity limit 1;",
-                  "read_only": true
-                }
+                "required": ["query"]
               }
             }
           }
@@ -16108,7 +15644,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -16129,10 +15664,7 @@
                     "items": {}
                   }
                 },
-                "required": ["query"],
-                "example": {
-                  "query": "select * from pg_stat_activity limit 1;"
-                }
+                "required": ["query"]
               }
             }
           }
@@ -16187,7 +15719,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -16244,7 +15775,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -16332,7 +15862,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -16349,10 +15878,7 @@
                     "minLength": 4
                   }
                 },
-                "required": ["password"],
-                "example": {
-                  "password": "correct-horse-battery-staple"
-                }
+                "required": ["password"]
               }
             }
           }
@@ -16392,7 +15918,7 @@
             "bearer": []
           },
           {
-            "fga_permissions": ["database_config_write"]
+            "fga_permissions": ["database_write"]
           }
         ],
         "summary": "Updates the database password",
@@ -16421,7 +15947,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -16534,7 +16059,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -16555,11 +16079,7 @@
                     "minLength": 1
                   }
                 },
-                "required": ["role", "rhost"],
-                "example": {
-                  "role": "postgres",
-                  "rhost": "203.0.113.10"
-                }
+                "required": ["role", "rhost"]
               }
             }
           }
@@ -16669,7 +16189,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -16732,23 +16251,7 @@
                     }
                   }
                 },
-                "required": ["user_id", "roles"],
-                "example": {
-                  "user_id": "55555555-5555-4555-8555-555555555555",
-                  "roles": [
-                    {
-                      "role": "postgres",
-                      "expires_at": 1740787200,
-                      "allowed_networks": {
-                        "allowed_cidrs": [
-                          {
-                            "cidr": "203.0.113.0/24"
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
+                "required": ["user_id", "roles"]
               }
             }
           }
@@ -16856,7 +16359,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -16973,7 +16475,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -16983,7 +16484,6 @@
             "in": "path",
             "schema": {
               "format": "uuid",
-              "example": "55555555-5555-4555-8555-555555555555",
               "type": "string"
             }
           }
@@ -17032,7 +16532,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -17105,7 +16604,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -17220,7 +16718,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -17230,7 +16727,6 @@
             "in": "query",
             "schema": {
               "pattern": "^[A-Za-z0-9_-]+$",
-              "example": "hello-world",
               "type": "string"
             }
           },
@@ -17239,7 +16735,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "Hello World",
               "type": "string"
             }
           },
@@ -17249,7 +16744,6 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
-              "example": true,
               "type": "boolean"
             }
           },
@@ -17259,7 +16753,6 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
-              "example": false,
               "type": "boolean"
             }
           },
@@ -17268,7 +16761,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "index.ts",
               "type": "string"
             }
           },
@@ -17277,7 +16769,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "import_map.json",
               "type": "string"
             }
           },
@@ -17286,7 +16777,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "44c691990518d25498f0fd80cf6631ecf2b58eb9c5eb2a087dd1688f2904dac7",
               "type": "string"
             }
           }
@@ -17318,13 +16808,7 @@
                     "type": "boolean"
                   }
                 },
-                "required": ["slug", "name", "body"],
-                "example": {
-                  "slug": "hello-world",
-                  "name": "Hello World",
-                  "body": "Deno.serve(() => new Response('Hello, world!'))",
-                  "verify_jwt": true
-                }
+                "required": ["slug", "name", "body"]
               }
             }
           }
@@ -17438,7 +16922,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -17490,18 +16973,7 @@
                     }
                   },
                   "required": ["id", "slug", "name", "status", "version"]
-                },
-                "example": [
-                  {
-                    "id": "3c078cce-ad70-4148-9f37-4da362789053",
-                    "slug": "hello-world",
-                    "name": "Hello World",
-                    "status": "ACTIVE",
-                    "version": 2,
-                    "verify_jwt": true,
-                    "entrypoint_path": "index.ts"
-                  }
-                ]
+                }
               }
             }
           }
@@ -17626,7 +17098,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -17636,7 +17107,6 @@
             "in": "query",
             "schema": {
               "pattern": "^[A-Za-z][A-Za-z0-9_-]*$",
-              "example": "hello-world",
               "type": "string"
             }
           },
@@ -17646,7 +17116,6 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
-              "example": false,
               "type": "boolean"
             }
           }
@@ -17690,15 +17159,7 @@
                     "required": ["entrypoint_path"]
                   }
                 },
-                "required": ["metadata"],
-                "example": {
-                  "file": ["./supabase/functions/hello-world/index.ts"],
-                  "metadata": {
-                    "entrypoint_path": "index.ts",
-                    "verify_jwt": true,
-                    "name": "Hello World"
-                  }
-                }
+                "required": ["metadata"]
               }
             }
           }
@@ -17806,7 +17267,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -17817,7 +17277,6 @@
             "description": "Function slug",
             "schema": {
               "pattern": "^[A-Za-z0-9_-]+$",
-              "example": "hello-world",
               "type": "string"
             }
           }
@@ -17928,7 +17387,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -17939,7 +17397,6 @@
             "description": "Function slug",
             "schema": {
               "pattern": "^[A-Za-z0-9_-]+$",
-              "example": "hello-world",
               "type": "string"
             }
           },
@@ -17949,7 +17406,6 @@
             "in": "query",
             "schema": {
               "pattern": "^[A-Za-z0-9_-]+$",
-              "example": "hello-world",
               "type": "string"
             }
           },
@@ -17958,7 +17414,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "Hello World",
               "type": "string"
             }
           },
@@ -17968,7 +17423,6 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
-              "example": true,
               "type": "boolean"
             }
           },
@@ -17978,7 +17432,6 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
-              "example": false,
               "type": "boolean"
             }
           },
@@ -17987,7 +17440,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "index.ts",
               "type": "string"
             }
           },
@@ -17996,7 +17448,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "import_map.json",
               "type": "string"
             }
           },
@@ -18005,7 +17456,6 @@
             "required": false,
             "in": "query",
             "schema": {
-              "example": "44c691990518d25498f0fd80cf6631ecf2b58eb9c5eb2a087dd1688f2904dac7",
               "type": "string"
             }
           }
@@ -18032,11 +17482,6 @@
                   "verify_jwt": {
                     "type": "boolean"
                   }
-                },
-                "example": {
-                  "name": "Hello World",
-                  "body": "Deno.serve(() => new Response('Hello again!'))",
-                  "verify_jwt": true
                 }
               }
             }
@@ -18148,7 +17593,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -18159,7 +17603,6 @@
             "description": "Function slug",
             "schema": {
               "pattern": "^[A-Za-z0-9_-]+$",
-              "example": "hello-world",
               "type": "string"
             }
           }
@@ -18215,7 +17658,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -18226,7 +17668,6 @@
             "description": "Function slug",
             "schema": {
               "pattern": "^[A-Za-z0-9_-]+$",
-              "example": "hello-world",
               "type": "string"
             }
           }
@@ -18289,7 +17730,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -18375,7 +17815,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -18483,7 +17922,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -18548,15 +17986,7 @@
                     ]
                   }
                 },
-                "required": ["attributes"],
-                "example": {
-                  "attributes": {
-                    "type": "gp3",
-                    "size_gb": 100,
-                    "iops": 3000,
-                    "throughput_mibps": 125
-                  }
-                }
+                "required": ["attributes"]
               }
             }
           }
@@ -18604,7 +18034,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -18680,7 +18109,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -18759,7 +18187,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -18921,7 +18348,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -19011,15 +18437,7 @@
                     "required": ["upstreamTarget"]
                   }
                 },
-                "additionalProperties": false,
-                "example": {
-                  "fileSizeLimit": 10485760,
-                  "features": {
-                    "imageTransformation": {
-                      "enabled": true
-                    }
-                  }
-                }
+                "additionalProperties": false
               }
             }
           }
@@ -19067,7 +18485,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -19156,7 +18573,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -19276,7 +18692,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -19299,10 +18714,6 @@
                     "enum": ["transaction", "session"],
                     "description": "Dedicated pooler mode for the project"
                   }
-                },
-                "example": {
-                  "default_pool_size": 25,
-                  "pool_mode": "transaction"
                 }
               }
             }
@@ -19375,7 +18786,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -19531,7 +18941,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -19641,13 +19050,7 @@
                     "type": "boolean"
                   }
                 },
-                "additionalProperties": false,
-                "example": {
-                  "max_connections": 120,
-                  "shared_buffers": "256MB",
-                  "work_mem": "4MB",
-                  "statement_timeout": "60000ms"
-                }
+                "additionalProperties": false
               }
             }
           }
@@ -19805,7 +19208,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -19940,7 +19342,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -20013,12 +19414,7 @@
                     "description": "Whether to enable presence"
                   }
                 },
-                "additionalProperties": false,
-                "example": {
-                  "private_only": false,
-                  "max_concurrent_users": 1000,
-                  "max_channels_per_client": 100
-                }
+                "additionalProperties": false
               }
             }
           }
@@ -20063,7 +19459,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -20111,7 +19506,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -20193,25 +19587,7 @@
                     ]
                   }
                 },
-                "required": ["type"],
-                "example": {
-                  "type": "saml",
-                  "metadata_url": "https://sso.acme.com/metadata.xml",
-                  "domains": ["acme.com"],
-                  "attribute_mapping": {
-                    "keys": {
-                      "email": {
-                        "name": "email"
-                      },
-                      "first_name": {
-                        "name": "first_name"
-                      },
-                      "last_name": {
-                        "name": "last_name"
-                      }
-                    }
-                  }
-                }
+                "required": ["type"]
               }
             }
           }
@@ -20374,7 +19750,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -20548,7 +19923,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -20558,7 +19932,6 @@
             "in": "path",
             "schema": {
               "format": "uuid",
-              "example": "77777777-7777-4777-8777-777777777777",
               "type": "string"
             }
           }
@@ -20721,7 +20094,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -20731,7 +20103,6 @@
             "in": "path",
             "schema": {
               "format": "uuid",
-              "example": "77777777-7777-4777-8777-777777777777",
               "type": "string"
             }
           }
@@ -20807,10 +20178,6 @@
                       "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
                     ]
                   }
-                },
-                "example": {
-                  "metadata_url": "https://sso.acme.com/metadata.xml",
-                  "domains": ["acme.com", "contractors.acme.com"]
                 }
               }
             }
@@ -20974,7 +20341,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -20984,7 +20350,6 @@
             "in": "path",
             "schema": {
               "format": "uuid",
-              "example": "77777777-7777-4777-8777-777777777777",
               "type": "string"
             }
           }
@@ -21149,7 +20514,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -21266,7 +20630,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -21284,10 +20647,7 @@
                     "format": "int64"
                   }
                 },
-                "required": ["recovery_time_target_unix"],
-                "example": {
-                  "recovery_time_target_unix": 1740787200
-                }
+                "required": ["recovery_time_target_unix"]
               }
             }
           }
@@ -21339,7 +20699,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -21356,10 +20715,7 @@
                     "maxLength": 20
                   }
                 },
-                "required": ["name"],
-                "example": {
-                  "name": "before-upgrade"
-                }
+                "required": ["name"]
               }
             }
           }
@@ -21432,7 +20788,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -21519,7 +20874,6 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
-              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -21536,10 +20890,7 @@
                     "maxLength": 20
                   }
                 },
-                "required": ["name"],
-                "example": {
-                  "name": "before-upgrade"
-                }
+                "required": ["name"]
               }
             }
           }
@@ -21579,201 +20930,6 @@
         "x-oauth-scope": "database:write"
       }
     },
-    "/v1/organizations/{slug}/entitlements": {
-      "get": {
-        "description": "Returns the entitlements available to the organization based on their plan and any overrides.",
-        "operationId": "v1-get-organization-entitlements",
-        "parameters": [
-          {
-            "name": "slug",
-            "required": true,
-            "in": "path",
-            "description": "Organization slug",
-            "schema": {
-              "pattern": "^[\\w-]+$",
-              "example": "tsrqponmlkjihgfedcba",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "entitlements": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "feature": {
-                            "type": "object",
-                            "properties": {
-                              "key": {
-                                "type": "string",
-                                "enum": [
-                                  "instances.compute_update_available_sizes",
-                                  "instances.read_replicas",
-                                  "instances.disk_modifications",
-                                  "instances.high_availability",
-                                  "instances.orioledb",
-                                  "replication.etl",
-                                  "storage.max_file_size",
-                                  "storage.max_file_size.configurable",
-                                  "storage.image_transformations",
-                                  "storage.vector_buckets",
-                                  "storage.iceberg_catalog",
-                                  "security.audit_logs_days",
-                                  "security.questionnaire",
-                                  "security.soc2_report",
-                                  "security.iso27001_certificate",
-                                  "security.private_link",
-                                  "security.enforce_mfa",
-                                  "log.retention_days",
-                                  "custom_domain",
-                                  "vanity_subdomain",
-                                  "ipv4",
-                                  "pitr.available_variants",
-                                  "log_drains",
-                                  "branching_limit",
-                                  "branching_persistent",
-                                  "auth.mfa_phone",
-                                  "auth.mfa_web_authn",
-                                  "auth.mfa_enhanced_security",
-                                  "auth.hooks",
-                                  "auth.platform.sso",
-                                  "auth.custom_jwt_template",
-                                  "auth.saml_2",
-                                  "auth.user_sessions",
-                                  "auth.leaked_password_protection",
-                                  "auth.advanced_auth_settings",
-                                  "auth.performance_settings",
-                                  "auth.password_hibp",
-                                  "backup.retention_days",
-                                  "backup.restore_to_new_project",
-                                  "function.max_count",
-                                  "function.size_limit_mb",
-                                  "realtime.max_concurrent_users",
-                                  "realtime.max_events_per_second",
-                                  "realtime.max_joins_per_second",
-                                  "realtime.max_channels_per_client",
-                                  "realtime.max_bytes_per_second",
-                                  "realtime.max_presence_events_per_second",
-                                  "realtime.max_payload_size_in_kb",
-                                  "project_scoped_roles",
-                                  "security.member_roles",
-                                  "project_pausing",
-                                  "project_cloning",
-                                  "project_restore_after_expiry",
-                                  "assistant.advance_model",
-                                  "integrations.github_connections",
-                                  "dedicated_pooler",
-                                  "observability.dashboard_advanced_metrics"
-                                ]
-                              },
-                              "type": {
-                                "type": "string",
-                                "enum": ["boolean", "numeric", "set"]
-                              }
-                            },
-                            "required": ["key", "type"]
-                          },
-                          "hasAccess": {
-                            "type": "boolean"
-                          },
-                          "type": {
-                            "type": "string",
-                            "enum": ["boolean", "numeric", "set"]
-                          },
-                          "config": {
-                            "oneOf": [
-                              {
-                                "type": "object",
-                                "properties": {
-                                  "enabled": {
-                                    "type": "boolean"
-                                  }
-                                },
-                                "required": ["enabled"]
-                              },
-                              {
-                                "type": "object",
-                                "properties": {
-                                  "enabled": {
-                                    "type": "boolean"
-                                  },
-                                  "value": {
-                                    "type": "number"
-                                  },
-                                  "unlimited": {
-                                    "type": "boolean"
-                                  },
-                                  "unit": {
-                                    "type": "string"
-                                  }
-                                },
-                                "required": ["enabled", "value", "unlimited", "unit"]
-                              },
-                              {
-                                "type": "object",
-                                "properties": {
-                                  "enabled": {
-                                    "type": "boolean"
-                                  },
-                                  "set": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "string"
-                                    }
-                                  }
-                                },
-                                "required": ["enabled", "set"]
-                              }
-                            ]
-                          }
-                        },
-                        "required": ["feature", "hasAccess", "type", "config"]
-                      }
-                    }
-                  },
-                  "required": ["entitlements"]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden action"
-          },
-          "429": {
-            "description": "Rate limit exceeded"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "fga_permissions": ["organization_admin_read"]
-          }
-        ],
-        "summary": "Get entitlements for an organization",
-        "tags": ["Organizations"],
-        "x-badges": [
-          {
-            "name": "OAuth scope: organizations:read",
-            "position": "after"
-          }
-        ],
-        "x-endpoint-owners": ["billing"],
-        "x-oauth-scope": "organizations:read"
-      }
-    },
     "/v1/organizations/{slug}/members": {
       "get": {
         "operationId": "v1-list-organization-members",
@@ -21785,7 +20941,6 @@
             "description": "Organization slug",
             "schema": {
               "pattern": "^[\\w-]+$",
-              "example": "tsrqponmlkjihgfedcba",
               "type": "string"
             }
           }
@@ -21854,7 +21009,6 @@
             "description": "Organization slug",
             "schema": {
               "pattern": "^[\\w-]+$",
-              "example": "tsrqponmlkjihgfedcba",
               "type": "string"
             }
           }
@@ -21942,7 +21096,6 @@
             "description": "Organization slug",
             "schema": {
               "pattern": "^[\\w-]+$",
-              "example": "tsrqponmlkjihgfedcba",
               "type": "string"
             }
           },
@@ -21951,7 +21104,6 @@
             "required": true,
             "in": "path",
             "schema": {
-              "example": "0123456789abcdef0123456789abcdef01234567",
               "type": "string"
             }
           }
@@ -22111,7 +21263,6 @@
             "description": "Organization slug",
             "schema": {
               "pattern": "^[\\w-]+$",
-              "example": "tsrqponmlkjihgfedcba",
               "type": "string"
             }
           },
@@ -22120,7 +21271,6 @@
             "required": true,
             "in": "path",
             "schema": {
-              "example": "0123456789abcdef0123456789abcdef01234567",
               "type": "string"
             }
           }
@@ -22165,7 +21315,6 @@
             "description": "Organization slug",
             "schema": {
               "pattern": "^[\\w-]+$",
-              "example": "tsrqponmlkjihgfedcba",
               "type": "string"
             }
           },
@@ -22177,7 +21326,6 @@
             "schema": {
               "minimum": 0,
               "default": 0,
-              "example": 0,
               "type": "integer"
             }
           },
@@ -22190,7 +21338,6 @@
               "minimum": 1,
               "maximum": 100,
               "default": 100,
-              "example": 20,
               "type": "integer"
             }
           },
@@ -22200,7 +21347,6 @@
             "in": "query",
             "description": "Search projects by name",
             "schema": {
-              "example": "acme",
               "type": "string"
             }
           },
@@ -22211,7 +21357,6 @@
             "description": "Sort order for projects",
             "schema": {
               "default": "name_asc",
-              "example": "created_desc",
               "type": "string",
               "enum": ["name_asc", "name_desc", "created_asc", "created_desc"]
             }
@@ -22222,7 +21367,7 @@
             "in": "query",
             "description": "A comma-separated list of project statuses to filter by.\n\nThe following values are supported: `ACTIVE_HEALTHY`, `INACTIVE`.",
             "schema": {
-              "example": "ACTIVE_HEALTHY,INACTIVE",
+              "example": "?statuses=ACTIVE_HEALTHY,INACTIVE",
               "type": "string"
             }
           }
@@ -22398,15 +21543,6 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden action"
-          },
-          "429": {
-            "description": "Rate limit exceeded"
-          },
           "500": {
             "description": "Failed to retrieve projects"
           }
@@ -22421,14 +21557,7 @@
         ],
         "summary": "Gets all projects for the given organization",
         "tags": ["Projects"],
-        "x-badges": [
-          {
-            "name": "OAuth scope: projects:read",
-            "position": "after"
-          }
-        ],
-        "x-endpoint-owners": ["management-api"],
-        "x-oauth-scope": "projects:read"
+        "x-endpoint-owners": ["management-api"]
       }
     }
   },
@@ -22540,13 +21669,6 @@
             "format": "uri",
             "description": "HTTP endpoint to receive branch status updates."
           }
-        },
-        "example": {
-          "branch_name": "preview-login-page",
-          "git_branch": "feature/login-page",
-          "persistent": true,
-          "request_review": true,
-          "notify_url": "https://example.com/webhooks/branches"
         }
       },
       "BranchResponse": {
@@ -22667,9 +21789,6 @@
           "migration_version": {
             "type": "string"
           }
-        },
-        "example": {
-          "migration_version": "20250312000000"
         }
       },
       "BranchUpdateResponse": {
@@ -22695,6 +21814,126 @@
         },
         "required": ["message"]
       },
+      "V1ListProjectsPaginatedResponse": {
+        "type": "object",
+        "properties": {
+          "projects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "cloud_provider": {
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "name": {
+                  "type": "string"
+                },
+                "organization_id": {
+                  "type": "number"
+                },
+                "organization_slug": {
+                  "type": "string"
+                },
+                "ref": {
+                  "type": "string"
+                },
+                "region": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "subscription_id": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "is_branch_enabled": {
+                  "type": "boolean"
+                },
+                "is_physical_backups_enabled": {
+                  "type": "boolean",
+                  "nullable": true
+                },
+                "preview_branch_refs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "disk_volume_size_gb": {
+                  "type": "number"
+                },
+                "infra_compute_size": {
+                  "type": "string",
+                  "enum": [
+                    "pico",
+                    "nano",
+                    "micro",
+                    "small",
+                    "medium",
+                    "large",
+                    "xlarge",
+                    "2xlarge",
+                    "4xlarge",
+                    "8xlarge",
+                    "12xlarge",
+                    "16xlarge",
+                    "24xlarge",
+                    "24xlarge_optimized_memory",
+                    "24xlarge_optimized_cpu",
+                    "24xlarge_high_memory",
+                    "48xlarge",
+                    "48xlarge_optimized_memory",
+                    "48xlarge_optimized_cpu",
+                    "48xlarge_high_memory"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "cloud_provider",
+                "inserted_at",
+                "name",
+                "organization_id",
+                "organization_slug",
+                "ref",
+                "region",
+                "status",
+                "subscription_id",
+                "is_branch_enabled",
+                "is_physical_backups_enabled",
+                "preview_branch_refs"
+              ]
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "number",
+                "description": "Total number of projects. Use this to calculate the total number of pages."
+              },
+              "limit": {
+                "type": "number",
+                "description": "Maximum number of projects per page (actual number may be less)"
+              },
+              "offset": {
+                "type": "number",
+                "description": "Number of projects skipped in this response"
+              }
+            },
+            "required": ["count", "limit", "offset"]
+          }
+        },
+        "required": ["projects", "pagination"]
+      },
       "V1ProjectWithDatabaseResponse": {
         "type": "object",
         "properties": {
@@ -22708,8 +21947,7 @@
             "minLength": 20,
             "maxLength": 20,
             "pattern": "^[a-z]+$",
-            "description": "Project ref",
-            "example": "abcdefghijklmnopqrst"
+            "description": "Project ref"
           },
           "organization_id": {
             "type": "string",
@@ -22719,8 +21957,7 @@
           "organization_slug": {
             "type": "string",
             "pattern": "^[\\w-]+$",
-            "description": "Organization slug",
-            "example": "tsrqponmlkjihgfedcba"
+            "description": "Organization slug"
           },
           "name": {
             "type": "string",
@@ -22728,11 +21965,13 @@
           },
           "region": {
             "type": "string",
-            "description": "Region of your project"
+            "description": "Region of your project",
+            "example": "us-east-1"
           },
           "created_at": {
             "type": "string",
-            "description": "Creation timestamp"
+            "description": "Creation timestamp",
+            "example": "2023-03-29T16:32:59Z"
           },
           "status": {
             "type": "string",
@@ -22809,8 +22048,7 @@
           "organization_slug": {
             "type": "string",
             "pattern": "^[\\w-]+$",
-            "description": "Organization slug",
-            "example": "tsrqponmlkjihgfedcba"
+            "description": "Organization slug"
           },
           "plan": {
             "type": "string",
@@ -22821,6 +22059,7 @@
           "region": {
             "type": "string",
             "description": "Region you want your server to reside in. Use region_selection instead.",
+            "example": "us-east-1",
             "deprecated": true,
             "enum": [
               "us-east-1",
@@ -22893,13 +22132,15 @@
                   "code": {
                     "type": "string",
                     "enum": ["americas", "emea", "apac"],
-                    "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint."
+                    "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
+                    "example": "apac"
                   }
                 },
                 "required": ["type", "code"]
               }
             ],
-            "description": "Region selection. Only one of region or region_selection can be specified."
+            "description": "Region selection. Only one of region or region_selection can be specified.",
+            "example": "{ type: 'smartGroup', code: 'americas' }"
           },
           "kps_enabled": {
             "type": "boolean",
@@ -22908,6 +22149,7 @@
           },
           "desired_instance_size": {
             "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
+            "example": "nano",
             "type": "string",
             "enum": [
               "nano",
@@ -22934,18 +22176,13 @@
           "template_url": {
             "type": "string",
             "format": "uri",
-            "description": "Template URL used to create the project from the CLI."
+            "description": "Template URL used to create the project from the CLI.",
+            "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
           }
         },
         "required": ["db_pass", "name", "organization_slug"],
         "additionalProperties": false,
-        "hideDefinitions": ["release_channel", "postgres_engine"],
-        "example": {
-          "db_pass": "correct-horse-battery-staple",
-          "name": "acme-prod",
-          "organization_slug": "tsrqponmlkjihgfedcba",
-          "region": "us-east-1"
-        }
+        "hideDefinitions": ["release_channel", "postgres_engine"]
       },
       "V1ProjectResponse": {
         "type": "object",
@@ -22960,8 +22197,7 @@
             "minLength": 20,
             "maxLength": 20,
             "pattern": "^[a-z]+$",
-            "description": "Project ref",
-            "example": "abcdefghijklmnopqrst"
+            "description": "Project ref"
           },
           "organization_id": {
             "type": "string",
@@ -22971,8 +22207,7 @@
           "organization_slug": {
             "type": "string",
             "pattern": "^[\\w-]+$",
-            "description": "Organization slug",
-            "example": "tsrqponmlkjihgfedcba"
+            "description": "Organization slug"
           },
           "name": {
             "type": "string",
@@ -22980,11 +22215,13 @@
           },
           "region": {
             "type": "string",
-            "description": "Region of your project"
+            "description": "Region of your project",
+            "example": "us-east-1"
           },
           "created_at": {
             "type": "string",
-            "description": "Creation timestamp"
+            "description": "Creation timestamp",
+            "example": "2023-03-29T16:32:59Z"
           },
           "status": {
             "type": "string",
@@ -23178,8 +22415,7 @@
           "slug": {
             "type": "string",
             "pattern": "^[\\w-]+$",
-            "description": "Organization slug",
-            "example": "tsrqponmlkjihgfedcba"
+            "description": "Organization slug"
           },
           "name": {
             "type": "string"
@@ -23196,10 +22432,7 @@
           }
         },
         "required": ["name"],
-        "additionalProperties": false,
-        "example": {
-          "name": "Acme"
-        }
+        "additionalProperties": false
       },
       "OAuthTokenBody": {
         "type": "object",
@@ -23236,16 +22469,7 @@
             "type": "string"
           }
         },
-        "additionalProperties": false,
-        "example": {
-          "grant_type": "authorization_code",
-          "client_id": "66666666-6666-4666-8666-666666666666",
-          "client_secret": "sb_secret_live_example_9f4d3a206b2e4a7e8c91",
-          "code": "oauth_code_9f4d3a206b2e4a7e8c91",
-          "code_verifier": "qW0Z6d9pQnW0mL1dK1q9wFq6Yz2nV5rA8jT3mP7sH4c",
-          "redirect_uri": "https://app.acme.com/auth/callback",
-          "scope": "projects:read projects:write"
-        }
+        "additionalProperties": false
       },
       "OAuthTokenResponse": {
         "type": "object",
@@ -23282,12 +22506,7 @@
           }
         },
         "required": ["client_id", "client_secret", "refresh_token"],
-        "additionalProperties": false,
-        "example": {
-          "client_id": "66666666-6666-4666-8666-666666666666",
-          "client_secret": "sb_secret_live_example_9f4d3a206b2e4a7e8c91",
-          "refresh_token": "oauth_refresh_9f4d3a206b2e4a7e8c91"
-        }
+        "additionalProperties": false
       },
       "SnippetList": {
         "type": "object",
@@ -23481,21 +22700,6 @@
           "content"
         ]
       },
-      "V1ProfileResponse": {
-        "type": "object",
-        "properties": {
-          "gotrue_id": {
-            "type": "string"
-          },
-          "primary_email": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          }
-        },
-        "required": ["gotrue_id", "primary_email", "username"]
-      },
       "ListActionRunResponse": {
         "type": "array",
         "items": {
@@ -23666,12 +22870,6 @@
             "type": "string",
             "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
           }
-        },
-        "example": {
-          "clone": "RUNNING",
-          "configure": "RUNNING",
-          "migrate": "RUNNING",
-          "deploy": "CREATED"
         }
       },
       "UpdateRunStatusResponse": {
@@ -23765,12 +22963,7 @@
             "nullable": true
           }
         },
-        "required": ["type", "name"],
-        "example": {
-          "type": "secret",
-          "name": "ci_secret_key",
-          "description": "CI deploy key"
-        }
+        "required": ["type", "name"]
       },
       "UpdateApiKeyBody": {
         "type": "object",
@@ -23790,10 +22983,6 @@
             "additionalProperties": {},
             "nullable": true
           }
-        },
-        "example": {
-          "name": "ci_secret_key_rotated",
-          "description": "Rotated after March release"
         }
       },
       "CreateBranchBody": {
@@ -23865,14 +23054,7 @@
             "description": "HTTP endpoint to receive branch status updates."
           }
         },
-        "required": ["branch_name"],
-        "example": {
-          "branch_name": "preview-login-page",
-          "git_branch": "feature/login-page",
-          "persistent": true,
-          "with_data": false,
-          "notify_url": "https://example.com/webhooks/branches"
-        }
+        "required": ["branch_name"]
       },
       "UpdateCustomHostnameResponse": {
         "type": "object",
@@ -24005,10 +23187,7 @@
             "minLength": 1
           }
         },
-        "required": ["custom_hostname"],
-        "example": {
-          "custom_hostname": "docs.example.com"
-        }
+        "required": ["custom_hostname"]
       },
       "JitAccessResponse": {
         "type": "object",
@@ -24070,13 +23249,10 @@
         "properties": {
           "state": {
             "type": "string",
-            "enum": ["enabled", "disabled"]
+            "enum": ["enabled", "disabled", "unavailable"]
           }
         },
-        "required": ["state"],
-        "example": {
-          "state": "enabled"
-        }
+        "required": ["state"]
       },
       "NetworkBanResponse": {
         "type": "object",
@@ -24133,11 +23309,7 @@
             "type": "string"
           }
         },
-        "required": ["ipv4_addresses"],
-        "example": {
-          "ipv4_addresses": ["203.0.113.10"],
-          "requester_ip": false
-        }
+        "required": ["ipv4_addresses"]
       },
       "NetworkRestrictionsResponse": {
         "type": "object",
@@ -24180,10 +23352,6 @@
                 }
               }
             },
-            "example": {
-              "dbAllowedCidrs": ["203.0.113.0/24"],
-              "dbAllowedCidrsV6": ["2001:db8::/32"]
-            },
             "description": "Populated when a new config has been received, but not registered as successfully applied to a project."
           },
           "status": {
@@ -24216,10 +23384,6 @@
               "type": "string"
             }
           }
-        },
-        "example": {
-          "dbAllowedCidrs": ["203.0.113.0/24"],
-          "dbAllowedCidrsV6": ["2001:db8::/32"]
         }
       },
       "NetworkRestrictionsPatchRequest": {
@@ -24258,14 +23422,6 @@
                 }
               }
             }
-          }
-        },
-        "example": {
-          "add": {
-            "dbAllowedCidrs": ["203.0.113.0/24"]
-          },
-          "remove": {
-            "dbAllowedCidrs": ["198.51.100.0/24"]
           }
         }
       },
@@ -24351,10 +23507,7 @@
             "type": "string"
           }
         },
-        "required": ["root_key"],
-        "example": {
-          "root_key": "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
-        }
+        "required": ["root_key"]
       },
       "PostgrestConfigWithJWTSecretResponse": {
         "type": "object",
@@ -24398,11 +23551,6 @@
             "minimum": 0,
             "maximum": 1000
           }
-        },
-        "example": {
-          "db_schema": "public,storage",
-          "db_pool": 20,
-          "max_rows": 1000
         }
       },
       "V1PostgrestConfigResponse": {
@@ -24449,10 +23597,7 @@
             "maxLength": 256
           }
         },
-        "required": ["name"],
-        "example": {
-          "name": "Acme Platform"
-        }
+        "required": ["name"]
       },
       "SecretResponse": {
         "type": "object",
@@ -24478,7 +23623,8 @@
               "type": "string",
               "maxLength": 256,
               "pattern": "^(?!SUPABASE_).*",
-              "description": "Secret name must not start with the SUPABASE_ prefix."
+              "description": "Secret name must not start with the SUPABASE_ prefix.",
+              "example": "string"
             },
             "value": {
               "type": "string",
@@ -24486,24 +23632,13 @@
             }
           },
           "required": ["name", "value"]
-        },
-        "example": [
-          {
-            "name": "OPENAI_API_KEY",
-            "value": "sk-example-secret"
-          },
-          {
-            "name": "STRIPE_WEBHOOK_SECRET",
-            "value": "whsec_example"
-          }
-        ]
+        }
       },
       "DeleteSecretsBody": {
         "type": "array",
         "items": {
           "type": "string"
-        },
-        "example": ["OPENAI_API_KEY"]
+        }
       },
       "SslEnforcementResponse": {
         "type": "object",
@@ -24536,12 +23671,7 @@
             "required": ["database"]
           }
         },
-        "required": ["requestedConfig"],
-        "example": {
-          "requestedConfig": {
-            "database": true
-          }
-        }
+        "required": ["requestedConfig"]
       },
       "TypescriptResponse": {
         "type": "object",
@@ -24574,10 +23704,7 @@
             "maxLength": 63
           }
         },
-        "required": ["vanity_subdomain"],
-        "example": {
-          "vanity_subdomain": "acme-prod"
-        }
+        "required": ["vanity_subdomain"]
       },
       "SubdomainAvailabilityResponse": {
         "type": "object",
@@ -24608,11 +23735,7 @@
             "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           }
         },
-        "required": ["target_version"],
-        "example": {
-          "target_version": "17",
-          "release_channel": "ga"
-        }
+        "required": ["target_version"]
       },
       "ProjectUpgradeInitiateResponse": {
         "type": "object",
@@ -24944,13 +24067,11 @@
               "ap-south-1",
               "sa-east-1"
             ],
-            "description": "Region you want your read replica to reside in"
+            "description": "Region you want your read replica to reside in",
+            "example": "us-east-1"
           }
         },
-        "required": ["read_replica_region"],
-        "example": {
-          "read_replica_region": "us-west-1"
-        }
+        "required": ["read_replica_region"]
       },
       "RemoveReadReplicaBody": {
         "type": "object",
@@ -24959,10 +24080,7 @@
             "type": "string"
           }
         },
-        "required": ["database_identifier"],
-        "example": {
-          "database_identifier": "abcdefghijklmnopqrst-rr-us-west-1-abcde"
-        }
+        "required": ["database_identifier"]
       },
       "V1ServiceHealthResponse": {
         "type": "object",
@@ -25295,11 +24413,7 @@
           }
         },
         "required": ["algorithm"],
-        "additionalProperties": false,
-        "example": {
-          "algorithm": "RS256",
-          "status": "standby"
-        }
+        "additionalProperties": false
       },
       "SigningKeysResponse": {
         "type": "object",
@@ -25350,10 +24464,7 @@
           }
         },
         "required": ["status"],
-        "additionalProperties": false,
-        "example": {
-          "status": "standby"
-        }
+        "additionalProperties": false
       },
       "AuthConfigResponse": {
         "type": "object",
@@ -26022,21 +25133,6 @@
             "type": "boolean",
             "nullable": true
           },
-          "passkey_enabled": {
-            "type": "boolean"
-          },
-          "webauthn_rp_display_name": {
-            "type": "string",
-            "nullable": true
-          },
-          "webauthn_rp_id": {
-            "type": "string",
-            "nullable": true
-          },
-          "webauthn_rp_origins": {
-            "type": "string",
-            "nullable": true
-          },
           "mfa_phone_otp_length": {
             "type": "integer"
           },
@@ -26152,7 +25248,7 @@
             "nullable": true
           },
           "sessions_inactivity_timeout": {
-            "type": "number",
+            "type": "integer",
             "nullable": true
           },
           "sessions_single_per_user": {
@@ -26164,7 +25260,7 @@
             "nullable": true
           },
           "sessions_timebox": {
-            "type": "number",
+            "type": "integer",
             "nullable": true
           },
           "site_url": {
@@ -26477,10 +25573,6 @@
           "mfa_phone_verify_enabled",
           "mfa_web_authn_enroll_enabled",
           "mfa_web_authn_verify_enabled",
-          "passkey_enabled",
-          "webauthn_rp_display_name",
-          "webauthn_rp_id",
-          "webauthn_rp_origins",
           "mfa_phone_otp_length",
           "mfa_phone_template",
           "mfa_phone_max_frequency",
@@ -26788,12 +25880,12 @@
             "nullable": true
           },
           "sessions_timebox": {
-            "type": "number",
+            "type": "integer",
             "minimum": 0,
             "nullable": true
           },
           "sessions_inactivity_timeout": {
-            "type": "number",
+            "type": "integer",
             "minimum": 0,
             "nullable": true
           },
@@ -27478,21 +26570,6 @@
             "type": "boolean",
             "nullable": true
           },
-          "passkey_enabled": {
-            "type": "boolean"
-          },
-          "webauthn_rp_display_name": {
-            "type": "string",
-            "nullable": true
-          },
-          "webauthn_rp_id": {
-            "type": "string",
-            "nullable": true
-          },
-          "webauthn_rp_origins": {
-            "type": "string",
-            "nullable": true
-          },
           "mfa_phone_enroll_enabled": {
             "type": "boolean",
             "nullable": true
@@ -27540,11 +26617,6 @@
           "custom_oauth_enabled": {
             "type": "boolean"
           }
-        },
-        "example": {
-          "site_url": "https://app.example.com",
-          "disable_signup": false,
-          "jwt_exp": 3600
         }
       },
       "CreateThirdPartyAuthBody": {
@@ -27557,10 +26629,6 @@
             "type": "string"
           },
           "custom_jwks": {}
-        },
-        "example": {
-          "oidc_issuer_url": "https://login.acme.com",
-          "jwks_url": "https://login.acme.com/.well-known/jwks.json"
         }
       },
       "ThirdPartyAuth": {
@@ -27901,11 +26969,7 @@
             ]
           }
         },
-        "required": ["addon_variant", "addon_type"],
-        "example": {
-          "addon_variant": "pitr_7",
-          "addon_type": "pitr"
-        }
+        "required": ["addon_variant", "addon_type"]
       },
       "ProjectClaimTokenResponse": {
         "type": "object",
@@ -28271,10 +27335,7 @@
             "type": "boolean"
           }
         },
-        "required": ["read_only"],
-        "example": {
-          "read_only": true
-        }
+        "required": ["read_only"]
       },
       "CreateRoleResponse": {
         "type": "object",
@@ -28335,12 +27396,7 @@
             "type": "string"
           }
         },
-        "required": ["query"],
-        "example": {
-          "query": "create table public.widgets(id bigint primary key);",
-          "name": "create_widgets_table",
-          "rollback": "drop table if exists public.widgets;"
-        }
+        "required": ["query"]
       },
       "V1UpsertMigrationBody": {
         "type": "object",
@@ -28356,12 +27412,7 @@
             "type": "string"
           }
         },
-        "required": ["query"],
-        "example": {
-          "query": "create table public.widgets(id bigint primary key);",
-          "name": "create_widgets_table",
-          "rollback": "drop table if exists public.widgets;"
-        }
+        "required": ["query"]
       },
       "V1GetMigrationResponse": {
         "type": "object",
@@ -28403,10 +27454,6 @@
           "rollback": {
             "type": "string"
           }
-        },
-        "example": {
-          "name": "create_widgets_table",
-          "rollback": "drop table if exists public.widgets;"
         }
       },
       "V1RunQueryBody": {
@@ -28424,11 +27471,7 @@
             "type": "boolean"
           }
         },
-        "required": ["query"],
-        "example": {
-          "query": "select * from pg_stat_activity limit 1;",
-          "read_only": true
-        }
+        "required": ["query"]
       },
       "V1ReadOnlyQueryBody": {
         "type": "object",
@@ -28442,10 +27485,7 @@
             "items": {}
           }
         },
-        "required": ["query"],
-        "example": {
-          "query": "select * from pg_stat_activity limit 1;"
-        }
+        "required": ["query"]
       },
       "GetProjectDbMetadataResponse": {
         "type": "object",
@@ -28487,10 +27527,7 @@
             "minLength": 4
           }
         },
-        "required": ["password"],
-        "example": {
-          "password": "correct-horse-battery-staple"
-        }
+        "required": ["password"]
       },
       "V1UpdatePasswordResponse": {
         "type": "object",
@@ -28513,11 +27550,7 @@
             "minLength": 1
           }
         },
-        "required": ["role", "rhost"],
-        "example": {
-          "role": "postgres",
-          "rhost": "203.0.113.10"
-        }
+        "required": ["role", "rhost"]
       },
       "JitAuthorizeAccessResponse": {
         "type": "object",
@@ -28689,23 +27722,7 @@
             }
           }
         },
-        "required": ["user_id", "roles"],
-        "example": {
-          "user_id": "55555555-5555-4555-8555-555555555555",
-          "roles": [
-            {
-              "role": "postgres",
-              "expires_at": 1740787200,
-              "allowed_networks": {
-                "allowed_cidrs": [
-                  {
-                    "cidr": "203.0.113.0/24"
-                  }
-                ]
-              }
-            }
-          ]
-        }
+        "required": ["user_id", "roles"]
       },
       "FunctionResponse": {
         "type": "object",
@@ -28769,13 +27786,7 @@
             "type": "boolean"
           }
         },
-        "required": ["slug", "name", "body"],
-        "example": {
-          "slug": "hello-world",
-          "name": "Hello World",
-          "body": "Deno.serve(() => new Response('Hello, world!'))",
-          "verify_jwt": true
-        }
+        "required": ["slug", "name", "body"]
       },
       "BulkUpdateFunctionBody": {
         "type": "array",
@@ -28820,18 +27831,7 @@
             }
           },
           "required": ["id", "slug", "name", "status", "version"]
-        },
-        "example": [
-          {
-            "id": "3c078cce-ad70-4148-9f37-4da362789053",
-            "slug": "hello-world",
-            "name": "Hello World",
-            "status": "ACTIVE",
-            "version": 2,
-            "verify_jwt": true,
-            "entrypoint_path": "index.ts"
-          }
-        ]
+        }
       },
       "BulkUpdateFunctionResponse": {
         "type": "object",
@@ -28922,15 +27922,7 @@
             "required": ["entrypoint_path"]
           }
         },
-        "required": ["metadata"],
-        "example": {
-          "file": ["./supabase/functions/hello-world/index.ts"],
-          "metadata": {
-            "entrypoint_path": "index.ts",
-            "verify_jwt": true,
-            "name": "Hello World"
-          }
-        }
+        "required": ["metadata"]
       },
       "DeployFunctionResponse": {
         "type": "object",
@@ -29038,11 +28030,6 @@
           "verify_jwt": {
             "type": "boolean"
           }
-        },
-        "example": {
-          "name": "Hello World",
-          "body": "Deno.serve(() => new Response('Hello again!'))",
-          "verify_jwt": true
         }
       },
       "V1StorageBucketResponse": {
@@ -29183,15 +28170,7 @@
             ]
           }
         },
-        "required": ["attributes"],
-        "example": {
-          "attributes": {
-            "type": "gp3",
-            "size_gb": 100,
-            "iops": 3000,
-            "throughput_mibps": 125
-          }
-        }
+        "required": ["attributes"]
       },
       "DiskUtilMetricsResponse": {
         "type": "object",
@@ -29432,15 +28411,7 @@
             "required": ["upstreamTarget"]
           }
         },
-        "additionalProperties": false,
-        "example": {
-          "fileSizeLimit": 10485760,
-          "features": {
-            "imageTransformation": {
-              "enabled": true
-            }
-          }
-        }
+        "additionalProperties": false
       },
       "V1PgbouncerConfigResponse": {
         "type": "object",
@@ -29549,10 +28520,6 @@
             "enum": ["transaction", "session"],
             "description": "Dedicated pooler mode for the project"
           }
-        },
-        "example": {
-          "default_pool_size": 25,
-          "pool_mode": "transaction"
         }
       },
       "UpdateSupavisorConfigResponse": {
@@ -29768,13 +28735,7 @@
             "type": "boolean"
           }
         },
-        "additionalProperties": false,
-        "example": {
-          "max_connections": 120,
-          "shared_buffers": "256MB",
-          "work_mem": "4MB",
-          "statement_timeout": "60000ms"
-        }
+        "additionalProperties": false
       },
       "RealtimeConfigResponse": {
         "type": "object",
@@ -29928,12 +28889,7 @@
             "description": "Whether to enable presence"
           }
         },
-        "additionalProperties": false,
-        "example": {
-          "private_only": false,
-          "max_concurrent_users": 1000,
-          "max_channels_per_client": 100
-        }
+        "additionalProperties": false
       },
       "CreateProviderBody": {
         "type": "object",
@@ -30008,25 +28964,7 @@
             ]
           }
         },
-        "required": ["type"],
-        "example": {
-          "type": "saml",
-          "metadata_url": "https://sso.acme.com/metadata.xml",
-          "domains": ["acme.com"],
-          "attribute_mapping": {
-            "keys": {
-              "email": {
-                "name": "email"
-              },
-              "first_name": {
-                "name": "first_name"
-              },
-              "last_name": {
-                "name": "last_name"
-              }
-            }
-          }
-        }
+        "required": ["type"]
       },
       "CreateProviderResponse": {
         "type": "object",
@@ -30422,10 +29360,6 @@
               "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
             ]
           }
-        },
-        "example": {
-          "metadata_url": "https://sso.acme.com/metadata.xml",
-          "domains": ["acme.com", "contractors.acme.com"]
         }
       },
       "UpdateProviderResponse": {
@@ -30694,10 +29628,7 @@
             "format": "int64"
           }
         },
-        "required": ["recovery_time_target_unix"],
-        "example": {
-          "recovery_time_target_unix": 1740787200
-        }
+        "required": ["recovery_time_target_unix"]
       },
       "V1RestorePointPostBody": {
         "type": "object",
@@ -30707,10 +29638,7 @@
             "maxLength": 20
           }
         },
-        "required": ["name"],
-        "example": {
-          "name": "before-upgrade"
-        }
+        "required": ["name"]
       },
       "V1RestorePointResponse": {
         "type": "object",
@@ -30738,150 +29666,7 @@
             "maxLength": 20
           }
         },
-        "required": ["name"],
-        "example": {
-          "name": "before-upgrade"
-        }
-      },
-      "V1ListEntitlementsResponse": {
-        "type": "object",
-        "properties": {
-          "entitlements": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "feature": {
-                  "type": "object",
-                  "properties": {
-                    "key": {
-                      "type": "string",
-                      "enum": [
-                        "instances.compute_update_available_sizes",
-                        "instances.read_replicas",
-                        "instances.disk_modifications",
-                        "instances.high_availability",
-                        "instances.orioledb",
-                        "replication.etl",
-                        "storage.max_file_size",
-                        "storage.max_file_size.configurable",
-                        "storage.image_transformations",
-                        "storage.vector_buckets",
-                        "storage.iceberg_catalog",
-                        "security.audit_logs_days",
-                        "security.questionnaire",
-                        "security.soc2_report",
-                        "security.iso27001_certificate",
-                        "security.private_link",
-                        "security.enforce_mfa",
-                        "log.retention_days",
-                        "custom_domain",
-                        "vanity_subdomain",
-                        "ipv4",
-                        "pitr.available_variants",
-                        "log_drains",
-                        "branching_limit",
-                        "branching_persistent",
-                        "auth.mfa_phone",
-                        "auth.mfa_web_authn",
-                        "auth.mfa_enhanced_security",
-                        "auth.hooks",
-                        "auth.platform.sso",
-                        "auth.custom_jwt_template",
-                        "auth.saml_2",
-                        "auth.user_sessions",
-                        "auth.leaked_password_protection",
-                        "auth.advanced_auth_settings",
-                        "auth.performance_settings",
-                        "auth.password_hibp",
-                        "backup.retention_days",
-                        "backup.restore_to_new_project",
-                        "function.max_count",
-                        "function.size_limit_mb",
-                        "realtime.max_concurrent_users",
-                        "realtime.max_events_per_second",
-                        "realtime.max_joins_per_second",
-                        "realtime.max_channels_per_client",
-                        "realtime.max_bytes_per_second",
-                        "realtime.max_presence_events_per_second",
-                        "realtime.max_payload_size_in_kb",
-                        "project_scoped_roles",
-                        "security.member_roles",
-                        "project_pausing",
-                        "project_cloning",
-                        "project_restore_after_expiry",
-                        "assistant.advance_model",
-                        "integrations.github_connections",
-                        "dedicated_pooler",
-                        "observability.dashboard_advanced_metrics"
-                      ]
-                    },
-                    "type": {
-                      "type": "string",
-                      "enum": ["boolean", "numeric", "set"]
-                    }
-                  },
-                  "required": ["key", "type"]
-                },
-                "hasAccess": {
-                  "type": "boolean"
-                },
-                "type": {
-                  "type": "string",
-                  "enum": ["boolean", "numeric", "set"]
-                },
-                "config": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "enabled": {
-                          "type": "boolean"
-                        }
-                      },
-                      "required": ["enabled"]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "enabled": {
-                          "type": "boolean"
-                        },
-                        "value": {
-                          "type": "number"
-                        },
-                        "unlimited": {
-                          "type": "boolean"
-                        },
-                        "unit": {
-                          "type": "string"
-                        }
-                      },
-                      "required": ["enabled", "value", "unlimited", "unit"]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "enabled": {
-                          "type": "boolean"
-                        },
-                        "set": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      },
-                      "required": ["enabled", "set"]
-                    }
-                  ]
-                }
-              },
-              "required": ["feature", "hasAccess", "type", "config"]
-            }
-          }
-        },
-        "required": ["entitlements"]
+        "required": ["name"]
       },
       "V1OrganizationMemberResponse": {
         "type": "object",

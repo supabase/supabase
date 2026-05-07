@@ -1,38 +1,35 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useFeatureFlags, useFlag, useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
+import { EdgeFunctionRecentInvocations } from 'components/interfaces/Functions/EdgeFunctionRecentInvocations'
+import ReportWidget from 'components/interfaces/Reports/ReportWidget'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
+import AreaChart from 'components/ui/Charts/AreaChart'
+import StackedBarChart from 'components/ui/Charts/StackedBarChart'
+import NoPermission from 'components/ui/NoPermission'
+import {
+  FunctionsCombinedStatsVariables,
+  useFunctionsCombinedStatsQuery,
+} from 'data/analytics/functions-combined-stats-query'
+import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import dayjs, { Dayjs } from 'dayjs'
+import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import maxBy from 'lodash/maxBy'
 import meanBy from 'lodash/meanBy'
 import sumBy from 'lodash/sumBy'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
+import type { ChartIntervals, NextPageWithLayout } from 'types'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  LogoLoader,
   WarningIcon,
 } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
-
-import { EdgeFunctionOverview } from '@/components/interfaces/Functions/EdgeFunctionOverview/EdgeFunctionOverview'
-import { EdgeFunctionRecentInvocations } from '@/components/interfaces/Functions/EdgeFunctionRecentInvocations'
-import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
-import EdgeFunctionDetailsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
-import AreaChart from '@/components/ui/Charts/AreaChart'
-import StackedBarChart from '@/components/ui/Charts/StackedBarChart'
-import NoPermission from '@/components/ui/NoPermission'
-import {
-  FunctionsCombinedStatsVariables,
-  useFunctionsCombinedStatsQuery,
-} from '@/data/analytics/functions-combined-stats-query'
-import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
-import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import type { ChartIntervals, NextPageWithLayout } from '@/types'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -65,7 +62,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
   },
 ]
 
-const LegacyEdgeFunctionOverview = () => {
+const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
 
@@ -430,21 +427,6 @@ const LegacyEdgeFunctionOverview = () => {
       </PageSection>
     </PageContainer>
   )
-}
-
-const PageLayout: NextPageWithLayout = () => {
-  const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const showNewOverview = useFlag('edgeFunctionsOverview') === true
-
-  if (IS_PLATFORM && !flagsLoaded) {
-    return <LogoLoader />
-  }
-
-  if (showNewOverview) {
-    return <EdgeFunctionOverview />
-  }
-
-  return <LegacyEdgeFunctionOverview />
 }
 
 PageLayout.getLayout = (page) => (

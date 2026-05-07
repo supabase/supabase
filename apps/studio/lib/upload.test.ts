@@ -1,6 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+import { createClient } from '@supabase/supabase-js'
 import { uploadAttachment } from './upload'
 
 vi.mock('@supabase/supabase-js', () => ({

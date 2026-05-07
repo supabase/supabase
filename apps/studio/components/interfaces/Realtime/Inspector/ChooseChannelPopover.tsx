@@ -3,28 +3,28 @@ import { IS_PLATFORM, useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import {
-  Button,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Switch,
-} from 'ui'
 import * as z from 'zod'
 
+import { DocsButton } from 'components/ui/DocsButton'
+import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
+import {
+  Button,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  Switch,
+} from 'ui'
 import { RealtimeConfig } from './useRealtimeMessages'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { getTemporaryAPIKey } from '@/data/api-keys/temp-api-keys-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from '@/lib/constants'
 
 interface ChooseChannelPopoverProps {
   config: RealtimeConfig
@@ -96,28 +96,28 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
         <div className="p-4 flex flex-col text-sm">
           {config.channelName.length === 0 ? (
             <>
-              <Form {...form}>
+              <Form_Shadcn_ {...form}>
                 <form
                   id="realtime-channel"
                   onSubmit={form.handleSubmit(() => onSubmit())}
                   className="flex flex-col gap-y-4"
                 >
-                  <FormField
+                  <FormField_Shadcn_
                     name="channel"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItem className="flex flex-col gap-y-2">
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <div className="flex flex-col gap-y-1">
                           <label className="text-foreground text-xs">Name of channel</label>
                           <div className="flex flex-row">
-                            <FormControl>
+                            <FormControl_Shadcn_>
                               <Input_Shadcn_
                                 {...field}
                                 autoComplete="off"
                                 className="rounded-r-none text-xs px-2.5 py-1 h-auto"
                                 placeholder="Enter a channel name"
                               />
-                            </FormControl>
+                            </FormControl_Shadcn_>
 
                             <Button
                               type="primary"
@@ -129,7 +129,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                             </Button>
                           </div>
                         </div>
-                        <FormDescription className="text-xs text-foreground-lighter">
+                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
                           The channel you initialize with the Supabase Realtime client. Learn more
                           in{' '}
                           <a
@@ -140,32 +140,34 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                           >
                             our docs
                           </a>
-                        </FormDescription>
-                      </FormItem>
+                        </FormDescription_Shadcn_>
+                      </FormItem_Shadcn_>
                     )}
                   />
 
-                  <FormField
+                  <FormField_Shadcn_
                     key="isPrivate"
                     control={form.control}
                     name="isPrivate"
                     render={({ field }) => (
-                      <FormItem className="">
+                      <FormItem_Shadcn_ className="">
                         <div className="flex flex-row items-center gap-x-2">
-                          <FormControl>
+                          <FormControl_Shadcn_>
                             <Switch
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               disabled={field.disabled}
                             />
-                          </FormControl>
-                          <FormLabel className="text-xs">Is channel private?</FormLabel>
+                          </FormControl_Shadcn_>
+                          <FormLabel_Shadcn_ className="text-xs">
+                            Is channel private?
+                          </FormLabel_Shadcn_>
                         </div>
-                        <FormDescription className="text-xs text-foreground-lighter mt-2">
+                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter mt-2">
                           If the channel is marked as private, it will use RLS policies to filter
                           messages.
-                        </FormDescription>
-                      </FormItem>
+                        </FormDescription_Shadcn_>
+                      </FormItem_Shadcn_>
                     )}
                   />
 
@@ -175,7 +177,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                     href={`${DOCS_URL}/guides/realtime/authorization`}
                   />
                 </form>
-              </Form>
+              </Form_Shadcn_>
             </>
           ) : (
             <div className="space-y-2">

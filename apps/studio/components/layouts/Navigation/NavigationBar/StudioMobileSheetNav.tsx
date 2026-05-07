@@ -1,4 +1,6 @@
+import { CommandMenuInnerContent } from 'components/interfaces/App/CommandMenu/CommandMenu'
 import type { ReactNode } from 'react'
+import { sidebarManagerState, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { CommandWrapper, MobileSheetNav } from 'ui-patterns'
 
 import {
@@ -7,8 +9,6 @@ import {
 } from '../../ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import type { MobileSheetContentType } from './MobileSheetContext'
 import { useMobileSheet } from './MobileSheetContext'
-import { CommandMenuInnerContent } from '@/components/interfaces/App/CommandMenu/CommandMenu'
-import { sidebarManagerState, useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 function isSidebarId(content: unknown): content is TYPEOF_SIDEBAR_KEYS {
   return (

@@ -2,15 +2,25 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useWatch } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
+import { EnableExtensionModal } from 'components/interfaces/Database/Extensions/EnableExtensionModal'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { getDatabaseCronJob } from 'data/database-cron-jobs/database-cron-job-query'
+import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/database-cron-jobs-create-mutation'
+import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -40,17 +50,7 @@ import {
   type CronJobType,
 } from './CreateCronJobSheet.constants'
 import { CronJobScheduleSection } from './CronJobScheduleSection'
-import { EnableExtensionModal } from '@/components/interfaces/Database/Extensions/EnableExtensionModal'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { getDatabaseCronJob } from '@/data/database-cron-jobs/database-cron-job-query'
-import { useDatabaseCronJobCreateMutation } from '@/data/database-cron-jobs/database-cron-jobs-create-mutation'
-import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
-import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { isGreaterThanOrEqual } from '@/lib/semver'
 
@@ -176,18 +176,13 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
         const nameExists = !!checkExistingJob
 
         if (nameExists) {
-          return form.setError(
-            'name',
-            {
-              type: 'manual',
-              message: 'A cron job with this name already exists',
-            },
-            { shouldFocus: true }
-          )
+          return form.setError('name', {
+            type: 'manual',
+            message: 'A cron job with this name already exists',
+          })
         }
       } catch (error: any) {
         toast.error(`Failed to validate cron job name: ${error.message}`)
-        return
       } finally {
         setIsLoadingGetCronJob(false)
       }
@@ -296,22 +291,22 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
               </SheetTitle>
             </SheetHeader>
 
-            <div className="overflow-auto grow">
-              <Form {...form}>
+            <div className="overflow-auto flex-grow">
+              <Form_Shadcn_ {...form}>
                 <form
                   id={FORM_ID}
-                  className="grow overflow-auto"
+                  className="flex-grow overflow-auto"
                   onSubmit={form.handleSubmit(onSubmit)}
                 >
                   <SheetSection>
-                    <FormField
+                    <FormField_Shadcn_
                       control={form.control}
                       name="name"
                       render={({ field }) => (
                         <FormItemLayout label="Name" layout="vertical" className="gap-1 relative">
-                          <FormControl>
+                          <FormControl_Shadcn_>
                             <Input_Shadcn_ {...field} disabled={isEditing} />
-                          </FormControl>
+                          </FormControl_Shadcn_>
                           <span className="text-foreground-lighter text-xs absolute top-0 right-0">
                             Cron jobs cannot be renamed once created
                           </span>
@@ -323,12 +318,12 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                   <CronJobScheduleSection form={form} supportsSeconds={supportsSeconds} />
                   <Separator />
                   <SheetSection>
-                    <FormField
+                    <FormField_Shadcn_
                       control={form.control}
                       name="values.type"
                       render={({ field }) => (
                         <FormItemLayout label="Type" layout="vertical" className="gap-1">
-                          <FormControl>
+                          <FormControl_Shadcn_>
                             <RadioGroupStacked
                               id="function_type"
                               name="function_type"
@@ -373,7 +368,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                                 </RadioGroupStackedItem>
                               ))}
                             </RadioGroupStacked>
-                          </FormControl>
+                          </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
                     />
@@ -436,7 +431,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                   {cronType === 'sql_function' && <SqlFunctionSection form={form} />}
                   {cronType === 'sql_snippet' && <SqlSnippetSection form={form} />}
                 </form>
-              </Form>
+              </Form_Shadcn_>
             </div>
             <SheetFooter>
               <Button

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import { ArrowRight, SearchIcon } from 'lucide-react'
 import { ReactNode, useEffect, useMemo, useState } from 'react'
+
 import {
   cn,
   DropdownMenu,
@@ -10,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-
 import { ChartHighlight } from './useChartHighlight'
 
 export type UpdateDateRange = (from: string, to: string) => void
@@ -117,7 +117,7 @@ export const ChartHighlightActions = ({
                 className="w-full flex items-center gap-1.5"
               >
                 {action.icon}
-                <span className="grow text-left">{labelNode}</span>
+                <span className="flex-grow text-left">{labelNode}</span>
                 {rightNode}
               </button>
             </DropdownMenuItem>

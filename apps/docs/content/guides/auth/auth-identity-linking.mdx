@@ -35,8 +35,7 @@ Supabase Auth allows a user to initiate identity linking with a different email 
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+const supabase = createClient('<your-supabase-url>', '<your-supabase-anon-key>')
 
 // ---cut---
 const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
@@ -163,8 +162,7 @@ You can use [`getUserIdentities()`](/docs/reference/javascript/auth-getuserident
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+const supabase = createClient('<your-supabase-url>', '<your-supabase-anon-key>')
 
 // ---cut---
 // retrieve all identities linked to a user

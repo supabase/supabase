@@ -1,9 +1,8 @@
 import type { AuthMFAListFactorsResponse, Factor } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
-
+import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'
-import { auth } from '@/lib/gotrue'
-import { UseCustomQueryOptions } from '@/types'
+import { UseCustomQueryOptions } from 'types'
 
 export async function getMfaListFactors() {
   const { error, data } = await auth.mfa.listFactors()

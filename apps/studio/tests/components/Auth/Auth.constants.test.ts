@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'vitest'
-
-import { urlRegex } from '@/components/interfaces/Auth/Auth.constants'
+import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
+import { describe, it, expect } from 'vitest'
 
 describe('Auth.constants: urlRegex', () => {
   it('should match valid URLs', () => {

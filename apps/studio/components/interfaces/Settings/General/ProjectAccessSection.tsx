@@ -1,3 +1,9 @@
+import AlertError from 'components/ui/AlertError'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
+import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useProfile } from 'lib/profile'
 import Link from 'next/link'
 import {
   Badge,
@@ -14,6 +20,7 @@ import {
 import {
   PageSection,
   PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -21,12 +28,6 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { summarizeProjectAccess } from './General.utils'
-import AlertError from '@/components/ui/AlertError'
-import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
-import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useProfile } from '@/lib/profile'
 
 export const ProjectAccessSection = () => {
   const { data: project } = useSelectedProjectQuery()

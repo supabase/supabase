@@ -1,17 +1,19 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useMemo, useState } from 'react'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { Policies } from '@/components/interfaces/Auth/Policies/Policies'
-import { PoliciesDataProvider } from '@/components/interfaces/Auth/Policies/PoliciesDataContext'
-import { PolicyEditorPanel } from '@/components/interfaces/Auth/Policies/PolicyEditorPanel'
-import AlertError from '@/components/ui/AlertError'
-import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
-import { useTablesQuery } from '@/data/tables/tables-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { Policies } from 'components/interfaces/Auth/Policies/Policies'
+import { PoliciesDataProvider } from 'components/interfaces/Auth/Policies/PoliciesDataContext'
+import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
+import AlertError from 'components/ui/AlertError'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const RealtimePolicies = () => {
   const { data: project } = useSelectedProjectQuery()
+  const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
 
   const [showPolicyEditor, setShowPolicyEditor] = useState(false)
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
@@ -45,8 +47,15 @@ export const RealtimePolicies = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  // realtime is never in PostgREST's db_schema — skip the config query to avoid a false warning
-  const exposedSchemas = useMemo(() => ['realtime'], [])
+  const exposedSchemas = useMemo(() => {
+    const dbSchema = postgrestConfig?.db_schema
+    if (!dbSchema) return []
+
+    return dbSchema
+      .split(',')
+      .map((schema) => schema.trim())
+      .filter((schema) => schema.length > 0)
+  }, [postgrestConfig?.db_schema])
 
   return (
     <>

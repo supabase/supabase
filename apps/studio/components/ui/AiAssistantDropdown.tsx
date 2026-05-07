@@ -1,5 +1,6 @@
 import { AiAssistantSource } from 'common/telemetry-constants'
 import { Chatgpt, Claude } from 'icons'
+import { useTrack } from 'lib/telemetry/track'
 import { Check, ChevronDown, Copy } from 'lucide-react'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import {
@@ -16,8 +17,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-
-import { useTrack } from '@/lib/telemetry/track'
 
 type TelemetrySource = AiAssistantSource
 
@@ -49,7 +48,6 @@ export interface AiAssistantDropdownProps {
   label: string
   iconOnly?: boolean
   onOpenAssistant: () => void
-  onCopyPrompt?: () => void
   telemetrySource?: TelemetrySource
   size?: ComponentProps<typeof Button>['size']
   type?: ComponentProps<typeof Button>['type']
@@ -68,7 +66,6 @@ export function AiAssistantDropdown({
   label,
   iconOnly = false,
   onOpenAssistant,
-  onCopyPrompt,
   telemetrySource,
   size = 'tiny',
   type = 'default',
@@ -96,7 +93,6 @@ export function AiAssistantDropdown({
     copyToClipboard(prompt)
     setShowCopied(true)
     setIsOpen(false)
-    onCopyPrompt?.()
 
     if (telemetrySource) {
       track('ai_prompt_copied', { source: telemetrySource })

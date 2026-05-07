@@ -2,7 +2,7 @@ import { ComponentProps } from 'react'
 
 export const Stripes = () => (
   <div
-    className="grow absolute inset-0"
+    className="flex-grow absolute inset-0"
     style={{
       backgroundImage: `repeating-linear-gradient(
         45deg,

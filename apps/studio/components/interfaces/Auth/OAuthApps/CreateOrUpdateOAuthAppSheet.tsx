@@ -5,18 +5,27 @@ import type {
   UpdateOAuthClientParams,
 } from '@supabase/supabase-js'
 import { useParams } from 'common'
-import { Trash2, Upload, X } from 'lucide-react'
+import { InlineLink } from 'components/ui/InlineLink'
+import Panel from 'components/ui/Panel'
+import { useProjectApiUrl } from 'data/config/project-endpoint-query'
+import { useOAuthServerAppCreateMutation } from 'data/oauth-server-apps/oauth-server-app-create-mutation'
+import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
+import { useOAuthServerAppUpdateMutation } from 'data/oauth-server-apps/oauth-server-app-update-mutation'
+import { DOCS_URL } from 'lib/constants'
+import { Plus, Trash2, Upload, X } from 'lucide-react'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormLabel,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
   Input_Shadcn_,
   Separator,
   Sheet,
@@ -31,16 +40,7 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import * as z from 'zod'
-
-import { InlineLink } from '@/components/ui/InlineLink'
-import Panel from '@/components/ui/Panel'
-import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useOAuthServerAppCreateMutation } from '@/data/oauth-server-apps/oauth-server-app-create-mutation'
-import { useOAuthServerAppRegenerateSecretMutation } from '@/data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
-import { useOAuthServerAppUpdateMutation } from '@/data/oauth-server-apps/oauth-server-app-update-mutation'
-import { DOCS_URL } from '@/lib/constants'
 
 interface CreateOrUpdateOAuthAppSheetProps {
   visible: boolean
@@ -100,6 +100,15 @@ export const CreateOrUpdateOAuthAppSheet = ({
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: initialValues,
+  })
+
+  const {
+    fields: redirectUriFields,
+    append: appendRedirectUri,
+    remove: removeRedirectUri,
+  } = useFieldArray({
+    name: 'redirect_uris',
+    control: form.control,
   })
 
   const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
@@ -251,7 +260,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
               <SheetClose
                 className={cn(
                   'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-                  'focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                  'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
                   'disabled:pointer-events-none data-[state=open]:bg-secondary',
                   'transition'
                 )}
@@ -264,28 +273,28 @@ export const CreateOrUpdateOAuthAppSheet = ({
               </SheetTitle>
             </div>
           </SheetHeader>
-          <SheetSection className="overflow-auto grow px-0">
-            <Form {...form}>
+          <SheetSection className="overflow-auto flex-grow px-0">
+            <Form_Shadcn_ {...form}>
               <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)} id={FORM_ID}>
                 <div className="px-5 flex items-start justify-between gap-4">
-                  <div className="grow space-y-4">
-                    <FormField
+                  <div className="flex-grow space-y-4">
+                    <FormField_Shadcn_
                       control={form.control}
                       name="name"
                       render={({ field }) => (
                         <FormItemLayout label="Name">
-                          <FormControl>
+                          <FormControl_Shadcn_>
                             <Input_Shadcn_ {...field} placeholder="My OAuth App" />
-                          </FormControl>
+                          </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
                     />
-                    <FormField
+                    <FormField_Shadcn_
                       control={form.control}
                       name="logo_uri"
                       render={() => (
                         <FormItemLayout label="Logo" description="Upload a logo for your OAuth app">
-                          <FormControl>
+                          <FormControl_Shadcn_>
                             <div className="flex gap-4 items-center">
                               <button
                                 type="button"
@@ -325,7 +334,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                 onChange={onFileUpload}
                               />
                             </div>
-                          </FormControl>
+                          </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
                     />
@@ -338,12 +347,12 @@ export const CreateOrUpdateOAuthAppSheet = ({
                     <div className="px-5">
                       <Panel>
                         <Panel.Content className="space-y-2">
-                          <FormField
+                          <FormField_Shadcn_
                             control={form.control}
                             name="client_id"
                             render={() => (
                               <FormItemLayout label="Client ID">
-                                <FormControl>
+                                <FormControl_Shadcn_>
                                   <Input
                                     copy
                                     readOnly
@@ -352,14 +361,14 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                     onChange={() => {}}
                                     onCopy={() => toast.success('Client ID copied to clipboard')}
                                   />
-                                </FormControl>
+                                </FormControl_Shadcn_>
                               </FormItemLayout>
                             )}
                           />
 
                           {!isPublicClient && (
                             <>
-                              <FormField
+                              <FormField_Shadcn_
                                 control={form.control}
                                 name="client_secret"
                                 render={() => (
@@ -367,7 +376,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                     label="Client Secret"
                                     description="Client secret is hidden for security. Use the regenerate button to create a new one."
                                   >
-                                    <FormControl>
+                                    <FormControl_Shadcn_>
                                       <Input
                                         readOnly
                                         type="password"
@@ -375,7 +384,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                         value="****************************************************************"
                                         onChange={() => {}}
                                       />
-                                    </FormControl>
+                                    </FormControl_Shadcn_>
                                   </FormItemLayout>
                                 )}
                               />
@@ -397,25 +406,58 @@ export const CreateOrUpdateOAuthAppSheet = ({
                 )}
 
                 <div className="px-5 gap-2 flex flex-col">
-                  <FormLabel className="text-foreground">Redirect URIs</FormLabel>
-                  <SingleValueFieldArray
-                    control={form.control}
-                    name="redirect_uris"
-                    valueFieldName="value"
-                    createEmptyRow={() => ({ value: '' })}
-                    placeholder="https://example.com/callback"
-                    addLabel="Add redirect URI"
-                    removeLabel="Remove redirect URI"
-                    minimumRows={1}
-                    rowsClassName="space-y-2"
-                  />
-                  <FormDescription className="text-foreground-lighter">
+                  <FormLabel_Shadcn_ className="text-foreground">Redirect URIs</FormLabel_Shadcn_>
+
+                  <div className="space-y-2">
+                    {redirectUriFields.map((fieldItem, index) => (
+                      <FormField_Shadcn_
+                        control={form.control}
+                        key={fieldItem.id}
+                        name={`redirect_uris.${index}.value`}
+                        render={({ field: inputField }) => (
+                          <FormItem_Shadcn_>
+                            <div className="flex flex-row gap-2">
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_
+                                  {...inputField}
+                                  placeholder={'https://example.com/callback'}
+                                  onChange={(e) => {
+                                    inputField.onChange(e)
+                                  }}
+                                />
+                              </FormControl_Shadcn_>
+                              {redirectUriFields.length > 1 && (
+                                <Button
+                                  type="default"
+                                  size="tiny"
+                                  className="h-[34px]"
+                                  icon={<Trash2 size={12} />}
+                                  onClick={() => removeRedirectUri(index)}
+                                />
+                              )}
+                            </div>
+                            <FormMessage_Shadcn_ />
+                          </FormItem_Shadcn_>
+                        )}
+                      />
+                    ))}
+                  </div>
+                  <div>
+                    <Button
+                      type="default"
+                      icon={<Plus strokeWidth={1.5} />}
+                      onClick={() => appendRedirectUri({ value: '' })}
+                    >
+                      Add redirect URI
+                    </Button>
+                  </div>
+                  <FormDescription_Shadcn_ className="text-foreground-lighter">
                     URLs where users will be redirected after authentication.
-                  </FormDescription>
+                  </FormDescription_Shadcn_>
                 </div>
 
                 <Separator />
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="client_type"
                   render={({ field }) => (
@@ -435,7 +477,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                       }
                       className={'px-5'}
                     >
-                      <FormControl>
+                      <FormControl_Shadcn_>
                         <Switch
                           checked={field.value === 'public'}
                           onCheckedChange={(checked) =>
@@ -443,12 +485,12 @@ export const CreateOrUpdateOAuthAppSheet = ({
                           }
                           disabled={isEditMode}
                         />
-                      </FormControl>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
               </form>
-            </Form>
+            </Form_Shadcn_>
           </SheetSection>
           <SheetFooter>
             <Button type="default" disabled={isCreating || isUpdating} onClick={onClose}>

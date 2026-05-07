@@ -1,6 +1,5 @@
+import { CloneStatus } from 'data/projects/clone-status-query'
 import { Badge } from 'ui'
-
-import { CloneStatus } from '@/data/projects/clone-status-query'
 
 export const StatusBadge = ({
   status,

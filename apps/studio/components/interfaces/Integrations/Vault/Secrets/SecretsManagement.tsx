@@ -1,10 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
+import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import { sortBy } from 'lodash'
 import { RefreshCw, Search, X } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
+import type { VaultSecret } from 'types'
 import {
   Button,
   cn,
@@ -22,13 +29,6 @@ import { DeleteSecretModal } from './DeleteSecretModal'
 import { EditSecretModal } from './EditSecretModal'
 import { formatSecretColumns } from './Secrets.utils'
 import AlertError from '@/components/ui/AlertError'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL } from '@/lib/constants'
-import type { VaultSecret } from '@/types'
 
 export const SecretsManagement = () => {
   const { search } = useParams()
@@ -153,12 +153,12 @@ export const SecretsManagement = () => {
           <LoadingLine loading={isLoading || isRefetching} />
 
           {isError ? (
-            <div className="grow p-4">
+            <div className="flex-grow p-4">
               <AlertError error={error} subject="Failed to load secrets" />
             </div>
           ) : (
             <DataGrid
-              className="grow border-t-0"
+              className="flex-grow border-t-0"
               rowHeight={52}
               headerRowHeight={36}
               columns={columns}
@@ -167,7 +167,7 @@ export const SecretsManagement = () => {
               rowClass={() => {
                 return cn(
                   'cursor-pointer',
-                  '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
+                  '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
                   '[&>.rdg-cell:first-child>div]:pl-8'
                 )
               }}

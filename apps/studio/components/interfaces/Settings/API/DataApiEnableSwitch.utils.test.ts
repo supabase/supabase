@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { getDefaultSchemas } from './DataApiEnableSwitch.utils'
+import type { EnableCheckState } from './DataApiEnableSwitch.types'
+import { enableCheckReducer, getDefaultSchemas } from './DataApiEnableSwitch.utils'
 
 describe('getDefaultSchemas', () => {
   it('returns ["public"] for undefined', () => {

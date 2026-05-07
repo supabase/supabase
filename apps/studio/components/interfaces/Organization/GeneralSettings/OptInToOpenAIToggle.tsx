@@ -1,3 +1,5 @@
+import { InlineLink } from 'components/ui/InlineLink'
+
 import {
   Button,
   Dialog,
@@ -7,8 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-
-import { InlineLink } from '@/components/ui/InlineLink'
 
 export const OptInToOpenAIToggle = () => {
   return (

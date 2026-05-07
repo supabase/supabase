@@ -84,22 +84,15 @@ const page: GoPageInput = {
               </div>
             )}
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button asChild type="primary" size="medium">
-              <Link href="https://www.multigres.com" target="_blank" rel="noopener noreferrer">
-                Learn about Multigres
-              </Link>
-            </Button>
-            <Button asChild type="default" size="medium">
-              <Link
-                href="https://supabase.link/postgresconf-sjc-2026-slides"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Download slides
-              </Link>
-            </Button>
-          </div>
+          <Button asChild type="default" size="medium">
+            <Link
+              href="https://supabase.link/postgresconf-sjc-2026-slides"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Download slides
+            </Link>
+          </Button>
         </div>
       ),
     },

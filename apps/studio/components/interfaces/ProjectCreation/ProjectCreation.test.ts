@@ -1,5 +1,4 @@
 import { expect, test } from 'vitest'
-
 import { DATABASE_PASSWORD_REGEX } from './ProjectCreation.constants'
 
 test('Regex test to surface if password contains @, : or /', () => {

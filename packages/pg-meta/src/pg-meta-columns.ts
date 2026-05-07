@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import { ident, literal, safeSql, type SafeSqlFragment } from './pg-format'
+import { ident, literal } from './pg-format'
 import { COLUMNS_SQL } from './sql/columns'
 
 const pgColumnZod = z.object({
@@ -46,10 +46,10 @@ function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgColumnArrayZod
 } {
-  let sql = safeSql`
+  let sql = `
 with
   columns as (${COLUMNS_SQL})
 select
@@ -67,16 +67,16 @@ where
   )
 
   if (filter) {
-    sql = safeSql`${sql} and schema ${filter}`
+    sql += ` and schema ${filter}`
   }
   if (tableId !== undefined) {
-    sql = safeSql`${sql} and table_id = ${literal(tableId)} `
+    sql += ` and table_id = ${literal(tableId)} `
   }
   if (limit) {
-    sql = safeSql`${sql} limit ${literal(limit)}`
+    sql = `${sql} limit ${limit}`
   }
   if (offset) {
-    sql = safeSql`${sql} offset ${literal(offset)}`
+    sql = `${sql} offset ${offset}`
   }
   return {
     sql,
@@ -86,20 +86,20 @@ where
 
 type ColumnIdentifier = Pick<PGColumn, 'id'> | Pick<PGColumn, 'name' | 'schema' | 'table'>
 
-function getIdentifierWhereClause(identifier: ColumnIdentifier): SafeSqlFragment {
+function getIdentifierWhereClause(identifier: ColumnIdentifier) {
   if ('id' in identifier && identifier.id) {
-    return safeSql`${ident('id')} = ${literal(identifier.id)}`
+    return `${ident('id')} = ${literal(identifier.id)}`
   } else if ('name' in identifier && identifier.name && identifier.schema && identifier.table) {
-    return safeSql`schema = ${literal(identifier.schema)} AND ${ident('table')} = ${literal(identifier.table)} AND name = ${literal(identifier.name)}`
+    return `schema = ${literal(identifier.schema)} AND ${ident('table')} = ${literal(identifier.table)} AND name = ${literal(identifier.name)}`
   }
   throw new Error('Must provide either id or schema, name and table')
 }
 
 function retrieve(identifier: ColumnIdentifier): {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgColumnOptionalZod
 } {
-  const sql = safeSql`WITH columns AS (${COLUMNS_SQL}) SELECT * FROM columns WHERE ${getIdentifierWhereClause(identifier)};`
+  const sql = `WITH columns AS (${COLUMNS_SQL}) SELECT * FROM columns WHERE ${getIdentifierWhereClause(identifier)};`
   return {
     sql,
     zod: pgColumnOptionalZod,
@@ -393,8 +393,10 @@ COMMIT;`
 function remove(
   column: Pick<PGColumn, 'name' | 'schema' | 'table'>,
   { cascade = false } = {}
-): { sql: SafeSqlFragment } {
-  const sql = safeSql`ALTER TABLE ${ident(column.schema)}.${ident(column.table)} DROP COLUMN ${ident(column.name)} ${cascade ? safeSql`CASCADE` : safeSql`RESTRICT`};`
+): { sql: string } {
+  const sql = `ALTER TABLE ${ident(column.schema)}.${ident(column.table)} DROP COLUMN ${ident(
+    column.name
+  )} ${cascade ? 'CASCADE' : 'RESTRICT'};`
   return { sql }
 }
 

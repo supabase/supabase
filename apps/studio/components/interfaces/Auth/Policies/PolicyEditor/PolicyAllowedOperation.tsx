@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { RadioGroupCard, RadioGroupCardItem } from 'ui'
+import { Radio } from 'ui'
 
 interface PolicyAllowedOperationProps {
   operation: string
@@ -20,17 +20,18 @@ const PolicyAllowedOperation = ({
       </div>
       <div className="w-2/3">
         <div className="flex items-center space-x-8">
-          <RadioGroupCard
-            id="allowed-operation"
-            name="allowed-operation"
-            className="flex flex-wrap gap-3"
-            value={operation}
-            onValueChange={(value) => onSelectOperation(value)}
-          >
+          <Radio.Group type="small-cards" size="tiny" id="allowed-operation">
             {['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'ALL'].map((op) => (
-              <RadioGroupCardItem key={op} value={op} id={`r${op}`} label={op} className="w-24" />
+              <Radio
+                key={op}
+                name="allowed-operation"
+                label={op}
+                value={op}
+                checked={operation === op}
+                onChange={(e) => onSelectOperation(e.target.value)}
+              />
             ))}
-          </RadioGroupCard>
+          </Radio.Group>
         </div>
       </div>
     </div>

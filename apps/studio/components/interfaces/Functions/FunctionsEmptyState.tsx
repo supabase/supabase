@@ -1,9 +1,20 @@
 import { useParams } from 'common'
-import { Code, Github, Play, Server, Terminal } from 'lucide-react'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import { DocsButton } from 'components/ui/DocsButton'
+import { ResourceItem } from 'components/ui/Resource/ResourceItem'
+import { ResourceList } from 'components/ui/Resource/ResourceList'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
+import { Code, Github, Lock, Play, Server, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -24,17 +35,6 @@ import {
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
-import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
-import { ResourceList } from '@/components/ui/Resource/ResourceList'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from '@/lib/constants'
-import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const FunctionsEmptyState = () => {
   const { ref } = useParams()
@@ -169,7 +169,7 @@ export const FunctionsEmptyState = () => {
         {templates.map((template) => (
           <ResourceItem
             key={template.name}
-            media={<Code strokeWidth={1.5} size={16} className="translate-y-[-9px]" />}
+            media={<Code strokeWidth={1.5} size={16} className="-translate-y-[9px]" />}
             onClick={() => {
               sendEvent({
                 action: 'edge_function_template_clicked',
@@ -325,7 +325,7 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
               <DialogTrigger asChild>
                 <ResourceItem
                   key={template.name}
-                  media={<Code strokeWidth={1.5} size={16} className="translate-y-[-9px]" />}
+                  media={<Code strokeWidth={1.5} size={16} className="-translate-y-[9px]" />}
                 >
                   <div>
                     <p>{template.name}</p>
@@ -339,7 +339,7 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
                   <DialogDescription>{template.description}</DialogDescription>
                 </DialogHeader>
                 <Separator />
-                <DialogSection className="p-0!">
+                <DialogSection className="!p-0">
                   <CodeBlock
                     language="ts"
                     hideLineNumbers={true}

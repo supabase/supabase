@@ -8,7 +8,7 @@ export function NamedCodeBlock({ name, children }: PropsWithChildren<{ name: str
       <h6
         className={cn(
           'w-fit flex items-center text-center',
-          'shadow-xs rounded-sm border border-stronger bg-selection',
+          'shadow-sm rounded border border-stronger bg-selection',
           'px-2.5 py-1',
           'text-xs text-foreground'
         )}

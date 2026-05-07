@@ -1,5 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -11,9 +14,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
   WarningIcon,
 } from 'ui'
@@ -30,9 +33,6 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { ProjectAccessSection } from './ProjectAccessSection'
-import { useProjectUpdateMutation } from '@/data/projects/project-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const General = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -109,11 +109,11 @@ export const General = () => {
               </CardContent>
             </Card>
           ) : (
-            <Form {...form}>
+            <Form_Shadcn_ {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <Card>
                   <CardContent>
-                    <FormField
+                    <FormField_Shadcn_
                       control={form.control}
                       name="name"
                       render={({ field }) => (
@@ -123,13 +123,13 @@ export const General = () => {
                           description="Displayed throughout the dashboard."
                           className="[&>div]:md:w-1/2"
                         >
-                          <FormControl>
+                          <FormControl_Shadcn_>
                             <Input_Shadcn_
                               {...field}
                               disabled={isBranch || !canUpdateProject}
                               autoComplete="off"
                             />
-                          </FormControl>
+                          </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
                     />
@@ -141,9 +141,9 @@ export const General = () => {
                       description="Reference used in APIs and URLs."
                       className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                     >
-                      <FormControl>
+                      <FormControl_Shadcn_>
                         <Input copy readOnly size="small" value={project?.ref ?? ''} />
-                      </FormControl>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   </CardContent>
                   <CardFooter className="justify-end space-x-2">
@@ -170,7 +170,7 @@ export const General = () => {
                   </CardFooter>
                 </Card>
               </form>
-            </Form>
+            </Form_Shadcn_>
           )}
         </PageSectionContent>
       </PageSection>

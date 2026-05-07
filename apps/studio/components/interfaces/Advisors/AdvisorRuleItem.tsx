@@ -1,7 +1,15 @@
-import { useParams } from 'common'
 import { ChevronRight, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+
+import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
+import { useLintRuleDeleteMutation } from 'data/lint/delete-lint-rule-mutation'
+import { useProjectLintRulesQuery } from 'data/lint/lint-rules-query'
+import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Badge,
   Button,
@@ -14,19 +22,11 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-
 import { LintInfo } from '../Linter/Linter.constants'
 import { generateRuleText } from './AdvisorRules.utils'
 import { CreateRuleSheet } from './CreateRuleSheet'
 import { DisableRuleModal } from './DisableRuleModal'
 import { EnableRuleModal } from './EnableRuleModal'
-import AlertError from '@/components/ui/AlertError'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { useLintRuleDeleteMutation } from '@/data/lint/delete-lint-rule-mutation'
-import { useProjectLintRulesQuery } from '@/data/lint/lint-rules-query'
-import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface AdvisorRuleItemProps {
   lint: LintInfo
@@ -106,7 +106,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
           else setExpandedLint(undefined)
         }}
       >
-        <CollapsibleTrigger_Shadcn_ asChild className="[&[data-state=open]>div>svg]:rotate-90!">
+        <CollapsibleTrigger_Shadcn_ asChild className="[&[data-state=open]>div>svg]:!rotate-90">
           <Card className="border-b-0 rounded-none">
             <CardContent className="py-3 flex items-center justify-between text-sm gap-4 cursor-pointer transition hover:bg-surface-200">
               <div className="flex items-center justify-center [&>svg]:text-foreground-lighter">
@@ -138,7 +138,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
         </CollapsibleTrigger_Shadcn_>
         <CollapsibleContent_Shadcn_
           className={cn(
-            'bg-surface border-x border-t rounded-none!',
+            'bg-surface border-x border-t !rounded-none',
             rules.length > 0 ? 'divide-y' : ''
           )}
         >

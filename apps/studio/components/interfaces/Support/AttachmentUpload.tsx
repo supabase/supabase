@@ -1,7 +1,11 @@
 // End of third-party imports
 
+import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachment-urls-mutation'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import { compact } from 'lodash'
-import { FileCode, Plus, X } from 'lucide-react'
+import { File, FileCode, Plus, X } from 'lucide-react'
+import { InlineLink } from 'components/ui/InlineLink'
 import {
   useCallback,
   useEffect,
@@ -15,10 +19,6 @@ import { toast } from 'sonner'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { createSupportStorageClient } from './support-storage-client'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { useGenerateAttachmentURLsMutation } from '@/data/support/generate-attachment-urls-mutation'
-import { uuidv4 } from '@/lib/helpers'
-import { useProfile } from '@/lib/profile'
 
 const MAX_ATTACHMENTS = 5
 
@@ -188,7 +188,7 @@ export function AttachmentUploadDisplay({
             return (
               <div
                 key={url}
-                className="border relative h-14 w-14 rounded-sm flex items-center justify-center"
+                className="border relative h-14 w-14 rounded flex items-center justify-center"
               >
                 <Tooltip>
                   <TooltipTrigger className="cursor-default" onClick={(e) => e.preventDefault()}>
@@ -220,7 +220,7 @@ export function AttachmentUploadDisplay({
               <div
                 key={url}
                 style={{ backgroundImage: `url("${url}")` }}
-                className="relative h-14 w-14 rounded-sm bg-cover bg-center bg-no-repeat"
+                className="relative h-14 w-14 rounded bg-cover bg-center bg-no-repeat"
               >
                 <button
                   type="button"
@@ -242,7 +242,7 @@ export function AttachmentUploadDisplay({
             type="button"
             className={cn(
               'border border-stronger opacity-50 transition hover:opacity-100',
-              'group flex h-14 w-14 cursor-pointer items-center justify-center rounded-sm'
+              'group flex h-14 w-14 cursor-pointer items-center justify-center rounded'
             )}
             onClick={addFile}
           >

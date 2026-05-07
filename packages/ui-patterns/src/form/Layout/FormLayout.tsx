@@ -1,6 +1,13 @@
 import { cva } from 'class-variance-authority'
+import { motion } from 'framer-motion'
 import React from 'react'
-import { cn, FormDescription, FormLabel, FormMessage, Label_Shadcn_ } from 'ui'
+import {
+  cn,
+  FormDescription_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
+  Label_Shadcn_,
+} from 'ui'
 import { SIZE } from 'ui/src/lib/constants'
 
 type Props = {
@@ -24,8 +31,8 @@ const ContainerVariants = cva('relative grid gap-10', {
   variants: {
     size: {
       tiny: 'text-xs',
-      small: 'text-base md:text-sm leading-4',
-      medium: 'text-base md:text-sm',
+      small: 'text-sm leading-4',
+      medium: 'text-sm',
       large: 'text-base',
       xlarge: 'text-base',
     },
@@ -75,7 +82,7 @@ const LabelContainerVariants = cva('transition-all duration-500 ease-in-out', {
       horizontal: 'flex flex-col gap-2 col-span-4',
       vertical: 'flex flex-row gap-2 justify-between',
       flex: 'flex flex-col gap-0 min-w-0',
-      'flex-row-reverse': 'flex flex-col min-w-0 grow',
+      'flex-row-reverse': 'flex flex-col min-w-0 flex-grow',
     },
     labelLayout: {
       horizontal: '',
@@ -294,7 +301,7 @@ export const FormLayout = React.forwardRef<
     const hasLabel = Boolean(label || beforeLabel || afterLabel)
     const renderError =
       isReactForm && !hideMessage ? (
-        <FormMessage
+        <FormMessage_Shadcn_
           className={cn(
             'mt-2 transition-all duration-300 ease-in-out',
             layout === 'flex-row-reverse' && 'mt-0'
@@ -305,13 +312,13 @@ export const FormLayout = React.forwardRef<
 
     const renderDescription =
       description && isReactForm ? (
-        <FormDescription
+        <FormDescription_Shadcn_
           className={cn(DescriptionVariants({ size, layout }))}
           data-formlayout-id={'description'}
           id={`${id}-description`}
         >
           {description}
-        </FormDescription>
+        </FormDescription_Shadcn_>
       ) : description ? (
         <p
           className={cn(DescriptionVariants({ size, layout }), 'text-sm text-foreground-light')}
@@ -364,16 +371,16 @@ export const FormLayout = React.forwardRef<
               data-formlayout-id={'labelContainer'}
             >
               {hasLabel && isReactForm ? (
-                <FormLabel
-                  className="text-foreground flex gap-2 items-center wrap-break-word"
+                <FormLabel_Shadcn_
+                  className="text-foreground flex gap-2 items-center break-words"
                   data-formlayout-id="formLabel"
                   htmlFor={props.name || id}
                 >
                   <LabelContents />
-                </FormLabel>
+                </FormLabel_Shadcn_>
               ) : (
                 <Label_Shadcn_
-                  className="text-foreground flex gap-2 items-center wrap-break-word leading-normal"
+                  className="text-foreground flex gap-2 items-center break-words leading-normal"
                   data-formlayout-id="label"
                   htmlFor={props.name || id}
                 >

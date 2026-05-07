@@ -1,6 +1,9 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useSignUpMutation } from 'data/misc/signup-mutation'
 import { motion } from 'framer-motion'
+import { BASE_PATH } from 'lib/constants'
+import { buildPathWithParams } from 'lib/gotrue'
 import { CheckCircle, Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
@@ -13,18 +16,15 @@ import {
   AlertTitle_Shadcn_,
   Button,
   cn,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import PasswordConditionsHelper from './PasswordConditionsHelper'
-import { useSignUpMutation } from '@/data/misc/signup-mutation'
-import { BASE_PATH } from '@/lib/constants'
-import { buildPathWithParams } from '@/lib/gotrue'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -143,15 +143,15 @@ export const SignUpForm = () => {
           isSubmitted ? 'max-h-[100px] opacity-0 pointer-events-none' : 'max-h-[1000px] opacity-100'
         )}
       >
-        <Form {...form}>
+        <Form_Shadcn_ {...form}>
           <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
+            <FormField_Shadcn_
               key="email"
               name="email"
               control={form.control}
               render={({ field }) => (
                 <FormItemLayout name="email" label="Email">
-                  <FormControl>
+                  <FormControl_Shadcn_>
                     <Input_Shadcn_
                       id="email"
                       autoComplete="email"
@@ -159,18 +159,18 @@ export const SignUpForm = () => {
                       {...field}
                       placeholder="you@example.com"
                     />
-                  </FormControl>
+                  </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
 
-            <FormField
+            <FormField_Shadcn_
               key="password"
               name="password"
               control={form.control}
               render={({ field }) => (
                 <FormItemLayout name="password" label="Password">
-                  <FormControl>
+                  <FormControl_Shadcn_>
                     <div className="relative">
                       <Input_Shadcn_
                         id="password"
@@ -191,14 +191,14 @@ export const SignUpForm = () => {
                         onClick={() => setPasswordHidden((prev) => !prev)}
                       />
                     </div>
-                  </FormControl>
+                  </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
 
             <div
               className={`${
-                showConditions ? 'max-h-[500px]' : 'max-h-0'
+                showConditions ? 'max-h-[500px]' : 'max-h-[0px]'
               } transition-all duration-400 overflow-y-hidden`}
             >
               <PasswordConditionsHelper password={password} />
@@ -225,7 +225,7 @@ export const SignUpForm = () => {
               Sign up
             </Button>
           </form>
-        </Form>
+        </Form_Shadcn_>
       </div>
     </div>
   )

@@ -13,9 +13,43 @@ import pgMeta, {
 } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
+import type { SupaRow } from 'components/grid/types'
+import { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
+import SparkBar from 'components/ui/SparkBar'
+import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
+import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
+import { updateDatabaseColumn } from 'data/database-columns/database-column-update-mutation'
+import { createDatabasePolicy } from 'data/database-policies/database-policy-create-mutation'
+import type { Constraint } from 'data/database/constraints-query'
+import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import { databaseKeys } from 'data/database/keys'
+import { entityTypeKeys } from 'data/entity-types/keys'
+import { lintKeys } from 'data/lint/keys'
+import { prefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
+import { getQueryClient } from 'data/query-client'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { tableEditorKeys } from 'data/table-editor/keys'
+import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
+import { tableRowKeys } from 'data/table-rows/keys'
+import { executeWithRetry } from 'data/table-rows/table-rows-query'
+import { tableKeys } from 'data/tables/keys'
+import {
+  getTable,
+  getTableQuery,
+  RetrievedTableColumn,
+  RetrieveTableResult,
+} from 'data/tables/table-retrieve-query'
+import {
+  UpdateTableBody,
+  updateTable as updateTableMutation,
+} from 'data/tables/table-update-mutation'
+import { getTables } from 'data/tables/tables-query'
+import { sendEvent } from 'data/telemetry/send-event-mutation'
+import { timeout, tryParseJson } from 'lib/helpers'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
+import type { SidePanel } from 'state/table-editor'
 
 import {
   generateCreateColumnPayload,
@@ -24,41 +58,7 @@ import {
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
-import type { SupaRow } from '@/components/grid/types'
-import { GeneratedPolicy } from '@/components/interfaces/Auth/Policies/Policies.utils'
-import SparkBar from '@/components/ui/SparkBar'
-import { createDatabaseColumn } from '@/data/database-columns/database-column-create-mutation'
-import { deleteDatabaseColumn } from '@/data/database-columns/database-column-delete-mutation'
-import { updateDatabaseColumn } from '@/data/database-columns/database-column-update-mutation'
-import { createDatabasePolicy } from '@/data/database-policies/database-policy-create-mutation'
-import type { Constraint } from '@/data/database/constraints-query'
-import { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
-import { databaseKeys } from '@/data/database/keys'
-import { entityTypeKeys } from '@/data/entity-types/keys'
-import { lintKeys } from '@/data/lint/keys'
-import { prefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
-import { getQueryClient } from '@/data/query-client'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import { tableEditorKeys } from '@/data/table-editor/keys'
-import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
-import { tableRowKeys } from '@/data/table-rows/keys'
-import { executeWithRetry } from '@/data/table-rows/table-rows-query'
-import { tableKeys } from '@/data/tables/keys'
-import {
-  getTable,
-  getTableQuery,
-  RetrievedTableColumn,
-  RetrieveTableResult,
-} from '@/data/tables/table-retrieve-query'
-import {
-  UpdateTableBody,
-  updateTable as updateTableMutation,
-} from '@/data/tables/table-update-mutation'
-import { getTables } from '@/data/tables/tables-query'
-import { sendEvent } from '@/data/telemetry/send-event-mutation'
-import { isObject, isObjectContainingKeys, timeout, tryParseJson } from '@/lib/helpers'
 import type { DeepReadonly } from '@/lib/type-helpers'
-import type { SidePanel } from '@/state/table-editor'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -656,13 +656,13 @@ export const createTable = async ({
 
         if (importContent.file && importContent.rowCount > 0) {
           // Via a CSV file
-          const { error } = await insertRowsViaSpreadsheet({
+          const { error }: any = await insertRowsViaSpreadsheet(
             projectRef,
             connectionString,
-            file: importContent.file,
+            importContent.file,
             table,
-            selectedHeaders: importContent.selectedHeaders,
-            onProgressUpdate: (progress: number) => {
+            importContent.selectedHeaders,
+            (progress: number) => {
               toast.loading(
                 <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
                   <SparkBar
@@ -678,28 +678,25 @@ export const createTable = async ({
                 </div>,
                 { id: toastId }
               )
-            },
-            emptyStringAsNullHeaders: importContent.emptyStringAsNullHeaders,
-          })
+            }
+          )
 
           if (error !== undefined) {
             span.setAttribute('import.error', 1)
             toast.error('Do check your spreadsheet if there are any discrepancies.')
-            const message = isObjectContainingKeys(error, ['message'])
-              ? String(error.message)
-              : 'An unknown error occurred during data import.'
+            const message = `Table ${table.name} has been created but we ran into an error while inserting rows: ${error.message}`
             toast.error(message)
             console.error('Error:', { error, message })
           }
         } else {
           // Via text copy and paste
-          await insertTableRows({
+          await insertTableRows(
             projectRef,
             connectionString,
             table,
-            rows: importContent.rows,
-            selectedHeaders: importContent.selectedHeaders,
-            onProgressUpdate: (progress: number) => {
+            importContent.rows,
+            importContent.selectedHeaders,
+            (progress: number) => {
               toast.loading(
                 <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
                   <SparkBar
@@ -714,9 +711,8 @@ export const createTable = async ({
                 </div>,
                 { id: toastId }
               )
-            },
-            emptyStringAsNullHeaders: importContent.emptyStringAsNullHeaders,
-          })
+            }
+          )
         }
 
         // For identity columns, manually raise the sequences (batched for performance)
@@ -970,22 +966,15 @@ export const formatRowsForInsert = ({
   rows,
   headers,
   columns = [],
-  emptyStringAsNullHeaders = headers,
 }: {
-  rows: unknown[]
+  rows: any[]
   headers: string[]
   columns?: RetrieveTableResult['columns']
-  emptyStringAsNullHeaders?: string[]
 }) => {
-  return rows.map((row) => {
-    const formattedRow: Record<string, unknown> = {}
-    if (!isObject(row)) {
-      return formattedRow
-    }
-
+  return rows.map((row: any) => {
+    const formattedRow: any = {}
     headers.forEach((header) => {
       const column = columns?.find((c) => c.name === header)
-
       const originalValue = row[header]
 
       if ((column?.format ?? '').includes('json')) {
@@ -1002,8 +991,7 @@ export const formatRowsForInsert = ({
           formattedRow[header] = tryParseJson(originalValue)
         }
       } else if (originalValue === '') {
-        formattedRow[header] =
-          column?.is_nullable && emptyStringAsNullHeaders.includes(header) ? null : ''
+        formattedRow[header] = column?.is_nullable ? null : ''
       } else {
         formattedRow[header] = originalValue
       }
@@ -1012,26 +1000,17 @@ export const formatRowsForInsert = ({
   })
 }
 
-export async function insertRowsViaSpreadsheet({
-  projectRef,
-  connectionString,
-  file,
-  table,
-  selectedHeaders,
-  emptyStringAsNullHeaders = selectedHeaders,
-  onProgressUpdate,
-}: {
-  projectRef: string
-  connectionString: string | undefined | null
-  file: File
-  table: RetrieveTableResult
-  selectedHeaders: string[]
-  emptyStringAsNullHeaders?: string[]
+export const insertRowsViaSpreadsheet = async (
+  projectRef: string,
+  connectionString: string | undefined | null,
+  file: any,
+  table: RetrieveTableResult,
+  selectedHeaders: string[],
   onProgressUpdate: (progress: number) => void
-}): Promise<{ error: unknown }> {
+) => {
   let chunkNumber = 0
-  let insertError: unknown = undefined
-  const t1 = new Date()
+  let insertError: any = undefined
+  const t1: any = new Date()
   return new Promise((resolve) => {
     Papa.parse(file, {
       header: true,
@@ -1040,14 +1019,13 @@ export async function insertRowsViaSpreadsheet({
       skipEmptyLines: true,
       chunkSize: CHUNK_SIZE,
       quoteChar: file.type === 'text/tab-separated-values' ? '' : '"',
-      chunk: async (results, parser) => {
+      chunk: async (results: any, parser: any) => {
         parser.pause()
 
         const formattedData = formatRowsForInsert({
           rows: results.data,
           headers: selectedHeaders,
           columns: table.columns,
-          emptyStringAsNullHeaders,
         })
 
         const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
@@ -1068,79 +1046,33 @@ export async function insertRowsViaSpreadsheet({
         parser.resume()
       },
       complete: () => {
-        const t2 = new Date()
-        console.log(
-          `Total time taken for importing spreadsheet: ${(t2.getTime() - t1.getTime()) / 1000} seconds`
-        )
-        if (insertError === undefined) {
-          const sequenceColumns = (table.columns ?? []).filter(
-            (column) =>
-              column.is_identity ||
-              (typeof column.default_value === 'string' &&
-                column.default_value.includes('nextval('))
-          )
-
-          if (sequenceColumns.length === 0) {
-            resolve({ error: insertError })
-            return
-          }
-
-          const updateSequenceSQL = sequenceColumns
-            .map((column) =>
-              getUpdateIdentitySequenceSQL({
-                schema: table.schema,
-                table: table.name,
-                column: column.name,
-              })
-            )
-            .join(';\n')
-
-          executeSql({
-            projectRef,
-            connectionString,
-            sql: updateSequenceSQL,
-            queryKey: ['sequences', 'update-batch'],
-          })
-            .then(() => resolve({ error: insertError }))
-            .catch((error) => resolve({ error }))
-          return
-        }
-
+        const t2: any = new Date()
+        console.log(`Total time taken for importing spreadsheet: ${(t2 - t1) / 1000} seconds`)
         resolve({ error: insertError })
       },
     })
   })
 }
 
-export async function insertTableRows({
-  projectRef,
-  connectionString,
-  table,
-  rows,
-  selectedHeaders,
-  emptyStringAsNullHeaders = selectedHeaders,
-  onProgressUpdate,
-}: {
-  projectRef: string
-  connectionString: string | undefined | null
-  table: RetrieveTableResult
-  rows: unknown[]
-  selectedHeaders: string[]
-  emptyStringAsNullHeaders?: string[]
+export const insertTableRows = async (
+  projectRef: string,
+  connectionString: string | undefined | null,
+  table: RetrieveTableResult,
+  rows: any,
+  selectedHeaders: string[],
   onProgressUpdate: (progress: number) => void
-}): Promise<{ error: unknown }> {
-  let insertError: unknown = undefined
+) => {
+  let insertError = undefined
   let insertProgress = 0
 
   const formattedRows = formatRowsForInsert({
     rows,
     headers: selectedHeaders,
     columns: table.columns,
-    emptyStringAsNullHeaders,
   })
 
   const batches = chunk(formattedRows, BATCH_SIZE)
-  const tasks = batches.map((batch) => {
+  const promises = batches.map((batch: any) => {
     return () => {
       return Promise.race([
         new Promise(async (resolve, reject) => {
@@ -1155,57 +1087,19 @@ export async function insertTableRows({
           insertProgress = insertProgress + batch.length / rows.length
           resolve({})
         }),
-        timeout(30_000),
+        timeout(30000),
       ])
     }
   })
 
-  const batchedPromises = chunk(tasks, 10)
+  const batchedPromises = chunk(promises, 10)
   for (const batchedPromise of batchedPromises) {
     const res = await Promise.allSettled(batchedPromise.map((batch) => batch()))
-    const failedBatch = res.find((result) => result.status === 'rejected')
-    if (failedBatch?.status === 'rejected') {
-      if (insertError === undefined) insertError = failedBatch.reason
-      break
-    }
+    const hasFailedBatch = find(res, { status: 'rejected' })
+    if (hasFailedBatch) break
     onProgressUpdate(insertProgress * 100)
   }
-
-  if (insertError !== undefined) {
-    return { error: insertError }
-  }
-
-  const sequenceColumns = (table.columns ?? []).filter(
-    (column) =>
-      column.is_identity ||
-      (typeof column.default_value === 'string' && column.default_value.includes('nextval('))
-  )
-
-  if (sequenceColumns.length === 0) {
-    return { error: insertError }
-  }
-
-  const updateSequenceSQL = sequenceColumns
-    .map((column) =>
-      getUpdateIdentitySequenceSQL({
-        schema: table.schema,
-        table: table.name,
-        column: column.name,
-      })
-    )
-    .join(';\n')
-
-  try {
-    await executeSql({
-      projectRef,
-      connectionString,
-      sql: updateSequenceSQL,
-      queryKey: ['sequences', 'update-batch'],
-    })
-    return { error: insertError }
-  } catch (error) {
-    return { error }
-  }
+  return { error: insertError }
 }
 
 const updateForeignKeys = async ({

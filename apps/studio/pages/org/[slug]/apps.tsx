@@ -1,3 +1,8 @@
+import { OAuthApps } from 'components/interfaces/Organization/OAuthApps/OAuthApps'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
+import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import { OrganizationSettingsLayout } from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
+import type { NextPageWithLayout } from 'types'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -5,12 +10,6 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
-
-import { OAuthApps } from '@/components/interfaces/Organization/OAuthApps/OAuthApps'
-import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import OrganizationLayout from '@/components/layouts/OrganizationLayout'
-import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
-import type { NextPageWithLayout } from '@/types'
 
 const OrgOAuthApps: NextPageWithLayout = () => {
   return (

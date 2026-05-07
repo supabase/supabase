@@ -1,13 +1,13 @@
-import { type DocsSearchResult as Page, type DocsSearchResultSection as PageSection } from 'common'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+
+import { type DocsSearchResult as Page, type DocsSearchResultSection as PageSection } from 'common'
 import { cn } from 'ui'
 import { TextHighlighterBase as TextHighlighter } from 'ui-patterns/CommandMenu'
-
 import { formatSectionUrl, generateLink, getPageIcon } from './SupportForm.utils'
 
 const cardBaseClasses =
-  'bg-200 rounded-lg hover:bg-surface-200 p-3 transition-colors hover:border-overlay hover:shadow-xs flex items-center justify-between'
+  'bg-200 rounded-lg hover:bg-surface-200 p-3 transition-colors hover:border-overlay hover:shadow-sm flex items-center justify-between'
 
 interface DocsLinkGroup {
   page: Page

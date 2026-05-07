@@ -1,16 +1,17 @@
-import { AUTH_ERROR_CODES } from 'common/constants/auth-error-codes'
-import z from 'zod'
+import type { AnalyticsInterval } from 'data/analytics/constants'
 
+import { analyticsIntervalToGranularity } from 'data/reports/report.utils'
 import { ReportConfig, ReportDataProviderAttribute } from './reports.types'
+import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
+import { fetchLogs } from 'data/reports/report.utils'
+import z from 'zod'
 import {
   extractStatusCodesFromData,
   generateStatusCodeAttributes,
   transformCategoricalCountData,
   transformStatusCodeData,
-} from '@/components/interfaces/Reports/Reports.utils'
-import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
-import type { AnalyticsInterval } from '@/data/analytics/constants'
-import { analyticsIntervalToGranularity, fetchLogs } from '@/data/reports/report.utils'
+} from 'components/interfaces/Reports/Reports.utils'
+import { AUTH_ERROR_CODES } from 'common/constants/auth-error-codes'
 
 const AUTH_ERROR_CODE_LIST = Object.entries(AUTH_ERROR_CODES).map(([key, value]) => ({
   key,
@@ -725,6 +726,11 @@ export const createErrorsReportConfig = ({
         attribute: c,
         label: c,
         tooltip: AUTH_ERROR_CODE_LIST.find((e) => e.key === c)?.description,
+      }))
+
+      const data = rawData.result.map((point: any) => ({
+        ...point,
+        timestamp: point.timestamp,
       }))
 
       const pivoted = transformCategoricalCountData(rawData.result, 'error_code', distinct)

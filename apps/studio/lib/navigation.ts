@@ -1,7 +1,6 @@
-import { useRouter } from 'next/navigation'
 import type { NextRouter } from 'next/router'
-
 import { BASE_PATH } from './constants'
+import { useRouter } from 'next/navigation'
 
 type Router = NextRouter | ReturnType<typeof useRouter>
 

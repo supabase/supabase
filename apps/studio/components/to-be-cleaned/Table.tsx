@@ -1,8 +1,8 @@
-import type { PropsWithChildren, ReactNode } from 'react'
+import { PropsWithChildren } from 'react'
 
 interface TableProps {
-  body: ReactNode
-  head?: ReactNode
+  body: JSX.Element | JSX.Element[]
+  head?: JSX.Element | JSX.Element[]
   className?: string
   containerClassName?: string
   borderless?: boolean

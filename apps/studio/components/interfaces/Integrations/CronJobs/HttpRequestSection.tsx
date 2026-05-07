@@ -1,10 +1,11 @@
 import { UseFormReturn } from 'react-hook-form'
+
 import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
   Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -14,7 +15,6 @@ import {
   SheetSection,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
 import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 
 interface HttpRequestSectionProps {
@@ -24,41 +24,41 @@ interface HttpRequestSectionProps {
 export const HttpRequestSection = ({ form }: HttpRequestSectionProps) => {
   return (
     <SheetSection className="flex flex-col gap-3">
-      <FormField
+      <FormField_Shadcn_
         control={form.control}
         name="values.method"
         render={({ field }) => (
-          <FormItem>
-            <FormLabel>Method</FormLabel>
+          <FormItem_Shadcn_>
+            <FormLabel_Shadcn_>Method</FormLabel_Shadcn_>
             <Select_Shadcn_ onValueChange={field.onChange} value={field.value}>
-              <FormControl>
+              <FormControl_Shadcn_>
                 <SelectTrigger_Shadcn_>
                   <SelectValue_Shadcn_ placeholder="Select a method for the HTTP request" />
                 </SelectTrigger_Shadcn_>
-              </FormControl>
+              </FormControl_Shadcn_>
               <SelectContent_Shadcn_>
                 <SelectItem_Shadcn_ value="GET">GET</SelectItem_Shadcn_>
                 <SelectItem_Shadcn_ value="POST">POST</SelectItem_Shadcn_>
               </SelectContent_Shadcn_>
             </Select_Shadcn_>
-            <FormMessage />
-          </FormItem>
+            <FormMessage_Shadcn_ />
+          </FormItem_Shadcn_>
         )}
       />
 
-      <FormField
+      <FormField_Shadcn_
         control={form.control}
         name="values.endpoint"
         render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Endpoint URL" className="gap-1">
-            <FormControl>
+            <FormControl_Shadcn_>
               <Input {...rest} placeholder="https://api.example.com/endpoint" />
-            </FormControl>
+            </FormControl_Shadcn_>
           </FormItemLayout>
         )}
       />
 
-      <FormField
+      <FormField_Shadcn_
         control={form.control}
         name="values.timeoutMs"
         render={({ field: { ref, ...rest } }) => (

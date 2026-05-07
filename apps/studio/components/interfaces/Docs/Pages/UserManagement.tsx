@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useRouter } from 'next/router'
 
 import CodeSnippet from '../CodeSnippet'
 import { DocSection } from '../DocSection'
@@ -17,6 +18,7 @@ interface UserManagementProps {
 }
 
 export const UserManagement = ({ selectedLang, showApiKey }: UserManagementProps) => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const keyToShow = showApiKey ? showApiKey : 'SUPABASE_KEY'
 

@@ -781,7 +781,7 @@ with records as (
       )
       or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
     )
-    and nc.nspname IN (${schemas.map((schema) => `'${schema.replace(/'/g, "''")}'`).join(', ')})
+    and nc.nspname IN (${schemas.map((schema) => `'${schema}'`).join(', ')})
   order by c.relname asc
   limit ${limit}
   offset 0

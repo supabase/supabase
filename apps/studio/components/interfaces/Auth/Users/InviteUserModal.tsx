@@ -1,14 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { useUserInviteMutation } from 'data/auth/user-invite-mutation'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_, Modal } from 'ui'
+import {
+  Button,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  Modal,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
-
-import { useUserInviteMutation } from '@/data/auth/user-invite-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export type InviteUserModalProps = {
   visible: boolean
@@ -62,17 +68,17 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
       header="Invite a new user"
       onCancel={handleToggle}
     >
-      <Form {...form}>
+      <Form_Shadcn_ {...form}>
         <Modal.Content>
           <form id={formId} onSubmit={form.handleSubmit(onInviteUser)} noValidate>
-            <FormField
+            <FormField_Shadcn_
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItemLayout layout="vertical" label="User email">
-                  <FormControl className="relative col-span-6">
+                  <FormControl_Shadcn_ className="relative col-span-6">
                     <Input_Shadcn_ {...field} />
-                  </FormControl>
+                  </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
@@ -91,7 +97,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
             Invite user
           </Button>
         </Modal.Content>
-      </Form>
+      </Form_Shadcn_>
     </Modal>
   )
 }

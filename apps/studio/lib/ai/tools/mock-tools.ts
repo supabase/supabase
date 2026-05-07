@@ -1,9 +1,8 @@
-import assert from 'node:assert'
-import { tool } from 'ai'
+import { tool, type ToolSet } from 'ai'
+import { getRenderingTools } from '../tools/rendering-tools'
 import { z } from 'zod'
-
-import { getStudioTools } from '../tools/studio-tools'
-import { getMcpTools } from '@/lib/ai/tools/mcp-tools'
+import { getMcpTools } from 'lib/ai/tools/mcp-tools'
+import assert from 'node:assert'
 
 const listTablesInputSchema = z.object({
   schemas: z.array(z.string()).describe('The schema names to list.'),
@@ -143,11 +142,11 @@ const MOCK_LOGS_DATA = [
   },
 ]
 
-function createMockedStudioTools() {
-  const studioTools = getStudioTools()
+function createMockedRenderingTools() {
+  const renderingTools = getRenderingTools()
 
   return Object.fromEntries(
-    Object.entries(studioTools).map(([name, baseTool]) => {
+    Object.entries(renderingTools).map(([name, baseTool]) => {
       if (typeof baseTool.execute === 'function') {
         return [name, baseTool]
       }
@@ -167,7 +166,7 @@ function createMockedStudioTools() {
         },
       ]
     })
-  ) as typeof studioTools
+  ) as typeof renderingTools
 }
 
 function createMockListTablesTool(overrideData?: Record<string, typeof MOCK_TABLES_DATA>) {
@@ -306,7 +305,7 @@ export type MockToolOverrides = {
  * Note: search_docs uses the real implementation
  */
 export async function getMockTools(overrides?: MockToolOverrides) {
-  const mockedStudioTools = createMockedStudioTools()
+  const mockedRenderingTools = createMockedRenderingTools()
 
   const { search_docs } = await getMcpTools({
     accessToken: 'mock-access-token',
@@ -317,7 +316,7 @@ export async function getMockTools(overrides?: MockToolOverrides) {
   assert(search_docs, 'search_docs tool not available from MCP server')
 
   return {
-    ...mockedStudioTools,
+    ...mockedRenderingTools,
     search_docs,
     list_tables: createMockListTablesTool(overrides?.list_tables),
     list_extensions: createMockListExtensionsTool(),

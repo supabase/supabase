@@ -5,14 +5,14 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+  Checkbox_Shadcn_,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
 } from 'ui'
 import { z } from 'zod'
 
@@ -68,32 +68,32 @@ export default function CheckboxReactHookFormMultiple() {
   }
 
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
+        <FormField_Shadcn_
           control={form.control}
           name="items"
           render={() => (
-            <FormItem>
+            <FormItem_Shadcn_>
               <div className="mb-4">
-                <FormLabel className="text-base">Sidebar</FormLabel>
-                <FormDescription>
+                <FormLabel_Shadcn_ className="text-base">Sidebar</FormLabel_Shadcn_>
+                <FormDescription_Shadcn_>
                   Select the items you want to display in the sidebar.
-                </FormDescription>
+                </FormDescription_Shadcn_>
               </div>
               {items.map((item) => (
-                <FormField
+                <FormField_Shadcn_
                   key={item.id}
                   control={form.control}
                   name="items"
                   render={({ field }) => {
                     return (
-                      <FormItem
+                      <FormItem_Shadcn_
                         key={item.id}
                         className="flex flex-row items-start space-x-3 space-y-0"
                       >
-                        <FormControl>
-                          <Checkbox
+                        <FormControl_Shadcn_>
+                          <Checkbox_Shadcn_
                             checked={field.value?.includes(item.id)}
                             onCheckedChange={(checked) => {
                               return checked
@@ -101,19 +101,19 @@ export default function CheckboxReactHookFormMultiple() {
                                 : field.onChange(field.value?.filter((value) => value !== item.id))
                             }}
                           />
-                        </FormControl>
-                        <FormLabel className="font-normal">{item.label}</FormLabel>
-                      </FormItem>
+                        </FormControl_Shadcn_>
+                        <FormLabel_Shadcn_ className="font-normal">{item.label}</FormLabel_Shadcn_>
+                      </FormItem_Shadcn_>
                     )
                   }}
                 />
               ))}
-              <FormMessage />
-            </FormItem>
+              <FormMessage_Shadcn_ />
+            </FormItem_Shadcn_>
           )}
         />
         <Button htmlType="submit">Submit</Button>
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }

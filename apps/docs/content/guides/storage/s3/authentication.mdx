@@ -19,7 +19,7 @@ S3 access keys provide full access to all S3 operations across all buckets and b
 
 </Admonition>
 
-To authenticate with S3, generate a pair of credentials (Access Key ID and Secret Access Key), copy the endpoint and region from the [S3 configuration page](/dashboard/project/_/storage/s3).
+To authenticate with S3, generate a pair of credentials (Access Key ID and Secret Access Key), copy the endpoint and region from the [project settings page](/dashboard/project/_/storage/settings).
 
 This is all the information you need to connect to Supabase Storage using any S3-compatible service.
 
@@ -79,7 +79,7 @@ All S3 operations performed with the Session Token are scoped to the authenticat
 To authenticate with S3 using a Session Token, use the following credentials:
 
 - access_key_id: `project_ref`
-- secret_access_key: `publishableKey`
+- secret_access_key: `anonKey`
 - session_token: `valid jwt token`
 
 For example, using the `aws-sdk` library:

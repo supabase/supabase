@@ -1,7 +1,6 @@
-import { describe, expect, it } from 'vitest'
-
-import type { PermissionResource, PermissionRow } from './Permissions.types'
+import { describe, it, expect } from 'vitest'
 import { sortActions, togglePermissionResource } from './Permissions.utils'
+import type { PermissionResource, PermissionRow } from './Permissions.types'
 
 // --- sortActions ---
 

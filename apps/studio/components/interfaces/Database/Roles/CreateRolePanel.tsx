@@ -1,23 +1,23 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import z from 'zod'
+
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { useDatabaseRoleCreateMutation } from 'data/database-roles/database-role-create-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
   SidePanel,
   Switch,
 } from 'ui'
-import z from 'zod'
-
 import { ROLE_PERMISSIONS } from './Roles.constants'
-import { FormActions } from '@/components/ui/Forms/FormActions'
-import { useDatabaseRoleCreateMutation } from '@/data/database-roles/database-role-create-mutation'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface CreateRolePanelProps {
   visible: boolean
@@ -93,32 +93,32 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
         </div>
       }
     >
-      <Form {...form}>
+      <Form_Shadcn_ {...form}>
         <form
           id={formId}
           className="grid gap-6 w-full px-8 py-8"
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <FormField
+          <FormField_Shadcn_
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                <FormLabel className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+              <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
                   Name
-                </FormLabel>
-                <FormControl className="col-span-8">
+                </FormLabel_Shadcn_>
+                <FormControl_Shadcn_ className="col-span-8">
                   <Input_Shadcn_ {...field} className="w-full" />
-                </FormControl>
-                <FormMessage className="col-start-5 col-span-8" />
-              </FormItem>
+                </FormControl_Shadcn_>
+                <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+              </FormItem_Shadcn_>
             )}
           />
           <div className="grid gap-2 mt-4 md:grid md:grid-cols-12">
             <div className="col-span-4">
-              <FormLabel className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+              <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
                 Role privileges
-              </FormLabel>
+              </FormLabel_Shadcn_>
             </div>
             <div className="col-span-8 grid gap-4">
               {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[])
@@ -127,20 +127,20 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                   const permission = ROLE_PERMISSIONS[permissionKey]
 
                   return (
-                    <FormField
+                    <FormField_Shadcn_
                       key={permissionKey}
                       control={form.control}
                       name={permissionKey}
                       render={({ field }) => (
-                        <FormItem className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                          <FormControl className="col-span-8 flex items-center gap-4">
+                        <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                          <FormControl_Shadcn_ className="col-span-8 flex items-center gap-4">
                             <div className="w-full text-sm">
                               <Switch checked={field.value} onCheckedChange={field.onChange} />
-                              <FormLabel>{permission.description}</FormLabel>
+                              <FormLabel_Shadcn_>{permission.description}</FormLabel_Shadcn_>
                             </div>
-                          </FormControl>
-                          <FormMessage className="col-start-5 col-span-8" />
-                        </FormItem>
+                          </FormControl_Shadcn_>
+                          <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                        </FormItem_Shadcn_>
                       )}
                     />
                   )
@@ -156,13 +156,13 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                     const permission = ROLE_PERMISSIONS[permissionKey]
 
                     return (
-                      <FormField
+                      <FormField_Shadcn_
                         key={permissionKey}
                         control={form.control}
                         name={permissionKey}
                         render={({ field }) => (
-                          <FormItem className="space-y-0 opacity-70">
-                            <FormControl className="flex items-center gap-4">
+                          <FormItem_Shadcn_ className="space-y-0 opacity-70">
+                            <FormControl_Shadcn_ className="flex items-center gap-4">
                               <div className="w-full text-sm">
                                 <Switch
                                   checked={field.value}
@@ -170,11 +170,11 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                                   disabled
                                   aria-readonly
                                 />
-                                <FormLabel>{permission.description}</FormLabel>
+                                <FormLabel_Shadcn_>{permission.description}</FormLabel_Shadcn_>
                               </div>
-                            </FormControl>
-                            <FormMessage className="col-start-5 col-span-8" />
-                          </FormItem>
+                            </FormControl_Shadcn_>
+                            <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                          </FormItem_Shadcn_>
                         )}
                       />
                     )
@@ -183,7 +183,7 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
             </div>
           </div>
         </form>
-      </Form>
+      </Form_Shadcn_>
     </SidePanel>
   )
 }

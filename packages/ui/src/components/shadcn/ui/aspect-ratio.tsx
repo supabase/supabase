@@ -1,6 +1,6 @@
 'use client'
 
-import { AspectRatio as AspectRatioPrimitive } from 'radix-ui'
+import * as AspectRatioPrimitive from '@radix-ui/react-aspect-ratio'
 
 const AspectRatio = AspectRatioPrimitive.Root
 

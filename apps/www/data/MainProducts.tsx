@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import { products } from 'shared-data'
 import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
 
@@ -6,7 +5,7 @@ export type ProductType = {
   [key: string]: {
     name: string
     icon: string
-    description: ReactNode
+    description: string | JSX.Element
     description_short: string
     label: string
     url: string

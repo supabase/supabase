@@ -1,9 +1,8 @@
-import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/react-query'
+import { type UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
+import { handleError, post } from 'data/fetchers'
 import { toast } from 'sonner'
-
+import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
 
 export type BranchRestoreVariables = {
   branchRef: string

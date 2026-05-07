@@ -1,18 +1,18 @@
 import { useFlag, useParams } from 'common'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { ArrowUpRight } from 'lucide-react'
 
 import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 
 export const useGenerateSettingsMenu = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
-  const showDashboardPreferences = useFlag('dashboardPreferences')
 
+  const showDashboardPreferences = useFlag('dashboardPreferences')
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
 
   const { projectSettingsLegacyJwtKeys: legacyJwtKeysEnabled, billingAll: billingEnabled } =
@@ -83,7 +83,7 @@ export const useGenerateSettingsMenu = () => {
         {
           name: 'API Keys',
           key: 'api-keys',
-          url: `/project/${ref}/settings/api-keys`,
+          url: `/project/${ref}/settings/api-keys/new`,
           items: [],
           disabled: !isProjectActive,
         },
@@ -110,18 +110,23 @@ export const useGenerateSettingsMenu = () => {
           url: `/project/${ref}/settings/addons`,
           items: [],
         },
-        ...(showDashboardPreferences
-          ? [
-              {
-                name: 'Dashboard',
-                key: 'dashboard',
-                url: `/project/${ref}/settings/dashboard`,
-                items: [],
-              },
-            ]
-          : []),
       ],
     },
+    ...(IS_PLATFORM && showDashboardPreferences
+      ? [
+          {
+            title: 'Preferences',
+            items: [
+              {
+                name: 'Dashboard preferences',
+                key: 'preferences',
+                url: `/project/${ref}/settings/preferences`,
+                items: [],
+              },
+            ],
+          },
+        ]
+      : []),
     {
       title: 'Integrations',
       items: [

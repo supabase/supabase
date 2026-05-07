@@ -3,7 +3,7 @@
 import { useConsentState } from 'common'
 import Link from 'next/link'
 import { PropsWithChildren, useState } from 'react'
-import { Label_Shadcn_, Modal, Switch } from 'ui'
+import { Modal, Toggle } from 'ui'
 
 import { Admonition } from '../admonition'
 
@@ -65,7 +65,7 @@ export const PrivacySettings = ({
         className="max-w-[calc(100vw-4rem)]"
         size="medium"
       >
-        <div className="divide-y divide-border">
+        <div className="pt-3 divide-y divide-border">
           {categories === null ? (
             <Modal.Content>
               <Admonition
@@ -135,12 +135,14 @@ function Category({
 
   return (
     <Modal.Content key={category.slug}>
-      <div className="flex flex-row items-center justify-between gap-4">
-        <div className="space-y-0.5">
-          <Label_Shadcn_ className="text-base" htmlFor={category.slug}>
-            {category.label}
-          </Label_Shadcn_>
-          <div className="text-sm text-foreground-light" id={`${category.slug}-description`}>
+      <Toggle
+        checked={isChecked}
+        defaultChecked={isChecked}
+        disabled={category.isEssential}
+        onChange={handleChange}
+        label={category.label}
+        descriptionText={
+          <>
             {category.description}
             <br />
             <Link
@@ -149,17 +151,9 @@ function Category({
             >
               Learn more
             </Link>
-          </div>
-        </div>
-        <Switch
-          id={category.slug}
-          checked={isChecked}
-          disabled={category.isEssential}
-          defaultChecked={isChecked}
-          onCheckedChange={handleChange}
-          aria-describedby={`${category.slug}-description`}
-        />
-      </div>
+          </>
+        }
+      />
     </Modal.Content>
   )
 }

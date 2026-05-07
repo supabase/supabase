@@ -1,10 +1,10 @@
+import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import Link from 'next/link'
 import { Button, Card, CardContent, CardFooter, CardHeader, CardTitle, cn, Loading } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
-import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 
 const colorClassMap: Record<string, string> = {
   muted: 'bg-muted',
@@ -30,7 +30,7 @@ export type ServiceHealthCardProps = {
 
 export const ServiceHealthCard = ({
   serviceName,
-  serviceKey: _serviceKey,
+  serviceKey,
   total,
   errorRate,
   errorCount,
@@ -42,7 +42,7 @@ export const ServiceHealthCard = ({
   onBarClick,
   datetimeFormat,
 }: ServiceHealthCardProps) => {
-  const { color } = getHealthStatus(errorRate, total)
+  const { status, color } = getHealthStatus(errorRate, total)
 
   return (
     <Card className="mb-0 md:mb-0 h-full flex flex-col">

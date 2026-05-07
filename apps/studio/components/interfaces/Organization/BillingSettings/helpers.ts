@@ -1,4 +1,4 @@
-import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 
 const pricingMetricBytes = [
   PricingMetric.DATABASE_SIZE,
@@ -94,13 +94,3 @@ export const generateUpgradeReasons = (originalPlan?: string, upgradedPlan?: str
 
   return reasons
 }
-
-// For `customerBalance`, negative sign means credit.
-// Negate it first so both sources contribute as positive credit amounts before combining.
-export const getTotalCreditBalanceCents = ({
-  customerBalance = 0,
-  prepaidCreditsBalance = 0,
-}: {
-  customerBalance?: number
-  prepaidCreditsBalance?: number
-}) => -customerBalance + prepaidCreditsBalance

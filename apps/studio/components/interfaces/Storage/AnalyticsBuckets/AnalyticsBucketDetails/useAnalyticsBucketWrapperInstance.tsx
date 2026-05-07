@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
 
-import { getAnalyticsBucketFDWName } from './AnalyticsBucketDetails.utils'
-import { WRAPPER_HANDLERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
   getWrapperMetaForWrapper,
   wrapperMetaComparator,
-} from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { useFDWsQuery } from '@/data/fdw/fdws-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+} from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { getAnalyticsBucketFDWName } from './AnalyticsBucketDetails.utils'
 
 export const useAnalyticsBucketWrapperInstance = (
   { bucketId }: { bucketId?: string },

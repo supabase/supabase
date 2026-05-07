@@ -1,13 +1,14 @@
 import { ColumnDef } from '@tanstack/react-table'
+import { DataTableColumnLevelIndicator } from 'components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
+import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
+import { AuthUserHoverCard } from './AuthUserHoverCard'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
 import { TextWithTooltip } from './TextWithTooltip'
-import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
-import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
 /**
  * Determines if a column should be hidden based on its values in the data.
@@ -50,7 +51,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       enableHiding: false,
       enableResizing: false,
       enableSorting: false,
-      filterFn: (_row, _columnId, _filterValue) => true,
+      filterFn: (row, columnId, filterValue) => true,
       size: 48,
       minSize: 48,
       maxSize: 48,
@@ -67,7 +68,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
         const date = new Date(row.getValue<ColumnSchema['date']>('date'))
         return <HoverCardTimestamp date={date} />
       },
-      filterFn: (_row, _columnId, _filterValue) => true,
+      filterFn: (row, columnId, filterValue) => true,
       enableResizing: false,
       enableSorting: false,
       size: 130,
@@ -91,7 +92,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
         )
       },
       enableHiding: false,
-      filterFn: (_row, _columnId, _filterValue) => true,
+      filterFn: (row, columnId, filterValue) => true,
       enableResizing: false,
       enableSorting: false,
       size: 40,
@@ -142,7 +143,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
           </div>
         )
       },
-      filterFn: (_row, _columnId, _filterValue) => true,
+      filterFn: (row, columnId, filterValue) => true,
       enableResizing: false,
       enableSorting: false,
       size: 70,

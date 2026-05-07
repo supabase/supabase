@@ -2,9 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, Copy } from 'lucide-react'
-// Required to avoid issue:
-// The inferred type of ConfirmationModal cannot be named without a reference to DialogProps
-import { Dialog as _RadixDialog } from 'radix-ui'
 import { forwardRef, ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -17,13 +14,13 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
 import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
@@ -50,9 +47,9 @@ export interface TextConfirmModalProps {
     description?: string | ReactNode
   }
   input?: React.ComponentProps<typeof Input_Shadcn_>
-  label?: React.ComponentProps<typeof FormLabel>
-  formMessage?: React.ComponentProps<typeof FormMessage>
-  description?: React.ComponentProps<typeof FormDescription>
+  label?: React.ComponentProps<typeof FormLabel_Shadcn_>
+  formMessage?: React.ComponentProps<typeof FormMessage_Shadcn_>
+  description?: React.ComponentProps<typeof FormDescription_Shadcn_>
   blockDeleteButton?: boolean
   errorMessage?: string
   enableCopy?: boolean
@@ -112,7 +109,7 @@ export const TextConfirmModal = forwardRef<
     const isFormValid = form.formState.isValid
 
     // 2. Define a submit handler.
-    function onSubmit(_values: z.infer<typeof formSchema>) {
+    function onSubmit(values: z.infer<typeof formSchema>) {
       // Do something with the form values.
       // ✅ This will be type-safe and validated.
       onConfirm()
@@ -138,7 +135,7 @@ export const TextConfirmModal = forwardRef<
           }
         }}
       >
-        <DialogContent ref={ref} className="p-0 gap-0 pb-5 block!" size={size}>
+        <DialogContent ref={ref} className="p-0 gap-0 pb-5 !block" size={size}>
           <DialogHeader className={cn('border-b')} padding={'small'}>
             <DialogTitle className="">{title}</DialogTitle>
           </DialogHeader>
@@ -166,18 +163,18 @@ export const TextConfirmModal = forwardRef<
               <DialogSectionSeparator />
             </>
           )}
-          <Form {...form}>
+          <Form_Shadcn_ {...form}>
             <form
               autoComplete="off"
               onSubmit={form.handleSubmit(onSubmit)}
               className="px-5 flex flex-col gap-y-3 pt-3"
             >
-              <FormField
+              <FormField_Shadcn_
                 control={form.control}
                 name="confirmValue"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col gap-y-2">
-                    <FormLabel {...label} enableSelection={!enableCopy}>
+                  <FormItem_Shadcn_ className="flex flex-col gap-y-2">
+                    <FormLabel_Shadcn_ {...label} enableSelection={!enableCopy}>
                       Type{' '}
                       {enableCopy ? (
                         <Button
@@ -199,18 +196,18 @@ export const TextConfirmModal = forwardRef<
                         </span>
                       )}{' '}
                       to confirm.
-                    </FormLabel>
-                    <FormControl>
+                    </FormLabel_Shadcn_>
+                    <FormControl_Shadcn_>
                       <Input_Shadcn_
                         autoComplete="off"
                         placeholder={confirmPlaceholder}
                         {...input}
                         {...field}
                       />
-                    </FormControl>
-                    {!!description && <FormDescription {...description} />}
-                    <FormMessage {...formMessage} />
-                  </FormItem>
+                    </FormControl_Shadcn_>
+                    {!!description && <FormDescription_Shadcn_ {...description} />}
+                    <FormMessage_Shadcn_ {...formMessage} />
+                  </FormItem_Shadcn_>
                 )}
               />
               <div className="flex gap-2">
@@ -238,7 +235,7 @@ export const TextConfirmModal = forwardRef<
                 </Button>
               </div>
             </form>
-          </Form>
+          </Form_Shadcn_>
         </DialogContent>
       </Dialog>
     )

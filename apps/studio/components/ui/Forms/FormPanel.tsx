@@ -1,4 +1,4 @@
-import { forwardRef, HTMLAttributes } from 'react'
+import { HTMLAttributes, forwardRef } from 'react'
 import { cn } from 'ui'
 
 interface Props {
@@ -26,7 +26,7 @@ export const FormPanelContainer = forwardRef<HTMLDivElement, HTMLAttributes<HTML
       ref={ref}
       {...props}
       className={cn(
-        'bg-surface-100 border overflow-hidden rounded-md shadow-sm max-w-full',
+        'bg-surface-100 border overflow-hidden rounded-md shadow max-w-full',
         props.className
       )}
     >

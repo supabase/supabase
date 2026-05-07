@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { useRef, useState } from 'react'
-import { Button, Card, cn } from 'ui'
 
-import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
+import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
+import { Button, Card, cn } from 'ui'
 
 interface ReportsChartUpsellProps {
   report: {

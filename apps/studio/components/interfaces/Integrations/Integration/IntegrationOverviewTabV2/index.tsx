@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
 import { PropsWithChildren } from 'react'
 import { cn } from 'ui'
 

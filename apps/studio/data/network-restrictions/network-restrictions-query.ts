@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { get, handleError } from 'data/fetchers'
 import { networkRestrictionKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
-import { UseCustomQueryOptions } from '@/types'
+import { UseCustomQueryOptions } from 'types'
 
 export type NetworkRestrictionsVariables = { projectRef?: string }
 

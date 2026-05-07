@@ -1,6 +1,4 @@
-import { safeSql } from '../pg-format'
-
-export const COLUMN_PRIVILEGES_SQL = /* SQL */ safeSql`
+export const COLUMN_PRIVILEGES_SQL = /* SQL */ `
 -- Lists each column's privileges in the form of:
 --
 -- [

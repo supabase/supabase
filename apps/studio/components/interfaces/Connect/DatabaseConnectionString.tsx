@@ -1,7 +1,21 @@
 import { useParams } from 'common'
+import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import AlertError from 'components/ui/AlertError'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
+import { InlineLink } from 'components/ui/InlineLink'
+import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
+import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
+import { pluckObjectFields } from 'lib/helpers'
 import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { HTMLAttributes, ReactNode, useEffect, useState } from 'react'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
@@ -32,20 +46,6 @@ import {
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings } from './DatabaseSettings.utils'
 import { examples, type Example } from './DirectConnectionExamples'
-import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
-import AlertError from '@/components/ui/AlertError'
-import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
-import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
-import { pluckObjectFields } from '@/lib/helpers'
-import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 const StepLabel = ({
   number,
@@ -490,15 +490,15 @@ export const DatabaseConnectionString = () => {
                       <Collapsible_Shadcn_ className="group">
                         <CollapsibleTrigger_Shadcn_
                           asChild
-                          className="w-full justify-start !last:rounded-b group-data-open:rounded-b-none border-light px-3"
+                          className="w-full justify-start !last:rounded-b group-data-[state=open]:rounded-b-none border-light px-3"
                         >
                           <Button
                             type="default"
                             size="large"
                             iconRight={
-                              <ChevronDown className="transition group-data-open:rotate-180" />
+                              <ChevronDown className="transition group-data-[state=open]:rotate-180" />
                             }
-                            className="text-foreground bg-dash-sidebar! justify-between"
+                            className="text-foreground !bg-dash-sidebar justify-between"
                           >
                             <div className="text-xs flex items-center gap-x-2 py-2 px-1">
                               <span>Using the Shared Pooler</span>
@@ -590,7 +590,7 @@ export const DatabaseConnectionString = () => {
         <>
           <Separator />
           <Collapsible_Shadcn_ className="px-8 py-5">
-            <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:-rotate-180!">
+            <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
               <div className="flex items-center gap-x-2 w-full">
                 <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                   Connecting to SQL Alchemy

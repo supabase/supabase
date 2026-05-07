@@ -1,38 +1,33 @@
-import { formatFilterURLParams } from '@/components/grid/SupabaseGrid.utils'
-import { Filter } from '@/components/grid/types'
-import { useTableEditorFiltersSort } from '@/hooks/misc/useTableEditorFiltersSort'
-import { useOptionalTableEditorTableStateSnapshot } from '@/state/table-editor-table'
+import { filtersToUrlParams, formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
+import type { Filter } from 'components/grid/types'
+import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
+import { useCallback } from 'react'
 
 /**
- * Hook for managing table filters.
- *
- * When called inside a TableEditorTableStateContextProvider, reads/writes
- * filters via the valtio table state. When called outside (e.g. the sidebar),
- * falls back to reading filters from URL params. Mutations (setFilters,
- * clearFilters) throw if called outside the provider.
+ * Hook for managing table filter URL parameters and saving.
+ * NO direct snapshot interaction.
  */
 export function useTableFilter() {
-  const snap = useOptionalTableEditorTableStateSnapshot()
-  const { filters: urlFilters } = useTableEditorFiltersSort()
-  const urlParsedFilters = formatFilterURLParams(urlFilters)
+  const { filters: urlFilters, setParams } = useTableEditorFiltersSort()
 
-  const filters = snap ? snap.filters : urlParsedFilters
+  const filters = formatFilterURLParams(urlFilters)
+
+  const onApplyFilters = useCallback(
+    (appliedFilters: Filter[]) => {
+      const newUrlFilters = filtersToUrlParams(appliedFilters)
+      setParams((prevParams) => ({ ...prevParams, filter: newUrlFilters }))
+    },
+    [setParams]
+  )
+
+  const clearFilters = useCallback(() => {
+    setParams((prevParams) => ({ ...prevParams, filter: [] }))
+  }, [setParams])
 
   return {
-    filters,
-    setFilters: (filters: Filter[]) => {
-      if (!snap) {
-        throw new Error('useTableFilter: setFilters requires TableEditorTableStateContextProvider')
-      }
-      snap.setFilters(filters)
-    },
-    clearFilters: () => {
-      if (!snap) {
-        throw new Error(
-          'useTableFilter: clearFilters requires TableEditorTableStateContextProvider'
-        )
-      }
-      snap.clearFilters()
-    },
+    filters, // Formatted Filter[] object array
+    urlFilters, // Raw string[] from URL
+    onApplyFilters, // Callback to apply changes
+    clearFilters, // Callback to clear filters
   }
 }

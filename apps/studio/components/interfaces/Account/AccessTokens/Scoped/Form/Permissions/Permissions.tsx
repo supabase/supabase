@@ -1,8 +1,11 @@
+import { ACCESS_TOKEN_RESOURCES } from 'components/interfaces/Account/AccessTokens/AccessToken.constants'
+import { formatAccessText } from 'components/interfaces/Account/AccessTokens/AccessToken.utils'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { ChevronDown, RotateCcw, X } from 'lucide-react'
 import { Path, PathValue } from 'react-hook-form'
 import {
   Button,
-  Checkbox,
+  Checkbox_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -12,9 +15,6 @@ import {
 import { PermissionResourceSelector } from './PermissionResourceSelector'
 import { PermissionRow, PermissionsFormValues, PermissionsProps } from './Permissions.types'
 import { sortActions } from './Permissions.utils'
-import { ACCESS_TOKEN_RESOURCES } from '@/components/interfaces/Account/AccessTokens/AccessToken.constants'
-import { formatAccessText } from '@/components/interfaces/Account/AccessTokens/AccessToken.utils'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 export const Permissions = <TFormValues extends PermissionsFormValues = PermissionsFormValues>({
   setValue,
@@ -112,7 +112,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                                   key={action}
                                   className="flex items-center gap-2 cursor-pointer"
                                 >
-                                  <Checkbox
+                                  <Checkbox_Shadcn_
                                     checked={row.actions.includes(action)}
                                     onCheckedChange={(checked) => {
                                       const newActions = checked

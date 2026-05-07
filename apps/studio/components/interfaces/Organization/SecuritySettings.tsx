@@ -1,17 +1,31 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { useParams } from 'common'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
+import NoPermission from 'components/ui/NoPermission'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
+import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
+import { useOrganizationMfaToggleMutation } from 'data/organizations/organization-mfa-mutation'
+import { useOrganizationMfaQuery } from 'data/organizations/organization-mfa-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useProfile } from 'lib/profile'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Switch,
   Tooltip,
   TooltipContent,
@@ -19,20 +33,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { z } from 'zod'
-
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
-import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
-import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
-import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
-import { useOrganizationMfaToggleMutation } from '@/data/organizations/organization-mfa-mutation'
-import { useOrganizationMfaQuery } from '@/data/organizations/organization-mfa-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useProfile } from '@/lib/profile'
 
 const schema = z.object({
   enforceMfa: z.boolean(),
@@ -131,11 +131,11 @@ export const SecuritySettings = () => {
             )}
 
             {isSuccessMfa && hasAccessToEnforceMfa && (
-              <Form {...form}>
+              <Form_Shadcn_ {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                   <Card>
                     <CardContent>
-                      <FormField
+                      <FormField_Shadcn_
                         control={form.control}
                         name="enforceMfa"
                         render={({ field }) => (
@@ -144,7 +144,7 @@ export const SecuritySettings = () => {
                             label="Require MFA to access organization"
                             description="Team members must have MFA enabled and a valid MFA session to access the organization and any projects."
                           >
-                            <FormControl>
+                            <FormControl_Shadcn_>
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Switch
@@ -171,7 +171,7 @@ export const SecuritySettings = () => {
                                   </TooltipContent>
                                 )}
                               </Tooltip>
-                            </FormControl>
+                            </FormControl_Shadcn_>
                           </FormItemLayout>
                         )}
                       />
@@ -205,7 +205,7 @@ export const SecuritySettings = () => {
                     </CardFooter>
                   </Card>
                 </form>
-              </Form>
+              </Form_Shadcn_>
             )}
           </>
         )}

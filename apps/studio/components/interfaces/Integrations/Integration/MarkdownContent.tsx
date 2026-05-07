@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import { cn } from 'ui'
 
-import { Markdown } from '@/components/interfaces/Markdown'
+import { Markdown } from 'components/interfaces/Markdown'
+import { cn } from 'ui'
 
 const CHAR_LIMIT = 500 // Adjust this number as needed
 
@@ -17,7 +17,7 @@ export const MarkdownContent = ({
   const [isExpanded, setIsExpanded] = useState(initiallyExpanded ?? false)
 
   useEffect(() => {
-    import(`@/static-data/integrations/${integrationId}/overview.md`)
+    import(`static-data/integrations/${integrationId}/overview.md`)
       .then((module) => setContent(String(module.default)))
       .catch((error) => console.error('Error loading markdown:', error))
   }, [integrationId])
@@ -36,13 +36,13 @@ export const MarkdownContent = ({
           className="overflow-hidden"
           transition={{ duration: 0.4 }}
         >
-          <Markdown content={displayContent} className="max-w-3xl!" />
+          <Markdown content={displayContent} className="!max-w-3xl" />
         </motion.div>
         {!isExpanded && (
           <div
             className={cn(
               'bottom-0 left-0 right-0 h-24',
-              supportExpanding && 'bg-linear-to-t from-background-200 to-transparent',
+              supportExpanding && 'bg-gradient-to-t from-background-200 to-transparent',
               !isExpanded ? 'absolute' : 'relative'
             )}
           />

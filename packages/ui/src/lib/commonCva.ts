@@ -20,11 +20,11 @@ const defaults = {
   },
   placeholder: 'placeholder-border-stronger',
   focus: `
-    outline-hidden
+    outline-none
     focus:ring-current focus:ring-2
   `,
   'focus-visible': `
-    outline-hidden
+    outline-none
     transition-all
     outline-0
     focus-visible:outline-4

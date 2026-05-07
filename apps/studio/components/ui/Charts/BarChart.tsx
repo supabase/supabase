@@ -1,3 +1,4 @@
+import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import dayjs from 'dayjs'
 import { ComponentProps, useMemo, useState } from 'react'
 import {
@@ -17,7 +18,6 @@ import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { useChartHoverState } from './useChartHoverState'
-import { CHART_COLORS, DateTimeFormats } from '@/components/ui/Charts/Charts.constants'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -171,9 +171,9 @@ function BarChart<D extends Datum = Datum>({
             key={xAxisKey}
           />
           <Tooltip
-            content={(_props) =>
+            content={(props) =>
               syncId && isHovered && isCurrentChart && hoveredIndex !== null ? (
-                <div className="bg-black/90 text-white p-2 rounded-sm text-xs">
+                <div className="bg-black/90 text-white p-2 rounded text-xs">
                   <div className="font-medium">
                     {dayjs(data[hoveredIndex]?.[xAxisKey]).format(customDateFormat)}
                   </div>

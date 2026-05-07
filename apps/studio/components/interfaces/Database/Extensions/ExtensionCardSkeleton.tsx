@@ -1,4 +1,4 @@
-import { Switch } from 'ui'
+import { Toggle } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface ExtensionCardSkeletonProps {
@@ -7,7 +7,7 @@ export interface ExtensionCardSkeletonProps {
 
 const ExtensionCardSkeleton = ({ index = 0 }: ExtensionCardSkeletonProps) => {
   return (
-    <div className="flex border-overlay flex-col overflow-hidden rounded-sm border shadow-xs">
+    <div className="flex border-overlay flex-col overflow-hidden rounded border shadow-sm">
       <div className="border-overlay bg-surface-100 flex justify-between w-full border-b py-3 px-4">
         <div className="flex items-center gap-1 max-w-[85%]">
           <div className="flex items-center space-x-2 truncate">
@@ -15,7 +15,7 @@ const ExtensionCardSkeleton = ({ index = 0 }: ExtensionCardSkeletonProps) => {
           </div>
         </div>
 
-        <Switch checked={false} disabled={true} />
+        <Toggle size="tiny" checked={false} disabled={true} />
       </div>
       <div className="bg-panel-header-light bg-panel-secondary-light flex h-full flex-col justify-between">
         <div className="py-3 px-4">

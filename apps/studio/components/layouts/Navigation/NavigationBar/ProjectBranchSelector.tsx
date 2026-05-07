@@ -1,4 +1,9 @@
 import { useBreakpoint, useParams } from 'common'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
@@ -15,11 +20,6 @@ import { getProjectBranchSelectorState } from './ProjectBranchSelector.utils'
 import { ProjectBranchSelectorPopover } from './ProjectBranchSelectorPopover'
 import { ProjectBranchSelectorSheet } from './ProjectBranchSelectorSheet'
 import { ProjectBranchSelectorTrigger } from './ProjectBranchSelectorTrigger'
-import { useBranchesQuery } from '@/data/branches/branches-query'
-import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from '@/lib/constants'
 
 export function ProjectBranchSelector() {
   const router = useRouter()

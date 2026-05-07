@@ -1,32 +1,32 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  Input_Shadcn_,
-  Switch,
-} from 'ui'
 import * as z from 'zod'
 
-import { FormActions } from '@/components/ui/Forms/FormActions'
+import { FormActions } from 'components/ui/Forms/FormActions'
 import type {
   EnvironmentTargets,
   Integration,
   IntegrationProjectConnection,
-} from '@/data/integrations/integrations.types'
-import { useVercelConnectionUpdateMutation } from '@/data/integrations/vercel-connection-update-mutate'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from '@/lib/constants'
+} from 'data/integrations/integrations.types'
+import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
+  Switch,
+} from 'ui'
 
 const VercelIntegrationConnectionForm = ({
   disabled,
@@ -91,7 +91,7 @@ const VercelIntegrationConnectionForm = ({
   const vercelConnectionFormId = `vercel-connection-form-${connection.id}`
 
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <form
         id={vercelConnectionFormId}
         onSubmit={form.handleSubmit(onSubmit)}
@@ -125,70 +125,70 @@ const VercelIntegrationConnectionForm = ({
                   Sync environment variables for selected target environments
                 </h5>
 
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="environmentVariablesProduction"
                   render={({ field }) => (
-                    <FormItem className="space-y-0 flex gap-x-4">
-                      <FormControl>
+                    <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
+                      <FormControl_Shadcn_>
                         <Switch
                           disabled={disabled}
                           className="mt-1"
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
-                      </FormControl>
+                      </FormControl_Shadcn_>
                       <div>
-                        <FormLabel className="!text">Production</FormLabel>
-                        <FormDescription className="text-xs text-foreground-lighter">
+                        <FormLabel_Shadcn_ className="!text">Production</FormLabel_Shadcn_>
+                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
                           Sync environment variables for <code>production</code> environment.
-                        </FormDescription>
+                        </FormDescription_Shadcn_>
                       </div>
-                    </FormItem>
+                    </FormItem_Shadcn_>
                   )}
                 />
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="environmentVariablesPreview"
                   render={({ field }) => (
-                    <FormItem className="space-y-0 flex gap-x-4">
-                      <FormControl>
+                    <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
+                      <FormControl_Shadcn_>
                         <Switch
                           disabled={disabled}
                           className="mt-1"
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
-                      </FormControl>
+                      </FormControl_Shadcn_>
                       <div>
-                        <FormLabel className="!text">Preview</FormLabel>
-                        <FormDescription className="text-xs text-foreground-lighter">
+                        <FormLabel_Shadcn_ className="!text">Preview</FormLabel_Shadcn_>
+                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
                           Sync environment variables for <code>preview</code> environment.
-                        </FormDescription>
+                        </FormDescription_Shadcn_>
                       </div>
-                    </FormItem>
+                    </FormItem_Shadcn_>
                   )}
                 />
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="environmentVariablesDevelopment"
                   render={({ field }) => (
-                    <FormItem className="space-y-0 flex gap-x-4">
-                      <FormControl>
+                    <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
+                      <FormControl_Shadcn_>
                         <Switch
                           disabled={disabled}
                           className="mt-1"
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
-                      </FormControl>
+                      </FormControl_Shadcn_>
                       <div>
-                        <FormLabel className="!text">Development</FormLabel>
-                        <FormDescription className="text-xs text-foreground-lighter">
+                        <FormLabel_Shadcn_ className="!text">Development</FormLabel_Shadcn_>
+                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
                           Sync environment variables for <code>development</code> environment.
-                        </FormDescription>
+                        </FormDescription_Shadcn_>
                       </div>
-                    </FormItem>
+                    </FormItem_Shadcn_>
                   )}
                 />
               </div>
@@ -196,23 +196,23 @@ const VercelIntegrationConnectionForm = ({
           </div>
           <h5 className="mt-2 text-foreground">Customize public environment variable prefix</h5>
           <div className="flex flex-col gap-4">
-            <FormField
+            <FormField_Shadcn_
               control={form.control}
               name="publicEnvVarPrefix"
               render={({ field }) => (
-                <FormItem className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                  <FormLabel className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+                <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                  <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
                     Prefix
-                  </FormLabel>
-                  <FormControl className="col-span-8">
+                  </FormLabel_Shadcn_>
+                  <FormControl_Shadcn_ className="col-span-8">
                     <Input_Shadcn_
                       {...field}
                       className="w-full"
                       disabled={disabled}
                       placeholder="An empty prefix will result in no public env vars"
                     />
-                  </FormControl>
-                  <FormDescription className="col-start-5 col-span-8 text-xs">
+                  </FormControl_Shadcn_>
+                  <FormDescription_Shadcn_ className="col-start-5 col-span-8 text-xs">
                     e.g.{' '}
                     <code
                       className="cursor-pointer"
@@ -244,10 +244,10 @@ const VercelIntegrationConnectionForm = ({
                       PUBLIC_
                     </code>
                     , etc.
-                  </FormDescription>
+                  </FormDescription_Shadcn_>
 
-                  <FormMessage className="col-start-5 col-span-8" />
-                </FormItem>
+                  <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                </FormItem_Shadcn_>
               )}
             />
           </div>
@@ -270,7 +270,7 @@ const VercelIntegrationConnectionForm = ({
           />
         </div>
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }
 

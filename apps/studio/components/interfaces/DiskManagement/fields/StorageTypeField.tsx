@@ -1,11 +1,15 @@
-import { useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
+
+import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Badge,
   buttonVariants,
   cn,
-  FormControl,
-  FormField,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -17,14 +21,10 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
 import { IO2_AVAILABLE_REGIONS } from '../DiskManagement.constants'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { DISK_LIMITS, DISK_TYPE_OPTIONS, DiskType } from '../ui/DiskManagement.constants'
 import FormMessage from '../ui/FormMessage'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 type StorageTypeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -41,7 +41,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
   const { isPending: isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
 
   return (
-    <FormField
+    <FormField_Shadcn_
       name="storageType"
       control={control}
       render={({ field }) => (
@@ -90,11 +90,11 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                 )}
               />
             ) : (
-              <FormControl>
+              <FormControl_Shadcn_>
                 <SelectTrigger_Shadcn_ className="h-14 max-w-[420px]">
                   <SelectValue_Shadcn_ />
                 </SelectTrigger_Shadcn_>
-              </FormControl>
+              </FormControl_Shadcn_>
             )}
             <SelectContent_Shadcn_>
               <>
@@ -107,7 +107,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                           key={item.type}
                           disabled={disableInput || disableIo2}
                           value={item.type}
-                          className={cn(disableIo2 && 'pointer-events-auto!')}
+                          className={cn(disableIo2 && '!pointer-events-auto')}
                         >
                           <div className="flex flex-col gap-0 items-start">
                             <div className="flex gap-2 items-center">

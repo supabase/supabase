@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
+import { ident, literal } from './pg-format'
 import { PUBLICATIONS_SQL } from './sql/publications'
 
 const pgPublicationTableZod = z.object({
@@ -32,15 +32,15 @@ function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgPublicationArrayZod
 } {
-  let sql = safeSql`with publications as (${PUBLICATIONS_SQL}) select * from publications`
+  let sql = `with publications as (${PUBLICATIONS_SQL}) select * from publications`
   if (limit) {
-    sql = safeSql`${sql} limit ${literal(limit)}`
+    sql += ` limit ${limit}`
   }
   if (offset) {
-    sql = safeSql`${sql} offset ${literal(offset)}`
+    sql += ` offset ${offset}`
   }
   return {
     sql,
@@ -50,20 +50,20 @@ function list({
 
 type PublicationIdentifier = Pick<PGPublication, 'id'> | Pick<PGPublication, 'name'>
 
-function getIdentifierWhereClause(identifier: PublicationIdentifier): SafeSqlFragment {
+function getIdentifierWhereClause(identifier: PublicationIdentifier) {
   if ('id' in identifier && identifier.id) {
-    return safeSql`${ident('id')} = ${literal(identifier.id)}`
+    return `${ident('id')} = ${literal(identifier.id)}`
   } else if ('name' in identifier && identifier.name) {
-    return safeSql`${ident('name')} = ${literal(identifier.name)}`
+    return `${ident('name')} = ${literal(identifier.name)}`
   }
   throw new Error('Must provide either id or name')
 }
 
 function retrieve(identifier: PublicationIdentifier): {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgPublicationOptionalZod
 } {
-  const sql = safeSql`with publications as (${PUBLICATIONS_SQL}) select * from publications where ${getIdentifierWhereClause(identifier)};`
+  const sql = `with publications as (${PUBLICATIONS_SQL}) select * from publications where ${getIdentifierWhereClause(identifier)};`
   return {
     sql,
     zod: pgPublicationOptionalZod,
@@ -86,35 +86,35 @@ function create({
   publish_delete = false,
   publish_truncate = false,
   tables = null,
-}: PublicationCreateParams): { sql: SafeSqlFragment } {
-  let tableClause: SafeSqlFragment
+}: PublicationCreateParams): { sql: string } {
+  let tableClause: string
   if (tables === undefined || tables === null) {
-    tableClause = safeSql`FOR ALL TABLES`
+    tableClause = 'FOR ALL TABLES'
   } else if (tables.length === 0) {
-    tableClause = safeSql``
+    tableClause = ''
   } else {
-    tableClause = safeSql`FOR TABLE ${joinSqlFragments(
-      tables.map((t) => {
+    tableClause = `FOR TABLE ${tables
+      .map((t) => {
         if (!t.includes('.')) {
           return ident(t)
         }
+
         const [schema, ...rest] = t.split('.')
         const table = rest.join('.')
-        return safeSql`${ident(schema)}.${ident(table)}`
-      }),
-      ','
-    )}`
+        return `${ident(schema)}.${ident(table)}`
+      })
+      .join(',')}`
   }
 
-  const publishOps: Array<string> = []
+  let publishOps = []
   if (publish_insert) publishOps.push('insert')
   if (publish_update) publishOps.push('update')
   if (publish_delete) publishOps.push('delete')
   if (publish_truncate) publishOps.push('truncate')
 
-  const sql = safeSql`
+  const sql = `
 CREATE PUBLICATION ${ident(name)} ${tableClause}
-  WITH (publish = ${literal(publishOps.join(','))});`
+  WITH (publish = '${publishOps.join(',')}');`
 
   return { sql }
 }
@@ -140,21 +140,21 @@ function update(
     publish_truncate,
     tables,
   }: PublicationUpdateParams
-): { sql: SafeSqlFragment } {
-  const sql = safeSql`
+): { sql: string } {
+  const sql = `
 do $$
 declare
   id oid := ${literal(id)};
   old record;
-  new_name text := ${name === undefined ? literal(null) : literal(name)};
-  new_owner text := ${owner === undefined ? literal(null) : literal(owner)};
-  new_publish_insert bool := ${literal(publish_insert ?? null)};
-  new_publish_update bool := ${literal(publish_update ?? null)};
-  new_publish_delete bool := ${literal(publish_delete ?? null)};
-  new_publish_truncate bool := ${literal(publish_truncate ?? null)};
+  new_name text := ${name === undefined ? null : literal(name)};
+  new_owner text := ${owner === undefined ? null : literal(owner)};
+  new_publish_insert bool := ${publish_insert ?? null};
+  new_publish_update bool := ${publish_update ?? null};
+  new_publish_delete bool := ${publish_delete ?? null};
+  new_publish_truncate bool := ${publish_truncate ?? null};
   new_tables text := ${
     tables === undefined
-      ? literal(null)
+      ? null
       : literal(
           tables === null
             ? 'all tables'
@@ -166,7 +166,7 @@ declare
 
                   const [schema, ...rest] = t.split('.')
                   const table = rest.join('.')
-                  return safeSql`${ident(schema)}.${ident(table)}`
+                  return `${ident(schema)}.${ident(table)}`
                 })
                 .join(',')
         )
@@ -237,8 +237,8 @@ end $$;
   return { sql }
 }
 
-function remove(publication: Pick<PGPublication, 'name'>): { sql: SafeSqlFragment } {
-  const sql = safeSql`DROP PUBLICATION IF EXISTS ${ident(publication.name)};`
+function remove(publication: Pick<PGPublication, 'name'>): { sql: string } {
+  const sql = `DROP PUBLICATION IF EXISTS ${ident(publication.name)};`
   return { sql }
 }
 

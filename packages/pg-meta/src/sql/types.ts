@@ -1,6 +1,4 @@
-import { safeSql } from '../pg-format'
-
-export const TYPES_SQL = /* SQL */ safeSql`
+export const TYPES_SQL = /* SQL */ `
 select
   t.oid::int8 as id,
   t.typname as name,

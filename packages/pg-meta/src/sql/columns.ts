@@ -1,6 +1,4 @@
-import { safeSql } from '../pg-format'
-
-export const COLUMNS_SQL = /* SQL */ safeSql`
+export const COLUMNS_SQL = /* SQL */ `
 -- Adapted from information_schema.columns
 
 SELECT

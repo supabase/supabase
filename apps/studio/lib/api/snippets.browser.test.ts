@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { generateDeterministicUuid } from './snippets.browser'
 
 describe('snippets.utils', () => {

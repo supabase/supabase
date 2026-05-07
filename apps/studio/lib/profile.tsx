@@ -1,18 +1,18 @@
 import * as Sentry from '@sentry/nextjs'
-import { useIsLoggedIn, useUser } from 'common'
 import { useRouter } from 'next/router'
-import { createContext, PropsWithChildren, useContext, useEffect, useMemo } from 'react'
+import { PropsWithChildren, createContext, useContext, useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 
+import { useIsLoggedIn, useUser } from 'common'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
+import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
+import { useProfileQuery } from 'data/profile/profile-query'
+import type { Profile } from 'data/profile/types'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import type { ResponseError } from 'types'
 import { useSignOut } from './auth'
 import { getGitHubProfileImgUrl } from './github'
-import { usePermissionsQuery } from '@/data/permissions/permissions-query'
-import { useProfileCreateMutation } from '@/data/profile/profile-create-mutation'
-import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
-import { useProfileQuery } from '@/data/profile/profile-query'
-import type { Profile } from '@/data/profile/types'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import type { ResponseError } from '@/types'
 
 export type ProfileContextType = {
   profile: Profile | undefined
@@ -131,6 +131,7 @@ export function useProfileNameAndPicture(): {
   const { profile, isLoading: isLoadingProfile } = useProfile()
   const { data: identitiesData, isPending: isLoadingIdentities } = useProfileIdentitiesQuery()
 
+  const username = profile?.username
   const isGitHubProfile = profile?.auth0_id?.startsWith('github')
 
   const gitHubUsername = isGitHubProfile

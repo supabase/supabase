@@ -1,6 +1,4 @@
-import { safeSql } from '../pg-format'
-
-export const VERSION_SQL = /* SQL */ safeSql`
+export const VERSION_SQL = /* SQL */ `
 select
   version(),
   current_setting('server_version_num')::int8 as version_number,

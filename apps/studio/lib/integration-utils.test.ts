@@ -1,17 +1,16 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-import {
-  getInitialMigrationSQLFromGitHubRepo,
-  getIntegrationConfigurationUrl,
-} from './integration-utils'
 import type {
   GitHubAccount,
   Integration,
   VercelAccount,
   VercelTeamAccount,
-} from '@/data/integrations/integrations.types'
+} from 'data/integrations/integrations.types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  getInitialMigrationSQLFromGitHubRepo,
+  getIntegrationConfigurationUrl,
+} from './integration-utils'
 
-vi.mock('@/data/fetchers', () => ({
+vi.mock('data/fetchers', () => ({
   fetchHandler: vi.fn(),
 }))
 
@@ -39,7 +38,7 @@ describe('integration-utils', () => {
       const mockSeedContent = 'INSERT INTO users (id) VALUES (1);'
 
       // Mock the fetch responses
-      const { fetchHandler } = await import('@/data/fetchers')
+      const { fetchHandler } = await import('data/fetchers')
       const mockFetchHandler = fetchHandler as unknown as ReturnType<typeof vi.fn>
       mockFetchHandler
         .mockResolvedValueOnce(
@@ -90,7 +89,7 @@ describe('integration-utils', () => {
     it('should handle GitHub API errors gracefully', async () => {
       const mockGitHubUrl = 'https://github.com/org/repo/tree/main/examples/with-supabase'
 
-      const { fetchHandler } = await import('@/data/fetchers')
+      const { fetchHandler } = await import('data/fetchers')
       const mockFetchHandler = fetchHandler as unknown as ReturnType<typeof vi.fn>
 
       mockFetchHandler

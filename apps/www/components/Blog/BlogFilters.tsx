@@ -1,19 +1,20 @@
 'use client'
 
-import type { BlogView } from 'app/blog/BlogClient'
 import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
 import { startCase } from 'lib/helpers'
-import { AlignJustify, ChevronDown, X as CloseIcon, Grid, Search } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { useEffect, useState, useCallback } from 'react'
+import type { BlogView } from 'app/blog/BlogClient'
+
+import { AlignJustify, ChevronDown, Grid, Search, X as CloseIcon } from 'lucide-react'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Input,
+  cn,
 } from 'ui'
 
 interface Props {
@@ -183,7 +184,7 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
           </DropdownMenu>
         </div>
       )}
-      <div className="hidden lg:flex flex-wrap items-center grow gap-2">
+      <div className="hidden lg:flex flex-wrap items-center flex-grow gap-2">
         {allCategories.map((category: string) => (
           <Button
             key={category}

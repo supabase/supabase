@@ -1,42 +1,29 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { Download, MoreVertical, Trash } from 'lucide-react'
 import { useState } from 'react'
-import {
-  Button,
-  CriticalIcon,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogSection,
-  DialogTitle,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from 'ui'
 
-import { DeleteProjectModal } from '@/components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
-import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import { LogicalBackupCliInstructions } from '@/components/layouts/ProjectLayout/LogicalBackupCliInstructions'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
-import { useDownloadableBackupQuery } from '@/data/database/backup-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useParams } from 'common'
+import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
+import { useDownloadableBackupQuery } from 'data/database/backup-query'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Button, CriticalIcon, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 
 export const RestoreFailedState = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [visible, setVisible] = useState(false)
-  const [showCliBackup, setShowCliBackup] = useState(false)
 
   const { can: canDeleteProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: { project_id: project?.id },
   })
 
-  const { data, isPending: isLoadingBackups } = useDownloadableBackupQuery({ projectRef: ref })
+  const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
@@ -54,18 +41,9 @@ export const RestoreFailedState = () => {
 
   const onClickDownloadBackup = () => {
     if (!ref) return console.error('Project ref is required')
-    if (backups.length === 0 || data?.status === 'physical-backups-enabled')
-      return setShowCliBackup(true)
+    if (backups.length === 0) return console.error('No available backups to download')
     downloadBackup({ ref, backup: backups[0] })
   }
-
-  const downloadBackupTooltipText = isLoadingBackups
-    ? undefined
-    : data?.status === 'physical-backups-enabled'
-      ? 'Project uses physical backups — click to see CLI backup instructions'
-      : backups.length === 0
-        ? 'No downloadable backup available — click to see CLI backup instructions'
-        : undefined
 
   return (
     <>
@@ -105,12 +83,17 @@ export const RestoreFailedState = () => {
               <ButtonTooltip
                 type="default"
                 icon={<Download />}
-                disabled={isLoadingBackups}
-                loading={isDownloading || isLoadingBackups}
+                loading={isDownloading}
+                disabled={backups.length === 0}
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: downloadBackupTooltipText,
+                    text:
+                      data?.status === 'physical-backups-enabled'
+                        ? 'No available backups to download as project is on physical backups'
+                        : backups.length === 0
+                          ? 'No available backups to download'
+                          : undefined,
                   },
                 }}
                 onClick={onClickDownloadBackup}
@@ -152,18 +135,6 @@ export const RestoreFailedState = () => {
           </div>
         </div>
       </div>
-
-      <Dialog open={showCliBackup} onOpenChange={setShowCliBackup}>
-        <DialogContent size="medium">
-          <DialogHeader>
-            <DialogTitle>Back up your database</DialogTitle>
-          </DialogHeader>
-          <DialogSection>
-            <LogicalBackupCliInstructions showResetPassword={false} />
-          </DialogSection>
-        </DialogContent>
-      </Dialog>
-
       <DeleteProjectModal visible={visible} onClose={() => setVisible(false)} />
     </>
   )

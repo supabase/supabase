@@ -1,6 +1,7 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { some } from 'lodash'
 
+import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import {
   generateColumnField,
   generateColumnFieldFromPostgresColumn,
@@ -8,7 +9,6 @@ import {
 import type { ColumnField } from '../SidePanelEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
-import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
 
 type ValidateFieldsReturn = {
   name?: string

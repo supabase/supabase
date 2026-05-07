@@ -1,3 +1,4 @@
+import ReportWidget from '../ReportWidget'
 import {
   ErrorCountsChartRenderer,
   NetworkTrafficRenderer,
@@ -5,7 +6,6 @@ import {
   TopApiRoutesRenderer,
   TotalRequestsChartRenderer,
 } from '../renderers/ApiRenderers'
-import ReportWidget from '../ReportWidget'
 import { SharedAPIReportKey } from './SharedAPIReport.constants'
 
 type SharedAPIReportWidgetsProps = {

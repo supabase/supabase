@@ -1,8 +1,11 @@
 import type { UseFormReturn } from 'react-hook-form'
+// End of third-party imports
+
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import {
   Badge,
-  FormControl,
-  FormField,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -11,12 +14,8 @@ import {
   SelectValue_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
 import type { SupportFormValues } from './SupportForm.schema'
 import { getOrgSubscriptionPlan, NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
-// End of third-party imports
-
-import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 
 interface OrganizationSelectorProps {
   form: UseFormReturn<SupportFormValues>
@@ -28,14 +27,14 @@ export function OrganizationSelector({ form, orgSlug }: OrganizationSelectorProp
   const subscriptionPlanId = getOrgSubscriptionPlan(organizations, orgSlug)
 
   return (
-    <FormField
+    <FormField_Shadcn_
       name="organizationSlug"
       control={form.control}
       render={({ field }) => {
         const { ref: _ref, ...fieldWithoutRef } = field
         return (
           <FormItemLayout hideMessage layout="vertical" label="Which organization is affected?">
-            <FormControl>
+            <FormControl_Shadcn_>
               <Select_Shadcn_
                 {...fieldWithoutRef}
                 disabled={!isSuccessOrganizations}
@@ -75,7 +74,7 @@ export function OrganizationSelector({ form, orgSlug }: OrganizationSelectorProp
                   </SelectGroup_Shadcn_>
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
-            </FormControl>
+            </FormControl_Shadcn_>
           </FormItemLayout>
         )
       }}

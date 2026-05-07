@@ -1,15 +1,14 @@
-import DotGrid from '~/components/AIDemo/DotGrid'
-import { AIDemoPanel } from '~/components/AIDemo/Panel'
-import { SqlSnippet } from '~/components/AIDemo/SqlSnippet'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { motion } from 'framer-motion'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from 'ui'
-
+import DotGrid from '~/components/AIDemo/DotGrid'
+import { AIDemoPanel } from '~/components/AIDemo/Panel'
+import { SqlSnippet } from '~/components/AIDemo/SqlSnippet'
 import { EASE_OUT } from '../lib/animations'
 
 const DefaultLayout = dynamic(() => import('~/components/Layouts/Default'))
@@ -18,9 +17,9 @@ const SectionContainer = dynamic(() => import('~/components/Layouts/SectionConta
 interface Message {
   id: string
   role: 'user' | 'assistant'
-  content: ReactNode
+  content: string | JSX.Element
   createdAt: Date
-  render?: ReactNode
+  render?: JSX.Element
 }
 
 const welcomeMessages = [
@@ -193,14 +192,14 @@ RETURNS INTEGER AS $$
 DECLARE
   total_points INTEGER;
 BEGIN
-  SELECT
+  SELECT 
     COALESCE(
       (SELECT COUNT(*) * 10 FROM posts WHERE author_id = user_id) + -- 10 points per post
       (SELECT COUNT(*) * 5 FROM comments WHERE user_id = user_id) + -- 5 points per comment
       (SELECT COUNT(*) * 2 FROM post_likes WHERE user_id = user_id), -- 2 points per like
       0
     ) INTO total_points;
-
+    
   RETURN total_points;
 END;
 $$ LANGUAGE plpgsql;`}
@@ -237,16 +236,16 @@ FOR SELECT
 USING (
   team_id IN (
     -- User can see members of teams they belong to
-    SELECT team_id
-    FROM team_members
+    SELECT team_id 
+    FROM team_members 
     WHERE user_id = auth.uid()
   )
-  OR
+  OR 
   -- Team admins can see all members
   EXISTS (
-    SELECT 1
-    FROM team_admins
-    WHERE user_id = auth.uid()
+    SELECT 1 
+    FROM team_admins 
+    WHERE user_id = auth.uid() 
     AND team_id = team_members.team_id
   )
 );`}
@@ -273,7 +272,7 @@ USING (
           <SqlSnippet
             id="projects-sql"
             title="Get All Projects SQL"
-            sql={`SELECT
+            sql={`SELECT 
   p.id,
   p.name,
   p.description,
@@ -676,7 +675,7 @@ function Assistant() {
               {/* Main content */}
               <div className="mb-6 flex flex-col gap-4 max-w-lg">
                 <h1 className="text-4xl sm:text-5xl sm:leading-none">Chat with Postgres</h1>
-                <p className="p text-lg m-0!">
+                <p className="p text-lg !m-0">
                   Generate, run and debug queries, chart your data, create functions, policies and
                   more. The Assistant is here to help.
                 </p>
@@ -765,7 +764,7 @@ function Assistant() {
                     ease: 'easeInOut',
                     delay: 0.5,
                   }}
-                  className="absolute inset-0 bg-linear-to-r from-transparent via-background-muted/40 to-transparent transform -skew-x-12 z-10"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-background-muted/40 to-transparent transform -skew-x-12 z-10"
                 />
                 <AIDemoPanel incomingMessages={incomingMessages} />
               </motion.div>

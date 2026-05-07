@@ -1,7 +1,6 @@
+import SqlEditor from 'components/ui/SqlEditor'
 import { useState } from 'react'
 import { Button, Modal } from 'ui'
-
-import SqlEditor from '@/components/ui/SqlEditor'
 
 const ReviewEmptyState = () => {
   return (

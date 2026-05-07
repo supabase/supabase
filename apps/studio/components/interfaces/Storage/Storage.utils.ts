@@ -2,14 +2,14 @@ import { PostgresPolicy } from '@supabase/postgres-meta'
 import { difference } from 'lodash'
 import { useRouter } from 'next/router'
 
+import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
+import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { FDW } from 'data/fdw/fdws-query'
+import { Bucket } from 'data/storage/buckets-query'
+import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
+import { createWrappedSymbol } from 'lib/helpers'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
 import type { StoragePolicyFormField } from './Storage.types'
-import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
-import { convertKVStringArrayToJson } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { FDW } from '@/data/fdw/fdws-query'
-import { Bucket } from '@/data/storage/buckets-query'
-import { getDecryptedValues } from '@/data/vault/vault-secret-decrypted-value-query'
-import { createWrappedSymbol } from '@/lib/helpers'
 
 const shortHash = (str: string) => {
   let hash = 0
@@ -236,7 +236,7 @@ export const getDecryptedParameters = async ({
 
   const paramsToBeDecrypted = Object.fromEntries(
     new Map(
-      Object.entries(serverOptions).filter(([key, _value]) => {
+      Object.entries(serverOptions).filter(([key, value]) => {
         return wrapperServerOptions.find((option) => option.name === key)?.encrypted
       })
     )

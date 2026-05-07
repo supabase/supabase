@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'vitest'
-
-import { DEFAULT_FALLBACK_PATH, validateReturnTo } from './gotrue'
+import { validateReturnTo, DEFAULT_FALLBACK_PATH } from './gotrue'
+import { describe, it, expect } from 'vitest'
 
 describe('validateReturnTo', () => {
   const fallback = DEFAULT_FALLBACK_PATH

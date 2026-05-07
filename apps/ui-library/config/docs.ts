@@ -25,14 +25,13 @@ export const gettingStarted: SidebarNavGroup = {
 }
 
 export const aiEditorsRules: SidebarNavGroup = {
-  title: 'AI Skills',
+  title: 'AI Editors Rules',
   items: [
     {
-      title: 'Skills',
-      href: '/docs/ai-editors-rules/skills',
+      title: 'Prompts',
+      href: '/docs/ai-editors-rules/prompts',
       items: [],
-      new: true,
-      commandItemLabel: 'AI Skills',
+      commandItemLabel: 'AI Editors Rules',
     },
   ],
 }

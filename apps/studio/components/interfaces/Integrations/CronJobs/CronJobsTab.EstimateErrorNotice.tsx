@@ -21,7 +21,7 @@ export const CronJobRunDetailsEstimateErrorNotice = ({
     >
       <div className="space-y-3 text-sm">
         {error?.message && (
-          <p className="text-foreground-light wrap-break-word">
+          <p className="text-foreground-light break-words">
             Error message: <code className="text-xs">{error.message}</code>
           </p>
         )}

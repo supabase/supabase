@@ -2,17 +2,17 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import { ident, keyword, literal, safeSql, type SafeSqlFragment } from './pg-format'
+import { ident, literal } from './pg-format'
 import { TRIGGERS_SQL } from './sql/triggers'
 
 type TriggerIdentifier = Pick<PGTrigger, 'id'> | Pick<PGTrigger, 'name' | 'schema' | 'table'>
 
-function getIdentifierWhereClause(identifier: TriggerIdentifier): SafeSqlFragment {
+function getIdentifierWhereClause(identifier: TriggerIdentifier): string {
   if ('id' in identifier && identifier.id) {
-    return safeSql`${ident('id')} = ${literal(identifier.id)}`
+    return `${ident('id')} = ${literal(identifier.id)}`
   }
   if ('name' in identifier && identifier.name && identifier.table && identifier.schema) {
-    return safeSql`${ident('name')} = ${literal(identifier.name)} and ${ident('schema')} = ${literal(identifier.schema)} and ${ident('table')} = ${literal(identifier.table)}`
+    return `${ident('name')} = ${literal(identifier.name)} and ${ident('schema')} = ${literal(identifier.schema)} and ${ident('table')} = ${literal(identifier.table)}`
   }
   throw new Error('Must provide either id or name, schema and table')
 }
@@ -51,23 +51,23 @@ export function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgTriggerArrayZod
 } {
-  let sql = safeSql`with triggers as (${TRIGGERS_SQL}) select * from triggers`
+  let sql = `with triggers as (${TRIGGERS_SQL}) select * from triggers`
   const filter = filterByList(
     includedSchemas,
     excludedSchemas,
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
   if (filter) {
-    sql = safeSql`${sql} where schema ${filter}`
+    sql += ` where schema ${filter}`
   }
   if (limit) {
-    sql = safeSql`${sql} limit ${literal(limit)}`
+    sql += ` limit ${limit}`
   }
   if (offset) {
-    sql = safeSql`${sql} offset ${literal(offset)}`
+    sql += ` offset ${offset}`
   }
   return {
     sql,
@@ -76,14 +76,14 @@ export function list({
 }
 
 type TriggersRetrieveReturn = {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgTriggerOptionalZod
 }
 
 export function retrieve(identifier: TriggerIdentifier): TriggersRetrieveReturn
 export function retrieve(params: TriggerIdentifier): TriggersRetrieveReturn {
   const whereIdentifierCondition = getIdentifierWhereClause(params)
-  const sql = safeSql`with triggers as (${TRIGGERS_SQL}) select * from triggers where ${whereIdentifierCondition};`
+  const sql = `with triggers as (${TRIGGERS_SQL}) select * from triggers where ${whereIdentifierCondition};`
   return {
     sql,
     zod: pgTriggerOptionalZod,
@@ -148,23 +148,23 @@ export function update(
   id: { name: string; schema: string; table: string },
   params: PGTriggerUpdate
 ): {
-  sql: SafeSqlFragment
+  sql: string
   zod: z.ZodType<void>
 } {
-  const qualifiedTableName = safeSql`${ident(id.schema)}.${ident(id.table)}`
+  const qualifiedTableName = `${ident(id.schema)}.${ident(id.table)}`
 
-  let enabledModeSql = safeSql``
+  let enabledModeSql = ''
 
   switch (params.enabled_mode) {
     case 'ORIGIN':
-      enabledModeSql = safeSql`alter table ${qualifiedTableName} enable trigger ${ident(id.name)};`
+      enabledModeSql = `alter table ${qualifiedTableName} enable trigger ${ident(id.name)};`
       break
     case 'DISABLED':
-      enabledModeSql = safeSql`alter table ${qualifiedTableName} disable trigger ${ident(id.name)};`
+      enabledModeSql = `alter table ${qualifiedTableName} disable trigger ${ident(id.name)};`
       break
     case 'REPLICA':
     case 'ALWAYS':
-      enabledModeSql = safeSql`alter table ${qualifiedTableName} enable ${keyword(params.enabled_mode)} trigger ${ident(id.name)};`
+      enabledModeSql = `alter table ${qualifiedTableName} enable ${params.enabled_mode} trigger ${ident(id.name)};`
       break
     default:
       break
@@ -172,11 +172,11 @@ export function update(
 
   const updateNameSql =
     params.name && params.name !== id.name
-      ? safeSql`alter trigger ${ident(id.name)} on ${qualifiedTableName} rename to ${ident(params.name)};`
-      : safeSql``
+      ? `alter trigger ${ident(id.name)} on ${qualifiedTableName} rename to ${ident(params.name)};`
+      : ''
 
   // updateNameSql must be last
-  const sql = safeSql`begin; ${enabledModeSql}; ${updateNameSql}; commit;`
+  const sql = `begin; ${enabledModeSql}; ${updateNameSql}; commit;`
 
   return {
     sql,
@@ -188,12 +188,12 @@ export function remove(
   id: { name: string; schema: string; table: string },
   { cascade = false } = {}
 ): {
-  sql: SafeSqlFragment
+  sql: string
   zod: z.ZodType<void>
 } {
-  const qualifiedTableName = safeSql`${ident(id.schema)}.${ident(id.table)}`
+  const qualifiedTableName = `${ident(id.schema)}.${ident(id.table)}`
 
-  const sql = safeSql`drop trigger ${ident(id.name)} on ${qualifiedTableName} ${cascade ? safeSql`cascade` : safeSql``};`
+  const sql = `drop trigger ${ident(id.name)} on ${qualifiedTableName} ${cascade ? 'cascade' : ''};`
 
   return {
     sql,

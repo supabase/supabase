@@ -1,7 +1,6 @@
+import { DocsButton } from 'components/ui/DocsButton'
+import { DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
-
-import { DocsButton } from '@/components/ui/DocsButton'
-import { DOCS_URL } from '@/lib/constants'
 
 const NoChannelEmptyState = () => {
   return (

@@ -1,17 +1,42 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { CreateAnalyticsBucketSheet } from 'components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import {
+  BatchConfig,
+  useCreateDestinationPipelineMutation,
+} from 'data/replication/create-destination-pipeline-mutation'
+import { useReplicationDestinationByIdQuery } from 'data/replication/destination-by-id-query'
+import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
+import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
+import { useRestartPipelineHelper } from 'data/replication/restart-pipeline-helper'
+import { useReplicationSourcesQuery } from 'data/replication/sources-query'
+import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
+import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
+import {
+  useValidateDestinationMutation,
+  type ValidationFailure,
+} from 'data/replication/validate-destination-mutation'
+import { useValidatePipelineMutation } from 'data/replication/validate-pipeline-mutation'
+import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
+import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 'ui'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from 'state/replication-pipeline-request-status'
+import { Button, DialogSectionSeparator, Form_Shadcn_, SheetFooter, SheetSection } from 'ui'
 import * as z from 'zod'
 
 import {
   useIsETLBigQueryPrivateAlpha,
-  useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
 } from '../../useIsETLPrivateAlpha'
 import { DestinationType } from '../DestinationPanel.types'
@@ -21,41 +46,14 @@ import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.sche
 import {
   buildDestinationConfig,
   buildDestinationConfigForValidation,
-  getDucklakeValidationIssues,
 } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
-import { AnalyticsBucketFields, BigQueryFields, DuckLakeFields } from './DestinationPanelFields'
+import { AnalyticsBucketFields, BigQueryFields } from './DestinationPanelFields'
 import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
 import { PublicationSelection } from './PublicationSelection'
 import { ReplicationDisclaimerDialog } from './ReplicationDisclaimerDialog'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
-import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import {
-  BatchConfig,
-  useCreateDestinationPipelineMutation,
-} from '@/data/replication/create-destination-pipeline-mutation'
-import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
-import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
-import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
-import { useRestartPipelineHelper } from '@/data/replication/restart-pipeline-helper'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
-import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
-import { useUpdateDestinationPipelineMutation } from '@/data/replication/update-destination-pipeline-mutation'
-import {
-  useValidateDestinationMutation,
-  type ValidationFailure,
-} from '@/data/replication/validate-destination-mutation'
-import { useValidatePipelineMutation } from '@/data/replication/validate-pipeline-mutation'
-import { useIcebergNamespaceCreateMutation } from '@/data/storage/iceberg-namespace-create-mutation'
-import { useS3AccessKeyCreateMutation } from '@/data/storage/s3-access-key-create-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import {
-  PipelineStatusRequestStatus,
-  usePipelineRequestStatus,
-} from '@/state/replication-pipeline-request-status'
 
 const formId = 'destination-editor'
 
@@ -72,20 +70,6 @@ interface DestinationFormProps {
   onClose: () => void
 }
 
-type DucklakeApiConfig = {
-  catalog_url: string
-  data_path: string
-  pool_size?: number
-  s3_access_key_id?: string
-  s3_secret_access_key?: string
-  s3_region?: string
-  s3_endpoint?: string
-  s3_url_style?: 'path' | 'vhost'
-  s3_use_ssl?: boolean
-  metadata_schema?: string
-  expire_snapshots_older_than?: string
-}
-
 export const DestinationForm = ({
   selectedType,
   visible,
@@ -97,7 +81,6 @@ export const DestinationForm = ({
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
-  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const [isFormInteracting, setIsFormInteracting] = useState(false)
@@ -125,9 +108,8 @@ export const DestinationForm = ({
     if (etlEnableBigQuery) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
     if (etlEnableIceberg)
       destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
-    if (etlEnableDucklake) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
     return destinations
-  }, [etlEnableBigQuery, etlEnableDucklake, etlEnableIceberg])
+  }, [etlEnableBigQuery, etlEnableIceberg])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
@@ -189,14 +171,6 @@ export const DestinationForm = ({
     const config = destinationData?.config
     const isBigQueryConfig = config && 'big_query' in config
     const isIcebergConfig = config && 'iceberg' in config
-    const ducklakeConfigValue =
-      config && 'ducklake' in (config as Record<string, unknown>)
-        ? (config as Record<string, unknown>).ducklake
-        : undefined
-    const ducklakeConfig =
-      ducklakeConfigValue && typeof ducklakeConfigValue === 'object'
-        ? (ducklakeConfigValue as DucklakeApiConfig)
-        : undefined
 
     return {
       // Common fields
@@ -225,18 +199,6 @@ export const DestinationForm = ({
       s3SecretAccessKey: isIcebergConfig ? config.iceberg.supabase.s3_secret_access_key : '',
       s3Region:
         projectSettings?.region ?? (isIcebergConfig ? config.iceberg.supabase.s3_region : ''),
-      // DuckLake fields
-      ducklakeCatalogUrl: ducklakeConfig?.catalog_url ?? '',
-      ducklakeDataPath: ducklakeConfig?.data_path ?? '',
-      ducklakePoolSize: ducklakeConfig?.pool_size,
-      ducklakeS3AccessKeyId: ducklakeConfig?.s3_access_key_id ?? '',
-      ducklakeS3SecretAccessKey: ducklakeConfig?.s3_secret_access_key ?? '',
-      ducklakeS3Region: ducklakeConfig?.s3_region ?? '',
-      ducklakeS3Endpoint: ducklakeConfig?.s3_endpoint ?? '',
-      ducklakeS3UrlStyle: ducklakeConfig?.s3_url_style ?? 'path',
-      ducklakeS3UseSsl: ducklakeConfig?.s3_use_ssl ?? true,
-      ducklakeMetadataSchema: ducklakeConfig?.metadata_schema ?? 'ducklake',
-      ducklakeExpireSnapshotsOlderThan: ducklakeConfig?.expire_snapshots_older_than ?? '',
     }
   }, [destinationData, pipelineData, catalogToken, projectSettings])
 
@@ -282,10 +244,6 @@ export const DestinationForm = ({
           if (data.s3AccessKeyId !== 'create-new' && !data.s3SecretAccessKey?.length) {
             addRequiredFieldError('s3SecretAccessKey', 'S3 Secret Access Key is required')
           }
-        } else if (selectedType === 'DuckLake') {
-          getDucklakeValidationIssues(data).forEach(({ path, message }) => {
-            addRequiredFieldError(path, message)
-          })
         }
       })
     ),
@@ -548,11 +506,11 @@ export const DestinationForm = ({
 
   return (
     <>
-      <SheetSection className="grow overflow-auto px-0 py-0">
+      <SheetSection className="flex-grow overflow-auto px-0 py-0">
         {hasNoAvailableDestinations && !editMode ? (
           <NoDestinationsAvailable />
         ) : (
-          <Form {...form}>
+          <Form_Shadcn_ {...form}>
             <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
               <div className="p-5 flex flex-col gap-y-6">
                 <p className="text-sm font-medium text-foreground">Destination details</p>
@@ -578,8 +536,6 @@ export const DestinationForm = ({
                   setIsFormInteracting={setIsFormInteracting}
                   onSelectNewBucket={() => setNewBucketSheetVisible(true)}
                 />
-              ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
-                <DuckLakeFields form={form} />
               ) : null}
 
               <DialogSectionSeparator />
@@ -599,11 +555,11 @@ export const DestinationForm = ({
                 </>
               )}
             </form>
-          </Form>
+          </Form_Shadcn_>
         )}
       </SheetSection>
 
-      <SheetFooter className="justify-between!">
+      <SheetFooter className="!justify-between">
         <AnimatePresence mode="wait">
           {isValidating || isSaving ? (
             <motion.div

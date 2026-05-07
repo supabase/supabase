@@ -1,7 +1,14 @@
 import { useFlag, useParams } from 'common'
+import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
+import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from 'lib/constants'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
+import type { NextPageWithLayout } from 'types'
 import {
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
   BreadcrumbLink_Shadcn_ as BreadcrumbLink,
@@ -28,37 +35,24 @@ import {
 } from 'ui-patterns'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
-import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
+import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
-import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
-import { UnknownInterface } from '@/components/ui/UnknownInterface'
-import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import type { NextPageWithLayout } from '@/types'
 
 type NavigationItem = { label: string; href: string; active?: boolean }
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { data: project } = useSelectedProjectQuery()
   const { ref, id, pageId, childId } = useParams()
-
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
 
-  const { data: extensions } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
   const { data: allIntegrations, isPending: isAvailableIntegrationsLoading } =
     useAvailableIntegrations()
-  const { installedIntegrations, isLoading: isInstalledIntegrationsLoading } =
-    useInstalledIntegrations()
+  const {
+    installedIntegrations: installedIntegrations,
+    isLoading: isInstalledIntegrationsLoading,
+  } = useInstalledIntegrations()
 
   // everything is wrapped in useMemo to avoid UI resets when installing additional extensions like pg_net
   const integration = useMemo(() => allIntegrations.find((i) => i.id === id), [allIntegrations, id])
@@ -67,15 +61,6 @@ const IntegrationPage: NextPageWithLayout = () => {
     () => installedIntegrations.find((inst) => inst.id === id),
     [installedIntegrations, id]
   )
-
-  const installableExtensions = (extensions ?? []).filter((ext) =>
-    (integration?.requiredExtensions ?? []).includes(ext.name)
-  )
-  const extensionsInstalled = installableExtensions.every((x) => x.installed_version)
-
-  // [Joshen] installedIntegrations doesn't return wrappers unless there's a wrapper created
-  const isInstalled =
-    !!integration && (!!installation || (integration.type === 'wrapper' && extensionsInstalled))
 
   // Get the corresponding component dynamically
   const Component = useMemo(
@@ -88,10 +73,10 @@ const IntegrationPage: NextPageWithLayout = () => {
     if (!integration?.navigation) return []
 
     // Only show navigation if the integration is installed, or if we're on the overview page
-    const showNavigation = isInstalled || pageId === 'overview'
+    const showNavigation = installation || pageId === 'overview'
     if (!showNavigation) return []
 
-    const availableTabs = isInstalled
+    const availableTabs = installation
       ? integration.navigation
       : integration.navigation.filter((tab) => tab.route === 'overview')
 
@@ -100,7 +85,7 @@ const IntegrationPage: NextPageWithLayout = () => {
       href: `/project/${ref}/integrations/${id}/${nav.route}`,
       active: pageId === nav.route,
     }))
-  }, [integration, pageId, isInstalled, ref, id])
+  }, [integration, ref, id, pageId, installation])
 
   useEffect(() => {
     // if the integration is not installed, redirect to the overview page
@@ -108,12 +93,12 @@ const IntegrationPage: NextPageWithLayout = () => {
       router &&
       router?.isReady &&
       !isInstalledIntegrationsLoading &&
-      !isInstalled &&
+      !installation &&
       pageId !== 'overview'
     ) {
       router.replace(`/project/${ref}/integrations/${id}/overview`)
     }
-  }, [isInstalled, isInstalledIntegrationsLoading, pageId, router, ref, id])
+  }, [installation, isInstalledIntegrationsLoading, pageId, router, ref, id])
 
   // Determine page title, icon, and subtitle based on state
   const pageTitle = integration?.name || 'Integration not found'
@@ -209,13 +194,13 @@ const IntegrationPage: NextPageWithLayout = () => {
             </PageHeaderSummary>
 
             {integration?.type === 'oauth' ? (
-              <InstallOAuthIntegrationButton integration={integration} />
-            ) : isMarketplaceEnabled && !!integration && !isInstalled ? (
-              <InstallIntegrationSheet integration={integration} />
-            ) : isMarketplaceEnabled && isInstalled ? (
-              <Button disabled type="outline">
-                Installed
+              <Button asChild type="primary" className="shrink-0">
+                <a target="_blank" rel="noreferrer" href={integration.siteUrl ?? '/'}>
+                  Install integration
+                </a>
               </Button>
+            ) : isMarketplaceEnabled && !!integration && !installation ? (
+              <InstallIntegrationSheet integration={integration} />
             ) : null}
           </PageHeaderMeta>
         )}

@@ -1,9 +1,5 @@
 import { ChevronRight, ChevronsDown, Loader2, Search } from 'lucide-react'
 import Link from 'next/link'
-// Required to avoid issues:
-// The inferred type of InnerSideMenuCollapsible cannot be named without a reference to CollapsibleProps
-// The inferred type of InnerSideBarFilterSortDropdown cannot be named without a reference to DropdownMenuProps
-import { Collapsible as _RadixCollapsible, DropdownMenu as _RadixDropdownMenu } from 'radix-ui'
 import { ElementRef, forwardRef } from 'react'
 import {
   cn,
@@ -191,7 +187,7 @@ const InnerSideBarFilterSearchInput = forwardRef<
           'pl-7',
           'pr-7',
           'w-full',
-          'rounded-sm',
+          'rounded',
           // 'bg-transparent',
           // 'border',
           // 'border-control',
@@ -226,7 +222,7 @@ const InnerSideBarFilterSortDropdown = forwardRef<
     contentClassName?: string
     triggerClassName?: string
   }
->(({ value, onValueChange, contentClassName, triggerClassName, ...props }, _ref) => {
+>(({ value, onValueChange, contentClassName, triggerClassName, ...props }, ref) => {
   return (
     <DropdownMenu modal={false}>
       <Tooltip delayDuration={0}>

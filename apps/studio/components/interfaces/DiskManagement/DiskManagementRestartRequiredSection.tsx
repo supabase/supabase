@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { RotateCcw } from 'lucide-react'
+
 import { DialogSection, WarningIcon } from 'ui'
 
 interface DiskMangementRestartRequiredSectionProps {
@@ -29,7 +30,7 @@ export const DiskMangementRestartRequiredSection = ({
                 <WarningIcon className="absolute -right-1.5 -top-1.5" />
               </div>
             </div>
-            <div className="flex flex-col gap-0 grow">
+            <div className="flex flex-col gap-0 flex-grow">
               <p className="text-sm text-foreground">{title}</p>
               <p className="text-sm text-foreground-light">{description}</p>
             </div>

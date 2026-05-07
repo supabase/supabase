@@ -8,10 +8,9 @@ import {
   useReactFlow,
 } from '@xyflow/react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Badge, cn } from 'ui'
 
-import { useSchemaGraphContext } from './SchemaGraphContext'
 import { EdgeData } from './Schemas.constants'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
@@ -36,7 +35,6 @@ export const DefaultEdge = ({
   pathOptions,
   ...props
 }: EdgeProps<Edge<EdgeData>>) => {
-  const { isDownloading } = useSchemaGraphContext()
   const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
     sourceY,
@@ -48,13 +46,13 @@ export const DefaultEdge = ({
     offset: pathOptions?.offset,
     stepPosition: pathOptions?.stepPosition,
   })
+
   return (
     <>
       <BaseEdge
         id={id}
         path={edgePath}
-        className={cn(selected ? 'stroke-brand!' : isDownloading ? 'stroke-black!' : undefined)}
-        stroke="#000000"
+        className={cn(selected ? '!stroke-brand' : undefined)}
         {...props}
       />
       {data && selected ? (
@@ -75,6 +73,7 @@ export const DefaultEdge = ({
 
 const EdgeRelationInfo = ({
   data,
+  edgePath,
   source,
   target,
   labelX,

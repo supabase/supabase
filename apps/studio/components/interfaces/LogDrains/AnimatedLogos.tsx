@@ -1,8 +1,8 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { cn } from 'ui'
 import { Datadog, Grafana, Sentry } from 'icons'
 import { BracesIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { cn } from 'ui'
 
 export const AnimatedLogos = () => {
   const [currIndex, setCurrIndex] = useState(0)
@@ -115,7 +115,7 @@ export const AnimatedLogos = () => {
           )
         })}
       </AnimatePresence>
-      <div className="absolute -inset-4 bg-linear-to-r from-background-surface-75 via-transparent to-background-surface-75 z-40" />
+      <div className="absolute -inset-4 bg-gradient-to-r from-background-surface-75 via-transparent to-background-surface-75 z-40" />
     </div>
   )
 }

@@ -1,6 +1,5 @@
 import { useParams } from 'common'
-
-import { useBucketQuery } from '@/data/storage/buckets-query'
+import { useBucketQuery } from 'data/storage/buckets-query'
 
 export const useSelectedBucket = () => {
   const { ref, bucketId } = useParams()

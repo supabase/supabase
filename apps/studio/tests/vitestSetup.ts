@@ -1,15 +1,13 @@
 import '@testing-library/jest-dom/vitest'
-
-import { cleanup } from '@testing-library/react'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import timezone from 'dayjs/plugin/timezone'
-import utc from 'dayjs/plugin/utc'
+import { cleanup, configure } from '@testing-library/react'
 import { createDynamicRouteParser } from 'next-router-mock/dist/dynamic-routes'
 import { afterAll, afterEach, beforeAll, vi } from 'vitest'
-
-import { mswServer } from './lib/msw'
 import { routerMock } from './lib/route-mock'
+import { mswServer } from './lib/msw'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+import relativeTime from 'dayjs/plugin/relativeTime'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)

@@ -156,8 +156,8 @@ function Resources({ schema }: { schema: any }) {
                                 <li key={nestedAttribute}>
                                   {nestedAttribute}
                                   <ul>
-                                    <li className="*:m-0!">
-                                      <ReactMarkdown>
+                                    <li>
+                                      <ReactMarkdown className="*:!m-0">
                                         {
                                           schema[resource].block.attributes[attribute].nested_type
                                             .attributes[nestedAttribute].description
@@ -285,8 +285,8 @@ function DataSources({ schema }: { schema: any }) {
                                 <li key={nestedAttribute}>
                                   {nestedAttribute}
                                   <ul>
-                                    <li className="*:m-0!">
-                                      <ReactMarkdown>
+                                    <li>
+                                      <ReactMarkdown className="*:!m-0">
                                         {
                                           schema[dataSource].block.attributes[attribute].nested_type
                                             .attributes[nestedAttribute].description

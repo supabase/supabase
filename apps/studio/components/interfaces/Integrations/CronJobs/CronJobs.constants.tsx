@@ -1,11 +1,8 @@
 import { EdgeFunctions, RESTApi, SqlEditor } from 'icons'
 import { ScrollText } from 'lucide-react'
 
-const cronField = /(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)/
-const cronDayOfMonth = /(\*|\$|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)/
-export const cronPattern = new RegExp(
-  `^${cronField.source}\\s+${cronField.source}\\s+${cronDayOfMonth.source}\\s+${cronField.source}\\s+${cronField.source}$`
-)
+export const cronPattern =
+  /^(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)(\s+(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)){4}$/
 
 // detect seconds like "10 seconds" or normal cron syntax like "*/5 * * * *"
 export const secondsPattern = /^\d+\s+seconds*$/

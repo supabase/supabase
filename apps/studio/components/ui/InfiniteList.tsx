@@ -1,14 +1,14 @@
-import { useVirtualizer, Virtualizer } from '@tanstack/react-virtual'
+import { Virtualizer, useVirtualizer } from '@tanstack/react-virtual'
 import {
+  CSSProperties,
   ComponentPropsWithRef,
   ComponentType,
-  createContext,
-  createElement,
-  CSSProperties,
   ElementType,
-  memo,
   ReactNode,
   Ref,
+  createContext,
+  createElement,
+  memo,
   useContext,
   useEffect,
   useMemo,
@@ -16,13 +16,14 @@ import {
   type ComponentProps,
   type PropsWithChildren,
 } from 'react'
-import { cn, Skeleton } from 'ui'
+
+import { Skeleton, cn } from 'ui'
 
 // Regular memo erases generics, so this helper adds them back
 // any here is intentional to allow for generic components and does not affect
 // type safety of the wrapped component
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const typedMemo = <Component extends (props: any) => ReactNode>(
+const typedMemo = <Component extends (props: any) => JSX.Element | null>(
   component: Component,
   propsAreEqual?: (
     prevProps: Readonly<Parameters<Component>[0]>,

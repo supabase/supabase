@@ -1,9 +1,34 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
+import {
+  getAddons,
+  subscriptionHasHipaaAddon,
+} from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { ProjectUpdateDisabledTooltip } from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import AlertError from 'components/ui/AlertError'
+import { ResourceItem } from 'components/ui/Resource/ResourceItem'
+import { ResourceList } from 'components/ui/Resource/ResourceList'
+import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import {
+  useIsAwsCloudProvider,
+  useIsOrioleDbInAws,
+  useIsProjectActive,
+  useSelectedProjectQuery,
+} from 'hooks/misc/useSelectedProject'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
+import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { AlertCircle, Lock } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -26,31 +51,6 @@ import {
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
-import {
-  getAddons,
-  subscriptionHasHipaaAddon,
-} from '@/components/interfaces/Billing/Subscription/Subscription.utils'
-import { ProjectUpdateDisabledTooltip } from '@/components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
-import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import AlertError from '@/components/ui/AlertError'
-import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
-import { ResourceList } from '@/components/ui/Resource/ResourceList'
-import { HorizontalShimmerWithIcon } from '@/components/ui/Shimmers'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import {
-  useIsAwsCloudProvider,
-  useIsOrioleDbInAws,
-  useIsProjectActive,
-  useSelectedProjectQuery,
-} from '@/hooks/misc/useSelectedProject'
-import { BASE_PATH, DOCS_URL } from '@/lib/constants'
-import { getDatabaseMajorVersion, getSemanticVersion } from '@/lib/helpers'
-import { useAddonsPagePanel } from '@/state/addons-page'
 
 export const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -140,7 +140,7 @@ export const Addons = () => {
 
   const listTopSpacing = isBranch ? 'mt-6' : undefined
   const resourceItemClassName =
-    'min-h-[128px] border-b! last:border-b-0! [&>div:first-child]:hidden @lg:[&>div:first-child]:flex'
+    'min-h-[128px] !border-b last:!border-b-0 [&>div:first-child]:hidden @lg:[&>div:first-child]:flex'
 
   let pitrAlert = null
 

@@ -1,10 +1,13 @@
 import { useParams } from 'common'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { Database } from 'icons'
 import { Loader2, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
+import type { NextPageWithLayout } from 'types'
 import { Badge, Button } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 
@@ -16,8 +19,6 @@ import {
 import { DropReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/DropReplicaConfirmationModal'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { RestartReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/RestartReplicaConfirmationModal'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
-import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ScaffoldDescription, ScaffoldTitle } from '@/components/layouts/Scaffold'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -27,7 +28,6 @@ import {
   ReplicaInitializationStatus,
   useReadReplicasStatusesQuery,
 } from '@/data/read-replicas/replicas-status-query'
-import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReadReplicaPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -111,7 +111,7 @@ const DatabaseReadReplicaPage: NextPageWithLayout = () => {
         isLoadingDatabases ? (
           <ShimmeringLoader className="py-[11px]" />
         ) : (
-          <div className="flex items-center gap-x-2 mt-0!">
+          <div className="flex items-center gap-x-2 !mt-0">
             <ScaffoldDescription>ID: {identifier}</ScaffoldDescription>
             <CopyButton iconOnly type="default" text={identifier ?? ''} />
           </div>

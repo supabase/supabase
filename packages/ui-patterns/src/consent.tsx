@@ -1,6 +1,6 @@
 'use client'
 
-import { consentState, isBrowser } from 'common'
+import { clearTelemetryDataCookie, consentState, isBrowser } from 'common'
 import { useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { cn } from 'ui'
@@ -26,6 +26,7 @@ export const useConsentToast = () => {
     if (!isBrowser) return
 
     snap.denyAll()
+    clearTelemetryDataCookie()
 
     // Clear GA4 and sGTM tracking cookies
     const trackingCookies = ['_ga', '_ga_XW18KGKGNR', 'FPID', 'FPAU', 'FPLC']
@@ -47,8 +48,8 @@ export const useConsentToast = () => {
         closeButton: false,
         dismissible: false,
         className: cn(
-          'w-screen! fixed! border-t! h-auto! left-0! bottom-0! top-auto! right-0! rounded-none! max-w-none! !bg-overlay !text',
-          'sm:w-full! sm:max-w-[356px]! sm:left-auto! sm:right-8! sm:bottom-8! sm:rounded-lg! sm:border'
+          '!w-screen !fixed !border-t !h-auto !left-0 !bottom-0 !top-auto !right-0 !rounded-none !max-w-none !bg-overlay !text',
+          'sm:!w-full sm:!max-w-[356px] sm:!left-auto sm:!right-8 sm:!bottom-8 sm:!rounded-lg sm:border'
         ),
       })
     } else if (consentToastId.current) {

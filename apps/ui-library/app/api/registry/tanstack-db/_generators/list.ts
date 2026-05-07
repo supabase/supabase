@@ -117,7 +117,7 @@ ${selectFields}
               <div
                 className={cn(
                   'flex items-center justify-between rounded-lg p-4',
-                  'border border-border/50 bg-card shadow-xs',
+                  'border border-border/50 bg-card shadow-sm',
                   'transition-all duration-150 hover:shadow-md hover:border-border'
                 )}
                 key={${primaryKeyAccess}}

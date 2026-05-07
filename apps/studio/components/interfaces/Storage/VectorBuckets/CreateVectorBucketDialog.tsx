@@ -1,8 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import z from 'zod'
+
+import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
+import { useS3VectorsWrapperCreateMutation } from 'data/storage/s3-vectors-wrapper-create-mutation'
+import { useVectorBucketCreateMutation } from 'data/storage/vector-bucket-create-mutation'
+import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -12,26 +23,15 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import z from 'zod'
-
 import { validVectorBucketName } from './CreateVectorBucketDialog.utils'
 import { useS3VectorsWrapperExtension } from './useS3VectorsWrapper'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
-import { useS3VectorsWrapperCreateMutation } from '@/data/storage/s3-vectors-wrapper-create-mutation'
-import { useVectorBucketCreateMutation } from '@/data/storage/vector-bucket-create-mutation'
-import { useVectorBucketsQuery } from '@/data/storage/vector-buckets-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL } from '@/lib/constants'
 
 const FormSchema = z.object({
   name: z
@@ -173,10 +173,10 @@ export const CreateVectorBucketDialog = ({
 
         <DialogSectionSeparator />
 
-        <Form {...form}>
+        <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col p-0!">
-              <FormField
+            <DialogSection className="flex flex-col !p-0">
+              <FormField_Shadcn_
                 key="name"
                 name="name"
                 control={form.control}
@@ -188,7 +188,7 @@ export const CreateVectorBucketDialog = ({
                     labelOptional="Cannot be changed after creation"
                     description="Must be between 3–63 characters. Only lowercase letters, numbers, and hyphens are allowed"
                   >
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Input_Shadcn_
                         id="name"
                         data-1p-ignore
@@ -198,7 +198,7 @@ export const CreateVectorBucketDialog = ({
                         {...field}
                         placeholder="Enter bucket name"
                       />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
@@ -216,7 +216,7 @@ export const CreateVectorBucketDialog = ({
               </Admonition>
             </DialogSection>
           </form>
-        </Form>
+        </Form_Shadcn_>
 
         <DialogFooter>
           <Button type="default" disabled={isLoading} onClick={() => setVisible(false)}>

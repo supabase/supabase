@@ -3,9 +3,8 @@ import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-
-import { useGroupedPermissions } from '../hooks/useGroupedPermissions'
 import { TokenPermissionsSection } from './TokenPermissionSection'
+import { useGroupedPermissions } from '../hooks/useGroupedPermissions'
 
 interface AccessTokenNewBannerProps<T> {
   token: T

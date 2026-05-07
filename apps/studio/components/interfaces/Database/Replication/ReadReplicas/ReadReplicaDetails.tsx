@@ -154,7 +154,7 @@ export const ReadReplicaDetails = () => {
                       icon={
                         <img
                           alt="region icon"
-                          className="w-5 rounded-xs"
+                          className="w-5 rounded-sm"
                           src={`${BASE_PATH}/img/regions/${region ?? ''}.svg`}
                         />
                       }

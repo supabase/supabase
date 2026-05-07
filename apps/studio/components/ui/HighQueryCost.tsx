@@ -171,11 +171,9 @@ const LoadDataWarningDialog = ({
               Cancel
             </Button>
           </DialogClose>
-          <DialogClose asChild>
-            <Button type="warning" onClick={() => onSelectLoadData()}>
-              I understand, proceed
-            </Button>
-          </DialogClose>
+          <Button type="warning" onClick={() => onSelectLoadData()}>
+            I understand, proceed
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

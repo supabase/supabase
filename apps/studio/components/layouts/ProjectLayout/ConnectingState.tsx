@@ -1,17 +1,17 @@
-import { useParams } from 'common'
 import { ExternalLink, Loader, Monitor, Server } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
-import { Badge, Button } from 'ui'
 
-import ShimmerLine from '@/components/ui/ShimmerLine'
+import { useParams } from 'common'
+import ShimmerLine from 'components/ui/ShimmerLine'
 import {
   useInvalidateProjectDetailsQuery,
   useSetProjectPostgrestStatus,
   type Project,
-} from '@/data/projects/project-detail-query'
-import { DOCS_URL } from '@/lib/constants'
-import pingPostgrest from '@/lib/pingPostgrest'
+} from 'data/projects/project-detail-query'
+import { DOCS_URL } from 'lib/constants'
+import pingPostgrest from 'lib/pingPostgrest'
+import { Badge, Button } from 'ui'
 
 export interface ConnectingStateProps {
   project: Project
@@ -59,7 +59,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
               </Badge>
             </div>
           </div>
-          <div className="flex h-[500px] items-center justify-center rounded-sm border border-overlay bg-surface-100 p-8">
+          <div className="flex h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-8">
             <div className="w-[440px] space-y-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center">
                 <div>
@@ -92,7 +92,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
                 <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                   <Link
                     href={`${DOCS_URL}/guides/troubleshooting?products=platform#unable-to-connect-to-your-supabase-project`}
-                    className="translate-y-px"
+                    className="translate-y-[1px]"
                   >
                     Troubleshooting
                   </Link>

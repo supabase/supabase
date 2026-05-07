@@ -5,15 +5,16 @@ import {
   AccordionTrigger_Shadcn_ as AccordionTrigger,
 } from 'ui'
 
-import { DateRangeDisabled } from '../DataTable.types'
-import { useDataTable } from '../providers/DataTableProvider'
 import { DataTableFilterCheckbox } from './DataTableFilterCheckbox'
-import { DataTableFilterCheckboxAsync } from './DataTableFilterCheckboxAsync'
-import { DataTableFilterCheckboxLoader } from './DataTableFilterCheckboxLoader'
 import { DataTableFilterInput } from './DataTableFilterInput'
 import { DataTableFilterResetButton } from './DataTableFilterResetButton'
 import { DataTableFilterSlider } from './DataTableFilterSlider'
 import { DataTableFilterTimerange } from './DataTableFilterTimerange'
+
+import { DateRangeDisabled } from '../DataTable.types'
+import { useDataTable } from '../providers/DataTableProvider'
+import { DataTableFilterCheckboxAsync } from './DataTableFilterCheckboxAsync'
+import { DataTableFilterCheckboxLoader } from './DataTableFilterCheckboxLoader'
 
 // FIXME: use @container (especially for the slider element) to restructure elements
 
@@ -24,9 +25,7 @@ interface DataTableFilterControls {
   dateRangeDisabled?: DateRangeDisabled
 }
 
-export function DataTableFilterControls({
-  dateRangeDisabled: _dateRangeDisabled,
-}: DataTableFilterControls) {
+export function DataTableFilterControls({ dateRangeDisabled }: DataTableFilterControls) {
   const { filterFields, isLoadingCounts } = useDataTable()
   return (
     <Accordion
@@ -39,7 +38,7 @@ export function DataTableFilterControls({
         const value = field.value as string
         return (
           <AccordionItem key={value} value={value} className="border-none">
-            <AccordionTrigger className="w-full px-2 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-open:text-foreground focus-within:data-closed:text-foreground hover:data-closed:text-foreground">
+            <AccordionTrigger className="w-full px-2 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-[state=open]:text-foreground focus-within:data-[state=closed]:text-foreground hover:data-[state=closed]:text-foreground">
               <div className="flex w-full items-center justify-between gap-2 truncate py-2 pr-2">
                 <div className="flex items-center gap-2 truncate">
                   <p className="text-sm">{field.label}</p>

@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import { TextSearch } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { UIEvent, useMemo, useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -117,7 +118,7 @@ const columns = messagesCols.map((col) => {
             col.id === 'id' && 'ml-8'
           )}
         >
-          <p className="text-foreground!">{col.name}</p>
+          <p className="!text-foreground">{col.name}</p>
         </div>
       )
     },
@@ -137,6 +138,7 @@ export const QueueMessagesDataGrid = ({
   fetchNextPage,
 }: QueueDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
+  const router = useRouter()
 
   const [selectedMessageId, setSelectedMessageId] = useQueryState('messageId', parseAsInteger)
 
@@ -163,7 +165,7 @@ export const QueueMessagesDataGrid = ({
         rowClass={() => {
           return cn(
             'cursor-pointer',
-            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
+            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
             '[&>.rdg-cell:first-child>div]:ml-8'
           )
         }}

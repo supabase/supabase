@@ -81,8 +81,7 @@ check_logs functions \
 
 check_logs analytics \
     'Access LogflareWeb.Endpoint at http://localhost:4000' \
-    'Executing startup tasks' \
-    'Ensuring single tenant user is seeded'
+    'Initializing alerts scheduler'
 
 check_logs supavisor \
     'Connected to Postgres database' \

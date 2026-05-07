@@ -1,8 +1,7 @@
 import { screen } from '@testing-library/react'
+import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import { test } from 'vitest'
-
 import { render } from '../../helpers'
-import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
 
 test('static elements', async () => {
   render(

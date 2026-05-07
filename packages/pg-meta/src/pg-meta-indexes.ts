@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import { literal, safeSql, type SafeSqlFragment } from './pg-format'
+import { literal } from './pg-format'
 import { INDEXES_SQL } from './sql/indexes'
 
 const pgIndexZod = z.object({
@@ -54,10 +54,10 @@ function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: SafeSqlFragment
+  sql: string
   zod: typeof pgIndexArrayZod
 } {
-  let sql = safeSql`
+  let sql = `
     with indexes as (${INDEXES_SQL})
     select *
     from indexes
@@ -68,13 +68,13 @@ function list({
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
   if (filter) {
-    sql = safeSql`${sql} where schema ${filter}`
+    sql += ` where schema ${filter}`
   }
   if (limit) {
-    sql = safeSql`${sql} limit ${literal(limit)}`
+    sql += ` limit ${limit}`
   }
   if (offset) {
-    sql = safeSql`${sql} offset ${literal(offset)}`
+    sql += ` offset ${offset}`
   }
   return {
     sql,
@@ -82,11 +82,8 @@ function list({
   }
 }
 
-function retrieve({ id }: { id: number }): {
-  sql: SafeSqlFragment
-  zod: typeof pgIndexOptionalZod
-} {
-  const sql = safeSql`
+function retrieve({ id }: { id: number }): { sql: string; zod: typeof pgIndexOptionalZod } {
+  const sql = `
     with indexes as (${INDEXES_SQL})
     select *
     from indexes

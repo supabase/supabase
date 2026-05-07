@@ -1,7 +1,7 @@
-import { useParams } from 'common'
 import { useRouter } from 'next/router'
 
-import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { useParams } from 'common'
+import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 
 interface ReportHeaderProps {
   title: string

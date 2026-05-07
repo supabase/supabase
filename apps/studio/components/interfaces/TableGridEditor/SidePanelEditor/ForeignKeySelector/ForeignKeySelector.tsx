@@ -1,21 +1,27 @@
 import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import type { PostgresTable } from '@supabase/postgres-meta'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { DocsButton } from 'components/ui/DocsButton'
+import InformationBox from 'components/ui/InformationBox'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useTableQuery } from 'data/tables/table-retrieve-query'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
+import { DOCS_URL } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
 import { sortBy } from 'lodash'
-import { ArrowRight, HelpCircle, Loader2, X } from 'lucide-react'
+import { ArrowRight, Database, HelpCircle, Loader2, Table, X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Listbox,
   SidePanel,
 } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ActionBar } from '../ActionBar'
 import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -28,15 +34,6 @@ import {
   normalizeForeignKeyForDirtyCheck,
   type ForeignKeyDirtyState,
 } from './ForeignKeySelector.utils'
-import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import InformationBox from '@/components/ui/InformationBox'
-import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useTableQuery } from '@/data/tables/table-retrieve-query'
-import { useTablesQuery } from '@/data/tables/tables-query'
-import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { uuidv4 } from '@/lib/helpers'
 
 const EMPTY_STATE: ForeignKey = {
   id: undefined,
@@ -261,64 +258,61 @@ export const ForeignKeySelector = ({
               url="https://www.postgresql.org/docs/current/tutorial-fk.html"
               urlLabel="Postgres Foreign Key Documentation"
             />
-            <FormItemLayout
+
+            <Listbox
               id="schema"
-              isReactForm={false}
-              layout="vertical"
               label="Select a schema"
-              className="gap-[2px]"
-              size="tiny"
+              value={fk.schema}
+              onChange={(value: string) => updateSelectedSchema(value)}
             >
-              <Select_Shadcn_
-                value={fk.schema}
-                onValueChange={(value) => updateSelectedSchema(value)}
-              >
-                <SelectTrigger_Shadcn_ id="schema">
-                  <SelectValue_Shadcn_ />
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  {sortedSchemas.map((schema) => (
-                    <SelectItem_Shadcn_ key={schema.id} value={schema.name} className="min-w-96">
-                      {schema.name}
-                    </SelectItem_Shadcn_>
-                  ))}
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
-            </FormItemLayout>
-            <FormItemLayout
+              {sortedSchemas.map((schema) => {
+                return (
+                  <Listbox.Option
+                    key={schema.id}
+                    value={schema.name}
+                    label={schema.name}
+                    className="min-w-96"
+                    addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
+                  >
+                    <div className="flex items-center gap-2">
+                      {/* For aria searching to target the schema name instead of schema */}
+                      <span className="hidden">{schema.name}</span>
+                      <span className="text-foreground">{schema.name}</span>
+                    </div>
+                  </Listbox.Option>
+                )
+              })}
+            </Listbox>
+
+            <Listbox
               id="table"
-              isReactForm={false}
-              layout="vertical"
               label="Select a table to reference to"
-              className="gap-[2px]"
-              size="tiny"
+              value={selectedTable?.id ?? 1}
+              onChange={(value: string) => updateSelectedTable(Number(value))}
+              disabled={isLoadingSelectedTable}
             >
-              <Select_Shadcn_
-                value={selectedTable?.id !== undefined ? String(selectedTable.id) : undefined}
-                onValueChange={(value) => updateSelectedTable(Number(value))}
-                disabled={isLoadingSelectedTable}
-              >
-                <SelectTrigger_Shadcn_ id="table">
-                  <SelectValue_Shadcn_ />
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  {sortBy(tables, ['schema']).map((table) => (
-                    <SelectItem_Shadcn_
-                      key={table.id}
-                      value={table.id.toString()}
-                      className="min-w-96"
-                    >
-                      <div className="flex items-center gap-2">
-                        {/* For aria searching to target the table name instead of schema */}
-                        <span className="hidden">{table.name}</span>
-                        <span className="text-foreground-lighter">{table.schema}</span>
-                        <span className="text-foreground">{table.name}</span>
-                      </div>
-                    </SelectItem_Shadcn_>
-                  ))}
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
-            </FormItemLayout>
+              <Listbox.Option key="empty" className="min-w-96" value={1} label="---">
+                ---
+              </Listbox.Option>
+              {sortBy(tables, ['schema']).map((table) => {
+                return (
+                  <Listbox.Option
+                    key={table.id}
+                    value={table.id}
+                    label={table.name}
+                    className="min-w-96"
+                    addOnBefore={() => <Table size={16} strokeWidth={1.5} />}
+                  >
+                    <div className="flex items-center gap-2">
+                      {/* For aria searching to target the table name instead of schema */}
+                      <span className="hidden">{table.name}</span>
+                      <span className="text-foreground-lighter">{table.schema}</span>
+                      <span className="text-foreground">{table.name}</span>
+                    </div>
+                  </Listbox.Option>
+                )
+              })}
+            </Listbox>
 
             {fk.schema && fk.table && (
               <>
@@ -337,10 +331,10 @@ export const ForeignKeySelector = ({
                       to reference to
                     </label>
                     <div className="grid grid-cols-10 gap-y-2">
-                      <div className="col-span-5 text-xs">
+                      <div className="col-span-5 text-xs text-foreground-lighter">
                         {selectedSchema}.{table.name.length > 0 ? table.name : '[unnamed table]'}
                       </div>
-                      <div className="col-span-4 text-xs text-right">
+                      <div className="col-span-4 text-xs text-foreground-lighter text-right">
                         {fk.schema}.{fk.table}
                       </div>
                       {fk.columns.length === 0 && (
@@ -353,57 +347,73 @@ export const ForeignKeySelector = ({
                       {fk.columns.map((_, idx) => (
                         <Fragment key={`${fk.schema}-${fk.table}-${idx}`}>
                           <div className="col-span-4">
-                            <Select_Shadcn_
+                            <Listbox
+                              id="column"
                               value={fk.columns[idx].source}
-                              onValueChange={(value) => updateSelectedColumn(idx, 'source', value)}
+                              onChange={(value: string) =>
+                                updateSelectedColumn(idx, 'source', value)
+                              }
                             >
-                              <SelectTrigger_Shadcn_
-                                aria-label={`Column from ${selectedSchema}.${table.name.length > 0 ? table.name : '[unnamed table]'}`}
+                              <Listbox.Option
+                                key="empty"
+                                value={''}
+                                label="---"
+                                className="!w-[170px]"
                               >
-                                <SelectValue_Shadcn_ />
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
-                                {(table?.columns ?? [])
-                                  .filter((x) => x.name.length !== 0)
-                                  .map((column) => (
-                                    <SelectItem_Shadcn_ key={column.id} value={column.name}>
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-foreground">{column.name}</span>
-                                        <span className="text-foreground-lighter">
-                                          {column.format === '' ? '-' : column.format}
-                                        </span>
-                                      </div>
-                                    </SelectItem_Shadcn_>
-                                  ))}
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
-                          </div>
-                          <div className="col-span-1 flex justify-center items-center">
-                            <ArrowRight />
-                          </div>
-                          <div className="col-span-4">
-                            <Select_Shadcn_
-                              value={fk.columns[idx].target}
-                              onValueChange={(value) => updateSelectedColumn(idx, 'target', value)}
-                            >
-                              <SelectTrigger_Shadcn_
-                                aria-label={`Column from ${fk.schema}.${fk.table}`}
-                              >
-                                <SelectValue_Shadcn_ />
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
-                                {(selectedTable?.columns ?? []).map((column) => (
-                                  <SelectItem_Shadcn_ key={column.id} value={column.name}>
+                                ---
+                              </Listbox.Option>
+                              {(table?.columns ?? [])
+                                .filter((x) => x.name.length !== 0)
+                                .map((column) => (
+                                  <Listbox.Option
+                                    key={column.id}
+                                    value={column.name}
+                                    label={column.name}
+                                    className="!w-[170px]"
+                                  >
                                     <div className="flex items-center gap-2">
                                       <span className="text-foreground">{column.name}</span>
                                       <span className="text-foreground-lighter">
                                         {column.format === '' ? '-' : column.format}
                                       </span>
                                     </div>
-                                  </SelectItem_Shadcn_>
+                                  </Listbox.Option>
                                 ))}
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
+                            </Listbox>
+                          </div>
+                          <div className="col-span-1 flex justify-center items-center">
+                            <ArrowRight />
+                          </div>
+                          <div className="col-span-4">
+                            <Listbox
+                              id="column"
+                              value={fk.columns[idx].target}
+                              onChange={(value: string) =>
+                                updateSelectedColumn(idx, 'target', value)
+                              }
+                            >
+                              <Listbox.Option
+                                key="empty"
+                                value={''}
+                                label="---"
+                                className="!w-[170px]"
+                              >
+                                ---
+                              </Listbox.Option>
+                              {(selectedTable?.columns ?? []).map((column) => (
+                                <Listbox.Option
+                                  key={column.id}
+                                  value={column.name}
+                                  label={column.name}
+                                  className="!w-[170px]"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-foreground">{column.name}</span>
+                                    <span className="text-foreground-lighter">{column.format}</span>
+                                  </div>
+                                </Listbox.Option>
+                              ))}
+                            </Listbox>
                           </div>
                           <div className="col-span-1 flex justify-end items-center">
                             <Button
@@ -510,12 +520,11 @@ export const ForeignKeySelector = ({
                       urlLabel="More information"
                     />
 
-                    <FormItemLayout
+                    <Listbox
                       id="updateAction"
-                      isReactForm={false}
-                      layout="vertical"
+                      value={fk.updateAction}
                       label="Action if referenced row is updated"
-                      description={
+                      descriptionText={
                         <p>
                           {generateCascadeActionDescription(
                             'update',
@@ -524,60 +533,45 @@ export const ForeignKeySelector = ({
                           )}
                         </p>
                       }
-                      className="gap-[2px]"
-                      size="tiny"
+                      onChange={(value: string) => updateCascadeAction('updateAction', value)}
                     >
-                      <Select_Shadcn_
-                        value={fk.updateAction}
-                        onValueChange={(value) => updateCascadeAction('updateAction', value)}
-                      >
-                        <SelectTrigger_Shadcn_ id="updateAction">
-                          <SelectValue_Shadcn_ />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          {FOREIGN_KEY_CASCADE_OPTIONS.filter((option) =>
-                            ['no-action', 'cascade', 'restrict'].includes(option.key)
-                          ).map((option) => (
-                            <SelectItem_Shadcn_ key={option.key} value={option.value}>
-                              {option.label}
-                            </SelectItem_Shadcn_>
-                          ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
-                    </FormItemLayout>
-                    <FormItemLayout
+                      {FOREIGN_KEY_CASCADE_OPTIONS.filter((option) =>
+                        ['no-action', 'cascade', 'restrict'].includes(option.key)
+                      ).map((option) => (
+                        <Listbox.Option key={option.key} value={option.value} label={option.label}>
+                          <p className="text-foreground">{option.label}</p>
+                        </Listbox.Option>
+                      ))}
+                    </Listbox>
+
+                    <Listbox
                       id="deletionAction"
-                      isReactForm={false}
-                      layout="vertical"
+                      value={fk.deletionAction}
+                      className="[&>div>label]:flex [&>div>label]:items-center"
                       label="Action if referenced row is removed"
-                      description={
-                        <p>
-                          {generateCascadeActionDescription(
-                            'delete',
-                            fk.deletionAction,
-                            `${fk.schema}.${fk.table}`
-                          )}
-                        </p>
+                      // @ts-ignore
+                      labelOptional={
+                        <DocsButton href={`${DOCS_URL}/guides/database/postgres/cascade-deletes`} />
                       }
-                      className="gap-[2px]"
-                      size="tiny"
+                      descriptionText={
+                        <>
+                          <p>
+                            {generateCascadeActionDescription(
+                              'delete',
+                              fk.deletionAction,
+                              `${fk.schema}.${fk.table}`
+                            )}
+                          </p>
+                        </>
+                      }
+                      onChange={(value: string) => updateCascadeAction('deletionAction', value)}
                     >
-                      <Select_Shadcn_
-                        value={fk.deletionAction}
-                        onValueChange={(value) => updateCascadeAction('deletionAction', value)}
-                      >
-                        <SelectTrigger_Shadcn_ id="deletionAction">
-                          <SelectValue_Shadcn_ />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          {FOREIGN_KEY_CASCADE_OPTIONS.map((option) => (
-                            <SelectItem_Shadcn_ key={option.key} value={option.value}>
-                              {option.label}
-                            </SelectItem_Shadcn_>
-                          ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
-                    </FormItemLayout>
+                      {FOREIGN_KEY_CASCADE_OPTIONS.map((option) => (
+                        <Listbox.Option key={option.key} value={option.value} label={option.label}>
+                          <p className="text-foreground">{option.label}</p>
+                        </Listbox.Option>
+                      ))}
+                    </Listbox>
                   </>
                 )}
               </>

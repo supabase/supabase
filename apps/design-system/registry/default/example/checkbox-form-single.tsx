@@ -6,13 +6,13 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
+  Checkbox_Shadcn_,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
 } from 'ui'
 import { z } from 'zod'
 
@@ -39,28 +39,28 @@ export default function CheckboxReactHookFormSingle() {
   }
 
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
+        <FormField_Shadcn_
           control={form.control}
           name="mobile"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-              </FormControl>
+            <FormItem_Shadcn_ className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+              <FormControl_Shadcn_>
+                <Checkbox_Shadcn_ checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl_Shadcn_>
               <div className="space-y-1 leading-none">
-                <FormLabel>Use different settings for my mobile devices</FormLabel>
-                <FormDescription>
+                <FormLabel_Shadcn_>Use different settings for my mobile devices</FormLabel_Shadcn_>
+                <FormDescription_Shadcn_>
                   You can manage your mobile notifications in the{' '}
                   <Link href="/examples/forms">mobile settings</Link> page.
-                </FormDescription>
+                </FormDescription_Shadcn_>
               </div>
-            </FormItem>
+            </FormItem_Shadcn_>
           )}
         />
         <Button htmlType="submit">Submit</Button>
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }

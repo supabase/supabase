@@ -1,6 +1,4 @@
-import { safeSql } from '../pg-format'
-
-export const EXTENSIONS_SQL = /* SQL */ safeSql`
+export const EXTENSIONS_SQL = /* SQL */ `
 SELECT
   e.name,
   n.nspname AS schema,

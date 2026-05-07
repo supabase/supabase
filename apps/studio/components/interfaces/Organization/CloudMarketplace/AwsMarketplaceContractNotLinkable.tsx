@@ -1,8 +1,7 @@
-import Link from 'next/link'
-import { Button, Card, CardContent } from 'ui'
-
-import { SupportLink } from '../../Support/SupportLink'
 import { CloudMarketplaceContractLinkingIneligibilityReason } from './cloud-marketplace-query'
+import { Button, Card, CardContent } from 'ui'
+import Link from 'next/link'
+import { SupportLink } from '../../Support/SupportLink'
 
 interface Props {
   reason: CloudMarketplaceContractLinkingIneligibilityReason

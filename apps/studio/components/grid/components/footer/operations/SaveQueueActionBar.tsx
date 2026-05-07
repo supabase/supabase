@@ -1,6 +1,10 @@
+import { useOperationQueueActions } from 'components/grid/hooks/useOperationQueueActions'
+import { useOperationQueueShortcuts } from 'components/grid/hooks/useOperationQueueShortcuts'
+import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Eye, MoreVertical, Trash } from 'lucide-react'
 import { createPortal } from 'react-dom'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
   DropdownMenu,
@@ -11,14 +15,12 @@ import {
   KeyboardShortcut,
 } from 'ui'
 
-import { useOperationQueueActions } from '@/components/grid/hooks/useOperationQueueActions'
-import { useOperationQueueShortcuts } from '@/components/grid/hooks/useOperationQueueShortcuts'
-import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { getModKeyLabel } from '@/lib/helpers'
 
 export const SaveQueueActionBar = () => {
+  const modKey = getModKeyLabel()
   const snap = useTableEditorStateSnapshot()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { handleSave, handleCancel } = useOperationQueueActions()
@@ -64,13 +66,9 @@ export const SaveQueueActionBar = () => {
                     onClick={handleSave}
                     disabled={isSaving}
                     loading={isSaving}
-                    iconRight={
-                      isSaving ? undefined : (
-                        <KeyboardShortcut keys={['Meta', 's']} variant="inline" />
-                      )
-                    }
                   >
                     Save
+                    <span className="text-[10px] text-foreground/40 ml-1.5">{`${modKey}S`}</span>
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

@@ -1,11 +1,12 @@
+import React, { FC } from 'react'
+
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import UsersGrowthChart from '~/components/UsersGrowthChart'
-import React, { type FC, type ReactNode } from 'react'
 
 export interface PerfectTimingProps {
   id: string
-  heading: ReactNode
-  subheading: ReactNode
+  heading: string | JSX.Element
+  subheading: string | JSX.Element
   highlights: Highlight[]
 }
 
@@ -20,8 +21,8 @@ const PerfectTiming = (props: PerfectTimingProps) => {
       <div className="relative z-10 flex flex-col gap-4 md:gap-8 pb-20">
         <div className="flex flex-col gap-2 max-w-xl">
           {/* <span className="label">{props.label}</span> */}
-          <h2 className="h2 m-0!">{props.heading}</h2>
-          <p className="p text-foreground-lighter!">{props.subheading}</p>
+          <h2 className="h2 !m-0">{props.heading}</h2>
+          <p className="p !text-foreground-lighter">{props.subheading}</p>
         </div>
         <div className="flex flex-wrap gap-4 md:gap-12">
           {props.highlights.map((highlight) => (

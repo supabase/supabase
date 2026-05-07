@@ -87,7 +87,7 @@ The platform-specific examples below demonstrate how to implement this pattern f
 
     ```ts
     import { createClient } from '@supabase/supabase-js'
-    const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+    const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
 
     // ---cut---
     supabase.auth.signInWithOAuth({
@@ -534,7 +534,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     import Supabase
 
     struct SignInView: View {
-        let client = SupabaseClient(supabaseURL: URL(string: "https://your-project-id.supabase.co")!, supabaseKey: "sb_publishable_...")
+        let client = SupabaseClient(supabaseURL: URL(string: "your url")!, supabaseKey: "your anon key")
 
         var body: some View {
           SignInWithAppleButton { request in
@@ -640,7 +640,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     **Use the Compose Auth plugin in your Auth Screen**
 
     ```kotlin
-    val authState = supabaseClient.composeAuth.rememberSignInWithApple(
+    val authState = supabaseClient.composeAuth.rememberLoginWithApple(
     	onResult = { result ->
     		when(result) {
     			NativeSignInResult.ClosedByUser -> {

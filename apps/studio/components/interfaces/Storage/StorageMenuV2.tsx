@@ -1,14 +1,14 @@
 import { IS_PLATFORM, useParams } from 'common'
+import {
+  useIsAnalyticsBucketsEnabled,
+  useIsVectorBucketsEnabled,
+} from 'data/config/project-storage-config-query'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import Link from 'next/link'
 import { Badge, Menu } from 'ui'
 
 import { BUCKET_TYPES } from './Storage.constants'
 import { useStorageV2Page } from './Storage.utils'
-import {
-  useIsAnalyticsBucketsEnabled,
-  useIsVectorBucketsEnabled,
-} from '@/data/config/project-storage-config-query'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const StorageMenuV2 = () => {
   const { ref } = useParams()
@@ -29,7 +29,7 @@ export const StorageMenuV2 = () => {
   })
 
   return (
-    <Menu type="pills" className="my-2 md:my-4 flex grow flex-col">
+    <Menu type="pills" className="my-2 md:my-4 flex flex-grow flex-col">
       <div className="space-y-4">
         <div className="md:mx-3">
           <Menu.Group title={<span className="uppercase font-mono">Manage</span>} />

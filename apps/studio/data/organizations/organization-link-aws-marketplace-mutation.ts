@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, put } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { ResponseError, UseCustomMutationOptions } from '../../types'
+import { handleError, put } from '../fetchers'
 
 export type OrganizationLinkAwsMarketplaceVariables = {
   buyerId: string

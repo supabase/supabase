@@ -8,6 +8,9 @@ import {
   type PaginationState,
   type SortingState,
 } from '@tanstack/react-table'
+import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { ChevronLeft, ChevronRight, RotateCcw, Search } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import {
@@ -29,9 +32,6 @@ import { TanStackTableHeadSort } from 'ui-patterns/Table'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { statusBadgeVariant } from './PlatformWebhooksView.utils'
-import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
 interface DetailItemProps {
   label: string

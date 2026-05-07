@@ -54,6 +54,8 @@ export interface ChartBarProps {
   color?: string
   hoverColor?: string
   chartHighlight?: ChartHighlight
+  updateDateRange?: (from: string, to: string) => void
+  highlightActions?: ChartHighlightAction[]
   syncId?: string
   showHighlightArea?: boolean
   cursor?: string
@@ -78,6 +80,8 @@ export const ChartBar = ({
   color = CHART_COLORS.BRAND,
   hoverColor = CHART_COLORS.BRAND_HOVER,
   chartHighlight,
+  updateDateRange,
+  highlightActions,
   syncId,
   showHighlightArea = true,
   cursor,
@@ -129,7 +133,7 @@ export const ChartBar = ({
       data-testid="chart-bar"
       className={cn('flex flex-col gap-y-3 w-full', isFullHeight ? 'h-full' : 'h-24', className)}
     >
-      <ChartContainer className="w-full! h-full" config={chartConfig}>
+      <ChartContainer className="!w-full h-full" config={chartConfig}>
         <RechartBarChart
           data={data}
           syncId={syncId}

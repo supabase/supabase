@@ -1,13 +1,12 @@
+import { DOCS_URL } from 'lib/constants'
 import { ExternalLink } from 'lucide-react'
 import {
-  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   WarningIcon,
 } from 'ui'
-
-import { DOCS_URL } from '@/lib/constants'
 
 export const RestorePaidPlanProjectNotice = () => {
   return (

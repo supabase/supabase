@@ -1,8 +1,8 @@
-import { useParams } from 'common'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { PropsWithChildren } from 'react'
 
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer } from '@/components/layouts/Scaffold'
+import { useParams } from 'common'
 
 const JWTKeysLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef } = useParams()

@@ -1,15 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as z from 'zod'
+
+import { useParams } from 'common'
+import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
+import { User } from 'data/auth/users-infinite-query'
 import {
   Button,
   cn,
-  Form,
-  FormControl,
-  FormField,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Input_Shadcn_,
   Modal,
   Select_Shadcn_,
@@ -19,10 +23,6 @@ import {
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import * as z from 'zod'
-
-import { useUserUpdateMutation } from '@/data/auth/user-update-mutation'
-import { User } from '@/data/auth/users-infinite-query'
 
 interface BanUserModalProps {
   visible: boolean
@@ -87,31 +87,31 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
       header="Confirm to ban user"
       onCancel={() => onClose()}
     >
-      <Form {...form}>
+      <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Modal.Content className="flex flex-col gap-y-3">
             <p className="text-sm">
               This will revoke the user's access to your project and prevent them from logging in
               for a specified duration.
             </p>
-            <div className="flex items-start gap-x-2 [&>div:first-child]:grow">
-              <FormField
+            <div className="flex items-start gap-x-2 [&>div:first-child]:flex-grow">
+              <FormField_Shadcn_
                 control={form.control}
                 name="value"
                 render={({ field }) => (
                   <FormItemLayout className="[&>div>div]:mt-0" label="Set a ban duration">
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Input_Shadcn_ {...field} />
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
-              <FormField
+              <FormField_Shadcn_
                 control={form.control}
                 name="unit"
                 render={({ field }) => (
                   <FormItemLayout className="[&>div>div]:mt-0 mt-[33px]">
-                    <FormControl>
+                    <FormControl_Shadcn_>
                       <Select_Shadcn_
                         {...field}
                         value={field.value}
@@ -125,7 +125,7 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
                           <SelectItem_Shadcn_ value="days">Days</SelectItem_Shadcn_>
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
-                    </FormControl>
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
@@ -150,7 +150,7 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
             </Button>
           </Modal.Content>
         </form>
-      </Form>
+      </Form_Shadcn_>
     </Modal>
   )
 }

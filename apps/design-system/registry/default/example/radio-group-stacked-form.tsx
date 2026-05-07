@@ -5,12 +5,12 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
 } from 'ui'
@@ -39,44 +39,44 @@ export default function RadioGroupForm() {
   }
 
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-        <FormField
+        <FormField_Shadcn_
           control={form.control}
           name="type"
           render={({ field }) => (
-            <FormItem className="space-y-4">
-              <FormLabel>Notify me about...</FormLabel>
-              <FormControl>
+            <FormItem_Shadcn_ className="space-y-4">
+              <FormLabel_Shadcn_>Notify me about...</FormLabel_Shadcn_>
+              <FormControl_Shadcn_>
                 <RadioGroupStacked onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormItem asChild>
-                    <FormControl>
+                  <FormItem_Shadcn_ asChild>
+                    <FormControl_Shadcn_>
                       <RadioGroupStackedItem value="all" label="All new messages" />
-                    </FormControl>
-                  </FormItem>
-                  <FormItem asChild>
-                    <FormControl>
+                    </FormControl_Shadcn_>
+                  </FormItem_Shadcn_>
+                  <FormItem_Shadcn_ asChild>
+                    <FormControl_Shadcn_>
                       <RadioGroupStackedItem
                         value="mentions"
                         label="Direct messages and mentions"
                       />
-                    </FormControl>
-                  </FormItem>
-                  <FormItem asChild>
-                    <FormControl>
+                    </FormControl_Shadcn_>
+                  </FormItem_Shadcn_>
+                  <FormItem_Shadcn_ asChild>
+                    <FormControl_Shadcn_>
                       <RadioGroupStackedItem value="none" label="Nothing" />
-                    </FormControl>
-                  </FormItem>
+                    </FormControl_Shadcn_>
+                  </FormItem_Shadcn_>
                 </RadioGroupStacked>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+              </FormControl_Shadcn_>
+              <FormMessage_Shadcn_ />
+            </FormItem_Shadcn_>
           )}
         />
         <Button htmlType="submit" type="secondary" size="small">
           Submit
         </Button>
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }

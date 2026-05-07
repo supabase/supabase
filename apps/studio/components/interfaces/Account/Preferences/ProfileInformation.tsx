@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { groupBy } from 'lodash'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -7,16 +6,23 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form,
-  FormControl,
-  FormField,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Form_Shadcn_,
   Input_Shadcn_,
-  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
 } from 'ui'
+import z from 'zod'
+
+import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
+import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
+import { useProfile } from 'lib/profile'
+import { groupBy } from 'lodash'
+import type { FormSchema } from 'types'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -25,12 +31,6 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import z from 'zod'
-
-import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
-import { useProfileUpdateMutation } from '@/data/profile/profile-update-mutation'
-import { useProfile } from '@/lib/profile'
-import type { FormSchema } from '@/types'
 
 const FormSchema = z.object({
   first_name: z.string().optional(),
@@ -96,37 +96,37 @@ export const ProfileInformation = () => {
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        <Form {...form}>
+        <Form_Shadcn_ {...form}>
           <form id={formId} className="space-y-6 w-full" onSubmit={form.handleSubmit(onSubmit)}>
             <Card>
               <CardContent>
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="first_name"
                   render={({ field }) => (
                     <FormItemLayout label="First name" layout="flex-row-reverse">
-                      <FormControl className="col-span-8">
+                      <FormControl_Shadcn_ className="col-span-8">
                         <Input_Shadcn_ {...field} placeholder="First name" className="w-full" />
-                      </FormControl>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="last_name"
                   render={({ field }) => (
                     <FormItemLayout label="Last name" layout="flex-row-reverse">
-                      <FormControl className="col-span-8">
+                      <FormControl_Shadcn_ className="col-span-8">
                         <Input_Shadcn_ {...field} placeholder="Last name" className="w-full" />
-                      </FormControl>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="primary_email"
                   render={({ field }) => (
@@ -139,7 +139,7 @@ export const ProfileInformation = () => {
                       }
                       layout="flex-row-reverse"
                     >
-                      <FormControl className="col-span-8">
+                      <FormControl_Shadcn_ className="col-span-8">
                         <div className="flex flex-col gap-1">
                           <Select_Shadcn_
                             value={field.value}
@@ -159,13 +159,13 @@ export const ProfileInformation = () => {
                             </SelectContent_Shadcn_>
                           </Select_Shadcn_>
                         </div>
-                      </FormControl>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
               <CardContent>
-                <FormField
+                <FormField_Shadcn_
                   control={form.control}
                   name="username"
                   render={({ field }) => (
@@ -178,7 +178,7 @@ export const ProfileInformation = () => {
                       }
                       layout="flex-row-reverse"
                     >
-                      <FormControl className="col-span-8">
+                      <FormControl_Shadcn_ className="col-span-8">
                         <div className="flex flex-col gap-1">
                           <Input_Shadcn_
                             {...field}
@@ -187,7 +187,7 @@ export const ProfileInformation = () => {
                             disabled={profile?.is_sso_user}
                           />
                         </div>
-                      </FormControl>
+                      </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
@@ -209,7 +209,7 @@ export const ProfileInformation = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form>
+        </Form_Shadcn_>
       </PageSectionContent>
     </PageSection>
   )

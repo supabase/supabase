@@ -1,7 +1,8 @@
 import type { ToolUIPart, UIMessage } from 'ai'
+// End of third-party imports
 
+import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import type { ToolName } from '../tool-filter'
-import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 interface ToolSanitizer {
   toolName: ToolName

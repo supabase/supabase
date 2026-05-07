@@ -1,8 +1,24 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
+import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import type { AddonVariantId } from 'data/subscriptions/types'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH, DOCS_URL } from 'lib/constants'
+import { formatCurrency } from 'lib/helpers'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -10,29 +26,11 @@ import {
   Button,
   cn,
   CriticalIcon,
-  RadioGroupCard,
-  RadioGroupCardItem,
+  Radio,
   SidePanel,
 } from 'ui'
 
-import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
-import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
-import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useProjectAddonRemoveMutation } from '@/data/subscriptions/project-addon-remove-mutation'
-import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addon-update-mutation'
-import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
-import type { AddonVariantId } from '@/data/subscriptions/types'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { BASE_PATH, DOCS_URL } from '@/lib/constants'
-import { formatCurrency } from '@/lib/helpers'
-import { useAddonsPagePanel } from '@/state/addons-page'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -180,7 +178,7 @@ const PITRSidePanel = () => {
             in granularity.
           </p>
 
-          <div className="mt-8! pb-4">
+          <div className="!mt-8 pb-4">
             <div className="flex gap-3">
               {PITR_CATEGORY_OPTIONS.map((option) => {
                 const isSelected = selectedCategory === option.id
@@ -262,7 +260,7 @@ const PITRSidePanel = () => {
           ) : null}
 
           {selectedCategory === 'on' && (
-            <div className="mt-8! pb-4">
+            <div className="!mt-8 pb-4">
               {!hasAccessToPitrVariants ? (
                 <UpgradeToPro
                   className="mb-4"
@@ -281,45 +279,43 @@ const PITRSidePanel = () => {
                 />
               ) : null}
 
-              <label className="block text-sm text-foreground-light mb-4" htmlFor="pitr">
-                Choose the duration of recovery
-              </label>
-              <RadioGroupCard
+              <Radio.Group
+                type="large-cards"
+                size="tiny"
                 id="pitr"
-                className="flex flex-wrap gap-3"
-                value={selectedOption}
-                onValueChange={(value) => setSelectedOption(value)}
-                disabled={!hasAccessToPitrVariants || subscriptionCompute === undefined}
+                label={<p className="text-sm">Choose the duration of recovery</p>}
+                onChange={(event: any) => setSelectedOption(event.target.value)}
               >
                 {availableOptions.map((option) => (
-                  <RadioGroupCardItem
+                  <Radio
+                    name="pitr"
+                    disabled={!hasAccessToPitrVariants || subscriptionCompute === undefined}
+                    className="col-span-4 !p-0"
                     key={option.identifier}
+                    checked={selectedOption === option.identifier}
+                    label={<span className="text-sm">{option.name}</span>}
                     value={option.identifier}
-                    id={option.identifier}
-                    label={
-                      <div className="w-full group">
-                        <div className="border-b border-default px-4 py-2">
-                          <p className="text-sm">{option.name}</p>
-                        </div>
-                        <div className="px-4 py-2">
-                          <p className="text-foreground-light">
-                            Allow database restorations to any time up to{' '}
-                            {option.identifier.split('_')[1]} days ago
+                  >
+                    <div className="w-full group">
+                      <div className="border-b border-default px-4 py-2">
+                        <p className="text-sm">{option.name}</p>
+                      </div>
+                      <div className="px-4 py-2">
+                        <p className="text-foreground-light">
+                          Allow database restorations to any time up to{' '}
+                          {option.identifier.split('_')[1]} days ago
+                        </p>
+                        <div className="flex items-center space-x-1 mt-2">
+                          <p className="text-foreground text-sm" translate="no">
+                            {formatCurrency(option.price)}
                           </p>
-                          <div className="flex items-center space-x-1 mt-2">
-                            <p className="text-foreground text-sm" translate="no">
-                              {formatCurrency(option.price)}
-                            </p>
-                            <p className="text-foreground-light translate-y-px"> / month</p>
-                          </div>
+                          <p className="text-foreground-light translate-y-[1px]"> / month</p>
                         </div>
                       </div>
-                    }
-                    showIndicator={false}
-                  />
+                    </div>
+                  </Radio>
                 ))}
-              </RadioGroupCard>
-              <TaxDisclaimer className="mt-3" />
+              </Radio.Group>
             </div>
           )}
 

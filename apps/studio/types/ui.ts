@@ -1,6 +1,5 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-
-import { ProjectLogStatsVariables } from '@/data/analytics/project-log-stats-query'
+import { ProjectLogStatsVariables } from 'data/analytics/project-log-stats-query'
 
 export interface Notification {
   category: 'info' | 'error' | 'success' | 'loading'

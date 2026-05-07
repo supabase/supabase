@@ -1,7 +1,9 @@
+import { useParams } from 'common'
 import { Button } from 'ui'
 
 import { useStripeSyncStatus } from './useStripeSyncStatus'
 import AlertError from '@/components/ui/AlertError'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const InstallationError = ({
   error,
@@ -18,9 +20,14 @@ export const InstallationError = ({
   installing?: boolean
   uninstalling?: boolean
 }) => {
+  const { data: project } = useSelectedProjectQuery()
+
   const {
     schemaComment: { errorMessage },
-  } = useStripeSyncStatus()
+  } = useStripeSyncStatus({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   if (error === 'uninstall') {
     return (

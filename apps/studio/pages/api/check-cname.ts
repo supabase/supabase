@@ -1,6 +1,5 @@
+import { CheckCNAMERecordResponse } from 'data/custom-domains/check-cname-mutation'
 import { NextApiRequest, NextApiResponse } from 'next'
-
-import { CheckCNAMERecordResponse } from '@/data/custom-domains/check-cname-mutation'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { domain } = req.query

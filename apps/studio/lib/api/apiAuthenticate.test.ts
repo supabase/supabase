@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-
 import { apiAuthenticate } from './apiAuthenticate'
 
 const mocks = vi.hoisted(() => {
@@ -14,7 +13,7 @@ const mocks = vi.hoisted(() => {
   }
 })
 
-vi.mock('@/lib/gotrue', () => ({
+vi.mock('lib/gotrue', () => ({
   getUserClaims: mocks.getUserClaims,
 }))
 

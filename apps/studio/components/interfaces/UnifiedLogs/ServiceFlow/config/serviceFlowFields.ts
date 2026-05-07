@@ -1,6 +1,6 @@
+import { formatBytes } from 'lib/helpers'
 import { BlockFieldConfig } from '../types'
 import { getStorageMetadata } from '../utils/storageUtils'
-import { formatBytes } from '@/lib/helpers'
 
 // Helper functions that avoid duplication with existing storage utilities
 const getFileName = (path: string): string => {
@@ -64,7 +64,7 @@ export const networkPrimaryFields: BlockFieldConfig[] = [
   {
     id: 'user_agent',
     label: 'Client',
-    getValue: (_data, enrichedData) => {
+    getValue: (data, enrichedData) => {
       const userAgent = enrichedData?.headers_user_agent
       if (!userAgent) return null
       // TODO: Parse user agent for nice display with icons
@@ -78,7 +78,7 @@ export const networkPrimaryFields: BlockFieldConfig[] = [
 export const apiKeyPrimaryField: BlockFieldConfig = {
   id: 'api_key_role',
   label: 'API Key',
-  getValue: (_data, enrichedData) => {
+  getValue: (data, enrichedData) => {
     const prefix = enrichedData?.api_key_prefix
     const jwtRole = enrichedData?.jwt_key_role
     const authRole = enrichedData?.authorization_role
@@ -110,7 +110,7 @@ export const apiKeyAdditionalFields: BlockFieldConfig[] = [
   {
     id: 'api_key_prefix_full',
     label: 'API Key Prefix',
-    getValue: (_data, enrichedData) => {
+    getValue: (data, enrichedData) => {
       const prefix = enrichedData?.api_key_prefix
       return prefix || null
     },
@@ -119,19 +119,19 @@ export const apiKeyAdditionalFields: BlockFieldConfig[] = [
   {
     id: 'postgres_role',
     label: 'Postgres Role',
-    getValue: (_data, enrichedData) => enrichedData?.jwt_key_role,
+    getValue: (data, enrichedData) => enrichedData?.jwt_key_role,
     requiresEnrichedData: true,
   },
   {
     id: 'api_key_error',
     label: 'API Key Error',
-    getValue: (_data, enrichedData) => enrichedData?.api_key_error,
+    getValue: (data, enrichedData) => enrichedData?.api_key_error,
     requiresEnrichedData: true,
   },
   {
     id: 'api_key_hash',
     label: 'API Key Hash',
-    getValue: (_data, enrichedData) => {
+    getValue: (data, enrichedData) => {
       const hash = enrichedData?.api_key_hash
       return hash ? `${hash.substring(0, 12)}...` : null
     },
@@ -140,7 +140,7 @@ export const apiKeyAdditionalFields: BlockFieldConfig[] = [
   {
     id: 'authorization_role',
     label: 'Postgres Role',
-    getValue: (_data, enrichedData) => enrichedData?.authorization_role,
+    getValue: (data, enrichedData) => enrichedData?.authorization_role,
     requiresEnrichedData: true,
   },
 ]
@@ -149,7 +149,7 @@ export const apiKeyAdditionalFields: BlockFieldConfig[] = [
 export const userPrimaryField: BlockFieldConfig = {
   id: 'user_id',
   label: 'User',
-  getValue: (_data, enrichedData) => {
+  getValue: (data, enrichedData) => {
     const userId = enrichedData?.user_id
     return userId ? `${userId.substring(0, 8)}...` : null
   },
@@ -166,7 +166,7 @@ export const userAdditionalFields: BlockFieldConfig[] = [
   {
     id: 'user_email',
     label: 'User Email',
-    getValue: (_data, enrichedData) => enrichedData?.user_email,
+    getValue: (data, enrichedData) => enrichedData?.user_email,
     requiresEnrichedData: true,
   },
 ]
@@ -175,7 +175,7 @@ export const userAdditionalFields: BlockFieldConfig[] = [
 export const locationPrimaryField: BlockFieldConfig = {
   id: 'client_country',
   label: 'Location',
-  getValue: (_data, enrichedData) => {
+  getValue: (data, enrichedData) => {
     const country = enrichedData?.client_country || enrichedData?.cf_country
     const city = enrichedData?.client_city
     if (country && city) return `${city}, ${country}`
@@ -191,31 +191,31 @@ export const locationAdditionalFields: BlockFieldConfig[] = [
   {
     id: 'client_continent',
     label: 'Continent',
-    getValue: (_data, enrichedData) => enrichedData?.client_continent,
+    getValue: (data, enrichedData) => enrichedData?.client_continent,
     requiresEnrichedData: true,
   },
   {
     id: 'client_region',
     label: 'Region',
-    getValue: (_data, enrichedData) => enrichedData?.client_region,
+    getValue: (data, enrichedData) => enrichedData?.client_region,
     requiresEnrichedData: true,
   },
   {
     id: 'client_timezone',
     label: 'Timezone',
-    getValue: (_data, enrichedData) => enrichedData?.client_timezone,
+    getValue: (data, enrichedData) => enrichedData?.client_timezone,
     requiresEnrichedData: true,
   },
   {
     id: 'x_real_ip',
     label: 'Real IP',
-    getValue: (_data, enrichedData) => enrichedData?.headers_x_real_ip,
+    getValue: (data, enrichedData) => enrichedData?.headers_x_real_ip,
     requiresEnrichedData: true,
   },
   {
     id: 'client_ip',
     label: 'Client IP',
-    getValue: (_data, enrichedData) => enrichedData?.client_ip,
+    getValue: (data, enrichedData) => enrichedData?.client_ip,
     requiresEnrichedData: true,
   },
 ]
@@ -225,42 +225,42 @@ export const authorizationFields: BlockFieldConfig[] = [
   {
     id: 'jwt_auth_key_id',
     label: 'Key ID',
-    getValue: (_data, enrichedData) =>
+    getValue: (data, enrichedData) =>
       enrichedData?.jwt_auth_key_id || enrichedData?.jwt_apikey_key_id,
     requiresEnrichedData: true,
   },
   {
     id: 'jwt_auth_session_id',
     label: 'Session ID',
-    getValue: (_data, enrichedData) =>
+    getValue: (data, enrichedData) =>
       enrichedData?.jwt_auth_session_id || enrichedData?.jwt_apikey_session_id,
     requiresEnrichedData: true,
   },
   {
     id: 'jwt_auth_subject',
     label: 'Subject',
-    getValue: (_data, enrichedData) =>
+    getValue: (data, enrichedData) =>
       enrichedData?.jwt_auth_subject || enrichedData?.jwt_apikey_subject,
     requiresEnrichedData: true,
   },
   {
     id: 'jwt_auth_issuer',
     label: 'Issuer',
-    getValue: (_data, enrichedData) =>
+    getValue: (data, enrichedData) =>
       enrichedData?.jwt_auth_issuer || enrichedData?.jwt_apikey_issuer,
     requiresEnrichedData: true,
   },
   {
     id: 'jwt_auth_algorithm',
     label: 'Algorithm',
-    getValue: (_data, enrichedData) =>
+    getValue: (data, enrichedData) =>
       enrichedData?.jwt_auth_algorithm || enrichedData?.jwt_apikey_algorithm,
     requiresEnrichedData: true,
   },
   {
     id: 'jwt_auth_expires_at',
     label: 'Expires At',
-    getValue: (_data, enrichedData) => {
+    getValue: (data, enrichedData) => {
       const expiresAt = enrichedData?.jwt_auth_expires_at || enrichedData?.jwt_apikey_expires_at
       if (!expiresAt) return null
       try {
@@ -278,38 +278,38 @@ export const techDetailsFields: BlockFieldConfig[] = [
   {
     id: 'network_protocol',
     label: 'Protocol',
-    getValue: (_data, enrichedData) => enrichedData?.network_protocol,
+    getValue: (data, enrichedData) => enrichedData?.network_protocol,
     requiresEnrichedData: true,
   },
   {
     id: 'cf_datacenter',
     label: 'Datacenter',
-    getValue: (_data, enrichedData) =>
+    getValue: (data, enrichedData) =>
       enrichedData?.network_datacenter || enrichedData?.cf_datacenter,
     requiresEnrichedData: true,
   },
   {
     id: 'cache_status',
     label: 'Cache Status',
-    getValue: (_data, enrichedData) => enrichedData?.response_cache_status,
+    getValue: (data, enrichedData) => enrichedData?.response_cache_status,
     requiresEnrichedData: true,
   },
   {
     id: 'cf_ray',
     label: 'CF-Ray',
-    getValue: (_data, enrichedData) => enrichedData?.cf_ray,
+    getValue: (data, enrichedData) => enrichedData?.cf_ray,
     requiresEnrichedData: true,
   },
   {
     id: 'x_client_info',
     label: 'SDK',
-    getValue: (_data, enrichedData) => enrichedData?.headers_x_client_info,
+    getValue: (data, enrichedData) => enrichedData?.headers_x_client_info,
     requiresEnrichedData: true,
   },
   {
     id: 'x_forwarded_proto',
     label: 'Forwarded Proto',
-    getValue: (_data, enrichedData) => enrichedData?.headers_x_forwarded_proto,
+    getValue: (data, enrichedData) => enrichedData?.headers_x_forwarded_proto,
     requiresEnrichedData: true,
   },
 ]
@@ -328,7 +328,7 @@ export const postgrestPrimaryFields: BlockFieldConfig[] = [
   {
     id: 'postgres_role',
     label: 'Postgres Role',
-    getValue: (_data, enrichedData) => enrichedData?.api_role,
+    getValue: (data, enrichedData) => enrichedData?.api_role,
     requiresEnrichedData: true,
   },
   {
@@ -347,19 +347,19 @@ export const postgrestResponseFields: BlockFieldConfig[] = [
   {
     id: 'query_params',
     label: 'Query',
-    getValue: (_data, enrichedData) => enrichedData?.request_search,
+    getValue: (data, enrichedData) => enrichedData?.request_search,
     requiresEnrichedData: true,
   },
   {
     id: 'content_type',
     label: 'Content Type',
-    getValue: (_data, enrichedData) => enrichedData?.response_content_type,
+    getValue: (data, enrichedData) => enrichedData?.response_content_type,
     requiresEnrichedData: true,
   },
   {
     id: 'message',
     label: 'Message',
-    getValue: (_data, enrichedData) => enrichedData?.message,
+    getValue: (data, enrichedData) => enrichedData?.message,
     requiresEnrichedData: true,
   },
 ]
@@ -389,7 +389,7 @@ export const authPrimaryFields: BlockFieldConfig[] = [
   {
     id: 'referer',
     label: 'Referer',
-    getValue: (_data, enrichedData) => {
+    getValue: (data, enrichedData) => {
       return enrichedData?.headers_referer || null
     },
     requiresEnrichedData: true,

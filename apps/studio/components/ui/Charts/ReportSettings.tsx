@@ -1,3 +1,4 @@
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Settings } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -8,9 +9,7 @@ import {
   Label_Shadcn_,
   Switch,
 } from 'ui'
-
 import { useChartHoverState } from './useChartHoverState'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface ReportSettingsProps {
   chartId: string

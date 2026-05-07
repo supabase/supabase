@@ -1,5 +1,4 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-
 import { useLocalStorageQuery } from './useLocalStorage'
 
 type DashboardHistory = { editor?: string; sql?: string }

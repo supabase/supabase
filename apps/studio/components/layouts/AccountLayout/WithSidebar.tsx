@@ -1,12 +1,14 @@
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode } from 'react'
+import { useAppStateSnapshot } from 'state/app-state'
 import { cn, Menu } from 'ui'
 
 import type { SidebarSection } from './AccountLayout.types'
 
 interface WithSidebarProps {
-  title?: string
+  title: string
+  breadcrumbs: any[]
   sections: SidebarSection[]
   header?: ReactNode
   subitems?: any[]
@@ -19,6 +21,7 @@ interface WithSidebarProps {
 export const WithSidebar = ({
   title,
   header,
+  breadcrumbs = [],
   children,
   sections,
   subitems,
@@ -28,6 +31,7 @@ export const WithSidebar = ({
   backToDashboardURL,
 }: PropsWithChildren<WithSidebarProps>) => {
   const noContent = !sections && !customSidebarContent
+  const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
 
   return (
     <div className="flex flex-col md:flex-row h-full">
@@ -44,13 +48,14 @@ export const WithSidebar = ({
         />
       )}
       <div className="flex flex-1 flex-col">
-        <div className="flex-1 grow overflow-y-auto">{children}</div>
+        <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
       </div>
     </div>
   )
 }
 
 export const SidebarContent = ({
+  title,
   header,
   sections,
   subitems,
@@ -71,7 +76,7 @@ export const SidebarContent = ({
       >
         <div className="flex-1 flex flex-col">
           {backToDashboardURL && (
-            <div className="shrink-0 hidden md:block">
+            <div className="flex-shrink-0 hidden md:block">
               <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
                 <Link
                   href={backToDashboardURL}
@@ -142,7 +147,7 @@ interface SectionWithHeadersProps {
   subitemsParentKey?: number
 }
 
-const SectionWithHeaders = ({ section, subitems }: SectionWithHeadersProps) => (
+const SectionWithHeaders = ({ section, subitems, subitemsParentKey }: SectionWithHeadersProps) => (
   <div key={section.heading} className="my-6 space-y-8">
     <div className="mx-3">
       {section.heading && (

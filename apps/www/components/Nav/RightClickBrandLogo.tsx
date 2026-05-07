@@ -1,6 +1,7 @@
 'use client'
 
 import { CheckIcon, ClipboardIcon } from '@heroicons/react/outline'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/compat/router'
 import { Fragment, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react'
@@ -14,7 +15,8 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import SupabaseWordmark from './SupabaseWordmark'
+import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
+import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
 /**
  * Right click on the Supabase logo in the website navbar
@@ -93,9 +95,24 @@ const RightClickBrandLogo = () => {
           onContextMenu={handleRightClick}
           onFocus={handleKeyboardOpen}
           onKeyDown={(e) => e.key === 'Enter' && router?.push('/')}
-          className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-xs"
+          className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
         >
-          <SupabaseWordmark />
+          <Image
+            src={supabaseLogoWordmarkLight}
+            width={124}
+            height={24}
+            alt="Supabase Logo"
+            className="dark:hidden"
+            priority
+          />
+          <Image
+            src={supabaseLogoWordmarkDark}
+            width={124}
+            height={24}
+            alt="Supabase Logo"
+            className="hidden dark:block"
+            priority
+          />
         </Link>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -114,7 +131,7 @@ const RightClickBrandLogo = () => {
                   autoFocus
                   asChild
                   key={menuItem.label}
-                  className="w-full flex justify-between gap-2 items-center p-2!"
+                  className="w-full flex justify-between gap-2 items-center !p-2"
                 >
                   {menuItem.type === 'download' || menuItem.type === 'link' ? (
                     <Link

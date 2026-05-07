@@ -1,14 +1,14 @@
 import { useParams } from 'common'
+import { Destinations } from 'components/interfaces/Database/Replication/Destinations'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
+import type { NextPageWithLayout } from 'types'
 
-import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
-import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
-import { UnknownInterface } from '@/components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
-import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -37,7 +37,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
       <ReplicationDiagram />
 
       <ScaffoldContainer>
-        <ScaffoldSection isFullWidth className="pt-6!">
+        <ScaffoldSection isFullWidth className="!pt-6">
           <Destinations />
         </ScaffoldSection>
       </ScaffoldContainer>

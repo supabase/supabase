@@ -1,5 +1,4 @@
-import { describe, expect, it } from 'vitest'
-
+import { describe, it, expect } from 'vitest'
 import { PermissionRowSchema, TokenSchema } from './AccessToken.schemas'
 
 const validTokenData = {

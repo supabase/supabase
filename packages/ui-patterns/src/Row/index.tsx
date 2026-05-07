@@ -167,7 +167,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
 
       <div
         ref={containerRef}
-        className="w-full overflow-visible focus:outline-hidden"
+        className="w-full overflow-visible focus:outline-none"
         tabIndex={0}
         role="region"
         aria-roledescription="carousel"
@@ -188,7 +188,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
           }
         >
           {childrenArray.map((child, index) => (
-            <div key={index} className="shrink-0" style={{ width: 'var(--column-width)' }}>
+            <div key={index} className="flex-shrink-0" style={{ width: 'var(--column-width)' }}>
               {child}
             </div>
           ))}

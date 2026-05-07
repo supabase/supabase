@@ -1,14 +1,13 @@
+import { DocsButton } from 'components/ui/DocsButton'
+import Panel from 'components/ui/Panel'
+import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
+import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import { DOCS_URL } from 'lib/constants'
 import { Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-
-import { DocsButton } from '@/components/ui/DocsButton'
-import Panel from '@/components/ui/Panel'
-import { useCustomDomainDeleteMutation } from '@/data/custom-domains/custom-domains-delete-mutation'
-import type { CustomDomainResponse } from '@/data/custom-domains/custom-domains-query'
-import { DOCS_URL } from '@/lib/constants'
 
 export type CustomDomainDeleteProps = {
   projectRef?: string
@@ -78,7 +77,7 @@ export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDel
       >
         <p className="text-sm">
           Are you sure you want to delete the custom domain{' '}
-          <code className="text-code-inline break-normal!">{customDomain.hostname}</code> for your
+          <code className="text-code-inline !break-normal">{customDomain.hostname}</code> for your
           project? You will need to re-verify this domain if you want to use it again.
         </p>
       </ConfirmationModal>

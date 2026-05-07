@@ -1,31 +1,13 @@
-import { ident, literal } from '@supabase/pg-meta/src/pg-format'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { executeSql } from 'data/sql/execute-sql-query'
+import useDbQuery from 'hooks/analytics/useDbQuery'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 import { PRESET_CONFIG } from '../Reports/Reports.constants'
 import { Presets } from '../Reports/Reports.types'
-import {
-  QueryPerformanceRow,
-  QueryPerformanceSort,
-  QueryPerformanceSQLParams,
-} from './QueryPerformance.types'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import useDbQuery from '@/hooks/analytics/useDbQuery'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from '@/lib/constants'
-import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
-
-const VALID_SORT_COLUMNS: ReadonlySet<string> = new Set<QueryPerformanceSort['column']>([
-  'query',
-  'rolname',
-  'total_time',
-  'prop_total_time',
-  'calls',
-  'avg_rows',
-  'max_time',
-  'mean_time',
-  'min_time',
-])
+import { QueryPerformanceRow, QueryPerformanceSQLParams } from './QueryPerformance.types'
 
 export function generateQueryPerformanceSql({
   preset,
@@ -48,21 +30,14 @@ export function generateQueryPerformanceSql({
   const queryPerfQueries = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const baseSQL = queryPerfQueries.queries[preset]
 
-  const isValidOrderBy =
-    orderBy != null &&
-    VALID_SORT_COLUMNS.has(orderBy.column) &&
-    (orderBy.order === 'asc' || orderBy.order === 'desc')
-
-  const orderBySql = isValidOrderBy
-    ? `ORDER BY ${ident(orderBy!.column)} ${orderBy!.order}`
-    : undefined
+  const orderBySql = orderBy && `ORDER BY ${orderBy.column} ${orderBy.order}`
 
   const whereConditions = []
   if (roles.length > 0) {
-    whereConditions.push(`auth.rolname in (${roles.map((r) => `${literal(r)}`).join(', ')})`)
+    whereConditions.push(`auth.rolname in (${roles.map((r) => `'${r}'`).join(', ')})`)
   }
   if (searchQuery.length > 0) {
-    whereConditions.push(`statements.query ~* ${literal(searchQuery)}`)
+    whereConditions.push(`statements.query ~* '${searchQuery}'`)
   }
   if (sources.includes('dashboard') && !sources.includes('non-dashboard')) {
     whereConditions.push(`statements.query ~* 'source: dashboard'`)
@@ -70,10 +45,10 @@ export function generateQueryPerformanceSql({
   if (sources.includes('non-dashboard') && !sources.includes('dashboard')) {
     whereConditions.push(`statements.query !~* 'source: dashboard'`)
   }
-  if (Number.isFinite(minCalls) && minCalls > 0) {
+  if (minCalls > 0) {
     whereConditions.push(`statements.calls >= ${minCalls}`)
   }
-  if (Number.isFinite(minTotalTime) && minTotalTime > 0) {
+  if (minTotalTime > 0) {
     whereConditions.push(
       `(statements.total_exec_time + statements.total_plan_time) >= ${minTotalTime}`
     )
@@ -175,9 +150,7 @@ export const useQueryPerformanceInfiniteQuery = (
       },
       // Don't run until we have a connection string for the selected database.
       // For replicas this prevents a silent fallback to the primary before replicas load.
-      // In self-hosted mode (IS_PLATFORM=false) there is no real connection string, so we
-      // skip the check — executeSql works fine without one on self-hosted deployments.
-      enabled: Boolean(project?.ref) && (!IS_PLATFORM || Boolean(effectiveConnectionString)),
+      enabled: Boolean(project?.ref) && Boolean(effectiveConnectionString),
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
     })

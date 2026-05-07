@@ -1,3 +1,2 @@
 User-agent: *
 Sitemap: https://supabase.com/sitemap.xml
-Content-Signal: ai-train=yes, search=yes, ai-input=yes

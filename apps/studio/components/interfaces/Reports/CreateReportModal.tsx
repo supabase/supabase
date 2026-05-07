@@ -1,16 +1,23 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_, Modal, Textarea } from 'ui'
+import {
+  Button,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  Modal,
+  Textarea,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
-
-import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { uuidv4 } from '@/lib/helpers'
-import { useProfile } from '@/lib/profile'
 
 export interface CreateReportModal {
   visible: boolean
@@ -106,28 +113,28 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
       header="Create a custom report"
       size="small"
     >
-      <Form {...form}>
+      <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(createCustomReport)} noValidate>
           <Modal.Content>
-            <FormField
+            <FormField_Shadcn_
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItemLayout name="name" layout="vertical" label="Name">
-                  <FormControl>
+                  <FormControl_Shadcn_>
                     <Input_Shadcn_ {...field} id="name" />
-                  </FormControl>
+                  </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
           </Modal.Content>
           <Modal.Content>
-            <FormField
+            <FormField_Shadcn_
               control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItemLayout name="description" layout="vertical" label="Description">
-                  <FormControl>
+                  <FormControl_Shadcn_>
                     <Textarea
                       {...field}
                       id="description"
@@ -135,7 +142,7 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
                       placeholder="Describe your custom report"
                       className="resize-none"
                     />
-                  </FormControl>
+                  </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
             />
@@ -150,7 +157,7 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
             </Button>
           </Modal.Content>
         </form>
-      </Form>
+      </Form_Shadcn_>
     </Modal>
   )
 }

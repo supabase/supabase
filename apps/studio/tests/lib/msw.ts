@@ -1,9 +1,8 @@
-import { http, HttpResponse, HttpResponseResolver } from 'msw'
 import { setupServer } from 'msw/node'
-
-import type { paths } from '../../data/api'
 import { GlobalAPIMocks } from './msw-global-api-mocks'
-import { API_URL } from '@/lib/constants'
+import { http, HttpResponse, HttpResponseResolver } from 'msw'
+import { API_URL } from 'lib/constants'
+import type { paths } from '../../data/api'
 
 export const mswServer = setupServer(...GlobalAPIMocks)
 

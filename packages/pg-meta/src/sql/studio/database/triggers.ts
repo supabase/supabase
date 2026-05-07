@@ -1,11 +1,4 @@
-import {
-  ident,
-  joinSqlFragments,
-  keyword,
-  literal,
-  safeSql,
-  type SafeSqlFragment,
-} from '../../../pg-format'
+import { literal } from '../../../pg-format'
 import { PGTrigger, PGTriggerCreate } from '../../../pg-meta-triggers'
 
 // [Joshen] Writing this query within FE as the PATCH endpoint from pg-meta only supports updating
@@ -25,25 +18,21 @@ export function getDatabaseTriggerUpdateSQL({
     condition: string | null
     orientation: 'ROW' | 'STATEMENT'
     activation: 'BEFORE' | 'AFTER' | 'INSTEAD OF'
-    events: Array<string>
+    events: string[]
     function_schema: string
     function_name: string
-    function_args: Array<string>
+    function_args: string[]
   }
-  updatedTrigger: Omit<PGTriggerCreate, 'events'> &
-    Pick<PGTrigger, 'enabled_mode'> & { events: Array<SafeSqlFragment> }
-}): SafeSqlFragment {
+  updatedTrigger: PGTriggerCreate & Pick<PGTrigger, 'enabled_mode'>
+}) {
   const { name, activation, events, schema, table, function_schema, function_name, function_args } =
     updatedTrigger
-  const eventsList = joinSqlFragments(events, ' OR ')
-  const argsList =
-    function_args && function_args.length > 0
-      ? joinSqlFragments(function_args.map(literal), ',')
-      : safeSql``
-  return safeSql`BEGIN;
-DROP TRIGGER ${ident(originalTrigger.name)} ON ${ident(originalTrigger.schema)}.${ident(originalTrigger.table)};
-CREATE TRIGGER ${ident(name)} ${keyword(activation)} ${eventsList} ON ${ident(schema)}.${ident(table)}
-  FOR EACH ROW EXECUTE FUNCTION
-  ${ident(function_schema)}.${ident(function_name)}(${argsList});
-COMMIT;`
+  return /* SQL */ `
+BEGIN;
+DROP TRIGGER "${originalTrigger.name}" ON "${originalTrigger.schema}"."${originalTrigger.table}";
+CREATE TRIGGER "${name}" ${activation} ${events.join(' OR ')} ON "${schema}"."${table}" 
+  FOR EACH ROW EXECUTE FUNCTION 
+  "${function_schema}"."${function_name}"(${function_args?.map(literal).join(',') ?? ''});
+COMMIT;
+`.trim()
 }

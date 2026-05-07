@@ -1,21 +1,21 @@
+import {
+  Header,
+  LoadingCardView,
+  NoOrganizationsState,
+} from 'components/interfaces/Home/ProjectList/EmptyStates'
+import { buildOrgUrl } from 'components/interfaces/Organization/Organization.utils'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { withAuth } from 'hooks/misc/withAuth'
+import { buildStudioPageTitle } from 'lib/page-title'
 import { NextPage } from 'next'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
 
-import {
-  Header,
-  LoadingCardView,
-  NoOrganizationsState,
-} from '@/components/interfaces/Home/ProjectList/EmptyStates'
-import { buildOrgUrl } from '@/components/interfaces/Organization/Organization.utils'
 import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'
-import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
-import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
-import { withAuth } from '@/hooks/misc/withAuth'
-import { buildStudioPageTitle } from '@/lib/page-title'
 
 const GenericOrganizationPage: NextPage = () => {
   const router = useRouter()
@@ -40,11 +40,11 @@ const GenericOrganizationPage: NextPage = () => {
         <meta name="description" content="Supabase Studio" />
       </Head>
       <Header />
-      <PageLayout className="grow min-h-0" title="Select an organization to continue">
+      <PageLayout className="flex-grow min-h-0" title="Select an organization to continue">
         <ScaffoldContainer>
           <ScaffoldSection isFullWidth>
             <div
-              className="grow overflow-y-auto"
+              className="flex-grow overflow-y-auto"
               style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
             >
               <div className="w-full mx-auto flex flex-col gap-y-8">

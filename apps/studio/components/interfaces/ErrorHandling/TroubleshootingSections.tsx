@@ -1,5 +1,7 @@
 'use client'
 
+import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
+import { useTrack } from 'lib/telemetry/track'
 import { ExternalLink } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -10,8 +12,6 @@ import {
 } from 'ui'
 
 import { RestartProjectDialog } from './RestartProjectDialog'
-import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
-import { useTrack } from '@/lib/telemetry/track'
 
 interface StepTriggerProps {
   number: number
@@ -22,7 +22,7 @@ function StepTrigger({ number, title }: StepTriggerProps) {
   return (
     <AccordionTrigger className="py-3 hover:no-underline">
       <div className="flex items-center gap-2.5">
-        <span className="shrink-0 w-6 h-6 border border-button-hover text-foreground font-mono tabular-nums bg-button rounded-md text-xs font-medium flex items-center justify-center">
+        <span className="flex-shrink-0 w-6 h-6 border border-button-hover text-foreground font-mono tabular-nums bg-button rounded-md text-xs font-medium flex items-center justify-center">
           {number}
         </span>
         <span className="text-sm font-medium text-foreground text-left">{title}</span>

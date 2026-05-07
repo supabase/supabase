@@ -1,10 +1,10 @@
 import 'swiper/css'
 
-import { useBreakpoint } from 'common'
-import { domAnimation, LazyMotion, m, useAnimation, useInView } from 'framer-motion'
-import React, { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
+import React, { useState, useEffect, useRef } from 'react'
+import { LazyMotion, domAnimation, m, useAnimation, useInView } from 'framer-motion'
 import { cn } from 'ui'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { useBreakpoint } from 'common'
 
 interface TabProps {
   label: string | React.ReactNode
@@ -47,7 +47,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
           </p>
         </div>
       </div>
-      <div className="relative w-full h-px bg-border-strong opacity-80 group-hover:opacity-100 rounded-full overflow-hidden">
+      <div className="relative w-full h-[1px] bg-border-strong opacity-80 group-hover:opacity-100 rounded-full overflow-hidden">
         <LazyMotion features={domAnimation}>
           {isActive && (
             <m.div
@@ -66,9 +66,9 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
 }
 
 interface Tab {
-  label: ReactNode
-  paragraph?: ReactNode
-  panel?: ReactNode
+  label: string | React.ReactNode
+  paragraph?: string | React.ReactNode
+  panel?: JSX.Element
   code?: string
 }
 

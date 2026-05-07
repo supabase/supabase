@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
 
 import {
-  HIGH_CALL_THRESHOLD,
   SCORE_DEDUCTIONS,
+  HIGH_CALL_THRESHOLD,
 } from '../QueryInsightsHealth/QueryInsightsHealth.constants'
-import type { ClassifiedQuery } from '../QueryInsightsHealth/QueryInsightsHealth.types'
 import { getHealthLevel } from '../QueryInsightsHealth/QueryInsightsHealth.utils'
+import type { ClassifiedQuery } from '../QueryInsightsHealth/QueryInsightsHealth.types'
 
 export function useQueryInsightsScore({
   errors,
