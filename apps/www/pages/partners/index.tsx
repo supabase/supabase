@@ -1,219 +1,471 @@
-import { useBreakpoint } from 'common'
-import { Code } from 'lucide-react'
+import { ArrowRight, Check, ChevronDown, Minus } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Badge, Button } from 'ui'
-import { TextLink } from 'ui-patterns/TextLink'
+import { useState } from 'react'
+import { Badge, Button, cn } from 'ui'
 
 import DefaultLayout from '@/components/Layouts/Default'
 import SectionContainer from '@/components/Layouts/SectionContainer'
 import Panel from '@/components/Panel'
 import ProductHeaderCentered from '@/components/Sections/ProductHeaderCentered'
 import pageData from '@/data/partners'
-import { range } from '@/lib/helpers'
+import supabase from '@/lib/supabaseMisc'
 
-const Partners = () => {
+type FeaturedPartner = { slug: string; title: string; logo: string }
+
+interface Props {
+  featuredPartners: FeaturedPartner[]
+}
+
+const FEATURED_PARTNER_LIMIT = 30
+
+export async function getStaticProps() {
+  const { data: partners } = await supabase
+    .from('partners')
+    .select('slug,title,logo')
+    .eq('approved', true)
+    .eq('type', 'technology')
+    .order('title')
+
+  const all = (partners ?? []) as FeaturedPartner[]
+  const leadSlugs = pageData.featuredPartners.leadSlugs
+  const lead = leadSlugs
+    .map((slug) => all.find((p) => p.slug === slug))
+    .filter((p): p is FeaturedPartner => Boolean(p))
+  const rest = all.filter((p) => !leadSlugs.includes(p.slug))
+  const featuredPartners = [...lead, ...rest].slice(0, FEATURED_PARTNER_LIMIT)
+
+  return {
+    props: { featuredPartners },
+    revalidate: 1800,
+  }
+}
+
+interface SectionEyebrowProps {
+  eyebrow?: string
+  title: string
+  description?: string
+  align?: 'left' | 'center'
+}
+
+const FaqList = ({ items }: { items: { question: string; answer: string }[] }) => {
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
+
+  return (
+    <div className="border bg-background rounded-xl overflow-hidden divide-y">
+      {items.map((item, i) => {
+        const isOpen = openIndex === i
+        return (
+          <div key={i}>
+            <button
+              type="button"
+              className="flex w-full items-center justify-between gap-4 p-6 sm:p-8 text-left"
+              onClick={() => setOpenIndex(isOpen ? null : i)}
+              aria-expanded={isOpen}
+            >
+              <span className="text-foreground font-medium text-base">{item.question}</span>
+              <ChevronDown
+                size={16}
+                className={cn(
+                  'shrink-0 text-foreground-lighter transition-transform duration-200',
+                  isOpen && 'rotate-180'
+                )}
+              />
+            </button>
+            <div
+              className={cn(
+                'grid transition-all duration-200',
+                isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+              )}
+            >
+              <div className="overflow-hidden">
+                <p className="px-6 sm:px-8 pb-6 sm:pb-8 text-foreground-lighter text-sm text-pretty">
+                  {item.answer}
+                </p>
+              </div>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+const SectionHeading = ({ eyebrow, title, description, align = 'left' }: SectionEyebrowProps) => (
+  <div
+    className={
+      align === 'center' ? 'flex flex-col items-center text-center gap-3' : 'flex flex-col gap-3'
+    }
+  >
+    {eyebrow && (
+      <span className="text-brand font-mono text-sm uppercase tracking-wide">{eyebrow}</span>
+    )}
+    <h2 className="text-foreground text-3xl md:text-4xl font-medium tracking-tight max-w-[35ch] text-balance">
+      {title}
+    </h2>
+    {description && (
+      <p className="text-foreground-lighter text-lg max-w-[56ch] text-pretty">{description}</p>
+    )}
+  </div>
+)
+
+const Partners = ({ featuredPartners }: Props) => {
   const router = useRouter()
-  const isSm = useBreakpoint()
+  const { metaTitle, metaDescription, heroSection } = pageData
 
   return (
     <>
       <NextSeo
-        title={pageData.metaTitle}
-        description={pageData.metaDescription}
+        title={metaTitle}
+        description={metaDescription}
         openGraph={{
-          title: pageData.metaTitle,
-          description: pageData.metaDescription,
-          url: `https://supabase.com/partners`,
+          title: metaTitle,
+          description: metaDescription,
+          url: 'https://supabase.com/partners',
           images: [
             {
-              url: `https://supabase.com${router.basePath}/images/og/integrations.png`, // TODO
+              url: `https://supabase.com${router.basePath}/images/og/integrations.png`,
             },
           ],
         }}
       />
       <DefaultLayout>
-        <div className="relative bg-alternative overflow-hidden">
-          <SectionContainer className="overflow-hidden pt-8 pb-12 md:pt-12">
-            <ProductHeaderCentered {...pageData.heroSection} />
+        {/* Hero — centered (page entry) */}
+        <div className="bg-alternative border-b">
+          <SectionContainer className="!pb-12 md:!pb-16">
+            <ProductHeaderCentered
+              title={heroSection.title}
+              h1={heroSection.h1}
+              subheader={heroSection.subheader}
+              cta={heroSection.cta}
+              secondaryCta={heroSection.secondaryCta}
+            />
           </SectionContainer>
-          <div className="relative z-20 w-full flex py-16 mb-16 -mt-10 md:mb-24 md:-mt-20 justify-center gap-2 overflow-hidden mx-auto max-w-4xl before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,hsl(var(--background-alternative-default))_0%,transparent_10%,transparent_90%,hsl(var(--background-alternative-default))_100%)] before:z-10">
-            <div className="absolute w-32 h-32 md:w-40 md:h-40 rounded-full bg-alternative/90 backdrop-blur-2xl backdrop-filter bg-linear-to-t from-background to-background-alternative border-4 border-background-alternative shadow-xl top-1/2 -translate-x-1/2 left-1/2 -translate-y-1/2 flex items-center justify-center z-30">
-              <div className="absolute inset-0 w-full h-full transform">
-                <svg
-                  className="absolute inset-[-2px] transform animate-[transformSpin_3s_both_cubic-bezier(.5,.2,.5,.8)_infinite] opacity-90"
-                  viewBox="0 0 182 183"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M91 1C120.005 1 145.841 14.5702 162.505 35.708"
-                    stroke="url(#paint0_linear_4766_6117)"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                  <defs>
-                    <linearGradient
-                      id="paint0_linear_4766_6117"
-                      x1="107"
-                      y1="2.5"
-                      x2="151"
-                      y2="21.5"
-                      gradientUnits="userSpaceOnUse"
-                    >
-                      <stop stopColor="hsl(var(--brand-600))" stopOpacity="0" />
-                      <stop offset="0.510417" stopColor="hsl(var(--brand-600))" />
-                      <stop offset="1" stopColor="hsl(var(--brand-600))" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
+        </div>
 
-              <Image
-                src="/images/supabase-logo-icon.svg"
-                alt="Supabase icon"
-                width={isSm ? 45 : 60}
-                height={isSm ? 45 : 60}
-              />
-            </div>
-            {range(0, 3).map((_) => (
-              <div className="flex gap-2 animate-marquee will-change-transform">
-                {pageData.featuredApps.map((app) => (
-                  <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl bg-linear-to-t from-background to-background-alternative border border-muted flex items-center justify-center shadow-xl">
-                    <Image
-                      src={app.logo}
-                      alt={app.name}
-                      width={isSm ? 24 : 45}
-                      height={isSm ? 24 : 45}
-                      className="w-8 h-8  overflow-hidden rounded-full"
-                    />
-                  </div>
-                ))}
-              </div>
+        {/* Three reasons to partner — left-aligned */}
+        <SectionContainer>
+          <SectionHeading
+            eyebrow={pageData.reasonsSection.eyebrow}
+            title={pageData.reasonsSection.title}
+            description={pageData.reasonsSection.description}
+          />
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {pageData.reasons.map((reason) => (
+              <Panel
+                key={reason.title}
+                outerClassName="h-full"
+                innerClassName="flex flex-col gap-3 p-8"
+              >
+                <h3 className="text-foreground text-xl font-medium tracking-tight">
+                  {reason.title}
+                </h3>
+                <p className="text-foreground-lighter text-sm text-pretty">{reason.description}</p>
+              </Panel>
             ))}
           </div>
-          <div className="absolute inset-0 z-1 bg-[linear-gradient(to_top,hsl(var(--background-alternative-default))_40%,hsl(var(--background-default))_90%)]" />
-        </div>
-        <SectionContainer>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="col-span-1 md:col-span-2">
-              <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-.5px]">
-                Explore our marketplace
-              </h2>
-              <p className="text-foreground-lighter text-sm sm:text-sm md:text-base py-3 md:max-w-md">
-                Discover how technology and consulting partners are already working with Supabase.
-              </p>
-              <TextLink
-                url="https://supabase.com/docs/guides/platform/marketplace"
-                label="View docs"
-              />
-            </div>
-            <div className="col-span-1 md:col-span-2 w-full max-w-4xl grid gap-8 rounded-sm">
-              <Panel
-                hasInnerShimmer={false}
-                hasActiveOnHover={true}
-                innerClassName="px-8 py-6 group flex flex-col gap-4"
-              >
-                <div className="bg-surface-200 text-foreground flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
-                    />
-                  </svg>
-                </div>
+        </SectionContainer>
 
-                <div>
-                  <h3 className="text-foreground text-lg">Integrations</h3>
-                  <p className="text-foreground-lighter text-sm">
-                    Use your favorite tools with Supabase.
-                  </p>
-                </div>
-                <Link href="/partners/integrations" className="absolute inset-0" />
-              </Panel>
+        {/* Ways to partner — left-aligned, feature comparison table */}
+        <div className="bg-alternative border-y">
+          <SectionContainer>
+            <SectionHeading
+              eyebrow="Programs"
+              title={pageData.waysToPartner.title}
+              description={pageData.waysToPartner.description}
+            />
+            <div className="mt-10 overflow-x-auto rounded-xl border bg-background">
+              <table className="w-full min-w-[640px] border-collapse text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="w-2/5 px-4 py-4 text-left text-foreground-lighter font-mono text-xs uppercase tracking-wide">
+                      Capability
+                    </th>
+                    {pageData.waysToPartner.tiers.map((tier) => (
+                      <th
+                        key={tier.title}
+                        className="px-4 py-4 text-left text-foreground text-sm font-medium tracking-tight"
+                      >
+                        {tier.title}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b">
+                    <th
+                      scope="row"
+                      className="px-4 py-4 text-left text-foreground-lighter font-mono text-xs uppercase tracking-wide align-top"
+                    >
+                      Best for
+                    </th>
+                    {pageData.waysToPartner.tiers.map((tier) => (
+                      <td
+                        key={tier.title}
+                        className="px-4 py-4 text-foreground-light text-pretty align-top"
+                      >
+                        {tier.bestFor}
+                      </td>
+                    ))}
+                  </tr>
+                  <tr className="border-b">
+                    <th
+                      scope="row"
+                      className="px-4 py-4 text-left text-foreground-lighter font-mono text-xs uppercase tracking-wide align-top"
+                    >
+                      Time to launch
+                    </th>
+                    {pageData.waysToPartner.tiers.map((tier) => (
+                      <td key={tier.title} className="px-4 py-4 text-foreground-light align-top">
+                        {(tier as { timeToLaunch?: string }).timeToLaunch ?? '—'}
+                      </td>
+                    ))}
+                  </tr>
+                  {[
+                    { label: 'Listed in Partner Catalog', values: [true, true, true] },
+                    { label: 'In-product install surface', values: [false, true, true] },
+                    { label: 'One-click OAuth integration', values: [false, true, false] },
+                    { label: 'Co-marketing on Launch Weeks', values: [true, true, true] },
+                    { label: 'Joint launch treatment', values: [false, true, true] },
+                    { label: 'Custom commercial terms', values: [false, false, true] },
+                  ].map((row, i, arr) => (
+                    <tr key={row.label} className={i < arr.length - 1 ? 'border-b' : ''}>
+                      <th
+                        scope="row"
+                        className="px-4 py-3.5 text-left text-foreground-light font-normal align-middle"
+                      >
+                        {row.label}
+                      </th>
+                      {row.values.map((value, j) => (
+                        <td key={j} className="px-4 py-3.5 align-middle">
+                          {value ? (
+                            <Check
+                              size={16}
+                              className="text-brand shrink-0"
+                              aria-label="Included"
+                            />
+                          ) : (
+                            <Minus
+                              size={16}
+                              className="text-foreground-muted shrink-0"
+                              aria-label="Not included"
+                            />
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </div>
-        </SectionContainer>
-        <SectionContainer className="py-0!">
-          <div className="border-b" />
-        </SectionContainer>
-        <SectionContainer>
-          <h2 className="text-2xl sm:text-3xl xl:text-4xl text-center tracking-[-.5px]">
-            Partner benefits
-          </h2>
-          <div className="grid mt-8 lg:mt-16 gap-8 rounded-sm md:grid-cols-2 xl:grid-cols-4">
-            {pageData.featureBlocks.map((item, i) => {
-              return (
-                <div
-                  className="group flex flex-col items-center text-center gap-4 px-8 py-6"
-                  key={i}
-                >
-                  <div className="bg-brand-300 in-data-[theme*=dark]:bg-brand-500 text-brand-1200 group-hover:text-brand-800 [[data-theme*=dark]_&]:group-hover:text-brand-1000 flex h-12 w-12 items-center justify-center rounded-md border border-brand transition-all group-hover:scale-105">
-                    {item.icon ? item.icon : <Code strokeWidth={2} />}
-                  </div>
-
-                  <div>
-                    <h3 className="text-foreground text-lg">{item.title}</h3>
-                    <p className="text-foreground-lighter text-sm">{item.description}</p>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </SectionContainer>
-        <div className="bg-alternative border-t border-b">
-          <SectionContainer className="flex flex-col gap-8">
-            <div className="flex flex-col lg:flex-row gap-8 xl:gap-10 justify-between">
-              <div className="w-full lg:w-1/2 gap-2 flex flex-col items-start">
-                <Badge>Beta</Badge>
-                <h2 className="text-3xl xl:text-4xl mt-2 max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
-                  Publish an OAuth App
-                </h2>
-                <p className="text-foreground-lighter mb-4 max-w-sm">
-                  Supabase lets you build a third-party app that can control organizations or
-                  projects programmatically.
-                </p>
-                <TextLink
-                  url="https://supabase.com/docs/guides/platform/oauth-apps/publish-an-oauth-app"
-                  label="Learn more"
-                />
-              </div>
-              <div className="relative w-full lg:w-1/2 border bg-background flex items-center justify-center aspect-video rounded-xl overflow-hidden">
-                <Image
-                  src="/images/partners/register-oauth-app.svg"
-                  alt="Register app via API"
-                  layout="fill"
-                  objectFit="cover"
-                  quality={100}
-                />
-              </div>
+            <div className="mt-6 flex justify-start">
+              <Button asChild type="default" size="medium" iconRight={<ArrowRight />}>
+                <Link href="https://forms.supabase.com/partner">Apply to partner</Link>
+              </Button>
             </div>
           </SectionContainer>
         </div>
+
+        {/* What partnership gets you — left-aligned split */}
         <SectionContainer>
-          <div className="flex flex-col text-center gap-4 py-8 items-center justify-center">
-            <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl">
-              Reach out to partner with Supabase
-            </h2>
-            <div className="w-full mt-4 flex items-center justify-center text-center gap-4">
-              <Button asChild size="medium">
-                <Link href="https://forms.supabase.com/partner" tabIndex={-1}>
-                  Become a Partner
-                </Link>
-              </Button>
-            </div>
+          <div className="grid gap-12 md:grid-cols-2 md:gap-16 items-start">
+            <SectionHeading
+              eyebrow="Benefits"
+              title={pageData.benefits.title}
+              description="Partnerships open up access to the Supabase community, our product team, and our co-marketing motion."
+            />
+            <ul role="list" className="flex flex-col gap-3">
+              {pageData.benefits.items.map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="bg-brand-300 in-data-[theme*=dark]:bg-brand-500 text-brand-1200 mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full"
+                  >
+                    <Check size={12} strokeWidth={2.5} className="shrink-0" />
+                  </span>
+                  <span className="text-foreground-light text-pretty">{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </SectionContainer>
+
+        {/* How to apply — left-aligned */}
+        <div className="bg-alternative border-y">
+          <SectionContainer>
+            <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+              <SectionHeading
+                eyebrow="Get started"
+                title={pageData.howToApply.title}
+                description="Three steps from intro to launch. Most partners hear back within a week."
+              />
+              <Button
+                asChild
+                type="default"
+                size="medium"
+                iconRight={<ArrowRight />}
+                className="self-start md:self-end"
+              >
+                <Link href={pageData.howToApply.cta.link}>{pageData.howToApply.cta.label}</Link>
+              </Button>
+            </div>
+            <ol role="list" className="mt-12 grid gap-6 md:grid-cols-3">
+              {pageData.howToApply.steps.map((step, i) => (
+                <li key={step.title}>
+                  <Panel outerClassName="h-full" innerClassName="flex flex-col gap-3 p-8 h-full">
+                    <span className="text-foreground-lighter font-mono text-sm tabular-nums">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <h3 className="text-foreground text-xl font-medium tracking-tight">
+                      {step.title}
+                    </h3>
+                    <p className="text-foreground-lighter text-sm text-pretty">
+                      {step.description}
+                    </p>
+                  </Panel>
+                </li>
+              ))}
+            </ol>
+          </SectionContainer>
+        </div>
+
+        {/* Featured partners — infinite marquee */}
+        {featuredPartners.length > 0 && (
+          <SectionContainer>
+            <div className="flex flex-col items-center text-center gap-3">
+              <span className="text-brand font-mono text-sm uppercase tracking-wide">
+                Featured partners
+              </span>
+              <h2 className="text-foreground text-3xl md:text-4xl font-medium tracking-tight max-w-[35ch] text-balance">
+                {pageData.featuredPartners.title}
+              </h2>
+              <p className="text-foreground-lighter text-lg max-w-[56ch] text-pretty">
+                {pageData.featuredPartners.description}
+              </p>
+            </div>
+            <div className="mt-12 flex flex-col gap-6 overflow-hidden [mask-image:linear-gradient(to_right,transparent_0%,black_6%,black_94%,transparent_100%)]">
+              {[
+                {
+                  partners: featuredPartners.slice(0, Math.ceil(featuredPartners.length / 2)),
+                  reverse: false,
+                },
+                {
+                  partners: featuredPartners.slice(Math.ceil(featuredPartners.length / 2)),
+                  reverse: true,
+                },
+              ].map((row, rowIdx) => (
+                <div
+                  key={rowIdx}
+                  className={`flex gap-10 md:gap-14 will-change-transform animate-marquee [transform-style:preserve-3d] [backface-visibility:hidden] ${
+                    row.reverse ? '[animation-direction:reverse]' : ''
+                  }`}
+                >
+                  {[...row.partners, ...row.partners].map((partner, i) => (
+                    <Link
+                      key={`${partner.slug}-${i}`}
+                      href={`/partners/integrations/${partner.slug}`}
+                      title={partner.title}
+                      aria-hidden={i >= row.partners.length ? 'true' : undefined}
+                      tabIndex={i >= row.partners.length ? -1 : undefined}
+                      className="size-9 md:size-10 shrink-0 flex items-center justify-center [backface-visibility:hidden]"
+                    >
+                      <div className="relative size-full rounded-full overflow-hidden bg-muted">
+                        <Image
+                          src={partner.logo}
+                          alt={partner.title}
+                          fill
+                          className="object-contain"
+                          sizes="40px"
+                        />
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div className="mt-8 flex justify-center">
+              <Button asChild type="default" size="medium" iconRight={<ArrowRight />}>
+                <Link href="/partners/integrations">Browse the Partner Catalog</Link>
+              </Button>
+            </div>
+          </SectionContainer>
+        )}
+
+        {/* Ways you can integrate with Supabase — left-aligned, dl */}
+        <div className="bg-alternative border-y">
+          <SectionContainer>
+            <SectionHeading
+              eyebrow="Integration points"
+              title={pageData.integrationOptions.title}
+              description={pageData.integrationOptions.description}
+            />
+            <dl className="mt-12 grid gap-6 md:grid-cols-2">
+              {pageData.integrationOptions.options.map((option) => (
+                <Link
+                  key={option.title}
+                  href={option.href}
+                  className="group block"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Panel
+                    outerClassName="h-full"
+                    innerClassName="flex items-start gap-4 p-6 h-full"
+                    hasActiveOnHover
+                  >
+                    <div className="bg-surface-200 text-foreground flex size-10 shrink-0 items-center justify-center rounded-md border transition-all group-hover:scale-105">
+                      {option.icon}
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <dt className="text-foreground text-base font-medium tracking-tight">
+                        {option.title}
+                      </dt>
+                      <dd className="text-foreground-lighter text-sm text-pretty">
+                        {option.description}
+                      </dd>
+                      <span className="text-foreground-light text-sm inline-flex items-center gap-1 mt-1">
+                        Read the docs
+                        <ArrowRight
+                          size={14}
+                          className="shrink-0 transition-transform group-hover:translate-x-0.5"
+                        />
+                      </span>
+                    </div>
+                  </Panel>
+                </Link>
+              ))}
+            </dl>
+          </SectionContainer>
+        </div>
+
+        {/* FAQ — centered title, constrained list width */}
+        <SectionContainer>
+          <div className="flex flex-col items-center text-center gap-3 mb-12">
+            <h2 className="text-foreground text-2xl sm:text-3xl font-medium tracking-tight max-w-[35ch] text-balance">
+              {pageData.faq.title}
+            </h2>
+          </div>
+          <div className="mx-auto max-w-3xl">
+            <FaqList items={pageData.faq.items} />
+          </div>
+        </SectionContainer>
+
+        {/* Final CTA — centered */}
+        <div className="bg-alternative border-t">
+          <SectionContainer>
+            <div className="flex flex-col items-center text-center gap-6">
+              <Badge>Become a partner</Badge>
+              <h2 className="text-foreground text-3xl md:text-4xl font-medium tracking-tight max-w-[30ch] text-balance">
+                {pageData.finalCta.title}
+              </h2>
+              <Button asChild size="medium">
+                <Link href={pageData.finalCta.cta.link}>{pageData.finalCta.cta.label}</Link>
+              </Button>
+            </div>
+          </SectionContainer>
+        </div>
       </DefaultLayout>
     </>
   )

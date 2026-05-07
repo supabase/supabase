@@ -1,14 +1,14 @@
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
 import supabase from '~/lib/supabaseMisc'
 import type { Partner } from '~/types/partners'
-import { Loader, Search } from 'lucide-react'
+import { ArrowRight, Loader, Search } from 'lucide-react'
 import { NextSeo } from 'next-seo'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+import { Button, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 import { useDebounce } from 'use-debounce'
 
 import TileGrid from '../../../components/Partners/TileGrid'
@@ -43,8 +43,8 @@ function IntegrationPartnersPage(props: Props) {
 
   const router = useRouter()
 
-  const meta_title = 'Find an Integration'
-  const meta_description = `Use your favorite tools with Supabase.`
+  const meta_title = 'Partners building with Supabase'
+  const meta_description = `Browse companies that build on Supabase, integrate with Supabase, or both.`
 
   const [search, setSearch] = useState('')
   const [debouncedSearchTerm] = useDebounce(search, 300)
@@ -106,9 +106,12 @@ function IntegrationPartnersPage(props: Props) {
       />
       <DefaultLayout className="bg-alternative">
         <SectionContainer className="space-y-16">
-          <div>
-            <h1 className="h1">{meta_title}</h1>
-            <p className="text-foreground-lighter text-xl">{meta_description}</p>
+          <div className="flex flex-col gap-3">
+            <span className="text-brand font-mono uppercase tracking-widest text-sm">
+              Partner Catalog
+            </span>
+            <h1 className="h1 !mb-0">{meta_title}</h1>
+            <p className="text-foreground-lighter text-xl max-w-2xl">{meta_description}</p>
           </div>
           {/* Title */}
           <div className="grid space-y-12 md:gap-8 lg:grid-cols-12 lg:gap-16 lg:space-y-0 xl:gap-16">
@@ -154,10 +157,10 @@ function IntegrationPartnersPage(props: Props) {
                   <div className="text-foreground-lighter mb-2 text-sm">Explore more</div>
                   <div className="grid grid-cols-2 gap-8 lg:grid-cols-1">
                     <PartnerLinkBox
-                      href={`/partners/integrations#become-a-partner`}
+                      href="/partners"
                       title="Become a partner"
                       color="brand"
-                      description="Fill out a quick 30 second form to apply to become a partner"
+                      description="Build with Supabase. Get listed in the Partner Catalog."
                       icon={
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -191,7 +194,19 @@ function IntegrationPartnersPage(props: Props) {
             </div>
           </div>
         </SectionContainer>
-        <BecomeAPartner />
+        <div className="border-t bg-background">
+          <div
+            id="become-a-partner"
+            className="mx-auto max-w-2xl flex flex-col items-center gap-6 py-32 px-6 text-center"
+          >
+            <h2 className="h2 tracking-[-1px]">
+              Interested in adding your product to the catalog?
+            </h2>
+            <Button asChild size="medium" iconRight={<ArrowRight />}>
+              <Link href="/partners">Become a partner</Link>
+            </Button>
+          </div>
+        </div>
       </DefaultLayout>
     </>
   )
