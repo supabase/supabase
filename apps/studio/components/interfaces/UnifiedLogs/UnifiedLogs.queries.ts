@@ -119,21 +119,23 @@ const truncationFunction = (level: 'MINUTE' | 'HOUR' | 'DAY') => {
 }
 
 /**
- * Combine the requested log sources into the unified logs CTE.
+ * Inline subquery for the unified logs view.
  *
  * The OTEL endpoint exposes a single `logs` table with rows of the form
  *   { id, timestamp, project, source, event_message, severity_text, log_attributes }
  * where `source` is normalized (e.g. 'edge_logs', 'postgres_logs', ...). We
  * filter by source and project the columns the rest of the studio queries
  * expect (log_type, status, level, pathname, method, ...).
+ *
+ * Note: the OTEL endpoint rejects `WITH ... AS (...)` CTEs, so callers must
+ * embed this subquery via `FROM (subquery) AS unified_logs` instead.
  */
-export const getUnifiedLogsCTE = (logTypes: string[] = [...DEFAULT_LOG_TYPES]) => {
+export const getUnifiedLogsSubquery = (logTypes: string[] = [...DEFAULT_LOG_TYPES]) => {
   const effectiveLogTypes = logTypes.filter((t) => t in LOG_TYPE_TO_SOURCE)
   const types = effectiveLogTypes.length ? effectiveLogTypes : [...DEFAULT_LOG_TYPES]
   const sources = types.map((t) => `'${LOG_TYPE_TO_SOURCE[t]}'`).join(', ')
 
-  return `
-WITH unified_logs AS (
+  return `(
   SELECT
     id,
     null AS source_id,
@@ -156,8 +158,7 @@ WITH unified_logs AS (
     null AS logs
   FROM logs
   WHERE source IN (${sources})
-)
-  `
+)`
 }
 
 /**
@@ -167,8 +168,7 @@ export const getUnifiedLogsQuery = (search: QuerySearchParamsType): string => {
   const { finalWhere } = buildQueryConditions(search)
   const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
 
-  const sql = `
-${getUnifiedLogsCTE(effectiveLogTypes)}
+  return `
 SELECT
     id,
     source_id,
@@ -181,11 +181,9 @@ SELECT
     method,
     log_count,
     logs
-FROM unified_logs
+FROM ${getUnifiedLogsSubquery(effectiveLogTypes)} AS unified_logs
 ${finalWhere}
 `
-
-  return sql
 }
 
 // Helper function to build WHERE clause excluding a specific field
@@ -213,81 +211,82 @@ const buildFacetWhere = (search: QuerySearchParamsType, excludeField: string): s
   return conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 }
 
-export const getFacetCountCTE = ({
+/**
+ * Builds a single faceted-count SELECT (no CTE) with shape (dimension, value, count).
+ * Suitable both for stand-alone use and for UNION ALL stitching.
+ */
+export const getFacetCountQuery = ({
   search,
   facet,
   facetSearch,
+  logTypes,
 }: {
   search: QuerySearchParamsType
   facet: string
   facetSearch?: string
+  logTypes?: string[]
 }) => {
   const MAX_FACETS_QUANTITY = 20
-  const baseWhere = buildFacetWhere(search, `${facet}`)
+  const baseWhere = buildFacetWhere(search, facet)
+  const effectiveLogTypes = logTypes?.length ? logTypes : [...DEFAULT_LOG_TYPES]
+
+  const whereParts: string[] = []
+  if (baseWhere) {
+    whereParts.push(baseWhere.replace(/^WHERE /, ''))
+  }
+  whereParts.push(`${facet} IS NOT NULL`)
+  if (facetSearch) {
+    whereParts.push(`${facet} LIKE '%${facetSearch}%'`)
+  }
+  const where = `WHERE ${whereParts.join(' AND ')}`
 
   return `
-${facet}_count AS (
-  SELECT '${facet}' as dimension, ${facet} as value, COUNT(*) as count
-  FROM unified_logs
-  ${baseWhere || `WHERE ${facet} IS NOT NULL`}
-  ${baseWhere ? ` AND ${facet} IS NOT NULL` : ''}
-  ${!!facetSearch ? `AND ${facet} LIKE '%${facetSearch}%'` : ''}
-  GROUP BY ${facet}
-  LIMIT ${MAX_FACETS_QUANTITY}
-)
+SELECT '${facet}' AS dimension, ${facet} AS value, COUNT(*) AS count
+FROM ${getUnifiedLogsSubquery(effectiveLogTypes)} AS unified_logs
+${where}
+GROUP BY ${facet}
+LIMIT ${MAX_FACETS_QUANTITY}
 `.trim()
 }
 
 export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
   const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
+  const subquery = `${getUnifiedLogsSubquery(effectiveLogTypes)} AS unified_logs`
   const logTypeWhere = buildFacetWhere(search, 'log_type') || 'WHERE log_type IS NOT NULL'
   const levelWhere = buildFacetWhere(search, 'level') || 'WHERE level IS NOT NULL'
 
-  const sql = `
-${getUnifiedLogsCTE(effectiveLogTypes)},
+  // The static (log_type/level) buckets share one inner scan via per-row
+  // countIf, then the dynamic facet group-by counts are UNIONed in. Each
+  // branch re-references the subquery (no CTE support on the OTEL endpoint).
+  return `
+SELECT 'total' AS dimension, 'all' AS value, COUNT(*) AS count
+FROM ${subquery}
+${logTypeWhere}
 
-log_type_counts AS (
-  SELECT
-    COUNT(*) AS total,
-    countIf(log_type = 'edge') AS edge_count,
-    countIf(log_type = 'postgrest') AS postgrest_count,
-    countIf(log_type = 'storage') AS storage_count,
-    countIf(log_type = 'postgres') AS postgres_count,
-    countIf(log_type = 'edge function') AS edge_function_count,
-    countIf(log_type = 'auth') AS auth_count
-  FROM unified_logs
-  ${logTypeWhere}
-),
+UNION ALL SELECT 'log_type' AS dimension, 'edge' AS value, countIf(log_type = 'edge') AS count
+FROM ${subquery} ${logTypeWhere}
+UNION ALL SELECT 'log_type', 'postgrest', countIf(log_type = 'postgrest')
+FROM ${subquery} ${logTypeWhere}
+UNION ALL SELECT 'log_type', 'storage', countIf(log_type = 'storage')
+FROM ${subquery} ${logTypeWhere}
+UNION ALL SELECT 'log_type', 'postgres', countIf(log_type = 'postgres')
+FROM ${subquery} ${logTypeWhere}
+UNION ALL SELECT 'log_type', 'edge function', countIf(log_type = 'edge function')
+FROM ${subquery} ${logTypeWhere}
+UNION ALL SELECT 'log_type', 'auth', countIf(log_type = 'auth')
+FROM ${subquery} ${logTypeWhere}
 
-level_counts AS (
-  SELECT
-    countIf(level = 'success') AS success_count,
-    countIf(level = 'warning') AS warning_count,
-    countIf(level = 'error') AS error_count
-  FROM unified_logs
-  ${levelWhere}
-),
+UNION ALL SELECT 'level' AS dimension, 'success' AS value, countIf(level = 'success') AS count
+FROM ${subquery} ${levelWhere}
+UNION ALL SELECT 'level', 'warning', countIf(level = 'warning')
+FROM ${subquery} ${levelWhere}
+UNION ALL SELECT 'level', 'error', countIf(level = 'error')
+FROM ${subquery} ${levelWhere}
 
-${getFacetCountCTE({ search, facet: 'method' })},
-${getFacetCountCTE({ search, facet: 'status' })},
-${getFacetCountCTE({ search, facet: 'pathname' })}
-
-SELECT 'total' AS dimension, 'all' AS value, total AS count FROM log_type_counts
-UNION ALL SELECT 'log_type', 'edge', edge_count FROM log_type_counts
-UNION ALL SELECT 'log_type', 'postgrest', postgrest_count FROM log_type_counts
-UNION ALL SELECT 'log_type', 'storage', storage_count FROM log_type_counts
-UNION ALL SELECT 'log_type', 'postgres', postgres_count FROM log_type_counts
-UNION ALL SELECT 'log_type', 'edge function', edge_function_count FROM log_type_counts
-UNION ALL SELECT 'log_type', 'auth', auth_count FROM log_type_counts
-UNION ALL SELECT 'level', 'success', success_count FROM level_counts
-UNION ALL SELECT 'level', 'warning', warning_count FROM level_counts
-UNION ALL SELECT 'level', 'error', error_count FROM level_counts
-UNION ALL SELECT dimension, value, count FROM method_count
-UNION ALL SELECT dimension, value, count FROM status_count
-UNION ALL SELECT dimension, value, count FROM pathname_count
+UNION ALL ${getFacetCountQuery({ search, facet: 'method', logTypes: effectiveLogTypes })}
+UNION ALL ${getFacetCountQuery({ search, facet: 'status', logTypes: effectiveLogTypes })}
+UNION ALL ${getFacetCountQuery({ search, facet: 'pathname', logTypes: effectiveLogTypes })}
 `
-
-  return sql
 }
 
 /**
@@ -300,14 +299,13 @@ export const getLogsChartQuery = (search: QuerySearchParamsType): string => {
   const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
 
   return `
-${getUnifiedLogsCTE(effectiveLogTypes)}
 SELECT
   ${truncFn}(timestamp) as time_bucket,
   countIf(level = 'success') as success,
   countIf(level = 'warning') as warning,
   countIf(level = 'error') as error,
   COUNT(*) as total_per_bucket
-FROM unified_logs
+FROM ${getUnifiedLogsSubquery(effectiveLogTypes)} AS unified_logs
 ${finalWhere}
 GROUP BY time_bucket
 ORDER BY time_bucket ASC

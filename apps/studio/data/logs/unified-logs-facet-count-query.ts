@@ -6,10 +6,7 @@ import {
   UNIFIED_LOGS_QUERY_OPTIONS,
   UnifiedLogsVariables,
 } from './unified-logs-infinite-query'
-import {
-  getFacetCountCTE,
-  getUnifiedLogsCTE,
-} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { getFacetCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { handleError, post } from '@/data/fetchers'
 import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
@@ -29,11 +26,7 @@ export async function getUnifiedLogsFacetCount(
   }
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
-  const sql = `
-${getUnifiedLogsCTE()},
-${getFacetCountCTE({ search, facet, facetSearch })}
-SELECT dimension, value, count from ${facet}_count;
-`.trim()
+  const sql = getFacetCountQuery({ search, facet, facetSearch })
   const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all.otel`, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
