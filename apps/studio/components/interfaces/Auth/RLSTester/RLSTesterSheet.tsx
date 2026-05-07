@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { Code } from 'lucide-react'
+import { Box, Code, Loader2, RefreshCw } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   Badge,
@@ -40,6 +40,7 @@ import { UserSelector } from './UserSelector'
 import { UserSqlEditor } from './UserSqlEditor'
 import { useTestQueryRLS } from './useTestQueryRLS'
 import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { PostgresSandboxProvider, usePostgresSandbox } from '@/state/postgres-sandbox/sandbox'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
@@ -57,7 +58,7 @@ export const RLSTesterSheet = (props: RLSTesterSheetProps) => {
 }
 
 const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps) => {
-  const { status } = usePostgresSandbox()
+  const { status, startSandbox } = usePostgresSandbox()
   const { setRole } = useRoleImpersonationStateSnapshot()
 
   const [open, setOpen] = useState(false)
@@ -148,12 +149,14 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
           </SheetHeader>
 
           <div className="grow overflow-y-auto flex flex-col">
-            <SheetSection className="pb-0">
+            {/* [Joshen] As clean up - this whole thing should be in its own component */}
+            {status === 'idle' ? (
               <Admonition
                 type="default"
                 layout="horizontal"
+                className="border-none"
                 actions={[
-                  <Button key="set-up" type="default">
+                  <Button key="set-up" type="default" onClick={() => startSandbox()}>
                     Set up sandbox
                   </Button>,
                 ]}
@@ -166,9 +169,52 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
                   Ensure that queries do not affect your actual database
                 </p>
               </Admonition>
-            </SheetSection>
+            ) : status === 'loading' ? (
+              <Admonition
+                showIcon={false}
+                type="default"
+                className="border-none py-2 [&>div>div]:flex [&>div>div]:items-center [&>div>div]:justify-between"
+              >
+                <div className="flex items-center gap-x-3">
+                  <div className="bg w-6 h-6 rounded border border-border flex items-center justify-center">
+                    <Loader2 size={14} className="animate-spin" />
+                  </div>
+                  <p className="text-xs !mb-0 font-mono uppercase tracking-tight">
+                    Setting up sandbox
+                  </p>
+                </div>
+              </Admonition>
+            ) : status === 'ready' ? (
+              <Admonition
+                showIcon={false}
+                type="default"
+                className="border-none py-2 [&>div>div]:flex [&>div>div]:items-center [&>div>div]:justify-between"
+              >
+                <div className="flex items-center gap-x-3">
+                  <div className="bg-brand-300 w-6 h-6 rounded border border-brand-500 flex items-center justify-center">
+                    <Box size={14} className="text-brand" />
+                  </div>
+                  <p className="text-xs !mb-0 font-mono uppercase tracking-tight">Sandbox active</p>
+                  <p className="text-xs text-foreground-lighter !mb-0">
+                    Your database is never modified
+                  </p>
+                </div>
+                <div className="flex items-center gap-x-2">
+                  <ButtonTooltip
+                    type="default"
+                    icon={<RefreshCw />}
+                    className="w-7"
+                    tooltip={{ content: { side: 'bottom', text: 'Refresh schema' } }}
+                  />
+                </div>
+              </Admonition>
+            ) : (
+              status === 'error' && (
+                <Admonition type="warning" title="Oops" className="border-none" />
+              )
+            )}
 
-            <SheetSection className="px-0 py-0">
+            <SheetSection className="px-0 py-0 border-t">
               <div className="flex flex-col p-5 pt-4 gap-y-4">
                 <RoleSelector onSelectRole={setSelectedOption} />
                 {selectedOption === 'authenticated' && <UserSelector />}

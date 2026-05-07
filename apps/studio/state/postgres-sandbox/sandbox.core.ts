@@ -2,13 +2,15 @@ import { Results } from '@electric-sql/pglite'
 import { PGliteWorker } from '@electric-sql/pglite/worker'
 
 import { SANDBOX_SETUP_STATEMENTS } from './sandbox.constants'
+import { applySchema } from './sandbox.utils'
+import { DatabaseSchemaDDLData } from '@/data/database/schema-ddl-query'
 
 export interface SandboxCore {
-  // setSchema(data: ProjectSchemaDDLData): Promise<void>
   // setSeed(tables: TableSeedData[]): Promise<void>
   // broadcastSql(sql: string): Promise<void>
   // runAll(tiles: TileConfig[], sql: string): Promise<Record<string, TileResult>>
 
+  setSchema(data: DatabaseSchemaDDLData): Promise<void>
   // [Joshen] Valid to ignore the following:
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   runQuery: (sql: string) => Promise<Results<{ [key: string]: any }>[]>
@@ -41,9 +43,18 @@ const boot = async (): Promise<SandboxCore> => {
     }
   }
 
+  function makeExecutor() {
+    return { execSql: (sql: string) => pg.exec(sql).then(() => undefined as void) }
+  }
+
+  async function setSchema(data: DatabaseSchemaDDLData): Promise<void> {
+    await applySchema(makeExecutor(), data)
+  }
+
   const runQuery = async (sql: string) => await pg.exec(sql)
+
   const destroy = async () => webWorker.terminate()
 
-  instance = { runQuery, destroy }
+  instance = { runQuery, destroy, setSchema }
   return instance
 }

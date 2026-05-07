@@ -1,0 +1,129 @@
+import type { PostgresPolicy } from '@supabase/postgres-meta'
+
+import { DatabaseSchemaDDL } from '@/data/database/schema-ddl-query'
+import { getErrorMessage } from '@/lib/get-error-message'
+
+interface Executor {
+  execSql(sql: string): Promise<void>
+}
+
+function buildPolicySQL(policy: PostgresPolicy): string {
+  const target = `"${policy.schema}"."${policy.table}"`
+  const permissiveness = policy.action === 'RESTRICTIVE' ? 'AS RESTRICTIVE' : ''
+  const command = policy.command === 'ALL' ? '' : `FOR ${policy.command}`
+  const roles = policy.roles?.length ? `TO ${policy.roles.join(', ')}` : ''
+  const using = policy.definition ? `USING (${policy.definition})` : ''
+  const withCheck = policy.check ? `WITH CHECK (${policy.check})` : ''
+
+  const drop = `DROP POLICY IF EXISTS "${policy.name}" ON ${target}`
+  const create = [
+    `CREATE POLICY "${policy.name}"`,
+    `ON ${target}`,
+    permissiveness,
+    command,
+    roles,
+    using,
+    withCheck,
+  ]
+    .filter(Boolean)
+    .join(' ')
+  return `${drop}; ${create}`
+}
+
+async function tryExec(sandbox: Executor, sql: string, label: string): Promise<void> {
+  try {
+    await sandbox.execSql(sql)
+  } catch (err) {
+    console.warn(`[rls-sandbox] skipped ${label}:`, getErrorMessage(err) ?? err)
+  }
+}
+
+async function applyDDLWithRetries(sandbox: Executor, ddlStatements: string[]): Promise<void> {
+  let pending = ddlStatements.slice()
+
+  while (pending.length > 0) {
+    const failed: Array<{ ddl: string; error: string }> = []
+    for (const ddl of pending) {
+      try {
+        await sandbox.execSql(ddl)
+      } catch (err) {
+        failed.push({ ddl, error: getErrorMessage(err) ?? String(err) })
+      }
+    }
+    if (failed.length === pending.length) {
+      for (const { ddl, error } of failed) {
+        console.warn(
+          `[rls-sandbox] skipped DDL: ${ddl.slice(0, 80).replace(/\s+/g, ' ')} — ${error}`
+        )
+      }
+      break
+    }
+    pending = failed.map((f) => f.ddl)
+  }
+}
+
+export async function applySchema(
+  sandbox: Executor,
+  {
+    typeDefinitions,
+    entityDefinitions,
+    functionDefinitions,
+    policies,
+    rlsStatuses,
+    customRoles,
+  }: DatabaseSchemaDDL
+): Promise<void> {
+  if (customRoles.length > 0) {
+    const checks = customRoles
+      .map(({ name }) => {
+        const safeLiteral = name.replace(/'/g, "''")
+        const safeIdent = name.replace(/"/g, '""')
+        return `IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '${safeLiteral}') THEN CREATE ROLE "${safeIdent}" NOLOGIN; END IF;`
+      })
+      .join('\n')
+    await tryExec(sandbox, `DO $$ BEGIN\n${checks}\nEND $$`, 'custom roles')
+  }
+
+  await applyDDLWithRetries(sandbox, typeDefinitions)
+  await applyDDLWithRetries(sandbox, entityDefinitions)
+
+  await tryExec(
+    sandbox,
+    `GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role`,
+    'grant schema usage'
+  )
+
+  if (rlsStatuses.length > 0) {
+    const grants = rlsStatuses
+      .map(
+        (t) =>
+          `GRANT SELECT, INSERT, UPDATE, DELETE ON "${t.schema}"."${t.table}" TO anon, authenticated, service_role`
+      )
+      .join('; ')
+    await tryExec(sandbox, grants, 'grant roles on all tables')
+
+    const rlsEnables = rlsStatuses
+      .filter((t) => t.rls_enabled)
+      .map((t) => `ALTER TABLE "${t.schema}"."${t.table}" ENABLE ROW LEVEL SECURITY`)
+      .join('; ')
+    if (rlsEnables) {
+      await tryExec(sandbox, rlsEnables, 'enable RLS on all tables')
+    }
+  }
+
+  // Disable check_function_bodies so functions referencing not-yet-created objects don't abort.
+  // Postgres resolves policy→function references at query time, not at CREATE POLICY time.
+  await tryExec(sandbox, `SET check_function_bodies = off`, 'set check_function_bodies')
+  for (const fn of functionDefinitions) {
+    await tryExec(sandbox, fn, `function ${fn.slice(0, 60).replace(/\s+/g, ' ')}`)
+  }
+  await tryExec(sandbox, `RESET check_function_bodies`, 'reset check_function_bodies')
+
+  for (const policy of policies) {
+    await tryExec(
+      sandbox,
+      buildPolicySQL(policy),
+      `policy ${policy.schema}.${policy.table} "${policy.name}"`
+    )
+  }
+}
