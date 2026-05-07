@@ -162,71 +162,84 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
   }
 
   const onSubmit = async (values: FormValues) => {
-    setError(null)
-    setResponse(null)
+  setError(null)
+  setResponse(null)
 
-    // Validate that the body is valid JSON
+  // Validate that the body is valid JSON
+  try {
+    JSON.parse(JSON.stringify(values.body))
+  } catch (e) {
+    form.setError('body', { message: 'Must be a valid JSON string' })
+    return
+  }
+
+  let testAuthorization: string | undefined
+  const role = getImpersonatedRoleState().role
+
+  if (
+    projectRef !== undefined &&
+    config?.jwt_secret !== undefined &&
+    role !== undefined &&
+    role.type === 'postgrest'
+  ) {
     try {
-      JSON.parse(JSON.stringify(values.body))
-    } catch (e) {
-      form.setError('body', { message: 'Must be a valid JSON string' })
-      return
+      const token = await getRoleImpersonationJWT(
+        projectRef,
+        config.jwt_secret,
+        role
+      )
+
+      testAuthorization = 'Bearer ' + token
+    } catch (err: any) {
+      console.error('Failed to generate JWT:', {
+        error: err.message,
+        roleDetails: role,
+      })
     }
+  }
 
-    let testAuthorization: string | undefined
-    const role = getImpersonatedRoleState().role
+  // Construct custom headers
+  const customHeaders: Record<string, string> = {}
 
-
-    if (
-      projectRef !== undefined &&
-      config?.jwt_secret !== undefined &&
-      role !== undefined &&
-      role.type === 'postgrest'
-    ) {
-      try {
-        const token = await getRoleImpersonationJWT(projectRef, config.jwt_secret, role)
-        testAuthorization = 'Bearer ' + token
-      } catch (err: any) {
-        console.error('Failed to generate JWT:', {
-          error: err.message,
-          roleDetails: role,
-        })
-      }
+  values.headers.forEach(({ key, value }) => {
+    if (key && value) {
+      customHeaders[key] = value
     }
+  })
 
-    // Construct custom headers
-    const customHeaders: Record<string, string> = {}
-    values.headers.forEach(({ key, value }) => {
-      if (key && value) {
-        customHeaders[key] = value
-      }
-    })
+  // Construct query parameters
+  const queryString = values.queryParams
+    .filter(({ key, value }) => key && value)
+    .map(
+      ({ key, value }) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+    )
+    .join('&')
 
-    // Construct query parameters
-    const queryString = values.queryParams
-      .filter(({ key, value }) => key && value)
-      .map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-      .join('&')
+  const finalUrl = queryString ? `${url}?${queryString}` : url
 
-    const finalUrl = queryString ? `${url}?${queryString}` : url
+  testEdgeFunction({
+    url: finalUrl,
+    method: values.method,
+    body: values.body,
 
-    testEdgeFunction({
-  url: finalUrl,
-  method: values.method,
-  body: values.body,
-  headers: {
-    ...(accessToken && {
-      Authorization: `Bearer ${accessToken}`,
-    }),
-    'x-test-authorization':
-      testAuthorization ??
-      (role?.name === 'anon'
-        ? `Bearer ${settings?.api?.anon_key ?? ''}`
-        : `Bearer ${serviceKey?.api_key}`),
-    'Content-Type': 'application/json',
-    ...customHeaders,
-  },
-})
+    headers: {
+      ...(accessToken && {
+        Authorization: `Bearer ${accessToken}`,
+      }),
+
+      'x-test-authorization':
+        testAuthorization ??
+        (role?.name === 'anon'
+          ? `Bearer ${settings?.api?.anon_key ?? ''}`
+          : `Bearer ${serviceKey?.api_key}`),
+
+      'Content-Type': 'application/json',
+
+      ...customHeaders,
+    },
+  })
+}
   const renderKeyValuePairs = (type: 'headers' | 'queryParams', label: string) => (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
