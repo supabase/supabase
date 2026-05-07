@@ -24,7 +24,7 @@ const SUPPORTED_CSP_AVATAR_URLS = [GITHUB_AVATAR_URL, 'https://lh3.googleusercon
 
 const isCustomProvider = (provider: string) => provider.startsWith('custom:')
 
-export type FormattedUserRow = ReturnType<typeof formatUsersData>[number]
+type FormattedUserRow = ReturnType<typeof formatUsersData>[number]
 
 export const formatUsersData = (users: User[]) => {
   return users.map((user) => {
