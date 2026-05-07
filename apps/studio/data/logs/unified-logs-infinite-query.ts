@@ -85,10 +85,13 @@ export async function getUnifiedLogs(
     // Live mode: fetch logs newer than the cursor
     timestampEnd = new Date().toISOString()
   } else if (cursorDirection === 'next') {
-    // Regular pagination: fetch logs older than the cursor
-    timestampEnd = cursorValue
-      ? new Date(Number(cursorValue) / 1000).toISOString()
-      : isoTimestampEnd
+    // Regular pagination: fetch logs older than the cursor.
+    // The cursor is stored as milliseconds (set below from `date.getTime()`),
+    // so we can convert it directly without worrying about the wire format.
+    timestampEnd =
+      cursorValue !== null && cursorValue !== undefined
+        ? new Date(Number(cursorValue)).toISOString()
+        : isoTimestampEnd
   } else {
     timestampEnd = isoTimestampEnd
   }
@@ -137,11 +140,10 @@ export async function getUnifiedLogs(
   const lastRow = result.length > 0 ? result[result.length - 1] : null
   const hasMore = result.length >= LOGS_PAGE_LIMIT - 1
 
-  const nextCursor = lastRow ? lastRow.timestamp : null
-  // FIXED: Always provide prevCursor like DataTableDemo does
-  // This ensures live mode never breaks the infinite query chain
-  // DataTableDemo uses milliseconds, but our timestamps are in microseconds
-  const prevCursor = result.length > 0 ? firstRow!.timestamp : new Date().getTime() * 1000
+  // Cursors are stored as milliseconds (Date.getTime()) so the OTEL endpoint's
+  // wire format (ISO string vs numeric microseconds) doesn't bleed into pagination.
+  const nextCursor = lastRow ? lastRow.date.getTime() : null
+  const prevCursor = firstRow ? firstRow.date.getTime() : new Date().getTime()
 
   return {
     data: result,
