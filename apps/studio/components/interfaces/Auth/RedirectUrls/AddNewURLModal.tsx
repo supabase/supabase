@@ -4,7 +4,7 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, cn, DialogSectionSeparator, Form_Shadcn_, Modal, ScrollArea } from 'ui'
+import { Button, cn, DialogSectionSeparator, Form, Modal, ScrollArea } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import * as z from 'zod'
@@ -85,7 +85,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
     <Modal
       hideFooter
       size="medium"
-      className="!max-w-[440px]"
+      className="max-w-[440px]!"
       visible={visible}
       onCancel={() => {
         form.reset(initialValues)
@@ -94,7 +94,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
       header="Add new redirect URLs"
       description="This will add a URL to a list of allowed URLs that can interact with your Authentication services for this project."
     >
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Modal.Content className="flex flex-col gap-y-2 px-0">
             <Label className="px-5">URL</Label>
@@ -130,7 +130,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
             </Button>
           </Modal.Content>
         </form>
-      </Form_Shadcn_>
+      </Form>
     </Modal>
   )
 }

@@ -6,8 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import {
   Button,
   Calendar,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  FormControl,
   FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
@@ -24,7 +23,8 @@ import {
   SheetSection,
   Switch,
   Textarea,
-  useWatch_Shadcn_,
+  FormField as UIFormField,
+  useWatch,
 } from 'ui'
 import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -65,7 +65,7 @@ const FormField = ({
     )
   }
 
-  const fieldValue = useWatch_Shadcn_({ control, name })
+  const fieldValue = useWatch({ control, name })
   if (!hasAccess) {
     const planMessage = organizationSlug
       ? `Only available on [Pro plan](/org/${organizationSlug}/billing?panel=subscriptionPlan) and above.`
@@ -75,7 +75,7 @@ const FormField = ({
   const disabled =
     disabledProp || (properties.type === 'boolean' ? !hasAccess && !fieldValue : !hasAccess)
 
-  const showValue = useWatch_Shadcn_({
+  const showValue = useWatch({
     control,
     name: properties.show?.key,
     disabled: properties.show == null,
@@ -102,7 +102,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled || readOnly}
@@ -118,7 +118,7 @@ const FormField = ({
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Popover_Shadcn_>
                       <PopoverTrigger_Shadcn_ asChild>
                         <Button
@@ -141,7 +141,7 @@ const FormField = ({
                         />
                       </PopoverContent_Shadcn_>
                     </Popover_Shadcn_>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -154,7 +154,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled}
@@ -168,7 +168,7 @@ const FormField = ({
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
+                  <FormControl className="col-span-6">
                     {properties.isSecret ? (
                       <DataInput
                         {...field}
@@ -181,7 +181,7 @@ const FormField = ({
                     ) : (
                       <Input_Shadcn_ {...field} id={name} readOnly={readOnly} />
                     )}
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -194,7 +194,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled}
@@ -208,7 +208,7 @@ const FormField = ({
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
+                  <FormControl className="col-span-6">
                     <Textarea
                       {...field}
                       id={name}
@@ -217,7 +217,7 @@ const FormField = ({
                       className="resize-none"
                       readOnly={readOnly}
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -230,7 +230,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled}
@@ -244,7 +244,7 @@ const FormField = ({
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
+                  <FormControl className="col-span-6">
                     {properties.units ? (
                       <InputGroup>
                         <FormInputGroupInput
@@ -273,7 +273,7 @@ const FormField = ({
                         readOnly={readOnly}
                       />
                     )}
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -286,7 +286,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled || readOnly}
@@ -309,14 +309,14 @@ const FormField = ({
                     </div>
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
+                  <FormControl className="col-span-6">
                     <Switch
                       id={name}
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       size="small"
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -329,7 +329,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
-            <FormField_Shadcn_
+            <UIFormField
               control={control}
               name={name}
               disabled={disabled || readOnly}
@@ -347,7 +347,7 @@ const FormField = ({
                     ) : null
                   }
                 >
-                  <FormControl_Shadcn_ className="col-span-6">
+                  <FormControl className="col-span-6">
                     <Select_Shadcn_
                       defaultValue={properties.enum[0]?.value}
                       value={field.value}
@@ -373,7 +373,7 @@ const FormField = ({
                         ))}
                       </SelectContent_Shadcn_>
                     </Select_Shadcn_>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />

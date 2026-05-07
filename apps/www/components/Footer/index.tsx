@@ -85,8 +85,8 @@ const Footer = (props: Props) => {
       <h2 id="footerHeading" className="sr-only">
         Footer
       </h2>
-      <div className="w-full !py-0">
-        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between text-foreground md:justify-center gap-8 md:gap-16 xl:gap-28 !py-6 md:!py-10 text-sm">
+      <div className="w-full py-0!">
+        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between text-foreground md:justify-center gap-8 md:gap-16 xl:gap-28 py-6! md:py-10! text-sm">
           <div className="flex flex-col md:flex-row gap-2 md:items-center">
             We protect your data.
             <Link href="/security" className="text-brand-link hover:underline">
@@ -108,11 +108,11 @@ const Footer = (props: Props) => {
             </li>
           </ul>
         </SectionContainer>
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        <div className="w-full h-px bg-linear-to-r from-transparent via-border to-transparent" />
       </div>
       <SectionContainer className="py-8">
         <div className="xl:grid xl:grid-cols-7 xl:gap-4">
-          <div className="space-y-8 xl:col-span-2">
+          <div className="xl:col-span-2 flex flex-col gap-8">
             <Link href="#" as="/" className="w-40">
               <SupabaseWordmark className="w-40 h-[30px]" />
             </Link>
@@ -165,7 +165,7 @@ const Footer = (props: Props) => {
                 <IconInstagram size={22} />
               </a>
             </div>
-            <div className="mt-8">
+            <div>
               {newsletterStatus === 'success' ? (
                 <div className="flex flex-col gap-1">
                   <p className="text-brand-link text-sm">Thanks for subscribing!</p>
@@ -185,7 +185,7 @@ const Footer = (props: Props) => {
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     required
-                    className="flex-1 md:max-w-72 xl:max-w-[80%] !h-6 text-xs px-2"
+                    className="flex-1 md:max-w-72 xl:max-w-[80%] h-6! text-xs px-2"
                   />
                   <Button
                     type="primary"

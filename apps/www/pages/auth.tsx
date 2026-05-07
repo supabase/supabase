@@ -2,6 +2,7 @@ import { useBreakpoint } from 'common'
 import { ArrowUpRight, Briefcase, Eye, Link as IconLink, Shield } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
+import Head from 'next/head'
 import NextImage from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -18,6 +19,8 @@ import AuthProviders from '@/data/auth.json'
 import MainProducts from '@/data/MainProducts'
 import ApiExamples from '@/data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from '@/data/products/auth/auth-sql-rules-examples'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
 
 const SplitCodeBlockCarousel = dynamic(
   () => import('~/components/Carousels/SplitCodeBlockCarousel')
@@ -54,6 +57,27 @@ function AuthPage() {
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(
+              softwareApplicationSchema({
+                name: 'Supabase Auth',
+                description: meta_description,
+                url: 'https://supabase.com/auth',
+                image: `https://supabase.com${basePath}/images/product/auth/auth-og.jpg`,
+              })
+            ),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.auth)),
+          }}
+        />
+      </Head>
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.AUTHENTICATION} />
         <ProductHeader
@@ -93,7 +117,7 @@ function AuthPage() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
-              <div className="mb-4 -mt-[1.9rem]">
+              <div className="mb-4 mt-[-1.9rem]">
                 <div className="grid grid-flow-col grid-rows-2 gap-2 xl:w-64">
                   <div className="flex w-fit items-center">
                     <svg

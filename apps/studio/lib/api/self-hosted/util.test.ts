@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { assertSelfHosted, encryptString, getConnectionString } from './util'
+import { assertSelfHosted, encryptString } from './util'
 
 vi.mock('@/lib/constants', () => ({
   IS_PLATFORM: false,

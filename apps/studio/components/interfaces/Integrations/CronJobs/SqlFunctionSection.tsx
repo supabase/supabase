@@ -1,5 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
-import { FormField_Shadcn_, SheetSection } from 'ui'
+import { FormField, SheetSection } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
@@ -15,7 +15,7 @@ export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
 
   return (
     <SheetSection className="flex flex-col gap-3 2xl:flex-row 2xl:[&>div]:w-full">
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="values.schema"
         render={({ field }) => (
@@ -35,7 +35,7 @@ export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
         )}
       />
 
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="values.functionName"
         render={({ field }) => (

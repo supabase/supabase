@@ -27,6 +27,7 @@ interface OtherFeatures {
   isPlatform?: boolean
   unifiedLogs?: boolean
   showReports?: boolean
+  showLogs?: boolean
 }
 
 interface SettingsFeatures {
@@ -161,6 +162,7 @@ export const generateOtherRoutes = (
   const isPlatform = features?.isPlatform ?? IS_PLATFORM
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
+  const logsEnabled = features?.showLogs ?? true
   return [
     {
       key: 'advisors',
@@ -183,14 +185,20 @@ export const generateOtherRoutes = (
           },
         ]
       : []),
-    {
-      key: 'logs',
-      label: 'Logs',
-      disabled: false,
-      icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (unifiedLogsEnabled ? `/project/${ref}/logs` : `/project/${ref}/logs/explorer`),
-      shortcutId: SHORTCUT_IDS.NAV_LOGS,
-    },
+    ...(logsEnabled
+      ? [
+          {
+            key: 'logs',
+            label: 'Logs',
+            disabled: false,
+            icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link:
+              ref &&
+              (unifiedLogsEnabled ? `/project/${ref}/logs` : `/project/${ref}/logs/explorer`),
+            shortcutId: SHORTCUT_IDS.NAV_LOGS,
+          },
+        ]
+      : []),
     {
       key: 'integrations',
       label: 'Integrations',

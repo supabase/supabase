@@ -9,12 +9,12 @@ After configuring your SSO provider, thorough testing is essential before rollin
 
 Before you begin testing, verify:
 
-- [ ] Organization has Team or Enterprise plan
-- [ ] Login flow type decided (IdP-initiated, SP-initiated, or both) - see [Choosing a Login Flow](/docs/guides/platform/sso/choosing-login-flow)
-- [ ] Email domains identified (only required if using SP-initiated)
-- [ ] Auto-join settings and default role are decided
-- [ ] **At least one non-SSO owner account exists** (critical safety requirement)
-- [ ] Certificate expiration dates are documented (especially for Google Workspace)
+- Organization has Team or Enterprise plan
+- Login flow type decided (IdP-initiated, SP-initiated, or both) - see [Choosing a Login Flow](/docs/guides/platform/sso/choosing-login-flow)
+- Email domains identified (only required if using SP-initiated)
+- Auto-join settings and default role are decided
+- **At least one non-SSO owner account exists** (critical safety requirement)
+- Certificate expiration dates are documented (especially for Google Workspace)
 
 ## Testing login flows
 
@@ -137,13 +137,13 @@ You've configured SSO with:
 
 ### Login flow verification checklist
 
-- [ ] IdP-initiated login works from IdP dashboard
-- [ ] SP-initiated login works (if domains configured)
-- [ ] SP-initiated properly blocked if no domains configured
-- [ ] Domain matching works correctly for SP-initiated
-- [ ] Non-matching domains show appropriate errors
-- [ ] Multiple environments route correctly (if using multiple providers)
-- [ ] Both flows work simultaneously (if both enabled)
+- IdP-initiated login works from IdP dashboard
+- SP-initiated login works (if domains configured)
+- SP-initiated properly blocked if no domains configured
+- Domain matching works correctly for SP-initiated
+- Non-matching domains show appropriate errors
+- Multiple environments route correctly (if using multiple providers)
+- Both flows work simultaneously (if both enabled)
 
 ## Testing SSO login flow
 
@@ -250,14 +250,14 @@ Test with 2-3 additional users to verify:
 
 ### Auto-join verification checklist
 
-- [ ] Auto-join works when enabled
-- [ ] Users receive correct default role
-- [ ] Non-matching domains are excluded (if using SP-initiated with domains)
-- [ ] Existing users auto-join on their next login (not just new signups)
-- [ ] Auto-join can be disabled and re-enabled as needed
-- [ ] Auto-join is idempotent (no duplicate memberships)
-- [ ] Auto-join works with IdP-initiated only (no domains)
-- [ ] Auto-join works with both IdP and SP-initiated flows
+- Auto-join works when enabled
+- Users receive correct default role
+- Non-matching domains are excluded (if using SP-initiated with domains)
+- Existing users auto-join on their next login (not just new signups)
+- Auto-join can be disabled and re-enabled as needed
+- Auto-join is idempotent (no duplicate memberships)
+- Auto-join works with IdP-initiated only (no domains)
+- Auto-join works with both IdP and SP-initiated flows
 
 ## Testing invitations
 
@@ -298,11 +298,11 @@ Test with 2-3 additional users to verify:
 
 ### Invitation verification checklist
 
-- [ ] SSO-required invitations work correctly
-- [ ] Non-SSO invitations work correctly
-- [ ] SSO mismatch error message is clear
-- [ ] Mixed authentication organization functions properly
-- [ ] Invitations can be resent if needed
+- SSO-required invitations work correctly
+- Non-SSO invitations work correctly
+- SSO mismatch error message is clear
+- Mixed authentication organization functions properly
+- Invitations can be resent if needed
 
 <Admonition type="note">
 
@@ -364,12 +364,12 @@ SSO accounts have specific restrictions to prevent accidental organization locko
 
 ### SSO account restrictions checklist
 
-- [ ] SSO accounts cannot delete SSO providers
-- [ ] SSO accounts CAN update SSO settings
-- [ ] SSO accounts CAN disable SSO providers
-- [ ] Non-SSO owners CAN delete SSO providers
-- [ ] Error messages clearly explain the restriction
-- [ ] Restriction applies to all SSO accounts (not just certain roles)
+- SSO accounts cannot delete SSO providers
+- SSO accounts CAN update SSO settings
+- SSO accounts CAN disable SSO providers
+- Non-SSO owners CAN delete SSO providers
+- Error messages clearly explain the restriction
+- Restriction applies to all SSO accounts (not just certain roles)
 
 ## Common issues and troubleshooting
 
@@ -581,14 +581,14 @@ This behavior prevents "orphaned" SSO accounts that can no longer authenticate.
 
 ### Safe deletion verification checklist
 
-- [ ] Cannot delete without non-SSO owner account
-- [ ] Error message clearly explains requirement
-- [ ] Adding non-SSO owner enables deletion
-- [ ] All SSO members removed upon deletion
-- [ ] Non-SSO members unaffected by SSO provider deletion
-- [ ] Organization remains accessible via non-SSO accounts
-- [ ] SSO configuration completely removed after deletion
-- [ ] Non-SSO owner account tested BEFORE deletion
+- Cannot delete without non-SSO owner account
+- Error message clearly explains requirement
+- Adding non-SSO owner enables deletion
+- All SSO members removed upon deletion
+- Non-SSO members unaffected by SSO provider deletion
+- Organization remains accessible via non-SSO accounts
+- SSO configuration completely removed after deletion
+- Non-SSO owner account tested BEFORE deletion
 
 ### Best practices for safe deletion
 
@@ -785,53 +785,53 @@ Before rolling out SSO to your organization:
 
 **Authentication & Login Flows:**
 
-- [ ] IdP-initiated login works from IdP dashboard
-- [ ] SP-initiated login works (if domains configured)
-- [ ] Appropriate login flow chosen for your use case
-- [ ] Domain configuration correct (or intentionally empty for IdP-only)
-- [ ] Multiple environments route correctly (if using multiple providers)
+- IdP-initiated login works from IdP dashboard
+- SP-initiated login works (if domains configured)
+- Appropriate login flow chosen for your use case
+- Domain configuration correct (or intentionally empty for IdP-only)
+- Multiple environments route correctly (if using multiple providers)
 
 **Auto-Join Functionality:**
 
-- [ ] Auto-join adds users to correct organization (if enabled)
-- [ ] Auto-joined users receive correct default role
-- [ ] Auto-join works on first login (not just signup)
-- [ ] Existing users auto-join when feature enabled
-- [ ] Auto-join is idempotent (no duplicate memberships)
-- [ ] Auto-join works with IdP-initiated (no domains required)
-- [ ] Non-matching domains excluded (if using SP-initiated)
+- Auto-join adds users to correct organization (if enabled)
+- Auto-joined users receive correct default role
+- Auto-join works on first login (not just signup)
+- Existing users auto-join when feature enabled
+- Auto-join is idempotent (no duplicate memberships)
+- Auto-join works with IdP-initiated (no domains required)
+- Non-matching domains excluded (if using SP-initiated)
 
 **Invitations:**
 
-- [ ] SSO-required invitations work correctly
-- [ ] Non-SSO invitations work correctly
-- [ ] Invitation types can be explicitly chosen
-- [ ] SSO mismatch errors are clear
+- SSO-required invitations work correctly
+- Non-SSO invitations work correctly
+- Invitation types can be explicitly chosen
+- SSO mismatch errors are clear
 
 **Safety & Access Controls:**
 
-- [ ] At least one non-SSO owner account exists
-- [ ] Non-SSO owner account can log in successfully
-- [ ] Non-SSO credentials stored securely
-- [ ] SSO account deletion restrictions understood and tested
-- [ ] Safe deletion behavior verified (if tested)
+- At least one non-SSO owner account exists
+- Non-SSO owner account can log in successfully
+- Non-SSO credentials stored securely
+- SSO account deletion restrictions understood and tested
+- Safe deletion behavior verified (if tested)
 
 **Configuration:**
 
-- [ ] Certificate expiration date documented with calendar reminders
-- [ ] Team notified of SSO availability
-- [ ] Login instructions provided (IdP tile and/or supabase.com)
-- [ ] Rollback plan documented
-- [ ] Support contact information available
+- Certificate expiration date documented with calendar reminders
+- Team notified of SSO availability
+- Login instructions provided (IdP tile and/or supabase.com)
+- Rollback plan documented
+- Support contact information available
 
 **Testing Completed:**
 
-- [ ] Tested with multiple user accounts
-- [ ] Both login flows tested (if both enabled)
-- [ ] Auto-join behavior verified
-- [ ] SSO account restrictions confirmed
-- [ ] Domain restrictions validated (if applicable)
-- [ ] Multi-environment isolation verified (if using multiple providers)
+- Tested with multiple user accounts
+- Both login flows tested (if both enabled)
+- Auto-join behavior verified
+- SSO account restrictions confirmed
+- Domain restrictions validated (if applicable)
+- Multi-environment isolation verified (if using multiple providers)
 
 ## Need help?
 

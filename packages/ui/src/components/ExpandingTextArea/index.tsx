@@ -3,7 +3,7 @@
 import React, { forwardRef, useImperativeHandle, useLayoutEffect, useRef } from 'react'
 
 import { cn } from '../../lib/utils'
-import { TextArea } from '../shadcn/ui/text-area'
+import { Textarea } from '../shadcn/ui/textarea'
 
 export interface ExpandingTextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   /* The value of the textarea. Required to calculate the height of the textarea. */
@@ -34,7 +34,7 @@ const ExpandingTextArea = forwardRef<HTMLTextAreaElement, ExpandingTextAreaProps
     }, [value])
 
     return (
-      <TextArea
+      <Textarea
         ref={(element) => {
           if (element) {
             internalRef.current = element

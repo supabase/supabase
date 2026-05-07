@@ -31,7 +31,7 @@ export const TableHeader = forwardRef<
   HTMLTableSectionElement,
   ComponentPropsWithRef<typeof ShadcnTableHeader>
 >(({ className, ...props }, ref) => (
-  <ShadcnTableHeader ref={ref} className={cn('sticky top-0 z-[1]', className)} {...props} />
+  <ShadcnTableHeader ref={ref} className={cn('sticky top-0 z-1', className)} {...props} />
 ))
 TableHeader.displayName = 'TableHeader'
 
@@ -43,7 +43,8 @@ export const TableBody = forwardRef<
     ref={ref}
     {...props}
     className={cn(
-      'outline-1 -outline-offset-1 outline-primary transition-colors focus-visible:outline'
+      'transition-colors outline-none focus-visible:outline-1 focus-visible:-outline-offset-1 focus-visible:outline-primary',
+      className
     )}
   />
 ))
@@ -76,9 +77,9 @@ export const TableHead = forwardRef<
   <ShadcnTableHead
     ref={ref}
     className={cn(
-      '!text-xs !font-normal text-foreground-lighter font-mono',
+      'text-xs! font-normal! text-foreground-lighter font-mono',
       'relative select-none truncate [&>.cursor-col-resize]:last:opacity-0',
-      'text-muted-foreground h-8 px-2 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
+      'text-muted-foreground h-8 px-2 text-left align-middle [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-[2px]',
       className
     )}
     {...props}
@@ -92,7 +93,7 @@ export const TableCell = forwardRef<
 >(({ className, ...props }, ref) => (
   <ShadcnTableCell
     ref={ref}
-    className={cn('text-xs !py-1 p-2 [&>[role=checkbox]]:translate-y-[2px] truncate', className)}
+    className={cn('text-xs py-1! p-2 *:[[role=checkbox]]:translate-y-[2px] truncate', className)}
     {...props}
   />
 ))

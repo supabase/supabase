@@ -67,11 +67,11 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
           <SheetHeader>
             <SheetTitle>
               Insert vectors into{' '}
-              <code className="text-code-inline !text-sm">{index.indexName}</code>
+              <code className="text-code-inline text-sm!">{index.indexName}</code>
             </SheetTitle>
           </SheetHeader>
 
-          <div className="overflow-auto flex-grow">
+          <div className="overflow-auto grow">
             <VectorBucketIndexExamples
               bucketName={index.vectorBucketName}
               indexName={index.indexName}

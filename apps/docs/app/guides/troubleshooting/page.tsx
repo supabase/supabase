@@ -26,7 +26,7 @@ export default async function GlobalTroubleshootingPage() {
   const errors = await getAllTroubleshootingErrors()
 
   return (
-    <SidebarSkeleton hideSideNav className="w-full max-w-screen-lg mx-auto">
+    <SidebarSkeleton hideSideNav className="w-full max-w-(--breakpoint-lg) mx-auto">
       <div className="py-8 px-5">
         <h1 className="text-4xl tracking-tight mb-7">Troubleshooting</h1>
         <p className="text-lg text-foreground-light">

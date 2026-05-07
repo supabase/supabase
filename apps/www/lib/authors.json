@@ -945,5 +945,29 @@
     "company": "Figma",
     "author_url": "https://www.linkedin.com/in/samanthadotdesign/",
     "author_image_url": "/images/blog/avatars/samantha-lee.jpeg"
+  },
+  {
+    "author_id": "tomas_pozo",
+    "author": "Tomás Pozo",
+    "username": "tomaspozo",
+    "position": "Community",
+    "author_url": "https://github.com/tomaspozo",
+    "author_image_url": "https://github.com/tomaspozo.png"
+  },
+  {
+    "author_id": "kalleby_santos",
+    "author": "Kalleby Santos",
+    "username": "kallebysantos",
+    "position": "Engineering",
+    "author_url": "https://github.com/kallebysantos",
+    "author_image_url": "https://github.com/kallebysantos.png"
+  },
+  {
+    "author_id": "matt_johnston",
+    "author": "Matt Johnston",
+    "username": "johnstonmatt",
+    "position": "Engineering",
+    "author_url": "https://github.com/johnstonmatt",
+    "author_image_url": "https://github.com/johnstonmatt.png"
   }
 ]
