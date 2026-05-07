@@ -10,13 +10,7 @@ import {
   ValidStackColor,
 } from './Charts.constants'
 import type { CommonChartProps } from './Charts.types'
-import {
-  numberFormatter,
-  precisionFormatter,
-  timestampFormatter,
-  useChartSize,
-  useStacked,
-} from './Charts.utils'
+import { numberFormatter, precisionFormatter, useChartSize, useStacked } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { useChartHoverState } from './useChartHoverState'
 import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
@@ -186,9 +180,7 @@ const StackedBarChart: React.FC<Props> = ({
           ))}
           <Tooltip
             labelFormatter={
-              xAxisFormatAsDate
-                ? (label) => timestampFormatter(label, customDateFormat, displayDateInUtc)
-                : undefined
+              xAxisFormatAsDate ? (label) => formatChartDate(label as number | string) : undefined
             }
             formatter={(value, name, props) => {
               const suffix = format || ''
@@ -216,19 +208,9 @@ const StackedBarChart: React.FC<Props> = ({
       </Container>
       {stackedData && stackedData[0] && (
         <div className="text-foreground-lighter -mt-5 flex items-center justify-between text-xs">
+          <span>{formatChartDate(stackedData[0][xAxisKey] as number | string)}</span>
           <span>
-            {timestampFormatter(
-              stackedData[0][xAxisKey] as string,
-              customDateFormat,
-              displayDateInUtc
-            )}
-          </span>
-          <span>
-            {timestampFormatter(
-              stackedData[stackedData?.length - 1][xAxisKey] as string,
-              customDateFormat,
-              displayDateInUtc
-            )}
+            {formatChartDate(stackedData[stackedData?.length - 1][xAxisKey] as number | string)}
           </span>
         </div>
       )}
