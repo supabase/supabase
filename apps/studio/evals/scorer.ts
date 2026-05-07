@@ -1,9 +1,10 @@
 import { FinishReason } from 'ai'
 import { LLMClassifierFromTemplate } from 'autoevals'
-import { EvalCase, EvalScorer, SpanData, Trace } from 'braintrust'
+import { EvalCase, EvalScorer, Trace } from 'braintrust'
 import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
+import { getParsedToolSpans, getToolSpans } from './trace-utils'
 import { loadKnowledgeInputSchema } from '@/lib/ai/tools/studio-tools'
 import { extractUrls } from '@/lib/helpers'
 
@@ -148,13 +149,6 @@ async function getConversationContext(trace: Trace): Promise<string> {
   return parts.join('\n\n')
 }
 
-/** Returns tool spans from the trace, optionally filtered to a specific tool name. */
-export async function getToolSpans(trace: Trace, toolName?: string): Promise<SpanData[]> {
-  const spans = await trace.getSpans({ spanType: ['tool'] })
-  if (!toolName) return spans
-  return spans.filter((s) => s.span_attributes?.name === toolName)
-}
-
 // --- Scorers ---
 
 export const toolUsageScorer: EvalScorer<
@@ -165,7 +159,7 @@ export const toolUsageScorer: EvalScorer<
   if (!expected.requiredTools || !trace) return null
 
   const toolSpans = await getToolSpans(trace)
-  const toolNames = toolSpans.map((s) => s.span_attributes?.name).filter(Boolean)
+  const toolNames = toolSpans.map((s) => s.span.span_attributes?.name).filter(Boolean)
 
   const presentCount = expected.requiredTools.filter((tool) => toolNames.includes(tool)).length
   const totalCount = expected.requiredTools.length
@@ -184,11 +178,10 @@ export const knowledgeUsageScorer: EvalScorer<
 > = async ({ expected, trace }) => {
   if (!expected.requiredKnowledge || !trace) return null
 
-  const knowledgeSpans = await getToolSpans(trace, 'load_knowledge')
-  const loadedKnowledge: string[] = knowledgeSpans.flatMap((s) => {
-    const r = loadKnowledgeInputSchema.safeParse(s.input)
-    return r.success ? [r.data.name] : []
+  const knowledgeSpans = await getParsedToolSpans(trace, 'load_knowledge', {
+    inputSchema: loadKnowledgeInputSchema,
   })
+  const loadedKnowledge: string[] = knowledgeSpans.map((s) => s.input.name)
 
   const presentCount = expected.requiredKnowledge.filter((k) => loadedKnowledge.includes(k)).length
   const totalCount = expected.requiredKnowledge.length

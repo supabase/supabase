@@ -1,17 +1,17 @@
 import { EvalScorer, Trace } from 'braintrust'
 import { parse } from 'libpg-query'
 
-import { AssistantEvalInput, AssistantEvalOutput, Expected, getToolSpans } from './scorer'
+import { AssistantEvalInput, AssistantEvalOutput, Expected } from './scorer'
+import { getParsedToolSpans } from './trace-utils'
 import { executeSqlInputSchema } from '@/lib/ai/tools/studio-tools'
 import { extractIdentifiers, isQuotedInSql, needsQuoting } from '@/lib/sql-identifier-quoting'
 
 /** Extracts SQL strings from all `execute_sql` tool spans in the trace. */
 async function getSqlQueries(trace: Trace): Promise<string[]> {
-  const spans = await getToolSpans(trace, 'execute_sql')
-  return spans.flatMap((s) => {
-    const r = executeSqlInputSchema.safeParse(s.input)
-    return r.success ? [r.data.sql] : []
+  const spans = await getParsedToolSpans(trace, 'execute_sql', {
+    inputSchema: executeSqlInputSchema,
   })
+  return spans.map((s) => s.input.sql)
 }
 
 export const sqlSyntaxScorer: EvalScorer<
