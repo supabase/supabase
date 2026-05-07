@@ -4,60 +4,114 @@
  * from packages/ui/build/css/tw-extend/color.js. Run from packages/config/.
  *
  * - colors.css holds the @theme block of --color-* design tokens. Tailwind
- *   v4 uses these to generate bg-{name}, text-{name}, border-{name}, etc.
+ *   v4 uses these to generate bg-{name}, text-{name}, border-{name},
+ *   ring-{name}, plus directional border variants like border-r-{name}.
  *   Names use the prefixed form (e.g. --color-foreground-light) so they
- *   match the v3 extend.colors keys.
- * - aliases.css holds @utility blocks for the *stripped* names that the
- *   v3 textColor/backgroundColor/borderColor overrides used to provide
- *   (e.g. text-light, bg-default, border-strong). Each alias is scoped
- *   to a single utility namespace, so they don't pollute --color-*.
+ *   match the v3 extend.colors keys, plus stripped forms (--color-light,
+ *   --color-strong) for stripped names that only belong to one namespace.
+ * - aliases.css holds @utility blocks for stripped names that COLLIDE
+ *   between text/bg/border (default, muted, alternative, control,
+ *   overlay, button). Each one had a different color in v3, so we can't
+ *   share a --color-* token; the @utility scopes the value to a single
+ *   utility namespace. Directional variants for border-* aliases are
+ *   included for the cases actually used in source code.
  */
 
 const fs = require('node:fs')
 const path = require('node:path')
 
-const colorEntries = require('../../ui/build/css/tw-extend/color.js')
+// Snapshot of the v3 tw-extend/color.js (was deleted alongside the migration).
+// Kept here as a generation source so the script remains runnable.
+const colorEntries = require('./tw-extend-color-snapshot.js')
 
-// Per-utility prefix for stripped aliases.
-const NAMESPACE_TO_PROPERTY = {
-  foreground: { utility: 'text', property: 'color' },
-  background: { utility: 'bg', property: 'background-color' },
-  border: { utility: 'border', property: 'border-color' },
+const NAMESPACE_TO_UTIL = {
+  foreground: { utility: 'text', property: 'color', cssVar: '--foreground-' },
+  background: { utility: 'bg', property: 'background-color', cssVar: '--background-' },
+  border: { utility: 'border', property: 'border-color', cssVar: '--border-' },
+}
+
+// Stripped names that exist in multiple namespaces with different colors.
+// These get static @utility blocks instead of --color-* tokens.
+const CONFLICTING_STRIPPED_NAMES = new Set([
+  'default',
+  'muted',
+  'alternative',
+  'control',
+  'overlay',
+  'button',
+])
+
+// Directional border-color variants observed in source code grep. Add to this
+// set if a future class like `border-r-default` shows up.
+const DIRECTIONAL_BORDER_VARIANTS = {
+  default: ['b'],
+  muted: ['b', 't'],
+  strong: ['r'], // strong is non-conflicting so it goes through --color-*; included here
+  // for completeness even though it'll be auto-generated.
 }
 
 const themeLines = []
 const aliasBlocks = []
+const seenStripped = new Map() // stripped name → namespace count
 
+// First pass: classify each entry by stripped name.
 for (const [key, { cssVariable }] of Object.entries(colorEntries)) {
-  // Skip entries whose cssVariable references a non-existent --core-* variable.
-  // These were dead in the v3 setup too — no source code uses bg-colors-* or
-  // bg-variables-colors-* utilities, and the underlying CSS variables don't
-  // exist in any theme file.
   if (/var\(--core-/.test(cssVariable)) continue
 
-  // Always emit the prefixed --color-* token so v4 generates utilities for it
-  // (e.g. text-foreground-light, bg-background-surface-100, border-border-strong).
+  const firstDash = key.indexOf('-')
+  if (firstDash === -1) continue
+  const ns = key.slice(0, firstDash)
+  const remainder = key.slice(firstDash + 1)
+  if (!NAMESPACE_TO_UTIL[ns]) continue
+
+  const stripped =
+    remainder === 'DEFAULT' ? 'default' : remainder.replace(/-DEFAULT$/, '').toLowerCase()
+  seenStripped.set(stripped, (seenStripped.get(stripped) ?? 0) + 1)
+}
+
+// Second pass: emit tokens / utilities.
+for (const [key, { cssVariable }] of Object.entries(colorEntries)) {
+  if (/var\(--core-/.test(cssVariable)) continue
+
+  // Always emit the prefixed --color-* token so v4 generates utilities like
+  // text-foreground-light, bg-background-surface-100, border-border-strong.
   const themeKey = key.replace(/-DEFAULT$/, '')
   themeLines.push(`  --color-${themeKey}: hsl(${cssVariable});`)
 
-  // Emit a stripped alias for foreground/background/border namespaces so
-  // existing source code that uses bg-default / text-light / border-strong
-  // keeps working.
   const firstDash = key.indexOf('-')
   if (firstDash === -1) continue
-  const namespace = key.slice(0, firstDash)
+  const ns = key.slice(0, firstDash)
   const remainder = key.slice(firstDash + 1)
-  const ns = NAMESPACE_TO_PROPERTY[namespace]
-  if (!ns) continue
+  const nsInfo = NAMESPACE_TO_UTIL[ns]
+  if (!nsInfo) continue
 
-  const aliasName =
+  const stripped =
     remainder === 'DEFAULT' ? 'default' : remainder.replace(/-DEFAULT$/, '').toLowerCase()
-  // The utility name is e.g. "text-default", "bg-overlay-hover", "border-strong".
-  const fullAlias = `${ns.utility}-${aliasName}`
-  aliasBlocks.push(`@utility ${fullAlias} {\n  ${ns.property}: hsl(${cssVariable});\n}`)
+
+  if (CONFLICTING_STRIPPED_NAMES.has(stripped) || seenStripped.get(stripped) > 1) {
+    // Static utility scoped to one namespace.
+    const fullAlias = `${nsInfo.utility}-${stripped}`
+    aliasBlocks.push(`@utility ${fullAlias} {\n  ${nsInfo.property}: hsl(${cssVariable});\n}`)
+
+    // Emit directional border variants for the cases actually used in source.
+    if (ns === 'border' && DIRECTIONAL_BORDER_VARIANTS[stripped]) {
+      for (const dir of DIRECTIONAL_BORDER_VARIANTS[stripped]) {
+        const sideMap = { r: 'right', l: 'left', t: 'top', b: 'bottom' }
+        const side = sideMap[dir]
+        if (!side) continue
+        aliasBlocks.push(
+          `@utility border-${dir}-${stripped} {\n  border-${side}-color: hsl(${cssVariable});\n}`
+        )
+      }
+    }
+  } else {
+    // Non-conflicting: emit a stripped --color-{stripped} token. Tailwind
+    // auto-generates text-/bg-/border-/border-{r,l,t,b,x,y}- variants.
+    themeLines.push(`  --color-${stripped}: hsl(${cssVariable});`)
+  }
 }
 
-// Hand-rolled additions that don't come from tw-extend/color.js.
+// --- Hand-rolled additions that don't come from tw-extend/color.js ---
 
 // Radix hue palettes — each --color-{hue}-{step} resolves to the raw hue var.
 const radixHues = [
@@ -107,10 +161,9 @@ themeLines.push(`  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-f
 themeLines.push(`  --color-sidebar-border: hsl(var(--sidebar-border));`)
 themeLines.push(`  --color-sidebar-ring: hsl(var(--sidebar-ring));`)
 
-// Miscellaneous semantic colors retained from ui.config.js extend.colors.
+// Misc semantic colors.
 themeLines.push(`  --color-hi-contrast: hsl(var(--foreground-default));`)
 themeLines.push(`  --color-lo-contrast: hsl(var(--background-alternative-default));`)
-// `bg-studio` was a v3 backgroundColor alias.
 aliasBlocks.push(`@utility bg-studio {\n  background-color: hsl(var(--background-200));\n}`)
 
 // Misc design tokens (font, breakpoint, sizing, radius, transform-origin)
@@ -130,8 +183,8 @@ const colorsCss = `/*
  * Run \`node scripts/generate-colors.js\` from packages/config/ to refresh.
  *
  * Defines every Tailwind v4 --color-* design token. Tailwind generates
- * bg-{name} / text-{name} / border-{name} / ring-{name} utilities for
- * each entry. Source mappings come from packages/ui/build/css/tw-extend/color.js
+ * bg-{name} / text-{name} / border-{name} / ring-{name} / border-{r,l,t,b}-{name}
+ * utilities for each entry. Source mappings: tw-extend-color-snapshot.js
  * (semantic tokens) plus the Radix and scale aliases from radix-vars.css.
  */
 
@@ -146,11 +199,12 @@ ${miscTokens}
 const aliasesCss = `/*
  * Auto-generated by scripts/generate-colors.js — do not edit by hand.
  *
- * Stripped-name aliases for the prefixed --color-* tokens. The v3 config
- * exposed both prefixed (\`bg-background-surface-100\`) and stripped
- * (\`bg-default\`, \`text-light\`, \`border-strong\`) utilities. The prefixed
- * forms are auto-generated from colors.css; this file restores the stripped
- * aliases so existing source code keeps compiling unchanged.
+ * Stripped-name aliases for utility names that COLLIDE between text/bg/border
+ * with different colors in v3 (default, muted, alternative, control, overlay,
+ * button). Each @utility is scoped to one utility namespace so the colors
+ * stay distinct. Directional border variants (border-{r,l,t,b}-default, etc.)
+ * are emitted for cases actually used in source code; add to
+ * DIRECTIONAL_BORDER_VARIANTS in scripts/generate-colors.js as new ones appear.
  */
 
 ${aliasBlocks.join('\n')}

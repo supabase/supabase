@@ -206,38 +206,43 @@
     color: hsl(var(--foreground-default));
   }
 
-  /* ---- prose-docs — used by docs and changelog content ---- */
-
-  .prose-docs {
-    --tw-prose-body: hsl(var(--foreground-light));
-    --tw-prose-headings: hsl(var(--foreground-default));
-    --tw-prose-lead: hsl(var(--foreground-light));
-    --tw-prose-links: hsl(var(--brand-500));
-    --tw-prose-bold: hsl(var(--foreground-light));
-    --tw-prose-counters: hsl(var(--foreground-light));
-    --tw-prose-bullets: hsl(var(--foreground-muted));
-    --tw-prose-hr: hsl(var(--background-surface-300));
-    --tw-prose-quotes: hsl(var(--foreground-light));
-    --tw-prose-quote-borders: hsl(var(--background-surface-300));
-    --tw-prose-captions: hsl(var(--border-strong));
-    --tw-prose-code: hsl(var(--foreground-default));
-    --tw-prose-pre-code: hsl(var(--foreground-muted));
-    --tw-prose-pre-bg: hsl(var(--background-surface-200));
-    --tw-prose-th-borders: hsl(var(--background-surface-300));
-    --tw-prose-td-borders: hsl(var(--background-default));
-    --tw-prose-invert-body: hsl(var(--background-default));
-    --tw-prose-invert-headings: white;
-    --tw-prose-invert-lead: hsl(var(--background-surface-300));
-    --tw-prose-invert-links: white;
-    --tw-prose-invert-bold: white;
-    --tw-prose-invert-counters: hsl(var(--background-surface-200));
-    --tw-prose-invert-bullets: hsl(var(--background-selection));
-    --tw-prose-invert-hr: hsl(var(--border-strong));
-    --tw-prose-invert-quotes: hsl(var(--background-alternative-default));
-    --tw-prose-invert-quote-borders: hsl(var(--border-strong));
-    --tw-prose-invert-captions: hsl(var(--background-surface-200));
-  }
+  /* prose-docs descendant rules — applied when .prose-docs is on a parent element. */
   .prose-docs :is(h1, h2, h3, h4, h5) {
     font-weight: 400;
   }
+}
+
+/*
+ * prose-docs is registered as a @utility so it can be used with @apply
+ * (e.g. apps/studio/styles/ui.css does `@apply prose prose-docs prose-sm`).
+ * Body holds the CSS variable overrides that apply to the element itself.
+ */
+@utility prose-docs {
+  --tw-prose-body: hsl(var(--foreground-light));
+  --tw-prose-headings: hsl(var(--foreground-default));
+  --tw-prose-lead: hsl(var(--foreground-light));
+  --tw-prose-links: hsl(var(--brand-500));
+  --tw-prose-bold: hsl(var(--foreground-light));
+  --tw-prose-counters: hsl(var(--foreground-light));
+  --tw-prose-bullets: hsl(var(--foreground-muted));
+  --tw-prose-hr: hsl(var(--background-surface-300));
+  --tw-prose-quotes: hsl(var(--foreground-light));
+  --tw-prose-quote-borders: hsl(var(--background-surface-300));
+  --tw-prose-captions: hsl(var(--border-strong));
+  --tw-prose-code: hsl(var(--foreground-default));
+  --tw-prose-pre-code: hsl(var(--foreground-muted));
+  --tw-prose-pre-bg: hsl(var(--background-surface-200));
+  --tw-prose-th-borders: hsl(var(--background-surface-300));
+  --tw-prose-td-borders: hsl(var(--background-default));
+  --tw-prose-invert-body: hsl(var(--background-default));
+  --tw-prose-invert-headings: white;
+  --tw-prose-invert-lead: hsl(var(--background-surface-300));
+  --tw-prose-invert-links: white;
+  --tw-prose-invert-bold: white;
+  --tw-prose-invert-counters: hsl(var(--background-surface-200));
+  --tw-prose-invert-bullets: hsl(var(--background-selection));
+  --tw-prose-invert-hr: hsl(var(--border-strong));
+  --tw-prose-invert-quotes: hsl(var(--background-alternative-default));
+  --tw-prose-invert-quote-borders: hsl(var(--border-strong));
+  --tw-prose-invert-captions: hsl(var(--background-surface-200));
 }
