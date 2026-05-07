@@ -18,6 +18,7 @@ import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Datab
 import { AdvancedConfiguration } from '@/components/interfaces/ProjectCreation/AdvancedConfiguration'
 import { CloudProviderSelector } from '@/components/interfaces/ProjectCreation/CloudProviderSelector'
 import { ComputeSizeSelector } from '@/components/interfaces/ProjectCreation/ComputeSizeSelector'
+import { CustomInstanceTypeInput } from '@/components/interfaces/ProjectCreation/CustomInstanceTypeInput'
 import { CustomPostgresVersionInput } from '@/components/interfaces/ProjectCreation/CustomPostgresVersionInput'
 import { DatabasePasswordInput } from '@/components/interfaces/ProjectCreation/DatabasePasswordInput'
 import { DisabledWarningDueToIncident } from '@/components/interfaces/ProjectCreation/DisabledWarningDueToIncident'
@@ -131,6 +132,7 @@ const Wizard: NextPageWithLayout = () => {
       projectName: projectName || '',
       highAvailability: false,
       postgresVersion: '',
+      instanceType: '',
       cloudProvider: PROVIDERS[defaultProvider].id,
       dbPass: '',
       dbPassStrength: 0,
@@ -311,6 +313,7 @@ const Wizard: NextPageWithLayout = () => {
       dbPass,
       dbRegion,
       postgresVersion,
+      instanceType,
       instanceSize,
       dataApi,
       dataApiDefaultPrivileges,
@@ -364,6 +367,13 @@ const Wizard: NextPageWithLayout = () => {
 
       data['customSupabaseRequest'] = {
         ami: { search_tags: { 'tag:postgresVersion': postgresVersion } },
+      }
+    }
+
+    if (instanceType) {
+      data['customSupabaseRequest'] = {
+        ...(data['customSupabaseRequest'] ?? {}),
+        instance_type: instanceType,
       }
     }
 
@@ -502,7 +512,12 @@ const Wizard: NextPageWithLayout = () => {
                         </Panel.Content>
                       )}
 
-                      {showNonProdFields && <CustomPostgresVersionInput form={form} />}
+                      {showNonProdFields && (
+                        <>
+                          <CustomPostgresVersionInput form={form} />
+                          <CustomInstanceTypeInput form={form} />
+                        </>
+                      )}
 
                       <SecurityOptions form={form} />
                       {showAdvancedConfig && !!availableOrioleVersion && (
