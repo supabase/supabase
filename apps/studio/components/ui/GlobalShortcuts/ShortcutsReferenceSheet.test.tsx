@@ -1,11 +1,26 @@
+import type { HotkeyRegistrationView, SequenceRegistrationView } from '@tanstack/react-hotkeys'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ShortcutsReferenceSheet } from './ShortcutsReferenceSheet'
-import { useRegisterActiveShortcut } from '@/state/shortcuts/activeShortcuts'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
+import type { ShortcutHotkeyMeta } from '@/state/shortcuts/useShortcut'
 import { customRender } from '@/tests/lib/custom-render'
+
+const { mockUseHotkeyRegistrations } = vi.hoisted(() => ({
+  mockUseHotkeyRegistrations:
+    vi.fn<() => { hotkeys: HotkeyRegistrationView[]; sequences: SequenceRegistrationView[] }>(),
+}))
+
+vi.mock('@tanstack/react-hotkeys', async () => {
+  const actual =
+    await vi.importActual<typeof import('@tanstack/react-hotkeys')>('@tanstack/react-hotkeys')
+  return {
+    ...actual,
+    useHotkeyRegistrations: mockUseHotkeyRegistrations,
+  }
+})
 
 const ACTIVE_SHORTCUT_IDS = [
   SHORTCUT_IDS.COMMAND_MENU_OPEN,
@@ -17,46 +32,54 @@ const ACTIVE_DATABASE_SHORTCUT_IDS = [
   SHORTCUT_IDS.NAV_DATABASE_TABLES,
 ] satisfies ShortcutId[]
 
-const activeShortcutDefinition = (id: ShortcutId) => {
+let sequenceIdCounter = 0
+
+const buildSequenceRegistration = (id: ShortcutId): SequenceRegistrationView => {
   const definition = SHORTCUT_DEFINITIONS[id]
+  const meta: ShortcutHotkeyMeta = {
+    id: definition.id,
+    name: definition.label,
+    referenceGroup: definition.referenceGroup,
+  }
 
   return {
-    id: definition.id,
-    label: definition.label,
+    id: `sequence_${++sequenceIdCounter}`,
     sequence: definition.sequence,
-    referenceGroup: definition.referenceGroup,
+    options: {
+      enabled: true,
+      meta,
+    },
+    target: document,
+    triggerCount: 0,
+    hasFired: false,
+    matchedStepCount: 0,
+    partialMatchLastKeyTime: 0,
   }
 }
 
-function ActiveShortcutSeedItem({ id }: { id: ShortcutId }) {
-  useRegisterActiveShortcut(activeShortcutDefinition(id), true)
-  return null
-}
-
-function ActiveShortcutSeed({ ids }: { ids: ShortcutId[] }) {
-  return (
-    <>
-      {ids.map((id) => (
-        <ActiveShortcutSeedItem key={id} id={id} />
-      ))}
-    </>
-  )
+const seedRegistrations = (ids: ShortcutId[]) => {
+  mockUseHotkeyRegistrations.mockReturnValue({
+    hotkeys: [],
+    sequences: ids.map(buildSequenceRegistration),
+  })
 }
 
 const renderShortcutsReferenceSheet = (ids: ShortcutId[] = ACTIVE_SHORTCUT_IDS) => {
+  seedRegistrations(ids)
   const onOpenChange = vi.fn()
 
-  customRender(
-    <>
-      <ActiveShortcutSeed ids={ids} />
-      <ShortcutsReferenceSheet open onOpenChange={onOpenChange} />
-    </>
-  )
+  customRender(<ShortcutsReferenceSheet open onOpenChange={onOpenChange} />)
 
   return { onOpenChange }
 }
 
 describe('ShortcutsReferenceSheet', () => {
+  beforeEach(() => {
+    sequenceIdCounter = 0
+    mockUseHotkeyRegistrations.mockReset()
+    mockUseHotkeyRegistrations.mockReturnValue({ hotkeys: [], sequences: [] })
+  })
+
   it('renders the grouped shortcut list by default', async () => {
     renderShortcutsReferenceSheet()
 
@@ -114,6 +137,22 @@ describe('ShortcutsReferenceSheet', () => {
 
     expect(screen.getByText('No matching shortcuts found')).toBeInTheDocument()
     expect(screen.queryByText('Database Navigation')).not.toBeInTheDocument()
+  })
+
+  it('hides shortcuts whose registration is soft-disabled', async () => {
+    sequenceIdCounter = 0
+    const enabled = buildSequenceRegistration(SHORTCUT_IDS.COMMAND_MENU_OPEN)
+    const disabled = buildSequenceRegistration(SHORTCUT_IDS.NAV_HOME)
+    disabled.options = { ...disabled.options, enabled: false }
+    mockUseHotkeyRegistrations.mockReturnValue({
+      hotkeys: [],
+      sequences: [enabled, disabled],
+    })
+
+    customRender(<ShortcutsReferenceSheet open onOpenChange={vi.fn()} />)
+
+    expect(await screen.findByText('Open command menu')).toBeInTheDocument()
+    expect(screen.queryByText('Go to Project Overview')).not.toBeInTheDocument()
   })
 
   it('shows a clear button when searching and resets the list when clicked', async () => {
