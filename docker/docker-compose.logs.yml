@@ -1,4 +1,4 @@
-# This override adds log aggregation and analytics capabilities to Supabase:
+# This override adds the following to the self-hosted Supabase configuration:
 #   - Logflare: Log management and event analytics platform
 #   - Vector: High-performance observability data pipeline for logs
 #
