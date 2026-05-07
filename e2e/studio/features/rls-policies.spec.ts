@@ -342,6 +342,11 @@ test.describe('RLS Policies', () => {
       await page.getByRole('option', { name: 'authenticated' }).click()
       await page.keyboard.press('Escape')
 
+      await page
+        .getByRole('textbox', { name: /Editor content/i })
+        .nth(0)
+        .focus()
+      await page.keyboard.type('true')
       // Fill in USING clause (UPDATE has both USING and WITH CHECK editors, so use first)
       await page
         .getByRole('textbox', { name: /Editor content/i })
