@@ -4,3 +4,6 @@ export type {
   MarketingFormField,
   MarketingFormProps,
 } from './MarketingForm'
+
+export { default as HubSpotFormEmbed } from './HubSpotFormEmbed'
+export type { HubSpotFormEmbedProps } from './HubSpotFormEmbed'
