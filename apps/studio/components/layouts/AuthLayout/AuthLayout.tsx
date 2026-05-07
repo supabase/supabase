@@ -4,6 +4,7 @@ import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { useGenerateAuthMenu } from './AuthLayout.utils'
+import { AuthNavShortcuts } from '@/components/interfaces/AuthNavShortcuts'
 import { ProductMenu } from '@/components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from '@/data/auth/auth-config-query'
 import { withAuth } from '@/hooks/misc/withAuth'
@@ -27,6 +28,7 @@ const AuthLayout = ({ title, children }: PropsWithChildren<{ title: string }>) =
       productMenu={<AuthProductMenu />}
       isBlocking={false}
     >
+      <AuthNavShortcuts />
       {children}
     </ProjectLayout>
   )

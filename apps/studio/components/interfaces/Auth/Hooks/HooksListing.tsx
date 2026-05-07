@@ -26,6 +26,8 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
 import { executeSql } from '@/data/sql/execute-sql-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
@@ -40,6 +42,9 @@ export const HooksListing = () => {
   const [hook, setHook] = useQueryState('hook', parseAsString)
 
   const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook | null>(null)
+  const [addHookOpen, setAddHookOpen] = useState(false)
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setAddHookOpen(true), { label: 'Add hook' })
 
   const { mutate: updateAuthHooks, isPending: isDeletingAuthHook } = useAuthHooksUpdateMutation({
     onSuccess: async () => {
@@ -114,6 +119,8 @@ export const HooksListing = () => {
         </PageSectionSummary>
         <PageSectionAside>
           <AddHookDropdown
+            open={addHookOpen}
+            onOpenChange={setAddHookOpen}
             onSelectHook={(title) => {
               const hook = hooks.find((h) => h.title === title)
               if (hook) setHook(hook.id)
@@ -131,6 +138,8 @@ export const HooksListing = () => {
               type="default"
               align="center"
               buttonText="Add a new hook"
+              open={addHookOpen}
+              onOpenChange={setAddHookOpen}
               onSelectHook={(title) => {
                 const hook = hooks.find((h) => h.title === title)
                 if (hook) setHook(hook.id)
