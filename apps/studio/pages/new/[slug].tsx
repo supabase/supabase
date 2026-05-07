@@ -18,12 +18,11 @@ import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Datab
 import { AdvancedConfiguration } from '@/components/interfaces/ProjectCreation/AdvancedConfiguration'
 import { CloudProviderSelector } from '@/components/interfaces/ProjectCreation/CloudProviderSelector'
 import { ComputeSizeSelector } from '@/components/interfaces/ProjectCreation/ComputeSizeSelector'
-import { CustomInstanceTypeInput } from '@/components/interfaces/ProjectCreation/CustomInstanceTypeInput'
-import { CustomPostgresVersionInput } from '@/components/interfaces/ProjectCreation/CustomPostgresVersionInput'
 import { DatabasePasswordInput } from '@/components/interfaces/ProjectCreation/DatabasePasswordInput'
 import { DisabledWarningDueToIncident } from '@/components/interfaces/ProjectCreation/DisabledWarningDueToIncident'
 import { FreeProjectLimitWarning } from '@/components/interfaces/ProjectCreation/FreeProjectLimitWarning'
 import { HighAvailabilityInput } from '@/components/interfaces/ProjectCreation/HighAvailabilityInput'
+import { InternalOnlyConfiguration } from '@/components/interfaces/ProjectCreation/InternalOnlyConfiguration'
 import { OrganizationSelector } from '@/components/interfaces/ProjectCreation/OrganizationSelector'
 import {
   extractPostgresVersionDetails,
@@ -471,7 +470,7 @@ const Wizard: NextPageWithLayout = () => {
               {projectCreationDisabled ? (
                 <DisabledWarningDueToIncident title="Project creation is currently disabled" />
               ) : (
-                <div className="divide-y divide-border-muted">
+                <div className="divide-y divide-border-border">
                   <OrganizationSelector form={form} />
 
                   {canCreateProject && (
@@ -510,21 +509,17 @@ const Wizard: NextPageWithLayout = () => {
                         </Panel.Content>
                       )}
 
-                      {showNonProdFields && (
-                        <>
-                          <CustomPostgresVersionInput form={form} />
-                          <CustomInstanceTypeInput form={form} />
-                        </>
-                      )}
-
                       <SecurityOptions form={form} />
+
                       {showAdvancedConfig && !!availableOrioleVersion && (
                         <AdvancedConfiguration form={form} />
                       )}
 
+                      {showNonProdFields && <InternalOnlyConfiguration form={form} />}
+
                       {shouldShowFreeProjectInfo ? (
                         <Admonition
-                          className="rounded-none border-0 border-t"
+                          className="rounded-none border-0"
                           type="note"
                           title="Need a free project?"
                           description={
