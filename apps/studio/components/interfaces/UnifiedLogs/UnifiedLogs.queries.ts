@@ -72,7 +72,9 @@ const buildQueryConditions = (search: QuerySearchParamsType) => {
 /**
  * Calculates the chart bucketing level (minute/hour/day) given the date range.
  */
-const calculateChartBucketing = (search: SearchParamsType | Record<string, unknown>): 'MINUTE' | 'HOUR' | 'DAY' => {
+const calculateChartBucketing = (
+  search: SearchParamsType | Record<string, unknown>
+): 'MINUTE' | 'HOUR' | 'DAY' => {
   const dateRange = (search.date as Array<Date | string | number | null | undefined>) || []
 
   const convertToMillis = (timestamp: Date | string | number | null | undefined) => {
