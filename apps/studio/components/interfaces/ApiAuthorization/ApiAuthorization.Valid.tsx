@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { OAuthScope } from '@supabase/shared-types/out/constants'
+import Head from 'next/head'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useForm, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -23,6 +24,7 @@ import {
 } from '@/data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { buildStudioPageTitle } from '@/lib/page-title'
 import type { Organization, ResponseError } from '@/types'
 
 function getMatchingOrganization(
@@ -210,6 +212,9 @@ export function ApiAuthorizationValidScreen({
   const effectiveOrganizationsState = mockState?.organizations ?? organizationsState
   const effectiveOrganizationSlug = mockState?.organizationSlug ?? organization_slug
   const effectiveApprovalState = mockState?.approvalState ?? approvalState
+  const pageTitle = effectiveRequester
+    ? buildStudioPageTitle({ section: `Authorize ${effectiveRequester.name}`, brand: 'Supabase' })
+    : undefined
 
   if (!effectiveRequester) return null
 
@@ -222,23 +227,29 @@ export function ApiAuthorizationValidScreen({
         : undefined
 
     return (
-      <ApiAuthorizationApprovedScreen
-        requester={effectiveRequester}
-        organization={approvedOrganization}
-      />
+      <>
+        <Head>{pageTitle && <title>{pageTitle}</title>}</Head>
+        <ApiAuthorizationApprovedScreen
+          requester={effectiveRequester}
+          organization={approvedOrganization}
+        />
+      </>
     )
   }
 
   return (
-    <ApiAuthorizationMainView
-      approvalState={effectiveApprovalState}
-      form={form}
-      requester={effectiveRequester}
-      requestedOrganizationSlug={effectiveOrganizationSlug}
-      organizations={effectiveOrganizationsState}
-      onApprove={onApproveRequest}
-      onDecline={mockState ? () => navigate('/organizations') : onDeclineRequest}
-    />
+    <>
+      <Head>{pageTitle && <title>{pageTitle}</title>}</Head>
+      <ApiAuthorizationMainView
+        approvalState={effectiveApprovalState}
+        form={form}
+        requester={effectiveRequester}
+        requestedOrganizationSlug={effectiveOrganizationSlug}
+        organizations={effectiveOrganizationsState}
+        onApprove={onApproveRequest}
+        onDecline={mockState ? () => navigate('/organizations') : onDeclineRequest}
+      />
+    </>
   )
 }
 

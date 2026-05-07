@@ -1,11 +1,6 @@
-import { ChevronDown } from 'lucide-react'
+import { Check, ChevronDown } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
-import {
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  cn,
-} from 'ui'
+import { cn, Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_ } from 'ui'
 
 import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'
 import type { Organization } from '@/types'
@@ -19,6 +14,7 @@ export const ConnectOrganizationSelector = ({
   onSelect,
   disabled = false,
   unavailableReason,
+  description,
   getOrganizationDescription,
   getUnavailableOrganizationDescription,
   createLabel,
@@ -31,6 +27,7 @@ export const ConnectOrganizationSelector = ({
   onSelect: (slug: string) => void
   disabled?: boolean
   unavailableReason?: ReactNode
+  description?: ReactNode
   getOrganizationDescription?: (organization: Organization) => ReactNode
   getUnavailableOrganizationDescription?: (organization: Organization) => ReactNode
   createLabel?: string
@@ -68,9 +65,12 @@ export const ConnectOrganizationSelector = ({
 
   return (
     <section className="space-y-2" aria-label="Organizations">
-      <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
-        Organization
-      </p>
+      <div className="space-y-1">
+        <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
+          Organization
+        </p>
+        {description && <p className="text-xs text-foreground-lighter pr-4">{description}</p>}
+      </div>
       <div className="space-y-2">
         {visibleOrganizations.map((organization) => (
           <ConnectOrganizationButton
@@ -79,7 +79,9 @@ export const ConnectOrganizationSelector = ({
             selected={selectedSlug === organization.slug}
             disabled={disabled}
             onClick={() => onSelect(organization.slug)}
-            description={getOrganizationDescription?.(organization)}
+            description={
+              getOrganizationDescription?.(organization) ?? getPlanDescription(organization)
+            }
           />
         ))}
 
@@ -96,7 +98,7 @@ export const ConnectOrganizationSelector = ({
             <OrganizationCard
               isLink={false}
               organization={createOrganizationCardModel(createLabel)}
-              description={createDescription}
+              description={createDescription ?? null}
               className="pointer-events-none border-dashed shadow-none"
             />
           </button>
@@ -119,7 +121,9 @@ export const ConnectOrganizationSelector = ({
                     selected={selectedSlug === organization.slug}
                     disabled={disabled}
                     onClick={() => onSelect(organization.slug)}
-                    description={getOrganizationDescription?.(organization)}
+                    description={
+                      getOrganizationDescription?.(organization) ?? getPlanDescription(organization)
+                    }
                   />
                 ))}
               </div>
@@ -159,6 +163,8 @@ export const ConnectOrganizationSelector = ({
   )
 }
 
+const getPlanDescription = (organization: Organization) => `${organization.plan.name} Plan`
+
 const ConnectOrganizationButton = ({
   organization,
   selected,
@@ -178,7 +184,7 @@ const ConnectOrganizationButton = ({
     onClick={onClick}
     aria-pressed={selected}
     className={cn(
-      'block w-full text-left disabled:cursor-not-allowed disabled:opacity-50',
+      'group relative block w-full cursor-pointer text-left disabled:cursor-not-allowed disabled:opacity-50',
       disabled && 'pointer-events-none'
     )}
   >
@@ -187,10 +193,17 @@ const ConnectOrganizationButton = ({
       organization={organization}
       description={description}
       className={cn(
-        'pointer-events-none shadow-none',
-        selected && 'border-brand bg-brand-200/20 hover:border-brand hover:bg-brand-200/20'
+        'pointer-events-none shadow-none transition-colors',
+        !disabled && !selected && 'group-hover:border-default group-hover:bg-surface-200',
+        selected &&
+          'border-brand bg-brand-200/20 dark:bg-brand-300 pr-10 group-hover:border-brand group-hover:bg-brand-200/20'
       )}
     />
+    {selected && (
+      <span className="pointer-events-none absolute right-3 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-brand-500 dark:bg-brand-200 text-white dark:text-brand">
+        <Check className="size-3.5" strokeWidth={2} />
+      </span>
+    )}
   </button>
 )
 

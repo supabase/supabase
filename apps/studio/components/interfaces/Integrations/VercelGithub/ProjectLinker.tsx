@@ -57,6 +57,7 @@ export interface ProjectLinkerProps {
   onSkip?: () => void
   loadingForeignProjects?: boolean
   showNoEntitiesState?: boolean
+  variant?: 'card' | 'embedded'
 
   defaultSupabaseProjectRef?: string
   defaultForeignProjectId?: string
@@ -76,6 +77,7 @@ const ProjectLinker = ({
   onSkip,
   loadingForeignProjects,
   showNoEntitiesState = true,
+  variant = 'card',
 
   defaultSupabaseProjectRef,
   defaultForeignProjectId,
@@ -168,10 +170,16 @@ const ProjectLinker = ({
   const noForeignProjects = foreignProjects.length === 0
   const missingEntity = noSupabaseProjects ? 'Supabase' : mode
   const oppositeMissingEntity = noSupabaseProjects ? mode : 'Supabase'
+  const isEmbedded = variant === 'embedded'
 
   return (
-    <div className="flex flex-col bg border shadow-sm rounded-lg overflow-hidden">
-      <div className="relative p-12 border-b border-muted">
+    <div
+      className={cn(
+        'flex flex-col overflow-hidden',
+        isEmbedded ? 'rounded-md border border-muted' : 'rounded-lg border bg shadow-sm'
+      )}
+    >
+      <div className={cn('relative border-b border-muted', isEmbedded ? 'p-8' : 'p-12')}>
         <div
           className="absolute inset-0 bg-grid-black/5 mask-[linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:mask-[linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
           style={{ backgroundPosition: '10px 10px' }}
@@ -379,7 +387,7 @@ const ProjectLinker = ({
         )}
       </div>
 
-      <div className="flex w-full justify-end gap-2 p-4 bg-surface-75">
+      <div className="flex w-full justify-end gap-2 bg-surface-75 p-4">
         {onSkip !== undefined && (
           <Button
             size="medium"

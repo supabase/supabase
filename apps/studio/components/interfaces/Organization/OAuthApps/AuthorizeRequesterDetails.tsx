@@ -242,9 +242,7 @@ function PermissionSummaryRow({
   return (
     <div className="flex items-center justify-between gap-3 py-3 text-sm">
       <p className="min-w-0 leading-tight">
-        <span className="font-medium text-foreground">
-          {permissions.map(({ label }) => label).join(', ')}
-        </span>
+        <span className="text-foreground">{permissions.map(({ label }) => label).join(', ')}</span>
       </p>
       <Badge variant={getPermissionLevelBadgeVariant(level)} className="shrink-0">
         {formatPermissionLevel(level)}
@@ -284,9 +282,7 @@ function PermissionDetails({
                     className="flex items-center justify-between gap-3 py-2"
                   >
                     <div className="flex min-w-0 items-center gap-1.5">
-                      <p className="truncate text-sm font-medium text-foreground">
-                        {permission.label}
-                      </p>
+                      <p className="truncate text-sm text-foreground">{permission.label}</p>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <button

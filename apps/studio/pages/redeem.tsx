@@ -39,7 +39,7 @@ export const REDEEM_CREDITS_MOCK_STATES = [
 export type RedeemCreditsMockState = (typeof REDEEM_CREDITS_MOCK_STATES)[number]
 
 const MOCK_SELECTED_ORG_SLUG = 'acme-production'
-const PAGE_TITLE = buildStudioPageTitle({ section: 'Redeem credits', brand: 'Supabase' })
+const PAGE_TITLE = buildStudioPageTitle({ section: 'Redeem Credits', brand: 'Supabase' })
 
 const createMockOrganization = (details: Partial<Organization>): Organization => ({
   id: 1,
@@ -149,11 +149,7 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
     description?: ReactNode
     children: ReactNode
   }) => (
-    <InterstitialLayout
-      logo={<SupabaseLogo />}
-      title={title}
-      description={description}
-    >
+    <InterstitialLayout logo={<SupabaseLogo />} title={title} description={description}>
       <div className="px-6 pb-6">{children}</div>
     </InterstitialLayout>
   )
@@ -169,7 +165,7 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
   if (mock === 'redeemed') {
     return withInterstitial({
       title: 'Credits redeemed',
-      description: 'Your credits were applied to the selected organization.',
+      description: 'Your credits were applied to the selected organization',
       children: (
         <div className="flex flex-col gap-3">
           <Admonition
@@ -206,7 +202,7 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
 
     return withInterstitial({
       title: notice.title,
-      description: 'The credit code could not be redeemed.',
+      description: 'The credit code could not be redeemed',
       children: (
         <div className="flex flex-col gap-3">
           <Admonition type="warning" title={notice.title} description={notice.description} />
@@ -218,7 +214,7 @@ export const RedeemCreditsScreen = ({ mock }: { mock?: RedeemCreditsMockState })
   if (mock === 'error' || isOrganizationsError) {
     return withInterstitial({
       title: 'Unable to load credit redemption',
-      description: 'Please try again before redeeming this code.',
+      description: 'Please try again before redeeming this code',
       children: (
         <div className="flex flex-col gap-3">
           <Admonition

@@ -26,9 +26,10 @@ export const OrganizationCard = ({
 }) => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const isPlatformOrg = organization.plan?.id === 'platform'
+  const shouldRenderDefaultDescription = description === undefined
   const { data } = useOrgProjectsInfiniteQuery(
     { slug: organization.slug },
-    { enabled: !isPlatformOrg && description === undefined }
+    { enabled: !isPlatformOrg && shouldRenderDefaultDescription }
   )
   const numProjects = data?.pages[0].pagination.count ?? 0
   const isMfaRequired = organization.organization_requires_mfa
@@ -44,7 +45,7 @@ export const OrganizationCard = ({
       title={organization.name}
       onClick={onClick}
       description={
-        description ?? (
+        shouldRenderDefaultDescription ? (
           <div className="flex items-center justify-between text-xs text-foreground-light font-sans">
             <div className="flex items-center gap-x-1">
               <span>{organization.plan.name} Plan</span>
@@ -71,6 +72,8 @@ export const OrganizationCard = ({
               )}
             </div>
           </div>
+        ) : (
+          description
         )
       }
     />

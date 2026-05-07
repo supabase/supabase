@@ -1,5 +1,8 @@
 import { useParams } from 'common'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useState } from 'react'
+import InlineSVG from 'react-inlinesvg'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
 import {
@@ -12,13 +15,22 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import {
+  ConnectMockMenu,
+  ConnectPreviewToolbar,
+  getConnectMockState,
+  isTemporaryConnectMockPreviewEnabled,
+} from '@/components/interfaces/Connect/ConnectMockMenu'
 import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
-import { Markdown } from '@/components/interfaces/Markdown'
-import VercelIntegrationWindowLayout from '@/components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
-import { ScaffoldColumn, ScaffoldContainer } from '@/components/layouts/Scaffold'
+import {
+  InterstitialAccountRow,
+  InterstitialLayout,
+  LogoBox,
+  LogoPair,
+  SupabaseLogo,
+} from '@/components/layouts/InterstitialLayout'
 import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
@@ -31,42 +43,215 @@ import {
   useTrackDefaultPrivilegesExposure,
 } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { withAuth } from '@/hooks/misc/withAuth'
 import { usePHFlag } from '@/hooks/ui/useFlag'
 import { BASE_PATH, PROVIDERS } from '@/lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from '@/lib/integration-utils'
+import { buildStudioPageTitle } from '@/lib/page-title'
 import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
+import { useProfile } from '@/lib/profile'
 import { generateStrongPassword } from '@/lib/project'
 import { useTrack } from '@/lib/telemetry/track'
 import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
 import type { NextPageWithLayout } from '@/types'
 
+const PAGE_TITLE = buildStudioPageTitle({ section: 'Create Supabase Project', brand: 'Supabase' })
+const VERCEL_PROJECT_CREATION_MOCK_STATES = ['ready', 'creating'] as const
+type VercelProjectCreationMockState = (typeof VERCEL_PROJECT_CREATION_MOCK_STATES)[number]
+
+const VercelLogo = () => (
+  <LogoBox className="border-black bg-black text-white">
+    <InlineSVG
+      src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
+      title="Vercel"
+      className="size-6 text-white"
+    />
+  </LogoBox>
+)
+
 const VercelIntegration: NextPageWithLayout = () => {
+  const router = useRouter()
+  const { profile } = useProfile()
+  const displayName = profile?.primary_email ?? profile?.username
+  const mock =
+    router.isReady && isTemporaryConnectMockPreviewEnabled()
+      ? getConnectMockState(router.query.mock, VERCEL_PROJECT_CREATION_MOCK_STATES)
+      : undefined
+
+  const replaceMockState = (state: VercelProjectCreationMockState) => {
+    router.replace(
+      { pathname: router.pathname, query: { ...router.query, mock: state } },
+      undefined,
+      { shallow: true }
+    )
+  }
+
+  if (mock) {
+    return (
+      <VercelProjectCreationMockScreen
+        mock={mock}
+        displayName={displayName}
+        onSelectMockState={replaceMockState}
+      />
+    )
+  }
+
   return (
     <>
-      <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
-        <ScaffoldColumn className="mx-auto w-full max-w-md">
-          <header>
-            <h2>New project</h2>
-            <Markdown
-              className="text-foreground-light"
-              content={`Choose the Supabase organization you wish to install in`}
-            />
-          </header>
+      <Head>
+        <title>{PAGE_TITLE}</title>
+      </Head>
+      <InterstitialLayout
+        logo={<LogoPair left={<VercelLogo />} right={<SupabaseLogo />} />}
+        title="Create Supabase project"
+        description="Create a project to connect with your Vercel deployment"
+        containerClassName="items-start"
+        cardClassName="max-w-[480px]"
+      >
+        <div className="flex flex-col gap-5 px-6 pb-6">
+          <InterstitialAccountRow displayName={displayName} />
           <CreateProject />
-          <Admonition
-            type="default"
-            layout="horizontal"
-            title="You can uninstall this Integration at any time."
-            description="You can remove this integration at any time via Vercel or the Supabase dashboard"
-          />
-        </ScaffoldColumn>
-      </ScaffoldContainer>
+          <div className="text-center text-xs text-foreground-muted text-balance">
+            <p>You can remove this integration at any time from Vercel or Supabase.</p>
+          </div>
+        </div>
+      </InterstitialLayout>
     </>
   )
 }
 
-VercelIntegration.getLayout = (page) => (
-  <VercelIntegrationWindowLayout>{page}</VercelIntegrationWindowLayout>
+const VercelProjectCreationMockScreen = ({
+  mock,
+  displayName,
+  onSelectMockState,
+}: {
+  mock: VercelProjectCreationMockState
+  displayName?: string
+  onSelectMockState: (state: VercelProjectCreationMockState) => void
+}) => (
+  <>
+    <Head>
+      <title>{PAGE_TITLE}</title>
+    </Head>
+    <ConnectPreviewToolbar>
+      <ConnectMockMenu
+        state={mock}
+        states={VERCEL_PROJECT_CREATION_MOCK_STATES}
+        onSelect={onSelectMockState}
+      />
+    </ConnectPreviewToolbar>
+    <InterstitialLayout
+      logo={<LogoPair left={<VercelLogo />} right={<SupabaseLogo />} />}
+      title="Create Supabase project"
+      description="Create a project to connect with your Vercel deployment"
+      containerClassName="items-start"
+      cardClassName="max-w-[480px]"
+    >
+      <div className="flex flex-col gap-5 px-6 pb-6">
+        <InterstitialAccountRow displayName={displayName ?? 'test@example.com'} />
+        <MockCreateProject isCreating={mock === 'creating'} />
+        <div className="text-center text-xs text-foreground-muted text-balance">
+          <p>You can remove this integration at any time from Vercel or Supabase.</p>
+        </div>
+      </div>
+    </InterstitialLayout>
+  </>
+)
+
+const MockCreateProject = ({ isCreating }: { isCreating: boolean }) => (
+  <div>
+    <p className="mb-2">Supabase project details</p>
+    <div className="py-2">
+      <Input
+        id="mockProjectName"
+        label="Project name"
+        type="text"
+        value="web-dashboard"
+        onChange={() => undefined}
+        disabled={isCreating}
+      />
+    </div>
+    <div className="py-2">
+      <Input
+        id="mockDbPass"
+        label="Database password"
+        type="password"
+        value="mock-password"
+        onChange={() => undefined}
+        disabled={isCreating}
+        copy={!isCreating}
+      />
+    </div>
+    <div className="py-2">
+      <div className="mt-1">
+        <FormItemLayout
+          id="mockRegion"
+          isReactForm={false}
+          layout="vertical"
+          label="Region"
+          description="Select a region close to your users for the best performance."
+          className="gap-[2px]"
+          size="tiny"
+        >
+          <Select_Shadcn_ value="US East (N. Virginia)" onValueChange={() => undefined}>
+            <SelectTrigger_Shadcn_ id="mockRegion" disabled={isCreating}>
+              <SelectValue_Shadcn_ />
+            </SelectTrigger_Shadcn_>
+            <SelectContent_Shadcn_>
+              <SelectItem_Shadcn_ value="US East (N. Virginia)">
+                <div className="flex gap-2">
+                  <img
+                    alt="region icon"
+                    className="w-5 rounded-xs"
+                    src={`${BASE_PATH}/img/regions/us-east-1.svg`}
+                  />
+                  <span>US East (N. Virginia)</span>
+                </div>
+              </SelectItem_Shadcn_>
+            </SelectContent_Shadcn_>
+          </Select_Shadcn_>
+        </FormItemLayout>
+      </div>
+    </div>
+    <div className="py-2 pb-4">
+      <div className="items-top flex space-x-2">
+        <Checkbox id="mockShouldRunMigrations" checked disabled={isCreating} />
+        <div className="grid gap-1.5 leading-none">
+          <label
+            htmlFor="mockShouldRunMigrations"
+            className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Create sample tables with seed data
+          </label>
+          <p className="text-sm text-foreground-muted">
+            To get you started quickly, we can create new tables for you with seed data.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div className="py-2 pb-4">
+      <div className="items-top flex space-x-2">
+        <Checkbox id="mockDataApiDefaultPrivileges" checked disabled={isCreating} />
+        <div className="grid gap-1.5 leading-none">
+          <label
+            htmlFor="mockDataApiDefaultPrivileges"
+            className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Automatically expose new tables
+          </label>
+          <p className="text-sm text-foreground-muted">
+            Grants privileges to Data API roles by default. We recommend disabling this to control
+            access manually.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div className="flex w-full flex-row justify-end">
+      <Button size="medium" className="self-end" loading={isCreating} disabled={isCreating}>
+        Create Project
+      </Button>
+    </div>
+  </div>
 )
 
 const CreateProject = () => {
@@ -378,4 +563,4 @@ const CreateProject = () => {
   )
 }
 
-export default VercelIntegration
+export default withAuth(VercelIntegration)

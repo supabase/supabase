@@ -284,7 +284,7 @@ describe('ApiAuthorizationScreen', () => {
           renderScreen()
 
           await screen.findByText('Authorize API access for Cursor')
-          await user.click(screen.getByRole('button', { name: 'About the Cursor publisher' }))
+          await user.click(screen.getByRole('button', { name: 'About this publisher' }))
 
           expect(await screen.findByText('About this publisher')).toBeInTheDocument()
           expect(screen.getByText(/anysphere-mcp/)).toBeInTheDocument()

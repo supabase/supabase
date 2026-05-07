@@ -161,17 +161,18 @@ describe('AwsMarketplaceOnboardingScreen', () => {
         body: { buyer_id: 'buyer-test' },
       })
     })
-    await screen.findByText('AWS Marketplace linked')
+    await screen.findByText('Organization linked')
   })
 
   test.each([
-    ['invalid', 'AWS Marketplace setup unavailable'],
-    ['error', 'Unable to load AWS Marketplace setup'],
-    ['linked', 'AWS Marketplace linked'],
+    ['invalid', 'Setup unavailable'],
+    ['error', 'Unable to load setup'],
+    ['linked', 'Organization linked'],
   ] satisfies Array<[AwsMarketplaceMockState, string]>)(
     'renders %s mock state',
     async (mock, expectedText) => {
       renderScreen({ mock })
+      expect(await screen.findByText('Link AWS Marketplace')).toBeInTheDocument()
       expect(await screen.findByText(expectedText)).toBeInTheDocument()
     }
   )

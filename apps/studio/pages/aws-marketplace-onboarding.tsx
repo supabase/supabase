@@ -25,11 +25,11 @@ import NewAwsMarketplaceOrgModal from '@/components/interfaces/Organization/Clou
 import {
   InterstitialAccountRow,
   InterstitialLayout,
-  InterstitialMetadataPill,
   LogoBox,
   LogoPair,
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useOrganizationLinkAwsMarketplaceMutation } from '@/data/organizations/organization-link-aws-marketplace-mutation'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { withAuth } from '@/hooks/misc/withAuth'
@@ -55,7 +55,9 @@ export type AwsMarketplaceMockState = (typeof AWS_MARKETPLACE_MOCK_STATES)[numbe
 
 const MOCK_BUYER_ID = 'buyer-mock-123456'
 const MOCK_LINKED_ORG_SLUG = 'acme-production'
-const PAGE_TITLE = buildStudioPageTitle({ section: 'AWS Marketplace setup', brand: 'Supabase' })
+const PAGE_TITLE = buildStudioPageTitle({ section: 'Link AWS Marketplace', brand: 'Supabase' })
+const INTERSTITIAL_TITLE = 'Link AWS Marketplace'
+const INTERSTITIAL_DESCRIPTION = 'Choose an organization to bill through AWS'
 
 const createMockOrganization = (details: Partial<Organization>): Organization => ({
   id: 1,
@@ -311,22 +313,16 @@ export const AwsMarketplaceOnboardingScreen = ({
     }, [effectiveOnboardingInfo, effectiveOrganizations])
 
   const withInterstitial = ({
-    title,
     description,
-    subtitle,
     children,
   }: {
-    title: ReactNode
     description?: ReactNode
-    subtitle?: ReactNode
     children: ReactNode
   }) => (
     <InterstitialLayout
       logo={<LogoPair left={<AwsLogo />} right={<SupabaseLogo />} />}
-      title={title}
-      description={description}
-      subtitle={subtitle}
-      subtitleClassName="leading-none"
+      title={INTERSTITIAL_TITLE}
+      description={description ?? INTERSTITIAL_DESCRIPTION}
     >
       <div className="px-6 pb-6">{children}</div>
     </InterstitialLayout>
@@ -334,12 +330,11 @@ export const AwsMarketplaceOnboardingScreen = ({
 
   if (mock === 'invalid' || (!isMockMode && !effectiveBuyerId)) {
     return withInterstitial({
-      title: 'AWS Marketplace setup unavailable',
-      description: 'We could not identify the AWS Marketplace subscription for this request.',
       children: (
         <div className="flex flex-col gap-3">
           <Admonition
             type="warning"
+            title="Setup unavailable"
             description="Open the onboarding link from AWS Marketplace again. The link must include a buyer_id parameter."
           />
           <Button type="default" block asChild>
@@ -352,7 +347,6 @@ export const AwsMarketplaceOnboardingScreen = ({
 
   if (effectiveIsLoading) {
     return withInterstitial({
-      title: <ShimmeringLoader className="mx-auto h-7 w-40 max-w-full py-0" />,
       description: <ShimmeringLoader className="mx-auto h-4 w-56 max-w-full py-0" />,
       children: <ConnectLoadingCards />,
     })
@@ -360,8 +354,6 @@ export const AwsMarketplaceOnboardingScreen = ({
 
   if (mock === 'wrong-account') {
     return withInterstitial({
-      title: 'AWS Marketplace subscription unavailable',
-      description: 'This subscription cannot be linked from the current Supabase account.',
       children: (
         <div className="flex flex-col gap-3">
           <Admonition
@@ -379,12 +371,11 @@ export const AwsMarketplaceOnboardingScreen = ({
 
   if (effectiveIsError) {
     return withInterstitial({
-      title: 'Unable to load AWS Marketplace setup',
-      description: 'Retry the onboarding link from AWS Marketplace.',
       children: (
         <div className="flex flex-col gap-3">
           <Admonition
             type="warning"
+            title="Unable to load setup"
             description={
               <>
                 Please try again. If the problem persists, contact support.
@@ -408,7 +399,6 @@ export const AwsMarketplaceOnboardingScreen = ({
     const reason = effectiveEligibility?.eligibility.reasons[0]
 
     return withInterstitial({
-      title: reason === 'AGREEMENT_BASED_OFFER' ? 'Subscription already linked' : 'Setup pending',
       description: getContractIneligibilityDescription(reason),
       children: (
         <div className="flex flex-col gap-3">
@@ -423,12 +413,11 @@ export const AwsMarketplaceOnboardingScreen = ({
 
   if (orgLinked) {
     return withInterstitial({
-      title: 'AWS Marketplace linked',
-      description: 'Your organization is now managed and billed through AWS Marketplace.',
       children: (
         <div className="flex flex-col gap-3">
           <Admonition
             type="success"
+            title="Organization linked"
             description={
               linkedOrganization
                 ? `${linkedOrganization.name} will be billed through AWS Marketplace.`
@@ -469,18 +458,6 @@ export const AwsMarketplaceOnboardingScreen = ({
   return (
     <>
       {withInterstitial({
-        title: hasAnyOrganizations ? 'Link AWS Marketplace' : 'Create an organization',
-        description: (
-          <>
-            You have subscribed to Supabase through AWS Marketplace. Select the organization that
-            should be managed and billed through AWS.
-          </>
-        ),
-        subtitle: effectiveOnboardingInfo ? (
-          <InterstitialMetadataPill>
-            {effectiveOnboardingInfo.plan_name_selected_on_marketplace} Plan
-          </InterstitialMetadataPill>
-        ) : undefined,
         children: (
           <div className="flex flex-col gap-5">
             {showAutoRenewalWarning && (
@@ -492,16 +469,10 @@ export const AwsMarketplaceOnboardingScreen = ({
 
             <InterstitialAccountRow displayName={displayName} />
 
-            <Admonition type="note" showIcon={false}>
-              Credits, invoices, and plan changes for the linked organization will be managed
-              through AWS Marketplace. Existing Supabase invoices remain in Supabase.
-            </Admonition>
-
             <ConnectOrganizationSelector
               organizations={linkableOrganizations}
               unavailableOrganizations={unavailableOrganizations}
-              unavailableReason="These organizations may be missing permissions, have outstanding invoices, or already be linked to a marketplace subscription."
-              getOrganizationDescription={(organization) => `${organization.plan.name} Plan`}
+              unavailableReason="These may have outstanding invoices or existing marketplace links."
               getUnavailableOrganizationDescription={(organization) =>
                 getOrganizationUnavailableReason(
                   eligibilityByOrganizationSlug.get(organization.slug)?.reasons[0]
@@ -511,7 +482,6 @@ export const AwsMarketplaceOnboardingScreen = ({
               disabled={isLinking}
               onSelect={setSelectedOrgSlug}
               createLabel="Create new organization"
-              createDescription="Create and link a new AWS-managed organization."
               onCreate={() => setShowOrgCreationDialog(true)}
             />
 
@@ -539,11 +509,12 @@ export const AwsMarketplaceOnboardingScreen = ({
               >
                 {primaryLabel}
               </Button>
-              <Button type="text" block asChild>
-                <Link href={`${DOCS_URL}/guides/platform/aws-marketplace`} target="_blank">
-                  Billing through AWS
-                </Link>
-              </Button>
+              <p className="text-center text-xs text-foreground-muted text-balance">
+                <InlineLink href={`${DOCS_URL}/guides/platform/aws-marketplace`}>
+                  Learn more
+                </InlineLink>{' '}
+                about billing through AWS.
+              </p>
             </div>
           </div>
         ),

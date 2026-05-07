@@ -52,6 +52,27 @@ const CONNECT_SURFACE_OPTIONS = [
     mock: 'pending',
     href: '/partners/stripe/projects/login?mock=pending',
   },
+  {
+    id: 'vercel-install',
+    label: 'Vercel install',
+    route: '/integrations/vercel/install',
+    mock: 'ready',
+    href: '/integrations/vercel/install?mock=ready',
+  },
+  {
+    id: 'vercel-project-connection',
+    label: 'Vercel project connection',
+    route: '/integrations/vercel/[slug]/marketplace/choose-project',
+    mock: 'ready',
+    href: '/integrations/vercel/acme-production/marketplace/choose-project?mock=ready&configurationId=mock-configuration-id',
+  },
+  {
+    id: 'vercel-project-creation',
+    label: 'Vercel project creation',
+    route: '/integrations/vercel/[slug]/deploy-button/new-project',
+    mock: 'ready',
+    href: '/integrations/vercel/acme-production/deploy-button/new-project?mock=ready&currentProjectId=mock-vercel-project&externalId=mock-repository',
+  },
 ] as const
 
 type ConnectSurfaceOption = (typeof CONNECT_SURFACE_OPTIONS)[number]

@@ -12,7 +12,7 @@ selectors, mock menus, or transition behaviour.
 
 - Partner authorisation and consent, such as OAuth, MCP, Stripe Projects, or similar handoffs.
 - Organisation invites and lightweight account-gated accept flows.
-- Marketplace and billing connection flows, such as AWS Marketplace and credit redemption.
+- Marketplace and billing connection flows, such as AWS Marketplace, Vercel install, and credit redemption.
 - CLI or device-code sign-in flows that need a verification code and a single next action.
 - Invalid, loading, error, success, and wrong-account states for these routes.
 
@@ -22,10 +22,11 @@ belongs in the Studio navigation, use the standard page layout patterns instead.
 ## For agents
 
 If you are asked to update `/authorize`, `/join`, `/redeem`,
-`/aws-marketplace-onboarding`, `/cli/login`, Stripe Projects, or another
-short-lived connect flow, start from this pattern and the existing Studio
-helpers. Do not create new local card, logo, account-row, organisation-selector,
-or mock-switcher components unless the shared helper is missing a real state.
+`/aws-marketplace-onboarding`, `/integrations/vercel/install`, `/cli/login`,
+Stripe Projects, or another short-lived connect flow, start from this pattern
+and the existing Studio helpers. Do not create new local card, logo,
+account-row, organisation-selector, or mock-switcher components unless the
+shared helper is missing a real state.
 
 ## Source of truth
 
@@ -70,8 +71,8 @@ Use `InterstitialLayout` for the outer card, then put route-specific content in
       right={<SupabaseLogo />}
     />
   }
-  title="Stripe Projects"
-  description="wants to connect to Supabase"
+  title="Authorize Stripe Projects"
+  description="This will create an organization on your behalf in Supabase"
 >
   <div className="px-6 pb-6">
     <InterstitialAccountRow displayName={displayName} />
@@ -91,6 +92,21 @@ For first-party Supabase flows, use the Supabase logo by itself.
   description="Select the organization that should receive these credits."
 >
   <div className="px-6 pb-6">{children}</div>
+</InterstitialLayout>
+```
+
+For connect flows that need a real embedded tool, such as choosing or creating
+a Vercel project, keep the same interstitial shell and widen only the card.
+
+```tsx
+<InterstitialLayout
+  logo={<LogoPair left={<VercelLogo />} right={<SupabaseLogo />} />}
+  title="Connect Vercel project"
+  description="Choose the Supabase project that should receive Vercel environment variables."
+  containerClassName="items-start"
+  cardClassName="max-w-[900px]"
+>
+  <div className="px-6 pb-6">{projectLinker}</div>
 </InterstitialLayout>
 ```
 
@@ -133,15 +149,16 @@ collapsed overflow.
 
 ```tsx
 <ConnectOrganizationSelector
+  description="AWS manages billing and plan changes for the linked organization."
   organizations={linkableOrganizations}
   unavailableOrganizations={unavailableOrganizations}
   selectedSlug={selectedOrgSlug}
   onSelect={setSelectedOrgSlug}
   disabled={isSubmitting}
-  getOrganizationDescription={(organization) => `${organization.plan.name} Plan`}
+  getOrganizationDescription={() => 'Organization'}
   getUnavailableOrganizationDescription={(organization) => getUnavailableReason(organization.slug)}
   createLabel="Create new organization"
-  createDescription="Create and link a new AWS-managed organization."
+  createDescription="New organization"
   onCreate={() => setShowOrgCreationDialog(true)}
 />
 ```
@@ -172,8 +189,11 @@ parallel card style.
 
 - Use sentence case.
 - Prefer `sign in` and `sign-in`; avoid `login` in user-facing copy.
-- Name the thing being authorized when it matters, for example `Authorize Supabase CLI`.
+- Use `Verb -> Thing` for route titles and primary actions, for example `Authorize CLI`, `Authorize Stripe Projects`, `Link AWS Marketplace`, `Install Vercel`, or `Redeem credits`.
+- Keep the layout title static across loading, error, and success states. Put state-specific copy in the body with `Admonition`, helper text, or actions.
+- Avoid repeating `Supabase` in the route title when the browser title already ends with `Supabase`.
 - Keep descriptions short and literal.
+- Do not end `InterstitialLayout` header descriptions with a full stop. Treat them like compact UI subtitles, not body paragraphs.
 - Use `organization` in UI strings where the product surface already uses that spelling.
 - Avoid explaining the layout, the mock controls, or how to use the page inside the page itself.
 
