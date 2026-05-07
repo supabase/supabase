@@ -45,7 +45,7 @@ export const parseParameters = (sql: string | undefined) => {
   }
 
   // Find all :parameter occurrences and count them
-  const paramRegex = /:(\w+)/g
+  const paramRegex = /(?<!:):([a-zA-Z_]\w*)/g
   const paramOccurrences: Record<string, number> = {}
   const uniqueParams = new Set<string>()
 
@@ -101,7 +101,7 @@ export const processParameterizedSql = (sql: string, parameters: Record<string, 
   let processedSql = sql.replace(/@set\s+\w+(?:\s*:\s*[^=]+)?\s*=\s*[^;\n]+[\n;]*/g, '')
 
   // Replace :parameters with values
-  const paramRegex = /:(\w+)/g
+  const paramRegex = /(?<!:):([a-zA-Z_]\w*)/g
   processedSql = processedSql.replace(paramRegex, (_match, paramName) => {
     const value = parameters[paramName] ?? paramDefaults[paramName]?.value
     if (value === undefined) {
