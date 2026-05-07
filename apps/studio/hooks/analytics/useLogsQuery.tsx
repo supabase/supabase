@@ -27,13 +27,13 @@ export interface LogsQueryHook {
   error: string | Object | null
   changeQuery: (newQuery?: string) => void
   runQuery: () => void
-  setParams: Dispatch
+  setParams: Dispatch<SetStateAction<LogsEndpointParams>>
   enabled?: boolean
 }
 
 export const useLogsQuery = (
   projectRef: string,
-  initialParams: Partial = {},
+  initialParams: Partial<LogsEndpointParams> = {},
   enabled = true,
   options: { useOtel?: boolean } = {}
 ): LogsQueryHook => {
