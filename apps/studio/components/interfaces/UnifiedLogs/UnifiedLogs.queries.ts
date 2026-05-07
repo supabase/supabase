@@ -15,9 +15,9 @@ const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] a
 // OTEL log_attributes keys for HTTP-style fields. Centralized so they can be
 // adjusted in one place if the backend conventions change.
 const ATTR = {
-  method: `log_attributes['http.request.method']`,
-  status: `log_attributes['http.response.status_code']`,
-  path: `log_attributes['url.path']`,
+  method: `log_attributes['request.method']`,
+  status: `log_attributes['response.status_code']`,
+  path: `log_attributes['request.path']`,
 } as const
 
 // Maps the studio-facing log_type label to the OTEL `source` value the
