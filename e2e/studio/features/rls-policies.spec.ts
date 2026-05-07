@@ -232,7 +232,7 @@ test.describe('RLS Policies', () => {
       await expect(page.getByRole('radio', { name: 'SELECT' })).toBeChecked()
 
       // Fill in USING clause - allow all access
-      await page.locator('.view-lines').click()
+      await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.type('true')
 
       // Save policy
@@ -290,7 +290,7 @@ test.describe('RLS Policies', () => {
       await page.keyboard.press('Escape')
 
       // Fill in WITH CHECK clause - allow all inserts
-      await page.locator('.view-lines').click()
+      await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.type('true')
 
       // Save policy
@@ -343,7 +343,10 @@ test.describe('RLS Policies', () => {
       await page.keyboard.press('Escape')
 
       // Fill in USING clause (UPDATE has both USING and WITH CHECK editors, so use first)
-      await page.locator('.view-lines').first().click()
+      await page
+        .getByRole('textbox', { name: /Editor content/i })
+        .nth(1)
+        .focus()
       await page.keyboard.type('true')
 
       // Save policy
@@ -395,7 +398,7 @@ test.describe('RLS Policies', () => {
       await page.keyboard.press('Escape')
 
       // Fill in USING clause
-      await page.locator('.view-lines').click()
+      await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.type('true')
 
       // Save policy
