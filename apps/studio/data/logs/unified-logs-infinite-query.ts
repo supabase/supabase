@@ -113,7 +113,9 @@ export async function getUnifiedLogs(
     // The OTEL endpoint may return timestamps as ISO strings or as numeric
     // microseconds. Tolerate both.
     const numericTs = Number(row.timestamp)
-    const date = Number.isFinite(numericTs) ? new Date(numericTs / 1000) : new Date(row.timestamp)
+    const ts = String(row.timestamp ?? '')
+    const isoString = /Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`
+    const date = Number.isFinite(numericTs) ? new Date(numericTs / 1000) : new Date(isoString)
 
     return {
       id: row.id,

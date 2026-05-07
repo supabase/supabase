@@ -72,9 +72,11 @@ export async function getUnifiedLogsChart(
       // The OTEL endpoint may return time_bucket as a numeric microseconds
       // value or as a parseable date string. Tolerate both.
       const numericBucket = Number(row.time_bucket)
+      const ts = String(row.time_bucket ?? '')
+      const isoString = /Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`
       const milliseconds = Number.isFinite(numericBucket)
         ? Math.floor(numericBucket / 1000)
-        : new Date(row.time_bucket).getTime()
+        : new Date(isoString).getTime()
 
       // Create chart data point
       const dataPoint = {

@@ -38,36 +38,87 @@ const sourceCaseExpression = () => {
   return `CASE source\n      ${whens}\n      ELSE source\n    END`
 }
 
-/**
- * Builds query conditions from search parameters and returns WHERE clause
- */
-const buildQueryConditions = (search: QuerySearchParamsType) => {
-  const whereConditions: string[] = []
+// SQL expression for derived `level`. Used inline (not as alias reference)
+// because the OTEL endpoint can't resolve aliases inside countIf when the
+// alias is not in GROUP BY.
+const LEVEL_EXPR = `CASE
+      WHEN severity_text IN ('TRACE','DEBUG','INFO','LOG','NOTICE') THEN 'success'
+      WHEN severity_text IN ('WARN','WARNING') THEN 'warning'
+      WHEN severity_text IN ('ERROR','FATAL','CRITICAL','ALERT','EMERGENCY') THEN 'error'
+      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) BETWEEN 200 AND 299 THEN 'success'
+      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) BETWEEN 400 AND 499 THEN 'warning'
+      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) >= 500 THEN 'error'
+      ELSE 'success'
+    END`
 
-  Object.entries(search).forEach(([key, value]) => {
-    // Skip pagination/control parameters
-    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) {
-      return
-    }
-
-    if (Array.isArray(value) && value.length > 0) {
-      whereConditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
-      return
-    }
-
-    if (value !== null && value !== undefined) {
-      if (['host', 'pathname'].includes(key)) {
-        whereConditions.push(`${key} LIKE '%${value}%'`)
-      } else {
-        whereConditions.push(`${key} = '${value}'`)
-      }
-    }
-  })
-
-  const finalWhere = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
-
-  return { whereConditions, finalWhere }
+const sourceListSql = (logTypes: string[]) => {
+  const effective = logTypes.filter((t) => t in LOG_TYPE_TO_SOURCE)
+  const types = effective.length ? effective : [...DEFAULT_LOG_TYPES]
+  return types.map((t) => `'${LOG_TYPE_TO_SOURCE[t]}'`).join(', ')
 }
+
+/**
+ * Translates a frontend filter key/value pair into an underlying SQL predicate.
+ * The OTEL endpoint won't accept queries that reference derived aliases like
+ * `log_type` or `level` in WHERE for some shapes, so we always emit raw-column
+ * predicates (source/severity_text/log_attributes[…]).
+ */
+const translateFilter = (key: string, value: unknown): string | null => {
+  if (value === null || value === undefined) return null
+
+  const arr = Array.isArray(value) ? (value.length > 0 ? value : null) : null
+  if (Array.isArray(value) && !arr) return null
+
+  const inList = (values: readonly unknown[]) => `(${values.map((v) => `'${v}'`).join(',')})`
+
+  switch (key) {
+    case 'log_type': {
+      const sources = (arr ?? [value]).map((v) => LOG_TYPE_TO_SOURCE[String(v)] ?? String(v))
+      return `source IN ${inList(sources)}`
+    }
+    case 'level': {
+      // No simple raw column for level; reference the inline CASE expression.
+      const levels = arr ?? [value]
+      return `(${LEVEL_EXPR}) IN ${inList(levels.map((v) => String(v)))}`
+    }
+    case 'method':
+      return arr ? `${ATTR.method} IN ${inList(arr)}` : `${ATTR.method} = '${value}'`
+    case 'status':
+      return arr ? `${ATTR.status} IN ${inList(arr)}` : `${ATTR.status} = '${value}'`
+    case 'pathname':
+      return arr
+        ? `(${arr.map((v) => `${ATTR.path} LIKE '%${v}%'`).join(' OR ')})`
+        : `${ATTR.path} LIKE '%${value}%'`
+    case 'host':
+      // Best-effort: use full request URL since `host` isn't a top-level field.
+      return arr
+        ? `(${arr.map((v) => `log_attributes['request.url'] LIKE '%${v}%'`).join(' OR ')})`
+        : `log_attributes['request.url'] LIKE '%${value}%'`
+    default:
+      // Unknown filter key — fall back to a generic equality on log_attributes.
+      return arr
+        ? `log_attributes['${key}'] IN ${inList(arr)}`
+        : `log_attributes['${key}'] = '${value}'`
+  }
+}
+
+/**
+ * Builds an array of WHERE predicate strings from search params, optionally
+ * skipping a specific facet field (used when computing faceted counts).
+ */
+const buildPredicates = (search: QuerySearchParamsType, excludeField?: string) => {
+  const predicates: string[] = []
+  Object.entries(search).forEach(([key, value]) => {
+    if (key === excludeField) return
+    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) return
+    const predicate = translateFilter(key, value)
+    if (predicate) predicates.push(predicate)
+  })
+  return predicates
+}
+
+const whereClause = (predicates: string[]) =>
+  predicates.length > 0 ? `WHERE ${predicates.join(' AND ')}` : ''
 
 /**
  * Calculates the chart bucketing level (minute/hour/day) given the date range.
@@ -119,101 +170,43 @@ const truncationFunction = (level: 'MINUTE' | 'HOUR' | 'DAY') => {
 }
 
 /**
- * Inline subquery for the unified logs view.
- *
- * The OTEL endpoint exposes a single `logs` table with rows of the form
- *   { id, timestamp, project, source, event_message, severity_text, log_attributes }
- * where `source` is normalized (e.g. 'edge_logs', 'postgres_logs', ...). We
- * filter by source and project the columns the rest of the studio queries
- * expect (log_type, status, level, pathname, method, ...).
- *
- * Note: the OTEL endpoint rejects `WITH ... AS (...)` CTEs, so callers must
- * embed this subquery via `FROM (subquery) AS unified_logs` instead.
+ * Returns the projection list for a unified-logs row. All derivations are
+ * inlined so the result can be referenced (or filtered) at the same query
+ * level — the OTEL endpoint rejects subqueries.
  */
-export const getUnifiedLogsSubquery = (logTypes: string[] = [...DEFAULT_LOG_TYPES]) => {
-  const effectiveLogTypes = logTypes.filter((t) => t in LOG_TYPE_TO_SOURCE)
-  const types = effectiveLogTypes.length ? effectiveLogTypes : [...DEFAULT_LOG_TYPES]
-  const sources = types.map((t) => `'${LOG_TYPE_TO_SOURCE[t]}'`).join(', ')
-
-  return `(
-  SELECT
+const rowProjection = () => `
     id,
     null AS source_id,
-    timestamp AS timestamp,
+    timestamp,
     ${sourceCaseExpression()} AS log_type,
     toString(${ATTR.status}) AS status,
-    CASE
-      WHEN severity_text IN ('TRACE','DEBUG','INFO','LOG','NOTICE') THEN 'success'
-      WHEN severity_text IN ('WARN','WARNING') THEN 'warning'
-      WHEN severity_text IN ('ERROR','FATAL','CRITICAL','ALERT','EMERGENCY') THEN 'error'
-      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) BETWEEN 200 AND 299 THEN 'success'
-      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) BETWEEN 400 AND 499 THEN 'warning'
-      WHEN ${ATTR.status} != '' AND toInt32OrZero(${ATTR.status}) >= 500 THEN 'error'
-      ELSE 'success'
-    END AS level,
+    ${LEVEL_EXPR} AS level,
     ${ATTR.path} AS pathname,
-    event_message AS event_message,
+    event_message,
     ${ATTR.method} AS method,
     null AS log_count,
     null AS logs
-  FROM logs
-  WHERE source IN (${sources})
-)`
-}
+`
 
 /**
- * Unified logs SQL query
+ * Unified logs row query — flat SELECT, no subquery wrapper.
  */
 export const getUnifiedLogsQuery = (search: QuerySearchParamsType): string => {
-  const { finalWhere } = buildQueryConditions(search)
   const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
-
+  const sources = sourceListSql(effectiveLogTypes)
+  const predicates = [
+    `source IN (${sources})`,
+    ...buildPredicates(search).filter((p) => !p.startsWith('source IN ')),
+  ]
   return `
-SELECT
-    id,
-    source_id,
-    timestamp,
-    log_type,
-    status,
-    level,
-    pathname,
-    event_message,
-    method,
-    log_count,
-    logs
-FROM ${getUnifiedLogsSubquery(effectiveLogTypes)} AS unified_logs
-${finalWhere}
+SELECT ${rowProjection()}
+FROM logs
+${whereClause(predicates)}
 `
 }
 
-// Helper function to build WHERE clause excluding a specific field
-const buildFacetWhere = (search: QuerySearchParamsType, excludeField: string): string => {
-  const conditions: string[] = []
-
-  Object.entries(search).forEach(([key, value]) => {
-    if (key === excludeField) return // Skip the field we're getting facets for
-    if ((EXCLUDED_QUERY_PARAMS as readonly string[]).includes(key)) return // Skip pagination and special params
-
-    if (Array.isArray(value) && value.length > 0) {
-      conditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
-      return
-    }
-
-    if (value !== null && value !== undefined) {
-      if (['host', 'pathname'].includes(key)) {
-        conditions.push(`${key} LIKE '%${value}%'`)
-      } else {
-        conditions.push(`${key} = '${value}'`)
-      }
-    }
-  })
-
-  return conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
-}
-
 /**
- * Builds a single faceted-count SELECT (no CTE) with shape (dimension, value, count).
- * Suitable both for stand-alone use and for UNION ALL stitching.
+ * Single-facet count query — a complete flat SELECT with GROUP BY.
  */
 export const getFacetCountQuery = ({
   search,
@@ -227,86 +220,111 @@ export const getFacetCountQuery = ({
   logTypes?: string[]
 }) => {
   const MAX_FACETS_QUANTITY = 20
-  const baseWhere = buildFacetWhere(search, facet)
   const effectiveLogTypes = logTypes?.length ? logTypes : [...DEFAULT_LOG_TYPES]
+  const sources = sourceListSql(effectiveLogTypes)
 
-  const whereParts: string[] = []
-  if (baseWhere) {
-    whereParts.push(baseWhere.replace(/^WHERE /, ''))
-  }
-  whereParts.push(`${facet} IS NOT NULL`)
+  const facetExpr =
+    facet === 'log_type'
+      ? sourceCaseExpression()
+      : facet === 'level'
+        ? LEVEL_EXPR
+        : facet === 'method'
+          ? ATTR.method
+          : facet === 'status'
+            ? `toString(${ATTR.status})`
+            : facet === 'pathname'
+              ? ATTR.path
+              : `log_attributes['${facet}']`
+
+  const predicates = [
+    `source IN (${sources})`,
+    ...buildPredicates(search, facet).filter((p) => !p.startsWith('source IN ')),
+    `(${facetExpr}) IS NOT NULL AND (${facetExpr}) != ''`,
+  ]
   if (facetSearch) {
-    whereParts.push(`${facet} LIKE '%${facetSearch}%'`)
+    predicates.push(`(${facetExpr}) LIKE '%${facetSearch}%'`)
   }
-  const where = `WHERE ${whereParts.join(' AND ')}`
 
   return `
-SELECT '${facet}' AS dimension, ${facet} AS value, COUNT(*) AS count
-FROM ${getUnifiedLogsSubquery(effectiveLogTypes)} AS unified_logs
-${where}
-GROUP BY ${facet}
+SELECT '${facet}' AS dimension, (${facetExpr}) AS value, count() AS count
+FROM logs
+${whereClause(predicates)}
+GROUP BY value
 LIMIT ${MAX_FACETS_QUANTITY}
 `.trim()
 }
 
+/**
+ * Bundled count query — UNION ALL of (dimension, value, count) rows so the
+ * frontend can render facet counts and total in one round trip.
+ */
 export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
   const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
-  const subquery = `${getUnifiedLogsSubquery(effectiveLogTypes)} AS unified_logs`
-  const logTypeWhere = buildFacetWhere(search, 'log_type') || 'WHERE log_type IS NOT NULL'
-  const levelWhere = buildFacetWhere(search, 'level') || 'WHERE level IS NOT NULL'
+  const sources = sourceListSql(effectiveLogTypes)
+  const baseFilters = (excludeField?: string) =>
+    [
+      `source IN (${sources})`,
+      ...buildPredicates(search, excludeField).filter((p) => !p.startsWith('source IN ')),
+    ].join(' AND ')
 
-  // The static (log_type/level) buckets share one inner scan via per-row
-  // countIf, then the dynamic facet group-by counts are UNIONed in. Each
-  // branch re-references the subquery (no CTE support on the OTEL endpoint).
-  return `
-SELECT 'total' AS dimension, 'all' AS value, COUNT(*) AS count
-FROM ${subquery}
-${logTypeWhere}
+  const totalSql = `
+SELECT 'total' AS dimension, 'all' AS value, count() AS count
+FROM logs
+WHERE ${baseFilters('log_type')}
+`.trim()
 
-UNION ALL SELECT 'log_type' AS dimension, 'edge' AS value, countIf(log_type = 'edge') AS count
-FROM ${subquery} ${logTypeWhere}
-UNION ALL SELECT 'log_type', 'postgrest', countIf(log_type = 'postgrest')
-FROM ${subquery} ${logTypeWhere}
-UNION ALL SELECT 'log_type', 'storage', countIf(log_type = 'storage')
-FROM ${subquery} ${logTypeWhere}
-UNION ALL SELECT 'log_type', 'postgres', countIf(log_type = 'postgres')
-FROM ${subquery} ${logTypeWhere}
-UNION ALL SELECT 'log_type', 'edge function', countIf(log_type = 'edge function')
-FROM ${subquery} ${logTypeWhere}
-UNION ALL SELECT 'log_type', 'auth', countIf(log_type = 'auth')
-FROM ${subquery} ${logTypeWhere}
+  // For log_type and level, reuse a single SELECT each with countIf branches
+  // expanded via UNION ALL so the response shape stays (dimension, value, count).
+  const logTypeBranches = Object.entries(LOG_TYPE_TO_SOURCE)
+    .map(([logType, sourceName]) =>
+      `
+SELECT 'log_type' AS dimension, '${logType}' AS value, countIf(source = '${sourceName}') AS count
+FROM logs
+WHERE ${baseFilters('log_type')}
+`.trim()
+    )
+    .join('\nUNION ALL\n')
 
-UNION ALL SELECT 'level' AS dimension, 'success' AS value, countIf(level = 'success') AS count
-FROM ${subquery} ${levelWhere}
-UNION ALL SELECT 'level', 'warning', countIf(level = 'warning')
-FROM ${subquery} ${levelWhere}
-UNION ALL SELECT 'level', 'error', countIf(level = 'error')
-FROM ${subquery} ${levelWhere}
+  const levelBranches = ['success', 'warning', 'error']
+    .map((lvl) =>
+      `
+SELECT 'level' AS dimension, '${lvl}' AS value, countIf((${LEVEL_EXPR}) = '${lvl}') AS count
+FROM logs
+WHERE ${baseFilters('level')}
+`.trim()
+    )
+    .join('\nUNION ALL\n')
 
-UNION ALL ${getFacetCountQuery({ search, facet: 'method', logTypes: effectiveLogTypes })}
-UNION ALL ${getFacetCountQuery({ search, facet: 'status', logTypes: effectiveLogTypes })}
-UNION ALL ${getFacetCountQuery({ search, facet: 'pathname', logTypes: effectiveLogTypes })}
-`
+  const facetBranches = ['method', 'status', 'pathname']
+    .map((facet) => getFacetCountQuery({ search, facet, logTypes: effectiveLogTypes }))
+    .join('\nUNION ALL\n')
+
+  return [totalSql, logTypeBranches, levelBranches, facetBranches].join('\nUNION ALL\n')
 }
 
 /**
  * Logs chart query with dynamic bucketing based on time range.
  */
 export const getLogsChartQuery = (search: QuerySearchParamsType): string => {
-  const { finalWhere } = buildQueryConditions(search)
   const truncationLevel = calculateChartBucketing(search)
   const truncFn = truncationFunction(truncationLevel)
   const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
+  const sources = sourceListSql(effectiveLogTypes)
+
+  const predicates = [
+    `source IN (${sources})`,
+    ...buildPredicates(search).filter((p) => !p.startsWith('source IN ')),
+  ]
 
   return `
 SELECT
-  ${truncFn}(timestamp) as time_bucket,
-  countIf(level = 'success') as success,
-  countIf(level = 'warning') as warning,
-  countIf(level = 'error') as error,
-  COUNT(*) as total_per_bucket
-FROM ${getUnifiedLogsSubquery(effectiveLogTypes)} AS unified_logs
-${finalWhere}
+  ${truncFn}(timestamp) AS time_bucket,
+  countIf((${LEVEL_EXPR}) = 'success') AS success,
+  countIf((${LEVEL_EXPR}) = 'warning') AS warning,
+  countIf((${LEVEL_EXPR}) = 'error') AS error,
+  count() AS total_per_bucket
+FROM logs
+${whereClause(predicates)}
 GROUP BY time_bucket
 ORDER BY time_bucket ASC
 `
