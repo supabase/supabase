@@ -7,7 +7,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Input_Shadcn_ as Input,
+  Input,
   Label_Shadcn_,
   Textarea,
 } from 'ui'
@@ -24,7 +24,7 @@ export function KeyDetailsDialog({
   onClose: () => void
 }) {
   const jwksURL = useMemo(() => new URL('/auth/v1/.well-known/jwks.json', restURL), [restURL])
-  const jwk = useMemo(() => JSON.stringify(selectedKey.public_jwk, null, 2), [selectedKey])
+  const jwks = useMemo(() => JSON.stringify({ keys: [selectedKey.public_jwk]}, null, 2), [selectedKey])
 
   return (
     <>
@@ -46,7 +46,7 @@ export function KeyDetailsDialog({
             <FileKey className="size-4 text-foreground-light" />
             Public Key (JSON Web Key format)
           </Label_Shadcn_>
-          <Textarea className="font-mono text-sm" rows={8} value={jwk} readOnly />
+          <Textarea className="font-mono text-sm" rows={8} value={jwks} readOnly />
         </div>
       </DialogSection>
       <DialogFooter>
