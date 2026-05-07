@@ -44,12 +44,15 @@ SELECT dimension, value, count from ${facet}_count;
   return (data.result ?? []) as Option[]
 }
 
-export type UnifiedLogsFacetCountData = Awaited
+export type UnifiedLogsFacetCountData = Awaited<ReturnType<typeof getUnifiedLogsFacetCount>>
 export type UnifiedLogsFacetCountError = ExecuteSqlError
 
 export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>(
   { projectRef, search, facet, facetSearch }: UnifiedLogsFacetCountVariables,
-  { enabled = true, ...options }: UseCustomQueryOptions = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData> = {}
 ) =>
   useQuery<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData>({
     queryKey: logsKeys.unifiedLogsFacetCount(projectRef, facet, facetSearch, search),

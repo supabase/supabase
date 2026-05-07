@@ -106,7 +106,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   )
 
   const [useOtelEndpoint, setUseOtelEndpoint] = useLocalStorage<boolean>(
-    'logs-explorer-use-otel-endpoint',
+    `logs-explorer-use-otel-endpoint-${projectRef}`,
     false
   )
 
@@ -169,7 +169,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     },
   })
 
-  const addRecentLogSqlSnippet = (snippet: Partial) => {
+  const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
     const defaults: LogSqlSnippets.Content = {
       schema_version: '1',
       sql: '',
@@ -217,7 +217,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     } else {
       setTimeRange('', '')
     }
-    const queryParams: Record = { ...router.query, q: query }
+    const queryParams: Record<string, string | string[] | undefined> = { ...router.query, q: query }
     if (datePickerValue.isHelper) {
       delete queryParams.its
       delete queryParams.ite

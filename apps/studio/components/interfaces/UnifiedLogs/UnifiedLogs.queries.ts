@@ -22,7 +22,7 @@ const ATTR = {
 
 // Maps the studio-facing log_type label to the OTEL `source` value the
 // /logs.all.otel endpoint normalizes to.
-const LOG_TYPE_TO_SOURCE: Record = {
+const LOG_TYPE_TO_SOURCE: Record<string, string> = {
   edge: 'edge_logs',
   postgrest: 'postgrest_logs',
   storage: 'storage_logs',
@@ -72,8 +72,8 @@ const buildQueryConditions = (search: QuerySearchParamsType) => {
 /**
  * Calculates the chart bucketing level (minute/hour/day) given the date range.
  */
-const calculateChartBucketing = (search: SearchParamsType | Record): 'MINUTE' | 'HOUR' | 'DAY' => {
-  const dateRange = (search.date as Array) || []
+const calculateChartBucketing = (search: SearchParamsType | Record<string, unknown>): 'MINUTE' | 'HOUR' | 'DAY' => {
+  const dateRange = (search.date as Array<Date | string | number | null | undefined>) || []
 
   const convertToMillis = (timestamp: Date | string | number | null | undefined) => {
     if (!timestamp) return null

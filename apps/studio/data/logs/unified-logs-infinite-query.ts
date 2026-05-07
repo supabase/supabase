@@ -154,7 +154,16 @@ export async function getUnifiedLogs(
 
 export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
   { projectRef, search }: UnifiedLogsVariables,
-  { enabled = true, ...options }: UseCustomInfiniteQueryOptions = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomInfiniteQueryOptions<
+    UnifiedLogsData,
+    UnifiedLogsError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    PageParam | null
+  > = {}
 ) => {
   return useInfiniteQuery({
     queryKey: logsKeys.unifiedLogsInfinite(projectRef, search),

@@ -50,7 +50,12 @@ export async function getUnifiedLogsChart(
 
   if (error) handleError(error)
 
-  const chartData: Array = []
+  const chartData: Array<{
+    timestamp: number
+    success: number
+    warning: number
+    error: number
+  }> = []
 
   const dataByTimestamp = new Map<
     number,
@@ -139,12 +144,15 @@ export async function getUnifiedLogsChart(
   return chartData
 }
 
-export type UnifiedLogsChartData = Awaited
+export type UnifiedLogsChartData = Awaited<ReturnType<typeof getUnifiedLogsChart>>
 export type UnifiedLogsChartError = ExecuteSqlError
 
 export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
   { projectRef, search }: UnifiedLogsVariables,
-  { enabled = true, ...options }: UseCustomQueryOptions = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
 ) =>
   useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
     queryKey: logsKeys.unifiedLogsChart(projectRef, search),

@@ -32,8 +32,8 @@ export async function getUnifiedLogsCount(
   if (error) handleError(error)
 
   // Process count results into facets structure
-  const facets: Record = {}
-  const countsByDimension: Record = {}
+  const facets: Record<string, FacetMetadataSchema> = {}
+  const countsByDimension: Record<string, Map<string, number>> = {}
   let totalRowCount = 0
 
   // Group by dimension
@@ -74,12 +74,15 @@ export async function getUnifiedLogsCount(
   return { totalRowCount, facets }
 }
 
-export type UnifiedLogsCountData = Awaited
+export type UnifiedLogsCountData = Awaited<ReturnType<typeof getUnifiedLogsCount>>
 export type UnifiedLogsCountError = ExecuteSqlError
 
 export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
   { projectRef, search }: UnifiedLogsVariables,
-  { enabled = true, ...options }: UseCustomQueryOptions = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<UnifiedLogsCountData, UnifiedLogsCountError, TData> = {}
 ) =>
   useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
     queryKey: logsKeys.unifiedLogsCount(projectRef, search),

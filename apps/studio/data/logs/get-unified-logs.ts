@@ -63,9 +63,12 @@ export async function retrieveUnifiedLogs({
   return result
 }
 
-type LogDrainCreateData = Awaited
+type LogDrainCreateData = Awaited<ReturnType<typeof retrieveUnifiedLogs>>
 
-export const useGetUnifiedLogsMutation = ({ onSuccess, onError, ...options }: Omit = {}) => {
+export const useGetUnifiedLogsMutation = ({ onSuccess, onError, ...options }: Omit<
+  UseCustomMutationOptions<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>,
+  'mutationFn'
+> = {}) => {
   return useMutation<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>({
     mutationFn: (vars) => retrieveUnifiedLogs(vars),
     async onSuccess(data, variables, context) {
