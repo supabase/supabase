@@ -243,16 +243,37 @@ This takes time on your first run because the CLI needs to download the Docker i
 Once all of the Supabase services are running, you'll see output containing your local Supabase credentials. It should look like this, with urls and keys that you'll use in your local project:
 
 ```
-
 Started supabase local development setup.
 
-         API URL: http://localhost:54321
-          DB URL: postgresql://postgres:postgres@localhost:54322/postgres
-      Studio URL: http://localhost:54323
-     Mailpit URL: http://localhost:54324
-        anon key: eyJh......
-service_role key: eyJh......
+╭──────────────────────────────────────╮
+│ 🔧 Development Tools                 │
+├─────────┬────────────────────────────┤
+│ Studio  │ http://127.0.0.1:54323     │
+│ Mailpit │ http://127.0.0.1:54324     │
+│ MCP     │ http://127.0.0.1:54321/mcp │
+╰─────────┴────────────────────────────╯
 
+╭──────────────────────────────────────────────────────╮
+│ 🌐 APIs                                              │
+├────────────────┬─────────────────────────────────────┤
+│ Project URL    │ http://127.0.0.1:54321              │
+│ REST           │ http://127.0.0.1:54321/rest/v1      │
+│ GraphQL        │ http://127.0.0.1:54321/graphql/v1   │
+│ Edge Functions │ http://127.0.0.1:54321/functions/v1 │
+╰────────────────┴─────────────────────────────────────╯
+
+╭───────────────────────────────────────────────────────────────╮
+│ ⛁ Database                                                    │
+├─────┬─────────────────────────────────────────────────────────┤
+│ URL │ postgresql://postgres:postgres@127.0.0.1:54322/postgres │
+╰─────┴─────────────────────────────────────────────────────────╯
+
+╭──────────────────────────────────────────────────────────────╮
+│ 🔑 Authentication Keys                                       │
+├─────────────┬────────────────────────────────────────────────┤
+│ Publishable │ sb_publishable_...                             │
+│ Secret      │ sb_secret_...                                  │
+╰─────────────┴────────────────────────────────────────────────╯
 ```
 
 <Tabs
@@ -305,8 +326,7 @@ If you are accessing these services without the client libraries, you may need t
 
 ```sh
 curl 'http://localhost:54321/rest/v1/' \
-    -H "apikey: <anon key>" \
-    -H "Authorization: Bearer <anon key>"
+    -H "apikey: sb_publishable_..."
 
 http://localhost:54321/rest/v1/           # REST (PostgREST)
 http://localhost:54321/realtime/v1/       # Realtime
@@ -316,7 +336,7 @@ http://localhost:54321/auth/v1/           # Auth (GoTrue)
 
 <Admonition type="note">
 
-`<anon key>` is provided when you run the command `supabase start`.
+`sb_publishable_...` is the publishable key output when you run the command `supabase start`.
 
 </Admonition>
 

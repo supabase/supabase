@@ -17,7 +17,7 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
   const { ref } = useParams()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref }, { enabled: canReadAPIKeys })
-  const { data } = useProjectSettingsV2Query({ projectRef: ref })
+  useProjectSettingsV2Query({ projectRef: ref })
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 

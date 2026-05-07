@@ -5,15 +5,7 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-} from 'ui'
+import { Card, CardContent, CardFooter, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -78,24 +70,24 @@ export const OrganizationDetailsForm = () => {
   }, [selectedOrganization, orgDetailsForm, isUpdatingDetails])
 
   return (
-    <Form_Shadcn_ {...orgDetailsForm}>
+    <Form {...orgDetailsForm}>
       <form
         id="org-details-form"
         onSubmit={orgDetailsForm.handleSubmit(onUpdateOrganizationDetails)}
       >
         <Card>
           <CardContent>
-            <FormField_Shadcn_
+            <FormField
               control={orgDetailsForm.control}
               name="name"
               render={({ field }) => (
                 <FormItemLayout label="Organization name" layout="flex-row-reverse">
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Input_Shadcn_
                       {...field}
                       disabled={!canUpdateOrganization || isUpdatingDetails}
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -117,6 +109,6 @@ export const OrganizationDetailsForm = () => {
           </CardFooter>
         </Card>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

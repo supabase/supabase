@@ -345,8 +345,6 @@ export interface paths {
     /**
      * List all projects
      * @description Returns a list of all projects you've previously created.
-     *
-     *     Use `/v1/organizations/{slug}/projects` instead when possible to get more precise results and pagination support.
      */
     get: operations['v1-list-all-projects']
     put?: never
@@ -1155,6 +1153,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/database/backups/restore': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Restores a physical backup for a database */
+    post: operations['v1-restore-physical-backup']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/database/backups/restore-pitr': {
     parameters: {
       query?: never
@@ -1564,9 +1579,9 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Get project's just-in-time access configuration. */
+    /** [Beta] Get project's temporary access configuration. */
     get: operations['v1-get-jit-access-config']
-    /** [Beta] Update project's just-in-time access configuration. */
+    /** [Beta] Update project's temporary access configuration. */
     put: operations['v1-update-jit-access-config']
     post?: never
     delete?: never
@@ -3094,7 +3109,7 @@ export interface components {
      *     } */
     JitAccessRequestRequest: {
       /** @enum {string} */
-      state: 'enabled' | 'disabled' | 'unavailable'
+      state: 'enabled' | 'disabled'
     }
     JitAccessResponse: {
       /** Format: uuid */
@@ -3146,6 +3161,21 @@ export interface components {
         }[]
       }[]
     }
+    JitStateResponse:
+      | {
+          appliedSuccessfully?: boolean
+          /** @enum {string} */
+          state: 'enabled' | 'disabled'
+        }
+      | {
+          /** @enum {string} */
+          state: 'unavailable'
+          /** @enum {string} */
+          unavailableReason:
+            | 'manual_migration_required'
+            | 'postgres_upgrade_required'
+            | 'temporarily_unavailable'
+        }
     LegacyApiKeysResponse: {
       enabled: boolean
     }
@@ -4653,6 +4683,7 @@ export interface components {
     }
     V1BackupsResponse: {
       backups: {
+        id: number
         inserted_at: string
         is_physical_backup: boolean
         /** @enum {string} */
@@ -4919,6 +4950,7 @@ export interface components {
             | 'auth.advanced_auth_settings'
             | 'auth.performance_settings'
             | 'auth.password_hibp'
+            | 'auth.custom_oauth.max_providers'
             | 'backup.retention_days'
             | 'backup.restore_to_new_project'
             | 'function.max_count'
@@ -4951,54 +4983,6 @@ export interface components {
       name?: string
       version: string
     }[]
-    V1ListProjectsPaginatedResponse: {
-      pagination: {
-        /** @description Total number of projects. Use this to calculate the total number of pages. */
-        count: number
-        /** @description Maximum number of projects per page (actual number may be less) */
-        limit: number
-        /** @description Number of projects skipped in this response */
-        offset: number
-      }
-      projects: {
-        cloud_provider: string
-        disk_volume_size_gb?: number
-        id: number
-        /** @enum {string} */
-        infra_compute_size?:
-          | 'pico'
-          | 'nano'
-          | 'micro'
-          | 'small'
-          | 'medium'
-          | 'large'
-          | 'xlarge'
-          | '2xlarge'
-          | '4xlarge'
-          | '8xlarge'
-          | '12xlarge'
-          | '16xlarge'
-          | '24xlarge'
-          | '24xlarge_optimized_memory'
-          | '24xlarge_optimized_cpu'
-          | '24xlarge_high_memory'
-          | '48xlarge'
-          | '48xlarge_optimized_memory'
-          | '48xlarge_optimized_cpu'
-          | '48xlarge_high_memory'
-        inserted_at: string | null
-        is_branch_enabled: boolean
-        is_physical_backups_enabled: boolean | null
-        name: string
-        organization_id: number
-        organization_slug: string
-        preview_branch_refs: string[]
-        ref: string
-        region: string
-        status: string
-        subscription_id: string | null
-      }[]
-    }
     V1OrganizationMemberResponse: {
       email?: string
       mfa_enabled: boolean
@@ -5215,6 +5199,12 @@ export interface components {
     V1ReadOnlyQueryBody: {
       parameters?: unknown[]
       query: string
+    }
+    /** @example {
+     *       "id": 12345
+     *     } */
+    V1RestoreBackupBody: {
+      id: number
     }
     /** @example {
      *       "recovery_time_target_unix": 1740787200
@@ -5675,6 +5665,27 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   'v1-revoke-token': {
@@ -5738,6 +5749,27 @@ export interface operations {
           'application/json': components['schemas']['OrganizationResponseV1'][]
         }
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Unexpected error listing organizations */
       500: {
         headers: {
@@ -5767,6 +5799,27 @@ export interface operations {
         content: {
           'application/json': components['schemas']['OrganizationResponseV1']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Unexpected error creating an organization */
       500: {
@@ -6004,6 +6057,27 @@ export interface operations {
           'application/json': components['schemas']['OrganizationProjectsResponse']
         }
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve projects */
       500: {
         headers: {
@@ -6049,6 +6123,27 @@ export interface operations {
           'application/json': components['schemas']['V1ProjectWithDatabaseResponse'][]
         }
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   'v1-create-a-project': {
@@ -6071,6 +6166,27 @@ export interface operations {
         content: {
           'application/json': components['schemas']['V1ProjectResponse']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -7302,27 +7418,6 @@ export interface operations {
           'application/json': components['schemas']['BranchResponse'][]
         }
       }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
       /** @description Failed to retrieve database branches */
       500: {
         headers: {
@@ -7355,27 +7450,6 @@ export interface operations {
         content: {
           'application/json': components['schemas']['BranchResponse']
         }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
       /** @description Failed to create database branch */
       500: {
@@ -7454,27 +7528,6 @@ export interface operations {
         content: {
           'application/json': components['schemas']['BranchResponse']
         }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
       }
       /** @description Failed to fetch database branch */
       500: {
@@ -9573,6 +9626,51 @@ export interface operations {
       }
     }
   }
+  'v1-restore-physical-backup': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1RestoreBackupBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-restore-pitr-backup': {
     parameters: {
       query?: never
@@ -11184,7 +11282,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitAccessResponse']
+          'application/json': components['schemas']['JitStateResponse']
         }
       }
       /** @description Unauthorized */
@@ -11208,7 +11306,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to retrieve project's JIT access config */
+      /** @description Failed to retrieve project's temporary access configuration. */
       500: {
         headers: {
           [name: string]: unknown
@@ -11238,7 +11336,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitAccessResponse']
+          'application/json': components['schemas']['JitStateResponse']
         }
       }
       /** @description Unauthorized */
@@ -11262,7 +11360,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to update project's just-in-time access configuration. */
+      /** @description Failed to update project's temporary access configuration. */
       500: {
         headers: {
           [name: string]: unknown
@@ -12948,6 +13046,27 @@ export interface operations {
           'application/json': components['schemas']['SnippetList']
         }
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to list user's SQL snippets */
       500: {
         headers: {
@@ -12975,6 +13094,27 @@ export interface operations {
         content: {
           'application/json': components['schemas']['SnippetResponse']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve SQL snippet */
       500: {

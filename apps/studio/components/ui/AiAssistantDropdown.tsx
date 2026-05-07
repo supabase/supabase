@@ -49,6 +49,7 @@ export interface AiAssistantDropdownProps {
   label: string
   iconOnly?: boolean
   onOpenAssistant: () => void
+  onCopyPrompt?: () => void
   telemetrySource?: TelemetrySource
   size?: ComponentProps<typeof Button>['size']
   type?: ComponentProps<typeof Button>['type']
@@ -67,6 +68,7 @@ export function AiAssistantDropdown({
   label,
   iconOnly = false,
   onOpenAssistant,
+  onCopyPrompt,
   telemetrySource,
   size = 'tiny',
   type = 'default',
@@ -94,6 +96,7 @@ export function AiAssistantDropdown({
     copyToClipboard(prompt)
     setShowCopied(true)
     setIsOpen(false)
+    onCopyPrompt?.()
 
     if (telemetrySource) {
       track('ai_prompt_copied', { source: telemetrySource })

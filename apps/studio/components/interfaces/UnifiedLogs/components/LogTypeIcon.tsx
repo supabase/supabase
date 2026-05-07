@@ -1,5 +1,5 @@
 import { Auth, EdgeFunctions, Storage } from 'icons'
-import { BookHeart, Box, Cpu, Database, Globe } from 'lucide-react'
+import { BookHeart, Box, Database } from 'lucide-react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { type LOG_TYPES } from '../UnifiedLogs.constants'

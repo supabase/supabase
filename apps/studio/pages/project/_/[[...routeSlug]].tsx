@@ -85,8 +85,8 @@ const GenericProjectPage: NextPage = () => {
   return (
     <div className="h-screen flex flex-col">
       <Header />
-      <PageLayout className="flex-grow min-h-0" title="Select a project to continue">
-        <ScaffoldContainer className="flex-grow flex flex-col gap-y-4">
+      <PageLayout className="grow min-h-0" title="Select a project to continue">
+        <ScaffoldContainer className="grow flex flex-col gap-y-4">
           <ScaffoldSection isFullWidth className="py-0">
             <div className="flex items-center gap-x-2">
               {isLoadingOrganizations ? (

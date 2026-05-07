@@ -3,6 +3,8 @@
   "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
     "allowJs": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "lib": ["dom", "dom.iterable", "esnext"],
     "paths": {
       "@/*": ["./*"],

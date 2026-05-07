@@ -158,7 +158,7 @@ preflight() {
         | grep -E '^db-config$|_db-config$' | head -n 1)
     [ -n "$db_config_vol" ] || die "Could not find db-config volume. Is Supabase running?"
 
-    # Read the target PG17 image from the compose overlay (what the user will run)
+    # Read the target PG17 image from the compose override (what the user will run)
     PG17_TARGET_IMAGE=$(grep 'image:.*postgres' docker-compose.pg17.yml | awk '{print $2}' | head -n 1)
     [ -n "$PG17_TARGET_IMAGE" ] || die "Could not read image from docker-compose.pg17.yml."
 

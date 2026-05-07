@@ -7,7 +7,6 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
-import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { OAuthServerSettingsForm } from '@/components/interfaces/Auth/OAuthApps/OAuthServerSettingsForm'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'

@@ -1,12 +1,14 @@
+@reference "./main.css";
+
 .storage-container {
   .sbui-space-col {
-    @apply flex-grow;
+    @apply grow;
     #files {
       @apply h-full;
     }
   }
   .sbui-btn {
-    @apply focus:outline-none;
+    @apply focus:outline-hidden;
   }
   .sbui-btn-default {
     @apply border;

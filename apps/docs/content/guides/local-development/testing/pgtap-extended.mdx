@@ -336,7 +336,34 @@ create table public.comments (
 );
 ```
 
-#### 2. RLS policies declaration
+#### 2. Grant role privileges
+
+Grant the necessary privileges for each role, ensuring the principle of least privilege is followed:
+
+```sql
+-- Grant the privileges that roles need
+GRANT SELECT ON public.profiles TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO service_role;
+
+GRANT SELECT ON public.organizations TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.organizations TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.organizations TO service_role;
+
+GRANT SELECT ON public.org_members TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.org_members TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.org_members TO service_role;
+
+GRANT SELECT ON public.posts TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.posts TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.posts TO service_role;
+
+GRANT SELECT ON public.comments TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.comments TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.comments TO service_role;
+```
+
+#### 3. RLS policies declaration
 
 Now to setup the RLS policies for each tables:
 
@@ -465,7 +492,7 @@ create policy "Users can update their own comments"
   on public.comments for update using (author_id = (select auth.uid()));
 ```
 
-#### 3. Test cases:
+#### 4. Test cases:
 
 Now everything is setup, let's write RLS test cases, note that each section could be in its own test:
 

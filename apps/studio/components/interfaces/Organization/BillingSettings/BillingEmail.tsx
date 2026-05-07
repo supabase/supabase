@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { FormMessage_Shadcn_, Input_Shadcn_ } from 'ui'
+import { FormMessage, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import {
@@ -133,7 +133,7 @@ const BillingEmail = () => {
                   </div>
                 }
               >
-                <FormSection className="!px-8">
+                <FormSection className="px-8!">
                   <FormSectionContent fullWidth loading={loadingBillingCustomer}>
                     <FormField
                       control={form.control}
@@ -148,7 +148,7 @@ const BillingEmail = () => {
                               disabled={!canUpdateOrganization}
                             />
                           </FormControl>
-                          <FormMessage_Shadcn_ />
+                          <FormMessage />
                         </FormItemLayout>
                       )}
                     />
@@ -188,7 +188,7 @@ const BillingEmail = () => {
                           {Array.isArray(additionalEmailsError) &&
                             additionalEmailsError.length > 0 && (
                               <div className="flex flex-col gap-y-1 mt-2">
-                                {additionalEmailsError.map((x, idx) => (
+                                {additionalEmailsError.map((_x, idx) => (
                                   <p
                                     key={`email-error-${idx}`}
                                     className="text-sm text-destructive"

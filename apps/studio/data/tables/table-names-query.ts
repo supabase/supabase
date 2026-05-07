@@ -1,3 +1,4 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
@@ -15,7 +16,7 @@ export type TableNamesVariables = {
   connectionString?: string | null
 }
 
-const TABLE_NAMES_SQL = /* sql */ `
+const TABLE_NAMES_SQL = safeSql`
 select
   c.oid::int8 as id,
   nc.nspname as schema,
@@ -31,7 +32,7 @@ where c.relkind in ('r', 'p')
     or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
   )
 order by nc.nspname, c.relname
-`.trim()
+`
 
 export async function getTableNames(
   { projectRef, connectionString }: TableNamesVariables,

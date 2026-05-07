@@ -3,15 +3,7 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Modal,
-  Textarea,
-} from 'ui'
+import { Button, Form, FormControl, FormField, Input_Shadcn_, Modal, Textarea } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -91,28 +83,28 @@ export const UpdateCustomReportModal = ({
       header="Update custom report"
       size="small"
     >
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(onConfirmUpdateReport)} noValidate>
           <Modal.Content>
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItemLayout name="name" layout="vertical" label="Name">
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Input_Shadcn_ {...field} id="name" />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
           </Modal.Content>
           <Modal.Content>
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItemLayout name="description" layout="vertical" label="Description">
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <Textarea
                       {...field}
                       id="description"
@@ -120,7 +112,7 @@ export const UpdateCustomReportModal = ({
                       placeholder="Describe your custom report"
                       className="resize-none"
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -135,7 +127,7 @@ export const UpdateCustomReportModal = ({
             </Button>
           </Modal.Content>
         </form>
-      </Form_Shadcn_>
+      </Form>
     </Modal>
   )
 }
