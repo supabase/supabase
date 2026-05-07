@@ -84,7 +84,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
               <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
             </h1>
             {meta?.referenceLink && (
-              <div className="text-base font-mono text-foreground-light flex items-center gap-2">
+              <div className="text-base font-mono text-foreground-light flex items-center mt-2 gap-2">
                 {meta.referenceLinkLabel}
                 <a
                   target="_blank"
