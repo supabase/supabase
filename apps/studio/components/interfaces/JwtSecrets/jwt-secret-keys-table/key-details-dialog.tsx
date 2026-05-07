@@ -7,7 +7,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Input,
+  Input_Shadcn_ as Input,
   Label_Shadcn_,
   Textarea,
 } from 'ui'

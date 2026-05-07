@@ -69,6 +69,7 @@ David Alvarez
 David Birdsong
 David Camacho Cateura
 David Weitzman
+David Whittington
 Davide Pellegatta
 Deepthi Sigireddi
 Deji I
@@ -150,6 +151,7 @@ Kang Ming Tay
 Karan S
 Karlo Ison
 Katerina Skroumpelou
+Keith Fiske
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
@@ -181,6 +183,7 @@ Matthias Luft
 Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
+Michelle Jubrey
 Miles Thomas
 Monica Khoury
 Mykhailo Mischa Lieibenson
@@ -258,6 +261,7 @@ Tyler Shukert
 TzeYiing L
 Utkarash Singh
 Victor Farazdagi
+Warwick Mitchell
 Wen Bo Xie
 Yorvi Arias
 Yuliya Marinova

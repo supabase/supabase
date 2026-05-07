@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Input, Modal } from 'ui'
+import { Input_Shadcn_ as Input, Modal } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
 import { tryParseJson } from '@/lib/helpers'
@@ -48,24 +49,28 @@ export const SendMessageModal = ({
       }}
     >
       <Modal.Content className="flex flex-col gap-y-4">
-        <Input
-          label="Message name"
-          size="small"
-          className="grow"
-          value={values.message}
-          onChange={(v) => setValues({ ...values, message: v.target.value })}
-        />
-        <div className="flex flex-col gap-y-2">
-          <p className="text-sm text-scale-1100">Message payload</p>
-          <CodeEditor
-            id="message-payload"
-            language="json"
-            className="mb-0! h-32 overflow-hidden rounded-sm border"
-            onInputChange={(e: string | undefined) => setValues({ ...values, payload: e ?? '{}' })}
-            options={{ wordWrap: 'off', contextmenu: false }}
-            value={values.payload}
+        <FormItemLayout label="Message name" layout="vertical" isReactForm={false}>
+          <Input
+            size="small"
+            value={values.message}
+            onChange={(v) => setValues({ ...values, message: v.target.value })}
           />
-          {error !== undefined && <p className="text-sm text-red-900">{error}</p>}
+        </FormItemLayout>
+
+        <div className="flex flex-col gap-y-2">
+          <FormItemLayout label="Message payload" layout="vertical" isReactForm={false}>
+            <CodeEditor
+              id="message-payload"
+              language="json"
+              className="mb-0! h-32 overflow-hidden rounded-sm border"
+              onInputChange={(e: string | undefined) =>
+                setValues({ ...values, payload: e ?? '{}' })
+              }
+              options={{ wordWrap: 'off', contextmenu: false }}
+              value={values.payload}
+            />
+            {error !== undefined && <p className="text-sm text-red-900">{error}</p>}
+          </FormItemLayout>
         </div>
       </Modal.Content>
     </Modal>

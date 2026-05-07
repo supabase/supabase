@@ -10,7 +10,6 @@ import {
   Form,
   FormControl,
   FormField,
-  Input,
   Input_Shadcn_,
   Sheet,
   SheetContent,
@@ -19,6 +18,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 

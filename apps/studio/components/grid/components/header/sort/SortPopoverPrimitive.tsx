@@ -243,7 +243,7 @@ export const SortPopoverPrimitive = ({
             {displayButtonText}
           </Button>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
+        <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="center">
           <div className="space-y-2 py-2">
             <DndContext
               sensors={sensors}

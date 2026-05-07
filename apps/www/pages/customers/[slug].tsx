@@ -8,7 +8,7 @@ import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import matter from 'gray-matter'
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
-import { MDXRemote } from 'next-mdx-remote'
+import { MDXClient } from 'next-mdx-remote-client/csr'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -228,7 +228,7 @@ function CaseStudyPage(props: any) {
                       </div>
                     </div>
                     <div className="xm:col-span-7 col-span-12 lg:col-span-8 xl:col-span-8 ">
-                      <MDXRemote {...content} components={mdxComponents()} />
+                      <MDXClient {...content} components={mdxComponents()} />
                     </div>
                   </div>
                 </article>

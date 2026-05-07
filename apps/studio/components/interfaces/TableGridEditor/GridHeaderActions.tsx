@@ -1,5 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Lock, PlusCircle, Unlock } from 'lucide-react'
+import { useParams } from 'common'
+import { Realtime } from 'icons'
+import { BookOpenText, Lightbulb, Lock, MoreVertical, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -7,6 +9,11 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -16,18 +23,18 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { EnableIndexAdvisorDialog } from '../QueryPerformance/IndexAdvisor/EnableIndexAdvisorButton'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector/RoleImpersonationPopover'
-import { IndexAdvisorPopover } from './IndexAdvisorPopover'
 import { InsertButton } from './InsertButton'
-import { RealtimeToggle } from './RealtimeToggle'
+import { RealtimeToggleDialog } from './RealtimeToggleDialog'
 import { SecurityDefinerViewPopover } from './SecurityDefinerViewPopover'
 import { ViewEntityAutofixSecurityModal } from './ViewEntityAutofixSecurityModal'
 import { RefreshButton } from '@/components/grid/components/header/RefreshButton'
 import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
 import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
-import { APIDocsButton } from '@/components/ui/APIDocsButton'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useIsTableRealtimeEnabled } from '@/data/database-publications/database-publications-query'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import {
   Entity,
@@ -37,22 +44,34 @@ import {
   isView as isTableLikeView,
 } from '@/data/table-editor/table-editor-types'
 import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
+import { useAppStateSnapshot } from '@/state/app-state'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface GridHeaderActionsProps {
   table: Entity
   isRefetching: boolean
 }
-
 export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
   const track = useTrack()
+  const { ref } = useParams()
+  const appSnap = useAppStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
+
+  const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
+  const [realtimeDialogOpen, setRealtimeDialogOpen] = useState(false)
+  const [indexAdvisorDialogOpen, setIndexAdvisorDialogOpen] = useState(false)
+  const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
 
   const [showWarning, setShowWarning] = useQueryState(
     'showWarning',
@@ -74,6 +93,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
+  const isRealtimeEnabled = useIsTableRealtimeEnabled({ id: table.id })
+
   const { mutate: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to toggle RLS: ${error.message}`)
@@ -83,10 +104,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     },
   })
 
-  const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
-  const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
-
-  const snap = useTableEditorTableStateSnapshot()
   const showHeaderActions = snap.selectedRows.size === 0
 
   const projectRef = project?.ref
@@ -138,6 +155,23 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const closeConfirmModal = () => {
     setRlsConfirmModalOpen(false)
   }
+
+  const onViewAPIDocs = () => {
+    appSnap.setActiveDocsSection(['entities', table.name])
+    appSnap.setShowProjectApiDocs(true)
+
+    sendEvent({
+      action: 'api_docs_opened',
+      properties: {
+        source: 'table_editor',
+      },
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
+    })
+  }
+
   const onToggleRLS = async () => {
     const payload = {
       id: table.id,
@@ -316,13 +350,37 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
 
           <RoleImpersonationPopover header="View data as a role" align="center" />
 
-          {isTable && isIndexAdvisorAvailable && !isIndexAdvisorEnabled && <IndexAdvisorPopover />}
-
-          {isTable && realtimeEnabled && <RealtimeToggle table={table} />}
-
-          {doesHaveAutoGeneratedAPIDocs && (
-            <APIDocsButton section={['entities', table.name]} source="table_editor" />
-          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="default" icon={<MoreVertical />} className="h-7 w-7" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-48">
+              {isTable && realtimeEnabled && (
+                <DropdownMenuItem className="gap-x-2" onClick={() => setRealtimeDialogOpen(true)}>
+                  <Realtime size={14} className={isRealtimeEnabled ? 'text-brand' : ''} />
+                  <span>{isRealtimeEnabled ? 'Disable' : 'Enable'} Realtime</span>
+                </DropdownMenuItem>
+              )}
+              {doesHaveAutoGeneratedAPIDocs && (
+                <DropdownMenuItem className="gap-x-2" onClick={() => onViewAPIDocs()}>
+                  <BookOpenText size={14} />
+                  <span>View API docs</span>
+                </DropdownMenuItem>
+              )}
+              {isTable && isIndexAdvisorAvailable && !isIndexAdvisorEnabled && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="gap-x-2"
+                    onClick={() => setIndexAdvisorDialogOpen(true)}
+                  >
+                    <Lightbulb size={14} />
+                    <span>Enable Index Advisor</span>
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <RefreshButton tableId={table.id} isRefetching={isRefetching} />
 
@@ -351,6 +409,14 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           onConfirm={onToggleRLS}
         />
       )}
+
+      <RealtimeToggleDialog
+        table={table}
+        open={realtimeDialogOpen}
+        setOpen={setRealtimeDialogOpen}
+      />
+
+      <EnableIndexAdvisorDialog open={indexAdvisorDialogOpen} setOpen={setIndexAdvisorDialogOpen} />
     </div>
   )
 }
