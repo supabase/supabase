@@ -40,7 +40,7 @@ With `@supabase/server` you just declare who can call your endpoint and get a fu
 - Built-in request/auth helpers
 
 ```typescript
-import { withSupabase } from '@supabase/server'
+import { withSupabase } from 'npm:@supabase/server'
 
 // Typical Deno.serve usage
 Deno.serve(
@@ -89,7 +89,7 @@ export default {
 If you need more control over error handling and responses, you can also call `createSupabaseContext` directly:
 
 ```typescript
-import { createSupabaseContext } from '@supabase/server'
+import { createSupabaseContext } from 'npm:@supabase/server'
 
 export default {
   fetch: async (req) => {
@@ -184,8 +184,6 @@ You had to install `jose`, configure a JWKS endpoint, build your own auth middle
 We fixed it. `@supabase/server` handles new key validation and JWT verification internally. You adopt the package and the new security model comes with it. No `jose`. No JWKS configuration. No manual secret setup.
 
 ```typescript
-import { withSupabase } from '@supabase/server'
-
 export default {
   // auth: 'user' will handle incoming user JWT validation for you
   fetch: withSupabase({ auth: 'user' }, async (req, { supabase }) => {
@@ -204,6 +202,8 @@ Now you get support for the new auth keys without manual JWT verification. Delet
 Edge Functions and Cloudflare Workers:
 
 ```typescript
+import { withSupabase } from 'npm:@supabase/server'
+
 export default {
   fetch: withSupabase({ auth: 'user' }, handler),
 }
@@ -342,7 +342,7 @@ with the admin client
 Or write it by hand:
 
 ```typescript
-import { withSupabase } from '@supabase/server'
+import { withSupabase } from 'npm:@supabase/server'
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
