@@ -133,7 +133,9 @@ export default function HubSpotFormEmbed({
   }, [portalId, formId, region, targetId])
 
   return (
-    <div className={className}>
+    <div className={`hubspot-form-themed ${className ?? ''}`}>
+      <HubSpotFormThemeStyles />
+
       <div id={targetId} ref={containerRef} aria-busy={state === 'loading'} />
 
       {state === 'loading' && (
@@ -152,5 +154,127 @@ export default function HubSpotFormEmbed({
         </p>
       )}
     </div>
+  )
+}
+
+/**
+ * Scoped overrides that re-skin HubSpot's default form CSS using the project's
+ * theme tokens. HubSpot ships its own stylesheet alongside the embed script;
+ * these rules sit on top so the form follows light/dark theme automatically.
+ */
+function HubSpotFormThemeStyles() {
+  return (
+    <style>{`
+      .hubspot-form-themed .hbspt-form,
+      .hubspot-form-themed .hs-form,
+      .hubspot-form-themed .hs-form fieldset {
+        background: transparent;
+        max-width: none;
+      }
+      .hubspot-form-themed .hs-richtext,
+      .hubspot-form-themed .hs-richtext * {
+        color: hsl(var(--foreground-light));
+      }
+      .hubspot-form-themed .hs-form-field > label,
+      .hubspot-form-themed .hs-form-field legend {
+        color: hsl(var(--foreground-default));
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+      .hubspot-form-themed .hs-form-required {
+        color: hsl(var(--destructive-default));
+        margin-left: 0.125rem;
+      }
+      .hubspot-form-themed .hs-input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='submit']) {
+        background-color: hsl(var(--background-surface-100));
+        color: hsl(var(--foreground-default));
+        border: 1px solid hsl(var(--border-default));
+        border-radius: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        width: 100%;
+      }
+      .hubspot-form-themed select.hs-input {
+        appearance: none;
+      }
+      .hubspot-form-themed .hs-input::placeholder {
+        color: hsl(var(--foreground-lighter));
+      }
+      .hubspot-form-themed .hs-input:focus,
+      .hubspot-form-themed .hs-input:focus-visible {
+        outline: none;
+        border-color: hsl(var(--foreground-default));
+        box-shadow: 0 0 0 1px hsl(var(--foreground-default));
+      }
+      .hubspot-form-themed .hs-input.invalid,
+      .hubspot-form-themed .hs-input.error {
+        border-color: hsl(var(--destructive-default));
+      }
+      .hubspot-form-themed .hs-error-msgs {
+        list-style: none;
+        padding: 0;
+        margin: 0.375rem 0 0;
+      }
+      .hubspot-form-themed .hs-error-msg,
+      .hubspot-form-themed .hs-error-msgs label {
+        color: hsl(var(--destructive-default));
+        font-size: 0.75rem;
+      }
+      .hubspot-form-themed .legal-consent-container,
+      .hubspot-form-themed .legal-consent-container * {
+        color: hsl(var(--foreground-lighter));
+        font-size: 0.75rem;
+        line-height: 1.5;
+      }
+      .hubspot-form-themed .legal-consent-container a {
+        color: hsl(var(--brand-link));
+        text-decoration: underline;
+      }
+      .hubspot-form-themed .hs-form-field {
+        margin-bottom: 1rem;
+      }
+      .hubspot-form-themed .input {
+        margin-right: 0;
+      }
+      .hubspot-form-themed .hs-button.primary,
+      .hubspot-form-themed input[type='submit'].hs-button {
+        background-color: hsl(var(--foreground-default));
+        color: hsl(var(--background-default));
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        width: 100%;
+        transition: opacity 150ms ease;
+      }
+      .hubspot-form-themed .hs-button.primary:hover,
+      .hubspot-form-themed input[type='submit'].hs-button:hover {
+        opacity: 0.9;
+      }
+      .hubspot-form-themed .hs-button.primary:disabled,
+      .hubspot-form-themed input[type='submit'].hs-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .hubspot-form-themed .hs-fieldtype-booleancheckbox label,
+      .hubspot-form-themed .hs-fieldtype-checkbox label {
+        color: hsl(var(--foreground-light));
+        font-weight: 400;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      .hubspot-form-themed input[type='checkbox'].hs-input,
+      .hubspot-form-themed input[type='radio'].hs-input {
+        accent-color: hsl(var(--foreground-default));
+      }
+      .hubspot-form-themed .submitted-message {
+        color: hsl(var(--foreground-default));
+      }
+    `}</style>
   )
 }
