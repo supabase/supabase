@@ -3,12 +3,14 @@ import { z } from 'zod'
 
 import { deployEdgeFunction } from '@/data/edge-functions/edge-functions-deploy-mutation'
 import { executeSql } from '@/data/sql/execute-sql-query'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import {
   EDGE_FUNCTION_PROMPT,
   PG_BEST_PRACTICES,
   REALTIME_PROMPT,
   RLS_PROMPT,
 } from '@/lib/ai/prompts'
+import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
 import { fixSqlBackslashEscapes } from '@/lib/ai/util'
 
 const KNOWLEDGE = {
@@ -50,10 +52,11 @@ export type StudioToolsContext = {
   projectRef?: string
   connectionString?: string
   authorization?: string
+  aiOptInLevel?: AiOptInLevel
 }
 
 export const getStudioTools = (ctx: StudioToolsContext = {}) => {
-  const { projectRef, connectionString, authorization } = ctx
+  const { projectRef, connectionString, authorization, aiOptInLevel = 'schema' } = ctx
   const authHeaders = authorization
     ? { 'Content-Type': 'application/json', Authorization: authorization }
     : undefined
@@ -61,16 +64,16 @@ export const getStudioTools = (ctx: StudioToolsContext = {}) => {
   return {
     execute_sql: tool({
       description:
-        'Asks the user to execute a SQL statement and return the results. Requires user approval for write queries.',
+        'Asks the user to execute a SQL statement and return the results. Requires user approval before executing.',
       inputSchema: executeSqlInputSchema,
-      needsApproval: (input) => input.isWriteQuery === true,
+      needsApproval: true,
       execute: async ({ sql }) => {
         const { result } = await executeSql(
           { projectRef, connectionString, sql },
           undefined,
           authHeaders
         )
-        return result
+        return aiOptInLevel === 'schema_and_log_and_data' ? result : NO_DATA_PERMISSIONS
       },
     }),
     deploy_edge_function: tool({
