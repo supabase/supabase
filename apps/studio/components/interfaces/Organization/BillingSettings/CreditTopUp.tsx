@@ -246,7 +246,10 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
   const onSuccessfulPayment = async () => {
     onTopUpDialogVisibilityChange(false)
-    await queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) })
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) }),
+      queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgBalance(slug) }),
+    ])
     toast.success(
       'Successfully topped up balance. It may take a minute to reflect in your account.'
     )

@@ -1,13 +1,112 @@
-@import 'tailwindcss';
-
-@import './../../../packages/ui/build/css/source/global.css';
-@import './../../../packages/ui/build/css/themes/dark.css';
-@import './../../../packages/ui/build/css/themes/light.css';
+@import 'config/tailwind.config.css';
 @import './../../../packages/ui/build/css/themes/classic-dark.css';
-
 @import 'config/typography.css';
 
-@config '../tailwind.config.ts';
+@source '../pages/**/*.{js,ts,jsx,tsx}';
+@source '../components/**/*.{js,ts,jsx,tsx}';
+@source './../../../packages/ui/src/**/*.{tsx,ts,js}';
+@source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+
+@theme {
+  --text-grid: 13px;
+
+  --color-typography-body-light: hsl(var(--foreground-light));
+  --color-typography-body-dark: hsl(var(--foreground-light));
+  --color-typography-body-secondary-light: hsl(var(--foreground-lighter));
+  --color-typography-body-secondary-dark: hsl(var(--foreground-lighter));
+  --color-typography-body-strong-light: hsl(var(--foreground-default));
+  --color-typography-body-strong-dark: hsl(var(--foreground-default));
+  --color-typography-body-faded-light: hsl(var(--foreground-muted));
+  --color-typography-body-faded-dark: hsl(var(--foreground-muted));
+
+  --color-table-body-light: hsl(var(--background-default));
+  --color-table-body-dark: hsl(var(--background-default));
+  --color-table-header-light: hsl(var(--background-surface-100));
+  --color-table-header-dark: hsl(var(--background-surface-100));
+  --color-table-footer-light: hsl(var(--background-surface-100));
+  --color-table-footer-dark: hsl(var(--background-surface-100));
+  --color-table-border-light: hsl(var(--border-default));
+  --color-table-border-dark: hsl(var(--border-default));
+
+  --color-panel-body-light: hsl(var(--background-surface-100));
+  --color-panel-body-dark: hsl(var(--background-surface-100));
+  --color-panel-header-light: hsl(var(--background-surface-100));
+  --color-panel-header-dark: hsl(var(--background-surface-100));
+  --color-panel-footer-light: hsl(var(--background-surface-100));
+  --color-panel-footer-dark: hsl(var(--background-surface-100));
+  --color-panel-border-light: hsl(var(--border-default));
+  --color-panel-border-dark: hsl(var(--border-default));
+  --color-panel-border-interior-light: hsl(var(--border-muted));
+  --color-panel-border-interior-dark: hsl(var(--border-muted));
+  --color-panel-border-hover-light: hsl(var(--border-muted));
+  --color-panel-border-hover-dark: hsl(var(--border-muted));
+
+  --animate-shimmer: shimmer 2s infinite linear;
+  --animate-badge-shimmer: badge-shimmer 3s ease-in-out infinite;
+  --animate-badge-pulse: badge-pulse 3s ease-in-out infinite;
+  --animate-chevron-up: chevron-up 2s ease-in-out infinite;
+  --animate-sway: sway 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes badge-shimmer {
+  0% {
+    transform: rotate(-45deg) translateX(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 1;
+  }
+  50% {
+    transform: rotate(-45deg) translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(-45deg) translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes badge-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes chevron-up {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-10deg) scale(1.5) translateY(4rem);
+  }
+  50% {
+    transform: rotate(10deg) scale(1.5) translateY(2rem);
+  }
+}
 
 :root {
   --chart-1: var(--brand-default);
