@@ -280,14 +280,17 @@ export const PolicyEditorPanel = memo(function ({
           command: command.toLowerCase(),
           roles: roles.length === 1 && roles[0] === 'public' ? '' : roles.join(', '),
         })
-        if (selectedPolicy.definition) setUsing(safeSql`  ${selectedPolicy.definition}`)
-        if (selectedPolicy.check && selectedPolicy.command === 'INSERT')
-          setUsing(safeSql`  ${selectedPolicy.check}`)
-        if (selectedPolicy.check && selectedPolicy.command !== 'INSERT')
-          setCheck(safeSql`  ${selectedPolicy.check}`)
-        if (selectedPolicy.check && selectedPolicy.command !== 'INSERT') {
-          setShowCheckBlock(true)
+
+        // For INSERT: editor one holds the check expression (not using)
+        // For others: editor one = using, editor two = optional check
+        if (selectedPolicy.definition) {
+          setUsing(safeSql`  ${selectedPolicy.definition}`)
         }
+        if (selectedPolicy.check) {
+          if (selectedPolicy.command === 'INSERT') setUsing(safeSql`  ${selectedPolicy.check}`)
+          else setCheck(safeSql`  ${selectedPolicy.check}`)
+        }
+
         setRolesFragment(
           roles.length === 1 && roles[0] === 'public'
             ? safeSql`public`
@@ -356,6 +359,7 @@ export const PolicyEditorPanel = memo(function ({
                     <LockedCreateQuerySection
                       schema={schema}
                       selectedPolicy={selectedPolicy}
+                      isRenamingPolicy={isRenamingPolicy}
                       formFields={{ name, table, behavior, command, roles }}
                     />
 
@@ -578,7 +582,10 @@ export const PolicyEditorPanel = memo(function ({
                             form.setValue('roles', value.roles.join(', ') ?? '')
 
                             setUsing(safeSql`  ${value.definition}`)
-                            setCheck(safeSql`  ${value.check}`)
+                            if (value.command === 'insert' && value.check) {
+                              setCheck(safeSql`  ${value.check}`)
+                            }
+
                             setRolesFragment(
                               value.roles.length === 0 ||
                                 (value.roles.length === 1 && value.roles[0] === 'public')
