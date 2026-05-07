@@ -1,14 +1,16 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
 
 import { logsKeys } from './keys'
 import { UNIFIED_LOGS_QUERY_OPTIONS, UnifiedLogsVariables } from './unified-logs-infinite-query'
 import { getLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { getLogsChartQuery as getLogsChartQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { handleError, post } from '@/data/fetchers'
 import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
 import { UseCustomQueryOptions } from '@/types'
 
 export async function getUnifiedLogsChart(
-  { projectRef, search }: UnifiedLogsVariables,
+  { projectRef, search, useOtel = false }: UnifiedLogsVariables & { useOtel?: boolean },
   signal?: AbortSignal,
   headersInit?: HeadersInit
 ) {
@@ -37,11 +39,14 @@ export async function getUnifiedLogsChart(
   }
 
   // Get SQL query from utility function (with dynamic bucketing)
-  const sql = getLogsChartQuery(search)
+  const sql = useOtel ? getLogsChartQuery(search) : getLogsChartQueryBq(search)
 
   let headers = new Headers(headersInit)
 
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all.otel`, {
+  const endpoint = useOtel
+    ? (`/platform/projects/{ref}/analytics/endpoints/logs.all.otel` as const)
+    : (`/platform/projects/{ref}/analytics/endpoints/logs.all` as const)
+  const { data, error } = await post(endpoint, {
     params: { path: { ref: projectRef } },
     body: { sql, iso_timestamp_start: dateStart, iso_timestamp_end: dateEnd },
     signal,
@@ -155,12 +160,14 @@ export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
-) =>
-  useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
-    queryKey: logsKeys.unifiedLogsChart(projectRef, search),
-    queryFn: ({ signal }) => getUnifiedLogsChart({ projectRef, search }, signal),
+) => {
+  const useOtel = !!useFlag('otelUnifiedLogs')
+  return useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
+    queryKey: [...logsKeys.unifiedLogsChart(projectRef, search), { otel: useOtel }],
+    queryFn: ({ signal }) => getUnifiedLogsChart({ projectRef, search, useOtel }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     placeholderData: keepPreviousData,
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,
   })
+}

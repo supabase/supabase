@@ -1,7 +1,9 @@
 import { InfiniteData, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
 
 import { logsKeys } from './keys'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import {
   PageParam,
   QuerySearchParamsType,
@@ -47,7 +49,12 @@ export const getUnifiedLogsISOStartEnd = (
 }
 
 export async function getUnifiedLogs(
-  { projectRef, search, pageParam }: UnifiedLogsVariables & { pageParam: PageParam | null },
+  {
+    projectRef,
+    search,
+    pageParam,
+    useOtel = false,
+  }: UnifiedLogsVariables & { pageParam: PageParam | null; useOtel?: boolean },
   signal?: AbortSignal,
   headersInit?: HeadersInit
 ) {
@@ -74,7 +81,8 @@ export async function getUnifiedLogs(
    */
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
-  const sql = `${getUnifiedLogsQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${LOGS_PAGE_LIMIT}`
+  const buildQuery = useOtel ? getUnifiedLogsQuery : getUnifiedLogsQueryBq
+  const sql = `${buildQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${LOGS_PAGE_LIMIT}`
 
   const cursorValue = pageParam?.cursor
   const cursorDirection = pageParam?.direction
@@ -98,7 +106,10 @@ export async function getUnifiedLogs(
 
   let headers = new Headers(headersInit)
 
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all.otel`, {
+  const endpoint = useOtel
+    ? (`/platform/projects/{ref}/analytics/endpoints/logs.all.otel` as const)
+    : (`/platform/projects/{ref}/analytics/endpoints/logs.all` as const)
+  const { data, error } = await post(endpoint, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: timestampEnd, sql },
     signal,
@@ -167,10 +178,11 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     PageParam | null
   > = {}
 ) => {
+  const useOtel = !!useFlag('otelUnifiedLogs')
   return useInfiniteQuery({
-    queryKey: logsKeys.unifiedLogsInfinite(projectRef, search),
+    queryKey: [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }],
     queryFn: ({ signal, pageParam }) => {
-      return getUnifiedLogs({ projectRef, search, pageParam }, signal)
+      return getUnifiedLogs({ projectRef, search, pageParam, useOtel }, signal)
     },
     enabled: enabled && typeof projectRef !== 'undefined',
     placeholderData: keepPreviousData,

@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
 
 import { logsKeys } from './keys'
 import {
@@ -7,23 +8,27 @@ import {
   UnifiedLogsVariables,
 } from './unified-logs-infinite-query'
 import { getLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { getLogsCountQuery as getLogsCountQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { FacetMetadataSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
 import { handleError, post } from '@/data/fetchers'
 import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
 import { UseCustomQueryOptions } from '@/types'
 
 export async function getUnifiedLogsCount(
-  { projectRef, search }: UnifiedLogsVariables,
+  { projectRef, search, useOtel = false }: UnifiedLogsVariables & { useOtel?: boolean },
   signal?: AbortSignal
 ) {
   if (typeof projectRef === 'undefined') {
     throw new Error('projectRef is required for getUnifiedLogsCount')
   }
 
-  const sql = getLogsCountQuery(search)
+  const sql = useOtel ? getLogsCountQuery(search) : getLogsCountQueryBq(search)
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
 
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all.otel`, {
+  const endpoint = useOtel
+    ? (`/platform/projects/{ref}/analytics/endpoints/logs.all.otel` as const)
+    : (`/platform/projects/{ref}/analytics/endpoints/logs.all` as const)
+  const { data, error } = await post(endpoint, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
     signal,
@@ -83,11 +88,13 @@ export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<UnifiedLogsCountData, UnifiedLogsCountError, TData> = {}
-) =>
-  useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
-    queryKey: logsKeys.unifiedLogsCount(projectRef, search),
-    queryFn: ({ signal }) => getUnifiedLogsCount({ projectRef, search }, signal),
+) => {
+  const useOtel = !!useFlag('otelUnifiedLogs')
+  return useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
+    queryKey: [...logsKeys.unifiedLogsCount(projectRef, search), { otel: useOtel }],
+    queryFn: ({ signal }) => getUnifiedLogsCount({ projectRef, search, useOtel }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,
   })
+}
