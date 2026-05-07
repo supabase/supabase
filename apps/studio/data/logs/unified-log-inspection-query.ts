@@ -5,13 +5,6 @@ import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
 } from './unified-logs-infinite-query'
-import {
-  getAuthServiceFlowQuery,
-  getEdgeFunctionServiceFlowQuery,
-  getPostgresServiceFlowQuery,
-  getPostgrestServiceFlowQuery,
-  getStorageServiceFlowQuery,
-} from '@/components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -129,36 +122,27 @@ export async function getUnifiedLogInspection(
     throw new Error('type is required')
   }
 
-  let sql = ''
-  switch (type) {
-    case 'postgrest':
-      sql = getPostgrestServiceFlowQuery(logId)
-      break
-    case 'auth':
-      sql = getAuthServiceFlowQuery(logId)
-      break
-    case 'edge-function':
-      sql = getEdgeFunctionServiceFlowQuery(logId)
-      break
-    case 'storage':
-      sql = getStorageServiceFlowQuery(logId)
-      break
-    case 'postgres':
-      sql = getPostgresServiceFlowQuery(logId)
-      break
-    default:
-      throw new Error('Invalid type')
-  }
+  // The OTEL endpoint stores all log sources in a single `logs` table and
+  // exposes the rich detail through the `log_attributes` Map (per-source
+  // shape varies). For inspection we just fetch the single row by id and
+  // flatten its attributes onto the response so existing panel components
+  // that read `enrichedData['request.path']` etc. keep working without per
+  // service flow SQL.
+  const sql = `
+SELECT id, timestamp, source, event_message, severity_text, log_attributes
+FROM logs
+WHERE id = '${logId}'
+LIMIT 1
+`.trim()
 
-  // Use the same timestamp logic as the main unified logs query
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
 
-  const { data, error } = await post('/platform/projects/{ref}/analytics/endpoints/logs.all', {
+  const { data, error } = await post('/platform/projects/{ref}/analytics/endpoints/logs.all.otel', {
     params: { path: { ref: projectRef } },
     body: {
       iso_timestamp_start: isoTimestampStart,
       iso_timestamp_end: isoTimestampEnd,
-      sql: sql,
+      sql,
     },
     signal,
   })
@@ -167,7 +151,34 @@ export async function getUnifiedLogInspection(
     handleError(error)
   }
 
-  return data as unknown as UnifiedLogInspectionResponse
+  const row: any = (data as any)?.result?.[0]
+  if (!row) {
+    return { result: [] }
+  }
+
+  const attrs: Record<string, any> = row.log_attributes ?? {}
+  const entry: UnifiedLogInspectionEntry = {
+    // Spread log_attributes verbatim — the OTEL keys (e.g. `request.path`,
+    // `response.status_code`, `request.cf.country`) are dotted strings that
+    // already match the panel's expected field names.
+    ...attrs,
+    id: row.id,
+    timestamp: row.timestamp,
+    service_name: row.source ?? '',
+    method: attrs['request.method'] ?? '',
+    path: attrs['request.path'] ?? '',
+    host: attrs['request.host'] ?? '',
+    status_code: attrs['response.status_code'] ?? '',
+    level: row.severity_text ?? '',
+    cf_ray: attrs['request.headers.cf_ray'],
+    cf_country: attrs['request.cf.country'],
+    cf_datacenter: attrs['request.cf.colo'],
+    client_ip: attrs['request.headers.cf_connecting_ip'] ?? attrs['request.headers.x_real_ip'],
+    raw_log_data: row,
+    service_specific_data: {},
+  }
+
+  return { result: [entry] }
 }
 
 export type UnifiedLogInspectionData = Awaited<ReturnType<typeof getUnifiedLogInspection>>
