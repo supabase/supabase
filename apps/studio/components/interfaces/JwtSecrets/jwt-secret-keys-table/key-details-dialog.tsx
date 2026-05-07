@@ -1,4 +1,3 @@
-import CopyButton from '@/components/ui/CopyButton'
 import { FileKey } from 'lucide-react'
 import { useMemo } from 'react'
 import {
@@ -13,6 +12,7 @@ import {
   Textarea,
 } from 'ui'
 
+import CopyButton from '@/components/ui/CopyButton'
 import { JWTSigningKey } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
 
 export function KeyDetailsDialog({
