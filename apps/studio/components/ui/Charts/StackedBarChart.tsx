@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { useState } from 'react'
 import { Bar, BarChart, Cell, Legend, Tooltip, XAxis } from 'recharts'
 
@@ -20,6 +19,7 @@ import {
 } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { useChartHoverState } from './useChartHoverState'
+import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
 
 interface Props extends CommonChartProps<any> {
   xAxisKey: string
@@ -69,12 +69,19 @@ const StackedBarChart: React.FC<Props> = ({
   })
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
-  const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
+  // When `displayDateInUtc` is set the chart explicitly wants UTC labels.
+  // Otherwise honour the user's selected timezone via the picker.
+  const formatPickerDate = useFormatDateTime()
+  const formatChartDate = (value: number | string) =>
+    displayDateInUtc
+      ? formatDateTime(value, { tz: 'UTC', format: customDateFormat })
+      : formatPickerDate(value, customDateFormat)
+
   const resolvedHighlightedLabel =
     (focusDataIndex !== null &&
       data &&
       data[focusDataIndex] !== undefined &&
-      day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
+      formatChartDate(data[focusDataIndex][xAxisKey])) ||
     highlightedLabel
 
   const resolvedHighlightedValue =
