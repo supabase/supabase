@@ -1,12 +1,18 @@
 import { useParams } from 'common'
-import { keyBy } from 'lodash'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useCallback, useMemo, type ReactNode } from 'react'
+import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import InlineSVG from 'react-inlinesvg'
 import { toast } from 'sonner'
-import { Button, cn } from 'ui'
-import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import {
+  Button,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+} from 'ui'
+import { Admonition } from 'ui-patterns'
 
 import {
   ConnectMockMenu,
@@ -16,31 +22,31 @@ import {
 } from '@/components/interfaces/Connect/ConnectMockMenu'
 import { ENV_VAR_RAW_KEYS } from '@/components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
 import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
-import ProjectLinker, {
-  ForeignProject,
-} from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
+import type { ForeignProject } from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
 import { Markdown } from '@/components/interfaces/Markdown'
 import {
+  InterstitialAccountRow,
   InterstitialLayout,
   LogoBox,
   LogoPair,
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
-import { vercelIcon } from '@/components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
 import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
+import type {
+  IntegrationConnectionsCreateVariables,
+  IntegrationProjectConnection,
+} from '@/data/integrations/integrations.types'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { BASE_PATH } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
+import { useProfile } from '@/lib/profile'
 import { EMPTY_ARR } from '@/lib/void'
 import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
 import type { NextPageWithLayout, Organization } from '@/types'
-
-const VERCEL_ICON = (
-  <img src={`${BASE_PATH}/img/icons/vercel-icon.svg`} alt="Vercel Icon" className="w-4" />
-)
 
 const PAGE_TITLE = buildStudioPageTitle({ section: 'Connect Vercel Project', brand: 'Supabase' })
 const VERCEL_PROJECT_CONNECTION_MOCK_STATES = [
@@ -63,6 +69,8 @@ const VercelLogo = () => (
 
 const VercelIntegration: NextPageWithLayout = () => {
   const router = useRouter()
+  const { profile } = useProfile()
+  const displayName = profile?.primary_email ?? profile?.username
   const { slug, configurationId, next } = useParams()
   const mock =
     router.isReady && isTemporaryConnectMockPreviewEnabled()
@@ -108,25 +116,6 @@ const VercelIntegration: NextPageWithLayout = () => {
     )
 
   const vercelProjects = useMemo(() => vercelProjectsData ?? EMPTY_ARR, [vercelProjectsData])
-  const vercelProjectsById = useMemo(() => keyBy(vercelProjects, 'id'), [vercelProjects])
-
-  const getForeignProjectIcon = useCallback(
-    (_project: ForeignProject) => {
-      const project = vercelProjectsById[_project.id]
-
-      return !project?.framework ? (
-        vercelIcon
-      ) : (
-        <img
-          src={`${BASE_PATH}/img/icons/frameworks/${project.framework}.svg`}
-          width={21}
-          height={21}
-          alt={`icon`}
-        />
-      )
-    },
-    [vercelProjectsById]
-  )
 
   const snapshot = useIntegrationInstallationSnapshot()
 
@@ -148,7 +137,7 @@ const VercelIntegration: NextPageWithLayout = () => {
     })
 
   const onCreateConnections = useCallback(
-    (vars: any) => {
+    (vars: IntegrationConnectionsCreateVariables) => {
       createConnections({
         ...vars,
         connection: {
@@ -168,7 +157,13 @@ const VercelIntegration: NextPageWithLayout = () => {
   )
 
   if (mock) {
-    return <VercelProjectConnectionMockScreen mock={mock} onSelectMockState={replaceMockState} />
+    return (
+      <VercelProjectConnectionMockScreen
+        mock={mock}
+        displayName={displayName}
+        onSelectMockState={replaceMockState}
+      />
+    )
   }
 
   return (
@@ -180,28 +175,22 @@ const VercelIntegration: NextPageWithLayout = () => {
         logo={<LogoPair left={<VercelLogo />} right={<SupabaseLogo />} />}
         title="Connect Vercel project"
         description="Choose the Supabase project that should receive Vercel environment variables"
-        containerClassName="items-start"
-        cardClassName="max-w-[900px]"
       >
         <div className="flex flex-col gap-5 px-6 pb-6">
-          <ProjectLinker
+          <InterstitialAccountRow displayName={displayName} />
+          <VercelProjectConnectionForm
             slug={organization?.slug}
             organizationIntegrationId={integration?.id}
             foreignProjects={vercelProjects}
             onCreateConnections={onCreateConnections}
             installedConnections={integration?.connections}
             isLoading={isCreatingConnection}
-            integrationIcon={VERCEL_ICON}
-            getForeignProjectIcon={getForeignProjectIcon}
-            choosePrompt="Choose Vercel Project"
             onSkip={() => {
               if (next && isVercelUrl(next)) {
                 window.location.href = next
               }
             }}
             loadingForeignProjects={isLoadingVercelProjectsData}
-            mode="Vercel"
-            variant="embedded"
           />
           <div className="rounded-md border border-muted bg-surface-75 px-4 py-3">
             <Markdown
@@ -217,11 +206,201 @@ const VercelIntegration: NextPageWithLayout = () => {
 
 export default withAuth(VercelIntegration)
 
+const VercelProjectConnectionForm = ({
+  slug,
+  organizationIntegrationId,
+  foreignProjects,
+  onCreateConnections: _onCreateConnections,
+  installedConnections = EMPTY_ARR,
+  isLoading,
+  onSkip,
+  loadingForeignProjects,
+}: {
+  slug?: string
+  organizationIntegrationId?: string
+  foreignProjects: ForeignProject[]
+  onCreateConnections: (variables: IntegrationConnectionsCreateVariables) => void
+  installedConnections?: IntegrationProjectConnection[]
+  isLoading?: boolean
+  onSkip?: () => void
+  loadingForeignProjects?: boolean
+}) => {
+  const [supabaseProjectRef, setSupabaseProjectRef] = useState<string>()
+  const [vercelProjectId, setVercelProjectId] = useState<string>()
+
+  const { data: orgProjects, isPending: isLoadingSupabaseProjects } = useOrgProjectsInfiniteQuery(
+    { slug },
+    { enabled: !!slug }
+  )
+  const supabaseProjects = useMemo(
+    () => orgProjects?.pages.flatMap((page) => page.projects) ?? EMPTY_ARR,
+    [orgProjects?.pages]
+  )
+  const selectedSupabaseProject = supabaseProjectRef
+    ? supabaseProjects.find((project) => project.ref === supabaseProjectRef)
+    : undefined
+  const selectedVercelProject = vercelProjectId
+    ? foreignProjects.find((project) => project.id?.toLowerCase() === vercelProjectId.toLowerCase())
+    : undefined
+  const connectedVercelProjectIds = new Set(
+    installedConnections.map((connection) => connection.foreign_project_id)
+  )
+  const hasSupabaseProjects = supabaseProjects.length > 0
+  const hasVercelProjects = foreignProjects.length > 0
+  const isSelectedVercelProjectConnected = selectedVercelProject
+    ? connectedVercelProjectIds.has(selectedVercelProject.id)
+    : false
+  const isReadyToConnect =
+    !!organizationIntegrationId &&
+    !!selectedSupabaseProject?.ref &&
+    !!selectedVercelProject?.id &&
+    !isSelectedVercelProjectConnected
+
+  function createConnection() {
+    if (!selectedVercelProject?.id) return console.error('No Vercel project ID set')
+    if (!selectedSupabaseProject?.ref) return console.error('No Supabase project ref set')
+
+    if (connectedVercelProjectIds.has(selectedVercelProject.id)) {
+      return toast.error(
+        `Unable to connect to ${selectedVercelProject.name}: selected project already has an installed connection`
+      )
+    }
+
+    _onCreateConnections({
+      organizationIntegrationId: organizationIntegrationId!,
+      connection: {
+        foreign_project_id: selectedVercelProject.id,
+        supabase_project_ref: selectedSupabaseProject.ref,
+        integration_id: '0',
+        metadata: {
+          ...selectedVercelProject,
+        },
+      },
+      orgSlug: slug,
+      new: {
+        installation_id: selectedVercelProject.installation_id!,
+        project_ref: selectedSupabaseProject.ref,
+        repository_id: Number(selectedVercelProject.id),
+      },
+    })
+  }
+
+  return (
+    <div className="flex flex-col gap-5">
+      <ProjectSelectionSection
+        label="Supabase project"
+        description="Project that receives the Vercel environment variables"
+      >
+        <Select_Shadcn_
+          value={supabaseProjectRef ?? ''}
+          disabled={isLoadingSupabaseProjects || isLoading}
+          onValueChange={setSupabaseProjectRef}
+        >
+          <SelectTrigger_Shadcn_ size="small" aria-label="Supabase project to connect">
+            <SelectValue_Shadcn_
+              placeholder={isLoadingSupabaseProjects ? 'Loading projects' : 'Select a project'}
+            />
+          </SelectTrigger_Shadcn_>
+          <SelectContent_Shadcn_>
+            {supabaseProjects.map((project) => (
+              <SelectItem_Shadcn_ key={project.ref} value={project.ref} className="text-xs">
+                {project.name}
+              </SelectItem_Shadcn_>
+            ))}
+          </SelectContent_Shadcn_>
+        </Select_Shadcn_>
+      </ProjectSelectionSection>
+
+      <ProjectSelectionSection
+        label="Vercel project"
+        description="Project that will receive the Supabase variables"
+      >
+        <Select_Shadcn_
+          value={vercelProjectId ?? ''}
+          disabled={loadingForeignProjects || isLoading}
+          onValueChange={setVercelProjectId}
+        >
+          <SelectTrigger_Shadcn_ size="small" aria-label="Vercel project to connect">
+            <SelectValue_Shadcn_
+              placeholder={loadingForeignProjects ? 'Loading projects' : 'Select a project'}
+            />
+          </SelectTrigger_Shadcn_>
+          <SelectContent_Shadcn_>
+            {foreignProjects.map((project) => {
+              const isConnected = connectedVercelProjectIds.has(project.id)
+
+              return (
+                <SelectItem_Shadcn_ key={project.id} value={project.id} className="text-xs">
+                  {project.name}
+                  {isConnected ? ' (already connected)' : ''}
+                </SelectItem_Shadcn_>
+              )
+            })}
+          </SelectContent_Shadcn_>
+        </Select_Shadcn_>
+      </ProjectSelectionSection>
+
+      {!hasSupabaseProjects && (
+        <Admonition
+          type="warning"
+          description="Create a Supabase project before connecting this Vercel project."
+        />
+      )}
+
+      {!loadingForeignProjects && !hasVercelProjects && (
+        <Admonition
+          type="warning"
+          description="No Vercel projects were found for this integration."
+        />
+      )}
+
+      <div className="flex flex-col gap-2">
+        <Button
+          type="primary"
+          block
+          loading={isLoading}
+          disabled={
+            !isReadyToConnect || isLoadingSupabaseProjects || loadingForeignProjects || isLoading
+          }
+          onClick={createConnection}
+        >
+          Connect project
+        </Button>
+        {onSkip && (
+          <Button type="text" block disabled={isLoading} onClick={onSkip}>
+            Skip for now
+          </Button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const ProjectSelectionSection = ({
+  label,
+  description,
+  children,
+}: {
+  label: string
+  description: string
+  children: ReactNode
+}) => (
+  <section className="space-y-2">
+    <div className="space-y-1">
+      <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">{label}</p>
+      <p className="pr-4 text-xs text-foreground-lighter">{description}</p>
+    </div>
+    {children}
+  </section>
+)
+
 const VercelProjectConnectionMockScreen = ({
   mock,
+  displayName,
   onSelectMockState,
 }: {
   mock: VercelProjectConnectionMockState
+  displayName?: string
   onSelectMockState: (state: VercelProjectConnectionMockState) => void
 }) => (
   <>
@@ -239,11 +418,10 @@ const VercelProjectConnectionMockScreen = ({
       logo={<LogoPair left={<VercelLogo />} right={<SupabaseLogo />} />}
       title="Connect Vercel project"
       description="Choose the Supabase project that should receive Vercel environment variables"
-      containerClassName="items-start"
-      cardClassName="max-w-[900px]"
     >
       <div className="flex flex-col gap-5 px-6 pb-6">
-        <MockProjectLinker state={mock} />
+        <InterstitialAccountRow displayName={displayName ?? 'test@example.com'} />
+        <MockProjectConnectionForm state={mock} />
         {mock === 'connected' && (
           <Admonition
             type="success"
@@ -262,68 +440,72 @@ const VercelProjectConnectionMockScreen = ({
   </>
 )
 
-const MockProjectLinker = ({ state }: { state: VercelProjectConnectionMockState }) => {
+const MockProjectConnectionForm = ({ state }: { state: VercelProjectConnectionMockState }) => {
   const isLoading = state === 'loading'
   const isEmpty = state === 'no-projects'
   const isConnected = state === 'connected'
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-md border border-muted">
-      <div className="relative border-b border-muted p-8">
-        <div
-          className="absolute inset-0 bg-grid-black/5 mask-[linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:mask-[linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
-          style={{ backgroundPosition: '10px 10px' }}
-        />
-        {isLoading ? (
-          <div className="relative mx-auto w-1/2 space-y-2 py-4">
-            <p className="text-center text-sm text-foreground">Loading projects</p>
-            <ShimmeringLoader className="py-2" />
-          </div>
-        ) : isEmpty ? (
-          <div className="relative text-center">
-            <h5 className="text-foreground">No Vercel Projects found</h5>
-            <p className="text-sm text-foreground-light">
-              You can skip this and create a project connection later.
-            </p>
-          </div>
-        ) : (
-          <div className="relative flex w-full justify-center gap-0">
-            <MockProjectPanel logo={<SupabaseLogo />} label="api-service" selected={isConnected} />
-            <div className="mb-4 h-px w-8 self-end border border-dashed border-foreground-lighter" />
-            <MockProjectPanel logo={<VercelLogo />} label="web-dashboard" selected={isConnected} />
-          </div>
-        )}
-      </div>
+    <div className="flex flex-col gap-5">
+      <ProjectSelectionSection
+        label="Supabase project"
+        description="Project that receives the Vercel environment variables"
+      >
+        <Select_Shadcn_ value={isLoading ? '' : 'abcd1234'} disabled={isLoading || isConnected}>
+          <SelectTrigger_Shadcn_ size="small" aria-label="Supabase project to connect">
+            <SelectValue_Shadcn_
+              placeholder={isLoading ? 'Loading projects' : 'Select a project'}
+            />
+          </SelectTrigger_Shadcn_>
+          <SelectContent_Shadcn_>
+            <SelectItem_Shadcn_ value="abcd1234" className="text-xs">
+              api-service
+            </SelectItem_Shadcn_>
+          </SelectContent_Shadcn_>
+        </Select_Shadcn_>
+      </ProjectSelectionSection>
 
-      <div className="flex w-full justify-end gap-2 bg-surface-75 p-4">
-        <Button size="medium" type="default" disabled={isLoading || isConnected}>
-          Skip
-        </Button>
-        <Button size="medium" disabled={isLoading || isEmpty || isConnected}>
+      <ProjectSelectionSection
+        label="Vercel project"
+        description="Project that will receive the Supabase variables"
+      >
+        <Select_Shadcn_
+          value={isLoading || isEmpty ? '' : 'prj_mock_vercel_project'}
+          disabled={isLoading || isEmpty || isConnected}
+        >
+          <SelectTrigger_Shadcn_ size="small" aria-label="Vercel project to connect">
+            <SelectValue_Shadcn_
+              placeholder={isLoading ? 'Loading projects' : 'Select a project'}
+            />
+          </SelectTrigger_Shadcn_>
+          <SelectContent_Shadcn_>
+            <SelectItem_Shadcn_ value="prj_mock_vercel_project" className="text-xs">
+              web-dashboard
+            </SelectItem_Shadcn_>
+          </SelectContent_Shadcn_>
+        </Select_Shadcn_>
+      </ProjectSelectionSection>
+
+      {isEmpty && (
+        <Admonition
+          type="warning"
+          description="No Vercel projects were found for this integration."
+        />
+      )}
+
+      <div className="flex flex-col gap-2">
+        <Button
+          type="primary"
+          block
+          loading={isLoading}
+          disabled={isLoading || isEmpty || isConnected}
+        >
           {isConnected ? 'Connected' : 'Connect project'}
+        </Button>
+        <Button type="text" block disabled={isLoading || isConnected}>
+          Skip for now
         </Button>
       </div>
     </div>
   )
 }
-
-const MockProjectPanel = ({
-  logo,
-  label,
-  selected,
-}: {
-  logo: ReactNode
-  label: string
-  selected?: boolean
-}) => (
-  <div className="mx-auto flex min-w-0 flex-1 grow flex-col items-center justify-center gap-6 px-5">
-    {logo}
-    <Button
-      type="default"
-      block
-      className={cn('h-[34px] justify-start', selected && 'border-brand bg-brand-200')}
-    >
-      {label}
-    </Button>
-  </div>
-)
