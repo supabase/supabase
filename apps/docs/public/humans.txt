@@ -69,6 +69,7 @@ David Alvarez
 David Birdsong
 David Camacho Cateura
 David Weitzman
+David Whittington
 Davide Pellegatta
 Deepthi Sigireddi
 Deji I
@@ -259,6 +260,7 @@ Tyler Shukert
 TzeYiing L
 Utkarash Singh
 Victor Farazdagi
+Warwick Mitchell
 Wen Bo Xie
 Yorvi Arias
 Yuliya Marinova

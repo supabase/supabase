@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Checkbox,
@@ -17,8 +16,10 @@ import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
+import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { useTrackDefaultPrivilegesExposure } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
+import { DOCS_URL } from '@/lib/constants'
 
 interface SecurityOptionsProps {
   form: UseFormReturn<CreateProjectForm>
@@ -51,13 +52,9 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
                   <FormDescription className="text-foreground-lighter">
                     Autogenerate a RESTful API for your public schema. Recommended if using a client
                     library like{' '}
-                    <Link
-                      href="https://supabase.com/docs/reference/javascript/introduction"
-                      target="_blank"
-                      className="text-link"
-                    >
+                    <InlineLink href={`${DOCS_URL}/reference/javascript/introduction`}>
                       supabase-js
-                    </Link>
+                    </InlineLink>
                     .
                   </FormDescription>
                 </div>

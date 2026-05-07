@@ -17,6 +17,7 @@ export const FormSchema = z
     postgresVersion: z.string({
       required_error: 'Please enter a Postgres version.',
     }),
+    instanceType: z.string().optional(),
     dbRegion: z.string({
       required_error: 'Please select a region.',
     }),
