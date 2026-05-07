@@ -1,9 +1,12 @@
 import { useParams } from 'common'
-import { useMemo, type PropsWithChildren } from 'react'
+import { useMemo, useState, type PropsWithChildren } from 'react'
 
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { ConfirmFooter } from './ConfirmFooter'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface EdgeFunctionRendererProps {
   label: string
@@ -27,8 +30,15 @@ export const EdgeFunctionRenderer = ({
   showConfirmFooter = true,
 }: PropsWithChildren<EdgeFunctionRendererProps>) => {
   const { ref } = useParams()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
+  const [showReplaceWarning, setShowReplaceWarning] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref }, { enabled: !!ref })
+  const { data: existingFunction } = useEdgeFunctionQuery(
+    { projectRef: ref, slug: functionName },
+    { enabled: !!ref && !!functionName && !initialIsDeployed }
+  )
 
   const functionUrl = useMemo(() => {
     const endpoint = settings?.app_config?.endpoint
@@ -55,6 +65,26 @@ export const EdgeFunctionRenderer = ({
     return `supabase functions download ${functionName}`
   }, [functionName])
 
+  const handleDeploy = () => {
+    if (!code || isDeploying || !ref || !functionName) return
+
+    if (existingFunction && !showReplaceWarning) {
+      setShowReplaceWarning(true)
+      return
+    }
+
+    setShowReplaceWarning(false)
+    sendEvent({
+      action: 'edge_function_deploy_button_clicked',
+      properties: { origin: 'functions_ai_assistant' },
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
+    })
+    onApprove?.()
+  }
+
   return (
     <div className="w-auto overflow-x-hidden my-4">
       <EdgeFunctionBlock
@@ -68,6 +98,9 @@ export const EdgeFunctionRenderer = ({
         deploymentDetailsUrl={deploymentDetailsUrl}
         downloadCommand={downloadCommand}
         hideDeployButton={showConfirmFooter || initialIsDeployed}
+        showReplaceWarning={showReplaceWarning}
+        onCancelReplace={() => setShowReplaceWarning(false)}
+        onConfirmReplace={handleDeploy}
       />
       {showConfirmFooter && (
         <div className="mx-4">
@@ -77,7 +110,7 @@ export const EdgeFunctionRenderer = ({
             confirmLabel={isDeploying ? 'Deploying...' : 'Deploy'}
             isLoading={isDeploying}
             onCancel={() => onDeny?.()}
-            onConfirm={() => onApprove?.()}
+            onConfirm={handleDeploy}
           />
         </div>
       )}
