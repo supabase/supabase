@@ -1,210 +1,66 @@
 ---
 id: 'partner-integration-guide'
 title: 'Supabase Partner Integration Guide'
-subtitle: "TBD"
+subtitle: 'TBD'
 description: 'TBD'
 ---
 
-This guide describes how a Supabase partner can integrate with the Supabase platform via OAuth. It details the flow a user goes through when they click the **Install Integration** button on the [**Integration**](https://supabase.com/dashboard/project/_/integrations) section of the Dashboard. It also shows what a partner needs to implement in their system to make such a flow work.
+This guide assumes you have already followed [the Build a Supabase Integration guide](/docs/guides/integrations/build-a-supabase-oauth-integration) and have a working OAuth client.
 
-This guide assumes that the reader is familiar with how OAuth works. The purpose of this guide is not to explain OAuth, but to show how we extend OAuth to make it possible to start the OAuth flow from the Supabase dashboard's Integrations page.
+When a Supabase user clicks the **Install Integration** button in the Dashboard, they are redirected to your system to begin the OAuth flow. You can implement this redirect in one of two ways:
 
-# Problem
+- **[Simple redirect](#method-1-simple-redirect)**: Easier to build, but your system cannot verify that the incoming user was sent by Supabase.
+- **[Signed redirect](#method-2-signed-redirect)**: More work to build, but cryptographically verifies that the redirect originated from Supabase. **Recommended for production integrations.**
 
-We want users to be able to start the OAuth flow from Supabase dashboard's Integrations page. In standard OAuth authorization code flow, the user starts on the partner's webpage and clicks a button like **Connect to Supabase** to start the flow. In a sequence diagram, it looks like the following:
+Pick the method that fits your security requirements, then follow the matching section below.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User
-    participant Browser
-    participant Partner as Partner (OAuth Client)
-    participant Supabase as Supabase (OAuth Authorization Server/Protected Resource)
+## Method 1: Simple redirect
 
-    Note over Browser: Partner's Website Open
-    User->>Browser: Clicks "Connect to Supabase"
-    Browser->>Supabase: Request Authorization
-    
-    Supabase->>Browser: Redirect to Consent Screen
-    Browser->>User: Display Consent Screen
+In this method, you implement a single `GET` endpoint. Supabase redirects the user to this endpoint when they click **Install Integration**, and your endpoint kicks off the OAuth flow.
 
-    User->>Browser: Gives Consent
-    Browser->>Supabase: Submit User Consent
+{/* IMG? */}
 
-    Supabase->>Browser: Redirect to Grafana With Authorization Code
-    Browser->>Partner: Submit Authorization Code
+### Step 1: Implement the redirect endpoint
 
-    Partner->>Supabase: Exchange Authorization Code for Token
-    Supabase->>Partner: Return Token
+Expose a `GET` endpoint at any URL you control:
 
-    Partner->>Supabase: Request Management API Resources
-    Supabase->>Partner: Return Resources
-
-    Partner->>Browser: Ok 200, OAuth Flow Complete
-    Browser->>User: Display "Successfully Connected" Message
+```
+GET https://<your-host>/<optional-path>?project_id=<supabase-project_ref>&organization_slug=<supabase-org-slug>
 ```
 
-The OAuth standard doesn't talk about how to start the OAuth flow if the user is already present on the Authorization Server/Protected Resources's website (Supabase in this case). So we need to extend the protocol to make this possible.
+Supabase will append the following query parameters to the URL when redirecting:
 
-# Solution
+| Param               | Description                                                                                    |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| `project_id`        | Supabase project ref of the project where the user clicked the **Install Integration** button. |
+| `organization_slug` | Supabase organization slug where the user clicked the **Install Integration** button.          |
 
-We have two options for extending the protocol.
+Save these parameters in your system. You can use them to fetch project or organization details, or to pre-select a project or organization in your UI once the OAuth flow is complete.
 
-## Simple Redirect
+Your endpoint may ask the user to sign up, sign in, or perform other setup tasks on your website. Once those are complete, immediately [redirect to the Supabase authorization URL](/docs/guides/integrations/build-a-supabase-oauth-integration#redirecting-to-the-authorize-url) without further user interaction. This starts the OAuth flow.
 
-The first is that the **Install Integration** button can redirect the user to a Partner webpage which kicks off the OAuth flow. It looks like the following:
+### Step 2: Share your endpoint with Supabase
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User
-    participant Browser
-    participant Partner as Partner (OAuth Client)
-    participant Supabase as Supabase (OAuth Authorization Server/Protected Resource)
+Send Supabase the URL of your endpoint so we can configure the **Install Integration** button to redirect there.
 
-    Note over Browser: Supabase Dashboard Open
-    
-    User->>Browser: Clicks "Install Integration"
-    
-    Browser->>Partner: "Connect to Partner" Click Handler Page
-    Partner->>Browser: Redirect to Supabase Authorization Page
-    
-    Browser->>Supabase: Request Authorization
-    Supabase->>Browser: Redirect to Consent Screen
-    
-    Browser->>User: Display Consent Screen
-    User->>Browser: Gives Consent
-    
-    Browser->>Supabase: Submit User Consent
-    Supabase->>Browser: Redirect to Partner With Authorization Code
-    
-    Browser->>Partner: Submit Authorization Code
-    
-    Partner->>Supabase: Exchange Authorization Code for Token
-    Supabase->>Partner: Return Token
-    
-    Partner->>Supabase: Request Management API Resources
-    Supabase->>Partner: Return Resources
-    
-    Partner->>Browser: Ok 200, OAuth Flow Complete
-    
-    Browser->>User: Display "Integration Installed" Message
+## Method 2: Signed redirect
+
+In this method, Supabase signs a JWT before redirecting the user. You verify the signature, generate a one-time redirect record, and return its URL to Supabase. Supabase then redirects the user to that URL. This guarantees that any redirect your system handles originated from Supabase.
+
+You will implement two endpoints:
+
+1. A `POST` endpoint that validates the signed JWT and returns a unique redirect URL.
+2. A `GET` endpoint that handles the user once they are redirected to that URL.
+
+{/* IMG */}
+
+### Step 1: Exchange public keys with Supabase
+
+Supabase generates two key-pairs, one for staging, one for production, and shares the public keys with you. Save both public keys and their key IDs in your system. The keys are PEM-encoded EC P-256.
+
+Example:
+
 ```
-
-This works but the partner's system doesn't know if the incoming redirect is coming really from Supabase or not. To provide a guarantee that it is indeed Supabase who sent the user, we can alter the flow as explained next.
-
-## Signed Redirect
-
-A one time setup is required to make this flow possible. Supabase generates a key-pair, keeps the private key in it's system and shares the public key with the partner. The partner saves the public key in their system for later use.
-
-Before redirecting the user, Supabase signs a Json Web Token (JWT) with the private key, makes a POST call to a partner API endpoint. This API endpoint validates the JWT with the public key, creates a unique redirect page record in the partner's system and returns that to Supabase. Supabase will then redirect the user to that unique page, mitigating the risk of partners receiving redirect requests from sources other than Supabase.
-
-The flow looks like this:
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User
-    participant Browser
-    participant Partner as Partner (OAuth Client)
-    participant Supabase as Supabase (OAuth Authorization Server/Protected Resource)
-
-    Note over Browser: Supabase Dashboard Open
-    
-    User->>Browser: Clicks "Install Integration"
-    
-    Browser->>Supabase: Request Redirect URL Generation
-    Supabase->>Partner: Send Signed JWT
-    Partner->>Partner: Validate JWT
-    Partner->>Partner: Generate Unique Redirect URL
-    Partner->>Supabase: Return Redirect URL
-    Supabase->>Browser: Redirect to the Redirect URL
-    
-    Browser->>Partner: Visit Redirect URL
-    Partner->>Partner: Validate Redirect Record
-    Partner->>Browser: Optional User Actions
-    Browser->>User: User Performs Optional Actions
-    User->>Browser: User Optional Actions Complete
-    Browser->>Partner: User Optional Actions Complete
-    Partner->>Browser: Redirect to Supabase Authorization Page
-    
-    Browser->>Supabase: Request Authorization
-    Supabase->>Browser: Redirect to Consent Screen
-    
-    Browser->>User: Display Consent Screen
-    User->>Browser: Gives Consent
-    
-    Browser->>Supabase: Submit User Consent
-    Supabase->>Browser: Redirect to Partner With Authorization Code
-    
-    Browser->>Partner: Submit Authorization Code
-    
-    Partner->>Supabase: Exchange Authorization Code for Token
-    Supabase->>Partner: Return Token
-    
-    Partner->>Supabase: Request Management API Resources
-    Supabase->>Partner: Return Resources
-    
-    Partner->>Browser: Ok 200, OAuth Flow Complete
-    
-    Browser->>User: Display "Integration Installed" Message
-```
-
-The part where user performs optional actions will be different to each partner but usually contains:
-
-- Asking the user to sign-up if they are not signed up.
-- Asking the user to sign-in if they are not signed in.
-- Asking the user to configure the partner system which is required for the integration to work.
-
-Although a partner is free to implement this section as they see fit, it is strongly recommended that the user is taken through a wizard like experience upon completing which they are redirected to the Supabase authorization endpoint to kick off the OAuth flow. This is to avoid having the user getting distracted, clicking around to another section of a partner's website and forgetting to complete the OAuth flow. The UX should be designed to minimize such abandoning of the OAuth flow.
-
-# Implementation
-
-This section explains what a partner needs to do to implement the two integration options discussed above. A partner can pick either option. The benefit of simple redirect is that it is easier to implement. The signed redirect is more work but has better security.
-
-The following sections assume that the partner have already followed the [Build a Supabase Integration](https://supabase.com/docs/guides/integrations/build-a-supabase-oauth-integration) guide and have a working OAuth client.
-
-## Simple Redirect
-
-In this method, the partner implements a `GET` endpoint to which Supabase will redirect when the **Install Integration** button is clicked by a user.
-
-#### Endpoint
-
-```json
-GET https://<partner-url-which-kicks-off-oauth/<optional-path>?project_id=<supabase-project_ref>&organization_slug=<supabase-org-slug>
-```
-
-This endpoint can ask the user to optionally sign-up or sign-in, or perform other required tasks on the partner's website but once the user has performed all those tasks it should immediately kick off a [redirect to the Supabase authotization URL](https://supabase.com/docs/guides/integrations/build-a-supabase-oauth-integration#redirecting-to-the-authorize-url) without further user interaction. This will start the OAuth flow.
-
-When redirecting to the endpoint, supabase will send the following query parameters in the URL:
-
-| **Param** | **Description** |
-| --- | --- |
-| `project_id` | Supabase project ref of the project where the **Install Integration** button was clicked. |
-| `organization_slug` | Supabase organization slug where the **Install Integration** button was clicked. |
-
-The endpoint handler can save these params in their system and use them to fetch details about the project or organization or use them in the UI to pre-select a project or an organization once the OAuth flow is complete.
-
-#### Details Shared With Supabase
-
-This endpoint should be shared with Supabase so that we can configure the **Install Integration** button to be redirected to this endpoint.
-
-## Signed Redirect
-
-In this method, the partner implements two endpoints:
-
-1. A `POST` API endpoint to generate a redirect record.
-2. A `GET` endpoint to handle redirected users.
-
-When the user clicks the **Install Integration** button, Supabase will call the first endpoint to get a redirect URL, to which the user is redirected.
-
-For the signed redirect method to work, there's a one time setup required for the cryptographic algorithm work correctly.
-
-#### Key Pairs
-
-Supabase will generate two key-pairs, one each for a staging and a production environment. Get public keys and their key ids for those environments from Supabase and save them in your system. The key-pair will be in PEM encoded EC P-256 format. An example of the key-pairs is as follows:
-
-```json
 ===============Staging==================
 
 Key ID: pik_3038669348a3ea75dbaf0655
@@ -224,103 +80,115 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEWCGhwtFWn4jpWZNeyZpTlaAdq/tD
 -----END PUBLIC KEY-----
 ```
 
-The key ids are used to identify the correct public key to use when validating the signed JWT. They also help in zero-downtime key rotation. To rotate keys, Supabase will share a new set of key-pairs which the partner saves in their system. No code changes should be required in the partner system as the key identity is established by the key id. When the new keys are used by Supabase to sign the JWT, it will send new key ids as well, making it possible for the partner to lookup the correct key to use for validating the JWT signature.
+Look up the correct public key by the `kid` field in the JWT header.
 
-<aside>
-💡
+Storing keys by ID enables zero-downtime key rotation. When Supabase rotates keys, we share new key-pairs and start signing JWTs with the new key ID. Your system picks the correct key based on `kid` without any code changes.
 
-In future we plan to fully automate sharing the keys with partners and key rotation by publishing them on a `.../.well-known/jwks.json` URL. For now this is done manually.
+<Admonition type="note">
 
-</aside>
+In future, we plan to publish keys at a `.../.well-known/jwks.json` URL and fully automate key rotation. For now this is done manually.
 
-### Endpoint to Generate Redirect Record
+</Admonition>
 
-This endpoint is called by Supabase to get a redirect record. A redirect record is a uuid uniquely identifying a specific redirect that a user initiated when they clicked the **Install Integration** button. Each click on the **Install Integration** button should generate a new redirect record. 
+### Step 2: Implement the redirect record endpoint
 
-#### Endpoint
+This endpoint receives the signed JWT from Supabase and returns a one-time redirect URL.
 
-The endpoint can be hosted anywhere with whatever path the partner likes. This endpoint should not require any authentication. It is recommended to add rate limiting to this endpoint to prevent abuse.
+Host the endpoint at any URL and path you control. Do not require authentication on this endpoint, but apply rate limiting to prevent abuse.
 
-```json
-POST https://<partner-api-host>/<partner-api-path>
+```
+POST https://<your-api-host>/<your-api-path>
 Content-Type: application/json
 ```
 
-#### Request Body
-
-The endpoint needs to a accept a JSON body in the following format:
+#### Request body
 
 ```json
 {
-	"token": "<signed-jwt>"
+  "token": "<signed-jwt>"
 }
 ```
 
-Upon receiving a request, the handler for this endpoint should extract the key id from the `kid` field of the JWT header, read the public key associated with this key id and use the public key to verify the signature on the JWT. If the signature is invalid it should return a 401 status code error. If the signature is valid, it should generate a uuid to identify a unique redirect record (aka integration record) and save this uuid in their system. The redirect record should have an expiry (usually 1 hour) to avoid them accumulating in the partner's system and to also prevent malicious users from calling the redirect endpoint in case the record is leaked.
+#### JWT fields
 
-#### JWT Fields
+The token is a JWT signed with the ES256 private key.
 
-The token is a JWT signed with the ES256 private key. It contains the following fields
+**Protected header (JOSE header)**
 
-**Protected Header (JOSE Header)**
+| Field | Required | Description                                                                                               |
+| ----- | -------- | --------------------------------------------------------------------------------------------------------- |
+| `alg` | Yes      | Always `ES256` — the only signing algorithm currently supported.                                          |
+| `kid` | Yes      | The key ID identifying the keypair. Use this to pick the correct public key when verifying the signature. |
 
-| **Field** | **Required** | **Description** |
-| --- | --- | --- |
-| `alg` | Yes | It will always be “ES256”, because that's the only signing algorithm currently supported. |
-| `kid` | Yes | A key id, uniquely identifying the keypair. This will be used to pick the correct public key when verifying the signature. |
+**Payload (claims)**
 
-**Payload (Claims)**
-
-| **Claim** | **Required** | **Description** |
-| --- | --- | --- |
-| `iss` | Yes | It will always be “supabase”. |
-| `aud` | Yes | A unique string to identify the audience of this JWT. Usually a URL. |
-| `iat` | Yes | Issued-at timestamp (seconds since epoch). |
-| `exp` | Yes | Expiry timestamp — must be at most 5 minutes after `iat`. |
-| `organization_slug` | No | The Supabase organization the user is connecting from. Used to pre-select the org during the OAuth consent screen. |
-| `project_id` | No | The Supabase project ref the user wants to connect. Can be used by the partner to pre-select a Supabase project in their UI. |
+| Claim               | Required | Description                                                                                                       |
+| ------------------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
+| `iss`               | Yes      | Always `supabase`.                                                                                                |
+| `aud`               | Yes      | A unique string identifying the audience of this JWT. Usually a URL.                                              |
+| `iat`               | Yes      | Issued-at timestamp (seconds since epoch).                                                                        |
+| `exp`               | Yes      | Expiry timestamp — at most 5 minutes after `iat`.                                                                 |
+| `organization_slug` | No       | The Supabase organization the user is connecting from. Use to pre-select the org during the OAuth consent screen. |
+| `project_id`        | No       | The Supabase project ref the user wants to connect. Use to pre-select a Supabase project in your UI.              |
 
 **Signature**
 
-The header and claims are signed by the EC P-256 private key.
+The header and claims are signed with the EC P-256 private key.
 
-**Validation**
+#### Validation
 
-The following should be validated in the JWT:
+When you receive a request:
 
-1. That the `alg` is `ES256`.
-2. That the `iss` claim is equal to `supabase`.
-3. That the `aud` claim value is the one you agreed with Supabase.
-4. That the current time is within the `iat` and `exp` claims.
+1. Read the `kid` field from the JWT header and look up the matching public key.
+2. Verify the JWT signature with that public key.
+3. Verify that `alg` is `ES256`.
+4. Verify that `iss` is `supabase`.
+5. Verify that `aud` matches the value you agreed with Supabase.
+6. Verify that the current time is between `iat` and `exp`.
 
-If the JWT is invalid a 401 status code should be returned to the client.
+If any check fails, return `401 Unauthorized`.
 
-#### Response Body
+If validation succeeds, generate a UUID to identify this redirect record (also called an integration record), save it in your system with an expiry (typically 1 hour), and return it in the response. The expiry prevents records from accumulating and limits the window in which a leaked record can be used.
 
-The response body must be in the following format:
+#### Response body
 
 ```json
 {
   "integrationId": "<a unique uuid>",
-  "redirectUrl": "https://<partner-api-host>/<partner-api-path>/<integration-id>",
+  "redirectUrl": "https://<your-api-host>/<your-api-path>/<integration-id>",
   "expiresAt": "<timestamp>"
 }
 ```
 
-| **Field** | **Description** |
-| --- | --- |
-| `integrationId` | A UUID uniquely identifying the redirect record (aka an integration record). |
-| `redirectUrl` | The URL the user will be redirected to. It must contain the `integrationId` in its path somewhere to retrieve the record when the user is redirected. |
-| `expiresAt`  | The time when the redirect record will expire (usually 1 hour from creation). The user must begin the flow before this time. |
+| Field           | Description                                                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `integrationId` | A UUID uniquely identifying the redirect record.                                                                                           |
+| `redirectUrl`   | The URL the user will be redirected to. Must contain the `integrationId` somewhere in its path so you can retrieve the record on redirect. |
+| `expiresAt`     | The time when the redirect record expires (typically 1 hour from creation). The user must begin the flow before this time.                 |
 
-### Endpoint to Handle Redirects
+### Step 3: Implement the redirect handler endpoint
 
-The redirect URL must have the redirect record in its path. The handler should extract the redirect record from the URL and look it up in its system. If the redirect record doesn't exist it should return a 401 error to the client.
+This is the `GET` endpoint at the `redirectUrl` you returned in the previous step. The redirect record's UUID must be in its path.
 
-#### Details Shared With  Supabase
+When a user arrives at this endpoint:
 
-Please share the following with Supabase so that we can configure the **Install Integration** button to correctly get a redirect URL and redirect the user there.
+1. Extract the redirect record UUID from the URL path.
+2. Look it up in your system. If it doesn't exist or has expired, return `401 Unauthorized`.
+3. Optionally, walk the user through any setup required on your side — for example, signing up, signing in, or configuring your system so the integration will work.
+4. Redirect the user to the [Supabase authorization URL](/docs/guides/integrations/build-a-supabase-oauth-integration#redirecting-to-the-authorize-url) to start the OAuth flow.
 
-- Ask Supabase for the public keys and their key ids for staging and prod environments.
-- Share the redirect record generation endpoint and the redirect handling endpoints with Supabase.
-- Share the `aud` claim value you'd like Supabase to send in the signed JWT.
+<Admonition type="tip">
+
+If you need the user to perform setup steps on your site, design the experience as a wizard that ends by redirecting to the Supabase authorization URL. This minimizes the chance of users getting distracted, navigating elsewhere on your site, and abandoning the OAuth flow.
+
+</Admonition>
+
+### Step 4: Share your details with Supabase
+
+Send Supabase the following so we can configure the **Install Integration** button:
+
+- The URL of your redirect record endpoint ([Step 2](#step-2-implement-the-redirect-record-endpoint)).
+- The URL pattern of your redirect handler endpoint ([Step 3](#step-3-implement-the-redirect-handler-endpoint)).
+- The `aud` claim value you want Supabase to send in the signed JWT.
+
+Ask Supabase for the public keys and key IDs for the staging and production environments.
