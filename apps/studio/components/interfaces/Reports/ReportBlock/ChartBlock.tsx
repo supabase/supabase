@@ -43,7 +43,13 @@ interface ChartBlockProps {
   isLoading?: boolean
   actions?: ReactNode
   maxHeight?: number
-  onUpdateChartConfig?: ({ chart, chartConfig }: { chart?: Partial<Dashboards.Chart>; chartConfig?: Partial<ChartConfig> }) => void
+  onUpdateChartConfig?: ({
+    chart,
+    chartConfig,
+  }: {
+    chart?: Partial<Dashboards.Chart>
+    chartConfig?: Partial<ChartConfig>
+  }) => void
 }
 
 export const ChartBlock = ({
