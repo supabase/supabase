@@ -1,0 +1,81 @@
+Filters allow you to only return rows that match certain conditions.
+
+Filters can be used on `select()`, `update()`, `upsert()`, and `delete()` queries.
+
+If a Postgres function returns a table response, you can also apply filters.
+
+<Tabs
+  scrollable
+  type="rounded-pills"
+>
+  <TabPanel id="applying-filters" label="Applying Filters">
+```ts
+const { data, error } = await supabase
+  .from('instruments')
+  .select('name, section_id')
+  .eq('name', 'violin')    // Correct
+
+const { data, error } = await supabase
+  .from('instruments')
+  .eq('name', 'violin')    // Incorrect
+  .select('name, section_id')
+```
+  <CollapsibleDetails title="Notes" content="Filters must be applied after any of `select()`, `update()`, `upsert()`, `delete()`, and `rpc()` and before [modifiers](/docs/reference/javascript/using-modifiers)." />
+  </TabPanel>
+  <TabPanel id="chaining-filters" label="Chaining">
+```ts
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .gte('population', 1000)
+  .lt('population', 10000)
+```
+  <CollapsibleDetails title="Notes" content="Filters can be chained together to produce advanced queries. For example, to query cities with population between 1,000 and 10,000." />
+  </TabPanel>
+  <TabPanel id="conditional-chaining" label="Conditional Chaining">
+```ts
+const filterByName = null
+const filterPopLow = 1000
+const filterPopHigh = 10000
+
+let query = supabase
+  .from('cities')
+  .select('name, country_id')
+
+if (filterByName)  { query = query.eq('name', filterByName) }
+if (filterPopLow)  { query = query.gte('population', filterPopLow) }
+if (filterPopHigh) { query = query.lt('population', filterPopHigh) }
+
+const { data, error } = await query
+```
+  <CollapsibleDetails title="Notes" content="Filters can be built up one step at a time and then executed." />
+  </TabPanel>
+  <TabPanel id="filter-by-value-within-json-column" label="Filter by values within a JSON column">
+```ts
+const { data, error } = await supabase
+  .from('users')
+  .select()
+  .eq('address->postcode', 90210)
+```
+  <CollapsibleDetails title="Data source" content={"```sql\ncreate table\n  users (\n    id int8 primary key,\n    name text,\n    address jsonb\n  );\ninsert into\n  users (id, name, address)\nvalues\n  (1, 'Michael', '{ \"postcode\": 90210 }'),\n  (2, 'Jane', null);\n```"} />
+  <div className="mt-4"><CollapsibleDetails title="Response" content={"```json\n{\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"Michael\",\n      \"address\": {\n        \"postcode\": 90210\n      }\n    }\n  ],\n  \"status\": 200,\n  \"statusText\": \"OK\"\n}\n```"} /></div>
+  </TabPanel>
+  <TabPanel id="filter-referenced-tables" label="Filter referenced tables">
+```ts
+const { data, error } = await supabase
+  .from('orchestral_sections')
+  .select(`
+    name,
+    instruments!inner (
+      name
+    )
+  `)
+  .eq('instruments.name', 'flute')
+```
+  <CollapsibleDetails title="Notes" content={"You can filter on referenced tables in your `select()` query using dot notation."} />
+  <div className="mt-4"><CollapsibleDetails title="Data source" content={"```sql\ncreate table\n  orchestral_sections (id int8 primary key, name text);\ncreate table\n  instruments (\n    id int8 primary key,\n    section_id int8 not null references orchestral_sections,\n    name text\n  );\n\ninsert into\n  orchestral_sections (id, name)\nvalues\n  (1, 'strings'),\n  (2, 'woodwinds');\ninsert into\n  instruments (id, section_id, name)\nvalues\n  (1, 2, 'flute'),\n  (2, 1, 'violin');\n```"} /></div>
+  <div className="mt-4"><CollapsibleDetails title="Response" content={"```json\n{\n  \"data\": [\n    {\n      \"name\": \"woodwinds\",\n      \"characters\": [\n        {\n          \"name\": \"flute\"\n        }\n      ]\n    }\n  ],\n  \"status\": 200,\n  \"statusText\": \"OK\"\n}\n```"} /></div>
+  </TabPanel>
+</Tabs>
+
+---

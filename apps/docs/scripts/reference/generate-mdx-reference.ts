@@ -258,42 +258,78 @@ function generateMdx(categories: SpecCategory[], config: SpecConfig, specDir: st
 
     lines.push(`## ${category.trim()} [#${catSlug}]`, '')
 
-    // Insert optional partial: <specDir>/<category-slug>.partial.mdx
+    // Insert optional category-level partial: <specDir>/<category-slug>.partial.mdx
     const partialPath = join(specDir, `${catSlug}.partial.mdx`)
     if (existsSync(partialPath)) {
       lines.push(processPartialForMdx(readFileSync(partialPath, 'utf-8').trimEnd(), catSlug), '')
     }
 
-    for (let j = 0; j < definitions.length; j++) {
-      const def = definitions[j]
-      const isLastInCategory = j === definitions.length - 1
-      const defSlug = `${catSlug}-${toSlug(def.name)}`
+    // Deduplicate by name (same method can appear on multiple TypeDoc classes),
+    // then split into flat definitions and subcategory groups preserving insertion order.
+    // Subcategory groups are emitted after flat definitions — matching the nav order.
+    const seenFlat = new Set<string>()
+    const flatDefs: any[] = []
+    const subcatMap = new Map<string, any[]>()
 
-      lines.push(`### ${def.name} [#${defSlug}]`, '')
-
-      if (def.description) {
-        lines.push(escapeMdxProse(def.description), '')
-      }
-
-      if (def.remarks?.length) {
-        for (const remark of def.remarks) {
-          lines.push(escapeMdxProse(remark), '')
+    for (const def of definitions) {
+      if (def.subcategory) {
+        if (!subcatMap.has(def.subcategory)) subcatMap.set(def.subcategory, [])
+        const group = subcatMap.get(def.subcategory)!
+        if (!group.some((d) => d.name === def.name)) group.push(def)
+      } else {
+        if (!seenFlat.has(def.name)) {
+          seenFlat.add(def.name)
+          flatDefs.push(def)
         }
       }
+    }
 
+    function emitDefinition(def: any, isLast: boolean) {
+      const defSlug = `${catSlug}-${toSlug(def.name)}`
+      lines.push(`### ${def.name} [#${defSlug}]`, '')
+      if (def.description) lines.push(escapeMdxProse(def.description), '')
+      if (def.remarks?.length) {
+        for (const remark of def.remarks) lines.push(escapeMdxProse(remark), '')
+      }
       if (def.parameters?.length) {
         lines.push(`<RefDefinitionParams parameters=${prop(def.parameters)} />`, '')
       }
-
       if (def.returnType) {
         lines.push(`<RefDefinitionReturnType returnType=${prop(def.returnType)} />`, '')
       }
-
       if (def.examples?.length) {
         lines.push(...generateExamplesBlock(def.examples))
-        if (!isLastInCategory) {
-          lines.push('', '<hr />', '')
-        }
+        if (!isLast) lines.push('', '<hr />', '')
+      }
+    }
+
+    const totalFlat = flatDefs.length
+    const subcatEntries = Array.from(subcatMap.entries())
+
+    for (let j = 0; j < flatDefs.length; j++) {
+      emitDefinition(flatDefs[j], j === totalFlat - 1 && subcatEntries.length === 0)
+    }
+
+    for (let s = 0; s < subcatEntries.length; s++) {
+      const [subcategory, defs] = subcatEntries[s]
+      const subcatSlug = `${catSlug}-${toSlug(subcategory)}`
+      const isLastSubcat = s === subcatEntries.length - 1
+
+      lines.push('', '<hr />', '')
+      lines.push(`### ${subcategory} [#${subcatSlug}]`, '')
+
+      // Optional subcategory partial: <specDir>/<subcategory-slug>.partial.mdx
+      // e.g. "Using filters" → using-filters.partial.mdx
+      const subcatPartialPath = join(specDir, `${toSlug(subcategory)}.partial.mdx`)
+      if (existsSync(subcatPartialPath)) {
+        lines.push(
+          processPartialForMdx(readFileSync(subcatPartialPath, 'utf-8').trimEnd(), subcatSlug),
+          ''
+        )
+      }
+
+      for (let j = 0; j < defs.length; j++) {
+        emitDefinition(defs[j], isLastSubcat && j === defs.length - 1)
       }
     }
   }

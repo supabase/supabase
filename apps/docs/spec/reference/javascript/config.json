@@ -2,7 +2,7 @@
   "language": "typescript",
   "menuTitle": "Javascript",
   "icon": "reference-javascript",
-  "title": "JavaScript Client library",
+  "title": "JavaScript Client Library",
   "subtitle": "Use the `supabase-js` package to interact with your Postgres database, listen to database changes, invoke Deno Edge Functions, build login and user management functionality, and manage large files.",
   "referenceLink": "https://github.com/supabase/supabase-js",
   "referenceLinkLabel": "@supabase/supabase-js",

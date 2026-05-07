@@ -1,0 +1,19 @@
+Any method under the supabase.auth.admin namespace requires a secret key.
+
+These methods are considered admin methods and should be called on a trusted server. Never expose your secret key in the browser.
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(supabase_url, secret_key, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+})
+
+// Access auth admin api
+const adminAuthClient = supabase.auth.admin
+```
+
+---
