@@ -63,7 +63,6 @@ import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { Toaster } from '@/lib/toaster'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
-import { ActiveShortcutsProvider } from '@/state/shortcuts/activeShortcuts'
 import type { AppPropsWithLayout } from '@/types'
 
 dayjs.extend(customParseFormat)
