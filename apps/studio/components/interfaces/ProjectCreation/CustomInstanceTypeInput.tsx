@@ -19,7 +19,7 @@ export const CustomInstanceTypeInput = ({ form }: CustomInstanceTypeInputProps) 
           <FormItemLayout
             label="Custom instance type"
             layout="horizontal"
-            description="Specify a custom instance type (e.g. t4g.micro). This is only applicable for local/staging projects."
+            description="Specify a custom instance type (e.g. t3.nano). This is only applicable for local/staging projects."
           >
             <FormControl>
               <Input_Shadcn_ placeholder="Instance type" {...field} autoComplete="off" />
