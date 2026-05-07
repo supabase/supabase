@@ -1,4 +1,5 @@
-/* This file unsets all built-in Tailwind CSS colors for which we have overrides. Some of them might not exist in 
+/* 
+ * This file unsets all built-in Tailwind CSS colors for which we have overrides. Some of them might not exist in 
  * Tailwind's default theme. 
  */
 @theme {
