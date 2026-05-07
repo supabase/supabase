@@ -17,6 +17,7 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { Code } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
+  Badge,
   Button,
   DialogSectionSeparator,
   Sheet,
@@ -147,6 +148,26 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
           </SheetHeader>
 
           <div className="grow overflow-y-auto flex flex-col">
+            <SheetSection className="pb-0">
+              <Admonition
+                type="default"
+                layout="horizontal"
+                actions={[
+                  <Button key="set-up" type="default">
+                    Set up sandbox
+                  </Button>,
+                ]}
+              >
+                <div className="flex items-center gap-x-2">
+                  <p className="!m-0">Set up sandbox for testing</p>
+                  <Badge variant="success">Recommended</Badge>
+                </div>
+                <p className="text-foreground-light !m-0">
+                  Ensure that queries do not affect your actual database
+                </p>
+              </Admonition>
+            </SheetSection>
+
             <SheetSection className="px-0 py-0">
               <div className="flex flex-col p-5 pt-4 gap-y-4">
                 <RoleSelector onSelectRole={setSelectedOption} />
