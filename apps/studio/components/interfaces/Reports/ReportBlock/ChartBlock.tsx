@@ -27,6 +27,7 @@ import {
   useProjectDailyStatsQuery,
 } from '@/data/analytics/project-daily-stats-query'
 import { METRICS } from '@/lib/constants/metrics'
+import { useFormatDateTime } from '@/lib/datetime'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { Dashboards } from '@/types'
 
@@ -42,13 +43,7 @@ interface ChartBlockProps {
   isLoading?: boolean
   actions?: ReactNode
   maxHeight?: number
-  onUpdateChartConfig?: ({
-    chart,
-    chartConfig,
-  }: {
-    chart?: Partial<Dashboards.Chart>
-    chartConfig?: Partial<ChartConfig>
-  }) => void
+  onUpdateChartConfig?: ({ chart, chartConfig }: { chart?: Partial<Dashboards.Chart>; chartConfig?: Partial<ChartConfig> }) => void
 }
 
 export const ChartBlock = ({
@@ -72,6 +67,7 @@ export const ChartBlock = ({
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
   const logScale = useMemo(() => defaultLogScale, [defaultLogScale])
   const [latestValue, setLatestValue] = useState<string | undefined>()
+  const formatChartDate = useFormatDateTime()
 
   const databaseIdentifier = state.selectedDatabaseId
 
@@ -316,7 +312,7 @@ export const ChartBlock = ({
                     <ChartTooltipContent
                       className="min-w-[200px]"
                       labelSuffix={isPercentage ? '%' : ''}
-                      labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
+                      labelFormatter={(x) => formatChartDate(x as string | number, 'DD MMM YYYY')}
                     />
                   }
                 />
@@ -343,7 +339,7 @@ export const ChartBlock = ({
                   content={
                     <ChartTooltipContent
                       labelSuffix={chartData?.format === '%' ? '%' : ''}
-                      labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
+                      labelFormatter={(x) => formatChartDate(x as string | number, 'DD MMM YYYY')}
                     />
                   }
                 />
