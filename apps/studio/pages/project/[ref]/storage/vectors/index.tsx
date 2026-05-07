@@ -34,7 +34,7 @@ const StorageVectorsPage: NextPageWithLayout = () => {
   // [Joshen] We're actively looking into lifting this restriction so can remove once done
   const isAvailableInProjectRegion = AVAILABLE_REGIONS.includes(project?.region ?? '')
   const regionLabel = AVAILABLE_REPLICA_REGIONS.find((region) =>
-    project?.region.includes(region.region)
+    project?.region?.includes(region.region)
   )
 
   if (!isAvailableInProjectRegion) {
