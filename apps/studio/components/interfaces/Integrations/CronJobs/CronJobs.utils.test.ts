@@ -235,6 +235,22 @@ describe('parseCronJobCommand', () => {
     })
   })
 
+  it('should return an HTTP request config with POST method, escape-string headers and body with backslashes', () => {
+    const command = String.raw`select net.http_post( url:='https://example.com/api/endpoint', headers:=E'{"Content-Type":"application/json","X-Regex":"^\\\\d+$"}'::jsonb,body:=E'{"path":"C:\\\\tmp","regex":"^\\\\d+$"}',timeout_milliseconds:=1000);`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [
+        { name: 'Content-Type', value: 'application/json' },
+        { name: 'X-Regex', value: String.raw`^\d+$` },
+      ],
+      httpBody: String.raw`{"path":"C:\\tmp","regex":"^\\d+$"}`,
+      timeoutMs: 1000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
   it('should parse a POST body without swallowing later quoted arguments', () => {
     const command = `select net.http_post( url:='https://example.com/api/endpoint', body:='{"payload":"ok"}'::jsonb, headers:='{"Authorization":"Bearer demo"}'::jsonb, timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({

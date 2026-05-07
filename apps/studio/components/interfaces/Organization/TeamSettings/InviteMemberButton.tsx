@@ -56,6 +56,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useProfile } from '@/lib/profile'
 
 export const InviteMemberButton = () => {
@@ -93,6 +94,8 @@ export const InviteMemberButton = () => {
   const hasOrgRole =
     (userMemberData?.role_ids ?? []).length === 1 &&
     orgScopedRoles.some((r) => r.id === userMemberData?.role_ids[0])
+
+  const isStripeProjectsOrg = organization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
   const { rolesAddable } = useGetRolesManagementPermissions(
     organization?.slug,
@@ -308,18 +311,30 @@ export const InviteMemberButton = () => {
                           <SelectGroup_Shadcn_>
                             {orgScopedRoles.map((role) => {
                               const canAssignRole = rolesAddable.includes(role.id)
+                              const isOwnerRole = role.name === 'Owner'
+                              const disabledForStripe = isStripeProjectsOrg && isOwnerRole
+                              const disabled = !canAssignRole || disabledForStripe
+                              const disabledReason = disabledForStripe
+                                ? 'Cannot be assigned in Stripe Projects organizations'
+                                : !canAssignRole
+                                  ? 'Additional permissions required to assign role'
+                                  : undefined
 
                               return (
                                 <SelectItem_Shadcn_
                                   key={role.id}
                                   value={role.id.toString()}
-                                  className="text-sm [&>span:nth-child(2)]:w-full [&>span:nth-child(2)]:flex [&>span:nth-child(2)]:items-center [&>span:nth-child(2)]:justify-between"
-                                  disabled={!canAssignRole}
+                                  className="text-sm"
+                                  disabled={disabled}
                                 >
-                                  <span>{role.name}</span>
-                                  {!canAssignRole && (
-                                    <span>Additional permissions required to assign role</span>
-                                  )}
+                                  <div className="flex flex-col gap-0.5">
+                                    <span>{role.name}</span>
+                                    {disabledReason && (
+                                      <span className="text-xs text-foreground-lighter">
+                                        {disabledReason}
+                                      </span>
+                                    )}
+                                  </div>
                                 </SelectItem_Shadcn_>
                               )
                             })}

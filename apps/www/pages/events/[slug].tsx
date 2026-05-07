@@ -13,7 +13,7 @@ import utc from 'dayjs/plugin/utc'
 import matter from 'gray-matter'
 import { ChevronLeft, X as XIcon } from 'lucide-react'
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
-import { MDXRemote } from 'next-mdx-remote'
+import { MDXClient } from 'next-mdx-remote-client/csr'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
 import NextImage from 'next/image'
@@ -388,7 +388,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 <h2 className="text-foreground-light text-sm font-mono uppercase">
                   About this event
                 </h2>
-                <MDXRemote {...content} components={mdxComponents()} />
+                <MDXClient {...content} components={mdxComponents()} />
               </div>
               <aside className="mt-8">
                 <Button

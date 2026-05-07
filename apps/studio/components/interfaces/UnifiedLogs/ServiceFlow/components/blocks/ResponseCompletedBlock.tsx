@@ -24,7 +24,7 @@ export const MemoizedResponseCompletedBlock = memo(function ResponseCompletedBlo
   const status = Number(data?.status)
 
   // Postgres operation handling
-  const eventMessage = enrichedData?.event_message || (data as any)?.event_message
+  const eventMessage = enrichedData?.event_message || data?.event_message
   const severity = enrichedData?.error_severity
   const hasPostgresError = severity && ['error', 'fatal'].includes(severity.toLowerCase())
 
