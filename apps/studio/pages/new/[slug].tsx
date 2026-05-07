@@ -358,22 +358,20 @@ const Wizard: NextPageWithLayout = () => {
           .join('\n') || undefined,
     }
 
-    if (postgresVersion) {
-      if (!postgresVersion.match(/1[2-9]\..*/)) {
-        toast.error(
-          `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
-        )
-      }
-
-      data['customSupabaseRequest'] = {
-        ami: { search_tags: { 'tag:postgresVersion': postgresVersion } },
-      }
+    if (postgresVersion && !postgresVersion.match(/1[2-9]\..*/)) {
+      toast.error(
+        `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
+      )
     }
 
-    if (instanceType) {
+    if (postgresVersion || instanceType) {
       data['customSupabaseRequest'] = {
-        ...(data['customSupabaseRequest'] ?? {}),
-        instance_type: instanceType,
+        ami: {
+          ...(postgresVersion && {
+            search_tags: { 'tag:postgresVersion': postgresVersion },
+          }),
+          ...(instanceType && { instance_type: instanceType }),
+        },
       }
     }
 
