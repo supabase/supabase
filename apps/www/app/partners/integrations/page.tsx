@@ -6,8 +6,9 @@ import IntegrationsContent from './IntegrationsContent'
 
 export const revalidate = 1800 // 30 minutes
 
-const META_TITLE = 'Find an Integration'
-const META_DESCRIPTION = 'Use your favorite tools with Supabase.'
+const META_TITLE = 'Partners building with Supabase'
+const META_DESCRIPTION =
+  'Browse companies that build on Supabase, integrate with Supabase, or both.'
 
 export const metadata: Metadata = {
   title: META_TITLE,

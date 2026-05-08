@@ -2,15 +2,13 @@
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import BecomeAPartner from '~/components/Partners/BecomeAPartner'
-import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
-import TileGrid from '~/components/Partners/TileGrid'
 import supabase from '~/lib/supabaseMisc'
 import type { Partner } from '~/types/partners'
-import { Loader, Search } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { ArrowRight, ArrowUpRight, Loader, Search } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+import { Button, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 import { useDebounce } from 'use-debounce'
 
 interface Props {
@@ -25,14 +23,12 @@ export default function IntegrationsContent({
   metaDescription,
 }: Props) {
   const [partners, setPartners] = useState(initialPartners)
-
   const allCategories = Array.from(new Set(initialPartners?.map((p) => p.category)))
-
-  const router = useRouter()
 
   const [search, setSearch] = useState('')
   const [debouncedSearchTerm] = useDebounce(search, 300)
   const [isSearching, setIsSearching] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   useEffect(() => {
     const searchPartners = async () => {
@@ -73,25 +69,40 @@ export default function IntegrationsContent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchTerm])
 
+  const featuredPartners = partners.filter((p) => p.featured).slice(0, 6)
+  const featuredSlugs = new Set(featuredPartners.map((p) => p.slug))
+  const hasSearchQuery = search.trim() !== ''
+  const isFiltered = hasSearchQuery || selectedCategory !== null
+  const showFeatured = !isFiltered && featuredPartners.length > 0
+  const listPartners = hasSearchQuery
+    ? partners
+    : selectedCategory
+      ? partners.filter((p) => p.category === selectedCategory)
+      : showFeatured
+        ? partners.filter((p) => !featuredSlugs.has(p.slug))
+        : partners
+
   return (
     <DefaultLayout className="bg-alternative">
       <SectionContainer className="space-y-16">
-        <div>
-          <h1 className="h1">{metaTitle}</h1>
-          <p className="text-foreground-lighter text-xl">{metaDescription}</p>
+        <div className="flex flex-col gap-3">
+          <span className="text-brand font-mono uppercase tracking-widest text-sm">
+            Partner Catalog
+          </span>
+          <h1 className="h1 !mb-0">{metaTitle}</h1>
+          <p className="text-foreground-lighter text-xl max-w-2xl">{metaDescription}</p>
         </div>
-        {/* Title */}
-        <div className="grid space-y-12 md:gap-8 lg:grid-cols-12 lg:gap-16 lg:space-y-0 xl:gap-16">
-          <div className="lg:col-span-4 xl:col-span-3">
-            {/* Horizontal link menu */}
-            <div className="space-y-6">
-              {/* Search Bar */}
+
+        <div className="space-y-10">
+          {/* Search + category pills (sticky) */}
+          <div className="sticky top-16 z-20 -mx-6 px-6 py-4 lg:-mx-16 lg:px-16 xl:-mx-20 xl:px-20 bg-alternative/90 backdrop-blur-md flex flex-col gap-4">
+            <div className="max-w-md">
               <InputGroup className="w-full">
                 <InputGroupInput
                   size="small"
                   autoComplete="off"
                   type="search"
-                  placeholder="Search..."
+                  placeholder="Search partners..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
@@ -106,62 +117,120 @@ export default function IntegrationsContent({
                   </InputGroupAddon>
                 )}
               </InputGroup>
-              <div className="hidden lg:block">
-                <div className="text-foreground-lighter mb-2 text-sm">Categories</div>
-                <div className="space-y-1">
-                  {allCategories.map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => router.push(`#${category.toLowerCase()}`)}
-                      className="text-foreground-light block text-base"
-                    >
-                      {category}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div className="text-foreground-lighter mb-2 text-sm">Explore more</div>
-                <div className="grid grid-cols-2 gap-8 lg:grid-cols-1">
-                  <PartnerLinkBox
-                    href={`/partners/integrations#become-a-partner`}
-                    title="Become a partner"
-                    color="brand"
-                    description="Fill out a quick 30 second form to apply to become a partner"
-                    icon={
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                        />
-                      </svg>
-                    }
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedCategory(null)}
+                className={cn(
+                  'rounded-full border px-3 py-1 text-sm transition-colors',
+                  selectedCategory === null
+                    ? 'bg-foreground text-background border-foreground'
+                    : 'bg-background hover:bg-surface-100 text-foreground-light'
+                )}
+              >
+                All
+              </button>
+              {allCategories.map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => setSelectedCategory(category)}
+                  className={cn(
+                    'rounded-full border px-3 py-1 text-sm transition-colors',
+                    selectedCategory === category
+                      ? 'bg-foreground text-background border-foreground'
+                      : 'bg-background hover:bg-surface-100 text-foreground-light'
+                  )}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Featured grid — shown when not filtering */}
+          {showFeatured && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {featuredPartners.map((p) => (
+                <Link
+                  key={p.slug}
+                  href={`/partners/integrations/${p.slug}`}
+                  className="group flex h-full flex-col gap-3 rounded-xl border bg-surface-100 p-5 transition-colors hover:bg-surface-200"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="relative size-10 shrink-0 rounded-full overflow-hidden bg-muted">
+                      <Image
+                        src={p.logo}
+                        alt={p.title}
+                        fill
+                        className="object-cover"
+                        sizes="40px"
+                      />
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 min-w-0">
+                      <h3 className="text-foreground text-base font-medium tracking-tight">
+                        {p.title}
+                      </h3>
+                      <span className="text-foreground-lighter font-mono text-xs uppercase tracking-wide rounded-full border px-2 py-0.5">
+                        {p.category}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-foreground-lighter text-sm line-clamp-3 text-pretty">
+                    {p.description}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* Compact list */}
+          {listPartners.length ? (
+            <div className="border bg-background rounded-xl overflow-hidden divide-y">
+              {listPartners.map((p) => (
+                <Link
+                  key={p.slug}
+                  href={`/partners/integrations/${p.slug}`}
+                  className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-surface-100"
+                >
+                  <div className="relative size-10 shrink-0 rounded-full overflow-hidden bg-muted">
+                    <Image src={p.logo} alt={p.title} fill className="object-cover" sizes="40px" />
+                  </div>
+                  <div className="flex-1 min-w-0 flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-foreground text-sm font-medium tracking-tight">
+                        {p.title}
+                      </span>
+                      <span className="text-foreground-lighter font-mono text-xs uppercase tracking-wide rounded-full border px-2 py-0.5">
+                        {p.category}
+                      </span>
+                    </div>
+                    <p className="text-foreground-lighter text-sm truncate">{p.description}</p>
+                  </div>
+                  <ArrowUpRight
+                    size={16}
+                    className="shrink-0 text-foreground-lighter transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   />
-                </div>
-              </div>
+                </Link>
+              ))}
             </div>
-          </div>
-          <div className="lg:col-span-8 xl:col-span-9">
-            {/* Partner Tiles */}
-            <div className="grid space-y-10">
-              {partners?.length ? (
-                <TileGrid partners={partners} />
-              ) : (
-                <p className="h2">No Partners Found</p>
-              )}
-            </div>
-          </div>
+          ) : (
+            <p className="text-foreground-lighter">No partners found.</p>
+          )}
         </div>
       </SectionContainer>
-      <BecomeAPartner />
+      <div className="border-t bg-background">
+        <div
+          id="become-a-partner"
+          className="mx-auto max-w-2xl flex flex-col items-center gap-6 py-32 px-6 text-center"
+        >
+          <h2 className="h2 tracking-[-1px]">Interested in adding your product to the catalog?</h2>
+          <Button asChild size="medium" iconRight={<ArrowRight />}>
+            <Link href="/partners#become-a-partner">Become a partner</Link>
+          </Button>
+        </div>
+      </div>
     </DefaultLayout>
   )
 }
