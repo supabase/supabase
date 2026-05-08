@@ -77,7 +77,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/project/$ref/storage.tsx` — StorageLayout + StorageBucketsLayout (reads `storageLayoutTitle`, optional `skipStorageBucketsLayout`, `storageBucketsLayoutTitle`, `storageBucketsLayoutHideSubtitle` from leaf `staticData`). **Delta vs plan:** the shell wraps in BOTH StorageLayout and StorageBucketsLayout by default — every storage page except bucket-detail pages uses both. Bucket-detail pages set `skipStorageBucketsLayout: true`. `/storage/s3` uses `storageBucketsLayout{Title,HideSubtitle}` to override the inner header.
 - [x] `routes/project/$ref/realtime.tsx` — RealtimeLayout (reads `realtimeLayoutTitle` from leaf `staticData`)
 - [ ] `routes/project/$ref/functions.tsx` — EdgeFunctionsLayout
-- [ ] `routes/project/$ref/branches.tsx` — BranchLayout + PageLayout
+- [x] `routes/project/$ref/branches.tsx` — BranchLayout only. **Delta vs plan:** the per-page `PageLayout` (with different titles + primary/secondary actions) stays in each leaf. Hoisted `BranchesPageWrapper` and `MergeRequestsPageWrapper` to top-level exports in their respective `pages/...` files so the route files can import + re-use the same wrapping.
 - [ ] `routes/project/$ref/logs.tsx` — LogsLayout
 - [ ] `routes/project/$ref/observability.tsx` — ObservabilityLayout
 - [ ] `routes/project/$ref/advisors.tsx` — AdvisorsLayout
@@ -226,8 +226,8 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/branches/*`
 
-- [ ] `routes/project/$ref/branches/index.tsx` ← `pages/project/[ref]/branches/index.tsx`
-- [ ] `routes/project/$ref/branches/merge-requests.tsx` ← `pages/project/[ref]/branches/merge-requests.tsx`
+- [x] A `routes/project/$ref/branches/index.tsx` ← `pages/project/[ref]/branches/index.tsx` (route wraps in exported `BranchesPageWrapper` to preserve the page's `PageLayout` + Create-branch action)
+- [x] A `routes/project/$ref/branches/merge-requests.tsx` ← `pages/project/[ref]/branches/merge-requests.tsx` (route wraps in exported `MergeRequestsPageWrapper`)
 
 ### Project shell — `/logs/*`
 

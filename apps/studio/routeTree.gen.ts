@@ -49,6 +49,7 @@ import { Route as ProjectRefSqlRouteImport } from './routes/project/$ref/sql'
 import { Route as ProjectRefRealtimeRouteImport } from './routes/project/$ref/realtime'
 import { Route as ProjectRefEditorRouteImport } from './routes/project/$ref/editor'
 import { Route as ProjectRefDatabaseRouteImport } from './routes/project/$ref/database'
+import { Route as ProjectRefBranchesRouteImport } from './routes/project/$ref/branches'
 import { Route as ProjectRefAuthRouteImport } from './routes/project/$ref/auth'
 import { Route as ApiIntegrationsStripeSyncRouteImport } from './routes/api/integrations/stripe-sync'
 import { Route as ApiEdgeFunctionsTestRouteImport } from './routes/api/edge-functions/test'
@@ -60,6 +61,7 @@ import { Route as AppAccountMeRouteImport } from './routes/_app/account/me'
 import { Route as AppAccountAuditRouteImport } from './routes/_app/account/audit'
 import { Route as ProjectRefSqlIndexRouteImport } from './routes/project/$ref/sql/index'
 import { Route as ProjectRefEditorIndexRouteImport } from './routes/project/$ref/editor/index'
+import { Route as ProjectRefBranchesIndexRouteImport } from './routes/project/$ref/branches/index'
 import { Route as ApiPlatformProjectsIndexRouteImport } from './routes/api/platform/projects/index'
 import { Route as ApiPlatformProfileIndexRouteImport } from './routes/api/platform/profile/index'
 import { Route as ApiPlatformOrganizationsIndexRouteImport } from './routes/api/platform/organizations/index'
@@ -84,6 +86,7 @@ import { Route as ProjectRefDatabaseIndexesRouteImport } from './routes/project/
 import { Route as ProjectRefDatabaseFunctionsRouteImport } from './routes/project/$ref/database/functions'
 import { Route as ProjectRefDatabaseExtensionsRouteImport } from './routes/project/$ref/database/extensions'
 import { Route as ProjectRefDatabaseColumnPrivilegesRouteImport } from './routes/project/$ref/database/column-privileges'
+import { Route as ProjectRefBranchesMergeRequestsRouteImport } from './routes/project/$ref/branches/merge-requests'
 import { Route as ProjectRefAuthUsersRouteImport } from './routes/project/$ref/auth/users'
 import { Route as ProjectRefAuthUrlConfigurationRouteImport } from './routes/project/$ref/auth/url-configuration'
 import { Route as ProjectRefAuthThirdPartyRouteImport } from './routes/project/$ref/auth/third-party'
@@ -413,6 +416,11 @@ const ProjectRefDatabaseRoute = ProjectRefDatabaseRouteImport.update({
   path: '/database',
   getParentRoute: () => ProjectRefRoute,
 } as any)
+const ProjectRefBranchesRoute = ProjectRefBranchesRouteImport.update({
+  id: '/branches',
+  path: '/branches',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
 const ProjectRefAuthRoute = ProjectRefAuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -468,6 +476,11 @@ const ProjectRefEditorIndexRoute = ProjectRefEditorIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ProjectRefEditorRoute,
+} as any)
+const ProjectRefBranchesIndexRoute = ProjectRefBranchesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectRefBranchesRoute,
 } as any)
 const ApiPlatformProjectsIndexRoute =
   ApiPlatformProjectsIndexRouteImport.update({
@@ -602,6 +615,12 @@ const ProjectRefDatabaseColumnPrivilegesRoute =
     id: '/column-privileges',
     path: '/column-privileges',
     getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
+const ProjectRefBranchesMergeRequestsRoute =
+  ProjectRefBranchesMergeRequestsRouteImport.update({
+    id: '/merge-requests',
+    path: '/merge-requests',
+    getParentRoute: () => ProjectRefBranchesRoute,
   } as any)
 const ProjectRefAuthUsersRoute = ProjectRefAuthUsersRouteImport.update({
   id: '/users',
@@ -1370,6 +1389,7 @@ export interface FileRoutesByFullPath {
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
+  '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
@@ -1418,6 +1438,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
+  '/project/$ref/branches/merge-requests': typeof ProjectRefBranchesMergeRequestsRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
   '/project/$ref/database/functions': typeof ProjectRefDatabaseFunctionsRoute
@@ -1442,6 +1463,7 @@ export interface FileRoutesByFullPath {
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile/': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
+  '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
   '/project/$ref/sql/': typeof ProjectRefSqlIndexRoute
   '/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
@@ -1616,6 +1638,7 @@ export interface FileRoutesByTo {
   '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
+  '/project/$ref/branches/merge-requests': typeof ProjectRefBranchesMergeRequestsRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
   '/project/$ref/database/functions': typeof ProjectRefDatabaseFunctionsRoute
@@ -1639,6 +1662,7 @@ export interface FileRoutesByTo {
   '/api/platform/organizations': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects': typeof ApiPlatformProjectsIndexRoute
+  '/project/$ref/branches': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor': typeof ProjectRefEditorIndexRoute
   '/project/$ref/sql': typeof ProjectRefSqlIndexRoute
   '/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
@@ -1772,6 +1796,7 @@ export interface FileRoutesById {
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
+  '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
@@ -1820,6 +1845,7 @@ export interface FileRoutesById {
   '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
+  '/project/$ref/branches/merge-requests': typeof ProjectRefBranchesMergeRequestsRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
   '/project/$ref/database/functions': typeof ProjectRefDatabaseFunctionsRoute
@@ -1844,6 +1870,7 @@ export interface FileRoutesById {
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile/': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
+  '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
   '/project/$ref/sql/': typeof ProjectRefSqlIndexRoute
   '/_app/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
@@ -1976,6 +2003,7 @@ export interface FileRouteTypes {
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
     | '/project/$ref/auth'
+    | '/project/$ref/branches'
     | '/project/$ref/database'
     | '/project/$ref/editor'
     | '/project/$ref/realtime'
@@ -2024,6 +2052,7 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/third-party'
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
+    | '/project/$ref/branches/merge-requests'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
     | '/project/$ref/database/functions'
@@ -2048,6 +2077,7 @@ export interface FileRouteTypes {
     | '/api/platform/organizations/'
     | '/api/platform/profile/'
     | '/api/platform/projects/'
+    | '/project/$ref/branches/'
     | '/project/$ref/editor/'
     | '/project/$ref/sql/'
     | '/org/$slug/webhooks/$endpointId'
@@ -2222,6 +2252,7 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/third-party'
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
+    | '/project/$ref/branches/merge-requests'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
     | '/project/$ref/database/functions'
@@ -2245,6 +2276,7 @@ export interface FileRouteTypes {
     | '/api/platform/organizations'
     | '/api/platform/profile'
     | '/api/platform/projects'
+    | '/project/$ref/branches'
     | '/project/$ref/editor'
     | '/project/$ref/sql'
     | '/org/$slug/webhooks/$endpointId'
@@ -2377,6 +2409,7 @@ export interface FileRouteTypes {
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
     | '/project/$ref/auth'
+    | '/project/$ref/branches'
     | '/project/$ref/database'
     | '/project/$ref/editor'
     | '/project/$ref/realtime'
@@ -2425,6 +2458,7 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/third-party'
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
+    | '/project/$ref/branches/merge-requests'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
     | '/project/$ref/database/functions'
@@ -2449,6 +2483,7 @@ export interface FileRouteTypes {
     | '/api/platform/organizations/'
     | '/api/platform/profile/'
     | '/api/platform/projects/'
+    | '/project/$ref/branches/'
     | '/project/$ref/editor/'
     | '/project/$ref/sql/'
     | '/_app/org/$slug/webhooks/$endpointId'
@@ -2925,6 +2960,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefDatabaseRouteImport
       parentRoute: typeof ProjectRefRoute
     }
+    '/project/$ref/branches': {
+      id: '/project/$ref/branches'
+      path: '/branches'
+      fullPath: '/project/$ref/branches'
+      preLoaderRoute: typeof ProjectRefBranchesRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
     '/project/$ref/auth': {
       id: '/project/$ref/auth'
       path: '/auth'
@@ -3001,6 +3043,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/editor/'
       preLoaderRoute: typeof ProjectRefEditorIndexRouteImport
       parentRoute: typeof ProjectRefEditorRoute
+    }
+    '/project/$ref/branches/': {
+      id: '/project/$ref/branches/'
+      path: '/'
+      fullPath: '/project/$ref/branches/'
+      preLoaderRoute: typeof ProjectRefBranchesIndexRouteImport
+      parentRoute: typeof ProjectRefBranchesRoute
     }
     '/api/platform/projects/': {
       id: '/api/platform/projects/'
@@ -3169,6 +3218,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/database/column-privileges'
       preLoaderRoute: typeof ProjectRefDatabaseColumnPrivilegesRouteImport
       parentRoute: typeof ProjectRefDatabaseRoute
+    }
+    '/project/$ref/branches/merge-requests': {
+      id: '/project/$ref/branches/merge-requests'
+      path: '/merge-requests'
+      fullPath: '/project/$ref/branches/merge-requests'
+      preLoaderRoute: typeof ProjectRefBranchesMergeRequestsRouteImport
+      parentRoute: typeof ProjectRefBranchesRoute
     }
     '/project/$ref/auth/users': {
       id: '/project/$ref/auth/users'
@@ -4212,6 +4268,19 @@ const ProjectRefAuthRouteWithChildren = ProjectRefAuthRoute._addFileChildren(
   ProjectRefAuthRouteChildren,
 )
 
+interface ProjectRefBranchesRouteChildren {
+  ProjectRefBranchesMergeRequestsRoute: typeof ProjectRefBranchesMergeRequestsRoute
+  ProjectRefBranchesIndexRoute: typeof ProjectRefBranchesIndexRoute
+}
+
+const ProjectRefBranchesRouteChildren: ProjectRefBranchesRouteChildren = {
+  ProjectRefBranchesMergeRequestsRoute: ProjectRefBranchesMergeRequestsRoute,
+  ProjectRefBranchesIndexRoute: ProjectRefBranchesIndexRoute,
+}
+
+const ProjectRefBranchesRouteWithChildren =
+  ProjectRefBranchesRoute._addFileChildren(ProjectRefBranchesRouteChildren)
+
 interface ProjectRefDatabaseTriggersRouteChildren {
   ProjectRefDatabaseTriggersDataRoute: typeof ProjectRefDatabaseTriggersDataRoute
   ProjectRefDatabaseTriggersEventRoute: typeof ProjectRefDatabaseTriggersEventRoute
@@ -4366,6 +4435,7 @@ const ProjectRefStorageRouteWithChildren =
 
 interface ProjectRefRouteChildren {
   ProjectRefAuthRoute: typeof ProjectRefAuthRouteWithChildren
+  ProjectRefBranchesRoute: typeof ProjectRefBranchesRouteWithChildren
   ProjectRefDatabaseRoute: typeof ProjectRefDatabaseRouteWithChildren
   ProjectRefEditorRoute: typeof ProjectRefEditorRouteWithChildren
   ProjectRefRealtimeRoute: typeof ProjectRefRealtimeRouteWithChildren
@@ -4376,6 +4446,7 @@ interface ProjectRefRouteChildren {
 
 const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefAuthRoute: ProjectRefAuthRouteWithChildren,
+  ProjectRefBranchesRoute: ProjectRefBranchesRouteWithChildren,
   ProjectRefDatabaseRoute: ProjectRefDatabaseRouteWithChildren,
   ProjectRefEditorRoute: ProjectRefEditorRouteWithChildren,
   ProjectRefRealtimeRoute: ProjectRefRealtimeRouteWithChildren,
