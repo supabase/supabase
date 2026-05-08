@@ -4,7 +4,7 @@ import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { type Dispatch, type MouseEventHandler } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
-import { DialogSectionSeparator, Form } from 'ui'
+import { Form, Separator } from 'ui'
 
 import {
   AffectedServicesSelector,
@@ -21,7 +21,7 @@ import {
 import { DashboardLogsToggle } from './DashboardLogsToggle'
 import { MessageField } from './MessageField'
 import { OrganizationSelector } from './OrganizationSelector'
-import { ProjectAndPlanInfo } from './ProjectAndPlanInfo'
+import { PlanExpectationInfoContent, ProjectAndPlanInfo } from './ProjectAndPlanInfo'
 import { SubjectAndSuggestionsInfo } from './SubjectAndSuggestionsInfo'
 import { SubmitButton } from './SubmitButton'
 import { DISABLE_SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessToggle'
@@ -34,6 +34,7 @@ import {
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
 } from './SupportForm.utils'
+import { SupportFormDirectEmailContent } from './SupportFormDirectEmailInfo'
 import { getProjectAuthConfig } from '@/data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from '@/data/feedback/support-ticket-send'
 import { type OrganizationPlanID } from '@/data/organizations/organization-query'
@@ -59,21 +60,28 @@ const useIsSimplifiedForm = (slug: string, subscriptionPlanId?: OrganizationPlan
   return false
 }
 
-interface SupportFormV2Props {
+interface SupportFormV3Props {
   form: UseFormReturn<SupportFormValues>
   initialError: string | null
   state: SupportFormState
   dispatch: Dispatch<SupportFormActions>
+  selectedProjectRef?: string | null
 }
 
-export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFormV2Props) => {
+export const SupportFormV3 = ({
+  form,
+  initialError,
+  state,
+  dispatch,
+  selectedProjectRef,
+}: SupportFormV3Props) => {
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
 
   const { organizationSlug, projectRef, category, severity, subject, library } = form.watch()
 
   const selectedOrgSlug = organizationSlug === NO_ORG_MARKER ? null : organizationSlug
-  const selectedProjectRef = projectRef === NO_PROJECT_MARKER ? null : projectRef
+  const currentProjectRef = projectRef === NO_PROJECT_MARKER ? null : projectRef
 
   const { data: organizations } = useOrganizationsQuery()
   const subscriptionPlanId = getOrgSubscriptionPlan(organizations, selectedOrgSlug)
@@ -86,7 +94,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   const sanitizedLogSnapshot = useConstant(getSanitizedBreadcrumbs)
 
   const { data: commit } = useDeploymentCommitQuery({
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 10,
   })
 
   const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
@@ -107,8 +115,6 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
   })
 
   const onSubmit: SubmitHandler<SupportFormValues> = async (formValues) => {
-    // Library is required when selecting "APIs and Client Libraries" category,
-    // but only when the library selector is visible (not in simplified form)
     if (
       !simplifiedSupportForm &&
       showClientLibraries &&
@@ -183,7 +189,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
         payload.siteUrl = authConfig.SITE_URL
         payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
       } catch {
-        // [Joshen] No error handler required as fetching these info are nice to haves, not necessary
+        // Nice-to-have only
       }
     }
 
@@ -196,17 +202,22 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
     handleFormSubmit(event)
   }
 
+  const showPlanExpectationInfo =
+    !!selectedOrgSlug &&
+    subscriptionPlanId !== 'enterprise' &&
+    subscriptionPlanId !== 'platform' &&
+    category !== 'Login_issues'
+  const showDirectEmailInfo = state.type !== 'success' && selectedProjectRef !== undefined
+
   return (
     <Form {...form}>
-      <form id="support-form" className="flex flex-col gap-y-6">
-        <h3 className="px-6 text-xl">How can we help?</h3>
-
-        <div className="px-6 flex flex-col gap-y-8">
+      <form id="support-form" className="flex min-h-full flex-col">
+        <div className="flex flex-col gap-y-6">
           <OrganizationSelector form={form} orgSlug={organizationSlug} />
           <ProjectAndPlanInfo
             form={form}
             orgSlug={selectedOrgSlug}
-            projectRef={selectedProjectRef}
+            projectRef={currentProjectRef}
             subscriptionPlanId={subscriptionPlanId}
             category={category}
           />
@@ -218,9 +229,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
           />
         </div>
 
-        <DialogSectionSeparator />
-
-        <div className="px-6 flex flex-col gap-y-8">
+        <div className="flex flex-col gap-y-6 py-6">
           <SubjectAndSuggestionsInfo form={form} subject={subject} category={category} />
           {!simplifiedSupportForm && (
             <>
@@ -232,30 +241,76 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
           <AttachmentUploadDisplay {...attachmentUpload} />
         </div>
 
-        <DialogSectionSeparator />
+        {(DASHBOARD_LOG_CATEGORIES.includes(category) ||
+          (!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category)) ||
+          showPlanExpectationInfo ||
+          showDirectEmailInfo) && (
+          <div className="flex flex-col gap-y-6">
+            <Separator />
 
-        {DASHBOARD_LOG_CATEGORIES.includes(category) && (
-          <>
-            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} className="px-6" />
-            <DialogSectionSeparator />
-          </>
+            {DASHBOARD_LOG_CATEGORIES.includes(category) && (
+              <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} align="right" />
+            )}
+
+            {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
+              <SupportAccessToggle form={form} align="right" />
+            )}
+
+            {(showPlanExpectationInfo || showDirectEmailInfo) && (
+              <SupportFormV3AdditionalInfoSection
+                orgSlug={selectedOrgSlug}
+                subscriptionPlanId={subscriptionPlanId}
+                projectRef={currentProjectRef}
+                showPlanExpectationInfo={showPlanExpectationInfo}
+                showDirectEmailInfo={showDirectEmailInfo}
+              />
+            )}
+          </div>
         )}
 
-        {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
-          <>
-            <SupportAccessToggle form={form} className="px-6" />
-            <DialogSectionSeparator />
-          </>
-        )}
-
-        <div className="px-6 pt-2">
+        <div className="sticky bottom-0 z-10 -mx-5 mt-6 border-t bg-panel-footer-light px-5 py-4">
           <SubmitButton
             isSubmitting={state.type === 'submitting'}
             userEmail={respondToEmail}
             onClick={handleSubmitButtonClick}
+            descriptionClassName="pr-0"
           />
         </div>
       </form>
     </Form>
+  )
+}
+
+interface SupportFormV3AdditionalInfoSectionProps {
+  orgSlug: string | null
+  subscriptionPlanId?: OrganizationPlanID
+  projectRef: string | null
+  showPlanExpectationInfo: boolean
+  showDirectEmailInfo: boolean
+}
+
+function SupportFormV3AdditionalInfoSection({
+  orgSlug,
+  subscriptionPlanId,
+  projectRef,
+  showPlanExpectationInfo,
+  showDirectEmailInfo,
+}: SupportFormV3AdditionalInfoSectionProps) {
+  return (
+    <div className="flex flex-col gap-y-5">
+      {showPlanExpectationInfo && orgSlug && (
+        <div className="flex flex-col gap-y-2">
+          <h5 className="text-foreground">Support varies by plan</h5>
+          <PlanExpectationInfoContent orgSlug={orgSlug} planId={subscriptionPlanId} />
+        </div>
+      )}
+
+      {showDirectEmailInfo && (
+        <div className="flex flex-col gap-y-2">
+          <h5 className="text-foreground">Having trouble submitting the form?</h5>
+          <SupportFormDirectEmailContent projectRef={projectRef} />
+        </div>
+      )}
+    </div>
   )
 }

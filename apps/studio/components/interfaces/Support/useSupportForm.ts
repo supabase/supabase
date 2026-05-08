@@ -6,6 +6,7 @@ import { SupportFormSchema, type SupportFormValues } from './SupportForm.schema'
 import type { SupportFormActions } from './SupportForm.state'
 import {
   loadSupportFormInitialParams,
+  loadSupportFormInitialParamsFromObject,
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
   selectInitialOrgAndProject,
@@ -36,7 +37,10 @@ interface UseSupportFormResult {
   orgSlug: string | null
 }
 
-export function useSupportForm(dispatch: Dispatch<SupportFormActions>): UseSupportFormResult {
+export function useSupportForm(
+  dispatch: Dispatch<SupportFormActions>,
+  initialParams?: Partial<SupportFormUrlKeys>
+): UseSupportFormResult {
   const form = useForm<SupportFormValues>({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
@@ -45,11 +49,15 @@ export function useSupportForm(dispatch: Dispatch<SupportFormActions>): UseSuppo
   })
 
   const urlParamsRef = useRef<SupportFormUrlKeys | null>(null)
+  const providedInitialParamsRef = useRef(initialParams)
   const [initialError, setInitialError] = useState<string | null>(null)
 
   // Load initial values from URL params
   useEffect(() => {
-    const params = loadSupportFormInitialParams(window.location.search)
+    const params =
+      providedInitialParamsRef.current !== undefined
+        ? loadSupportFormInitialParamsFromObject(providedInitialParamsRef.current)
+        : loadSupportFormInitialParams(window.location.search)
     urlParamsRef.current = params
     setInitialError(params.error ?? null)
 
