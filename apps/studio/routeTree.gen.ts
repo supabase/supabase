@@ -47,6 +47,7 @@ import { Route as AppOrgIndexRouteImport } from './routes/_app/org/index'
 import { Route as ProjectRefStorageRouteImport } from './routes/project/$ref/storage'
 import { Route as ProjectRefSqlRouteImport } from './routes/project/$ref/sql'
 import { Route as ProjectRefRealtimeRouteImport } from './routes/project/$ref/realtime'
+import { Route as ProjectRefFunctionsRouteImport } from './routes/project/$ref/functions'
 import { Route as ProjectRefEditorRouteImport } from './routes/project/$ref/editor'
 import { Route as ProjectRefDatabaseRouteImport } from './routes/project/$ref/database'
 import { Route as ProjectRefBranchesRouteImport } from './routes/project/$ref/branches'
@@ -60,6 +61,7 @@ import { Route as AppAccountSecurityRouteImport } from './routes/_app/account/se
 import { Route as AppAccountMeRouteImport } from './routes/_app/account/me'
 import { Route as AppAccountAuditRouteImport } from './routes/_app/account/audit'
 import { Route as ProjectRefSqlIndexRouteImport } from './routes/project/$ref/sql/index'
+import { Route as ProjectRefFunctionsIndexRouteImport } from './routes/project/$ref/functions/index'
 import { Route as ProjectRefEditorIndexRouteImport } from './routes/project/$ref/editor/index'
 import { Route as ProjectRefBranchesIndexRouteImport } from './routes/project/$ref/branches/index'
 import { Route as ApiPlatformProjectsIndexRouteImport } from './routes/api/platform/projects/index'
@@ -74,6 +76,8 @@ import { Route as ProjectRefSqlIdRouteImport } from './routes/project/$ref/sql/$
 import { Route as ProjectRefRealtimeSettingsRouteImport } from './routes/project/$ref/realtime/settings'
 import { Route as ProjectRefRealtimePoliciesRouteImport } from './routes/project/$ref/realtime/policies'
 import { Route as ProjectRefRealtimeInspectorRouteImport } from './routes/project/$ref/realtime/inspector'
+import { Route as ProjectRefFunctionsSecretsRouteImport } from './routes/project/$ref/functions/secrets'
+import { Route as ProjectRefFunctionsNewRouteImport } from './routes/project/$ref/functions/new'
 import { Route as ProjectRefEditorNewRouteImport } from './routes/project/$ref/editor/new'
 import { Route as ProjectRefEditorIdRouteImport } from './routes/project/$ref/editor/$id'
 import { Route as ProjectRefDatabaseTypesRouteImport } from './routes/project/$ref/database/types'
@@ -406,6 +410,11 @@ const ProjectRefRealtimeRoute = ProjectRefRealtimeRouteImport.update({
   path: '/realtime',
   getParentRoute: () => ProjectRefRoute,
 } as any)
+const ProjectRefFunctionsRoute = ProjectRefFunctionsRouteImport.update({
+  id: '/functions',
+  path: '/functions',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
 const ProjectRefEditorRoute = ProjectRefEditorRouteImport.update({
   id: '/editor',
   path: '/editor',
@@ -472,6 +481,12 @@ const ProjectRefSqlIndexRoute = ProjectRefSqlIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProjectRefSqlRoute,
 } as any)
+const ProjectRefFunctionsIndexRoute =
+  ProjectRefFunctionsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProjectRefFunctionsRoute,
+  } as any)
 const ProjectRefEditorIndexRoute = ProjectRefEditorIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -548,6 +563,17 @@ const ProjectRefRealtimeInspectorRoute =
     path: '/inspector',
     getParentRoute: () => ProjectRefRealtimeRoute,
   } as any)
+const ProjectRefFunctionsSecretsRoute =
+  ProjectRefFunctionsSecretsRouteImport.update({
+    id: '/secrets',
+    path: '/secrets',
+    getParentRoute: () => ProjectRefFunctionsRoute,
+  } as any)
+const ProjectRefFunctionsNewRoute = ProjectRefFunctionsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => ProjectRefFunctionsRoute,
+} as any)
 const ProjectRefEditorNewRoute = ProjectRefEditorNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -1392,6 +1418,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
+  '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
@@ -1451,6 +1478,8 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
   '/project/$ref/editor/$id': typeof ProjectRefEditorIdRoute
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
+  '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
+  '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -1465,6 +1494,7 @@ export interface FileRoutesByFullPath {
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
   '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
+  '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
   '/project/$ref/sql/': typeof ProjectRefSqlIndexRoute
   '/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
@@ -1650,6 +1680,8 @@ export interface FileRoutesByTo {
   '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
   '/project/$ref/editor/$id': typeof ProjectRefEditorIdRoute
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
+  '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
+  '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -1664,6 +1696,7 @@ export interface FileRoutesByTo {
   '/api/platform/projects': typeof ApiPlatformProjectsIndexRoute
   '/project/$ref/branches': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor': typeof ProjectRefEditorIndexRoute
+  '/project/$ref/functions': typeof ProjectRefFunctionsIndexRoute
   '/project/$ref/sql': typeof ProjectRefSqlIndexRoute
   '/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
@@ -1799,6 +1832,7 @@ export interface FileRoutesById {
   '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
+  '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
@@ -1858,6 +1892,8 @@ export interface FileRoutesById {
   '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
   '/project/$ref/editor/$id': typeof ProjectRefEditorIdRoute
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
+  '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
+  '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -1872,6 +1908,7 @@ export interface FileRoutesById {
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
   '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
+  '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
   '/project/$ref/sql/': typeof ProjectRefSqlIndexRoute
   '/_app/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/_auth/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
@@ -2006,6 +2043,7 @@ export interface FileRouteTypes {
     | '/project/$ref/branches'
     | '/project/$ref/database'
     | '/project/$ref/editor'
+    | '/project/$ref/functions'
     | '/project/$ref/realtime'
     | '/project/$ref/sql'
     | '/project/$ref/storage'
@@ -2065,6 +2103,8 @@ export interface FileRouteTypes {
     | '/project/$ref/database/types'
     | '/project/$ref/editor/$id'
     | '/project/$ref/editor/new'
+    | '/project/$ref/functions/new'
+    | '/project/$ref/functions/secrets'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -2079,6 +2119,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/'
     | '/project/$ref/branches/'
     | '/project/$ref/editor/'
+    | '/project/$ref/functions/'
     | '/project/$ref/sql/'
     | '/org/$slug/webhooks/$endpointId'
     | '/partners/stripe/projects/login'
@@ -2264,6 +2305,8 @@ export interface FileRouteTypes {
     | '/project/$ref/database/types'
     | '/project/$ref/editor/$id'
     | '/project/$ref/editor/new'
+    | '/project/$ref/functions/new'
+    | '/project/$ref/functions/secrets'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -2278,6 +2321,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects'
     | '/project/$ref/branches'
     | '/project/$ref/editor'
+    | '/project/$ref/functions'
     | '/project/$ref/sql'
     | '/org/$slug/webhooks/$endpointId'
     | '/partners/stripe/projects/login'
@@ -2412,6 +2456,7 @@ export interface FileRouteTypes {
     | '/project/$ref/branches'
     | '/project/$ref/database'
     | '/project/$ref/editor'
+    | '/project/$ref/functions'
     | '/project/$ref/realtime'
     | '/project/$ref/sql'
     | '/project/$ref/storage'
@@ -2471,6 +2516,8 @@ export interface FileRouteTypes {
     | '/project/$ref/database/types'
     | '/project/$ref/editor/$id'
     | '/project/$ref/editor/new'
+    | '/project/$ref/functions/new'
+    | '/project/$ref/functions/secrets'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -2485,6 +2532,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/'
     | '/project/$ref/branches/'
     | '/project/$ref/editor/'
+    | '/project/$ref/functions/'
     | '/project/$ref/sql/'
     | '/_app/org/$slug/webhooks/$endpointId'
     | '/_auth/partners/stripe/projects/login'
@@ -2946,6 +2994,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefRealtimeRouteImport
       parentRoute: typeof ProjectRefRoute
     }
+    '/project/$ref/functions': {
+      id: '/project/$ref/functions'
+      path: '/functions'
+      fullPath: '/project/$ref/functions'
+      preLoaderRoute: typeof ProjectRefFunctionsRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
     '/project/$ref/editor': {
       id: '/project/$ref/editor'
       path: '/editor'
@@ -3036,6 +3091,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/sql/'
       preLoaderRoute: typeof ProjectRefSqlIndexRouteImport
       parentRoute: typeof ProjectRefSqlRoute
+    }
+    '/project/$ref/functions/': {
+      id: '/project/$ref/functions/'
+      path: '/'
+      fullPath: '/project/$ref/functions/'
+      preLoaderRoute: typeof ProjectRefFunctionsIndexRouteImport
+      parentRoute: typeof ProjectRefFunctionsRoute
     }
     '/project/$ref/editor/': {
       id: '/project/$ref/editor/'
@@ -3134,6 +3196,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/realtime/inspector'
       preLoaderRoute: typeof ProjectRefRealtimeInspectorRouteImport
       parentRoute: typeof ProjectRefRealtimeRoute
+    }
+    '/project/$ref/functions/secrets': {
+      id: '/project/$ref/functions/secrets'
+      path: '/secrets'
+      fullPath: '/project/$ref/functions/secrets'
+      preLoaderRoute: typeof ProjectRefFunctionsSecretsRouteImport
+      parentRoute: typeof ProjectRefFunctionsRoute
+    }
+    '/project/$ref/functions/new': {
+      id: '/project/$ref/functions/new'
+      path: '/new'
+      fullPath: '/project/$ref/functions/new'
+      preLoaderRoute: typeof ProjectRefFunctionsNewRouteImport
+      parentRoute: typeof ProjectRefFunctionsRoute
     }
     '/project/$ref/editor/new': {
       id: '/project/$ref/editor/new'
@@ -4370,6 +4446,21 @@ const ProjectRefEditorRouteChildren: ProjectRefEditorRouteChildren = {
 const ProjectRefEditorRouteWithChildren =
   ProjectRefEditorRoute._addFileChildren(ProjectRefEditorRouteChildren)
 
+interface ProjectRefFunctionsRouteChildren {
+  ProjectRefFunctionsNewRoute: typeof ProjectRefFunctionsNewRoute
+  ProjectRefFunctionsSecretsRoute: typeof ProjectRefFunctionsSecretsRoute
+  ProjectRefFunctionsIndexRoute: typeof ProjectRefFunctionsIndexRoute
+}
+
+const ProjectRefFunctionsRouteChildren: ProjectRefFunctionsRouteChildren = {
+  ProjectRefFunctionsNewRoute: ProjectRefFunctionsNewRoute,
+  ProjectRefFunctionsSecretsRoute: ProjectRefFunctionsSecretsRoute,
+  ProjectRefFunctionsIndexRoute: ProjectRefFunctionsIndexRoute,
+}
+
+const ProjectRefFunctionsRouteWithChildren =
+  ProjectRefFunctionsRoute._addFileChildren(ProjectRefFunctionsRouteChildren)
+
 interface ProjectRefRealtimeRouteChildren {
   ProjectRefRealtimeInspectorRoute: typeof ProjectRefRealtimeInspectorRoute
   ProjectRefRealtimePoliciesRoute: typeof ProjectRefRealtimePoliciesRoute
@@ -4438,6 +4529,7 @@ interface ProjectRefRouteChildren {
   ProjectRefBranchesRoute: typeof ProjectRefBranchesRouteWithChildren
   ProjectRefDatabaseRoute: typeof ProjectRefDatabaseRouteWithChildren
   ProjectRefEditorRoute: typeof ProjectRefEditorRouteWithChildren
+  ProjectRefFunctionsRoute: typeof ProjectRefFunctionsRouteWithChildren
   ProjectRefRealtimeRoute: typeof ProjectRefRealtimeRouteWithChildren
   ProjectRefSqlRoute: typeof ProjectRefSqlRouteWithChildren
   ProjectRefStorageRoute: typeof ProjectRefStorageRouteWithChildren
@@ -4449,6 +4541,7 @@ const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefBranchesRoute: ProjectRefBranchesRouteWithChildren,
   ProjectRefDatabaseRoute: ProjectRefDatabaseRouteWithChildren,
   ProjectRefEditorRoute: ProjectRefEditorRouteWithChildren,
+  ProjectRefFunctionsRoute: ProjectRefFunctionsRouteWithChildren,
   ProjectRefRealtimeRoute: ProjectRefRealtimeRouteWithChildren,
   ProjectRefSqlRoute: ProjectRefSqlRouteWithChildren,
   ProjectRefStorageRoute: ProjectRefStorageRouteWithChildren,
