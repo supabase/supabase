@@ -3,6 +3,11 @@ import { useFlag } from 'common'
 
 import { logsKeys } from './keys'
 import {
+  aggregateFunctionLogs,
+  flattenOtelInspectionRow,
+  type OtelLogRow,
+} from './otel-inspection.utils'
+import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
 } from './unified-logs-infinite-query'
@@ -206,43 +211,50 @@ LIMIT 1
     handleError(error)
   }
 
-  type OtelLogRow = {
-    id: string
-    timestamp: string
-    source: string
-    event_message: string
-    severity_text?: string
-    // OTEL log_attributes is a Map<String, String> server-side but we treat
-    // values as `any` here because the entry type below has many optional
-    // dotted fields with mixed primitive types.
-    log_attributes?: Record<string, any>
-  }
   const otelData = data as { result?: OtelLogRow[] } | undefined
   const row = otelData?.result?.[0]
   if (!row) {
     return { result: [] }
   }
 
-  const attrs: Record<string, any> = row.log_attributes ?? {}
-  const entry: UnifiedLogInspectionEntry = {
-    ...attrs,
-    id: row.id,
-    timestamp: row.timestamp,
-    service_name: row.source ?? '',
-    method: attrs['request.method'] ?? '',
-    path: attrs['request.path'] ?? '',
-    host: attrs['request.host'] ?? '',
-    status_code: attrs['response.status_code'] ?? '',
-    level: row.severity_text ?? '',
-    cf_ray: attrs['request.headers.cf_ray'],
-    cf_country: attrs['request.cf.country'],
-    cf_datacenter: attrs['request.cf.colo'],
-    client_ip: attrs['request.headers.cf_connecting_ip'] ?? attrs['request.headers.x_real_ip'],
-    raw_log_data: row,
-    service_specific_data: {},
+  const entry = flattenOtelInspectionRow(row) as UnifiedLogInspectionEntry & Record<string, unknown>
+
+  // For edge function rows, fetch and aggregate the related `function_logs`
+  // (the per-execution console.log output) — this is the only legitimate
+  // cross-source join in the legacy BigQuery service-flow queries.
+  if (row.source === 'function_edge_logs') {
+    const executionId = row.log_attributes?.['execution_id'] ?? row.log_attributes?.['request_id']
+    if (typeof executionId === 'string' && /^[0-9a-fA-F-]{1,64}$/.test(executionId)) {
+      const fnSql = `
+SELECT id, timestamp, source, event_message, severity_text, log_attributes
+FROM logs
+WHERE source = 'function_logs' AND log_attributes['execution_id'] = '${executionId}'
+ORDER BY timestamp ASC
+LIMIT 100
+`.trim()
+
+      const { data: fnData, error: fnError } = await post(
+        '/platform/projects/{ref}/analytics/endpoints/logs.all.otel',
+        {
+          params: { path: { ref: projectRef } },
+          body: {
+            iso_timestamp_start: isoTimestampStart,
+            iso_timestamp_end: isoTimestampEnd,
+            sql: fnSql,
+          },
+          signal,
+        }
+      )
+
+      if (!fnError) {
+        const fnRows = ((fnData as { result?: OtelLogRow[] } | undefined)?.result ??
+          []) as OtelLogRow[]
+        Object.assign(entry, aggregateFunctionLogs(fnRows))
+      }
+    }
   }
 
-  return { result: [entry] }
+  return { result: [entry as UnifiedLogInspectionEntry] }
 }
 
 export type UnifiedLogInspectionData = Awaited<ReturnType<typeof getUnifiedLogInspection>>
