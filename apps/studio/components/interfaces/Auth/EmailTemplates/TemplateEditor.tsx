@@ -7,15 +7,6 @@ import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
   Button,
   CardContent,
   CardFooter,
@@ -30,9 +21,10 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
 
 import type { AuthTemplate } from './EmailTemplates.types'
-import { getAuthTemplateType } from './EmailTemplates.utils'
+import { ResetTemplateDialog } from './ResetTemplateDialog'
 import { SpamValidation } from './SpamValidation'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
@@ -40,7 +32,6 @@ import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import type { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
-import { useAuthTemplateResetMutation } from '@/data/auth/auth-template-reset-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
@@ -63,10 +54,20 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
+
+  const { id, properties } = template
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
+  const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT` as EmailTemplateContentKey
+
+  const { data: authConfig, isSuccess } = useAuthConfigQuery({ projectRef })
+
+  const [validationResult, setValidationResult] = useState<ValidateSpamResponse>()
+  const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
+  const [, setHasUnsavedChanges] = useState(false)
+  const [isSavingTemplate, setIsSavingTemplate] = useState(false)
+  const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
 
   // [Joshen] Error state is handled in the parent
-  const { data: authConfig, isSuccess } = useAuthConfigQuery({ projectRef })
 
   const { mutate: validateSpam } = useValidateSpamMutation()
 
@@ -77,34 +78,15 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     },
   })
 
-  const { mutate: resetAuthTemplate } = useAuthTemplateResetMutation({
-    onError: (error) => {
-      setIsResettingTemplate(false)
-      toast.error(`Failed to reset email template: ${error.message}`)
-    },
-  })
-
-  const { id, properties } = template
-
-  const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT` as EmailTemplateContentKey
   const subjectSlug = Object.keys(properties).find((key) => key.startsWith('MAILER_SUBJECTS_')) as
     | EmailTemplateSubjectKey
     | undefined
-
-  const templateType = getAuthTemplateType(id)
 
   const messageProperty = properties[messageSlug]
   const builtInSMTP =
     isSuccess &&
     authConfig &&
     (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
-
-  const [validationResult, setValidationResult] = useState<ValidateSpamResponse>()
-  const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
-  const [, setHasUnsavedChanges] = useState(false)
-  const [isSavingTemplate, setIsSavingTemplate] = useState(false)
-  const [isResettingTemplate, setIsResettingTemplate] = useState(false)
-  const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
 
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
 
@@ -128,7 +110,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     resolver: zodResolver(template.validationSchema),
   })
 
-  const onSubmit = (values: any) => {
+  const onSubmit = (values: z.infer<typeof template.validationSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
 
     setIsSavingTemplate(true)
@@ -212,30 +194,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
       authConfig?.MAILER_SUBJECTS_CUSTOM_CONTENTS?.[subjectSlug] === true)
   const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(baselineValues)
   const hasChanges = hasFormChanges || baselineBodyValue !== bodyValue
-
-  const resetTemplateToDefault = () => {
-    if (!projectRef) return console.error('Project ref is required')
-    if (!templateType) return console.error('Template type is required')
-
-    setIsResettingTemplate(true)
-    resetAuthTemplate(
-      {
-        projectRef,
-        template: templateType,
-      },
-      {
-        onSuccess: (config) => {
-          form.reset(getFormValuesFromConfig(config))
-          setBodyValue((config && config[messageSlug]) ?? '')
-          setValidationResult(undefined)
-          setHasUnsavedChanges(false)
-          setIsResettingTemplate(false)
-          toast.success('Email template reset to default')
-        },
-        onError: () => setIsResettingTemplate(false),
-      }
-    )
-  }
 
   // Function to insert text at cursor position
   const insertTextAtCursor = (text: string) => {
@@ -409,36 +367,15 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
             <CardFooter className="flex flex-row justify-between gap-2">
               {hasCustomTemplate && !hasChanges && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      type="default"
-                      htmlType="button"
-                      disabled={!canUpdateConfig || isSavingTemplate || isResettingTemplate}
-                    >
-                      Reset template
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Reset template to default</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will remove your custom subject line and email body content. The
-                        default values will be used instead.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel disabled={isResettingTemplate}>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={resetTemplateToDefault}
-                        disabled={isResettingTemplate}
-                        variant="warning"
-                      >
-                        Reset
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                <ResetTemplateDialog
+                  template={template}
+                  onResetSuccess={(config: AuthConfigResponse) => {
+                    form.reset(getFormValuesFromConfig(config))
+                    setBodyValue((config && config[messageSlug]) ?? '')
+                    setValidationResult(undefined)
+                    setHasUnsavedChanges(false)
+                  }}
+                />
               )}
               <div className="ml-auto flex flex-row gap-2">
                 {hasChanges && (
@@ -457,9 +394,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  disabled={
-                    !canUpdateConfig || isSavingTemplate || isResettingTemplate || !hasChanges
-                  }
+                  disabled={!canUpdateConfig || isSavingTemplate || !hasChanges}
                   loading={isSavingTemplate}
                 >
                   Save changes
