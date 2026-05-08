@@ -1,16 +1,20 @@
-import { Button } from 'ui'
-import Link from 'next/link'
+import PartnerIntakeForm from './PartnerIntakeForm'
 
 export default function BecomeAPartner() {
   return (
-    <div className="border-t">
-      <div id="become-a-partner" className="mx-auto max-w-2xl space-y-12 py-32 px-6 text-center">
-        <h2 className="h2">Ready to work together?</h2>
-        <Button asChild size="medium" className="text-white">
-          <Link href="https://forms.supabase.com/partner" as="https://forms.supabase.com/partner">
-            Become a partner
-          </Link>
-        </Button>
+    <div className="border-t bg-alternative">
+      <div
+        id="become-a-partner"
+        className="mx-auto max-w-3xl flex flex-col gap-10 py-24 px-6 md:py-32"
+      >
+        <div className="flex flex-col items-center gap-4 text-center text-balance">
+          <h2 className="text-3xl md:text-4xl tracking-tight">Become a Supabase Partner</h2>
+          <p className="text-foreground-light text-lg max-w-xl">
+            Tell us about your company and the program you’re interested in. Our team reviews every
+            application and will reach out if there’s a good fit.
+          </p>
+        </div>
+        <PartnerIntakeForm />
       </div>
     </div>
   )

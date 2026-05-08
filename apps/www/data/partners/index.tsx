@@ -1,6 +1,6 @@
 import { ArrowUpRight, Database, FileText, Globe, Key, Plug, Puzzle, Webhook } from 'lucide-react'
 
-const PARTNER_FORM_URL = 'https://forms.supabase.com/partner'
+const PARTNER_FORM_URL = '#become-a-partner'
 
 const partnersPageData = {
   metaTitle: 'Build with Supabase',
