@@ -62,6 +62,12 @@ function resolveHref(href: string | UrlObject): string {
   return `${pathname}${search}${hash}`
 }
 
+// Inlined at build time via Vite's `define`. Must agree with Vite `base`
+// and `tanstackStart({ router: { basepath } })`. Empty string when no
+// basePath is configured. Used to strip a duplicate prefix in
+// `splitInternalUrl` below — see the comment there.
+const NEXT_PUBLIC_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
 // TanStack Link's `to` prop is a route-pattern path; query params and hash
 // must be passed separately via `search` / `hash`. Studio code (and Next's
 // own contract) routinely passes one of three href shapes:
@@ -79,6 +85,17 @@ function resolveHref(href: string | UrlObject): string {
 // Split into three parts: pathname, search, hash. Same-origin absolute
 // URLs are normalised to a relative path. Cross-origin URLs are left
 // alone so TanStack's external-link path handles them.
+//
+// basePath quirk: TanStack's `to` is **basepath-relative** — given
+// `basepath: '/dashboard'` and `to: '/foo'`, TanStack builds the href
+// `/dashboard/foo`. Next's contract treats `href` as the **full path
+// from app root including basePath**, and studio code routinely
+// pre-prefixes BASE_PATH (e.g. `buildTableEditorUrl` calls
+// `new URL(`${BASE_PATH}/project/.../editor/...`, location.origin)`).
+// Forwarding the BASE_PATH-prefixed pathname as `to` makes TanStack
+// double-prefix it (`/dashboard/dashboard/project/...`). Strip the
+// basePath when we see it, so what we hand TanStack is always
+// basepath-relative.
 function splitInternalUrl(url: string): {
   to: string
   search?: Record<string, string>
@@ -112,10 +129,21 @@ function splitInternalUrl(url: string): {
     return { to: url }
   }
 
+  let pathname = parsed.pathname
+  // Strip a leading basePath segment so we hand TanStack a basepath-
+  // relative path. Match `/dashboard` exactly OR `/dashboard/...`; don't
+  // strip a coincidental prefix like `/dashboard-other`.
+  if (
+    NEXT_PUBLIC_BASE_PATH &&
+    (pathname === NEXT_PUBLIC_BASE_PATH || pathname.startsWith(`${NEXT_PUBLIC_BASE_PATH}/`))
+  ) {
+    pathname = pathname.slice(NEXT_PUBLIC_BASE_PATH.length) || '/'
+  }
+
   const search = Object.fromEntries(parsed.searchParams)
   const hash = parsed.hash || undefined
   return {
-    to: parsed.pathname,
+    to: pathname,
     search: Object.keys(search).length > 0 ? search : undefined,
     hash,
   }
