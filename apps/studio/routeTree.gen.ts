@@ -58,7 +58,15 @@ import { Route as ApiPlatformProfileIndexRouteImport } from './routes/api/platfo
 import { Route as ApiPlatformOrganizationsIndexRouteImport } from './routes/api/platform/organizations/index'
 import { Route as AppOrgSlugIndexRouteImport } from './routes/_app/org/$slug/index'
 import { Route as AppAccountTokensIndexRouteImport } from './routes/_app/account/tokens/index'
+import { Route as ProjectRefDatabaseTypesRouteImport } from './routes/project/$ref/database/types'
+import { Route as ProjectRefDatabaseSettingsRouteImport } from './routes/project/$ref/database/settings'
 import { Route as ProjectRefDatabaseSchemasRouteImport } from './routes/project/$ref/database/schemas'
+import { Route as ProjectRefDatabaseRolesRouteImport } from './routes/project/$ref/database/roles'
+import { Route as ProjectRefDatabaseMigrationsRouteImport } from './routes/project/$ref/database/migrations'
+import { Route as ProjectRefDatabaseIndexesRouteImport } from './routes/project/$ref/database/indexes'
+import { Route as ProjectRefDatabaseFunctionsRouteImport } from './routes/project/$ref/database/functions'
+import { Route as ProjectRefDatabaseExtensionsRouteImport } from './routes/project/$ref/database/extensions'
+import { Route as ProjectRefDatabaseColumnPrivilegesRouteImport } from './routes/project/$ref/database/column-privileges'
 import { Route as ApiPlatformTelemetryEventRouteImport } from './routes/api/platform/telemetry/event'
 import { Route as ApiPlatformIntegrationsSlugRouteImport } from './routes/api/platform/integrations/$slug'
 import { Route as ApiAiSqlTitleV2RouteImport } from './routes/api/ai/sql/title-v2'
@@ -396,10 +404,56 @@ const AppAccountTokensIndexRoute = AppAccountTokensIndexRouteImport.update({
   path: '/tokens/',
   getParentRoute: () => AppAccountRoute,
 } as any)
+const ProjectRefDatabaseTypesRoute = ProjectRefDatabaseTypesRouteImport.update({
+  id: '/types',
+  path: '/types',
+  getParentRoute: () => ProjectRefDatabaseRoute,
+} as any)
+const ProjectRefDatabaseSettingsRoute =
+  ProjectRefDatabaseSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
 const ProjectRefDatabaseSchemasRoute =
   ProjectRefDatabaseSchemasRouteImport.update({
     id: '/schemas',
     path: '/schemas',
+    getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
+const ProjectRefDatabaseRolesRoute = ProjectRefDatabaseRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => ProjectRefDatabaseRoute,
+} as any)
+const ProjectRefDatabaseMigrationsRoute =
+  ProjectRefDatabaseMigrationsRouteImport.update({
+    id: '/migrations',
+    path: '/migrations',
+    getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
+const ProjectRefDatabaseIndexesRoute =
+  ProjectRefDatabaseIndexesRouteImport.update({
+    id: '/indexes',
+    path: '/indexes',
+    getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
+const ProjectRefDatabaseFunctionsRoute =
+  ProjectRefDatabaseFunctionsRouteImport.update({
+    id: '/functions',
+    path: '/functions',
+    getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
+const ProjectRefDatabaseExtensionsRoute =
+  ProjectRefDatabaseExtensionsRouteImport.update({
+    id: '/extensions',
+    path: '/extensions',
+    getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
+const ProjectRefDatabaseColumnPrivilegesRoute =
+  ProjectRefDatabaseColumnPrivilegesRouteImport.update({
+    id: '/column-privileges',
+    path: '/column-privileges',
     getParentRoute: () => ProjectRefDatabaseRoute,
   } as any)
 const ApiPlatformTelemetryEventRoute =
@@ -966,7 +1020,15 @@ export interface FileRoutesByFullPath {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
+  '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
+  '/project/$ref/database/functions': typeof ProjectRefDatabaseFunctionsRoute
+  '/project/$ref/database/indexes': typeof ProjectRefDatabaseIndexesRoute
+  '/project/$ref/database/migrations': typeof ProjectRefDatabaseMigrationsRoute
+  '/project/$ref/database/roles': typeof ProjectRefDatabaseRolesRoute
   '/project/$ref/database/schemas': typeof ProjectRefDatabaseSchemasRoute
+  '/project/$ref/database/settings': typeof ProjectRefDatabaseSettingsRoute
+  '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
   '/account/tokens/': typeof AppAccountTokensIndexRoute
   '/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -1101,7 +1163,15 @@ export interface FileRoutesByTo {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
+  '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
+  '/project/$ref/database/functions': typeof ProjectRefDatabaseFunctionsRoute
+  '/project/$ref/database/indexes': typeof ProjectRefDatabaseIndexesRoute
+  '/project/$ref/database/migrations': typeof ProjectRefDatabaseMigrationsRoute
+  '/project/$ref/database/roles': typeof ProjectRefDatabaseRolesRoute
   '/project/$ref/database/schemas': typeof ProjectRefDatabaseSchemasRoute
+  '/project/$ref/database/settings': typeof ProjectRefDatabaseSettingsRoute
+  '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
   '/account/tokens': typeof AppAccountTokensIndexRoute
   '/org/$slug': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations': typeof ApiPlatformOrganizationsIndexRoute
@@ -1241,7 +1311,15 @@ export interface FileRoutesById {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
+  '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
+  '/project/$ref/database/functions': typeof ProjectRefDatabaseFunctionsRoute
+  '/project/$ref/database/indexes': typeof ProjectRefDatabaseIndexesRoute
+  '/project/$ref/database/migrations': typeof ProjectRefDatabaseMigrationsRoute
+  '/project/$ref/database/roles': typeof ProjectRefDatabaseRolesRoute
   '/project/$ref/database/schemas': typeof ProjectRefDatabaseSchemasRoute
+  '/project/$ref/database/settings': typeof ProjectRefDatabaseSettingsRoute
+  '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
   '/_app/account/tokens/': typeof AppAccountTokensIndexRoute
   '/_app/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -1380,7 +1458,15 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/database/column-privileges'
+    | '/project/$ref/database/extensions'
+    | '/project/$ref/database/functions'
+    | '/project/$ref/database/indexes'
+    | '/project/$ref/database/migrations'
+    | '/project/$ref/database/roles'
     | '/project/$ref/database/schemas'
+    | '/project/$ref/database/settings'
+    | '/project/$ref/database/types'
     | '/account/tokens/'
     | '/org/$slug/'
     | '/api/platform/organizations/'
@@ -1515,7 +1601,15 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/database/column-privileges'
+    | '/project/$ref/database/extensions'
+    | '/project/$ref/database/functions'
+    | '/project/$ref/database/indexes'
+    | '/project/$ref/database/migrations'
+    | '/project/$ref/database/roles'
     | '/project/$ref/database/schemas'
+    | '/project/$ref/database/settings'
+    | '/project/$ref/database/types'
     | '/account/tokens'
     | '/org/$slug'
     | '/api/platform/organizations'
@@ -1654,7 +1748,15 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/database/column-privileges'
+    | '/project/$ref/database/extensions'
+    | '/project/$ref/database/functions'
+    | '/project/$ref/database/indexes'
+    | '/project/$ref/database/migrations'
+    | '/project/$ref/database/roles'
     | '/project/$ref/database/schemas'
+    | '/project/$ref/database/settings'
+    | '/project/$ref/database/types'
     | '/_app/account/tokens/'
     | '/_app/org/$slug/'
     | '/api/platform/organizations/'
@@ -2174,11 +2276,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAccountTokensIndexRouteImport
       parentRoute: typeof AppAccountRoute
     }
+    '/project/$ref/database/types': {
+      id: '/project/$ref/database/types'
+      path: '/types'
+      fullPath: '/project/$ref/database/types'
+      preLoaderRoute: typeof ProjectRefDatabaseTypesRouteImport
+      parentRoute: typeof ProjectRefDatabaseRoute
+    }
+    '/project/$ref/database/settings': {
+      id: '/project/$ref/database/settings'
+      path: '/settings'
+      fullPath: '/project/$ref/database/settings'
+      preLoaderRoute: typeof ProjectRefDatabaseSettingsRouteImport
+      parentRoute: typeof ProjectRefDatabaseRoute
+    }
     '/project/$ref/database/schemas': {
       id: '/project/$ref/database/schemas'
       path: '/schemas'
       fullPath: '/project/$ref/database/schemas'
       preLoaderRoute: typeof ProjectRefDatabaseSchemasRouteImport
+      parentRoute: typeof ProjectRefDatabaseRoute
+    }
+    '/project/$ref/database/roles': {
+      id: '/project/$ref/database/roles'
+      path: '/roles'
+      fullPath: '/project/$ref/database/roles'
+      preLoaderRoute: typeof ProjectRefDatabaseRolesRouteImport
+      parentRoute: typeof ProjectRefDatabaseRoute
+    }
+    '/project/$ref/database/migrations': {
+      id: '/project/$ref/database/migrations'
+      path: '/migrations'
+      fullPath: '/project/$ref/database/migrations'
+      preLoaderRoute: typeof ProjectRefDatabaseMigrationsRouteImport
+      parentRoute: typeof ProjectRefDatabaseRoute
+    }
+    '/project/$ref/database/indexes': {
+      id: '/project/$ref/database/indexes'
+      path: '/indexes'
+      fullPath: '/project/$ref/database/indexes'
+      preLoaderRoute: typeof ProjectRefDatabaseIndexesRouteImport
+      parentRoute: typeof ProjectRefDatabaseRoute
+    }
+    '/project/$ref/database/functions': {
+      id: '/project/$ref/database/functions'
+      path: '/functions'
+      fullPath: '/project/$ref/database/functions'
+      preLoaderRoute: typeof ProjectRefDatabaseFunctionsRouteImport
+      parentRoute: typeof ProjectRefDatabaseRoute
+    }
+    '/project/$ref/database/extensions': {
+      id: '/project/$ref/database/extensions'
+      path: '/extensions'
+      fullPath: '/project/$ref/database/extensions'
+      preLoaderRoute: typeof ProjectRefDatabaseExtensionsRouteImport
+      parentRoute: typeof ProjectRefDatabaseRoute
+    }
+    '/project/$ref/database/column-privileges': {
+      id: '/project/$ref/database/column-privileges'
+      path: '/column-privileges'
+      fullPath: '/project/$ref/database/column-privileges'
+      preLoaderRoute: typeof ProjectRefDatabaseColumnPrivilegesRouteImport
       parentRoute: typeof ProjectRefDatabaseRoute
     }
     '/api/platform/telemetry/event': {
@@ -2895,11 +3053,28 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ProjectRefDatabaseRouteChildren {
+  ProjectRefDatabaseColumnPrivilegesRoute: typeof ProjectRefDatabaseColumnPrivilegesRoute
+  ProjectRefDatabaseExtensionsRoute: typeof ProjectRefDatabaseExtensionsRoute
+  ProjectRefDatabaseFunctionsRoute: typeof ProjectRefDatabaseFunctionsRoute
+  ProjectRefDatabaseIndexesRoute: typeof ProjectRefDatabaseIndexesRoute
+  ProjectRefDatabaseMigrationsRoute: typeof ProjectRefDatabaseMigrationsRoute
+  ProjectRefDatabaseRolesRoute: typeof ProjectRefDatabaseRolesRoute
   ProjectRefDatabaseSchemasRoute: typeof ProjectRefDatabaseSchemasRoute
+  ProjectRefDatabaseSettingsRoute: typeof ProjectRefDatabaseSettingsRoute
+  ProjectRefDatabaseTypesRoute: typeof ProjectRefDatabaseTypesRoute
 }
 
 const ProjectRefDatabaseRouteChildren: ProjectRefDatabaseRouteChildren = {
+  ProjectRefDatabaseColumnPrivilegesRoute:
+    ProjectRefDatabaseColumnPrivilegesRoute,
+  ProjectRefDatabaseExtensionsRoute: ProjectRefDatabaseExtensionsRoute,
+  ProjectRefDatabaseFunctionsRoute: ProjectRefDatabaseFunctionsRoute,
+  ProjectRefDatabaseIndexesRoute: ProjectRefDatabaseIndexesRoute,
+  ProjectRefDatabaseMigrationsRoute: ProjectRefDatabaseMigrationsRoute,
+  ProjectRefDatabaseRolesRoute: ProjectRefDatabaseRolesRoute,
   ProjectRefDatabaseSchemasRoute: ProjectRefDatabaseSchemasRoute,
+  ProjectRefDatabaseSettingsRoute: ProjectRefDatabaseSettingsRoute,
+  ProjectRefDatabaseTypesRoute: ProjectRefDatabaseTypesRoute,
 }
 
 const ProjectRefDatabaseRouteWithChildren =

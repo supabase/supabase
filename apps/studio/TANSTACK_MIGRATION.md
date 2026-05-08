@@ -129,14 +129,14 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 ### Project shell — `/database/*`
 
 - [x] A `routes/project/$ref/database/schemas.tsx` ← `pages/project/[ref]/database/schemas.tsx`
-- [ ] `routes/project/$ref/database/extensions.tsx` ← `pages/project/[ref]/database/extensions.tsx`
-- [ ] `routes/project/$ref/database/functions.tsx` ← `pages/project/[ref]/database/functions.tsx`
-- [ ] `routes/project/$ref/database/indexes.tsx` ← `pages/project/[ref]/database/indexes.tsx`
-- [ ] `routes/project/$ref/database/migrations.tsx` ← `pages/project/[ref]/database/migrations.tsx`
-- [ ] `routes/project/$ref/database/roles.tsx` ← `pages/project/[ref]/database/roles.tsx`
-- [ ] `routes/project/$ref/database/settings.tsx` ← `pages/project/[ref]/database/settings.tsx`
-- [ ] `routes/project/$ref/database/types.tsx` ← `pages/project/[ref]/database/types.tsx`
-- [ ] `routes/project/$ref/database/column-privileges.tsx` ← `pages/project/[ref]/database/column-privileges.tsx`
+- [x] A `routes/project/$ref/database/extensions.tsx` ← `pages/project/[ref]/database/extensions.tsx`
+- [x] A `routes/project/$ref/database/functions.tsx` ← `pages/project/[ref]/database/functions.tsx`
+- [x] A `routes/project/$ref/database/indexes.tsx` ← `pages/project/[ref]/database/indexes.tsx`
+- [x] A `routes/project/$ref/database/migrations.tsx` ← `pages/project/[ref]/database/migrations.tsx`
+- [x] A `routes/project/$ref/database/roles.tsx` ← `pages/project/[ref]/database/roles.tsx`
+- [x] A `routes/project/$ref/database/settings.tsx` ← `pages/project/[ref]/database/settings.tsx`
+- [x] A `routes/project/$ref/database/types.tsx` ← `pages/project/[ref]/database/types.tsx`
+- [x] A `routes/project/$ref/database/column-privileges.tsx` ← `pages/project/[ref]/database/column-privileges.tsx`
 - [ ] `routes/project/$ref/database/tables/index.tsx` ← `pages/project/[ref]/database/tables/index.tsx`
 - [ ] `routes/project/$ref/database/tables/$id.tsx` ← `pages/project/[ref]/database/tables/[id].tsx`
 - [ ] `routes/project/$ref/database/publications/index.tsx` ← `pages/project/[ref]/database/publications/index.tsx`
