@@ -1,35 +1,13 @@
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { Admonition, type AdmonitionStrictProps } from './admonition'
+import { Admonition, type AdmonitionProps } from './admonition'
 
-const validDescriptionOnly = {
+const stringDescriptionProps = {
   description: 'Description-only copy.',
-} satisfies AdmonitionStrictProps
-const validChildrenOnly = {
-  children: <p>Children-only copy.</p>,
-} satisfies AdmonitionStrictProps
-const validTitleWithDescription = {
-  title: 'Title',
-  description: 'Body copy.',
-} satisfies AdmonitionStrictProps
-const validLabelWithChildren = {
-  label: 'Legacy label',
-  children: <p>Body copy.</p>,
-} satisfies AdmonitionStrictProps
-// @ts-expect-error title-only usage is intentionally not part of the TS contract.
-const invalidTitleOnly: AdmonitionStrictProps = { title: 'Missing body' }
-// @ts-expect-error label-only usage is intentionally not part of the TS contract.
-const invalidLabelOnly: AdmonitionStrictProps = { label: 'Missing body' }
+} satisfies AdmonitionProps
 
-void [
-  validDescriptionOnly,
-  validChildrenOnly,
-  validTitleWithDescription,
-  validLabelWithChildren,
-  invalidTitleOnly,
-  invalidLabelOnly,
-]
+void stringDescriptionProps
 
 describe('Admonition', () => {
   it('renders description-only content', () => {

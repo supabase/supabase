@@ -13,41 +13,13 @@ export type AdmonitionType =
   | 'success'
   | 'warning'
 
-type AdmonitionBodyContent =
-  | {
-      description: ReactNode
-      children?: ReactNode
-    }
-  | {
-      description?: ReactNode
-      children: ReactNode
-    }
-
-type AdmonitionStrictContentProps =
-  | ({
-      title: string
-      label?: string
-    } & AdmonitionBodyContent)
-  | ({
-      label: string
-      title?: string
-    } & AdmonitionBodyContent)
-  | {
-      title?: never
-      label?: never
-      description?: ReactNode
-      children?: ReactNode
-    }
-
-type AdmonitionRuntimeContentProps = {
+export interface AdmonitionProps {
+  type?: AdmonitionType
   title?: string
+  /** @deprecated Prefer title for new usage. label remains supported for existing MDX content. */
   label?: string
   description?: ReactNode
   children?: ReactNode
-}
-
-interface AdmonitionBaseProps {
-  type?: AdmonitionType
   showIcon?: boolean
   childProps?: {
     title?: ComponentProps<typeof AlertTitle_Shadcn_>
@@ -58,10 +30,6 @@ interface AdmonitionBaseProps {
   icon?: ReactNode
   className?: string
 }
-
-export type AdmonitionStrictProps = AdmonitionBaseProps & AdmonitionStrictContentProps
-
-export type AdmonitionProps = AdmonitionBaseProps & AdmonitionRuntimeContentProps
 
 const admonitionToAlertMapping: Record<AdmonitionType, 'default' | 'destructive' | 'warning'> = {
   note: 'default',
