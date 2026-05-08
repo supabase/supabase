@@ -17,6 +17,15 @@ function toNextPathPattern(routeId: string) {
   return routeId.replace(/\$([a-zA-Z0-9_]+)/g, '[$1]')
 }
 
+// Normalise TanStack's `router.basepath` to Next's `router.basePath`
+// shape: '' for "no basePath" or '/path' for "configured" (leading
+// slash, no trailing slash).
+function toNextBasePath(tanstackBasepath: string | undefined): string {
+  if (!tanstackBasepath || tanstackBasepath === '/') return ''
+  const withLeading = tanstackBasepath.startsWith('/') ? tanstackBasepath : `/${tanstackBasepath}`
+  return withLeading.endsWith('/') ? withLeading.slice(0, -1) : withLeading
+}
+
 type QueryValue = string | number | boolean | string[] | undefined | null
 type UrlObject = {
   pathname?: string
@@ -104,11 +113,18 @@ export function useRouter() {
       route: pathPattern,
       query: { ...params, ...search },
       asPath: location.href,
-      basePath: router.basepath
-        ? router.basepath.startsWith('/')
-          ? router.basepath
-          : `/${router.basepath}`
-        : '',
+      // Mirror Next's pages-router contract for `basePath`:
+      //   - no basePath configured → '' (empty string)
+      //   - configured            → '/dashboard' (leading slash, no trailing)
+      //
+      // TanStack stores the raw `basepath` option without normalising:
+      // `undefined` becomes '/' (its internal default), 'dashboard' stays
+      // 'dashboard', '/dashboard/' stays '/dashboard/'. Studio code then
+      // does `${router.basePath}/img/...` and trips on every non-Next
+      // shape ('/' → '//img/...' protocol-relative; 'dashboard' →
+      // 'dashboard/img/...' relative-to-current-path; '/dashboard/' →
+      // '/dashboard//img/...' double slash).
+      basePath: toNextBasePath(router.basepath),
       // TanStack resolves params/search synchronously on render, so the
       // pages-router "is the dynamic param ready yet?" flag is always
       // true here. (In Next this can be false during the very first
