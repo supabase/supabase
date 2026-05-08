@@ -35,7 +35,7 @@ vi.mock(import('common'), async (importOriginal) => {
 })
 
 vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
-  default: ({
+  CodeEditor: ({
     value,
     onInputChange,
   }: {
