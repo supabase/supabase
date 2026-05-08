@@ -8,7 +8,7 @@
  * (semantic tokens) plus the Radix and scale aliases from radix-vars.css.
  */
 
-@theme {
+@theme inline {
   --color-foreground: hsl(var(--foreground-default));
   --color-foreground-light: hsl(var(--foreground-light));
   --color-light: hsl(var(--foreground-light));
@@ -508,7 +508,15 @@
   --color-lo-contrast: hsl(var(--background-alternative-default));
 
   /* misc theme tokens — typography, breakpoints, sizing, transform-origin */
-  --font-sans: var(--font-custom, Circular, custom-font, Helvetica Neue, Helvetica, Arial, sans-serif);
+  --font-sans: var(
+    --font-custom,
+    Circular,
+    custom-font,
+    Helvetica Neue,
+    Helvetica,
+    Arial,
+    sans-serif
+  );
   --font-mono: var(--font-source-code-pro, Source Code Pro, Office Code Pro, Menlo, monospace);
   --breakpoint-xs: 480px;
   --width-listbox: 320px;
