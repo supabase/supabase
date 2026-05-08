@@ -2,6 +2,7 @@
 
 import { CRMClient, type CRMConfig } from '../../crm'
 import type { GoFormCrmConfig } from '../schemas'
+import { evaluateShowWhen } from '../showWhen'
 
 export interface FormSubmitResult {
   success: boolean
@@ -20,6 +21,29 @@ function debug(message: string, data?: unknown) {
     console.log(`[go/form] ${message}`, JSON.stringify(data, null, 2))
   } else {
     console.log(`[go/form] ${message}`)
+  }
+}
+
+/**
+ * Apply per-provider `sendWhen` gating. Returns a copy of the config with any
+ * provider whose rule fails removed, so downstream code sees only the providers
+ * that should actually receive this submission.
+ */
+function applySendWhen(crm: GoFormCrmConfig, values: Record<string, string>): GoFormCrmConfig {
+  return {
+    hubspot:
+      crm.hubspot && (!crm.hubspot.sendWhen || evaluateShowWhen(crm.hubspot.sendWhen, values))
+        ? crm.hubspot
+        : undefined,
+    customerio:
+      crm.customerio &&
+      (!crm.customerio.sendWhen || evaluateShowWhen(crm.customerio.sendWhen, values))
+        ? crm.customerio
+        : undefined,
+    notion:
+      crm.notion && (!crm.notion.sendWhen || evaluateShowWhen(crm.notion.sendWhen, values))
+        ? crm.notion
+        : undefined,
   }
 }
 
@@ -81,14 +105,29 @@ export async function submitFormAction(
       return { success: false, errors: ['An email field is required for form submission.'] }
     }
 
+    const activeCrm = applySendWhen(crm, values)
+    const skipped = {
+      hubspot: !!crm.hubspot && !activeCrm.hubspot,
+      customerio: !!crm.customerio && !activeCrm.customerio,
+      notion: !!crm.notion && !activeCrm.notion,
+    }
+    if (skipped.hubspot || skipped.customerio || skipped.notion) {
+      debug('Providers skipped by sendWhen', skipped)
+    }
+
+    if (!activeCrm.hubspot && !activeCrm.customerio && !activeCrm.notion) {
+      debug('All providers gated out by sendWhen — nothing to send')
+      return { success: true, errors: [] }
+    }
+
     let client: CRMClient
     try {
-      const crmConfig = buildCrmConfig(crm)
+      const crmConfig = buildCrmConfig(activeCrm)
       debug('CRM config built', {
         providers: Object.keys(crmConfig),
-        hubspot: crm.hubspot ? { formGuid: crm.hubspot.formGuid } : undefined,
-        customerio: crm.customerio ? { event: crm.customerio.event } : undefined,
-        notion: crm.notion ? { database_id: crm.notion.database_id } : undefined,
+        hubspot: activeCrm.hubspot ? { formGuid: activeCrm.hubspot.formGuid } : undefined,
+        customerio: activeCrm.customerio ? { event: activeCrm.customerio.event } : undefined,
+        notion: activeCrm.notion ? { database_id: activeCrm.notion.database_id } : undefined,
       })
       client = new CRMClient(crmConfig)
     } catch (err: any) {
@@ -99,28 +138,28 @@ export async function submitFormAction(
     // Build HubSpot fields: apply optional field name mapping
     let hubspotFields: Record<string, string> | undefined
     let consent: string | undefined
-    if (crm.hubspot) {
-      const fieldMap = crm.hubspot.fieldMap ?? {}
+    if (activeCrm.hubspot) {
+      const fieldMap = activeCrm.hubspot.fieldMap ?? {}
       hubspotFields = {}
       for (const [formField, value] of Object.entries(values)) {
         const hsField = fieldMap[formField] ?? formField
         hubspotFields[hsField] = value
       }
-      consent = crm.hubspot.consent
+      consent = activeCrm.hubspot.consent
       debug('HubSpot payload', { hubspotFields, consent, context })
     }
 
     // Build Customer.io profile attributes from the profileMap
     let customerioProfile: Record<string, unknown> | undefined
-    if (crm.customerio?.profileMap) {
+    if (activeCrm.customerio?.profileMap) {
       customerioProfile = {}
-      for (const [formField, attrName] of Object.entries(crm.customerio.profileMap)) {
+      for (const [formField, attrName] of Object.entries(activeCrm.customerio.profileMap)) {
         customerioProfile[attrName] = values[formField]
       }
     }
-    if (crm.customerio) {
+    if (activeCrm.customerio) {
       debug('Customer.io payload', {
-        event: crm.customerio.event,
+        event: activeCrm.customerio.event,
         properties: values,
         customerioProfile,
       })
@@ -128,19 +167,19 @@ export async function submitFormAction(
 
     // Build Notion page properties: map form fields via columnMap, then merge staticProperties
     let notion: { databaseId: string; properties: Record<string, unknown> } | undefined
-    if (crm.notion) {
-      const columnMap = crm.notion.columnMap ?? {}
+    if (activeCrm.notion) {
+      const columnMap = activeCrm.notion.columnMap ?? {}
       const properties: Record<string, unknown> = {}
       for (const [formField, columnName] of Object.entries(columnMap)) {
         if (formField in values) {
           properties[columnName] = values[formField]
         }
       }
-      if (crm.notion.staticProperties) {
-        Object.assign(properties, crm.notion.staticProperties)
+      if (activeCrm.notion.staticProperties) {
+        Object.assign(properties, activeCrm.notion.staticProperties)
       }
-      notion = { databaseId: crm.notion.database_id, properties }
-      debug('Notion payload', { databaseId: crm.notion.database_id, properties })
+      notion = { databaseId: activeCrm.notion.database_id, properties }
+      debug('Notion payload', { databaseId: activeCrm.notion.database_id, properties })
     }
 
     const { errors } = await client.submitEvent({
@@ -148,9 +187,9 @@ export async function submitFormAction(
       hubspotFields,
       context,
       consent,
-      event: crm.customerio?.event,
-      properties: crm.customerio
-        ? { ...(values as Record<string, unknown>), ...crm.customerio.staticProperties }
+      event: activeCrm.customerio?.event,
+      properties: activeCrm.customerio
+        ? { ...(values as Record<string, unknown>), ...activeCrm.customerio.staticProperties }
         : undefined,
       customerioProfile,
       notion,
