@@ -147,7 +147,7 @@ export const Admonition = forwardRef<
           icon
         ) : showIcon && typeStyle === 'success' ? (
           <SuccessIcon />
-        ) : (showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
+        ) : showIcon && (typeMapped === 'warning' || typeMapped === 'destructive') ? (
           <WarningIcon />
         ) : showIcon ? (
           <InfoIcon />

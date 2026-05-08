@@ -80,6 +80,21 @@ describe('Admonition', () => {
     expect(alert.querySelector('svg path')?.getAttribute('d')).toContain('M10.5 19.5')
   })
 
+  it('does not render the destructive icon when showIcon is false', () => {
+    render(
+      <Admonition
+        type="destructive"
+        showIcon={false}
+        title="Deletion blocked"
+        description="Resolve dependent resources before retrying."
+      />
+    )
+
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveTextContent('Deletion blocked')
+    expect(alert.querySelector('svg')).not.toBeInTheDocument()
+  })
+
   it('prefers title over legacy label when both are provided', () => {
     render(
       <Admonition
