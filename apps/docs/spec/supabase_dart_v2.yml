@@ -109,7 +109,7 @@ functions:
           ```dart
           final supabase = SupabaseClient(
             'https://xyzcompany.supabase.co',
-            'your-publishable-key', // pass your secret key for server-side usage
+            'your-secret-key', // use your secret key for server-side usage
           );
           ```
 
