@@ -1,10 +1,10 @@
 import { FinishReason } from 'ai'
 import { LLMClassifierFromTemplate } from 'autoevals'
-import { EvalCase, EvalScorer, Trace } from 'braintrust'
+import { EvalCase, EvalScorer } from 'braintrust'
 import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
-import { getParsedToolSpans, getToolSpans } from './trace-utils'
+import { getParsedToolSpans, getThreadParts, getToolSpans } from './trace-utils'
 import { loadKnowledgeInputSchema } from '@/lib/ai/tools/studio-tools'
 import { extractUrls } from '@/lib/helpers'
 
@@ -57,100 +57,6 @@ export type AssistantEvalCase = EvalCase<AssistantEvalInput, Expected, Assistant
 const mcpTextContentSpanOutputSchema = z.object({
   content: z.array(z.object({ type: z.literal('text').optional(), text: z.string() })),
 })
-const projectContextPrefix = "The user's current project is "
-
-const threadTextBlockSchema = z.object({ type: z.literal('text'), text: z.string() })
-const threadToolCallBlockSchema = z.object({ type: z.literal('tool_call'), tool_name: z.string() })
-const threadContentBlockSchema = z.union([threadTextBlockSchema, threadToolCallBlockSchema])
-const threadContentSchema = z.union([
-  z.string(),
-  z.array(z.unknown()).transform((blocks) =>
-    blocks.flatMap((block) => {
-      const result = threadContentBlockSchema.safeParse(block)
-      return result.success ? [result.data] : []
-    })
-  ),
-])
-const threadMessageSchema = z.object({
-  role: z.enum(['system', 'user', 'assistant', 'tool']),
-  content: threadContentSchema,
-})
-
-type ThreadMessage = z.infer<typeof threadMessageSchema>
-type ThreadParts = {
-  projectContext: string | null
-  priorConversation: string | null
-  currentUserInput: string | null
-  lastAssistantTurn: string | null
-}
-
-function serializeMessageContent(message: ThreadMessage | undefined): string | null {
-  if (!message) return null
-  if (typeof message.content === 'string') return message.content || null
-
-  const content = message.content
-    .map((block) => (block.type === 'text' ? block.text : `[called ${block.tool_name}]`))
-    .join('\n')
-
-  return content || null
-}
-
-function serializeMessages(messages: ThreadMessage[]): string | null {
-  const parts = messages.flatMap((message) => {
-    const content = serializeMessageContent(message)
-    return content ? [`[${message.role}]\n${content}`] : []
-  })
-
-  return parts.length > 0 ? parts.join('\n\n') : null
-}
-
-function isProjectContextMessage(message: ThreadMessage): boolean {
-  return (
-    message.role === 'assistant' &&
-    Boolean(serializeMessageContent(message)?.startsWith(projectContextPrefix))
-  )
-}
-
-function findLastUserIndex(messages: ThreadMessage[]): number {
-  for (let i = messages.length - 1; i >= 0; i--) {
-    if (messages[i].role === 'user') return i
-  }
-  return -1
-}
-
-async function getThreadParts(trace: Trace): Promise<ThreadParts> {
-  const thread = await trace.getThread()
-  const messages = thread.flatMap((m) => {
-    const r = threadMessageSchema.safeParse(m)
-    if (!r.success || r.data.role === 'system' || r.data.role === 'tool') return []
-    return [r.data]
-  })
-
-  const projectContextMessages = messages.filter(isProjectContextMessage)
-  const chatMessages = messages.filter((message) => !isProjectContextMessage(message))
-  const lastUserIdx = findLastUserIndex(chatMessages)
-  const projectContext = serializeMessageContent(
-    projectContextMessages[projectContextMessages.length - 1]
-  )
-
-  if (lastUserIdx === -1) {
-    return {
-      projectContext,
-      priorConversation: serializeMessages(chatMessages),
-      currentUserInput: null,
-      lastAssistantTurn: null,
-    }
-  }
-
-  return {
-    projectContext,
-    priorConversation: serializeMessages(chatMessages.slice(0, lastUserIdx)),
-    currentUserInput: serializeMessageContent(chatMessages[lastUserIdx]),
-    lastAssistantTurn: serializeMessages(
-      chatMessages.slice(lastUserIdx + 1).filter((message) => message.role === 'assistant')
-    ),
-  }
-}
 
 // --- Scorers ---
 
