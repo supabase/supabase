@@ -7,13 +7,16 @@ export const Route = createFileRoute('/_app/account')({
 })
 
 function AccountShell() {
-  const matches = useMatches()
-  const leaf = matches[matches.length - 1]?.staticData as
-    | { accountLayoutTitle?: string }
-    | undefined
+  // `select` form: only re-render when the selected title changes, not on
+  // every router tick. See routes/_app.tsx for the full rationale.
+  const title = useMatches({
+    select: (matches) =>
+      (matches[matches.length - 1]?.staticData as { accountLayoutTitle?: string } | undefined)
+        ?.accountLayoutTitle ?? '',
+  })
 
   return (
-    <AccountLayout title={leaf?.accountLayoutTitle ?? ''}>
+    <AccountLayout title={title}>
       <Outlet />
     </AccountLayout>
   )
