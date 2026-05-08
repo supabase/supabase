@@ -21,11 +21,18 @@
  * one. */
 @import './unset-tw-colors.css';
 
-/* Theme tokens + utilities + variants + base layer + typography overrides. */
+/* Theme tokens + utilities + variants + base layer. */
 @import './css/colors.css';
 @import './css/aliases.css';
 @import './css/animations.css';
 @import './css/utilities.css';
 @import './css/variants.css';
 @import './css/base.css';
-@import './css/prose.css';
+
+/*
+ * Typography prose / prose-toc / prose-docs overrides live in a focused JS
+ * config because @tailwindcss/typography reads its theme.typography options
+ * from the JS config — not from CSS @theme tokens. See:
+ * https://github.com/tailwindlabs/tailwindcss-typography#customizing-the-css
+ */
+@config './typography.config.js';
