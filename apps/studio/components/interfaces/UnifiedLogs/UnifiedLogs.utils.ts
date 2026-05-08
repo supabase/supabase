@@ -64,19 +64,15 @@ export function getLevelRowClassName(value: (typeof LEVELS)[number]): string {
   switch (value) {
     case 'success':
       return ''
-    // `!` modifiers win specificity over the base TableRow's `hover:` and the
-    // `data-[row-hover=true]` variant is driven by JS pointer events on the
-    // unified-logs DataTableRow — both ensure warning/error rows stay tinted
-    // on hover and that the hover state isn't sticky after a re-render.
     case 'warning':
       return cn(
-        'bg-warning/5 hover:bg-warning/10! data-[row-hover=true]:bg-warning/10! data-[state=selected]:bg-warning/20 focus-visible:bg-warning/10!',
-        'dark:bg-warning/10 dark:hover:bg-warning/20! dark:data-[row-hover=true]:bg-warning/20! dark:data-[state=selected]:bg-warning/30 dark:focus-visible:bg-warning/20!'
+        'bg-warning/5 hover:bg-warning/10 data-[state=selected]:bg-warning/20 focus-visible:bg-warning/10',
+        'dark:bg-warning/10 dark:hover:bg-warning/20 dark:data-[state=selected]:bg-warning/30 dark:focus-visible:bg-warning/20'
       )
     case 'error':
       return cn(
-        'bg-destructive/5 hover:bg-destructive/10! data-[row-hover=true]:bg-destructive/10! data-[state=selected]:bg-destructive/20 focus-visible:bg-destructive/10!',
-        'dark:bg-error/10 dark:hover:bg-destructive/20! dark:data-[row-hover=true]:bg-destructive/20! dark:data-[state=selected]:bg-destructive/30 dark:focus-visible:bg-destructive/20!'
+        'bg-destructive/5 hover:bg-destructive/10 data-[state=selected]:bg-destructive/20 focus-visible:bg-destructive/10',
+        'dark:bg-error/10 dark:hover:bg-destructive/20 dark:data-[state=selected]:bg-destructive/30 dark:focus-visible:bg-destructive/20'
       )
     default:
       return ''
