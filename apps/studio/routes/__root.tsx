@@ -65,7 +65,6 @@ import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBil
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
-import { NotFound } from '@/components/ui/NotFound'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { AuthProvider } from '@/lib/auth'
@@ -73,6 +72,7 @@ import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/const
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { Toaster } from '@/lib/toaster'
+import Error404 from '@/pages/404'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 
 dayjs.extend(customParseFormat)
@@ -247,6 +247,10 @@ const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
   })
 
   console.error(error.stack)
+}
+
+function NotFound() {
+  return <Error404 />
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({

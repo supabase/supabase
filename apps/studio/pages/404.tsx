@@ -1,22 +1,21 @@
-import { Link } from '@tanstack/react-router'
+import { NextPage } from 'next'
 import { useTheme } from 'next-themes'
+import Image from 'next/legacy/image'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import { BASE_PATH } from '@/lib/constants'
 
-export function NotFound() {
+const Error404: NextPage = ({}) => {
   const { resolvedTheme } = useTheme()
-  const [show404, setShow404] = useState(false)
+  const [show404, setShow404] = useState<boolean>(false)
 
   useEffect(() => {
-    const id = window.setTimeout(() => setShow404(true), 500)
-    return () => window.clearTimeout(id)
+    setTimeout(() => {
+      setShow404(true)
+    }, 500)
   }, [])
-
-  const logoSrc = resolvedTheme?.includes('dark')
-    ? `${BASE_PATH}/img/supabase-dark.svg`
-    : `${BASE_PATH}/img/supabase-light.svg`
 
   return (
     <div className="relative mx-auto flex h-screen w-full flex-col items-center justify-center">
@@ -24,8 +23,17 @@ export function NotFound() {
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex shrink-0 grow items-center lg:grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
-              <Link to="/projects">
-                <img src={logoSrc} alt="supabase" height={24} width={120} />
+              <Link href="/projects">
+                <Image
+                  src={
+                    resolvedTheme?.includes('dark')
+                      ? `${BASE_PATH}/img/supabase-dark.svg`
+                      : `${BASE_PATH}/img/supabase-light.svg`
+                  }
+                  alt="supabase"
+                  height={24}
+                  width={120}
+                />
               </Link>
             </div>
           </div>
@@ -51,10 +59,12 @@ export function NotFound() {
         </div>
         <div className="flex items-center space-x-4">
           <Button asChild size="small">
-            <Link to="/projects">Head back</Link>
+            <Link href="/projects">Head back</Link>
           </Button>
         </div>
       </div>
     </div>
   )
 }
+
+export default Error404
