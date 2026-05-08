@@ -249,7 +249,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
             </div>
           )}
 
-          {partner.categories.map((category) =>
+          {partner.categories.map((category) => (
             <div key={category.slug} className="flex items-center justify-between py-2">
               <span className="text-lighter">Category</span>
               <Link
@@ -258,8 +258,8 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
               >
                 {category.name}
               </Link>
-            </div>)}
-
+            </div>
+          ))}
 
           <div className="flex items-center justify-between py-2">
             <span className="text-foreground-lighter">Website</span>
@@ -324,7 +324,7 @@ export const getStaticProps: GetStaticProps<PartnerData> = async ({ params }) =>
 
   if (!partner) {
     return {
-      notFound: true
+      notFound: true,
     }
   }
 

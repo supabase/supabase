@@ -32,8 +32,16 @@ function IntegrationPartnersPage(props: Props) {
   const [partners, setPartners] = useState(initialPartners)
 
   const categoryMap: { [slug: string]: Category } = {}
-  initialPartners.forEach((p) => (p.categories.forEach((c) => { if (!(c.slug in categoryMap)) { categoryMap[c.slug] = c } })))
-  const allCategories = Object.keys(categoryMap).toSorted().map((slug) => categoryMap[slug])
+  initialPartners.forEach((p) =>
+    p.categories.forEach((c) => {
+      if (!(c.slug in categoryMap)) {
+        categoryMap[c.slug] = c
+      }
+    })
+  )
+  const allCategories = Object.keys(categoryMap)
+    .toSorted()
+    .map((slug) => categoryMap[slug])
 
   const router = useRouter()
 

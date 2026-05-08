@@ -75,6 +75,7 @@
         "HUBSPOT_MEETINGS_TOKEN",
         "NOTION_EVENTS_API_KEY",
         "NOTION_EVENTS_DB_ID_ACTUAL",
+        "INTEGRATIONS_MARKETPLACE_DB",
       ],
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"],
     },
