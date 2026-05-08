@@ -84,7 +84,7 @@ vi.mock('sonner', () => ({
 const confirmationTemplate = TEMPLATES_SCHEMAS.find((template) => template.id === 'CONFIRMATION')!
 
 const createAuthConfig = ({
-  subject = 'Confirm your signup',
+  subject = 'Confirm your email address',
   body,
   hasCustomBody,
   hasCustomSubject = false,
@@ -136,8 +136,8 @@ describe('TemplateEditor reset to default', () => {
   })
 
   const resetAuthConfig = createAuthConfig({
-    subject: 'Confirm Your Signup',
-    body: '<h2>Confirm your signup</h2>\n\n<p>Follow this link to confirm your user:</p>\n<p><a href="{{ .ConfirmationURL }}">Confirm your mail</a></p>',
+    subject: 'Confirm your email address',
+    body: '<h2>Confirm your email address</h2>\n\n<p>Follow the link below to confirm this email address and finish signing up.</p>\n<p><a href="{{ .ConfirmationURL }}">Confirm email address</a></p>',
     hasCustomBody: false,
     hasCustomSubject: false,
   })
@@ -229,9 +229,9 @@ describe('TemplateEditor reset to default', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Reset' }))
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue('Confirm Your Signup')).toBeInTheDocument()
+      expect(screen.getByDisplayValue('Confirm your email address')).toBeInTheDocument()
       expect(screen.getByLabelText('Body source')).toHaveValue(
-        '<h2>Confirm your signup</h2>\n\n<p>Follow this link to confirm your user:</p>\n<p><a href="{{ .ConfirmationURL }}">Confirm your mail</a></p>'
+        '<h2>Confirm your email address</h2>\n\n<p>Follow the link below to confirm this email address and finish signing up.</p>\n<p><a href="{{ .ConfirmationURL }}">Confirm email address</a></p>'
       )
     })
   })
