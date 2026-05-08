@@ -16,6 +16,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { pgmqQueueTable } from './Queues.utils'
 import { DeleteQueue } from '@/components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
 import { PurgeQueue } from '@/components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
 import { QUEUE_MESSAGE_TYPE } from '@/components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
@@ -51,7 +52,8 @@ export const QueueTab = () => {
     connectionString: project?.connectionString,
     schema: 'pgmq',
   })
-  const queueTable = tables?.find((x) => x.name === `q_${queueName}`)
+  const queueRelname = queueName ? pgmqQueueTable(queueName) : undefined
+  const queueTable = tables?.find((x) => x.name === queueRelname)
   const isRlsEnabled = queueTable?.rls_enabled ?? false
 
   const { data: policies } = useDatabasePoliciesQuery({
@@ -59,7 +61,7 @@ export const QueueTab = () => {
     connectionString: project?.connectionString,
     schema: 'pgmq',
   })
-  const queuePolicies = (policies ?? []).filter((policy) => policy.table === `q_${queueName}`)
+  const queuePolicies = (policies ?? []).filter((policy) => policy.table === queueRelname)
 
   const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
     projectRef: project?.ref,

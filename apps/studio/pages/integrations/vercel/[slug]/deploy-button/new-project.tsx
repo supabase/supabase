@@ -1,4 +1,3 @@
-import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
@@ -176,15 +175,12 @@ const CreateProject = () => {
 
     snapshot.setLoading(true)
 
-    let dbSqlParts: string[] = []
+    let dbSql: string | undefined
     if (shouldRunMigrations) {
       const id = toast(`Fetching initial migrations from GitHub repo`)
       const migrationSql = await getInitialMigrationSQLFromGitHubRepo(externalId)
-      if (migrationSql) dbSqlParts.push(migrationSql)
+      if (migrationSql) dbSql = migrationSql
       toast.success(`Done fetching initial migrations`, { id })
-    }
-    if (!dataApiDefaultPrivileges) {
-      dbSqlParts.push(buildDefaultPrivilegesSql('revoke'))
     }
 
     createProject({
@@ -192,7 +188,8 @@ const CreateProject = () => {
       name: projectName,
       dbPass,
       dbRegion,
-      dbSql: dbSqlParts.length > 0 ? dbSqlParts.join('\n') : undefined,
+      dbSql,
+      dataApiRevokeDefaultPrivileges: !dataApiDefaultPrivileges,
     })
   }
 
@@ -356,11 +353,11 @@ const CreateProject = () => {
               htmlFor="dataApiDefaultPrivileges"
               className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Automatically expose new tables and functions
+              Automatically expose new tables
             </label>
             <p className="text-sm text-foreground-muted">
-              Grants privileges to Data API roles by default, exposing new tables and functions. We
-              recommend disabling this to control access manually.
+              Grants privileges to Data API roles by default, exposing new tables. We recommend
+              disabling this to control access manually.
             </p>
           </div>
         </div>

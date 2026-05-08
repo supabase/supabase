@@ -1,4 +1,5 @@
 import type { Monaco } from '@monaco-editor/react'
+import { acceptUntrustedSql, safeSql, untrustedSql } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
@@ -111,7 +112,7 @@ export const EditorPanel = () => {
   const isInlineEditorHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.INLINE_EDITOR_TOGGLE)
   const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
 
-  const currentValue = value || ''
+  const currentValue = value || safeSql``
 
   const { ref } = useParams()
   const router = useRouter()
@@ -173,7 +174,7 @@ export const EditorPanel = () => {
   useEffect(() => {
     if (!snippetById || !activeSnippetId) return
     const sqlSnippet = snippetById as unknown as Extract<Content, { type: 'sql' }>
-    const sql = sqlSnippet.content.sql ?? ''
+    const sql = sqlSnippet.content.unchecked_sql ?? safeSql``
     setValue(sql)
     setActiveSnippet(sqlSnippet)
     originalSnippetRef.current = { sql, name: sqlSnippet.name }
@@ -228,7 +229,7 @@ export const EditorPanel = () => {
     }
 
     executeSql({
-      sql: suffixWithLimit(currentValue, 100),
+      sql: suffixWithLimit(acceptUntrustedSql(currentValue), 100),
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       isStatementTimeoutDisabled: true,
@@ -243,8 +244,8 @@ export const EditorPanel = () => {
   const isValidExplainQuery = isExplainQuery(results ?? [])
 
   const handleChange = (value: string) => {
-    setValue(value)
-    onChange?.(value)
+    setValue(untrustedSql(value))
+    onChange?.(untrustedSql(value))
   }
 
   const onSelectTemplate = (content: string) => {

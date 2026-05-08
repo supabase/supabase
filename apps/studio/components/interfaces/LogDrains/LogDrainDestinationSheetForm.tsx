@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import Link from 'next/link'
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -29,6 +29,7 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
+  TextArea_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
@@ -180,6 +181,18 @@ const otlpSubmitSchema = z.object({
 
 const syslogSchema = z.object({
   type: z.literal('syslog'),
+  host: z.string().min(1, { message: 'Host is required' }),
+  port: z.coerce
+    .number()
+    .int({ message: 'Port must be an integer' })
+    .min(0, { message: 'Port must be between 0 and 65535' })
+    .max(65535, { message: 'Port must be between 0 and 65535' }),
+  tls: z.boolean().optional().default(false),
+  structured_data: z.string().optional(),
+  cipher_key: z.string().optional(),
+  ca_cert: z.string().optional(),
+  client_cert: z.string().optional(),
+  client_key: z.string().optional(),
 })
 
 const formUnion = z.discriminatedUnion('type', [
@@ -223,6 +236,23 @@ const formSchema = z
     description: z.string().optional(),
   })
   .and(formUnion)
+  .superRefine((data, ctx) => {
+    if (data.type !== 'syslog') return
+    if (data.client_cert && !data.client_key) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Client key is required when a client certificate is provided',
+        path: ['client_key'],
+      })
+    }
+    if (data.client_key && !data.client_cert) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Client certificate is required when a client key is provided',
+        path: ['client_cert'],
+      })
+    }
+  })
 
 const submitSchema = z
   .object({
@@ -308,17 +338,21 @@ export function LogDrainDestinationSheetForm({
   // it produces a correct union type of all possible configs. Unfortunately, this type was not designed correctly
   // and it does not include `type` inside the config itself, so it's not trivial to create `discriminatedUnion`
   // out of it, therefore for an ease of use now, we bail to `any` until the better time come.
-  const defaultConfig = (defaultValues?.config || {}) as any
   const defaultType = defaultValues?.type || 'webhook'
-  const defaultHeaderEntries = headerRecordToRows(
-    mode === 'create' ? getDefaultHeadersByType(defaultType) : defaultConfig?.headers || {}
-  )
+  const defaultHeaderEntries = useMemo(() => {
+    const config = (defaultValues?.config || {}) as any
+    const type = defaultValues?.type || 'webhook'
+    return headerRecordToRows(
+      mode === 'create' ? getDefaultHeadersByType(type) : config?.headers || {}
+    )
+  }, [defaultValues, mode])
 
   const sentryEnabled = useFlag('SentryLogDrain')
   const s3Enabled = useFlag('S3logdrain')
   const axiomEnabled = useFlag('axiomLogDrain')
   const otlpEnabled = useFlag('otlpLogDrain')
   const last9Enabled = useFlag('Last9LogDrain')
+  const syslogEnabled = useFlag('syslogLogDrain')
 
   const { ref } = useParams()
   const { data: logDrains } = useLogDrainsQuery({
@@ -327,34 +361,49 @@ export function LogDrainDestinationSheetForm({
 
   const track = useTrack()
 
-  const form = useForm<LogDrainDestinationFormValues>({
-    resolver: zodResolver(formSchema),
-    values: {
+  const formValues = useMemo(() => {
+    const config = (defaultValues?.config || {}) as any
+    const type = defaultValues?.type || 'webhook'
+    return {
       name: defaultValues?.name || '',
       description: defaultValues?.description || '',
-      type: defaultType,
-      http: defaultConfig?.http || 'http2',
-      gzip: mode === 'create' ? true : defaultConfig?.gzip || false,
+      type,
+      http: config?.http || 'http2',
+      gzip: mode === 'create' ? true : config?.gzip || false,
       headerEntries: defaultHeaderEntries,
-      url: defaultConfig?.url || '',
-      api_key: defaultConfig?.api_key || '',
-      region: defaultConfig?.region || '',
-      username: defaultConfig?.username || '',
-      password: defaultConfig?.password || '',
-      dsn: defaultConfig?.dsn || '',
-      s3_bucket: defaultConfig?.s3_bucket || '',
-      storage_region: defaultConfig?.storage_region || '',
-      access_key_id: defaultConfig?.access_key_id || '',
-      secret_access_key: defaultConfig?.secret_access_key || '',
-      batch_timeout: defaultConfig?.batch_timeout ?? 3000,
-      dataset_name: defaultConfig?.dataset_name || '',
-      api_token: defaultConfig?.api_token || '',
-      endpoint: defaultConfig?.endpoint || '',
-      protocol: defaultConfig?.protocol || 'http/protobuf',
-    },
+      url: config?.url || '',
+      api_key: config?.api_key || '',
+      region: config?.region || '',
+      username: config?.username || '',
+      password: config?.password || '',
+      dsn: config?.dsn || '',
+      s3_bucket: config?.s3_bucket || '',
+      storage_region: config?.storage_region || '',
+      access_key_id: config?.access_key_id || '',
+      secret_access_key: config?.secret_access_key || '',
+      batch_timeout: config?.batch_timeout ?? 3000,
+      dataset_name: config?.dataset_name || '',
+      api_token: config?.api_token || '',
+      endpoint: config?.endpoint || '',
+      protocol: config?.protocol || 'http/protobuf',
+      host: config?.host || '',
+      port: (config?.port ?? '') as number,
+      tls: config?.tls ?? false,
+      structured_data: config?.structured_data || '',
+      cipher_key: config?.cipher_key || '',
+      ca_cert: config?.ca_cert || '',
+      client_cert: config?.client_cert || '',
+      client_key: config?.client_key || '',
+    }
+  }, [defaultValues, mode, defaultHeaderEntries])
+
+  const form = useForm<LogDrainDestinationFormValues>({
+    resolver: zodResolver(formSchema),
+    values: formValues,
   })
 
   const type = form.watch('type')
+  const tls = form.watch('tls')
 
   useEffect(() => {
     if (mode === 'create' && !open) {
@@ -365,9 +414,8 @@ export function LogDrainDestinationSheetForm({
   useEffect(() => {
     if (!open || mode !== 'create') return
 
-    form.setValue('headerEntries', headerRecordToRows(getDefaultHeadersByType(type)), {
-      shouldValidate: true,
-    })
+    form.setValue('headerEntries', headerRecordToRows(getDefaultHeadersByType(type)))
+    form.clearErrors('headerEntries')
   }, [form, mode, open, type])
 
   return (
@@ -437,6 +485,7 @@ export function LogDrainDestinationSheetForm({
                           if (t.value === 'axiom') return axiomEnabled
                           if (t.value === 'otlp') return otlpEnabled
                           if (t.value === 'last9') return last9Enabled
+                          if (t.value === 'syslog') return syslogEnabled
                           return true
                         }).map((type) => (
                           <SelectItem_Shadcn_
@@ -803,6 +852,125 @@ export function LogDrainDestinationSheetForm({
                       description="Password for authentication from Last9 OTEL integration."
                     />
                   </div>
+                )}
+                {type === 'syslog' && (
+                  <>
+                    <div className="grid gap-4 px-content">
+                      <LogDrainFormItem
+                        value="host"
+                        label="Host"
+                        placeholder="logs.example.com"
+                        formControl={form.control}
+                        description="Hostname or IP address of the syslog receiver."
+                      />
+                      <LogDrainFormItem
+                        type="number"
+                        value="port"
+                        label="Port"
+                        placeholder="514"
+                        formControl={form.control}
+                        description="Port of the syslog receiver (0–65535)."
+                      />
+                      <LogDrainFormItem
+                        value="structured_data"
+                        label="Structured Data"
+                        placeholder='[exampleSDID@32473 iut="3" eventSource="Application"]'
+                        formControl={form.control}
+                        description="Static RFC 5424 Structured Data included in every log frame."
+                      />
+                      <LogDrainFormItem
+                        type="password"
+                        value="cipher_key"
+                        label="Cipher Key"
+                        placeholder="••••••••••••••••"
+                        formControl={form.control}
+                        description="Base64-encoded 32-byte key for AES-256-GCM encryption of the log body."
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="tls"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2 px-4">
+                          <div className="flex gap-2 items-center">
+                            <FormControl>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                            <FormLabel className="text-base">TLS</FormLabel>
+                            <InfoTooltip align="start">
+                              Connect via SSL/TLS instead of plain TCP.
+                            </InfoTooltip>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    {tls && (
+                      <div className="grid gap-4 px-content">
+                        <FormField
+                          name="ca_cert"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="horizontal"
+                              label="CA Certificate"
+                              description="PEM encoded CA certificate for verifying the server. Falls back to the system CA bundle if omitted."
+                            >
+                              <FormControl>
+                                <TextArea_Shadcn_
+                                  className="font-mono text-xs"
+                                  placeholder="-----BEGIN CERTIFICATE-----"
+                                  rows={4}
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                        <FormField
+                          name="client_cert"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="horizontal"
+                              label="Client Certificate"
+                              description="PEM encoded client certificate for mTLS."
+                            >
+                              <FormControl>
+                                <TextArea_Shadcn_
+                                  className="font-mono text-xs"
+                                  placeholder="-----BEGIN CERTIFICATE-----"
+                                  rows={4}
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                        <FormField
+                          name="client_key"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="horizontal"
+                              label="Client Key"
+                              description="PEM encoded client private key for mTLS. Required when a client certificate is provided."
+                            >
+                              <FormControl>
+                                <TextArea_Shadcn_
+                                  className="font-mono text-xs"
+                                  placeholder="-----BEGIN PRIVATE KEY-----"
+                                  rows={4}
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
                 {HEADER_ENABLED_TYPES.includes(type as (typeof HEADER_ENABLED_TYPES)[number]) && (
                   <div className="px-content">

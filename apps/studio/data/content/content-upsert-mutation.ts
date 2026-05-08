@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { Content } from './content-query'
+import { unmapSqlContentField } from './content-remap'
 import { contentKeys } from './keys'
 import type { Snippet } from './sql-folders-query'
 import type { components } from '@/data/api'
@@ -25,7 +26,7 @@ export async function upsertContent(
 ) {
   const { data, error } = await put('/platform/projects/{ref}/content', {
     params: { path: { ref: projectRef } },
-    body: payload,
+    body: unmapSqlContentField(payload),
     headers: { Version: '2' },
     signal,
   })

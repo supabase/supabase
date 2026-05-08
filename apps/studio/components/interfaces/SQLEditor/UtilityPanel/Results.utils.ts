@@ -17,6 +17,15 @@ export function formatCellValue(value: unknown) {
   return JSON.stringify(value)
 }
 
+const LARGE_VALUE_CHAR_THRESHOLD = 60
+
+export function isLargeValue(value: unknown) {
+  if (value === null || value === undefined) return false
+  if (typeof value === 'object') return true
+  const str = String(value)
+  return str.length > LARGE_VALUE_CHAR_THRESHOLD || str.includes('\n')
+}
+
 export function formatResults(
   results: ResultRow[]
 ): Record<string, string | number | boolean | null | undefined>[] {

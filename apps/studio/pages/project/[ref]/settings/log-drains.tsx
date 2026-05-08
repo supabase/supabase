@@ -58,6 +58,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   const axiomEnabled = useFlag('axiomLogDrain')
   const otlpEnabled = useFlag('otlpLogDrain')
   const last9Enabled = useFlag('Last9LogDrain')
+  const syslogEnabled = useFlag('syslogLogDrain')
 
   const { data: logDrains } = useLogDrainsQuery(
     { ref },
@@ -226,6 +227,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                       if (t.value === 'axiom') return axiomEnabled
                       if (t.value === 'otlp') return otlpEnabled
                       if (t.value === 'last9') return last9Enabled
+                      if (t.value === 'syslog') return syslogEnabled
                       return true
                     }).map((drainType) => (
                       <DropdownMenuItem

@@ -265,6 +265,28 @@ export interface FeaturePreviewDisabledEvent {
 }
 
 /**
+ * The user picked a timezone in the dashboard timezone picker (in the user
+ * avatar dropdown). Setting an explicit IANA value or returning to the auto
+ * detected default both fire this event.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface TimezonePickerClickedEvent {
+  action: 'timezone_picker_clicked'
+  properties: {
+    /** IANA name resolved before the change. */
+    previousTimezone: string
+    /** IANA name resolved after the change. */
+    nextTimezone: string
+    /** True when the user opted back into the browser-detected default. */
+    isAutoDetected: boolean
+    /** Where the picker was rendered. */
+    source: 'user_dropdown' | 'account_preferences'
+  }
+  groups: TelemetryGroups
+}
+/**
  * User was exposed to the project creation form (exposure event for RLS option experiment).
  *
  * @group Events
@@ -376,6 +398,18 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
     dataApiRevokeOnCreateDefaultEnabled?: boolean
   }
   groups: TelemetryGroups
+}
+
+/**
+ * User clicked to connect GitHub during project creation.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationGithubConnectClickedEvent {
+  action: 'project_creation_github_connect_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
 /**
@@ -2943,10 +2977,10 @@ export interface IntegrationInstallCompletedEvent {
 export interface IntegrationInstallSubmittedEvent {
   action: 'integration_install_submitted'
   properties: {
-    /**
-     * The name of the integration being installed
-     */
+    /** The name of the integration being installed */
     integrationName: string
+    /** The integration method (will be 'template' for frontend-driven integrations.) */
+    method: string
   }
   groups: TelemetryGroups
 }
@@ -3219,6 +3253,177 @@ export interface UnifiedLogsRowClickedEvent {
 }
 
 /**
+ * User clicked the Supabase logo in the top-left corner of the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderHomeLogoClickedEvent {
+  action: 'header_home_logo_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the mobile back-to-dashboard chevron in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderBackToDashboardClickedEvent {
+  action: 'header_back_to_dashboard_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the "Exceeding usage limits" badge in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderExceedingUsageBadgeClickedEvent {
+  action: 'header_exceeding_usage_badge_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened the organization dropdown in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderOrganizationDropdownOpenedEvent {
+  action: 'header_organization_dropdown_opened'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened the project dropdown in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderProjectDropdownOpenedEvent {
+  action: 'header_project_dropdown_opened'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened the branch dropdown in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderBranchDropdownOpenedEvent {
+  action: 'header_branch_dropdown_opened'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the merge-request trigger button in the page header.
+ * Fires on click; the existing branch_create_merge_request_button_clicked
+ * fires only on successful merge-request creation.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderMergeRequestButtonClickedEvent {
+  action: 'header_merge_request_button_clicked'
+  properties: {
+    /** Whether a review has already been requested for this branch. */
+    hasReviewRequested: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the "Connect" button in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderConnectButtonClickedEvent {
+  action: 'header_connect_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the feedback dropdown in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderFeedbackDropdownOpenedEvent {
+  action: 'header_feedback_dropdown_opened'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the Advisor Center toggle button in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderAdvisorButtonClickedEvent {
+  action: 'header_advisor_button_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the Inline SQL Editor toggle button in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderInlineEditorButtonClickedEvent {
+  action: 'header_inline_editor_button_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the AI Assistant toggle button in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderAssistantButtonClickedEvent {
+  action: 'header_assistant_button_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened the user/account dropdown in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderUserDropdownOpenedEvent {
+  action: 'header_user_dropdown_opened'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened the local-development settings dropdown in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderLocalDropdownOpenedEvent {
+  action: 'header_local_dropdown_opened'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User opened the local CLI version popover in the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderLocalVersionPopoverOpenedEvent {
+  action: 'header_local_version_popover_opened'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -3237,8 +3442,10 @@ export type TelemetryEvent =
   | CronJobHistoryClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
+  | TimezonePickerClickedEvent
   | ProjectCreationRlsOptionExperimentExposedEvent
   | ProjectCreationDefaultPrivilegesExposedEvent
+  | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | TableApiAccessToggleClickedEvent
@@ -3399,3 +3606,18 @@ export type TelemetryEvent =
   | ResourceExhaustionBannerUpgradeClickedEvent
   | ResourceExhaustionBannerAiAssistantClickedEvent
   | UnifiedLogsRowClickedEvent
+  | HeaderHomeLogoClickedEvent
+  | HeaderBackToDashboardClickedEvent
+  | HeaderExceedingUsageBadgeClickedEvent
+  | HeaderOrganizationDropdownOpenedEvent
+  | HeaderProjectDropdownOpenedEvent
+  | HeaderBranchDropdownOpenedEvent
+  | HeaderMergeRequestButtonClickedEvent
+  | HeaderConnectButtonClickedEvent
+  | HeaderFeedbackDropdownOpenedEvent
+  | HeaderAdvisorButtonClickedEvent
+  | HeaderInlineEditorButtonClickedEvent
+  | HeaderAssistantButtonClickedEvent
+  | HeaderUserDropdownOpenedEvent
+  | HeaderLocalDropdownOpenedEvent
+  | HeaderLocalVersionPopoverOpenedEvent
