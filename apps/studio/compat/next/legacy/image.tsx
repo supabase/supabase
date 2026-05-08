@@ -8,10 +8,17 @@ import {
   type SyntheticEvent,
 } from 'react'
 
+import { BASE_PATH } from '@/lib/constants'
+
 // `next/legacy/image` is the pre-Next-13 Image API. Functionally similar
 // to `next/image` but with `layout` and `objectFit`/`objectPosition`
 // props instead of `fill` + style. Same shim approach: degrade to a
 // plain <img> with the prop surface preserved.
+//
+// basePath: see the matching note in ../image.tsx — absolute `src`
+// values are auto-prefixed with the configured basePath; full URLs and
+// already-prefixed paths pass through; loader-produced URLs are not
+// touched.
 
 type ImageLoaderProps = { src: string; width: number; quality?: number }
 type ImageLoader = (props: ImageLoaderProps) => string
@@ -38,6 +45,14 @@ interface ImageProps extends Omit<ComponentPropsWithoutRef<'img'>, 'src' | 'alt'
   onLoadingComplete?: (img: HTMLImageElement) => void
 }
 
+function applyBasePath(src: string): string {
+  if (!BASE_PATH) return src
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(src) || src.startsWith('//')) return src
+  if (src === BASE_PATH || src.startsWith(`${BASE_PATH}/`)) return src
+  if (src.startsWith('/')) return `${BASE_PATH}${src}`
+  return src
+}
+
 function resolveSrc(
   src: ImageProps['src'],
   width?: ImageProps['width'],
@@ -45,12 +60,14 @@ function resolveSrc(
   loader?: ImageLoader
 ): string {
   const raw = typeof src === 'string' ? src : src.src
-  if (!loader) return raw
-  return loader({
-    src: raw,
-    width: typeof width === 'number' ? width : Number(width ?? 0),
-    quality: quality !== undefined ? Number(quality) : undefined,
-  })
+  if (loader) {
+    return loader({
+      src: raw,
+      width: typeof width === 'number' ? width : Number(width ?? 0),
+      quality: quality !== undefined ? Number(quality) : undefined,
+    })
+  }
+  return applyBasePath(raw)
 }
 
 const Image = forwardRef(function Image(
