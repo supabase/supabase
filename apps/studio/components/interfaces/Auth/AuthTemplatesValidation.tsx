@@ -300,8 +300,8 @@ const IDENTITY_LINKED_NOTIFICATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'IDENTITY_LINKED_NOTIFICATION',
   type: 'object',
-  title: 'New sign-in method linked',
-  purpose: 'Notify users when a new sign-in method has been linked to their account',
+  title: 'Sign-in method linked',
+  purpose: 'Notify users when a sign-in method has been linked to their account',
   properties: {
     MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: {
       title: 'Subject',
@@ -313,7 +313,7 @@ const IDENTITY_LINKED_NOTIFICATION: FormSchema = {
       type: 'code',
       description: `
 - \`{{ .Email }}\` : The user's email address
-- \`{{ .Provider }}\` : The provider of the newly linked sign-in method
+- \`{{ .Provider }}\` : The provider of the linked sign-in method
 - \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
@@ -360,9 +360,8 @@ const MFA_FACTOR_ENROLLED_NOTIFICATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'MFA_FACTOR_ENROLLED_NOTIFICATION',
   type: 'object',
-  title: 'Multi-factor authentication method added',
-  purpose:
-    'Notify users when a new multi-factor authentication method has been added to their account',
+  title: 'MFA method added',
+  purpose: 'Notify users when an MFA method has been added to their account',
   properties: {
     MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION: {
       title: 'Subject',
@@ -391,9 +390,8 @@ const MFA_FACTOR_UNENROLLED_NOTIFICATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'MFA_FACTOR_UNENROLLED_NOTIFICATION',
   type: 'object',
-  title: 'Multi-factor authentication method removed',
-  purpose:
-    'Notify users when a multi-factor authentication method has been removed from their account',
+  title: 'MFA method removed',
+  purpose: 'Notify users when an MFA method has been removed from their account',
   properties: {
     MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION: {
       title: 'Subject',

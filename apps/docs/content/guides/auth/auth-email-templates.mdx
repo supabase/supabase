@@ -20,7 +20,7 @@ Security notification emails:
 - Password changed
 - Email address changed
 - Phone number changed
-- New sign-in method linked
+- Sign-in method linked
 - Sign-in method removed
 - Verification method added
 - Verification method removed
@@ -44,7 +44,7 @@ The templating system provides the following variables for use:
 | `{{ .OldEmail }}`        | Contains the old email address of the user. This variable is only supported in the "Email address changed notification" template.                                                                                                                                                     |
 | `{{ .Phone }}`           | Contains the new phone number of the user. This variable is only supported in the "Phone number changed notification" template.                                                                                                                                                       |
 | `{{ .OldPhone }}`        | Contains the old phone address of the user. This variable is only supported in the "Phone number changed notification" template.                                                                                                                                                      |
-| `{{ .Provider }}`        | Contains the provider of the linked or removed sign-in method. This variable is only supported in the "New sign-in method linked" and "Sign-in method removed" notification templates.                                                                                                |
+| `{{ .Provider }}`        | Contains the provider of the linked or removed sign-in method. This variable is only supported in the "Sign-in method linked" and "Sign-in method removed" notification templates.                                                                                                    |
 | `{{ .FactorType }}`      | Contains the type of verification method that was added or removed. This variable is only supported in the "Verification method added" and "Verification method removed" notification templates.                                                                                      |
 
 ## Editing email templates
@@ -96,8 +96,8 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
       "mailer_subjects_mfa_factor_unenrolled_notification": "A verification method was removed from your account",
       "mailer_templates_mfa_factor_unenrolled_notification_content": "<h2>A verification method was removed</h2>\n\n<p>Sign-in verification method {{ .FactorType }} was removed from your account.</p>\n<p>If you didn't make this change, contact support immediately.</p>",
       "mailer_notifications_identity_linked_enabled": true,
-      "mailer_subjects_identity_linked_notification": "A new sign-in method was linked to your account",
-      "mailer_templates_identity_linked_notification_content": "<h2>A new sign-in method was linked</h2>\n\n<p>Your {{ .Provider }} account was linked as a new sign-in method for {{ .Email }}.</p>\n<p>If you didn't make this change, contact support immediately.</p>",
+      "mailer_subjects_identity_linked_notification": "A sign-in method was linked to your account",
+      "mailer_templates_identity_linked_notification_content": "<h2>A sign-in method was linked</h2>\n\n<p>Your {{ .Provider }} account was linked as a sign-in method for {{ .Email }}.</p>\n<p>If you didn't make this change, contact support immediately.</p>",
       "mailer_notifications_identity_unlinked_enabled": true,
       "mailer_subjects_identity_unlinked_notification": "A sign-in method was removed from your account",
       "mailer_templates_identity_unlinked_notification_content": "<h2>A sign-in method was removed</h2>\n\n<p>Your {{ .Provider }} account was removed as a sign-in method for {{ .Email }}.</p>\n<p>If you didn't make this change, contact support immediately.</p>"

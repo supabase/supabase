@@ -129,22 +129,22 @@ There are several security notification email templates which can be configured.
 
 **Default subject**: "A new verification method was added to your account"
 **When sent**: When a new verification method is added to the user's account
-**Purpose**: Notify users when a new multi-factor authentication method has been added to their account
+**Purpose**: Notify users when an MFA method has been added to their account
 **Content**: Confirms that a new verification method was added
 
 ### `auth.email.notification.mfa_factor_unenrolled`
 
 **Default subject**: "A verification method was removed from your account"
 **When sent**: When a verification method is removed from the user's account
-**Purpose**: Notify users when a multi-factor authentication method has been removed from their account
+**Purpose**: Notify users when an MFA method has been removed from their account
 **Content**: Confirms that a verification method was removed
 
 ### `auth.email.notification.identity_linked`
 
-**Default subject**: "A new sign-in method was linked to your account"
-**When sent**: When a new sign-in method is linked to the account
-**Purpose**: Notify users when a new sign-in method has been linked to their account
-**Content**: Confirms that a new sign-in method was linked
+**Default subject**: "A sign-in method was linked to your account"
+**When sent**: When a sign-in method is linked to the account
+**Purpose**: Notify users when a sign-in method has been linked to their account
+**Content**: Confirms that a sign-in method was linked
 
 ### `auth.email.notification.identity_unlinked`
 
@@ -263,7 +263,7 @@ Contains the provider of the linked or removed sign-in method. This is only avai
 **Usage**
 
 ```html
-<p>Your {{ .Provider }} account was linked as a new sign-in method.</p>
+<p>Your {{ .Provider }} account was linked as a sign-in method.</p>
 ```
 
 ### `FactorType`
