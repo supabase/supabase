@@ -2,6 +2,7 @@
 
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
@@ -117,6 +118,14 @@ export default defineConfig(({ mode }) => {
     },
     ...(basePath && { base: basePath }),
     define: publicEnvDefines,
+    css: {
+      // Disable PostCSS auto-discovery. Studio's postcss.config.cjs is kept
+      // for the Next build (`build:next`) and uses `@tailwindcss/postcss`,
+      // but under Vite we let `@tailwindcss/vite` (added below) handle
+      // Tailwind v4 directives directly. Running both plugins on the same
+      // CSS would double-process Tailwind output.
+      postcss: { plugins: [] },
+    },
     ssr: {
       // `lodash` is CJS; its named-export interop fails in Node ESM unless bundled.
       // `next/*` must be bundled so our nextCompat shim wins — otherwise Vite's
@@ -138,6 +147,7 @@ export default defineConfig(({ mode }) => {
       nextCompat(),
       ssrStubGraphiql(),
       devtools(),
+      tailwindcss(),
       tanstackStart({
         srcDirectory: './',
         spa: {
