@@ -19,6 +19,7 @@ import { Route as AuthorizeRouteImport } from './routes/authorize'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProjectRefRouteImport } from './routes/project/$ref'
 import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
 import { Route as ApiIncidentStatusRouteImport } from './routes/api/incident-status'
 import { Route as ApiIncidentBannerRouteImport } from './routes/api/incident-banner'
@@ -40,8 +41,10 @@ import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-pa
 import { Route as AppOrganizationsRouteImport } from './routes/_app/organizations'
 import { Route as AppOrgRouteImport } from './routes/_app/org'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
+import { Route as ProjectRefIndexRouteImport } from './routes/project/$ref/index'
 import { Route as ApiConnectIndexRouteImport } from './routes/api/connect/index'
 import { Route as AppOrgIndexRouteImport } from './routes/_app/org/index'
+import { Route as ProjectRefDatabaseRouteImport } from './routes/project/$ref/database'
 import { Route as ApiIntegrationsStripeSyncRouteImport } from './routes/api/integrations/stripe-sync'
 import { Route as ApiEdgeFunctionsTestRouteImport } from './routes/api/edge-functions/test'
 import { Route as ApiContentGraphqlRouteImport } from './routes/api/content/graphql'
@@ -55,6 +58,7 @@ import { Route as ApiPlatformProfileIndexRouteImport } from './routes/api/platfo
 import { Route as ApiPlatformOrganizationsIndexRouteImport } from './routes/api/platform/organizations/index'
 import { Route as AppOrgSlugIndexRouteImport } from './routes/_app/org/$slug/index'
 import { Route as AppAccountTokensIndexRouteImport } from './routes/_app/account/tokens/index'
+import { Route as ProjectRefDatabaseSchemasRouteImport } from './routes/project/$ref/database/schemas'
 import { Route as ApiPlatformTelemetryEventRouteImport } from './routes/api/platform/telemetry/event'
 import { Route as ApiPlatformIntegrationsSlugRouteImport } from './routes/api/platform/integrations/$slug'
 import { Route as ApiAiSqlTitleV2RouteImport } from './routes/api/ai/sql/title-v2'
@@ -192,6 +196,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectRefRoute = ProjectRefRouteImport.update({
+  id: '/project/$ref',
+  path: '/project/$ref',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiStatusOverrideRoute = ApiStatusOverrideRouteImport.update({
   id: '/api/status-override',
   path: '/api/status-override',
@@ -299,6 +308,11 @@ const AppAccountRoute = AppAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AppRoute,
 } as any)
+const ProjectRefIndexRoute = ProjectRefIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
 const ApiConnectIndexRoute = ApiConnectIndexRouteImport.update({
   id: '/api/connect/',
   path: '/api/connect/',
@@ -308,6 +322,11 @@ const AppOrgIndexRoute = AppOrgIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppOrgRoute,
+} as any)
+const ProjectRefDatabaseRoute = ProjectRefDatabaseRouteImport.update({
+  id: '/database',
+  path: '/database',
+  getParentRoute: () => ProjectRefRoute,
 } as any)
 const ApiIntegrationsStripeSyncRoute =
   ApiIntegrationsStripeSyncRouteImport.update({
@@ -377,6 +396,12 @@ const AppAccountTokensIndexRoute = AppAccountTokensIndexRouteImport.update({
   path: '/tokens/',
   getParentRoute: () => AppAccountRoute,
 } as any)
+const ProjectRefDatabaseSchemasRoute =
+  ProjectRefDatabaseSchemasRouteImport.update({
+    id: '/schemas',
+    path: '/schemas',
+    getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
 const ApiPlatformTelemetryEventRoute =
   ApiPlatformTelemetryEventRouteImport.update({
     id: '/api/platform/telemetry/event',
@@ -905,6 +930,7 @@ export interface FileRoutesByFullPath {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/project/$ref': typeof ProjectRefRouteWithChildren
   '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
   '/account/security': typeof AppAccountSecurityRoute
@@ -913,8 +939,10 @@ export interface FileRoutesByFullPath {
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
+  '/project/$ref/': typeof ProjectRefIndexRoute
   '/account/tokens/scoped': typeof AppAccountTokensScopedRoute
   '/org/$slug/apps': typeof AppOrgSlugAppsRoute
   '/org/$slug/audit': typeof AppOrgSlugAuditRoute
@@ -938,6 +966,7 @@ export interface FileRoutesByFullPath {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/database/schemas': typeof ProjectRefDatabaseSchemasRoute
   '/account/tokens/': typeof AppAccountTokensIndexRoute
   '/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -1045,8 +1074,10 @@ export interface FileRoutesByTo {
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/org': typeof AppOrgIndexRoute
   '/api/connect': typeof ApiConnectIndexRoute
+  '/project/$ref': typeof ProjectRefIndexRoute
   '/account/tokens/scoped': typeof AppAccountTokensScopedRoute
   '/org/$slug/apps': typeof AppOrgSlugAppsRoute
   '/org/$slug/audit': typeof AppOrgSlugAuditRoute
@@ -1070,6 +1101,7 @@ export interface FileRoutesByTo {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/database/schemas': typeof ProjectRefDatabaseSchemasRoute
   '/account/tokens': typeof AppAccountTokensIndexRoute
   '/org/$slug': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations': typeof ApiPlatformOrganizationsIndexRoute
@@ -1173,6 +1205,7 @@ export interface FileRoutesById {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/project/$ref': typeof ProjectRefRouteWithChildren
   '/_app/account/audit': typeof AppAccountAuditRoute
   '/_app/account/me': typeof AppAccountMeRoute
   '/_app/account/security': typeof AppAccountSecurityRoute
@@ -1181,8 +1214,10 @@ export interface FileRoutesById {
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/_app/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
+  '/project/$ref/': typeof ProjectRefIndexRoute
   '/_app/account/tokens/scoped': typeof AppAccountTokensScopedRoute
   '/_app/org/$slug/apps': typeof AppOrgSlugAppsRoute
   '/_app/org/$slug/audit': typeof AppOrgSlugAuditRoute
@@ -1206,6 +1241,7 @@ export interface FileRoutesById {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/database/schemas': typeof ProjectRefDatabaseSchemasRoute
   '/_app/account/tokens/': typeof AppAccountTokensIndexRoute
   '/_app/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -1308,6 +1344,7 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/status-override'
+    | '/project/$ref'
     | '/account/audit'
     | '/account/me'
     | '/account/security'
@@ -1316,8 +1353,10 @@ export interface FileRouteTypes {
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/project/$ref/database'
     | '/org/'
     | '/api/connect/'
+    | '/project/$ref/'
     | '/account/tokens/scoped'
     | '/org/$slug/apps'
     | '/org/$slug/audit'
@@ -1341,6 +1380,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/database/schemas'
     | '/account/tokens/'
     | '/org/$slug/'
     | '/api/platform/organizations/'
@@ -1448,8 +1488,10 @@ export interface FileRouteTypes {
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/project/$ref/database'
     | '/org'
     | '/api/connect'
+    | '/project/$ref'
     | '/account/tokens/scoped'
     | '/org/$slug/apps'
     | '/org/$slug/audit'
@@ -1473,6 +1515,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/database/schemas'
     | '/account/tokens'
     | '/org/$slug'
     | '/api/platform/organizations'
@@ -1575,6 +1618,7 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/status-override'
+    | '/project/$ref'
     | '/_app/account/audit'
     | '/_app/account/me'
     | '/_app/account/security'
@@ -1583,8 +1627,10 @@ export interface FileRouteTypes {
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/project/$ref/database'
     | '/_app/org/'
     | '/api/connect/'
+    | '/project/$ref/'
     | '/_app/account/tokens/scoped'
     | '/_app/org/$slug/apps'
     | '/_app/org/$slug/audit'
@@ -1608,6 +1654,7 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/database/schemas'
     | '/_app/account/tokens/'
     | '/_app/org/$slug/'
     | '/api/platform/organizations/'
@@ -1700,6 +1747,7 @@ export interface RootRouteChildren {
   ApiIncidentBannerRoute: typeof ApiIncidentBannerRoute
   ApiIncidentStatusRoute: typeof ApiIncidentStatusRoute
   ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
+  ProjectRefRoute: typeof ProjectRefRouteWithChildren
   ApiAiDocsRoute: typeof ApiAiDocsRoute
   ApiContentGraphqlRoute: typeof ApiContentGraphqlRoute
   ApiEdgeFunctionsTestRoute: typeof ApiEdgeFunctionsTestRoute
@@ -1853,6 +1901,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/project/$ref': {
+      id: '/project/$ref'
+      path: '/project/$ref'
+      fullPath: '/project/$ref'
+      preLoaderRoute: typeof ProjectRefRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/status-override': {
       id: '/api/status-override'
       path: '/api/status-override'
@@ -2000,6 +2055,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAccountRouteImport
       parentRoute: typeof AppRoute
     }
+    '/project/$ref/': {
+      id: '/project/$ref/'
+      path: '/'
+      fullPath: '/project/$ref/'
+      preLoaderRoute: typeof ProjectRefIndexRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
     '/api/connect/': {
       id: '/api/connect/'
       path: '/api/connect'
@@ -2013,6 +2075,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/org/'
       preLoaderRoute: typeof AppOrgIndexRouteImport
       parentRoute: typeof AppOrgRoute
+    }
+    '/project/$ref/database': {
+      id: '/project/$ref/database'
+      path: '/database'
+      fullPath: '/project/$ref/database'
+      preLoaderRoute: typeof ProjectRefDatabaseRouteImport
+      parentRoute: typeof ProjectRefRoute
     }
     '/api/integrations/stripe-sync': {
       id: '/api/integrations/stripe-sync'
@@ -2104,6 +2173,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/tokens/'
       preLoaderRoute: typeof AppAccountTokensIndexRouteImport
       parentRoute: typeof AppAccountRoute
+    }
+    '/project/$ref/database/schemas': {
+      id: '/project/$ref/database/schemas'
+      path: '/schemas'
+      fullPath: '/project/$ref/database/schemas'
+      preLoaderRoute: typeof ProjectRefDatabaseSchemasRouteImport
+      parentRoute: typeof ProjectRefDatabaseRoute
     }
     '/api/platform/telemetry/event': {
       id: '/api/platform/telemetry/event'
@@ -2818,6 +2894,31 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface ProjectRefDatabaseRouteChildren {
+  ProjectRefDatabaseSchemasRoute: typeof ProjectRefDatabaseSchemasRoute
+}
+
+const ProjectRefDatabaseRouteChildren: ProjectRefDatabaseRouteChildren = {
+  ProjectRefDatabaseSchemasRoute: ProjectRefDatabaseSchemasRoute,
+}
+
+const ProjectRefDatabaseRouteWithChildren =
+  ProjectRefDatabaseRoute._addFileChildren(ProjectRefDatabaseRouteChildren)
+
+interface ProjectRefRouteChildren {
+  ProjectRefDatabaseRoute: typeof ProjectRefDatabaseRouteWithChildren
+  ProjectRefIndexRoute: typeof ProjectRefIndexRoute
+}
+
+const ProjectRefRouteChildren: ProjectRefRouteChildren = {
+  ProjectRefDatabaseRoute: ProjectRefDatabaseRouteWithChildren,
+  ProjectRefIndexRoute: ProjectRefIndexRoute,
+}
+
+const ProjectRefRouteWithChildren = ProjectRefRoute._addFileChildren(
+  ProjectRefRouteChildren,
+)
+
 interface ApiPlatformProjectsRefAnalyticsLogDrainsRouteChildren {
   ApiPlatformProjectsRefAnalyticsLogDrainsUuidRoute: typeof ApiPlatformProjectsRefAnalyticsLogDrainsUuidRoute
 }
@@ -2854,6 +2955,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIncidentBannerRoute: ApiIncidentBannerRoute,
   ApiIncidentStatusRoute: ApiIncidentStatusRoute,
   ApiStatusOverrideRoute: ApiStatusOverrideRoute,
+  ProjectRefRoute: ProjectRefRouteWithChildren,
   ApiAiDocsRoute: ApiAiDocsRoute,
   ApiContentGraphqlRoute: ApiContentGraphqlRoute,
   ApiEdgeFunctionsTestRoute: ApiEdgeFunctionsTestRoute,

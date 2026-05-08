@@ -48,8 +48,8 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell
 
-- [ ] `routes/project/$ref.tsx` — DefaultLayout + ProjectLayoutWithAuth
-- [ ] `routes/project/$ref/database.tsx` — DatabaseLayout
+- [x] `routes/project/$ref.tsx` — DefaultLayout only. **Delta vs plan:** ProjectLayoutWithAuth omitted from the shell because product layouts (DatabaseLayout, AuthLayout, StorageLayout, …) already render `withAuth(... ProjectLayout ...)` internally — adding it here would double-wrap. The home page (`/project/$ref/index.tsx`) wraps itself in `ProjectLayoutWithAuth` since it has no product layout.
+- [x] `routes/project/$ref/database.tsx` — DatabaseLayout (reads `databaseLayoutTitle` from leaf `staticData`)
 - [ ] `routes/project/$ref/auth.tsx` — AuthLayout
 - [ ] `routes/project/$ref/auth/templates.tsx` — AuthEmailsLayout
 - [ ] `routes/project/$ref/storage.tsx` — StorageLayout
@@ -119,7 +119,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — home
 
-- [ ] `routes/project/$ref/index.tsx` ← `pages/project/[ref]/index.tsx`
+- [x] A `routes/project/$ref/index.tsx` ← `pages/project/[ref]/index.tsx` (route wraps in `ProjectLayoutWithAuth` itself — see shell delta above)
 - [ ] `routes/project/$ref/merge.tsx` ← `pages/project/[ref]/merge.tsx`
 
 ### Project shell — `/api/*`
@@ -128,7 +128,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/database/*`
 
-- [ ] `routes/project/$ref/database/schemas.tsx` ← `pages/project/[ref]/database/schemas.tsx`
+- [x] A `routes/project/$ref/database/schemas.tsx` ← `pages/project/[ref]/database/schemas.tsx`
 - [ ] `routes/project/$ref/database/extensions.tsx` ← `pages/project/[ref]/database/extensions.tsx`
 - [ ] `routes/project/$ref/database/functions.tsx` ← `pages/project/[ref]/database/functions.tsx`
 - [ ] `routes/project/$ref/database/indexes.tsx` ← `pages/project/[ref]/database/indexes.tsx`
