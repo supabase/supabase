@@ -3,34 +3,17 @@ import { toast } from 'sonner'
 
 import type { ProjectAuthConfigData } from './auth-config-query'
 import { authKeys } from './keys'
+import { type AuthTemplateResetType } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.types'
 import { handleError, post } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
-export const AUTH_TEMPLATE_TYPES = [
-  'confirmation',
-  'email-change',
-  'invite',
-  'magic-link',
-  'recovery',
-  'reauthentication',
-  'password-changed-notification',
-  'email-changed-notification',
-  'phone-changed-notification',
-  'mfa-factor-enrolled-notification',
-  'mfa-factor-unenrolled-notification',
-  'identity-linked-notification',
-  'identity-unlinked-notification',
-] as const
-
-export type AuthTemplateType = (typeof AUTH_TEMPLATE_TYPES)[number]
-
-export type AuthTemplateResetVariables = {
+type AuthTemplateResetVariables = {
   projectRef: string
-  template: AuthTemplateType
+  template: AuthTemplateResetType
 }
 
-export async function resetAuthTemplate({ projectRef, template }: AuthTemplateResetVariables) {
+async function resetAuthTemplate({ projectRef, template }: AuthTemplateResetVariables) {
   const { data, error } = await post('/platform/auth/{ref}/templates/{template}/reset', {
     params: { path: { ref: projectRef, template } },
   })

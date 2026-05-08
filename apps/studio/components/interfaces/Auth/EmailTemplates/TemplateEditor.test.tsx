@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
+import { TEMPLATES_SCHEMAS } from './AuthTemplatesValidation'
 import { TemplateEditor } from './TemplateEditor'
 import { render } from '@/tests/helpers'
 

@@ -1,11 +1,8 @@
 import * as z from 'zod'
 
-import type { FormSchema } from '@/types'
+import type { AuthTemplate } from './EmailTemplates.types'
 
-const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
-
-const CONFIRMATION: FormSchema = {
-  $schema: JSON_SCHEMA_VERSION,
+const CONFIRMATION: AuthTemplate = {
   id: 'CONFIRMATION',
   type: 'object',
   title: 'Confirm sign up',
@@ -38,8 +35,7 @@ const CONFIRMATION: FormSchema = {
   },
 }
 
-const INVITE: FormSchema = {
-  $schema: JSON_SCHEMA_VERSION,
+const INVITE: AuthTemplate = {
   id: 'INVITE',
   type: 'object',
   title: 'Invite user',
@@ -72,8 +68,7 @@ const INVITE: FormSchema = {
   },
 }
 
-const MAGIC_LINK: FormSchema = {
-  $schema: JSON_SCHEMA_VERSION,
+const MAGIC_LINK: AuthTemplate = {
   id: 'MAGIC_LINK',
   type: 'object',
   title: 'Magic link',
@@ -106,8 +101,7 @@ const MAGIC_LINK: FormSchema = {
   },
 }
 
-const EMAIL_CHANGE: FormSchema = {
-  $schema: JSON_SCHEMA_VERSION,
+const EMAIL_CHANGE: AuthTemplate = {
   id: 'EMAIL_CHANGE',
   type: 'object',
   title: 'Change email address',
@@ -141,8 +135,7 @@ const EMAIL_CHANGE: FormSchema = {
   },
 }
 
-const RECOVERY: FormSchema = {
-  $schema: JSON_SCHEMA_VERSION,
+const RECOVERY: AuthTemplate = {
   id: 'RECOVERY',
   type: 'object',
   title: 'Reset password',
@@ -174,8 +167,8 @@ const RECOVERY: FormSchema = {
     emailTemplateType: 'authentication',
   },
 }
-const REAUTHENTICATION: FormSchema = {
-  $schema: JSON_SCHEMA_VERSION,
+
+const REAUTHENTICATION: AuthTemplate = {
   id: 'REAUTHENTICATION',
   type: 'object',
   title: 'Reauthentication',
@@ -206,8 +199,7 @@ const REAUTHENTICATION: FormSchema = {
 }
 
 // Notifications
-const PASSWORD_CHANGED_NOTIFICATION: FormSchema = {
-  $schema: JSON_SCHEMA_VERSION,
+const PASSWORD_CHANGED_NOTIFICATION: AuthTemplate = {
   id: 'PASSWORD_CHANGED_NOTIFICATION',
   type: 'object',
   title: 'Password changed',
@@ -235,8 +227,7 @@ const PASSWORD_CHANGED_NOTIFICATION: FormSchema = {
   },
 }
 
-const EMAIL_CHANGED_NOTIFICATION: FormSchema = {
-  $schema: JSON_SCHEMA_VERSION,
+const EMAIL_CHANGED_NOTIFICATION: AuthTemplate = {
   id: 'EMAIL_CHANGED_NOTIFICATION',
   type: 'object',
   title: 'Email address changed',
@@ -265,8 +256,7 @@ const EMAIL_CHANGED_NOTIFICATION: FormSchema = {
   },
 }
 
-const PHONE_CHANGED_NOTIFICATION: FormSchema = {
-  $schema: JSON_SCHEMA_VERSION,
+const PHONE_CHANGED_NOTIFICATION: AuthTemplate = {
   id: 'PHONE_CHANGED_NOTIFICATION',
   type: 'object',
   title: 'Phone number changed',
@@ -296,8 +286,7 @@ const PHONE_CHANGED_NOTIFICATION: FormSchema = {
   },
 }
 
-const IDENTITY_LINKED_NOTIFICATION: FormSchema = {
-  $schema: JSON_SCHEMA_VERSION,
+const IDENTITY_LINKED_NOTIFICATION: AuthTemplate = {
   id: 'IDENTITY_LINKED_NOTIFICATION',
   type: 'object',
   title: 'Identity linked',
@@ -326,8 +315,7 @@ const IDENTITY_LINKED_NOTIFICATION: FormSchema = {
   },
 }
 
-const IDENTITY_UNLINKED_NOTIFICATION: FormSchema = {
-  $schema: JSON_SCHEMA_VERSION,
+const IDENTITY_UNLINKED_NOTIFICATION: AuthTemplate = {
   id: 'IDENTITY_UNLINKED_NOTIFICATION',
   type: 'object',
   title: 'Identity unlinked',
@@ -356,8 +344,7 @@ const IDENTITY_UNLINKED_NOTIFICATION: FormSchema = {
   },
 }
 
-const MFA_FACTOR_ENROLLED_NOTIFICATION: FormSchema = {
-  $schema: JSON_SCHEMA_VERSION,
+const MFA_FACTOR_ENROLLED_NOTIFICATION: AuthTemplate = {
   id: 'MFA_FACTOR_ENROLLED_NOTIFICATION',
   type: 'object',
   title: 'MFA method added',
@@ -386,8 +373,7 @@ const MFA_FACTOR_ENROLLED_NOTIFICATION: FormSchema = {
   },
 }
 
-const MFA_FACTOR_UNENROLLED_NOTIFICATION: FormSchema = {
-  $schema: JSON_SCHEMA_VERSION,
+const MFA_FACTOR_UNENROLLED_NOTIFICATION: AuthTemplate = {
   id: 'MFA_FACTOR_UNENROLLED_NOTIFICATION',
   type: 'object',
   title: 'MFA method removed',

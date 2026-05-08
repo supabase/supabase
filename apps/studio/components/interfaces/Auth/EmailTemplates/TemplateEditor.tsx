@@ -31,21 +31,21 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import type { AuthTemplate } from './EmailTemplates.types'
+import { getAuthTemplateType } from './EmailTemplates.utils'
 import { SpamValidation } from './SpamValidation'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import type { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
-import type { AuthTemplateType } from '@/data/auth/auth-template-reset-mutation'
 import { useAuthTemplateResetMutation } from '@/data/auth/auth-template-reset-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import type { FormSchema } from '@/types'
 
 interface TemplateEditorProps {
-  template: FormSchema
+  template: AuthTemplate
 }
 
 type EmailTemplateContentKey = Extract<
@@ -56,22 +56,6 @@ type EmailTemplateSubjectKey = Exclude<
   Extract<keyof AuthConfigResponse, `MAILER_SUBJECTS_${string}`>,
   'MAILER_SUBJECTS_CUSTOM_CONTENTS'
 >
-
-const AUTH_TEMPLATE_TYPES_BY_ID = {
-  CONFIRMATION: 'confirmation',
-  EMAIL_CHANGE: 'email-change',
-  INVITE: 'invite',
-  MAGIC_LINK: 'magic-link',
-  RECOVERY: 'recovery',
-  REAUTHENTICATION: 'reauthentication',
-  PASSWORD_CHANGED_NOTIFICATION: 'password-changed-notification',
-  EMAIL_CHANGED_NOTIFICATION: 'email-changed-notification',
-  PHONE_CHANGED_NOTIFICATION: 'phone-changed-notification',
-  MFA_FACTOR_ENROLLED_NOTIFICATION: 'mfa-factor-enrolled-notification',
-  MFA_FACTOR_UNENROLLED_NOTIFICATION: 'mfa-factor-unenrolled-notification',
-  IDENTITY_LINKED_NOTIFICATION: 'identity-linked-notification',
-  IDENTITY_UNLINKED_NOTIFICATION: 'identity-unlinked-notification',
-} satisfies Record<string, AuthTemplateType>
 
 export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
@@ -106,7 +90,9 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const subjectSlug = Object.keys(properties).find((key) => key.startsWith('MAILER_SUBJECTS_')) as
     | EmailTemplateSubjectKey
     | undefined
-  const templateType = AUTH_TEMPLATE_TYPES_BY_ID[id as keyof typeof AUTH_TEMPLATE_TYPES_BY_ID]
+
+  const templateType = getAuthTemplateType(id)
+
   const messageProperty = properties[messageSlug]
   const builtInSMTP =
     isSuccess &&

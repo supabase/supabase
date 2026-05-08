@@ -1,0 +1,41 @@
+import z from 'zod'
+
+export type KebabCase<S extends string> = S extends `${infer A}_${infer B}`
+  ? `${Lowercase<A>}-${KebabCase<B>}`
+  : Lowercase<S>
+
+const AUTH_TEMPLATE_TYPES = [
+  'CONFIRMATION',
+  'EMAIL_CHANGE',
+  'INVITE',
+  'MAGIC_LINK',
+  'RECOVERY',
+  'REAUTHENTICATION',
+  'PASSWORD_CHANGED_NOTIFICATION',
+  'EMAIL_CHANGED_NOTIFICATION',
+  'PHONE_CHANGED_NOTIFICATION',
+  'IDENTITY_LINKED_NOTIFICATION',
+  'IDENTITY_UNLINKED_NOTIFICATION',
+  'MFA_FACTOR_ENROLLED_NOTIFICATION',
+  'MFA_FACTOR_UNENROLLED_NOTIFICATION',
+] as const
+
+export type AuthTemplateType = (typeof AUTH_TEMPLATE_TYPES)[number]
+export type AuthTemplateResetType = KebabCase<AuthTemplateType>
+
+export interface AuthTemplate {
+  id: AuthTemplateType
+  type: 'object'
+  title: string
+  purpose: string
+  properties: {
+    [x: string]: {
+      title: string
+      type: 'boolean' | 'string' | 'select' | 'number' | 'code'
+      description?: string
+      descriptionOptional?: string
+    }
+  }
+  validationSchema: z.AnyZodObject
+  misc: { emailTemplateType: 'authentication' | 'security' }
+}

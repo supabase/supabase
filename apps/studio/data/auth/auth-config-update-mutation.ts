@@ -55,7 +55,7 @@ export const useAuthConfigUpdateMutation = ({
 
       await onSuccess?.(data, variables, context)
 
-      void queryClient
+      queryClient
         .invalidateQueries({ queryKey: lintKeys.lint(projectRef) })
         .then(() =>
           queryClient.refetchQueries({

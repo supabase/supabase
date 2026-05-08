@@ -18,7 +18,7 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
-import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
+import { TEMPLATES_SCHEMAS } from './AuthTemplatesValidation'
 import { slugifyTitle } from './EmailTemplates.utils'
 import AlertError from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
