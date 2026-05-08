@@ -198,7 +198,19 @@ LIMIT 1
     handleError(error)
   }
 
-  const row: any = (data as any)?.result?.[0]
+  type OtelLogRow = {
+    id: string
+    timestamp: string
+    source: string
+    event_message: string
+    severity_text?: string
+    // OTEL log_attributes is a Map<String, String> server-side but we treat
+    // values as `any` here because the entry type below has many optional
+    // dotted fields with mixed primitive types.
+    log_attributes?: Record<string, any>
+  }
+  const otelData = data as { result?: OtelLogRow[] } | undefined
+  const row = otelData?.result?.[0]
   if (!row) {
     return { result: [] }
   }
