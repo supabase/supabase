@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowRight, Check, ChevronDown, Minus } from 'lucide-react'
+import { ArrowRight, Check, ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -116,7 +116,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
           {pageData.reasons.map((reason) => (
             <Panel
               key={reason.title}
-              outerClassName="h-full"
+              outerClassName="h-full hover:shadow-none!"
               innerClassName="flex flex-col gap-3 p-8"
             >
               <h3 className="text-foreground text-xl font-medium tracking-tight">{reason.title}</h3>
@@ -126,7 +126,7 @@ export default function PartnersContent({ featuredPartners }: Props) {
         </div>
       </SectionContainer>
 
-      {/* Ways to partner — left-aligned, feature comparison table */}
+      {/* Ways to partner — left-aligned, card grid */}
       <div className="bg-alternative border-y">
         <SectionContainer>
           <SectionHeading
@@ -134,87 +134,54 @@ export default function PartnersContent({ featuredPartners }: Props) {
             title={pageData.waysToPartner.title}
             description={pageData.waysToPartner.description}
           />
-          <div className="mt-10 overflow-x-auto rounded-xl border bg-background">
-            <table className="w-full min-w-[640px] border-collapse text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="w-2/5 px-4 py-4 text-left text-foreground-lighter font-mono text-xs uppercase tracking-wide">
-                    Capability
-                  </th>
-                  {pageData.waysToPartner.tiers.map((tier) => (
-                    <th
-                      key={tier.title}
-                      className="px-4 py-4 text-left text-foreground text-sm font-medium tracking-tight"
-                    >
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {pageData.waysToPartner.tiers.map((tier) => {
+              const timeToLaunch = (tier as { timeToLaunch?: string }).timeToLaunch
+              return (
+                <Panel
+                  key={tier.title}
+                  outerClassName="h-full hover:shadow-none!"
+                  innerClassName="flex flex-col gap-6 p-8 h-full"
+                >
+                  <div className="flex flex-col gap-3">
+                    <h3 className="text-foreground text-xl font-medium tracking-tight">
                       {tier.title}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b">
-                  <th
-                    scope="row"
-                    className="px-4 py-4 text-left text-foreground-lighter font-mono text-xs uppercase tracking-wide align-top"
-                  >
-                    Best for
-                  </th>
-                  {pageData.waysToPartner.tiers.map((tier) => (
-                    <td
-                      key={tier.title}
-                      className="px-4 py-4 text-foreground-light text-pretty align-top"
-                    >
-                      {tier.bestFor}
-                    </td>
-                  ))}
-                </tr>
-                <tr className="border-b">
-                  <th
-                    scope="row"
-                    className="px-4 py-4 text-left text-foreground-lighter font-mono text-xs uppercase tracking-wide align-top"
-                  >
-                    Time to launch
-                  </th>
-                  {pageData.waysToPartner.tiers.map((tier) => (
-                    <td key={tier.title} className="px-4 py-4 text-foreground-light align-top">
-                      {(tier as { timeToLaunch?: string }).timeToLaunch ?? '—'}
-                    </td>
-                  ))}
-                </tr>
-                {[
-                  { label: 'Listed in Partner Catalog', values: [true, true, true] },
-                  { label: 'In-product install surface', values: [false, true, true] },
-                  { label: 'One-click OAuth integration', values: [false, true, false] },
-                  { label: 'Co-marketing on Launch Weeks', values: [true, true, true] },
-                  { label: 'Joint launch treatment', values: [false, true, true] },
-                  { label: 'Custom commercial terms', values: [false, false, true] },
-                ].map((row, i, arr) => (
-                  <tr key={row.label} className={i < arr.length - 1 ? 'border-b' : ''}>
-                    <th
-                      scope="row"
-                      className="px-4 py-3.5 text-left text-foreground-light font-normal align-middle"
-                    >
-                      {row.label}
-                    </th>
-                    {row.values.map((value, j) => (
-                      <td key={j} className="px-4 py-3.5 align-middle">
-                        {value ? (
-                          <Check size={16} className="text-brand shrink-0" aria-label="Included" />
-                        ) : (
-                          <Minus
-                            size={16}
-                            className="text-foreground-muted shrink-0"
-                            aria-label="Not included"
-                          />
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </h3>
+                    <p className="text-foreground-lighter text-sm text-pretty">
+                      {tier.description}
+                    </p>
+                  </div>
+                  <dl className="mt-auto flex flex-col gap-4 pt-4 border-t">
+                    <div className="flex flex-col gap-1">
+                      <dt className="text-foreground-lighter font-mono text-xs uppercase tracking-wide">
+                        Best for
+                      </dt>
+                      <dd className="text-foreground-light text-sm text-pretty">{tier.bestFor}</dd>
+                    </div>
+                    {tier.whatYouGet && (
+                      <div className="flex flex-col gap-1">
+                        <dt className="text-foreground-lighter font-mono text-xs uppercase tracking-wide">
+                          What you get
+                        </dt>
+                        <dd className="text-foreground-light text-sm text-pretty">
+                          {tier.whatYouGet}
+                        </dd>
+                      </div>
+                    )}
+                    {timeToLaunch && (
+                      <div className="flex flex-col gap-1">
+                        <dt className="text-foreground-lighter font-mono text-xs uppercase tracking-wide">
+                          Time to launch
+                        </dt>
+                        <dd className="text-foreground-light text-sm">{timeToLaunch}</dd>
+                      </div>
+                    )}
+                  </dl>
+                </Panel>
+              )
+            })}
           </div>
-          <div className="mt-6 flex justify-start">
+          <div className="mt-8 flex justify-start">
             <Button asChild type="default" size="medium" iconRight={<ArrowRight />}>
               <Link href="#become-a-partner">Apply to partner</Link>
             </Button>
@@ -268,7 +235,10 @@ export default function PartnersContent({ featuredPartners }: Props) {
           <ol role="list" className="mt-12 grid gap-6 md:grid-cols-3">
             {pageData.howToApply.steps.map((step, i) => (
               <li key={step.title}>
-                <Panel outerClassName="h-full" innerClassName="flex flex-col gap-3 p-8 h-full">
+                <Panel
+                  outerClassName="h-full hover:shadow-none!"
+                  innerClassName="flex flex-col gap-3 p-8 h-full"
+                >
                   <span className="text-foreground-lighter font-mono text-sm tabular-nums">
                     {String(i + 1).padStart(2, '0')}
                   </span>
