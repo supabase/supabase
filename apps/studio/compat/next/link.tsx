@@ -64,32 +64,51 @@ function resolveHref(href: string | UrlObject): string {
 
 // TanStack Link's `to` prop is a route-pattern path; query params and hash
 // must be passed separately via `search` / `hash`. Studio code (and Next's
-// own contract) routinely passes a single composed string like
-// `/project/abc/editor/123?schema=public` as the href. If we forward that
-// straight through, TanStack ends up matching the literal path-with-query
-// against its known route patterns, fails to find one, and falls back to
-// native browser navigation — which the user sees as a full page reload
-// (concretely: clicking a table in the editor sidebar).
+// own contract) routinely passes one of three href shapes:
+//   1. a relative path like `/project/abc/editor/123?schema=public`
+//   2. a same-origin absolute URL produced by `new URL(...).toString()`,
+//      e.g. `http://localhost:8082/project/abc/editor/123?schema=public`
+//      (this is what `buildTableEditorUrl` does)
+//   3. a genuinely external URL like `https://supabase.com/docs`.
 //
-// Split the resolved string into its three parts so TanStack can route
-// internally. External URLs (anything with a scheme or `//`) are left
-// untouched — TanStack's own external-link path handles those.
+// If we forward any of these straight through to TanStack as `to`, TanStack
+// either fails to match a known route pattern (#1 with query) or treats
+// the whole thing as external (#2) and falls back to native browser
+// navigation — which the user sees as a full page reload.
+//
+// Split into three parts: pathname, search, hash. Same-origin absolute
+// URLs are normalised to a relative path. Cross-origin URLs are left
+// alone so TanStack's external-link path handles them.
 function splitInternalUrl(url: string): {
   to: string
   search?: Record<string, string>
   hash?: string
 } {
-  // External / protocol-relative — bail out, let TanStack treat it as-is.
-  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(url) || url.startsWith('//')) {
+  // Try to detect cross-origin absolute URLs cheaply before paying for a
+  // full parse. Protocol-relative URLs (`//host/...`) are always external.
+  if (url.startsWith('//')) {
     return { to: url }
   }
 
-  // Use a placeholder origin so URL parsing accepts a relative input. The
-  // origin is discarded; only pathname/search/hash are kept.
+  // Use the document origin as the parse base so relative inputs resolve.
+  // SSR has no `location`; fall back to a placeholder host that won't ever
+  // collide with a real one.
+  const base =
+    typeof window !== 'undefined' && window.location ? window.location.origin : 'http://_/'
+
   let parsed: URL
   try {
-    parsed = new URL(url, 'http://_')
+    parsed = new URL(url, base)
   } catch {
+    return { to: url }
+  }
+
+  // Cross-origin → leave for TanStack to handle as external.
+  if (
+    typeof window !== 'undefined' &&
+    window.location &&
+    parsed.origin !== window.location.origin
+  ) {
     return { to: url }
   }
 
