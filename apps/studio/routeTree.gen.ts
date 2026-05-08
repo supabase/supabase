@@ -72,8 +72,10 @@ import { Route as ProjectRefDatabaseColumnPrivilegesRouteImport } from './routes
 import { Route as ProjectRefAuthUsersRouteImport } from './routes/project/$ref/auth/users'
 import { Route as ProjectRefAuthUrlConfigurationRouteImport } from './routes/project/$ref/auth/url-configuration'
 import { Route as ProjectRefAuthThirdPartyRouteImport } from './routes/project/$ref/auth/third-party'
+import { Route as ProjectRefAuthSmtpRouteImport } from './routes/project/$ref/auth/smtp'
 import { Route as ProjectRefAuthSessionsRouteImport } from './routes/project/$ref/auth/sessions'
 import { Route as ProjectRefAuthRateLimitsRouteImport } from './routes/project/$ref/auth/rate-limits'
+import { Route as ProjectRefAuthProvidersRouteImport } from './routes/project/$ref/auth/providers'
 import { Route as ProjectRefAuthProtectionRouteImport } from './routes/project/$ref/auth/protection'
 import { Route as ProjectRefAuthPoliciesRouteImport } from './routes/project/$ref/auth/policies'
 import { Route as ProjectRefAuthPerformanceRouteImport } from './routes/project/$ref/auth/performance'
@@ -111,6 +113,7 @@ import { Route as ProjectRefDatabaseTriggersIndexRouteImport } from './routes/pr
 import { Route as ProjectRefDatabaseTablesIndexRouteImport } from './routes/project/$ref/database/tables/index'
 import { Route as ProjectRefDatabaseReplicationIndexRouteImport } from './routes/project/$ref/database/replication/index'
 import { Route as ProjectRefDatabasePublicationsIndexRouteImport } from './routes/project/$ref/database/publications/index'
+import { Route as ProjectRefAuthTemplatesIndexRouteImport } from './routes/project/$ref/auth/templates/index'
 import { Route as ApiPlatformProjectsRefIndexRouteImport } from './routes/api/platform/projects/$ref/index'
 import { Route as AppOrgSlugWebhooksIndexRouteImport } from './routes/_app/org/$slug/webhooks/index'
 import { Route as AppOrgSlugPrivateAppsIndexRouteImport } from './routes/_app/org/$slug/private-apps/index'
@@ -122,6 +125,7 @@ import { Route as ProjectRefDatabasePublicationsIdRouteImport } from './routes/p
 import { Route as ProjectRefDatabaseBackupsScheduledRouteImport } from './routes/project/$ref/database/backups/scheduled'
 import { Route as ProjectRefDatabaseBackupsRestoreToNewProjectRouteImport } from './routes/project/$ref/database/backups/restore-to-new-project'
 import { Route as ProjectRefDatabaseBackupsPitrRouteImport } from './routes/project/$ref/database/backups/pitr'
+import { Route as ProjectRefAuthTemplatesTemplateIdRouteImport } from './routes/project/$ref/auth/templates/$templateId'
 import { Route as ApiV1ProjectsRefApiKeysRouteImport } from './routes/api/v1/projects/$ref/api-keys'
 import { Route as ApiPlatformPropsOrgSlugRouteImport } from './routes/api/platform/props/org/$slug'
 import { Route as ApiPlatformProjectsRefSettingsRouteImport } from './routes/api/platform/projects/$ref/settings'
@@ -514,6 +518,11 @@ const ProjectRefAuthThirdPartyRoute =
     path: '/third-party',
     getParentRoute: () => ProjectRefAuthRoute,
   } as any)
+const ProjectRefAuthSmtpRoute = ProjectRefAuthSmtpRouteImport.update({
+  id: '/smtp',
+  path: '/smtp',
+  getParentRoute: () => ProjectRefAuthRoute,
+} as any)
 const ProjectRefAuthSessionsRoute = ProjectRefAuthSessionsRouteImport.update({
   id: '/sessions',
   path: '/sessions',
@@ -525,6 +534,11 @@ const ProjectRefAuthRateLimitsRoute =
     path: '/rate-limits',
     getParentRoute: () => ProjectRefAuthRoute,
   } as any)
+const ProjectRefAuthProvidersRoute = ProjectRefAuthProvidersRouteImport.update({
+  id: '/providers',
+  path: '/providers',
+  getParentRoute: () => ProjectRefAuthRoute,
+} as any)
 const ProjectRefAuthProtectionRoute =
   ProjectRefAuthProtectionRouteImport.update({
     id: '/protection',
@@ -719,6 +733,12 @@ const ProjectRefDatabasePublicationsIndexRoute =
     path: '/publications/',
     getParentRoute: () => ProjectRefDatabaseRoute,
   } as any)
+const ProjectRefAuthTemplatesIndexRoute =
+  ProjectRefAuthTemplatesIndexRouteImport.update({
+    id: '/templates/',
+    path: '/templates/',
+    getParentRoute: () => ProjectRefAuthRoute,
+  } as any)
 const ApiPlatformProjectsRefIndexRoute =
   ApiPlatformProjectsRefIndexRouteImport.update({
     id: '/api/platform/projects/$ref/',
@@ -783,6 +803,12 @@ const ProjectRefDatabaseBackupsPitrRoute =
     id: '/backups/pitr',
     path: '/backups/pitr',
     getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
+const ProjectRefAuthTemplatesTemplateIdRoute =
+  ProjectRefAuthTemplatesTemplateIdRouteImport.update({
+    id: '/templates/$templateId',
+    path: '/templates/$templateId',
+    getParentRoute: () => ProjectRefAuthRoute,
   } as any)
 const ApiV1ProjectsRefApiKeysRoute = ApiV1ProjectsRefApiKeysRouteImport.update({
   id: '/api/v1/projects/$ref/api-keys',
@@ -1231,8 +1257,10 @@ export interface FileRoutesByFullPath {
   '/project/$ref/auth/performance': typeof ProjectRefAuthPerformanceRoute
   '/project/$ref/auth/policies': typeof ProjectRefAuthPoliciesRoute
   '/project/$ref/auth/protection': typeof ProjectRefAuthProtectionRoute
+  '/project/$ref/auth/providers': typeof ProjectRefAuthProvidersRoute
   '/project/$ref/auth/rate-limits': typeof ProjectRefAuthRateLimitsRoute
   '/project/$ref/auth/sessions': typeof ProjectRefAuthSessionsRoute
+  '/project/$ref/auth/smtp': typeof ProjectRefAuthSmtpRoute
   '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
@@ -1277,6 +1305,7 @@ export interface FileRoutesByFullPath {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/project/$ref/auth/templates/$templateId': typeof ProjectRefAuthTemplatesTemplateIdRoute
   '/project/$ref/database/backups/pitr': typeof ProjectRefDatabaseBackupsPitrRoute
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
@@ -1288,6 +1317,7 @@ export interface FileRoutesByFullPath {
   '/org/$slug/private-apps/': typeof AppOrgSlugPrivateAppsIndexRoute
   '/org/$slug/webhooks/': typeof AppOrgSlugWebhooksIndexRoute
   '/api/platform/projects/$ref/': typeof ApiPlatformProjectsRefIndexRoute
+  '/project/$ref/auth/templates/': typeof ProjectRefAuthTemplatesIndexRoute
   '/project/$ref/database/publications/': typeof ProjectRefDatabasePublicationsIndexRoute
   '/project/$ref/database/replication/': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables/': typeof ProjectRefDatabaseTablesIndexRoute
@@ -1404,8 +1434,10 @@ export interface FileRoutesByTo {
   '/project/$ref/auth/performance': typeof ProjectRefAuthPerformanceRoute
   '/project/$ref/auth/policies': typeof ProjectRefAuthPoliciesRoute
   '/project/$ref/auth/protection': typeof ProjectRefAuthProtectionRoute
+  '/project/$ref/auth/providers': typeof ProjectRefAuthProvidersRoute
   '/project/$ref/auth/rate-limits': typeof ProjectRefAuthRateLimitsRoute
   '/project/$ref/auth/sessions': typeof ProjectRefAuthSessionsRoute
+  '/project/$ref/auth/smtp': typeof ProjectRefAuthSmtpRoute
   '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
@@ -1449,6 +1481,7 @@ export interface FileRoutesByTo {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/project/$ref/auth/templates/$templateId': typeof ProjectRefAuthTemplatesTemplateIdRoute
   '/project/$ref/database/backups/pitr': typeof ProjectRefDatabaseBackupsPitrRoute
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
@@ -1460,6 +1493,7 @@ export interface FileRoutesByTo {
   '/org/$slug/private-apps': typeof AppOrgSlugPrivateAppsIndexRoute
   '/org/$slug/webhooks': typeof AppOrgSlugWebhooksIndexRoute
   '/api/platform/projects/$ref': typeof ApiPlatformProjectsRefIndexRoute
+  '/project/$ref/auth/templates': typeof ProjectRefAuthTemplatesIndexRoute
   '/project/$ref/database/publications': typeof ProjectRefDatabasePublicationsIndexRoute
   '/project/$ref/database/replication': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables': typeof ProjectRefDatabaseTablesIndexRoute
@@ -1581,8 +1615,10 @@ export interface FileRoutesById {
   '/project/$ref/auth/performance': typeof ProjectRefAuthPerformanceRoute
   '/project/$ref/auth/policies': typeof ProjectRefAuthPoliciesRoute
   '/project/$ref/auth/protection': typeof ProjectRefAuthProtectionRoute
+  '/project/$ref/auth/providers': typeof ProjectRefAuthProvidersRoute
   '/project/$ref/auth/rate-limits': typeof ProjectRefAuthRateLimitsRoute
   '/project/$ref/auth/sessions': typeof ProjectRefAuthSessionsRoute
+  '/project/$ref/auth/smtp': typeof ProjectRefAuthSmtpRoute
   '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
@@ -1627,6 +1663,7 @@ export interface FileRoutesById {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/project/$ref/auth/templates/$templateId': typeof ProjectRefAuthTemplatesTemplateIdRoute
   '/project/$ref/database/backups/pitr': typeof ProjectRefDatabaseBackupsPitrRoute
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
@@ -1638,6 +1675,7 @@ export interface FileRoutesById {
   '/_app/org/$slug/private-apps/': typeof AppOrgSlugPrivateAppsIndexRoute
   '/_app/org/$slug/webhooks/': typeof AppOrgSlugWebhooksIndexRoute
   '/api/platform/projects/$ref/': typeof ApiPlatformProjectsRefIndexRoute
+  '/project/$ref/auth/templates/': typeof ProjectRefAuthTemplatesIndexRoute
   '/project/$ref/database/publications/': typeof ProjectRefDatabasePublicationsIndexRoute
   '/project/$ref/database/replication/': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables/': typeof ProjectRefDatabaseTablesIndexRoute
@@ -1758,8 +1796,10 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/performance'
     | '/project/$ref/auth/policies'
     | '/project/$ref/auth/protection'
+    | '/project/$ref/auth/providers'
     | '/project/$ref/auth/rate-limits'
     | '/project/$ref/auth/sessions'
+    | '/project/$ref/auth/smtp'
     | '/project/$ref/auth/third-party'
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
@@ -1804,6 +1844,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/project/$ref/auth/templates/$templateId'
     | '/project/$ref/database/backups/pitr'
     | '/project/$ref/database/backups/restore-to-new-project'
     | '/project/$ref/database/backups/scheduled'
@@ -1815,6 +1856,7 @@ export interface FileRouteTypes {
     | '/org/$slug/private-apps/'
     | '/org/$slug/webhooks/'
     | '/api/platform/projects/$ref/'
+    | '/project/$ref/auth/templates/'
     | '/project/$ref/database/publications/'
     | '/project/$ref/database/replication/'
     | '/project/$ref/database/tables/'
@@ -1931,8 +1973,10 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/performance'
     | '/project/$ref/auth/policies'
     | '/project/$ref/auth/protection'
+    | '/project/$ref/auth/providers'
     | '/project/$ref/auth/rate-limits'
     | '/project/$ref/auth/sessions'
+    | '/project/$ref/auth/smtp'
     | '/project/$ref/auth/third-party'
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
@@ -1976,6 +2020,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/project/$ref/auth/templates/$templateId'
     | '/project/$ref/database/backups/pitr'
     | '/project/$ref/database/backups/restore-to-new-project'
     | '/project/$ref/database/backups/scheduled'
@@ -1987,6 +2032,7 @@ export interface FileRouteTypes {
     | '/org/$slug/private-apps'
     | '/org/$slug/webhooks'
     | '/api/platform/projects/$ref'
+    | '/project/$ref/auth/templates'
     | '/project/$ref/database/publications'
     | '/project/$ref/database/replication'
     | '/project/$ref/database/tables'
@@ -2107,8 +2153,10 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/performance'
     | '/project/$ref/auth/policies'
     | '/project/$ref/auth/protection'
+    | '/project/$ref/auth/providers'
     | '/project/$ref/auth/rate-limits'
     | '/project/$ref/auth/sessions'
+    | '/project/$ref/auth/smtp'
     | '/project/$ref/auth/third-party'
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
@@ -2153,6 +2201,7 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/project/$ref/auth/templates/$templateId'
     | '/project/$ref/database/backups/pitr'
     | '/project/$ref/database/backups/restore-to-new-project'
     | '/project/$ref/database/backups/scheduled'
@@ -2164,6 +2213,7 @@ export interface FileRouteTypes {
     | '/_app/org/$slug/private-apps/'
     | '/_app/org/$slug/webhooks/'
     | '/api/platform/projects/$ref/'
+    | '/project/$ref/auth/templates/'
     | '/project/$ref/database/publications/'
     | '/project/$ref/database/replication/'
     | '/project/$ref/database/tables/'
@@ -2752,6 +2802,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefAuthThirdPartyRouteImport
       parentRoute: typeof ProjectRefAuthRoute
     }
+    '/project/$ref/auth/smtp': {
+      id: '/project/$ref/auth/smtp'
+      path: '/smtp'
+      fullPath: '/project/$ref/auth/smtp'
+      preLoaderRoute: typeof ProjectRefAuthSmtpRouteImport
+      parentRoute: typeof ProjectRefAuthRoute
+    }
     '/project/$ref/auth/sessions': {
       id: '/project/$ref/auth/sessions'
       path: '/sessions'
@@ -2764,6 +2821,13 @@ declare module '@tanstack/react-router' {
       path: '/rate-limits'
       fullPath: '/project/$ref/auth/rate-limits'
       preLoaderRoute: typeof ProjectRefAuthRateLimitsRouteImport
+      parentRoute: typeof ProjectRefAuthRoute
+    }
+    '/project/$ref/auth/providers': {
+      id: '/project/$ref/auth/providers'
+      path: '/providers'
+      fullPath: '/project/$ref/auth/providers'
+      preLoaderRoute: typeof ProjectRefAuthProvidersRouteImport
       parentRoute: typeof ProjectRefAuthRoute
     }
     '/project/$ref/auth/protection': {
@@ -3025,6 +3089,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefDatabasePublicationsIndexRouteImport
       parentRoute: typeof ProjectRefDatabaseRoute
     }
+    '/project/$ref/auth/templates/': {
+      id: '/project/$ref/auth/templates/'
+      path: '/templates'
+      fullPath: '/project/$ref/auth/templates/'
+      preLoaderRoute: typeof ProjectRefAuthTemplatesIndexRouteImport
+      parentRoute: typeof ProjectRefAuthRoute
+    }
     '/api/platform/projects/$ref/': {
       id: '/api/platform/projects/$ref/'
       path: '/api/platform/projects/$ref'
@@ -3101,6 +3172,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/database/backups/pitr'
       preLoaderRoute: typeof ProjectRefDatabaseBackupsPitrRouteImport
       parentRoute: typeof ProjectRefDatabaseRoute
+    }
+    '/project/$ref/auth/templates/$templateId': {
+      id: '/project/$ref/auth/templates/$templateId'
+      path: '/templates/$templateId'
+      fullPath: '/project/$ref/auth/templates/$templateId'
+      preLoaderRoute: typeof ProjectRefAuthTemplatesTemplateIdRouteImport
+      parentRoute: typeof ProjectRefAuthRoute
     }
     '/api/v1/projects/$ref/api-keys': {
       id: '/api/v1/projects/$ref/api-keys'
@@ -3651,11 +3729,15 @@ interface ProjectRefAuthRouteChildren {
   ProjectRefAuthPerformanceRoute: typeof ProjectRefAuthPerformanceRoute
   ProjectRefAuthPoliciesRoute: typeof ProjectRefAuthPoliciesRoute
   ProjectRefAuthProtectionRoute: typeof ProjectRefAuthProtectionRoute
+  ProjectRefAuthProvidersRoute: typeof ProjectRefAuthProvidersRoute
   ProjectRefAuthRateLimitsRoute: typeof ProjectRefAuthRateLimitsRoute
   ProjectRefAuthSessionsRoute: typeof ProjectRefAuthSessionsRoute
+  ProjectRefAuthSmtpRoute: typeof ProjectRefAuthSmtpRoute
   ProjectRefAuthThirdPartyRoute: typeof ProjectRefAuthThirdPartyRoute
   ProjectRefAuthUrlConfigurationRoute: typeof ProjectRefAuthUrlConfigurationRoute
   ProjectRefAuthUsersRoute: typeof ProjectRefAuthUsersRoute
+  ProjectRefAuthTemplatesTemplateIdRoute: typeof ProjectRefAuthTemplatesTemplateIdRoute
+  ProjectRefAuthTemplatesIndexRoute: typeof ProjectRefAuthTemplatesIndexRoute
 }
 
 const ProjectRefAuthRouteChildren: ProjectRefAuthRouteChildren = {
@@ -3669,11 +3751,16 @@ const ProjectRefAuthRouteChildren: ProjectRefAuthRouteChildren = {
   ProjectRefAuthPerformanceRoute: ProjectRefAuthPerformanceRoute,
   ProjectRefAuthPoliciesRoute: ProjectRefAuthPoliciesRoute,
   ProjectRefAuthProtectionRoute: ProjectRefAuthProtectionRoute,
+  ProjectRefAuthProvidersRoute: ProjectRefAuthProvidersRoute,
   ProjectRefAuthRateLimitsRoute: ProjectRefAuthRateLimitsRoute,
   ProjectRefAuthSessionsRoute: ProjectRefAuthSessionsRoute,
+  ProjectRefAuthSmtpRoute: ProjectRefAuthSmtpRoute,
   ProjectRefAuthThirdPartyRoute: ProjectRefAuthThirdPartyRoute,
   ProjectRefAuthUrlConfigurationRoute: ProjectRefAuthUrlConfigurationRoute,
   ProjectRefAuthUsersRoute: ProjectRefAuthUsersRoute,
+  ProjectRefAuthTemplatesTemplateIdRoute:
+    ProjectRefAuthTemplatesTemplateIdRoute,
+  ProjectRefAuthTemplatesIndexRoute: ProjectRefAuthTemplatesIndexRoute,
 }
 
 const ProjectRefAuthRouteWithChildren = ProjectRefAuthRoute._addFileChildren(
