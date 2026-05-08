@@ -3,20 +3,22 @@
 import { useState } from 'react'
 
 const colorNames = [
-  'Gray',
-  'Slate',
-  'Tomato',
-  'Red',
+  'Amber',
+  'Blue',
+  'Brand',
   'Crimson',
+  'Gold',
+  'Gray',
+  'Green',
+  'Indigo',
+  'Orange',
   'Pink',
   'Purple',
+  'Red',
+  'Scale',
+  'Slate',
+  'Tomato',
   'Violet',
-  'Indigo',
-  'Blue',
-  'Green',
-  'Gold',
-  'Orange',
-  'Amber',
   'Yellow',
 ]
 
