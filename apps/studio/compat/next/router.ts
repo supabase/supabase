@@ -23,8 +23,15 @@ export function useRouter() {
   const params = useParams({ strict: false })
   const search = useSearch({ strict: false })
   const leafRouteId = matches[matches.length - 1]?.routeId ?? location.pathname
+  const pathPattern = toNextPathPattern(leafRouteId)
   return {
-    pathname: toNextPathPattern(leafRouteId),
+    pathname: pathPattern,
+    // Next's pages-router exposes `route` and `pathname` as the same value
+    // — the route pattern with bracketed dynamic segments. Some studio
+    // code (e.g. AppLayout/BranchLink, AppLayout/ProjectDropdown) reads
+    // `router.route` specifically; without this it's `undefined` and
+    // downstream `.split('/')` calls crash.
+    route: pathPattern,
     query: { ...params, ...search },
     asPath: location.href,
     basePath: router.basepath ?? '',

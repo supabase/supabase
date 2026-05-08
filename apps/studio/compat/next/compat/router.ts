@@ -22,8 +22,12 @@ export function useRouter() {
   const params = useParams({ strict: false })
   const search = useSearch({ strict: false })
   const leafRouteId = matches[matches.length - 1]?.routeId ?? location.pathname
+  const pathPattern = toNextPathPattern(leafRouteId)
   return {
-    pathname: toNextPathPattern(leafRouteId),
+    pathname: pathPattern,
+    // Match pages-router: `route` mirrors `pathname` (the bracketed
+    // pattern). Studio call sites read `router.route` directly.
+    route: pathPattern,
     query: { ...params, ...search },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     push: (path: string) => router.navigate({ to: path as any }),
