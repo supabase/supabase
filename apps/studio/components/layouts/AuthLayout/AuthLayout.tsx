@@ -4,8 +4,8 @@ import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { useGenerateAuthMenu } from './AuthLayout.utils'
-import { AuthNavShortcuts } from '@/components/interfaces/AuthNavShortcuts'
 import { ProductMenu } from '@/components/ui/ProductMenu'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { useAuthConfigPrefetch } from '@/data/auth/auth-config-query'
 import { withAuth } from '@/hooks/misc/withAuth'
 
@@ -21,14 +21,21 @@ export const AuthProductMenu = () => {
 }
 
 const AuthLayout = ({ title, children }: PropsWithChildren<{ title: string }>) => {
+  const router = useRouter()
+  const { ref: projectRef = 'default' } = useParams()
+
+  useAuthConfigPrefetch({ projectRef })
+  const page = router.pathname.split('/')[4]
+  const menu = useGenerateAuthMenu()
+
   return (
     <ProjectLayout
       product="Authentication"
       browserTitle={{ section: title }}
-      productMenu={<AuthProductMenu />}
+      productMenu={<ProductMenu page={page} menu={menu} />}
       isBlocking={false}
     >
-      <AuthNavShortcuts />
+      <ProductMenuShortcuts menu={menu} />
       {children}
     </ProjectLayout>
   )
