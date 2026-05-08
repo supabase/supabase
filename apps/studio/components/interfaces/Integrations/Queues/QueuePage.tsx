@@ -34,7 +34,10 @@ export const QueuePage = () => {
     connectionString: project?.connectionString,
   })
 
-  const currentQueue = queues?.find((queue) => queue.queue_name === childId)
+  // pgmq is case-insensitive when storing queue names — compare lowercased to be safe
+  const currentQueue = queues?.find(
+    (queue) => queue.queue_name.toLowerCase() === childId?.toLowerCase()
+  )
 
   const pageTitle = childLabel || childId || 'Queue'
 

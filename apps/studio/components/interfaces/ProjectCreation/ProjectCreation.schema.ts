@@ -17,6 +17,7 @@ export const FormSchema = z
     postgresVersion: z.string({
       required_error: 'Please enter a Postgres version.',
     }),
+    instanceType: z.string().optional(),
     dbRegion: z.string({
       required_error: 'Please select a region.',
     }),
@@ -33,6 +34,9 @@ export const FormSchema = z
     dbPassStrengthMessage: z.string().default(''),
     dbPassStrengthWarning: z.string().default(''),
     instanceSize: z.string().optional(),
+    githubRepositoryId: z.string().optional().default(''),
+    githubInstallationId: z.number().optional(),
+    githubRepositoryName: z.string().optional().default(''),
     dataApi: z.boolean(),
     dataApiDefaultPrivileges: z.boolean(),
     enableRlsEventTrigger: z.boolean(),

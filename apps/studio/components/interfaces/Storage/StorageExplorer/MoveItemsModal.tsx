@@ -1,6 +1,7 @@
 import { noop } from 'lodash'
 import { useEffect, useState } from 'react'
-import { Button, Input, Modal } from 'ui'
+import { Button, Input_Shadcn_ as Input, Modal } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { StorageItemWithColumn } from '../Storage.types'
 
@@ -68,18 +69,20 @@ export const MoveItemsModal = ({
     >
       <Modal.Content>
         <form>
-          <div className="relative flex items-center">
+          <FormItemLayout
+            label={`Path to new directory in ${bucketName}`}
+            description="Leave blank to move items to the root of the bucket"
+            layout="vertical"
+            isReactForm={false}
+          >
             <Input
               autoFocus
-              label={`Path to new directory in ${bucketName}`}
               type="text"
-              className="w-full"
               placeholder="e.g folder1/subfolder2"
               value={newPath}
-              descriptionText="Leave blank to move items to the root of the bucket"
               onChange={(event) => setNewPath(event.target.value)}
             />
-          </div>
+          </FormItemLayout>
 
           <button className="hidden" type="submit" onClick={onConfirmMove} />
         </form>

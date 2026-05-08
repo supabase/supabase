@@ -14,9 +14,9 @@ import {
   Form,
   FormControl,
   FormField,
-  Input,
   Input_Shadcn_,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -149,15 +149,25 @@ export const CreateNewProjectDialog = ({
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItemLayout>
+                  <FormItemLayout
+                    label="Database password"
+                    description={
+                      <PasswordStrengthBar
+                        passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
+                        password={field.value}
+                        passwordStrengthMessage={passwordStrengthMessage}
+                        generateStrongPassword={generatePassword}
+                      />
+                    }
+                  >
                     <FormControl>
                       <Input
                         id="db-password"
-                        label="Database password"
                         type="password"
                         placeholder="Type in a strong password"
                         value={field.value}
                         copy={field.value?.length > 0}
+                        reveal
                         onChange={(e) => {
                           const value = e.target.value
                           field.onChange(value)
@@ -166,14 +176,6 @@ export const CreateNewProjectDialog = ({
                             setPasswordStrengthMessage('')
                           } else checkPasswordStrength(value)
                         }}
-                        descriptionText={
-                          <PasswordStrengthBar
-                            passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
-                            password={field.value}
-                            passwordStrengthMessage={passwordStrengthMessage}
-                            generateStrongPassword={generatePassword}
-                          />
-                        }
                       />
                     </FormControl>
                   </FormItemLayout>
