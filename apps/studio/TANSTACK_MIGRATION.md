@@ -76,7 +76,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - ~~`routes/project/$ref/auth/templates.tsx` — AuthEmailsLayout~~ **Delta vs plan: not landed.** A unified `templates.tsx` sub-shell would force `templates/$templateId.tsx` (which uses plain `AuthLayout`, not `AuthEmailsLayout`) into the wrong wrapping. Instead `templates/index.tsx` and `auth/smtp.tsx` each set `skipAuthLayout: true` and wrap themselves in `AuthEmailsLayout`; `templates/$templateId.tsx` uses the standard auth shell with `authLayoutTitle: 'Emails'`.
 - [x] `routes/project/$ref/storage.tsx` — StorageLayout + StorageBucketsLayout (reads `storageLayoutTitle`, optional `skipStorageBucketsLayout`, `storageBucketsLayoutTitle`, `storageBucketsLayoutHideSubtitle` from leaf `staticData`). **Delta vs plan:** the shell wraps in BOTH StorageLayout and StorageBucketsLayout by default — every storage page except bucket-detail pages uses both. Bucket-detail pages set `skipStorageBucketsLayout: true`. `/storage/s3` uses `storageBucketsLayout{Title,HideSubtitle}` to override the inner header.
 - [x] `routes/project/$ref/realtime.tsx` — RealtimeLayout (reads `realtimeLayoutTitle` from leaf `staticData`)
-- [ ] `routes/project/$ref/functions.tsx` — EdgeFunctionsLayout
+- [x] `routes/project/$ref/functions.tsx` — EdgeFunctionsLayout (reads `functionsLayoutTitle` from leaf `staticData`). Honours `skipFunctionsLayout: true` opt-out for the `$functionSlug` subtree, whose `EdgeFunctionDetailsLayout` already wraps `EdgeFunctionsLayout` internally — same pattern as auth.tsx. Sub-shell at `routes/project/$ref/functions/$functionSlug.tsx` provides `EdgeFunctionDetailsLayout` for all 5 slug leaves (reads `edgeFunctionDetailsTitle` from leaf staticData).
 - [x] `routes/project/$ref/branches.tsx` — BranchLayout only. **Delta vs plan:** the per-page `PageLayout` (with different titles + primary/secondary actions) stays in each leaf. Hoisted `BranchesPageWrapper` and `MergeRequestsPageWrapper` to top-level exports in their respective `pages/...` files so the route files can import + re-use the same wrapping.
 - [ ] `routes/project/$ref/logs.tsx` — LogsLayout
 - [ ] `routes/project/$ref/observability.tsx` — ObservabilityLayout
@@ -215,14 +215,14 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/functions/*`
 
-- [ ] `routes/project/$ref/functions/index.tsx` ← `pages/project/[ref]/functions/index.tsx`
-- [ ] `routes/project/$ref/functions/new.tsx` ← `pages/project/[ref]/functions/new.tsx`
-- [ ] `routes/project/$ref/functions/secrets.tsx` ← `pages/project/[ref]/functions/secrets.tsx`
-- [ ] `routes/project/$ref/functions/$functionSlug/index.tsx` ← `pages/project/[ref]/functions/[functionSlug]/index.tsx`
-- [ ] `routes/project/$ref/functions/$functionSlug/code.tsx` ← `pages/project/[ref]/functions/[functionSlug]/code.tsx`
-- [ ] `routes/project/$ref/functions/$functionSlug/details.tsx` ← `pages/project/[ref]/functions/[functionSlug]/details.tsx`
-- [ ] `routes/project/$ref/functions/$functionSlug/invocations.tsx` ← `pages/project/[ref]/functions/[functionSlug]/invocations.tsx`
-- [ ] `routes/project/$ref/functions/$functionSlug/logs.tsx` ← `pages/project/[ref]/functions/[functionSlug]/logs.tsx`
+- [x] A `routes/project/$ref/functions/index.tsx` ← `pages/project/[ref]/functions/index.tsx` (route wraps in exported `EdgeFunctionsIndexPageWrapper` for the inline PageHeader + actions)
+- [x] A `routes/project/$ref/functions/new.tsx` ← `pages/project/[ref]/functions/new.tsx`
+- [x] A `routes/project/$ref/functions/secrets.tsx` ← `pages/project/[ref]/functions/secrets.tsx` (route wraps in exported `SecretsPageWrapper`)
+- [x] A `routes/project/$ref/functions/$functionSlug/index.tsx` ← `pages/project/[ref]/functions/[functionSlug]/index.tsx`
+- [x] A `routes/project/$ref/functions/$functionSlug/code.tsx` ← `pages/project/[ref]/functions/[functionSlug]/code.tsx`
+- [x] A `routes/project/$ref/functions/$functionSlug/details.tsx` ← `pages/project/[ref]/functions/[functionSlug]/details.tsx`
+- [x] A `routes/project/$ref/functions/$functionSlug/invocations.tsx` ← `pages/project/[ref]/functions/[functionSlug]/invocations.tsx`
+- [x] A `routes/project/$ref/functions/$functionSlug/logs.tsx` ← `pages/project/[ref]/functions/[functionSlug]/logs.tsx`
 
 ### Project shell — `/branches/*`
 

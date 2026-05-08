@@ -78,6 +78,7 @@ import { Route as ProjectRefRealtimePoliciesRouteImport } from './routes/project
 import { Route as ProjectRefRealtimeInspectorRouteImport } from './routes/project/$ref/realtime/inspector'
 import { Route as ProjectRefFunctionsSecretsRouteImport } from './routes/project/$ref/functions/secrets'
 import { Route as ProjectRefFunctionsNewRouteImport } from './routes/project/$ref/functions/new'
+import { Route as ProjectRefFunctionsFunctionSlugRouteImport } from './routes/project/$ref/functions/$functionSlug'
 import { Route as ProjectRefEditorNewRouteImport } from './routes/project/$ref/editor/new'
 import { Route as ProjectRefEditorIdRouteImport } from './routes/project/$ref/editor/$id'
 import { Route as ProjectRefDatabaseTypesRouteImport } from './routes/project/$ref/database/types'
@@ -134,6 +135,7 @@ import { Route as AppAccountTokensScopedRouteImport } from './routes/_app/accoun
 import { Route as ProjectRefStorageVectorsIndexRouteImport } from './routes/project/$ref/storage/vectors/index'
 import { Route as ProjectRefStorageFilesIndexRouteImport } from './routes/project/$ref/storage/files/index'
 import { Route as ProjectRefStorageAnalyticsIndexRouteImport } from './routes/project/$ref/storage/analytics/index'
+import { Route as ProjectRefFunctionsFunctionSlugIndexRouteImport } from './routes/project/$ref/functions/$functionSlug/index'
 import { Route as ProjectRefDatabaseTriggersIndexRouteImport } from './routes/project/$ref/database/triggers/index'
 import { Route as ProjectRefDatabaseTablesIndexRouteImport } from './routes/project/$ref/database/tables/index'
 import { Route as ProjectRefDatabaseReplicationIndexRouteImport } from './routes/project/$ref/database/replication/index'
@@ -144,6 +146,10 @@ import { Route as AppOrgSlugWebhooksIndexRouteImport } from './routes/_app/org/$
 import { Route as AppOrgSlugPrivateAppsIndexRouteImport } from './routes/_app/org/$slug/private-apps/index'
 import { Route as ProjectRefStorageFilesSettingsRouteImport } from './routes/project/$ref/storage/files/settings'
 import { Route as ProjectRefStorageFilesPoliciesRouteImport } from './routes/project/$ref/storage/files/policies'
+import { Route as ProjectRefFunctionsFunctionSlugLogsRouteImport } from './routes/project/$ref/functions/$functionSlug/logs'
+import { Route as ProjectRefFunctionsFunctionSlugInvocationsRouteImport } from './routes/project/$ref/functions/$functionSlug/invocations'
+import { Route as ProjectRefFunctionsFunctionSlugDetailsRouteImport } from './routes/project/$ref/functions/$functionSlug/details'
+import { Route as ProjectRefFunctionsFunctionSlugCodeRouteImport } from './routes/project/$ref/functions/$functionSlug/code'
 import { Route as ProjectRefDatabaseTriggersEventRouteImport } from './routes/project/$ref/database/triggers/event'
 import { Route as ProjectRefDatabaseTriggersDataRouteImport } from './routes/project/$ref/database/triggers/data'
 import { Route as ProjectRefDatabaseTablesIdRouteImport } from './routes/project/$ref/database/tables/$id'
@@ -574,6 +580,12 @@ const ProjectRefFunctionsNewRoute = ProjectRefFunctionsNewRouteImport.update({
   path: '/new',
   getParentRoute: () => ProjectRefFunctionsRoute,
 } as any)
+const ProjectRefFunctionsFunctionSlugRoute =
+  ProjectRefFunctionsFunctionSlugRouteImport.update({
+    id: '/$functionSlug',
+    path: '/$functionSlug',
+    getParentRoute: () => ProjectRefFunctionsRoute,
+  } as any)
 const ProjectRefEditorNewRoute = ProjectRefEditorNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -874,6 +886,12 @@ const ProjectRefStorageAnalyticsIndexRoute =
     path: '/analytics/',
     getParentRoute: () => ProjectRefStorageRoute,
   } as any)
+const ProjectRefFunctionsFunctionSlugIndexRoute =
+  ProjectRefFunctionsFunctionSlugIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProjectRefFunctionsFunctionSlugRoute,
+  } as any)
 const ProjectRefDatabaseTriggersIndexRoute =
   ProjectRefDatabaseTriggersIndexRouteImport.update({
     id: '/',
@@ -932,6 +950,30 @@ const ProjectRefStorageFilesPoliciesRoute =
     id: '/files/policies',
     path: '/files/policies',
     getParentRoute: () => ProjectRefStorageRoute,
+  } as any)
+const ProjectRefFunctionsFunctionSlugLogsRoute =
+  ProjectRefFunctionsFunctionSlugLogsRouteImport.update({
+    id: '/logs',
+    path: '/logs',
+    getParentRoute: () => ProjectRefFunctionsFunctionSlugRoute,
+  } as any)
+const ProjectRefFunctionsFunctionSlugInvocationsRoute =
+  ProjectRefFunctionsFunctionSlugInvocationsRouteImport.update({
+    id: '/invocations',
+    path: '/invocations',
+    getParentRoute: () => ProjectRefFunctionsFunctionSlugRoute,
+  } as any)
+const ProjectRefFunctionsFunctionSlugDetailsRoute =
+  ProjectRefFunctionsFunctionSlugDetailsRouteImport.update({
+    id: '/details',
+    path: '/details',
+    getParentRoute: () => ProjectRefFunctionsFunctionSlugRoute,
+  } as any)
+const ProjectRefFunctionsFunctionSlugCodeRoute =
+  ProjectRefFunctionsFunctionSlugCodeRouteImport.update({
+    id: '/code',
+    path: '/code',
+    getParentRoute: () => ProjectRefFunctionsFunctionSlugRoute,
   } as any)
 const ProjectRefDatabaseTriggersEventRoute =
   ProjectRefDatabaseTriggersEventRouteImport.update({
@@ -1478,6 +1520,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
   '/project/$ref/editor/$id': typeof ProjectRefEditorIdRoute
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
+  '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugRouteWithChildren
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
@@ -1531,6 +1574,10 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/functions/$functionSlug/code': typeof ProjectRefFunctionsFunctionSlugCodeRoute
+  '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
+  '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
+  '/project/$ref/functions/$functionSlug/logs': typeof ProjectRefFunctionsFunctionSlugLogsRoute
   '/project/$ref/storage/files/policies': typeof ProjectRefStorageFilesPoliciesRoute
   '/project/$ref/storage/files/settings': typeof ProjectRefStorageFilesSettingsRoute
   '/org/$slug/private-apps/': typeof AppOrgSlugPrivateAppsIndexRoute
@@ -1541,6 +1588,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/replication/': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables/': typeof ProjectRefDatabaseTablesIndexRoute
   '/project/$ref/database/triggers/': typeof ProjectRefDatabaseTriggersIndexRoute
+  '/project/$ref/functions/$functionSlug/': typeof ProjectRefFunctionsFunctionSlugIndexRoute
   '/project/$ref/storage/analytics/': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files/': typeof ProjectRefStorageFilesIndexRoute
   '/project/$ref/storage/vectors/': typeof ProjectRefStorageVectorsIndexRoute
@@ -1733,6 +1781,10 @@ export interface FileRoutesByTo {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/functions/$functionSlug/code': typeof ProjectRefFunctionsFunctionSlugCodeRoute
+  '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
+  '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
+  '/project/$ref/functions/$functionSlug/logs': typeof ProjectRefFunctionsFunctionSlugLogsRoute
   '/project/$ref/storage/files/policies': typeof ProjectRefStorageFilesPoliciesRoute
   '/project/$ref/storage/files/settings': typeof ProjectRefStorageFilesSettingsRoute
   '/org/$slug/private-apps': typeof AppOrgSlugPrivateAppsIndexRoute
@@ -1743,6 +1795,7 @@ export interface FileRoutesByTo {
   '/project/$ref/database/replication': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables': typeof ProjectRefDatabaseTablesIndexRoute
   '/project/$ref/database/triggers': typeof ProjectRefDatabaseTriggersIndexRoute
+  '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugIndexRoute
   '/project/$ref/storage/analytics': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files': typeof ProjectRefStorageFilesIndexRoute
   '/project/$ref/storage/vectors': typeof ProjectRefStorageVectorsIndexRoute
@@ -1892,6 +1945,7 @@ export interface FileRoutesById {
   '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
   '/project/$ref/editor/$id': typeof ProjectRefEditorIdRoute
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
+  '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugRouteWithChildren
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
@@ -1945,6 +1999,10 @@ export interface FileRoutesById {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/functions/$functionSlug/code': typeof ProjectRefFunctionsFunctionSlugCodeRoute
+  '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
+  '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
+  '/project/$ref/functions/$functionSlug/logs': typeof ProjectRefFunctionsFunctionSlugLogsRoute
   '/project/$ref/storage/files/policies': typeof ProjectRefStorageFilesPoliciesRoute
   '/project/$ref/storage/files/settings': typeof ProjectRefStorageFilesSettingsRoute
   '/_app/org/$slug/private-apps/': typeof AppOrgSlugPrivateAppsIndexRoute
@@ -1955,6 +2013,7 @@ export interface FileRoutesById {
   '/project/$ref/database/replication/': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables/': typeof ProjectRefDatabaseTablesIndexRoute
   '/project/$ref/database/triggers/': typeof ProjectRefDatabaseTriggersIndexRoute
+  '/project/$ref/functions/$functionSlug/': typeof ProjectRefFunctionsFunctionSlugIndexRoute
   '/project/$ref/storage/analytics/': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files/': typeof ProjectRefStorageFilesIndexRoute
   '/project/$ref/storage/vectors/': typeof ProjectRefStorageVectorsIndexRoute
@@ -2103,6 +2162,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/types'
     | '/project/$ref/editor/$id'
     | '/project/$ref/editor/new'
+    | '/project/$ref/functions/$functionSlug'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
     | '/project/$ref/realtime/inspector'
@@ -2156,6 +2216,10 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/functions/$functionSlug/code'
+    | '/project/$ref/functions/$functionSlug/details'
+    | '/project/$ref/functions/$functionSlug/invocations'
+    | '/project/$ref/functions/$functionSlug/logs'
     | '/project/$ref/storage/files/policies'
     | '/project/$ref/storage/files/settings'
     | '/org/$slug/private-apps/'
@@ -2166,6 +2230,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/replication/'
     | '/project/$ref/database/tables/'
     | '/project/$ref/database/triggers/'
+    | '/project/$ref/functions/$functionSlug/'
     | '/project/$ref/storage/analytics/'
     | '/project/$ref/storage/files/'
     | '/project/$ref/storage/vectors/'
@@ -2358,6 +2423,10 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/functions/$functionSlug/code'
+    | '/project/$ref/functions/$functionSlug/details'
+    | '/project/$ref/functions/$functionSlug/invocations'
+    | '/project/$ref/functions/$functionSlug/logs'
     | '/project/$ref/storage/files/policies'
     | '/project/$ref/storage/files/settings'
     | '/org/$slug/private-apps'
@@ -2368,6 +2437,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/replication'
     | '/project/$ref/database/tables'
     | '/project/$ref/database/triggers'
+    | '/project/$ref/functions/$functionSlug'
     | '/project/$ref/storage/analytics'
     | '/project/$ref/storage/files'
     | '/project/$ref/storage/vectors'
@@ -2516,6 +2586,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/types'
     | '/project/$ref/editor/$id'
     | '/project/$ref/editor/new'
+    | '/project/$ref/functions/$functionSlug'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
     | '/project/$ref/realtime/inspector'
@@ -2569,6 +2640,10 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/functions/$functionSlug/code'
+    | '/project/$ref/functions/$functionSlug/details'
+    | '/project/$ref/functions/$functionSlug/invocations'
+    | '/project/$ref/functions/$functionSlug/logs'
     | '/project/$ref/storage/files/policies'
     | '/project/$ref/storage/files/settings'
     | '/_app/org/$slug/private-apps/'
@@ -2579,6 +2654,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/replication/'
     | '/project/$ref/database/tables/'
     | '/project/$ref/database/triggers/'
+    | '/project/$ref/functions/$functionSlug/'
     | '/project/$ref/storage/analytics/'
     | '/project/$ref/storage/files/'
     | '/project/$ref/storage/vectors/'
@@ -3211,6 +3287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefFunctionsNewRouteImport
       parentRoute: typeof ProjectRefFunctionsRoute
     }
+    '/project/$ref/functions/$functionSlug': {
+      id: '/project/$ref/functions/$functionSlug'
+      path: '/$functionSlug'
+      fullPath: '/project/$ref/functions/$functionSlug'
+      preLoaderRoute: typeof ProjectRefFunctionsFunctionSlugRouteImport
+      parentRoute: typeof ProjectRefFunctionsRoute
+    }
     '/project/$ref/editor/new': {
       id: '/project/$ref/editor/new'
       path: '/new'
@@ -3603,6 +3686,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefStorageAnalyticsIndexRouteImport
       parentRoute: typeof ProjectRefStorageRoute
     }
+    '/project/$ref/functions/$functionSlug/': {
+      id: '/project/$ref/functions/$functionSlug/'
+      path: '/'
+      fullPath: '/project/$ref/functions/$functionSlug/'
+      preLoaderRoute: typeof ProjectRefFunctionsFunctionSlugIndexRouteImport
+      parentRoute: typeof ProjectRefFunctionsFunctionSlugRoute
+    }
     '/project/$ref/database/triggers/': {
       id: '/project/$ref/database/triggers/'
       path: '/'
@@ -3672,6 +3762,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/storage/files/policies'
       preLoaderRoute: typeof ProjectRefStorageFilesPoliciesRouteImport
       parentRoute: typeof ProjectRefStorageRoute
+    }
+    '/project/$ref/functions/$functionSlug/logs': {
+      id: '/project/$ref/functions/$functionSlug/logs'
+      path: '/logs'
+      fullPath: '/project/$ref/functions/$functionSlug/logs'
+      preLoaderRoute: typeof ProjectRefFunctionsFunctionSlugLogsRouteImport
+      parentRoute: typeof ProjectRefFunctionsFunctionSlugRoute
+    }
+    '/project/$ref/functions/$functionSlug/invocations': {
+      id: '/project/$ref/functions/$functionSlug/invocations'
+      path: '/invocations'
+      fullPath: '/project/$ref/functions/$functionSlug/invocations'
+      preLoaderRoute: typeof ProjectRefFunctionsFunctionSlugInvocationsRouteImport
+      parentRoute: typeof ProjectRefFunctionsFunctionSlugRoute
+    }
+    '/project/$ref/functions/$functionSlug/details': {
+      id: '/project/$ref/functions/$functionSlug/details'
+      path: '/details'
+      fullPath: '/project/$ref/functions/$functionSlug/details'
+      preLoaderRoute: typeof ProjectRefFunctionsFunctionSlugDetailsRouteImport
+      parentRoute: typeof ProjectRefFunctionsFunctionSlugRoute
+    }
+    '/project/$ref/functions/$functionSlug/code': {
+      id: '/project/$ref/functions/$functionSlug/code'
+      path: '/code'
+      fullPath: '/project/$ref/functions/$functionSlug/code'
+      preLoaderRoute: typeof ProjectRefFunctionsFunctionSlugCodeRouteImport
+      parentRoute: typeof ProjectRefFunctionsFunctionSlugRoute
     }
     '/project/$ref/database/triggers/event': {
       id: '/project/$ref/database/triggers/event'
@@ -4446,13 +4564,43 @@ const ProjectRefEditorRouteChildren: ProjectRefEditorRouteChildren = {
 const ProjectRefEditorRouteWithChildren =
   ProjectRefEditorRoute._addFileChildren(ProjectRefEditorRouteChildren)
 
+interface ProjectRefFunctionsFunctionSlugRouteChildren {
+  ProjectRefFunctionsFunctionSlugCodeRoute: typeof ProjectRefFunctionsFunctionSlugCodeRoute
+  ProjectRefFunctionsFunctionSlugDetailsRoute: typeof ProjectRefFunctionsFunctionSlugDetailsRoute
+  ProjectRefFunctionsFunctionSlugInvocationsRoute: typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
+  ProjectRefFunctionsFunctionSlugLogsRoute: typeof ProjectRefFunctionsFunctionSlugLogsRoute
+  ProjectRefFunctionsFunctionSlugIndexRoute: typeof ProjectRefFunctionsFunctionSlugIndexRoute
+}
+
+const ProjectRefFunctionsFunctionSlugRouteChildren: ProjectRefFunctionsFunctionSlugRouteChildren =
+  {
+    ProjectRefFunctionsFunctionSlugCodeRoute:
+      ProjectRefFunctionsFunctionSlugCodeRoute,
+    ProjectRefFunctionsFunctionSlugDetailsRoute:
+      ProjectRefFunctionsFunctionSlugDetailsRoute,
+    ProjectRefFunctionsFunctionSlugInvocationsRoute:
+      ProjectRefFunctionsFunctionSlugInvocationsRoute,
+    ProjectRefFunctionsFunctionSlugLogsRoute:
+      ProjectRefFunctionsFunctionSlugLogsRoute,
+    ProjectRefFunctionsFunctionSlugIndexRoute:
+      ProjectRefFunctionsFunctionSlugIndexRoute,
+  }
+
+const ProjectRefFunctionsFunctionSlugRouteWithChildren =
+  ProjectRefFunctionsFunctionSlugRoute._addFileChildren(
+    ProjectRefFunctionsFunctionSlugRouteChildren,
+  )
+
 interface ProjectRefFunctionsRouteChildren {
+  ProjectRefFunctionsFunctionSlugRoute: typeof ProjectRefFunctionsFunctionSlugRouteWithChildren
   ProjectRefFunctionsNewRoute: typeof ProjectRefFunctionsNewRoute
   ProjectRefFunctionsSecretsRoute: typeof ProjectRefFunctionsSecretsRoute
   ProjectRefFunctionsIndexRoute: typeof ProjectRefFunctionsIndexRoute
 }
 
 const ProjectRefFunctionsRouteChildren: ProjectRefFunctionsRouteChildren = {
+  ProjectRefFunctionsFunctionSlugRoute:
+    ProjectRefFunctionsFunctionSlugRouteWithChildren,
   ProjectRefFunctionsNewRoute: ProjectRefFunctionsNewRoute,
   ProjectRefFunctionsSecretsRoute: ProjectRefFunctionsSecretsRoute,
   ProjectRefFunctionsIndexRoute: ProjectRefFunctionsIndexRoute,
