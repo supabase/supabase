@@ -58,6 +58,7 @@ import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProv
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
 import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
+import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -289,14 +290,16 @@ function RootComponent() {
                     <DevToolbarProvider apiUrl={API_URL}>
                       <AiAssistantStateContextProvider>
                         <CommandProvider>
-                          <FeaturePreviewContextProvider>
-                            <MainScrollContainerProvider>
-                              <Outlet />
-                            </MainScrollContainerProvider>
-                            <StudioCommandMenu />
-                            <FeaturePreviewModal />
-                            <UpdateBillingAddressModal />
-                          </FeaturePreviewContextProvider>
+                          <BannerStackProvider>
+                            <FeaturePreviewContextProvider>
+                              <MainScrollContainerProvider>
+                                <Outlet />
+                              </MainScrollContainerProvider>
+                              <StudioCommandMenu />
+                              <FeaturePreviewModal />
+                              <UpdateBillingAddressModal />
+                            </FeaturePreviewContextProvider>
+                          </BannerStackProvider>
                           <Toaster />
                           <MonacoThemeProvider />
                         </CommandProvider>
