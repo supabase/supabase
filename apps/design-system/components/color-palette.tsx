@@ -40,7 +40,7 @@ const ColorPalette = () => {
   }
 
   return (
-    <div className="my-6 w-full overflow-x-auto">
+    <div className="my-6 w-full">
       <div className="flex min-w-[640px] flex-col gap-1">
         <div className={`grid gap-1 ${GRID_COLS}`}>
           <div />
