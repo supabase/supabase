@@ -112,6 +112,7 @@ import { Route as AppOrgSlugAuditRouteImport } from './routes/_app/org/$slug/aud
 import { Route as AppOrgSlugAppsRouteImport } from './routes/_app/org/$slug/apps'
 import { Route as AppAccountTokensScopedRouteImport } from './routes/_app/account/tokens/scoped'
 import { Route as ProjectRefStorageFilesIndexRouteImport } from './routes/project/$ref/storage/files/index'
+import { Route as ProjectRefStorageAnalyticsIndexRouteImport } from './routes/project/$ref/storage/analytics/index'
 import { Route as ProjectRefDatabaseTriggersIndexRouteImport } from './routes/project/$ref/database/triggers/index'
 import { Route as ProjectRefDatabaseTablesIndexRouteImport } from './routes/project/$ref/database/tables/index'
 import { Route as ProjectRefDatabaseReplicationIndexRouteImport } from './routes/project/$ref/database/replication/index'
@@ -164,6 +165,8 @@ import { Route as ApiPlatformProjectsRefContentIndexRouteImport } from './routes
 import { Route as ApiPlatformProjectsRefConfigIndexRouteImport } from './routes/api/platform/projects/$ref/config/index'
 import { Route as ApiPlatformPgMetaRefQueryIndexRouteImport } from './routes/api/platform/pg-meta/$ref/query/index'
 import { Route as ApiPlatformAuthRefUsersIndexRouteImport } from './routes/api/platform/auth/$ref/users/index'
+import { Route as ProjectRefStorageFilesBucketsBucketIdRouteImport } from './routes/project/$ref/storage/files/buckets/$bucketId'
+import { Route as ProjectRefStorageAnalyticsBucketsBucketIdRouteImport } from './routes/project/$ref/storage/analytics/buckets/$bucketId'
 import { Route as ProjectRefDatabaseReplicationReplicaReplicaIdRouteImport } from './routes/project/$ref/database/replication/replica/$replicaId'
 import { Route as ApiV1ProjectsRefTypesTypescriptRouteImport } from './routes/api/v1/projects/$ref/types/typescript'
 import { Route as ApiV1ProjectsRefDatabaseMigrationsRouteImport } from './routes/api/v1/projects/$ref/database/migrations'
@@ -730,6 +733,12 @@ const ProjectRefStorageFilesIndexRoute =
     path: '/files/',
     getParentRoute: () => ProjectRefStorageRoute,
   } as any)
+const ProjectRefStorageAnalyticsIndexRoute =
+  ProjectRefStorageAnalyticsIndexRouteImport.update({
+    id: '/analytics/',
+    path: '/analytics/',
+    getParentRoute: () => ProjectRefStorageRoute,
+  } as any)
 const ProjectRefDatabaseTriggersIndexRoute =
   ProjectRefDatabaseTriggersIndexRouteImport.update({
     id: '/',
@@ -1037,6 +1046,18 @@ const ApiPlatformAuthRefUsersIndexRoute =
     id: '/api/platform/auth/$ref/users/',
     path: '/api/platform/auth/$ref/users/',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const ProjectRefStorageFilesBucketsBucketIdRoute =
+  ProjectRefStorageFilesBucketsBucketIdRouteImport.update({
+    id: '/files/buckets/$bucketId',
+    path: '/files/buckets/$bucketId',
+    getParentRoute: () => ProjectRefStorageRoute,
+  } as any)
+const ProjectRefStorageAnalyticsBucketsBucketIdRoute =
+  ProjectRefStorageAnalyticsBucketsBucketIdRouteImport.update({
+    id: '/analytics/buckets/$bucketId',
+    path: '/analytics/buckets/$bucketId',
+    getParentRoute: () => ProjectRefStorageRoute,
   } as any)
 const ProjectRefDatabaseReplicationReplicaReplicaIdRoute =
   ProjectRefDatabaseReplicationReplicaReplicaIdRouteImport.update({
@@ -1359,6 +1380,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/replication/': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables/': typeof ProjectRefDatabaseTablesIndexRoute
   '/project/$ref/database/triggers/': typeof ProjectRefDatabaseTriggersIndexRoute
+  '/project/$ref/storage/analytics/': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files/': typeof ProjectRefStorageFilesIndexRoute
   '/api/platform/organizations/$slug/billing/subscription': typeof ApiPlatformOrganizationsSlugBillingSubscriptionRoute
   '/api/platform/projects/$ref/analytics/log-drains': typeof ApiPlatformProjectsRefAnalyticsLogDrainsRouteWithChildren
@@ -1372,6 +1394,8 @@ export interface FileRoutesByFullPath {
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
   '/api/v1/projects/$ref/types/typescript': typeof ApiV1ProjectsRefTypesTypescriptRoute
   '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
+  '/project/$ref/storage/analytics/buckets/$bucketId': typeof ProjectRefStorageAnalyticsBucketsBucketIdRoute
+  '/project/$ref/storage/files/buckets/$bucketId': typeof ProjectRefStorageFilesBucketsBucketIdRoute
   '/api/platform/auth/$ref/users/': typeof ApiPlatformAuthRefUsersIndexRoute
   '/api/platform/pg-meta/$ref/query/': typeof ApiPlatformPgMetaRefQueryIndexRoute
   '/api/platform/projects/$ref/config/': typeof ApiPlatformProjectsRefConfigIndexRoute
@@ -1540,6 +1564,7 @@ export interface FileRoutesByTo {
   '/project/$ref/database/replication': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables': typeof ProjectRefDatabaseTablesIndexRoute
   '/project/$ref/database/triggers': typeof ProjectRefDatabaseTriggersIndexRoute
+  '/project/$ref/storage/analytics': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files': typeof ProjectRefStorageFilesIndexRoute
   '/api/platform/organizations/$slug/billing/subscription': typeof ApiPlatformOrganizationsSlugBillingSubscriptionRoute
   '/api/platform/projects/$ref/analytics/log-drains': typeof ApiPlatformProjectsRefAnalyticsLogDrainsRouteWithChildren
@@ -1553,6 +1578,8 @@ export interface FileRoutesByTo {
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
   '/api/v1/projects/$ref/types/typescript': typeof ApiV1ProjectsRefTypesTypescriptRoute
   '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
+  '/project/$ref/storage/analytics/buckets/$bucketId': typeof ProjectRefStorageAnalyticsBucketsBucketIdRoute
+  '/project/$ref/storage/files/buckets/$bucketId': typeof ProjectRefStorageFilesBucketsBucketIdRoute
   '/api/platform/auth/$ref/users': typeof ApiPlatformAuthRefUsersIndexRoute
   '/api/platform/pg-meta/$ref/query': typeof ApiPlatformPgMetaRefQueryIndexRoute
   '/api/platform/projects/$ref/config': typeof ApiPlatformProjectsRefConfigIndexRoute
@@ -1727,6 +1754,7 @@ export interface FileRoutesById {
   '/project/$ref/database/replication/': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables/': typeof ProjectRefDatabaseTablesIndexRoute
   '/project/$ref/database/triggers/': typeof ProjectRefDatabaseTriggersIndexRoute
+  '/project/$ref/storage/analytics/': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files/': typeof ProjectRefStorageFilesIndexRoute
   '/api/platform/organizations/$slug/billing/subscription': typeof ApiPlatformOrganizationsSlugBillingSubscriptionRoute
   '/api/platform/projects/$ref/analytics/log-drains': typeof ApiPlatformProjectsRefAnalyticsLogDrainsRouteWithChildren
@@ -1740,6 +1768,8 @@ export interface FileRoutesById {
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
   '/api/v1/projects/$ref/types/typescript': typeof ApiV1ProjectsRefTypesTypescriptRoute
   '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
+  '/project/$ref/storage/analytics/buckets/$bucketId': typeof ProjectRefStorageAnalyticsBucketsBucketIdRoute
+  '/project/$ref/storage/files/buckets/$bucketId': typeof ProjectRefStorageFilesBucketsBucketIdRoute
   '/api/platform/auth/$ref/users/': typeof ApiPlatformAuthRefUsersIndexRoute
   '/api/platform/pg-meta/$ref/query/': typeof ApiPlatformPgMetaRefQueryIndexRoute
   '/api/platform/projects/$ref/config/': typeof ApiPlatformProjectsRefConfigIndexRoute
@@ -1913,6 +1943,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/replication/'
     | '/project/$ref/database/tables/'
     | '/project/$ref/database/triggers/'
+    | '/project/$ref/storage/analytics/'
     | '/project/$ref/storage/files/'
     | '/api/platform/organizations/$slug/billing/subscription'
     | '/api/platform/projects/$ref/analytics/log-drains'
@@ -1926,6 +1957,8 @@ export interface FileRouteTypes {
     | '/api/v1/projects/$ref/database/migrations'
     | '/api/v1/projects/$ref/types/typescript'
     | '/project/$ref/database/replication/replica/$replicaId'
+    | '/project/$ref/storage/analytics/buckets/$bucketId'
+    | '/project/$ref/storage/files/buckets/$bucketId'
     | '/api/platform/auth/$ref/users/'
     | '/api/platform/pg-meta/$ref/query/'
     | '/api/platform/projects/$ref/config/'
@@ -2094,6 +2127,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/replication'
     | '/project/$ref/database/tables'
     | '/project/$ref/database/triggers'
+    | '/project/$ref/storage/analytics'
     | '/project/$ref/storage/files'
     | '/api/platform/organizations/$slug/billing/subscription'
     | '/api/platform/projects/$ref/analytics/log-drains'
@@ -2107,6 +2141,8 @@ export interface FileRouteTypes {
     | '/api/v1/projects/$ref/database/migrations'
     | '/api/v1/projects/$ref/types/typescript'
     | '/project/$ref/database/replication/replica/$replicaId'
+    | '/project/$ref/storage/analytics/buckets/$bucketId'
+    | '/project/$ref/storage/files/buckets/$bucketId'
     | '/api/platform/auth/$ref/users'
     | '/api/platform/pg-meta/$ref/query'
     | '/api/platform/projects/$ref/config'
@@ -2280,6 +2316,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/replication/'
     | '/project/$ref/database/tables/'
     | '/project/$ref/database/triggers/'
+    | '/project/$ref/storage/analytics/'
     | '/project/$ref/storage/files/'
     | '/api/platform/organizations/$slug/billing/subscription'
     | '/api/platform/projects/$ref/analytics/log-drains'
@@ -2293,6 +2330,8 @@ export interface FileRouteTypes {
     | '/api/v1/projects/$ref/database/migrations'
     | '/api/v1/projects/$ref/types/typescript'
     | '/project/$ref/database/replication/replica/$replicaId'
+    | '/project/$ref/storage/analytics/buckets/$bucketId'
+    | '/project/$ref/storage/files/buckets/$bucketId'
     | '/api/platform/auth/$ref/users/'
     | '/api/platform/pg-meta/$ref/query/'
     | '/api/platform/projects/$ref/config/'
@@ -3145,6 +3184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefStorageFilesIndexRouteImport
       parentRoute: typeof ProjectRefStorageRoute
     }
+    '/project/$ref/storage/analytics/': {
+      id: '/project/$ref/storage/analytics/'
+      path: '/analytics'
+      fullPath: '/project/$ref/storage/analytics/'
+      preLoaderRoute: typeof ProjectRefStorageAnalyticsIndexRouteImport
+      parentRoute: typeof ProjectRefStorageRoute
+    }
     '/project/$ref/database/triggers/': {
       id: '/project/$ref/database/triggers/'
       path: '/'
@@ -3508,6 +3554,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/platform/auth/$ref/users/'
       preLoaderRoute: typeof ApiPlatformAuthRefUsersIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/project/$ref/storage/files/buckets/$bucketId': {
+      id: '/project/$ref/storage/files/buckets/$bucketId'
+      path: '/files/buckets/$bucketId'
+      fullPath: '/project/$ref/storage/files/buckets/$bucketId'
+      preLoaderRoute: typeof ProjectRefStorageFilesBucketsBucketIdRouteImport
+      parentRoute: typeof ProjectRefStorageRoute
+    }
+    '/project/$ref/storage/analytics/buckets/$bucketId': {
+      id: '/project/$ref/storage/analytics/buckets/$bucketId'
+      path: '/analytics/buckets/$bucketId'
+      fullPath: '/project/$ref/storage/analytics/buckets/$bucketId'
+      preLoaderRoute: typeof ProjectRefStorageAnalyticsBucketsBucketIdRouteImport
+      parentRoute: typeof ProjectRefStorageRoute
     }
     '/project/$ref/database/replication/replica/$replicaId': {
       id: '/project/$ref/database/replication/replica/$replicaId'
@@ -3943,14 +4003,22 @@ interface ProjectRefStorageRouteChildren {
   ProjectRefStorageS3Route: typeof ProjectRefStorageS3Route
   ProjectRefStorageFilesPoliciesRoute: typeof ProjectRefStorageFilesPoliciesRoute
   ProjectRefStorageFilesSettingsRoute: typeof ProjectRefStorageFilesSettingsRoute
+  ProjectRefStorageAnalyticsIndexRoute: typeof ProjectRefStorageAnalyticsIndexRoute
   ProjectRefStorageFilesIndexRoute: typeof ProjectRefStorageFilesIndexRoute
+  ProjectRefStorageAnalyticsBucketsBucketIdRoute: typeof ProjectRefStorageAnalyticsBucketsBucketIdRoute
+  ProjectRefStorageFilesBucketsBucketIdRoute: typeof ProjectRefStorageFilesBucketsBucketIdRoute
 }
 
 const ProjectRefStorageRouteChildren: ProjectRefStorageRouteChildren = {
   ProjectRefStorageS3Route: ProjectRefStorageS3Route,
   ProjectRefStorageFilesPoliciesRoute: ProjectRefStorageFilesPoliciesRoute,
   ProjectRefStorageFilesSettingsRoute: ProjectRefStorageFilesSettingsRoute,
+  ProjectRefStorageAnalyticsIndexRoute: ProjectRefStorageAnalyticsIndexRoute,
   ProjectRefStorageFilesIndexRoute: ProjectRefStorageFilesIndexRoute,
+  ProjectRefStorageAnalyticsBucketsBucketIdRoute:
+    ProjectRefStorageAnalyticsBucketsBucketIdRoute,
+  ProjectRefStorageFilesBucketsBucketIdRoute:
+    ProjectRefStorageFilesBucketsBucketIdRoute,
 }
 
 const ProjectRefStorageRouteWithChildren =
