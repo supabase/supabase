@@ -310,7 +310,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Error pages (handled at root)
 
-- [x] A `__root.tsx` — wired `notFoundComponent` to `pages/404.tsx`
+- [x] A→done `__root.tsx` — `notFoundComponent` wired to `components/ui/NotFound.tsx` (body moved out of `pages/404.tsx`, Next file deleted, `next/link` + `next/legacy/image` swapped for native equivalents)
 - [ ] `__root.tsx` — wire `errorComponent` for `pages/500.tsx` / `_error.jsx`
 
 ---

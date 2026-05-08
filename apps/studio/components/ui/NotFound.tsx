@@ -1,21 +1,22 @@
-import { NextPage } from 'next'
+import { Link } from '@tanstack/react-router'
 import { useTheme } from 'next-themes'
-import Image from 'next/legacy/image'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import { BASE_PATH } from '@/lib/constants'
 
-const Error404: NextPage = ({}) => {
+export function NotFound() {
   const { resolvedTheme } = useTheme()
-  const [show404, setShow404] = useState<boolean>(false)
+  const [show404, setShow404] = useState(false)
 
   useEffect(() => {
-    setTimeout(() => {
-      setShow404(true)
-    }, 500)
+    const id = window.setTimeout(() => setShow404(true), 500)
+    return () => window.clearTimeout(id)
   }, [])
+
+  const logoSrc = resolvedTheme?.includes('dark')
+    ? `${BASE_PATH}/img/supabase-dark.svg`
+    : `${BASE_PATH}/img/supabase-light.svg`
 
   return (
     <div className="relative mx-auto flex h-screen w-full flex-col items-center justify-center">
@@ -23,17 +24,8 @@ const Error404: NextPage = ({}) => {
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex shrink-0 grow items-center lg:grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
-              <Link href="/projects">
-                <Image
-                  src={
-                    resolvedTheme?.includes('dark')
-                      ? `${BASE_PATH}/img/supabase-dark.svg`
-                      : `${BASE_PATH}/img/supabase-light.svg`
-                  }
-                  alt="supabase"
-                  height={24}
-                  width={120}
-                />
+              <Link to="/projects">
+                <img src={logoSrc} alt="supabase" height={24} width={120} />
               </Link>
             </div>
           </div>
@@ -59,12 +51,10 @@ const Error404: NextPage = ({}) => {
         </div>
         <div className="flex items-center space-x-4">
           <Button asChild size="small">
-            <Link href="/projects">Head back</Link>
+            <Link to="/projects">Head back</Link>
           </Button>
         </div>
       </div>
     </div>
   )
 }
-
-export default Error404
