@@ -45,6 +45,7 @@ import { Route as ProjectRefIndexRouteImport } from './routes/project/$ref/index
 import { Route as ApiConnectIndexRouteImport } from './routes/api/connect/index'
 import { Route as AppOrgIndexRouteImport } from './routes/_app/org/index'
 import { Route as ProjectRefStorageRouteImport } from './routes/project/$ref/storage'
+import { Route as ProjectRefSqlRouteImport } from './routes/project/$ref/sql'
 import { Route as ProjectRefEditorRouteImport } from './routes/project/$ref/editor'
 import { Route as ProjectRefDatabaseRouteImport } from './routes/project/$ref/database'
 import { Route as ProjectRefAuthRouteImport } from './routes/project/$ref/auth'
@@ -56,6 +57,7 @@ import { Route as AuthCliLoginRouteImport } from './routes/_auth/cli/login'
 import { Route as AppAccountSecurityRouteImport } from './routes/_app/account/security'
 import { Route as AppAccountMeRouteImport } from './routes/_app/account/me'
 import { Route as AppAccountAuditRouteImport } from './routes/_app/account/audit'
+import { Route as ProjectRefSqlIndexRouteImport } from './routes/project/$ref/sql/index'
 import { Route as ProjectRefEditorIndexRouteImport } from './routes/project/$ref/editor/index'
 import { Route as ApiPlatformProjectsIndexRouteImport } from './routes/api/platform/projects/index'
 import { Route as ApiPlatformProfileIndexRouteImport } from './routes/api/platform/profile/index'
@@ -63,6 +65,9 @@ import { Route as ApiPlatformOrganizationsIndexRouteImport } from './routes/api/
 import { Route as AppOrgSlugIndexRouteImport } from './routes/_app/org/$slug/index'
 import { Route as AppAccountTokensIndexRouteImport } from './routes/_app/account/tokens/index'
 import { Route as ProjectRefStorageS3RouteImport } from './routes/project/$ref/storage/s3'
+import { Route as ProjectRefSqlTemplatesRouteImport } from './routes/project/$ref/sql/templates'
+import { Route as ProjectRefSqlQuickstartsRouteImport } from './routes/project/$ref/sql/quickstarts'
+import { Route as ProjectRefSqlIdRouteImport } from './routes/project/$ref/sql/$id'
 import { Route as ProjectRefEditorNewRouteImport } from './routes/project/$ref/editor/new'
 import { Route as ProjectRefEditorIdRouteImport } from './routes/project/$ref/editor/$id'
 import { Route as ProjectRefDatabaseTypesRouteImport } from './routes/project/$ref/database/types'
@@ -384,6 +389,11 @@ const ProjectRefStorageRoute = ProjectRefStorageRouteImport.update({
   path: '/storage',
   getParentRoute: () => ProjectRefRoute,
 } as any)
+const ProjectRefSqlRoute = ProjectRefSqlRouteImport.update({
+  id: '/sql',
+  path: '/sql',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
 const ProjectRefEditorRoute = ProjectRefEditorRouteImport.update({
   id: '/editor',
   path: '/editor',
@@ -440,6 +450,11 @@ const AppAccountAuditRoute = AppAccountAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AppAccountRoute,
 } as any)
+const ProjectRefSqlIndexRoute = ProjectRefSqlIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectRefSqlRoute,
+} as any)
 const ProjectRefEditorIndexRoute = ProjectRefEditorIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -476,6 +491,22 @@ const ProjectRefStorageS3Route = ProjectRefStorageS3RouteImport.update({
   id: '/s3',
   path: '/s3',
   getParentRoute: () => ProjectRefStorageRoute,
+} as any)
+const ProjectRefSqlTemplatesRoute = ProjectRefSqlTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => ProjectRefSqlRoute,
+} as any)
+const ProjectRefSqlQuickstartsRoute =
+  ProjectRefSqlQuickstartsRouteImport.update({
+    id: '/quickstarts',
+    path: '/quickstarts',
+    getParentRoute: () => ProjectRefSqlRoute,
+  } as any)
+const ProjectRefSqlIdRoute = ProjectRefSqlIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ProjectRefSqlRoute,
 } as any)
 const ProjectRefEditorNewRoute = ProjectRefEditorNewRouteImport.update({
   id: '/new',
@@ -1314,6 +1345,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
+  '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
   '/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
@@ -1370,6 +1402,9 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
   '/project/$ref/editor/$id': typeof ProjectRefEditorIdRoute
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
+  '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
+  '/project/$ref/sql/quickstarts': typeof ProjectRefSqlQuickstartsRoute
+  '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/account/tokens/': typeof AppAccountTokensIndexRoute
   '/org/$slug/': typeof AppOrgSlugIndexRoute
@@ -1377,6 +1412,7 @@ export interface FileRoutesByFullPath {
   '/api/platform/profile/': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
+  '/project/$ref/sql/': typeof ProjectRefSqlIndexRoute
   '/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
   '/api/platform/auth/$ref/invite': typeof ApiPlatformAuthRefInviteRoute
@@ -1559,6 +1595,9 @@ export interface FileRoutesByTo {
   '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
   '/project/$ref/editor/$id': typeof ProjectRefEditorIdRoute
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
+  '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
+  '/project/$ref/sql/quickstarts': typeof ProjectRefSqlQuickstartsRoute
+  '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/account/tokens': typeof AppAccountTokensIndexRoute
   '/org/$slug': typeof AppOrgSlugIndexRoute
@@ -1566,6 +1605,7 @@ export interface FileRoutesByTo {
   '/api/platform/profile': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects': typeof ApiPlatformProjectsIndexRoute
   '/project/$ref/editor': typeof ProjectRefEditorIndexRoute
+  '/project/$ref/sql': typeof ProjectRefSqlIndexRoute
   '/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
   '/api/platform/auth/$ref/invite': typeof ApiPlatformAuthRefInviteRoute
@@ -1699,6 +1739,7 @@ export interface FileRoutesById {
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
+  '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
   '/_app/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
@@ -1755,6 +1796,9 @@ export interface FileRoutesById {
   '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
   '/project/$ref/editor/$id': typeof ProjectRefEditorIdRoute
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
+  '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
+  '/project/$ref/sql/quickstarts': typeof ProjectRefSqlQuickstartsRoute
+  '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/_app/account/tokens/': typeof AppAccountTokensIndexRoute
   '/_app/org/$slug/': typeof AppOrgSlugIndexRoute
@@ -1762,6 +1806,7 @@ export interface FileRoutesById {
   '/api/platform/profile/': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
+  '/project/$ref/sql/': typeof ProjectRefSqlIndexRoute
   '/_app/org/$slug/webhooks/$endpointId': typeof AppOrgSlugWebhooksEndpointIdRoute
   '/_auth/partners/stripe/projects/login': typeof AuthPartnersStripeProjectsLoginRoute
   '/api/platform/auth/$ref/invite': typeof ApiPlatformAuthRefInviteRoute
@@ -1894,6 +1939,7 @@ export interface FileRouteTypes {
     | '/project/$ref/auth'
     | '/project/$ref/database'
     | '/project/$ref/editor'
+    | '/project/$ref/sql'
     | '/project/$ref/storage'
     | '/org/'
     | '/api/connect/'
@@ -1950,6 +1996,9 @@ export interface FileRouteTypes {
     | '/project/$ref/database/types'
     | '/project/$ref/editor/$id'
     | '/project/$ref/editor/new'
+    | '/project/$ref/sql/$id'
+    | '/project/$ref/sql/quickstarts'
+    | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
     | '/account/tokens/'
     | '/org/$slug/'
@@ -1957,6 +2006,7 @@ export interface FileRouteTypes {
     | '/api/platform/profile/'
     | '/api/platform/projects/'
     | '/project/$ref/editor/'
+    | '/project/$ref/sql/'
     | '/org/$slug/webhooks/$endpointId'
     | '/partners/stripe/projects/login'
     | '/api/platform/auth/$ref/invite'
@@ -2139,6 +2189,9 @@ export interface FileRouteTypes {
     | '/project/$ref/database/types'
     | '/project/$ref/editor/$id'
     | '/project/$ref/editor/new'
+    | '/project/$ref/sql/$id'
+    | '/project/$ref/sql/quickstarts'
+    | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
     | '/account/tokens'
     | '/org/$slug'
@@ -2146,6 +2199,7 @@ export interface FileRouteTypes {
     | '/api/platform/profile'
     | '/api/platform/projects'
     | '/project/$ref/editor'
+    | '/project/$ref/sql'
     | '/org/$slug/webhooks/$endpointId'
     | '/partners/stripe/projects/login'
     | '/api/platform/auth/$ref/invite'
@@ -2278,6 +2332,7 @@ export interface FileRouteTypes {
     | '/project/$ref/auth'
     | '/project/$ref/database'
     | '/project/$ref/editor'
+    | '/project/$ref/sql'
     | '/project/$ref/storage'
     | '/_app/org/'
     | '/api/connect/'
@@ -2334,6 +2389,9 @@ export interface FileRouteTypes {
     | '/project/$ref/database/types'
     | '/project/$ref/editor/$id'
     | '/project/$ref/editor/new'
+    | '/project/$ref/sql/$id'
+    | '/project/$ref/sql/quickstarts'
+    | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
     | '/_app/account/tokens/'
     | '/_app/org/$slug/'
@@ -2341,6 +2399,7 @@ export interface FileRouteTypes {
     | '/api/platform/profile/'
     | '/api/platform/projects/'
     | '/project/$ref/editor/'
+    | '/project/$ref/sql/'
     | '/_app/org/$slug/webhooks/$endpointId'
     | '/_auth/partners/stripe/projects/login'
     | '/api/platform/auth/$ref/invite'
@@ -2787,6 +2846,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefStorageRouteImport
       parentRoute: typeof ProjectRefRoute
     }
+    '/project/$ref/sql': {
+      id: '/project/$ref/sql'
+      path: '/sql'
+      fullPath: '/project/$ref/sql'
+      preLoaderRoute: typeof ProjectRefSqlRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
     '/project/$ref/editor': {
       id: '/project/$ref/editor'
       path: '/editor'
@@ -2864,6 +2930,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAccountAuditRouteImport
       parentRoute: typeof AppAccountRoute
     }
+    '/project/$ref/sql/': {
+      id: '/project/$ref/sql/'
+      path: '/'
+      fullPath: '/project/$ref/sql/'
+      preLoaderRoute: typeof ProjectRefSqlIndexRouteImport
+      parentRoute: typeof ProjectRefSqlRoute
+    }
     '/project/$ref/editor/': {
       id: '/project/$ref/editor/'
       path: '/'
@@ -2912,6 +2985,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/storage/s3'
       preLoaderRoute: typeof ProjectRefStorageS3RouteImport
       parentRoute: typeof ProjectRefStorageRoute
+    }
+    '/project/$ref/sql/templates': {
+      id: '/project/$ref/sql/templates'
+      path: '/templates'
+      fullPath: '/project/$ref/sql/templates'
+      preLoaderRoute: typeof ProjectRefSqlTemplatesRouteImport
+      parentRoute: typeof ProjectRefSqlRoute
+    }
+    '/project/$ref/sql/quickstarts': {
+      id: '/project/$ref/sql/quickstarts'
+      path: '/quickstarts'
+      fullPath: '/project/$ref/sql/quickstarts'
+      preLoaderRoute: typeof ProjectRefSqlQuickstartsRouteImport
+      parentRoute: typeof ProjectRefSqlRoute
+    }
+    '/project/$ref/sql/$id': {
+      id: '/project/$ref/sql/$id'
+      path: '/$id'
+      fullPath: '/project/$ref/sql/$id'
+      preLoaderRoute: typeof ProjectRefSqlIdRouteImport
+      parentRoute: typeof ProjectRefSqlRoute
     }
     '/project/$ref/editor/new': {
       id: '/project/$ref/editor/new'
@@ -4128,6 +4222,24 @@ const ProjectRefEditorRouteChildren: ProjectRefEditorRouteChildren = {
 const ProjectRefEditorRouteWithChildren =
   ProjectRefEditorRoute._addFileChildren(ProjectRefEditorRouteChildren)
 
+interface ProjectRefSqlRouteChildren {
+  ProjectRefSqlIdRoute: typeof ProjectRefSqlIdRoute
+  ProjectRefSqlQuickstartsRoute: typeof ProjectRefSqlQuickstartsRoute
+  ProjectRefSqlTemplatesRoute: typeof ProjectRefSqlTemplatesRoute
+  ProjectRefSqlIndexRoute: typeof ProjectRefSqlIndexRoute
+}
+
+const ProjectRefSqlRouteChildren: ProjectRefSqlRouteChildren = {
+  ProjectRefSqlIdRoute: ProjectRefSqlIdRoute,
+  ProjectRefSqlQuickstartsRoute: ProjectRefSqlQuickstartsRoute,
+  ProjectRefSqlTemplatesRoute: ProjectRefSqlTemplatesRoute,
+  ProjectRefSqlIndexRoute: ProjectRefSqlIndexRoute,
+}
+
+const ProjectRefSqlRouteWithChildren = ProjectRefSqlRoute._addFileChildren(
+  ProjectRefSqlRouteChildren,
+)
+
 interface ProjectRefStorageRouteChildren {
   ProjectRefStorageS3Route: typeof ProjectRefStorageS3Route
   ProjectRefStorageFilesPoliciesRoute: typeof ProjectRefStorageFilesPoliciesRoute
@@ -4162,6 +4274,7 @@ interface ProjectRefRouteChildren {
   ProjectRefAuthRoute: typeof ProjectRefAuthRouteWithChildren
   ProjectRefDatabaseRoute: typeof ProjectRefDatabaseRouteWithChildren
   ProjectRefEditorRoute: typeof ProjectRefEditorRouteWithChildren
+  ProjectRefSqlRoute: typeof ProjectRefSqlRouteWithChildren
   ProjectRefStorageRoute: typeof ProjectRefStorageRouteWithChildren
   ProjectRefIndexRoute: typeof ProjectRefIndexRoute
 }
@@ -4170,6 +4283,7 @@ const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefAuthRoute: ProjectRefAuthRouteWithChildren,
   ProjectRefDatabaseRoute: ProjectRefDatabaseRouteWithChildren,
   ProjectRefEditorRoute: ProjectRefEditorRouteWithChildren,
+  ProjectRefSqlRoute: ProjectRefSqlRouteWithChildren,
   ProjectRefStorageRoute: ProjectRefStorageRouteWithChildren,
   ProjectRefIndexRoute: ProjectRefIndexRoute,
 }

@@ -84,7 +84,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [ ] `routes/project/$ref/advisors/rules.tsx` — AdvisorRulesLayout (standalone, not nested under AdvisorsLayout)
 - [ ] `routes/project/$ref/settings.tsx` — SettingsLayout
 - [ ] `routes/project/$ref/integrations.tsx` — ProjectIntegrationsLayout
-- [ ] `routes/project/$ref/sql.tsx` — EditorBaseLayout + SQLEditorLayout
+- [x] `routes/project/$ref/sql.tsx` — EditorBaseLayout + SQLEditorLayout. Twin of editor.tsx; all four leaves share identical layout props so the shell hardcodes them (no `staticData` overrides). EditorBaseLayout wraps in ProjectLayoutWithAuth; SQLEditorLayout adds its own `withAuth` HOC but no extra ProjectLayout — same shape as the table editor (auth check runs twice but no double render).
 - [x] `routes/project/$ref/editor.tsx` — EditorBaseLayout + TableEditorLayout. All three leaves share identical layout props so the shell hardcodes them (no `staticData` overrides). EditorBaseLayout wraps in `ProjectLayoutWithAuth` internally; TableEditorLayout's happy path is just a fragment + side-effect (banner) and only wraps in `ProjectLayoutWithAuth` on its no-permission branch — same as Next, no double-wrap in normal use.
 
 ### Auth shell (pathless)
@@ -298,10 +298,10 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/sql/*`
 
-- [ ] `routes/project/$ref/sql/index.tsx` ← `pages/project/[ref]/sql/index.tsx`
-- [ ] `routes/project/$ref/sql/$id.tsx` ← `pages/project/[ref]/sql/[id].tsx`
-- [ ] `routes/project/$ref/sql/templates.tsx` ← `pages/project/[ref]/sql/templates.tsx`
-- [ ] `routes/project/$ref/sql/quickstarts.tsx` ← `pages/project/[ref]/sql/quickstarts.tsx`
+- [x] A `routes/project/$ref/sql/index.tsx` ← `pages/project/[ref]/sql/index.tsx`
+- [x] A `routes/project/$ref/sql/$id.tsx` ← `pages/project/[ref]/sql/[id].tsx`
+- [x] A `routes/project/$ref/sql/templates.tsx` ← `pages/project/[ref]/sql/templates.tsx`
+- [x] A `routes/project/$ref/sql/quickstarts.tsx` ← `pages/project/[ref]/sql/quickstarts.tsx`
 
 ### Project shell — `/editor/*`
 
