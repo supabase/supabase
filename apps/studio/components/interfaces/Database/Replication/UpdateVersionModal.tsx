@@ -80,10 +80,10 @@ export const UpdateVersionModal = ({
       try {
         await restartPipeline({ projectRef, pipelineId: pipeline.id })
         toast.success('Pipeline successfully updated and is currently restarting')
-      } catch (e: any) {
+      } catch (e) {
         // Clear optimistic state and surface a single concise error
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-        toast.error('Failed to restart pipeline')
+        toast.error(`Failed to restart pipeline: ${(e as Error).message}`)
       }
     } else {
       toast.success('Pipeline successfully updated')

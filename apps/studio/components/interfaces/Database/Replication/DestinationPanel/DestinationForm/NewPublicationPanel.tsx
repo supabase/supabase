@@ -73,7 +73,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
       toast.success('Successfully created publication')
       onClose()
     } catch (error) {
-      toast.error('Failed to create publication')
+      toast.error(`Failed to create publication: ${(error as Error).message}`)
     }
     form.reset(defaultValues)
   }

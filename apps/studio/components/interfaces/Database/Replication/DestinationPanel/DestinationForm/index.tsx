@@ -368,8 +368,13 @@ export const DestinationForm = ({
     const hasRequestError = results.some((r) => r.status === 'rejected')
 
     if (hasRequestError) {
-      // If any request failed, show a generic error and stop
-      toast.error('Failed to validate configuration. Please try again.')
+      // If any request failed, surface the upstream message so users see why
+      const rejected = results.find(
+        (r): r is PromiseRejectedResult => r.status === 'rejected'
+      )
+      const reason =
+        rejected?.reason instanceof Error ? rejected.reason.message : 'Please try again.'
+      toast.error(`Failed to validate configuration: ${reason}`)
       setHasRunValidation(false)
       return false
     }
@@ -481,7 +486,7 @@ export const DestinationForm = ({
       }
     } catch (error) {
       const action = editMode ? 'apply and run' : 'create and start'
-      toast.error(`Failed to ${action} destination`)
+      toast.error(`Failed to ${action} destination: ${(error as Error).message}`)
     }
   }
 
