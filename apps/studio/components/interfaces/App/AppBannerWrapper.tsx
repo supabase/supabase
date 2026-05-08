@@ -11,8 +11,6 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const showNoticeBanner2 = useFlag('showNoticeBanner2')
   const clockSkewBanner = useFlag('clockSkewBanner')
 
-  console.log('showNoticeBanner2?', showNoticeBanner2)
-
   return (
     <div className="flex flex-col">
       <div className="shrink-0">
