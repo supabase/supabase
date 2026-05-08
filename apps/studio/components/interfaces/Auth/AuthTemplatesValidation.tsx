@@ -43,7 +43,7 @@ const INVITE: FormSchema = {
   id: 'INVITE',
   type: 'object',
   title: 'Invite user',
-  purpose: "Invite users who don't yet have an account to sign up",
+  purpose: 'Invite someone to create an account',
   properties: {
     MAILER_SUBJECTS_INVITE: {
       title: 'Subject',
@@ -76,8 +76,8 @@ const MAGIC_LINK: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'MAGIC_LINK',
   type: 'object',
-  title: 'Magic link',
-  purpose: 'Allow users to sign in via a one-time link sent to their email',
+  title: 'Sign-in link or code',
+  purpose: 'Send a one-time sign-in link or code',
   properties: {
     MAILER_SUBJECTS_MAGIC_LINK: {
       title: 'Subject',
@@ -88,7 +88,7 @@ const MAGIC_LINK: FormSchema = {
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: `
-- \`{{ .ConfirmationURL }}\` : URL for a one-time login to the user's account
+- \`{{ .ConfirmationURL }}\` : URL for a one-time sign-in to the user's account
 - \`{{ .Token }}\` : The 6-digit numeric email OTP
 - \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
@@ -146,7 +146,7 @@ const RECOVERY: FormSchema = {
   id: 'RECOVERY',
   type: 'object',
   title: 'Reset password',
-  purpose: 'Allow users to reset their password if they forget it',
+  purpose: 'Send a password reset link or code',
   properties: {
     MAILER_SUBJECTS_RECOVERY: {
       title: 'Subject',
@@ -179,7 +179,7 @@ const REAUTHENTICATION: FormSchema = {
   id: 'REAUTHENTICATION',
   type: 'object',
   title: 'Reauthentication',
-  purpose: 'Ask users to re-authenticate before performing a sensitive action',
+  purpose: 'Ask users to verify their identity before a sensitive operation',
   properties: {
     MAILER_SUBJECTS_REAUTHENTICATION: {
       title: 'Subject',
@@ -300,8 +300,8 @@ const IDENTITY_LINKED_NOTIFICATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'IDENTITY_LINKED_NOTIFICATION',
   type: 'object',
-  title: 'Identity linked',
-  purpose: 'Notify users when a new identity has been linked to their account',
+  title: 'New sign-in method linked',
+  purpose: 'Notify users when a new sign-in method has been linked to their account',
   properties: {
     MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: {
       title: 'Subject',
@@ -313,7 +313,7 @@ const IDENTITY_LINKED_NOTIFICATION: FormSchema = {
       type: 'code',
       description: `
 - \`{{ .Email }}\` : The user's email address
-- \`{{ .Provider }}\` : The provider of the newly linked identity
+- \`{{ .Provider }}\` : The provider of the newly linked sign-in method
 - \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
@@ -330,8 +330,8 @@ const IDENTITY_UNLINKED_NOTIFICATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'IDENTITY_UNLINKED_NOTIFICATION',
   type: 'object',
-  title: 'Identity unlinked',
-  purpose: 'Notify users when an identity has been unlinked from their account',
+  title: 'Sign-in method removed',
+  purpose: 'Notify users when a sign-in method has been removed from their account',
   properties: {
     MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION: {
       title: 'Subject',
@@ -343,7 +343,7 @@ const IDENTITY_UNLINKED_NOTIFICATION: FormSchema = {
       type: 'code',
       description: `
 - \`{{ .Email }}\` : The user's email address
-- \`{{ .Provider }}\` : The provider of the unlinked identity
+- \`{{ .Provider }}\` : The provider of the removed sign-in method
 - \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
@@ -374,7 +374,7 @@ const MFA_FACTOR_ENROLLED_NOTIFICATION: FormSchema = {
       type: 'code',
       description: `
 - \`{{ .Email }}\` : The user's email address
-- \`{{ .FactorType }}\` : The type of the newly enrolled MFA factor
+- \`{{ .FactorType }}\` : The type of verification method that was added
 - \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
@@ -405,7 +405,7 @@ const MFA_FACTOR_UNENROLLED_NOTIFICATION: FormSchema = {
       type: 'code',
       description: `
 - \`{{ .Email }}\` : The user's email address
-- \`{{ .FactorType }}\` : The type of the newly enrolled MFA factor
+- \`{{ .FactorType }}\` : The type of verification method that was removed
 - \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
