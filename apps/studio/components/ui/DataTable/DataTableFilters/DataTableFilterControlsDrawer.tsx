@@ -35,9 +35,14 @@ export function DataTableFilterControlsDrawer() {
       <Tooltip>
         <TooltipTrigger asChild>
           <DrawerTrigger asChild>
-            <Button className="h-9 w-9" ref={isMobile ? triggerButtonRef : null}>
-              <FilterIcon className="w-4 h-4" />
-            </Button>
+            <Button
+              size="tiny"
+              type="text"
+              icon={<FilterIcon />}
+              className="w-[26px]"
+              ref={isMobile ? triggerButtonRef : null}
+              aria-label="Open filters"
+            />
           </DrawerTrigger>
         </TooltipTrigger>
         <TooltipContent side="right">

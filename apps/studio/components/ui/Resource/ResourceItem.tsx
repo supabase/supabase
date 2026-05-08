@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { forwardRef, HTMLAttributes, KeyboardEvent, ReactNode } from 'react'
 import {
   Button,
+  CardContent,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -96,21 +97,27 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
     )
 
     const rootClassName = cn(
-      'py-4 px-[var(--card-padding-x)] border-b last:border-none flex items-center justify-between text-sm gap-4',
+      'flex items-center justify-between text-sm gap-4',
+      'border-b-0!',
       (onClick || href) && 'cursor-pointer transition-colors duration-150 hover:bg-surface-200',
       className
     )
 
     if (href) {
       return (
-        <Link href={href} target={target} rel={rel} className={rootClassName}>
+        <Link
+          href={href}
+          target={target}
+          rel={rel}
+          className={cn('py-4 px-(--card-padding-x) border-b last:border-none', rootClassName)}
+        >
           {content}
         </Link>
       )
     }
 
     return (
-      <div
+      <CardContent
         ref={ref}
         className={rootClassName}
         onClick={onClick}
@@ -120,7 +127,7 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
         {...props}
       >
         {content}
-      </div>
+      </CardContent>
     )
   }
 )

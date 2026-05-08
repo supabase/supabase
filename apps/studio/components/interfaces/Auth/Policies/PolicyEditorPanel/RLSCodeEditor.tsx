@@ -33,6 +33,7 @@ interface RLSCodeEditorProps {
 export const RLSCodeEditor = ({
   id,
   defaultValue,
+  onInputChange,
   wrapperClassName,
   className,
   value,
@@ -115,6 +116,7 @@ export const RLSCodeEditor = ({
     }
 
     onChange()
+    onInputChange?.(value)
   }
 
   // when the value has changed, trigger the onChange callback so that the height of the container can be adjusted.
@@ -170,8 +172,8 @@ export const RLSCodeEditor = ({
         <div
           id={placeholderId}
           className={cn(
-            'monaco-placeholder absolute top-[0px] left-[57px] text-sm pointer-events-none font-mono tracking-tighter',
-            '[&>div>p]:text-foreground-lighter [&>div>p]:!m-0'
+            'monaco-placeholder absolute top-0 left-[57px] text-sm pointer-events-none font-mono tracking-tighter',
+            '[&>div>p]:text-foreground-lighter [&>div>p]:m-0!'
           )}
           style={{ display: 'none' }}
         >

@@ -538,9 +538,9 @@ export const LogTable = ({
                 const isMultiSelected = selectedRows.has(key)
                 const isSingleSelected = isEqual(row, selectedRow)
                 return cn(
-                  'font-mono tracking-tight !bg-studio hover:!bg-surface-100 cursor-pointer',
+                  'font-mono tracking-tight bg-studio! hover:bg-surface-100! cursor-pointer',
                   {
-                    '!bg-surface-200 rdg-row--focused': isSingleSelected || isMultiSelected,
+                    'bg-surface-200! rdg-row--focused': isSingleSelected || isMultiSelected,
                   }
                 )
               }}

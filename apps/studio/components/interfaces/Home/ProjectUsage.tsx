@@ -114,7 +114,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                   <Database strokeWidth={1.5} size={16} />
                 </div>
               }
@@ -140,7 +140,7 @@ const ProjectUsage = () => {
             <Panel.Content className="space-y-4">
               <PanelHeader
                 icon={
-                  <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                  <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                     <Auth strokeWidth={1.5} size={16} />
                   </div>
                 }
@@ -166,7 +166,7 @@ const ProjectUsage = () => {
             <Panel.Content className="space-y-4">
               <PanelHeader
                 icon={
-                  <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                  <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                     <Storage strokeWidth={1.5} size={16} />
                   </div>
                 }
@@ -192,7 +192,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                <div className="rounded-sm bg-surface-300 p-1.5 text-foreground-light shadow-xs">
                   <Realtime strokeWidth={1.5} size={16} />
                 </div>
               }

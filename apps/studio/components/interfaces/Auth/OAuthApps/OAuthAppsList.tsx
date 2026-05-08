@@ -13,7 +13,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Table,
   TableBody,
   TableCell,
@@ -231,14 +233,17 @@ export const OAuthAppsList = () => {
         )}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-            <Input
-              placeholder="Search OAuth apps"
-              size="tiny"
-              icon={<Search />}
-              value={filterString}
-              className="w-full lg:w-52"
-              onChange={(e) => setFilterString(e.target.value)}
-            />
+            <InputGroup className="w-full lg:w-52">
+              <InputGroupInput
+                size="tiny"
+                placeholder="Search OAuth apps"
+                value={filterString}
+                onChange={(e) => setFilterString(e.target.value)}
+              />
+              <InputGroupAddon>
+                <Search />
+              </InputGroupAddon>
+            </InputGroup>
             <FilterPopover
               name="Registration Type"
               options={OAUTH_APP_REGISTRATION_TYPE_OPTIONS}
@@ -278,7 +283,7 @@ export const OAuthAppsList = () => {
               disabled={!isOAuthServerEnabled}
               icon={<Plus />}
               onClick={() => setShowCreateSheet(true)}
-              className="flex-grow"
+              className="grow"
               tooltip={{
                 content: {
                   side: 'bottom',
@@ -332,7 +337,7 @@ export const OAuthAppsList = () => {
                     </TableHeadSort>
                   </TableHead>
                   <TableHead className="w-8 px-0">
-                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
+                    <div className="bg-200! px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -350,7 +355,7 @@ export const OAuthAppsList = () => {
                       <TableCell title={app.client_name}>
                         <Button
                           type="text"
-                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:!w-full"
+                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:w-full!"
                           onClick={() => setSelectedAppToEdit(app.client_id)}
                           title={app.client_name}
                         >

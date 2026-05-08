@@ -456,7 +456,7 @@ const Reports = () => {
         {config?.layout !== undefined && config.layout.length === 0 ? (
           <div
             className={cn(
-              'flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 border-default transition duration-100',
+              'flex min-h-full items-center justify-center rounded-sm border-2 border-dashed p-16 border-default transition duration-100',
               isDraggedOver ? 'bg-surface-100' : ''
             )}
             onDragOver={onDragOverEmptyState}
@@ -479,7 +479,7 @@ const Reports = () => {
             )}
           </div>
         ) : (
-          <div className="relative mb-16 flex-grow">
+          <div className="relative mb-16 grow">
             {config && startDate && endDate && (
               <GridResize
                 startDate={startDate}

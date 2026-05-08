@@ -11,7 +11,7 @@
 #   sh test-s3-backend.sh <backend_url>     # Custom URL
 #
 # Prerequisites:
-#   - Running self-hosted Supabase instance with S3 backend + test overlay:
+#   - Running self-hosted Supabase instance with S3 backend + test override:
 #       docker compose -f docker-compose.yml -f docker-compose.s3.yml \
 #         -f ./tests/docker-compose.s3.test.yml up -d
 #   - .env file with MINIO_ROOT_USER, MINIO_ROOT_PASSWORD, GLOBAL_S3_BUCKET
@@ -90,7 +90,7 @@ list_ok=$(echo "$list_output" | jq -r 'if .Buckets then "true" else "false" end'
 check "Backend reachable (ListBuckets)" "true" "$list_ok"
 
 if [ "$list_ok" != "true" ]; then
-    echo "  Cannot reach backend. Is the test overlay running?"
+    echo "  Cannot reach backend. Is the test override running?"
     echo "  Response: $list_output"
     echo ""
     echo "=== Results: $pass passed, $fail failed ==="

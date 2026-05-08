@@ -91,7 +91,7 @@ const CronJobRunDetailsOverflowDialog = ({
           <p className="text-sm">
             The dashboard fetches data for the cron jobs overview by running a join between the{' '}
             <code className="text-code-inline">cron.job</code> and{' '}
-            <code className="text-code-inline !break-keep">cron.job_run_details</code> tables to
+            <code className="text-code-inline break-keep!">cron.job_run_details</code> tables to
             show each cron job's latest run.
           </p>
 
@@ -107,7 +107,7 @@ const CronJobRunDetailsOverflowDialog = ({
               </TooltipContent>
             </Tooltip>{' '}
             exceeds safety thresholds, likely due to the size of{' '}
-            <code className="text-code-inline !break-keep">cron.job_run_details</code> table.
+            <code className="text-code-inline break-keep!">cron.job_run_details</code> table.
           </p>
         </DialogSection>
 

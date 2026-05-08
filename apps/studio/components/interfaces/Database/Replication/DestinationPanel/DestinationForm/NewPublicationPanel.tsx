@@ -87,7 +87,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
               <SheetTitle>Create a new Publication</SheetTitle>
               <SheetDescription>Replicate table changes to destinations</SheetDescription>
             </SheetHeader>
-            <SheetSection className="flex-grow overflow-auto">
+            <SheetSection className="grow overflow-auto">
               <Form {...form}>
                 <form
                   id={formId}

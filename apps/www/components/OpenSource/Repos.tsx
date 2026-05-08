@@ -158,17 +158,17 @@ const Repos = ({ tabs }: Props) => {
                     : SWIPER_STATE.MIDDLE
               )
             }
-            className="relative flex md:!hidden justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"
+            className="relative flex md:hidden! justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"
           >
             <div
               className={cn(
-                'not-sr-only absolute inset-0 left-auto bg-gradient-to-r from-transparent to-background-surface-100 w-10 z-20 pointer-events-none opacity-0 transition-opacity',
+                'not-sr-only absolute inset-0 left-auto bg-linear-to-r from-transparent to-background-surface-100 w-10 z-20 pointer-events-none opacity-0 transition-opacity',
                 swiperState !== SWIPER_STATE.END && 'opacity-100'
               )}
             />
             <div
               className={cn(
-                'not-sr-only absolute inset-0 right-auto bg-gradient-to-l from-transparent to-background-surface-100 w-10 z-20 pointer-events-none opacity-0 transition-opacity',
+                'not-sr-only absolute inset-0 right-auto bg-linear-to-l from-transparent to-background-surface-100 w-10 z-20 pointer-events-none opacity-0 transition-opacity',
                 swiperState !== SWIPER_STATE.START && 'opacity-100'
               )}
             />

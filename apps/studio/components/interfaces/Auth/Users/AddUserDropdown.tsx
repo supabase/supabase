@@ -56,7 +56,7 @@ export const AddUserDropdown = () => {
           )}
 
           <DropdownMenuItemTooltip
-            className="space-x-2 !pointer-events-auto"
+            className="space-x-2 pointer-events-auto!"
             disabled={!canCreateUsers}
             onClick={() => {
               if (canCreateUsers) setCreateVisible(true)

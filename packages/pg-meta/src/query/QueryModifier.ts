@@ -1,3 +1,4 @@
+import { safeSql, type SafeSqlFragment } from '../pg-format'
 import {
   countQuery,
   deleteQuery,
@@ -6,7 +7,7 @@ import {
   truncateQuery,
   updateQuery,
 } from './Query.utils'
-import type { Dictionary, Filter, QueryPagination, QueryTable, Sort } from './types'
+import type { ActionConfig, Filter, QueryPagination, QueryTable, Sort } from './types'
 
 export interface IQueryModifier {
   range: (from: number, to: number) => QueryModifier
@@ -18,12 +19,11 @@ export class QueryModifier implements IQueryModifier {
 
   constructor(
     protected table: QueryTable,
-    protected action: 'count' | 'delete' | 'insert' | 'select' | 'update' | 'truncate',
+    protected actionConfig: ActionConfig,
     protected options?: {
-      actionValue?: string | string[] | Dictionary<any> | Dictionary<any>[]
-      actionOptions?: { returning?: boolean; cascade?: boolean; enumArrayColumns?: string[] }
-      filters?: Filter[]
-      sorts?: Sort[]
+      actionOptions?: { returning?: boolean; cascade?: boolean; enumArrayColumns?: Array<string> }
+      filters?: Array<Filter>
+      sorts?: Array<Sort>
     }
   ) {}
 
@@ -41,10 +41,12 @@ export class QueryModifier implements IQueryModifier {
   /**
    * Return SQL string for query chains
    */
-  toSql(options: { isCTE: boolean; isFinal: boolean } = { isCTE: false, isFinal: true }) {
+  toSql(
+    options: { isCTE: boolean; isFinal: boolean } = { isCTE: false, isFinal: true }
+  ): SafeSqlFragment {
     try {
-      const { actionValue, actionOptions, filters, sorts } = this.options ?? {}
-      switch (this.action) {
+      const { actionOptions, filters, sorts } = this.options ?? {}
+      switch (this.actionConfig.action) {
         case 'count': {
           return countQuery(this.table, { filters })
         }
@@ -55,7 +57,7 @@ export class QueryModifier implements IQueryModifier {
           })
         }
         case 'insert': {
-          return insertQuery(this.table, actionValue as Dictionary<any>[], {
+          return insertQuery(this.table, this.actionConfig.actionValue, {
             returning: actionOptions?.returning,
             enumArrayColumns: actionOptions?.enumArrayColumns,
           })
@@ -63,7 +65,7 @@ export class QueryModifier implements IQueryModifier {
         case 'select': {
           return selectQuery(
             this.table,
-            actionValue as string | undefined,
+            this.actionConfig.actionValue,
             {
               filters,
               pagination: this.pagination,
@@ -74,7 +76,7 @@ export class QueryModifier implements IQueryModifier {
           )
         }
         case 'update': {
-          return updateQuery(this.table, actionValue as Dictionary<any>, {
+          return updateQuery(this.table, this.actionConfig.actionValue, {
             filters,
             returning: actionOptions?.returning,
             enumArrayColumns: actionOptions?.enumArrayColumns,
@@ -86,7 +88,7 @@ export class QueryModifier implements IQueryModifier {
           })
         }
         default: {
-          return ''
+          return safeSql``
         }
       }
     } catch (error) {

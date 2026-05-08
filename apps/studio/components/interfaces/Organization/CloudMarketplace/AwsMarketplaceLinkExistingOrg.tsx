@@ -247,14 +247,14 @@ export const AwsMarketplaceLinkExistingOrg = ({
                   </p>
                   <ChevronRight
                     size={16}
-                    className="text-foreground-lighter transition-all group-data-[state=open]:rotate-90"
+                    className="text-foreground-lighter transition-all group-data-open:rotate-90"
                     strokeWidth={1}
                   />
                 </CollapsibleTrigger_Shadcn_>
                 <CollapsibleContent_Shadcn_
                   className={cn(
                     'flex flex-col gap-4 transition-all',
-                    'data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+                    'data-closed:animate-collapsible-up data-open:animate-collapsible-down'
                   )}
                 >
                   <p className="text-foreground-light text-xs">

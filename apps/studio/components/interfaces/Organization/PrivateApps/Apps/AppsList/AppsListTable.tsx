@@ -95,7 +95,7 @@ export function AppsListTable({
                       )}
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
-                        className="!text-destructive gap-x-2"
+                        className="text-destructive! gap-x-2"
                         onClick={() => onDeleteApp(app)}
                       >
                         <Trash size={14} />

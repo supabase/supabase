@@ -161,7 +161,7 @@ export const SqlSnippet = ({
   }
 
   return (
-    <div className="my-3 mt-2 border rounded bg-surface-100 overflow-hidden">
+    <div className="my-3 mt-2 border rounded-sm bg-surface-100 overflow-hidden">
       <div className="">
         <div className="flex items-center gap-2 px-4 py-1">
           <SQL_ICON

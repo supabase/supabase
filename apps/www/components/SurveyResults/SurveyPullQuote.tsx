@@ -24,7 +24,7 @@ export function SurveyPullQuote({
             maskPosition: 'top left',
           }}
         />
-        <div className="relative max-w-[60rem] mx-auto md:border-x border-muted flex flex-col gap-4 text-center items-center px-6 py-24 bg-alternative">
+        <div className="relative max-w-240 mx-auto md:border-x border-muted flex flex-col gap-4 text-center items-center px-6 py-24 bg-alternative">
           <p className="text-foreground-lighter text-2xl tracking-tight text-balance max-w-prose">
             “{quote}”
           </p>

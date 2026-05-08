@@ -79,11 +79,11 @@ export const SchemaComboBox = ({
       )}
 
       {showError && isSchemasError && (
-        <Alert_Shadcn_ variant="warning" className="!px-3 !py-3">
+        <Alert_Shadcn_ variant="warning" className="px-3! py-3!">
           <AlertTitle_Shadcn_ className="text-xs text-amber-900">
             Failed to load schemas
           </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_ className="text-xs mb-2 break-words">
+          <AlertDescription_Shadcn_ className="text-xs mb-2 wrap-break-word">
             Error: {(schemasError as any)?.message}
           </AlertDescription_Shadcn_>
           <Button type="default" size="tiny" onClick={() => refetchSchemas()}>

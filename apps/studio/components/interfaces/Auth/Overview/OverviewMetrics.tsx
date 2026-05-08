@@ -288,7 +288,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                   <ChartTitle>Auth API Errors</ChartTitle>
                 </ChartHeader>
                 <ChartContent
-                  className="!p-0"
+                  className="p-0!"
                   isEmpty={responseErrors.length === 0}
                   emptyState={
                     <div className="p-6">
@@ -312,7 +312,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                       {
                         key: 'request',
                         header: 'Request',
-                        className: 'w-auto !pr-0',
+                        className: 'w-auto pr-0!',
                         render: (row) => {
                           return <StatusCode method={row.method} statusCode={row.status_code} />
                         },
@@ -330,7 +330,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                       {
                         key: 'count',
                         header: 'Count',
-                        className: 'text-right flex-shrink-0 ml-auto justify-end',
+                        className: 'text-right shrink-0 ml-auto justify-end',
                         render: (row) => (
                           <div className="flex justify-end items-center gap-2">
                             <div className="text-right text-xs tabular-nums">{row.count}</div>
@@ -351,7 +351,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                   <ChartActions actions={errorCodesActions} />
                 </ChartHeader>
                 <ChartContent
-                  className="!p-0"
+                  className="p-0!"
                   isEmpty={errorCodes.length === 0}
                   emptyState={
                     <div className="p-6">

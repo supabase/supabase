@@ -1,16 +1,21 @@
 import { render, renderHook } from '@testing-library/react'
+import type { ICommand } from 'ui-patterns/CommandMenu/api/types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from './registry'
 import { useShortcut } from './useShortcut'
 
-const { mockUseHotkeySequence, mockUseRegisterCommands, mockUseIsShortcutEnabled } = vi.hoisted(
-  () => ({
-    mockUseHotkeySequence: vi.fn(),
-    mockUseRegisterCommands: vi.fn(),
-    mockUseIsShortcutEnabled: vi.fn(),
-  })
-)
+const {
+  mockUseHotkeySequence,
+  mockUseRegisterCommands,
+  mockUseIsShortcutEnabled,
+  mockSetCommandMenuOpen,
+} = vi.hoisted(() => ({
+  mockUseHotkeySequence: vi.fn(),
+  mockUseRegisterCommands: vi.fn(),
+  mockUseIsShortcutEnabled: vi.fn(),
+  mockSetCommandMenuOpen: vi.fn(),
+}))
 
 vi.mock('@tanstack/react-hotkeys', () => ({
   useHotkeySequence: mockUseHotkeySequence,
@@ -18,6 +23,7 @@ vi.mock('@tanstack/react-hotkeys', () => ({
 
 vi.mock('ui-patterns/CommandMenu', () => ({
   useRegisterCommands: mockUseRegisterCommands,
+  useSetCommandMenuOpen: () => mockSetCommandMenuOpen,
 }))
 
 vi.mock('./useIsShortcutEnabled', () => ({
@@ -36,7 +42,7 @@ const getLastRegisterCall = () => {
   return call as [
     string,
     Array<{ id: string; name: string; action: () => void; badge: () => any }>,
-    { enabled: boolean; deps: unknown[] },
+    { enabled: boolean; deps: unknown[]; orderCommands?: unknown },
   ]
 }
 
@@ -204,6 +210,19 @@ describe('useShortcut', () => {
       expect(cb2).toHaveBeenCalledTimes(1)
     })
 
+    it('command action closes the command menu when fired', () => {
+      const cb = vi.fn()
+      renderHook(() =>
+        useShortcut(SHORTCUT_IDS.COMMAND_MENU_OPEN, cb, { registerInCommandMenu: true })
+      )
+      const action = mockUseRegisterCommands.mock.calls[0][1][0].action
+
+      action()
+
+      expect(mockSetCommandMenuOpen).toHaveBeenCalledWith(false)
+      expect(cb).toHaveBeenCalledTimes(1)
+    })
+
     it('command action identity is stable across renders', () => {
       const { rerender } = renderHook(
         ({ cb }: { cb: () => void }) =>
@@ -226,6 +245,32 @@ describe('useShortcut', () => {
       expect(options.deps).toEqual([
         true,
         SHORTCUT_DEFINITIONS[SHORTCUT_IDS.COMMAND_MENU_OPEN].label,
+      ])
+    })
+
+    it('orders "Show all keyboard shortcuts" last within the Shortcuts section', () => {
+      renderHook(() =>
+        useShortcut(SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE, vi.fn(), { registerInCommandMenu: true })
+      )
+
+      const [, commands, options] = getLastRegisterCall()
+      const orderCommands = options.orderCommands as (
+        existing: ICommand[],
+        commandsToInsert: ICommand[]
+      ) => ICommand[]
+
+      const ordered = orderCommands(
+        [
+          { id: SHORTCUT_IDS.TABLE_EDITOR_INSERT_ROW, name: 'Insert row', action: vi.fn() },
+          { id: SHORTCUT_IDS.TABLE_EDITOR_INSERT_COLUMN, name: 'Insert column', action: vi.fn() },
+        ],
+        commands
+      )
+
+      expect(ordered.map((command) => command.id)).toEqual([
+        SHORTCUT_IDS.TABLE_EDITOR_INSERT_ROW,
+        SHORTCUT_IDS.TABLE_EDITOR_INSERT_COLUMN,
+        SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE,
       ])
     })
 

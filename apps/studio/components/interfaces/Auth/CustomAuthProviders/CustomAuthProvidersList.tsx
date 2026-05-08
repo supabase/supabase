@@ -15,7 +15,9 @@ import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Table,
   TableBody,
   TableCell,
@@ -78,7 +80,7 @@ const NewProviderButton = ({
       disabled={!canCreateProvider}
       icon={<Plus />}
       onClick={() => setShowCreateSheet(true)}
-      className="flex-grow"
+      className="grow"
     >
       New Provider
     </Button>
@@ -284,14 +286,17 @@ export const CustomAuthProvidersList = () => {
       <div className="flex flex-col gap-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-            <Input
-              placeholder="Search custom providers"
-              size="tiny"
-              icon={<Search />}
-              value={filterString}
-              className="w-full lg:w-52"
-              onChange={(e) => setFilterString(e.target.value)}
-            />
+            <InputGroup className="w-full lg:w-52">
+              <InputGroupInput
+                size="tiny"
+                placeholder="Search custom providers"
+                value={filterString}
+                onChange={(e) => setFilterString(e.target.value)}
+              />
+              <InputGroupAddon>
+                <Search />
+              </InputGroupAddon>
+            </InputGroup>
             <FilterPopover
               name="Provider Type"
               options={CUSTOM_PROVIDER_TYPE_OPTIONS}
@@ -403,7 +408,7 @@ export const CustomAuthProvidersList = () => {
                   </TableHead>
                   <TableHead>Enabled</TableHead>
                   <TableHead className="w-8 px-0">
-                    <div className="!bg-200 px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
+                    <div className="bg-200! px-4 w-full h-full flex items-center border-l @[944px]:border-l-0" />
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -421,7 +426,7 @@ export const CustomAuthProvidersList = () => {
                       <TableCell className="flex" title={provider.name}>
                         <Button
                           type="text"
-                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:!w-full"
+                          className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:w-full!"
                           onClick={() => setSelectedProviderToEdit(provider.id)}
                           title={provider.name}
                         >

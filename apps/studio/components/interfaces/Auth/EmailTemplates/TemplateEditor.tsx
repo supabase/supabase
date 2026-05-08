@@ -25,7 +25,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SpamValidation } from './SpamValidation'
 import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
 import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
-import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
@@ -279,18 +279,18 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                   width={60}
                   options={['preview', 'source']}
                   activeOption={activeView}
-                  onClickOption={(option: 'source' | 'preview') => setActiveView(option)}
+                  onClickOption={(option) => setActiveView(option as 'source' | 'preview')}
                   borderOverride="border-muted"
                 />
               </div>
               {activeView === 'source' ? (
                 <>
-                  <div className="overflow-hidden rounded-md border dark:border-control overflow-hidden [&_.monaco-editor]:outline-0 [&_.monaco-editor-background]:!bg-surface-200/30 [&_.monaco-editor_.margin]:!bg-surface-200/30 dark:[&_.monaco-editor-background]:!bg-surface-300 dark:[&_.monaco-editor_.margin]:!bg-surface-300">
+                  <div className="overflow-hidden rounded-md border dark:border-control overflow-hidden [&_.monaco-editor]:outline-0 [&_.monaco-editor-background]:bg-surface-200/30! [&_.monaco-editor_.margin]:bg-surface-200/30! dark:[&_.monaco-editor-background]:bg-surface-300! dark:[&_.monaco-editor_.margin]:bg-surface-300!">
                     <CodeEditor
                       id="code-id"
                       language="html"
                       isReadOnly={!canUpdateConfig}
-                      className="!mb-0 relative h-96 outline-none outline-offset-0 outline-width-0 outline-0"
+                      className="mb-0! relative h-96 outline-hidden outline-offset-0 outline-width-0 outline-0"
                       onInputChange={(e: string | undefined) => {
                         setBodyValue(e ?? '')
                         if (bodyValue !== e) setHasUnsavedChanges(true)
@@ -325,7 +325,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
               ) : (
                 <>
                   <iframe
-                    className="!mb-0 mt-0 overflow-hidden h-96 w-full rounded-md border bg-white"
+                    className="mb-0! mt-0 overflow-hidden h-96 w-full rounded-md border bg-white"
                     title={id}
                     srcDoc={bodyValue}
                     sandbox="allow-scripts allow-forms"

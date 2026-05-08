@@ -246,7 +246,10 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
   const onSuccessfulPayment = async () => {
     onTopUpDialogVisibilityChange(false)
-    await queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) })
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) }),
+      queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgBalance(slug) }),
+    ])
     toast.success(
       'Successfully topped up balance. It may take a minute to reflect in your account.'
     )
@@ -280,14 +283,14 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
           size="invisible"
           onOpen={() => {
             // [Joshen] This is to ensure that hCaptcha popup remains clickable
-            if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+            if (document !== undefined) document.body.classList.add('pointer-events-auto!')
           }}
           onClose={() => {
-            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+            if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
           }}
           onVerify={(token) => {
             setCaptchaToken(token)
-            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+            if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
           }}
           onExpire={() => {
             setCaptchaToken(null)
@@ -410,7 +413,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                   {creditPreview.tax_status === 'calculated' &&
                     creditPreview.tax &&
                     creditPreview.tax.tax_amount > 0 && (
-                      <p className="mt-2 text-xs text-foreground-muted">
+                      <p className="mt-2 text-xs text-foreground-light">
                         You'll receive {formatCurrency(creditPreview.amount)} in credits.
                       </p>
                     )}
@@ -423,7 +426,9 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                 <Button
                   htmlType="submit"
                   type="primary"
-                  loading={executingTopUp || paymentConfirmationLoading}
+                  loading={
+                    form.formState.isSubmitting || executingTopUp || paymentConfirmationLoading
+                  }
                   disabled={isPreviewStale || creditPreviewIsFetching}
                 >
                   Top Up
