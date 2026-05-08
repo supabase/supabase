@@ -3,7 +3,7 @@
   "menuTitle": "Javascript",
   "icon": "reference-javascript",
   "title": "JavaScript Client Library",
-  "subtitle": "Use the `supabase-js` package to interact with your Postgres database, listen to database changes, invoke Deno Edge Functions, build login and user management functionality, and manage large files.",
+  "subtitle": "This reference documents every object and method available in Supabase's isomorphic JavaScript library. Use it to interact with your Postgres database, listen to database changes, invoke Deno Edge Functions, build login and user management functionality, and manage large files. To convert SQL queries to `supabase-js` calls, use the [SQL to REST API translator](/docs/guides/api/sql-to-rest).",
   "referenceLink": "https://github.com/supabase/supabase-js",
   "referenceLinkLabel": "@supabase/supabase-js",
   "versions": ["v2", "v1"],
