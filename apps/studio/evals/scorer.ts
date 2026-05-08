@@ -105,15 +105,19 @@ export const knowledgeUsageScorer: EvalScorer<
 const concisenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
   name: 'Conciseness',
   promptTemplate: stripIndent`
-    Evaluate the conciseness of this response.
+    Evaluate the conciseness of the assistant's prose response.
 
     Input: {{input}}
     Output: {{output}}
 
-    Is the response concise and free of unnecessary words?
-    a) Very concise - no wasted words
-    b) Acceptable verbosity - some verbosity but acceptable
-    c) Too verbose - contains superfluous wording or overly verbose
+    The output may include bracketed tool call markers like [called execute_sql].
+    Tool calls are visible agent actions, but they are not prose. Ignore tool call markers when judging verbosity.
+    Do consider whether the assistant's natural-language text is unnecessarily long, repetitive, padded, or over-explained for the user's request.
+
+    Is the assistant's prose concise and free of unnecessary words?
+    a) Very concise - no wasted prose
+    b) Acceptable verbosity - some extra wording but still reasonable
+    c) Too verbose - prose contains superfluous wording, repetition, or over-explanation
   `,
   choiceScores: { a: 1, b: 0.5, c: 0 },
   useCoT: true,
