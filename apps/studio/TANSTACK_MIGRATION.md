@@ -72,7 +72,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/project/$ref.tsx` — DefaultLayout only. **Delta vs plan:** ProjectLayoutWithAuth omitted from the shell because product layouts (DatabaseLayout, AuthLayout, StorageLayout, …) already render `withAuth(... ProjectLayout ...)` internally — adding it here would double-wrap. The home page (`/project/$ref/index.tsx`) wraps itself in `ProjectLayoutWithAuth` since it has no product layout.
 - [x] `routes/project/$ref/database.tsx` — DatabaseLayout (reads `databaseLayoutTitle` from leaf `staticData`)
 - [x] `routes/project/$ref/database/triggers.tsx` — sub-shell with `PageLayout` + permission gate + nav items, inlined from `DatabaseTriggersLayout`. **Delta vs plan:** the existing `DatabaseTriggersLayout` component wraps `<DatabaseLayout title="Triggers">` internally, so re-using it inside the database.tsx shell would double-wrap. Inlined the inner part instead; the Next-side component is left untouched (still used by the `pages/...` files we re-export).
-- [ ] `routes/project/$ref/auth.tsx` — AuthLayout
+- [x] `routes/project/$ref/auth.tsx` — AuthLayout (reads `authLayoutTitle` from leaf `staticData`). **Delta vs plan:** shell honours a `skipAuthLayout: true` opt-out in `staticData` for leaves whose own body or sub-layout already wraps in `AuthLayout` (`AuthProvidersLayout`, `AuthEmailsLayout`, `pages/.../auth/third-party.tsx`) — without it those routes would double-wrap (which also doubles `withAuth` + `ProjectLayout`).
 - [ ] `routes/project/$ref/auth/templates.tsx` — AuthEmailsLayout
 - [ ] `routes/project/$ref/storage.tsx` — StorageLayout
 - [ ] `routes/project/$ref/realtime.tsx` — RealtimeLayout
@@ -175,21 +175,21 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/auth/*`
 
-- [ ] `routes/project/$ref/auth/overview.tsx` ← `pages/project/[ref]/auth/overview.tsx`
-- [ ] `routes/project/$ref/auth/users.tsx` ← `pages/project/[ref]/auth/users.tsx`
-- [ ] `routes/project/$ref/auth/policies.tsx` ← `pages/project/[ref]/auth/policies.tsx`
+- [x] A `routes/project/$ref/auth/overview.tsx` ← `pages/project/[ref]/auth/overview.tsx`
+- [x] A `routes/project/$ref/auth/users.tsx` ← `pages/project/[ref]/auth/users.tsx`
+- [x] A `routes/project/$ref/auth/policies.tsx` ← `pages/project/[ref]/auth/policies.tsx`
 - [ ] `routes/project/$ref/auth/providers.tsx` ← `pages/project/[ref]/auth/providers.tsx`
-- [ ] `routes/project/$ref/auth/mfa.tsx` ← `pages/project/[ref]/auth/mfa.tsx`
-- [ ] `routes/project/$ref/auth/hooks.tsx` ← `pages/project/[ref]/auth/hooks.tsx`
+- [x] A `routes/project/$ref/auth/mfa.tsx` ← `pages/project/[ref]/auth/mfa.tsx`
+- [x] A `routes/project/$ref/auth/hooks.tsx` ← `pages/project/[ref]/auth/hooks.tsx`
 - [ ] `routes/project/$ref/auth/smtp.tsx` ← `pages/project/[ref]/auth/smtp.tsx`
-- [ ] `routes/project/$ref/auth/sessions.tsx` ← `pages/project/[ref]/auth/sessions.tsx`
-- [ ] `routes/project/$ref/auth/passkeys.tsx` ← `pages/project/[ref]/auth/passkeys.tsx`
+- [x] A `routes/project/$ref/auth/sessions.tsx` ← `pages/project/[ref]/auth/sessions.tsx`
+- [x] A `routes/project/$ref/auth/passkeys.tsx` ← `pages/project/[ref]/auth/passkeys.tsx`
 - [ ] `routes/project/$ref/auth/performance.tsx` ← `pages/project/[ref]/auth/performance.tsx`
 - [ ] `routes/project/$ref/auth/protection.tsx` ← `pages/project/[ref]/auth/protection.tsx`
 - [ ] `routes/project/$ref/auth/rate-limits.tsx` ← `pages/project/[ref]/auth/rate-limits.tsx`
 - [ ] `routes/project/$ref/auth/third-party.tsx` ← `pages/project/[ref]/auth/third-party.tsx`
-- [ ] `routes/project/$ref/auth/oauth-apps.tsx` ← `pages/project/[ref]/auth/oauth-apps.tsx`
-- [ ] `routes/project/$ref/auth/oauth-server.tsx` ← `pages/project/[ref]/auth/oauth-server.tsx`
+- [x] A `routes/project/$ref/auth/oauth-apps.tsx` ← `pages/project/[ref]/auth/oauth-apps.tsx`
+- [x] A `routes/project/$ref/auth/oauth-server.tsx` ← `pages/project/[ref]/auth/oauth-server.tsx`
 - [ ] `routes/project/$ref/auth/url-configuration.tsx` ← `pages/project/[ref]/auth/url-configuration.tsx`
 - [ ] `routes/project/$ref/auth/audit-logs.tsx` ← `pages/project/[ref]/auth/audit-logs.tsx`
 - [ ] `routes/project/$ref/auth/templates/index.tsx` ← `pages/project/[ref]/auth/templates/index.tsx`
