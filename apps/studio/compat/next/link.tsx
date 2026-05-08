@@ -62,6 +62,46 @@ function resolveHref(href: string | UrlObject): string {
   return `${pathname}${search}${hash}`
 }
 
+// TanStack Link's `to` prop is a route-pattern path; query params and hash
+// must be passed separately via `search` / `hash`. Studio code (and Next's
+// own contract) routinely passes a single composed string like
+// `/project/abc/editor/123?schema=public` as the href. If we forward that
+// straight through, TanStack ends up matching the literal path-with-query
+// against its known route patterns, fails to find one, and falls back to
+// native browser navigation — which the user sees as a full page reload
+// (concretely: clicking a table in the editor sidebar).
+//
+// Split the resolved string into its three parts so TanStack can route
+// internally. External URLs (anything with a scheme or `//`) are left
+// untouched — TanStack's own external-link path handles those.
+function splitInternalUrl(url: string): {
+  to: string
+  search?: Record<string, string>
+  hash?: string
+} {
+  // External / protocol-relative — bail out, let TanStack treat it as-is.
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(url) || url.startsWith('//')) {
+    return { to: url }
+  }
+
+  // Use a placeholder origin so URL parsing accepts a relative input. The
+  // origin is discarded; only pathname/search/hash are kept.
+  let parsed: URL
+  try {
+    parsed = new URL(url, 'http://_')
+  } catch {
+    return { to: url }
+  }
+
+  const search = Object.fromEntries(parsed.searchParams)
+  const hash = parsed.hash || undefined
+  return {
+    to: parsed.pathname,
+    search: Object.keys(search).length > 0 ? search : undefined,
+    hash,
+  }
+}
+
 // Next: prefetch=true|"auto" → eagerly preload; false → never; default
 // in production = true. TanStack's preload values are "intent" (on hover/
 // focus), "viewport" (when entering viewport), "render" (immediately),
@@ -90,7 +130,8 @@ const Link = forwardRef(function Link(
   }: LinkProps,
   ref: ForwardedRef<HTMLAnchorElement>
 ) {
-  const to = resolveHref(href)
+  const resolved = resolveHref(href)
+  const { to, search, hash } = splitInternalUrl(resolved)
   const preload = mapPrefetch(prefetch)
 
   // Next's `legacyBehavior` (and `passHref` with a custom anchor child)
@@ -109,6 +150,8 @@ const Link = forwardRef(function Link(
       <TanStackLink
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         to={to as any}
+        search={search}
+        hash={hash}
         replace={replace}
         preload={preload}
         // TanStack Link supports a function child for custom rendering.
@@ -120,7 +163,7 @@ const Link = forwardRef(function Link(
           // when legacyBehavior is true the consumer wants to control the
           // anchor themselves. Render the cloned child with merged props.
           return cloneElement(child, {
-            href: to,
+            href: resolved,
             ref,
             onClick: (e: MouseEvent<HTMLAnchorElement>) => {
               child.props.onClick?.(e)
@@ -143,6 +186,8 @@ const Link = forwardRef(function Link(
     <TanStackLink
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       to={to as any}
+      search={search}
+      hash={hash}
       replace={replace}
       preload={preload}
       ref={ref}
