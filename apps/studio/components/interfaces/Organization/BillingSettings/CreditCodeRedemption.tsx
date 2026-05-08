@@ -26,12 +26,11 @@ import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import { getTotalCreditBalanceCents } from './helpers'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
-import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
+import { useOrgBalanceQuery } from '@/data/subscriptions/org-balance-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLatest } from '@/hooks/misc/useLatest'
 
@@ -58,14 +57,11 @@ export const CreditCodeRedemption = ({
   )
 
   const { data: org, isLoading: isOrgLoading } = useOrganizationQuery({ slug })
-  const { data: customerProfile, isLoading: isCustomerProfileLoading } =
-    useOrganizationCustomerProfileQuery({ slug })
-  const combinedCreditBalanceCents = customerProfile
-    ? getTotalCreditBalanceCents({
-        customerBalance: customerProfile.balance,
-        prepaidCreditsBalance: customerProfile.prepaid_credits_balance,
-      })
-    : undefined
+  const { data: orgBalance, isLoading: isOrgBalanceLoading } = useOrgBalanceQuery(
+    { orgSlug: slug },
+    { enabled: codeRedemptionModalVisible }
+  )
+  const combinedCreditBalanceCents = orgBalance?.total_balance_cents
 
   const { can: canRedeemCode, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -77,7 +73,7 @@ export const CreditCodeRedemption = ({
   const captchaRef = useRef<HCaptcha>(null)
   const captchaTokenRef = useRef<string | null>(null)
   const codeRedemptionDisabled =
-    !canRedeemCode || !isPermissionsLoaded || isOrgLoading || isCustomerProfileLoading
+    !canRedeemCode || !isPermissionsLoaded || isOrgLoading || isOrgBalanceLoading
 
   const form = useForm<CreditCodeRedemptionForm>({
     resolver: zodResolver(FormSchema),
@@ -259,7 +255,7 @@ export const CreditCodeRedemption = ({
             <DialogSectionSeparator />
 
             <Form {...form}>
-              {isOrgLoading || isCustomerProfileLoading || !isPermissionsLoaded ? (
+              {isOrgLoading || isOrgBalanceLoading || !isPermissionsLoaded ? (
                 <div className="p-6 space-y-4">
                   <ShimmeringLoader />
                   <div className="flex space-x-4">

@@ -43,6 +43,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
 import { SortDropdown } from './SortDropdown'
+import { useAuthUsersShortcuts } from './useAuthUsersShortcuts'
 import { UserPanel } from './UserPanel'
 import type { SpecificFilterColumn } from './Users.constants'
 import {
@@ -101,6 +102,7 @@ export const UsersV2 = () => {
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const gridRef = useRef<DataGridHandle>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const xScroll = useRef<number>(0)
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -192,10 +194,10 @@ export const UsersV2 = () => {
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
   const [showFreeformWarning, setShowFreeformWarning] = useState(false)
   const [showCreateIndexesModal, setShowCreateIndexesModal] = useState(false)
+  const [search, setSearch] = useState(filterKeywords)
 
   const { data: totalUsersCountData, isSuccess: isCountLoaded } = useUsersCountQuery(
     {
@@ -453,6 +455,28 @@ export const UsersV2 = () => {
     }
   }
 
+  const handleRefresh = () => {
+    refetch()
+    sendEvent({
+      action: 'auth_users_search_submitted',
+      properties: {
+        trigger: 'refresh_button',
+        ...telemetryProps,
+      },
+      groups: telemetryGroups,
+    })
+  }
+
+  const { onCellKeyDown, showDeleteModal, setShowDeleteModal } = useAuthUsersShortcuts({
+    gridRef,
+    searchInputRef,
+    users,
+    selectedUsers,
+    setSelectedUsers,
+    setSearch,
+    onRefresh: handleRefresh,
+  })
+
   useEffect(() => {
     if (
       !isRefetching &&
@@ -578,6 +602,9 @@ export const UsersV2 = () => {
             <>
               <div className="flex flex-wrap items-center gap-2">
                 <UsersSearch
+                  ref={searchInputRef}
+                  search={search}
+                  setSearch={setSearch}
                   improvedSearchEnabled={improvedSearchEnabled}
                   telemetryProps={telemetryProps}
                   telemetryGroups={telemetryGroups}
@@ -748,17 +775,7 @@ export const UsersV2 = () => {
                   type="default"
                   className="w-7"
                   loading={isRefetching && !isFetchingNextPage}
-                  onClick={() => {
-                    refetch()
-                    sendEvent({
-                      action: 'auth_users_search_submitted',
-                      properties: {
-                        trigger: 'refresh_button',
-                        ...telemetryProps,
-                      },
-                      groups: telemetryGroups,
-                    })
-                  }}
+                  onClick={handleRefresh}
                   tooltip={{ content: { side: 'bottom', text: 'Refresh' } }}
                 />
                 <AddUserDropdown />
@@ -797,6 +814,7 @@ export const UsersV2 = () => {
                     toast(`Only up to ${MAX_BULK_DELETE} users can be selected at a time`)
                   } else setSelectedUsers(rows)
                 }}
+                onCellKeyDown={onCellKeyDown}
                 onColumnResize={(idx, width) => saveColumnConfiguration('resize', { idx, width })}
                 onColumnsReorder={(source, target) => {
                   const sourceIdx = columns.findIndex((col) => col.key === source)

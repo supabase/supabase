@@ -16,6 +16,7 @@ import {
 import type { OrgSubscription } from '@/data/subscriptions/types'
 import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 
 export interface ComputeProps {
@@ -50,6 +51,8 @@ export const TotalUsage = ({
   const isMobile = useBreakpoint('md')
   const isUsageBillingEnabled = subscription?.usage_billing_enabled
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
+  const { data: org } = useSelectedOrganizationQuery()
+  const hasActiveRestriction = Boolean(org?.restriction_status)
 
   const {
     data: usage,
@@ -154,7 +157,7 @@ export const TotalUsage = ({
 
         {isSuccessUsage && subscription && (
           <div>
-            {showRelationToSubscription && !isOnHigherPlan && (
+            {showRelationToSubscription && !isOnHigherPlan && !hasActiveRestriction && (
               <p className="text-sm">
                 {!hasExceededAnyLimits ? (
                   <span>

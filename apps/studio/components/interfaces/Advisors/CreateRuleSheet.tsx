@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-// import { useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -10,7 +9,6 @@ import {
   Form,
   FormControl,
   FormField,
-  Input,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -24,6 +22,7 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
+  TextArea_Shadcn_ as TextArea,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -221,9 +220,10 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
                     labelOptional="Optional"
                   >
                     <FormControl>
-                      <Input.TextArea
+                      <TextArea
                         {...field}
-                        className="[&>div>div>div>textarea]:text-sm"
+                        rows={4}
+                        className="text-sm"
                         placeholder="e.g Describe why this rule is being set"
                       />
                     </FormControl>

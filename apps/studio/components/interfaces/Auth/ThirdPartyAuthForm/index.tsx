@@ -39,6 +39,8 @@ import {
 } from '@/data/third-party-auth/integrations-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const ThirdPartyAuthForm = () => {
   const { ref: projectRef } = useParams()
@@ -54,6 +56,11 @@ export const ThirdPartyAuthForm = () => {
   const [selectedIntegration, setSelectedIntegration] = useState<INTEGRATION_TYPES>()
   const [selectedIntegrationForDeletion, setSelectedIntegrationForDeletion] =
     useState<ThirdPartyAuthIntegration>()
+  const [addIntegrationOpen, setAddIntegrationOpen] = useState(false)
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setAddIntegrationOpen(true), {
+    label: 'Add provider',
+  })
 
   const { mutateAsync: deleteIntegration } = useDeleteThirdPartyAuthIntegrationMutation()
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
@@ -87,7 +94,11 @@ export const ThirdPartyAuthForm = () => {
         </PageSectionSummary>
         <PageSectionAside>
           <DocsButton href={`${DOCS_URL}/guides/auth/third-party/overview`} />
-          <AddIntegrationDropdown onSelectIntegrationType={setSelectedIntegration} />
+          <AddIntegrationDropdown
+            open={addIntegrationOpen}
+            onOpenChange={setAddIntegrationOpen}
+            onSelectIntegrationType={setSelectedIntegration}
+          />
         </PageSectionAside>
       </PageSectionMeta>
       <PageSectionContent>
@@ -110,6 +121,8 @@ export const ThirdPartyAuthForm = () => {
               <AddIntegrationDropdown
                 align="center"
                 type="default"
+                open={addIntegrationOpen}
+                onOpenChange={setAddIntegrationOpen}
                 onSelectIntegrationType={setSelectedIntegration}
               />
             </EmptyStatePresentational>
