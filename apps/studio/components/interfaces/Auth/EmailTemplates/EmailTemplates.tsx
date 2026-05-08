@@ -53,6 +53,9 @@ const NotificationsFormSchema = z.object({
 
 export const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
+  const { data: selectedProject } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
@@ -75,8 +78,6 @@ export const EmailTemplates = () => {
     },
   })
 
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { data: selectedProject } = useSelectedProjectQuery()
   const usingBuiltInEmailSender = isSuccess && authConfig && !hasCustomEmailSender(authConfig)
   const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
     authConfig,
@@ -104,7 +105,7 @@ export const EmailTemplates = () => {
     defaultValues,
   })
 
-  const onSubmit = (values: any) => {
+  const onSubmit = (values: z.infer<typeof NotificationsFormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     updateAuthConfig({ projectRef: projectRef, config: { ...values } })
   }
@@ -137,7 +138,7 @@ export const EmailTemplates = () => {
           {isTemplateEditBlocked && (
             <PageSection>
               <PageSectionContent>
-                <CustomEmailTemplateRestrictionAdmonition projectRef={projectRef} />
+                <CustomEmailTemplateRestrictionAdmonition />
               </PageSectionContent>
             </PageSection>
           )}

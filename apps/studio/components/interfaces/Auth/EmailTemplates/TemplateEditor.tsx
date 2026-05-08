@@ -200,7 +200,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
   const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(baselineValues)
   const hasChanges = hasFormChanges || baselineBodyValue !== bodyValue
   const saveChangesTooltip = !canEdit
-    ? 'Set up Custom SMTP to edit and save templates'
+    ? 'Set up custom SMTP to edit and save templates'
     : !hasChanges
       ? 'Make a change before saving'
       : undefined
@@ -327,7 +327,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                   }}
                   borderOverride="border-muted"
                   disabledOptions={!canEdit ? ['source'] : []}
-                  disabledOptionTooltip="Set up Custom SMTP to edit the source"
+                  disabledOptionTooltip="Set up custom SMTP to edit the source"
                 />
               </div>
               {activeView === 'source' ? (
@@ -373,12 +373,12 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
               ) : (
                 <div>
                   <iframe
-                    className="mb-2! mt-0 overflow-hidden h-96 w-full rounded-md border bg-white"
+                    className="mb-3 mt-0 overflow-hidden h-96 w-full rounded-md border bg-white"
                     title={id}
                     srcDoc={previewSrcDoc}
                     sandbox="allow-scripts allow-forms"
                   />
-                  <p className="text-xs text-foreground-muted">
+                  <p className="text-xs text-foreground-lighter">
                     The preview shown here may differ slightly from how your email appears in the
                     recipient’s email client.
                   </p>

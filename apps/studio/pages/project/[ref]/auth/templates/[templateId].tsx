@@ -288,7 +288,7 @@ const RedirectToTemplates = () => {
               <PageSectionContent>
                 {isTemplateEditBlocked && (
                   <div className="mb-4">
-                    <CustomEmailTemplateRestrictionAdmonition projectRef={projectRef} />
+                    <CustomEmailTemplateRestrictionAdmonition />
                   </div>
                 )}
                 <Card>

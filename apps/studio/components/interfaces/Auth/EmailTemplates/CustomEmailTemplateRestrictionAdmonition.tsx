@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import {
@@ -11,13 +12,8 @@ import { Admonition } from 'ui-patterns/admonition'
 
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
-interface CustomEmailTemplateRestrictionAdmonitionProps {
-  projectRef?: string
-}
-
-export const CustomEmailTemplateRestrictionAdmonition = ({
-  projectRef,
-}: CustomEmailTemplateRestrictionAdmonitionProps) => {
+export const CustomEmailTemplateRestrictionAdmonition = () => {
+  const { ref: projectRef } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const organizationSlug = selectedOrganization?.slug ?? '_'
 
@@ -25,12 +21,12 @@ export const CustomEmailTemplateRestrictionAdmonition = ({
     <Admonition
       type="default"
       layout="responsive"
-      title="Set up Custom SMTP to edit templates"
-      description="Emails will be sent using the default templates. Set up Custom SMTP to edit their subject and body."
+      title="Set up custom SMTP to edit templates"
+      description="Emails will be sent using the default templates. Set up custom SMTP to edit their subject and body."
       actions={
         <div className="flex w-full @lg:w-auto">
           <Button asChild type="default" className="flex-1 rounded-r-none px-3 @lg:flex-none">
-            <Link href={`/project/${projectRef ?? '_'}/auth/smtp`}>Set up SMTP</Link>
+            <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -45,19 +41,19 @@ export const CustomEmailTemplateRestrictionAdmonition = ({
                 <Link
                   href={`/org/${organizationSlug}/billing?panel=subscriptionPlan&source=authEmailTemplates`}
                 >
-                  <div>
+                  <div className="flex flex-col gap-y-0.5">
                     <p className="block text-foreground">Upgrade to Pro</p>
-                    <p className="block text-foreground-lighter">
-                      Edit templates while using Supabase’s email service
+                    <p className="block text-foreground-lighter text-balance">
+                      Customize templates while using Supabase’s email service
                     </p>
                   </div>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href={`/project/${projectRef ?? '_'}/auth/hooks`}>
-                  <div>
+                <Link href={`/project/${projectRef}/auth/hooks`}>
+                  <div className="flex flex-col gap-y-0.5">
                     <p className="block text-foreground">Configure send-email hook</p>
-                    <p className="block text-foreground-lighter">
+                    <p className="block text-foreground-lighter text-balance">
                       Send auth emails through your own workflow
                     </p>
                   </div>
