@@ -117,7 +117,16 @@ export default defineConfig(({ mode }) => {
       tsconfigPaths: true,
     },
     ...(basePath && { base: basePath }),
-    define: publicEnvDefines,
+    define: {
+      ...publicEnvDefines,
+      // Node-style libs (e.g. `randombytes` via `generate-password-browser`)
+      // reference `global`, which exists in Node but not in browsers. Webpack
+      // auto-polyfilled this; Vite doesn't. Map the identifier to `globalThis`
+      // (which is the same object in Node and the browser) at build time so
+      // these libs work without per-import patches. Surfaces concretely on
+      // /auth/hooks via `randombytes/browser.js:16`.
+      global: 'globalThis',
+    },
     // Circular-dep workaround: pin `class-variance-authority` to its own
     // chunk. Without this, Rolldown splits `TreeView` into a separate
     // chunk that imports `cva` from the `ui` chunk while the `ui` chunk
