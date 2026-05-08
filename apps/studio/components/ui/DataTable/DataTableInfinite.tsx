@@ -3,7 +3,7 @@ import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack
 import { flexRender } from '@tanstack/react-table'
 import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
-import { Fragment, ReactNode, UIEvent, useCallback, useRef } from 'react'
+import { Fragment, ReactNode, UIEvent, useCallback, useRef, useState } from 'react'
 import { Button, cn } from 'ui'
 
 import { formatCompactNumber } from './DataTable.utils'
@@ -206,13 +206,21 @@ function DataTableRow<TData>({
   useQueryState('live', searchParamsParser.live)
   const rowClassName = (table.options.meta as any)?.getRowClassName?.(row)
   const cells = row.getVisibleCells()
+  // Track hover via pointer events instead of CSS `:hover` so the highlight
+  // doesn't get stuck when the row's DOM updates while the mouse is over it
+  // (common cause of "sticky hover" symptoms on tables that rerender often).
+  const [isHovered, setIsHovered] = useState(false)
 
   return (
     <TableRow
       id={row.id}
       tabIndex={0}
       data-state={selected && 'selected'}
+      data-row-hover={isHovered ? 'true' : undefined}
       onClick={() => row.toggleSelected()}
+      onPointerEnter={() => setIsHovered(true)}
+      onPointerLeave={() => setIsHovered(false)}
+      onPointerCancel={() => setIsHovered(false)}
       onKeyDown={(event) => {
         if (event.key === 'Enter') {
           event.preventDefault()
