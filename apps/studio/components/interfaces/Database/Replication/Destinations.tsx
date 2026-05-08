@@ -94,7 +94,17 @@ export const Destinations = () => {
     isError: isDatabasesError,
     isSuccess: isDatabasesSuccess,
   } = useReadReplicasQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
-  const readReplicas = databases.filter((x) => x.identifier !== projectRef)
+  // Memoise so the array reference is stable across renders. Without this
+  // the polling useEffect below has an unstable dep, runs every render, and
+  // its `setStatusRefetchInterval(false)` churn keeps the parent re-rendering
+  // — which trips a latent ref-instability bug in @radix-ui/react-slot
+  // (`composeRefs` is called per render instead of `useComposedRefs`) and
+  // tanks the page with "Maximum update depth exceeded" via the Tooltip
+  // trigger refs.
+  const readReplicas = useMemo(
+    () => databases.filter((x) => x.identifier !== projectRef),
+    [databases, projectRef]
+  )
   const hasReplicas = isDatabasesSuccess && readReplicas.length > 0
   const filteredReplicas =
     filterString.length === 0
