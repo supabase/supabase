@@ -65,6 +65,7 @@ async function applyDDLWithRetries(sandbox: Executor, ddlStatements: string[]): 
 export async function applySchema(
   sandbox: Executor,
   {
+    schemas,
     typeDefinitions,
     entityDefinitions,
     functionDefinitions,
@@ -73,6 +74,17 @@ export async function applySchema(
     customRoles,
   }: ProjectSchemaDDL
 ): Promise<void> {
+  for (const schema of schemas) {
+    if (schema === 'public') continue
+    const safe = schema.replace(/"/g, '""')
+    await tryExec(sandbox, `CREATE SCHEMA IF NOT EXISTS "${safe}"`, `schema ${schema}`)
+    await tryExec(
+      sandbox,
+      `GRANT USAGE ON SCHEMA "${safe}" TO anon, authenticated, service_role`,
+      `grant schema ${schema}`
+    )
+  }
+
   if (customRoles.length > 0) {
     const checks = customRoles
       .map(({ name }) => {
@@ -87,28 +99,25 @@ export async function applySchema(
   await applyDDLWithRetries(sandbox, typeDefinitions)
   await applyDDLWithRetries(sandbox, entityDefinitions)
 
-  await tryExec(
-    sandbox,
-    `GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role`,
-    'grant schema usage'
-  )
+  for (const schema of [...new Set(rlsStatuses.map((t) => t.schema))]) {
+    const safe = schema.replace(/"/g, '""')
+    await tryExec(
+      sandbox,
+      `GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA "${safe}" TO anon, authenticated, service_role`,
+      `grant tables in schema ${schema}`
+    )
+  }
 
-  if (rlsStatuses.length > 0) {
-    const grants = rlsStatuses
-      .map(
-        (t) =>
-          `GRANT SELECT, INSERT, UPDATE, DELETE ON "${t.schema}"."${t.table}" TO anon, authenticated, service_role`
-      )
-      .join('; ')
-    await tryExec(sandbox, grants, 'grant roles on all tables')
-
-    const rlsEnables = rlsStatuses
-      .filter((t) => t.rls_enabled)
-      .map((t) => `ALTER TABLE "${t.schema}"."${t.table}" ENABLE ROW LEVEL SECURITY`)
-      .join('; ')
-    if (rlsEnables) {
-      await tryExec(sandbox, rlsEnables, 'enable RLS on all tables')
-    }
+  for (const { schema, table, rls_enabled, rls_forced } of rlsStatuses) {
+    const actions: string[] = []
+    if (rls_enabled) actions.push('ENABLE ROW LEVEL SECURITY')
+    if (rls_forced) actions.push('FORCE ROW LEVEL SECURITY')
+    if (actions.length === 0) continue
+    await tryExec(
+      sandbox,
+      `ALTER TABLE "${schema}"."${table}" ${actions.join(', ')}`,
+      `RLS on ${schema}.${table}`
+    )
   }
 
   // Disable check_function_bodies so functions referencing not-yet-created objects don't abort.

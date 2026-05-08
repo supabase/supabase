@@ -1,6 +1,6 @@
 import { useMonaco } from '@monaco-editor/react'
 import { DatabaseZap, Download, Plus, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, Modal, TextArea_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -28,12 +28,12 @@ import { useTableColumnsQuery } from '@/data/database/table-columns-query'
 import { useProjectSchemaDDLQuery } from '@/data/rls-sandbox/project-schema-ddl-query'
 import { useProjectSeedDataQuery } from '@/data/rls-sandbox/project-seed-data-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { getErrorMessage } from '@/lib/get-error-message'
 import type { TileConfig, TileResult } from '@/lib/rls-sandbox/sandbox-core'
 import { useSandbox } from '@/lib/rls-sandbox/SandboxProvider'
 
 const SEED_ROW_LIMIT = 100
-const DDL_SCHEMAS = ['public']
 
 export interface LocalTile {
   id: string
@@ -92,28 +92,12 @@ export function RLSPlayground() {
     onSuccess: ({ sql }) => setAiGeneratedSQL(sql),
   })
 
-  const { data: schemaDDL, refetch: refetchSchema } = useProjectSchemaDDLQuery(
-    { projectRef: project?.ref, connectionString: project?.connectionString, schemas: DDL_SCHEMAS },
-    { enabled: false }
-  )
-
-  const { refetch: refetchSeed } = useProjectSeedDataQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      tables: schemaDDL?.rlsStatuses ?? [],
-      rowLimit: SEED_ROW_LIMIT,
-    },
-    { enabled: false }
-  )
-
   const { data: usersData } = useUsersInfiniteQuery(
     { projectRef: project?.ref, connectionString: project?.connectionString },
     { enabled: !!project?.ref }
   )
   const users = usersData?.pages.flatMap((p) => p.result) ?? []
 
-  // ── Postgres IntelliSense ──────────────────────────────────────────────────
   const monaco = useMonaco()
   const pgInfoRef = useRef<any>(null)
 
@@ -133,6 +117,23 @@ export function RLSPlayground() {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const ddlSchemas = useMemo(() => schemas?.map((s) => s.name) ?? [], [schemas])
+
+  const { data: schemaDDL, refetch: refetchSchema } = useProjectSchemaDDLQuery(
+    { projectRef: project?.ref, connectionString: project?.connectionString, schemas: ddlSchemas },
+    { enabled: false }
+  )
+
+  const { refetch: refetchSeed } = useProjectSeedDataQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      tables: schemaDDL?.rlsStatuses ?? [],
+      rowLimit: SEED_ROW_LIMIT,
+    },
+    { enabled: false }
+  )
 
   const isPgInfoReady =
     isKeywordsSuccess && isFunctionsSuccess && isSchemasSuccess && isTableColumnsSuccess
@@ -161,8 +162,11 @@ export function RLSPlayground() {
   }, [isPgInfoReady, monaco])
   // ──────────────────────────────────────────────────────────────────────────
 
+  const syncInProgress = useRef(false)
+
   const syncSchema = useCallback(async () => {
-    if (!core) return
+    if (!core || syncInProgress.current) return
+    syncInProgress.current = true
     setSchemaSyncStatus('syncing')
     try {
       const { data } = await refetchSchema()
@@ -173,8 +177,12 @@ export function RLSPlayground() {
     } catch (err) {
       setSchemaSyncStatus('error')
       toast.error(`Schema sync failed: ${getErrorMessage(err) ?? ''}`)
+    } finally {
+      syncInProgress.current = false
     }
   }, [core, refetchSchema])
+
+  const onAutoSync = useStaticEffectEvent(syncSchema)
 
   const seedFromProject = useCallback(async () => {
     if (!core) return
@@ -298,10 +306,10 @@ export function RLSPlayground() {
   const isSandboxReady = sandboxStatus === 'ready'
 
   useEffect(() => {
-    if (isSandboxReady && schemaSyncStatus === 'idle') {
-      syncSchema()
+    if (isSandboxReady && ddlSchemas.length > 0 && schemaSyncStatus === 'idle') {
+      onAutoSync()
     }
-  }, [isSandboxReady, schemaSyncStatus, syncSchema])
+  }, [isSandboxReady, ddlSchemas.length, schemaSyncStatus, onAutoSync])
 
   return (
     <>

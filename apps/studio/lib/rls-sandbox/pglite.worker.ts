@@ -8,6 +8,7 @@ worker({
     return new PGlite({
       dataDir: 'memory://',
       extensions: { pgcrypto, uuid_ossp },
+      debug: 0,
     })
   },
 })
