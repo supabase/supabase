@@ -52,6 +52,54 @@ function nextCompat(): Plugin {
   }
 }
 
+// Short-circuit UMD wrappers' AMD branch by string-replacing the
+// `define.amd` check. Vite's `config.define` doesn't reach pre-bundled
+// deps (Vite 8's Rolldown-based optimizer doesn't honour member-
+// expression define keys at the prebundle stage), and adding the same
+// substitution to `optimizeDeps.rolldownOptions.define` had no effect
+// on the emitted `node_modules/.vite/deps/*.js`. This transform fires
+// when Vite *serves* the prebundled file, rewriting the runtime AMD
+// check before it reaches the browser.
+//
+// Applied broadly to any module containing the AMD check (not just
+// papaparse) — UMD wrappers all share the same shape, and we never
+// want to take the AMD branch when Monaco's loader is around.
+//
+// Surfaces concretely on /functions/[slug]/invocations: papaparse
+// pre-bundled into `.vite/deps/papaparse.js` retained the literal
+// `"function" == typeof define && define.amd` check; Monaco's CDN
+// loader installs `window.define` first, so papaparse's UMD takes the
+// AMD branch and calls an anonymous `define([], t)` that Monaco
+// rejects with "Can only have one anonymous define call per script
+// file".
+function umdAmdShortCircuit(): Plugin {
+  // Matches both unminified (`typeof define === 'function' && define.amd`)
+  // and minified (`"function" == typeof define && define.amd`) forms of
+  // the UMD AMD-detection check. Replaces the whole expression with
+  // `false` so dead-code elimination drops the AMD branch.
+  const AMD_CHECK_PATTERNS = [
+    /typeof\s+define\s*===?\s*['"]function['"]\s*&&\s*define\.amd/g,
+    /['"]function['"]\s*===?\s*typeof\s+define\s*&&\s*define\.amd/g,
+  ]
+
+  return {
+    name: 'studio-umd-amd-short-circuit',
+    enforce: 'pre',
+    transform(code, id) {
+      if (!code.includes('define.amd')) return
+      // Skip Monaco's loader.js if it ever ends up in our graph — it
+      // legitimately needs `define.amd` to register itself as AMD.
+      if (id.includes('monaco-editor/min/vs/loader')) return
+      let next = code
+      for (const pattern of AMD_CHECK_PATTERNS) {
+        next = next.replace(pattern, 'false')
+      }
+      if (next === code) return
+      return { code: next, map: null }
+    },
+  }
+}
+
 // Replace our `components/interfaces/GraphQL/GraphiQL` module with a no-op
 // React component in SSR builds only.
 //
@@ -155,13 +203,6 @@ export default defineConfig(({ mode }) => {
       tsconfigPaths: true,
     },
     ...(basePath && { base: basePath }),
-    optimizeDeps: {
-      // Vite 8 uses Rolldown for dep pre-bundling; `esbuildOptions` is
-      // deprecated.
-      rolldownOptions: {
-        define: sharedDefines,
-      },
-    },
     define: {
       ...publicEnvDefines,
       ...sharedDefines,
@@ -212,6 +253,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       nextCompat(),
       ssrStubGraphiql(),
+      umdAmdShortCircuit(),
       devtools(),
       tailwindcss(),
       tanstackStart({
