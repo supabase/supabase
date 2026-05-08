@@ -132,6 +132,7 @@ import { Route as ApiPlatformProjectsRefContentIndexRouteImport } from './routes
 import { Route as ApiPlatformProjectsRefConfigIndexRouteImport } from './routes/api/platform/projects/$ref/config/index'
 import { Route as ApiPlatformPgMetaRefQueryIndexRouteImport } from './routes/api/platform/pg-meta/$ref/query/index'
 import { Route as ApiPlatformAuthRefUsersIndexRouteImport } from './routes/api/platform/auth/$ref/users/index'
+import { Route as ProjectRefDatabaseReplicationReplicaReplicaIdRouteImport } from './routes/project/$ref/database/replication/replica/$replicaId'
 import { Route as ApiV1ProjectsRefTypesTypescriptRouteImport } from './routes/api/v1/projects/$ref/types/typescript'
 import { Route as ApiV1ProjectsRefDatabaseMigrationsRouteImport } from './routes/api/v1/projects/$ref/database/migrations'
 import { Route as ApiPlatformPropsProjectRefApiRouteImport } from './routes/api/platform/props/project/$ref/api'
@@ -827,6 +828,12 @@ const ApiPlatformAuthRefUsersIndexRoute =
     path: '/api/platform/auth/$ref/users/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ProjectRefDatabaseReplicationReplicaReplicaIdRoute =
+  ProjectRefDatabaseReplicationReplicaReplicaIdRouteImport.update({
+    id: '/replication/replica/$replicaId',
+    path: '/replication/replica/$replicaId',
+    getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
 const ApiV1ProjectsRefTypesTypescriptRoute =
   ApiV1ProjectsRefTypesTypescriptRouteImport.update({
     id: '/api/v1/projects/$ref/types/typescript',
@@ -1122,6 +1129,7 @@ export interface FileRoutesByFullPath {
   '/api/platform/props/project/$ref/api': typeof ApiPlatformPropsProjectRefApiRoute
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
   '/api/v1/projects/$ref/types/typescript': typeof ApiV1ProjectsRefTypesTypescriptRoute
+  '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
   '/api/platform/auth/$ref/users/': typeof ApiPlatformAuthRefUsersIndexRoute
   '/api/platform/pg-meta/$ref/query/': typeof ApiPlatformPgMetaRefQueryIndexRoute
   '/api/platform/projects/$ref/config/': typeof ApiPlatformProjectsRefConfigIndexRoute
@@ -1271,6 +1279,7 @@ export interface FileRoutesByTo {
   '/api/platform/props/project/$ref/api': typeof ApiPlatformPropsProjectRefApiRoute
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
   '/api/v1/projects/$ref/types/typescript': typeof ApiV1ProjectsRefTypesTypescriptRoute
+  '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
   '/api/platform/auth/$ref/users': typeof ApiPlatformAuthRefUsersIndexRoute
   '/api/platform/pg-meta/$ref/query': typeof ApiPlatformPgMetaRefQueryIndexRoute
   '/api/platform/projects/$ref/config': typeof ApiPlatformProjectsRefConfigIndexRoute
@@ -1425,6 +1434,7 @@ export interface FileRoutesById {
   '/api/platform/props/project/$ref/api': typeof ApiPlatformPropsProjectRefApiRoute
   '/api/v1/projects/$ref/database/migrations': typeof ApiV1ProjectsRefDatabaseMigrationsRoute
   '/api/v1/projects/$ref/types/typescript': typeof ApiV1ProjectsRefTypesTypescriptRoute
+  '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
   '/api/platform/auth/$ref/users/': typeof ApiPlatformAuthRefUsersIndexRoute
   '/api/platform/pg-meta/$ref/query/': typeof ApiPlatformPgMetaRefQueryIndexRoute
   '/api/platform/projects/$ref/config/': typeof ApiPlatformProjectsRefConfigIndexRoute
@@ -1578,6 +1588,7 @@ export interface FileRouteTypes {
     | '/api/platform/props/project/$ref/api'
     | '/api/v1/projects/$ref/database/migrations'
     | '/api/v1/projects/$ref/types/typescript'
+    | '/project/$ref/database/replication/replica/$replicaId'
     | '/api/platform/auth/$ref/users/'
     | '/api/platform/pg-meta/$ref/query/'
     | '/api/platform/projects/$ref/config/'
@@ -1727,6 +1738,7 @@ export interface FileRouteTypes {
     | '/api/platform/props/project/$ref/api'
     | '/api/v1/projects/$ref/database/migrations'
     | '/api/v1/projects/$ref/types/typescript'
+    | '/project/$ref/database/replication/replica/$replicaId'
     | '/api/platform/auth/$ref/users'
     | '/api/platform/pg-meta/$ref/query'
     | '/api/platform/projects/$ref/config'
@@ -1880,6 +1892,7 @@ export interface FileRouteTypes {
     | '/api/platform/props/project/$ref/api'
     | '/api/v1/projects/$ref/database/migrations'
     | '/api/v1/projects/$ref/types/typescript'
+    | '/project/$ref/database/replication/replica/$replicaId'
     | '/api/platform/auth/$ref/users/'
     | '/api/platform/pg-meta/$ref/query/'
     | '/api/platform/projects/$ref/config/'
@@ -2872,6 +2885,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPlatformAuthRefUsersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/project/$ref/database/replication/replica/$replicaId': {
+      id: '/project/$ref/database/replication/replica/$replicaId'
+      path: '/replication/replica/$replicaId'
+      fullPath: '/project/$ref/database/replication/replica/$replicaId'
+      preLoaderRoute: typeof ProjectRefDatabaseReplicationReplicaReplicaIdRouteImport
+      parentRoute: typeof ProjectRefDatabaseRoute
+    }
     '/api/v1/projects/$ref/types/typescript': {
       id: '/api/v1/projects/$ref/types/typescript'
       path: '/api/v1/projects/$ref/types/typescript'
@@ -3188,6 +3208,7 @@ interface ProjectRefDatabaseRouteChildren {
   ProjectRefDatabasePublicationsIndexRoute: typeof ProjectRefDatabasePublicationsIndexRoute
   ProjectRefDatabaseReplicationIndexRoute: typeof ProjectRefDatabaseReplicationIndexRoute
   ProjectRefDatabaseTablesIndexRoute: typeof ProjectRefDatabaseTablesIndexRoute
+  ProjectRefDatabaseReplicationReplicaReplicaIdRoute: typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
 }
 
 const ProjectRefDatabaseRouteChildren: ProjectRefDatabaseRouteChildren = {
@@ -3210,6 +3231,8 @@ const ProjectRefDatabaseRouteChildren: ProjectRefDatabaseRouteChildren = {
   ProjectRefDatabaseReplicationIndexRoute:
     ProjectRefDatabaseReplicationIndexRoute,
   ProjectRefDatabaseTablesIndexRoute: ProjectRefDatabaseTablesIndexRoute,
+  ProjectRefDatabaseReplicationReplicaReplicaIdRoute:
+    ProjectRefDatabaseReplicationReplicaReplicaIdRoute,
 }
 
 const ProjectRefDatabaseRouteWithChildren =
