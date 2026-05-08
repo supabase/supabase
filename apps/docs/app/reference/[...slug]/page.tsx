@@ -60,6 +60,9 @@ const DEDICATED_ROUTES = new Set(['javascript'])
 
 export async function generateStaticParams() {
   const all = await generateReferenceStaticParams()
-  return all.filter((p) => !DEDICATED_ROUTES.has(p.slug[0]))
+  return all.filter((p) => {
+    const fullSlug = p.slug.join('/')
+    !DEDICATED_ROUTES.has(fullSlug)
+  })
 }
 export const generateMetadata = generateReferenceMetadata
