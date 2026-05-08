@@ -121,8 +121,6 @@ export const ThirdPartyAuthForm = () => {
               <AddIntegrationDropdown
                 align="center"
                 type="default"
-                open={addIntegrationOpen}
-                onOpenChange={setAddIntegrationOpen}
                 onSelectIntegrationType={setSelectedIntegration}
               />
             </EmptyStatePresentational>
