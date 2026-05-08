@@ -111,6 +111,7 @@ import { Route as AppOrgSlugBillingRouteImport } from './routes/_app/org/$slug/b
 import { Route as AppOrgSlugAuditRouteImport } from './routes/_app/org/$slug/audit'
 import { Route as AppOrgSlugAppsRouteImport } from './routes/_app/org/$slug/apps'
 import { Route as AppAccountTokensScopedRouteImport } from './routes/_app/account/tokens/scoped'
+import { Route as ProjectRefStorageVectorsIndexRouteImport } from './routes/project/$ref/storage/vectors/index'
 import { Route as ProjectRefStorageFilesIndexRouteImport } from './routes/project/$ref/storage/files/index'
 import { Route as ProjectRefStorageAnalyticsIndexRouteImport } from './routes/project/$ref/storage/analytics/index'
 import { Route as ProjectRefDatabaseTriggersIndexRouteImport } from './routes/project/$ref/database/triggers/index'
@@ -165,6 +166,7 @@ import { Route as ApiPlatformProjectsRefContentIndexRouteImport } from './routes
 import { Route as ApiPlatformProjectsRefConfigIndexRouteImport } from './routes/api/platform/projects/$ref/config/index'
 import { Route as ApiPlatformPgMetaRefQueryIndexRouteImport } from './routes/api/platform/pg-meta/$ref/query/index'
 import { Route as ApiPlatformAuthRefUsersIndexRouteImport } from './routes/api/platform/auth/$ref/users/index'
+import { Route as ProjectRefStorageVectorsBucketsBucketIdRouteImport } from './routes/project/$ref/storage/vectors/buckets/$bucketId'
 import { Route as ProjectRefStorageFilesBucketsBucketIdRouteImport } from './routes/project/$ref/storage/files/buckets/$bucketId'
 import { Route as ProjectRefStorageAnalyticsBucketsBucketIdRouteImport } from './routes/project/$ref/storage/analytics/buckets/$bucketId'
 import { Route as ProjectRefDatabaseReplicationReplicaReplicaIdRouteImport } from './routes/project/$ref/database/replication/replica/$replicaId'
@@ -727,6 +729,12 @@ const AppAccountTokensScopedRoute = AppAccountTokensScopedRouteImport.update({
   path: '/tokens/scoped',
   getParentRoute: () => AppAccountRoute,
 } as any)
+const ProjectRefStorageVectorsIndexRoute =
+  ProjectRefStorageVectorsIndexRouteImport.update({
+    id: '/vectors/',
+    path: '/vectors/',
+    getParentRoute: () => ProjectRefStorageRoute,
+  } as any)
 const ProjectRefStorageFilesIndexRoute =
   ProjectRefStorageFilesIndexRouteImport.update({
     id: '/files/',
@@ -1046,6 +1054,12 @@ const ApiPlatformAuthRefUsersIndexRoute =
     id: '/api/platform/auth/$ref/users/',
     path: '/api/platform/auth/$ref/users/',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const ProjectRefStorageVectorsBucketsBucketIdRoute =
+  ProjectRefStorageVectorsBucketsBucketIdRouteImport.update({
+    id: '/vectors/buckets/$bucketId',
+    path: '/vectors/buckets/$bucketId',
+    getParentRoute: () => ProjectRefStorageRoute,
   } as any)
 const ProjectRefStorageFilesBucketsBucketIdRoute =
   ProjectRefStorageFilesBucketsBucketIdRouteImport.update({
@@ -1382,6 +1396,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/triggers/': typeof ProjectRefDatabaseTriggersIndexRoute
   '/project/$ref/storage/analytics/': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files/': typeof ProjectRefStorageFilesIndexRoute
+  '/project/$ref/storage/vectors/': typeof ProjectRefStorageVectorsIndexRoute
   '/api/platform/organizations/$slug/billing/subscription': typeof ApiPlatformOrganizationsSlugBillingSubscriptionRoute
   '/api/platform/projects/$ref/analytics/log-drains': typeof ApiPlatformProjectsRefAnalyticsLogDrainsRouteWithChildren
   '/api/platform/projects/$ref/api-keys/temporary': typeof ApiPlatformProjectsRefApiKeysTemporaryRoute
@@ -1396,6 +1411,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
   '/project/$ref/storage/analytics/buckets/$bucketId': typeof ProjectRefStorageAnalyticsBucketsBucketIdRoute
   '/project/$ref/storage/files/buckets/$bucketId': typeof ProjectRefStorageFilesBucketsBucketIdRoute
+  '/project/$ref/storage/vectors/buckets/$bucketId': typeof ProjectRefStorageVectorsBucketsBucketIdRoute
   '/api/platform/auth/$ref/users/': typeof ApiPlatformAuthRefUsersIndexRoute
   '/api/platform/pg-meta/$ref/query/': typeof ApiPlatformPgMetaRefQueryIndexRoute
   '/api/platform/projects/$ref/config/': typeof ApiPlatformProjectsRefConfigIndexRoute
@@ -1566,6 +1582,7 @@ export interface FileRoutesByTo {
   '/project/$ref/database/triggers': typeof ProjectRefDatabaseTriggersIndexRoute
   '/project/$ref/storage/analytics': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files': typeof ProjectRefStorageFilesIndexRoute
+  '/project/$ref/storage/vectors': typeof ProjectRefStorageVectorsIndexRoute
   '/api/platform/organizations/$slug/billing/subscription': typeof ApiPlatformOrganizationsSlugBillingSubscriptionRoute
   '/api/platform/projects/$ref/analytics/log-drains': typeof ApiPlatformProjectsRefAnalyticsLogDrainsRouteWithChildren
   '/api/platform/projects/$ref/api-keys/temporary': typeof ApiPlatformProjectsRefApiKeysTemporaryRoute
@@ -1580,6 +1597,7 @@ export interface FileRoutesByTo {
   '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
   '/project/$ref/storage/analytics/buckets/$bucketId': typeof ProjectRefStorageAnalyticsBucketsBucketIdRoute
   '/project/$ref/storage/files/buckets/$bucketId': typeof ProjectRefStorageFilesBucketsBucketIdRoute
+  '/project/$ref/storage/vectors/buckets/$bucketId': typeof ProjectRefStorageVectorsBucketsBucketIdRoute
   '/api/platform/auth/$ref/users': typeof ApiPlatformAuthRefUsersIndexRoute
   '/api/platform/pg-meta/$ref/query': typeof ApiPlatformPgMetaRefQueryIndexRoute
   '/api/platform/projects/$ref/config': typeof ApiPlatformProjectsRefConfigIndexRoute
@@ -1756,6 +1774,7 @@ export interface FileRoutesById {
   '/project/$ref/database/triggers/': typeof ProjectRefDatabaseTriggersIndexRoute
   '/project/$ref/storage/analytics/': typeof ProjectRefStorageAnalyticsIndexRoute
   '/project/$ref/storage/files/': typeof ProjectRefStorageFilesIndexRoute
+  '/project/$ref/storage/vectors/': typeof ProjectRefStorageVectorsIndexRoute
   '/api/platform/organizations/$slug/billing/subscription': typeof ApiPlatformOrganizationsSlugBillingSubscriptionRoute
   '/api/platform/projects/$ref/analytics/log-drains': typeof ApiPlatformProjectsRefAnalyticsLogDrainsRouteWithChildren
   '/api/platform/projects/$ref/api-keys/temporary': typeof ApiPlatformProjectsRefApiKeysTemporaryRoute
@@ -1770,6 +1789,7 @@ export interface FileRoutesById {
   '/project/$ref/database/replication/replica/$replicaId': typeof ProjectRefDatabaseReplicationReplicaReplicaIdRoute
   '/project/$ref/storage/analytics/buckets/$bucketId': typeof ProjectRefStorageAnalyticsBucketsBucketIdRoute
   '/project/$ref/storage/files/buckets/$bucketId': typeof ProjectRefStorageFilesBucketsBucketIdRoute
+  '/project/$ref/storage/vectors/buckets/$bucketId': typeof ProjectRefStorageVectorsBucketsBucketIdRoute
   '/api/platform/auth/$ref/users/': typeof ApiPlatformAuthRefUsersIndexRoute
   '/api/platform/pg-meta/$ref/query/': typeof ApiPlatformPgMetaRefQueryIndexRoute
   '/api/platform/projects/$ref/config/': typeof ApiPlatformProjectsRefConfigIndexRoute
@@ -1945,6 +1965,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/triggers/'
     | '/project/$ref/storage/analytics/'
     | '/project/$ref/storage/files/'
+    | '/project/$ref/storage/vectors/'
     | '/api/platform/organizations/$slug/billing/subscription'
     | '/api/platform/projects/$ref/analytics/log-drains'
     | '/api/platform/projects/$ref/api-keys/temporary'
@@ -1959,6 +1980,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/replication/replica/$replicaId'
     | '/project/$ref/storage/analytics/buckets/$bucketId'
     | '/project/$ref/storage/files/buckets/$bucketId'
+    | '/project/$ref/storage/vectors/buckets/$bucketId'
     | '/api/platform/auth/$ref/users/'
     | '/api/platform/pg-meta/$ref/query/'
     | '/api/platform/projects/$ref/config/'
@@ -2129,6 +2151,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/triggers'
     | '/project/$ref/storage/analytics'
     | '/project/$ref/storage/files'
+    | '/project/$ref/storage/vectors'
     | '/api/platform/organizations/$slug/billing/subscription'
     | '/api/platform/projects/$ref/analytics/log-drains'
     | '/api/platform/projects/$ref/api-keys/temporary'
@@ -2143,6 +2166,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/replication/replica/$replicaId'
     | '/project/$ref/storage/analytics/buckets/$bucketId'
     | '/project/$ref/storage/files/buckets/$bucketId'
+    | '/project/$ref/storage/vectors/buckets/$bucketId'
     | '/api/platform/auth/$ref/users'
     | '/api/platform/pg-meta/$ref/query'
     | '/api/platform/projects/$ref/config'
@@ -2318,6 +2342,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/triggers/'
     | '/project/$ref/storage/analytics/'
     | '/project/$ref/storage/files/'
+    | '/project/$ref/storage/vectors/'
     | '/api/platform/organizations/$slug/billing/subscription'
     | '/api/platform/projects/$ref/analytics/log-drains'
     | '/api/platform/projects/$ref/api-keys/temporary'
@@ -2332,6 +2357,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/replication/replica/$replicaId'
     | '/project/$ref/storage/analytics/buckets/$bucketId'
     | '/project/$ref/storage/files/buckets/$bucketId'
+    | '/project/$ref/storage/vectors/buckets/$bucketId'
     | '/api/platform/auth/$ref/users/'
     | '/api/platform/pg-meta/$ref/query/'
     | '/api/platform/projects/$ref/config/'
@@ -3177,6 +3203,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAccountTokensScopedRouteImport
       parentRoute: typeof AppAccountRoute
     }
+    '/project/$ref/storage/vectors/': {
+      id: '/project/$ref/storage/vectors/'
+      path: '/vectors'
+      fullPath: '/project/$ref/storage/vectors/'
+      preLoaderRoute: typeof ProjectRefStorageVectorsIndexRouteImport
+      parentRoute: typeof ProjectRefStorageRoute
+    }
     '/project/$ref/storage/files/': {
       id: '/project/$ref/storage/files/'
       path: '/files'
@@ -3554,6 +3587,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/platform/auth/$ref/users/'
       preLoaderRoute: typeof ApiPlatformAuthRefUsersIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/project/$ref/storage/vectors/buckets/$bucketId': {
+      id: '/project/$ref/storage/vectors/buckets/$bucketId'
+      path: '/vectors/buckets/$bucketId'
+      fullPath: '/project/$ref/storage/vectors/buckets/$bucketId'
+      preLoaderRoute: typeof ProjectRefStorageVectorsBucketsBucketIdRouteImport
+      parentRoute: typeof ProjectRefStorageRoute
     }
     '/project/$ref/storage/files/buckets/$bucketId': {
       id: '/project/$ref/storage/files/buckets/$bucketId'
@@ -4005,8 +4045,10 @@ interface ProjectRefStorageRouteChildren {
   ProjectRefStorageFilesSettingsRoute: typeof ProjectRefStorageFilesSettingsRoute
   ProjectRefStorageAnalyticsIndexRoute: typeof ProjectRefStorageAnalyticsIndexRoute
   ProjectRefStorageFilesIndexRoute: typeof ProjectRefStorageFilesIndexRoute
+  ProjectRefStorageVectorsIndexRoute: typeof ProjectRefStorageVectorsIndexRoute
   ProjectRefStorageAnalyticsBucketsBucketIdRoute: typeof ProjectRefStorageAnalyticsBucketsBucketIdRoute
   ProjectRefStorageFilesBucketsBucketIdRoute: typeof ProjectRefStorageFilesBucketsBucketIdRoute
+  ProjectRefStorageVectorsBucketsBucketIdRoute: typeof ProjectRefStorageVectorsBucketsBucketIdRoute
 }
 
 const ProjectRefStorageRouteChildren: ProjectRefStorageRouteChildren = {
@@ -4015,10 +4057,13 @@ const ProjectRefStorageRouteChildren: ProjectRefStorageRouteChildren = {
   ProjectRefStorageFilesSettingsRoute: ProjectRefStorageFilesSettingsRoute,
   ProjectRefStorageAnalyticsIndexRoute: ProjectRefStorageAnalyticsIndexRoute,
   ProjectRefStorageFilesIndexRoute: ProjectRefStorageFilesIndexRoute,
+  ProjectRefStorageVectorsIndexRoute: ProjectRefStorageVectorsIndexRoute,
   ProjectRefStorageAnalyticsBucketsBucketIdRoute:
     ProjectRefStorageAnalyticsBucketsBucketIdRoute,
   ProjectRefStorageFilesBucketsBucketIdRoute:
     ProjectRefStorageFilesBucketsBucketIdRoute,
+  ProjectRefStorageVectorsBucketsBucketIdRoute:
+    ProjectRefStorageVectorsBucketsBucketIdRoute,
 }
 
 const ProjectRefStorageRouteWithChildren =

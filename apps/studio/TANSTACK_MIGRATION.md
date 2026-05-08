@@ -204,8 +204,8 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/storage/files/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/files/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
 - [x] A `routes/project/$ref/storage/analytics/index.tsx` ← `pages/project/[ref]/storage/analytics/index.tsx`
 - [x] A `routes/project/$ref/storage/analytics/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/analytics/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
-- [ ] `routes/project/$ref/storage/vectors/index.tsx` ← `pages/project/[ref]/storage/vectors/index.tsx`
-- [ ] `routes/project/$ref/storage/vectors/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/vectors/buckets/[bucketId].tsx`
+- [x] A `routes/project/$ref/storage/vectors/index.tsx` ← `pages/project/[ref]/storage/vectors/index.tsx`
+- [x] A `routes/project/$ref/storage/vectors/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/vectors/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
 
 ### Project shell — `/realtime/*`
 
