@@ -118,13 +118,14 @@ export default defineConfig(({ mode }) => {
     },
     ...(basePath && { base: basePath }),
     define: publicEnvDefines,
-    // Force `class-variance-authority` into its own chunk. Without this,
-    // Rolldown splits `TreeView` into a separate chunk that imports `cva`
-    // from the `ui` chunk while the `ui` chunk imports `TreeView` back —
-    // a circular dep in the bundle output (not in source) that leaves
-    // `cva` undefined when TreeView's top-level `cva(...)` initializer
-    // runs at SSR prerender time. Pinning cva to its own chunk breaks
-    // the cycle.
+    // Circular-dep workaround: pin `class-variance-authority` to its own
+    // chunk. Without this, Rolldown splits `TreeView` into a separate
+    // chunk that imports `cva` from the `ui` chunk while the `ui` chunk
+    // imports `TreeView` back — a circular dep in the bundle output (not
+    // in source) that leaves `cva` undefined when TreeView's top-level
+    // `cva(...)` initializer runs at SSR prerender time. See
+    // CIRCULAR_IMPORTS.md (entry #1) — slated to be lifted into a
+    // separate PR.
     build: {
       rollupOptions: {
         output: {
