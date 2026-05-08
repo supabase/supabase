@@ -108,18 +108,20 @@ export function EventList() {
                     )}
                   </div>
 
-                  <div className="flex gap-2 items-center text-sm text-foreground-light">
-                    <div className="size-5 rounded-full border bg-linear-to-br from-background-surface-100 to-background-surface-200 relative">
-                      {event.hosts[0]?.avatar_url && (
-                        <img
-                          src={event.hosts[0].avatar_url}
-                          alt={event.hosts[0].name || 'Host image'}
-                          className="absolute inset-0 w-full h-full object-cover rounded-full"
-                        />
-                      )}
+                  {event.hosts.length > 0 && (
+                    <div className="flex gap-2 items-center text-sm text-foreground-light">
+                      <div className="size-5 rounded-full border bg-linear-to-br from-background-surface-100 to-background-surface-200 relative">
+                        {event.hosts[0]?.avatar_url && (
+                          <img
+                            src={event.hosts[0].avatar_url}
+                            alt={event.hosts[0].name || 'Host image'}
+                            className="absolute inset-0 w-full h-full object-cover rounded-full"
+                          />
+                        )}
+                      </div>
+                      Hosted by {formatHosts(event.hosts).displayText}
                     </div>
-                    Hosted by {formatHosts(event.hosts).displayText}
-                  </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2 relative z-10">

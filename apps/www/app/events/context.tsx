@@ -49,7 +49,6 @@ export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProv
             const categories: string[] = [
               event?.calendar === 'hackathon' ? 'hackathon' : 'community',
             ]
-            const isCommunity = categories[0] === 'community'
 
             const rawUrl = event?.url || ''
             let safeUrl: string | undefined
@@ -78,8 +77,8 @@ export function EventsProvider({ children, notionEvents, mdxEvents }: EventsProv
               location: new Intl.ListFormat('en', { style: 'narrow', type: 'unit' }).format(
                 [event?.city, event?.country].filter(Boolean)
               ),
-              hosts:
-                isCommunity || event?.hosts?.length === 0 ? [SUPABASE_HOST] : event?.hosts || [],
+              // All Luma events are Supabase-hosted regardless of which calendar they're from.
+              hosts: [SUPABASE_HOST],
               source: 'luma' as const,
               disable_page_build: true,
               link: safeUrl ? { href: safeUrl, target: '_blank' as const } : undefined,

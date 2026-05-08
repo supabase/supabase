@@ -73,6 +73,12 @@ function getMultiSelect(page: any, name: string): string[] {
   return prop.multi_select.map((s: any) => s.name)
 }
 
+function getSelect(page: any, name: string): string {
+  const prop = page.properties[name]
+  if (!prop || prop.type !== 'select') return ''
+  return prop.select?.name ?? ''
+}
+
 // ─── Main fetch ─────────────────────────────────────────────────────────────
 
 /**
@@ -110,6 +116,10 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
         const rawMeetingLink = getUrl(page, 'Book Meeting Link')
         const meetingLink = isSafeHttpUrl(rawMeetingLink) ? rawMeetingLink : ''
         const location = getRichText(page, 'Location')
+        const notionType = getSelect(page, 'Type')
+        // "Conference" events are third-party — we attend but don't host, so no
+        // "Hosted by" line. "Supabase event" → host = Supabase.
+        const isConferenceType = notionType.toLowerCase() === 'conference'
         const categories = ['conference']
         const speakingAnswers = getMultiSelect(page, 'Are you speaking at this event?')
         const isSpeaking = speakingAnswers.includes('Yes')
@@ -129,7 +139,7 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
           categories,
           timezone: '',
           location,
-          hosts: [SUPABASE_HOST],
+          hosts: isConferenceType ? [] : [SUPABASE_HOST],
           source: 'notion',
           disable_page_build: true,
           isSpeaking,
@@ -223,6 +233,8 @@ export const getMdxEvents = (): SupabaseEvent[] => {
 
         const slug = mdxSlugFromFilename(filename)
         const categories = data.categories ?? (data.type ? [data.type] : [])
+        // Webinars don't show a "Hosted by" line — drop hosts entirely.
+        const isWebinar = data.type === 'webinar' || categories.includes('webinar')
         const rawCtaUrl = data.main_cta?.url ?? ''
         const isExternalCta = /^https?:\/\//i.test(rawCtaUrl)
         const safeExternalCta = isExternalCta && isSafeHttpUrl(rawCtaUrl) ? rawCtaUrl : ''
@@ -245,7 +257,7 @@ export const getMdxEvents = (): SupabaseEvent[] => {
           categories,
           timezone: data.timezone ?? '',
           location: '',
-          hosts: mdxHostsToEventHosts(data.hosts),
+          hosts: isWebinar ? [] : mdxHostsToEventHosts(data.hosts),
           source: 'mdx',
           onDemand: data.onDemand,
           disable_page_build: data.disable_page_build,
