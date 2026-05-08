@@ -4,6 +4,11 @@ import 'react-data-grid/lib/styles.css'
 import '@/styles/code.css'
 import '@/styles/editor.css'
 import '@/styles/focus.css'
+// Vite-only: defines @font-face for the custom fonts. The Next pipeline
+// (pages/_app.tsx) loads these via next/font instead, so this import has no
+// counterpart there — but dropping it under Vite makes the browser fall back
+// to system fonts.
+import '@/styles/fonts.css'
 import '@/styles/graphiql-base.css'
 import '@/styles/grid.css'
 import '@/styles/globals.css'
