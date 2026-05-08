@@ -97,6 +97,14 @@ export const NoticeBanner2 = () => {
       project.databases.some((db) => MAINTENANCE_REGIONS.has(db.region))
     )
 
+  console.log('Notice Banner 2 evaluation:', {
+    bannerAcknowledged,
+    isExpired,
+    shouldEvaluate,
+    isProjectsFetched,
+    hasMaintenanceRegionProject,
+  })
+
   if (!shouldEvaluate || !isProjectsFetched || !hasMaintenanceRegionProject) {
     return null
   }
