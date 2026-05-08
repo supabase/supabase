@@ -1,10 +1,20 @@
 import { Link as TanStackLink } from '@tanstack/react-router'
-import type { AnchorHTMLAttributes, ReactNode } from 'react'
+import {
+  cloneElement,
+  forwardRef,
+  isValidElement,
+  type AnchorHTMLAttributes,
+  type ForwardedRef,
+  type MouseEvent,
+  type ReactElement,
+  type ReactNode,
+  type Ref,
+} from 'react'
 
-// Next's Link accepts either a string `href` or a `UrlObject` ({pathname, query, hash}).
-// Workspace source does both — `pages/sign-in.tsx` uses the object form to forward
-// `router.query` into the SSO/sign-up links. The TanStackLink `to` prop takes a
-// route string, so we flatten `UrlObject` into `pathname?search#hash` first.
+// Next's Link accepts either a string `href` or a `UrlObject`
+// ({pathname, query, hash}). Workspace source does both — flatten
+// `UrlObject` into `pathname?search#hash` first so the TanStack `to`
+// prop (which only takes a string) works for either input.
 
 type QueryValue = string | number | boolean | string[] | undefined | null
 type UrlObject = {
@@ -18,14 +28,14 @@ interface LinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'
   href: string | UrlObject
   children?: ReactNode
   replace?: boolean
-  // Next-specific props that have no TanStack equivalent; we drop them silently.
-  as?: string | UrlObject
   scroll?: boolean
   shallow?: boolean
   passHref?: boolean
-  prefetch?: boolean | null
+  prefetch?: boolean | null | 'auto'
   locale?: string | false
   legacyBehavior?: boolean
+  // Next-specific props with no TanStack equivalent; accepted and dropped.
+  as?: string | UrlObject
 }
 
 function serializeQuery(query: UrlObject['query']): string {
@@ -52,23 +62,96 @@ function resolveHref(href: string | UrlObject): string {
   return `${pathname}${search}${hash}`
 }
 
-export default function Link({
-  href,
-  as: _as,
-  scroll: _scroll,
-  shallow: _shallow,
-  passHref: _passHref,
-  prefetch: _prefetch,
-  locale: _locale,
-  legacyBehavior: _legacyBehavior,
-  children,
-  ...rest
-}: LinkProps) {
+// Next: prefetch=true|"auto" → eagerly preload; false → never; default
+// in production = true. TanStack's preload values are "intent" (on hover/
+// focus), "viewport" (when entering viewport), "render" (immediately),
+// or false. "intent" is the closest behavioural match to Next's default
+// hover-prefetch behaviour.
+function mapPrefetch(prefetch: LinkProps['prefetch']): 'intent' | false | undefined {
+  if (prefetch === false) return false
+  if (prefetch === true || prefetch === 'auto') return 'intent'
+  return undefined
+}
+
+const Link = forwardRef(function Link(
+  {
+    href,
+    as: _as,
+    replace,
+    scroll: _scroll,
+    shallow: _shallow,
+    passHref,
+    prefetch,
+    locale: _locale,
+    legacyBehavior,
+    children,
+    onClick,
+    ...rest
+  }: LinkProps,
+  ref: ForwardedRef<HTMLAnchorElement>
+) {
   const to = resolveHref(href)
+  const preload = mapPrefetch(prefetch)
+
+  // Next's `legacyBehavior` (and `passHref` with a custom anchor child)
+  // expects the consumer's child element to *be* the anchor — the parent
+  // <Link> shouldn't render its own. We approximate by cloning the
+  // single child element and stamping `href` plus a click handler that
+  // fires TanStack navigation. Modifier-clicks / middle-clicks fall
+  // through to the browser the same way Next does.
+  if (legacyBehavior && isValidElement(children)) {
+    const child = children as ReactElement<{
+      href?: string
+      onClick?: (e: MouseEvent<HTMLAnchorElement>) => void
+      ref?: Ref<HTMLAnchorElement>
+    }>
+    return (
+      <TanStackLink
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        to={to as any}
+        replace={replace}
+        preload={preload}
+        // TanStack Link supports a function child for custom rendering.
+        // Cast through unknown to bridge the typing — runtime contract is
+        // the same.
+      >
+        {(() => {
+          // Inside TanStackLink's child slot we still get an <a> by default;
+          // when legacyBehavior is true the consumer wants to control the
+          // anchor themselves. Render the cloned child with merged props.
+          return cloneElement(child, {
+            href: to,
+            ref,
+            onClick: (e: MouseEvent<HTMLAnchorElement>) => {
+              child.props.onClick?.(e)
+              onClick?.(e)
+            },
+          })
+        })()}
+      </TanStackLink>
+    )
+  }
+
+  // `passHref` without `legacyBehavior` is a no-op in modern Next when
+  // the child is anything other than an `<a>` — the wrapping <Link>
+  // renders the anchor and the `href` attribute lands on it. We get the
+  // same outcome by passing children through TanStackLink, which also
+  // renders an anchor.
+  void passHref
+
   return (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    <TanStackLink to={to as any} {...(rest as any)}>
+    <TanStackLink
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      to={to as any}
+      replace={replace}
+      preload={preload}
+      ref={ref}
+      onClick={onClick}
+      {...rest}
+    >
       {children}
     </TanStackLink>
   )
-}
+})
+
+export default Link
