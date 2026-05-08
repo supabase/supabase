@@ -15,10 +15,15 @@ type FunctionsStaticData = {
 }
 
 function FunctionsShell() {
+  // `skipFunctionsLayout` is set on the $functionSlug sub-shell's
+  // staticData, not on the leaf — so checking only the leaf misses it
+  // and we end up double-wrapping (`functions.tsx` adds
+  // EdgeFunctionsLayout, then the sub-shell's EdgeFunctionDetailsLayout
+  // wraps EdgeFunctionsLayout again internally → duplicated sidebar).
+  // Scan the whole match chain instead.
   const skip = useMatches({
     select: (matches) =>
-      (matches[matches.length - 1]?.staticData as FunctionsStaticData | undefined)
-        ?.skipFunctionsLayout ?? false,
+      matches.some((m) => (m.staticData as FunctionsStaticData | undefined)?.skipFunctionsLayout),
   })
   const title = useMatches({
     select: (matches) =>
