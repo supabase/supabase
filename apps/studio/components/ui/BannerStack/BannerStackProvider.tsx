@@ -2,7 +2,6 @@ import { createContext, useCallback, useContext, useState } from 'react'
 
 export const BANNER_ID = {
   METRICS_API: 'metrics-api-banner',
-  FEATURED_MARKETPLACE_ITEM: 'featured-marketplace-item-banner',
   INDEX_ADVISOR: 'index-advisor-banner',
   TABLE_EDITOR_QUEUE_OPERATIONS: 'table-editor-queue-operations-banner',
   RLS_EVENT_TRIGGER: 'rls-event-trigger-banner',
