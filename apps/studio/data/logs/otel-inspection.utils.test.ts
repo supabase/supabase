@@ -65,7 +65,7 @@ const pgRow: OtelLogRow = {
 
 describe('flattenOtelInspectionRow', () => {
   it('maps edge_logs request/CF/headers attributes to underscored aliases', () => {
-    const e = flattenOtelInspectionRow(edgeRow) as Record<string, unknown>
+    const e = flattenOtelInspectionRow(edgeRow) as unknown as Record<string, unknown>
     expect(e.request_method).toBe('GET')
     expect(e.request_path).toBe('/rest/v1/customers')
     expect(e.request_host).toBe('example.supabase.red')
@@ -81,13 +81,13 @@ describe('flattenOtelInspectionRow', () => {
   })
 
   it('coalesces request.path / request.pathname for function_edge_logs', () => {
-    const e = flattenOtelInspectionRow(fnEdgeRow) as Record<string, unknown>
+    const e = flattenOtelInspectionRow(fnEdgeRow) as unknown as Record<string, unknown>
     expect(e.request_path).toBe('/functions/v1/hello-world')
     expect(e.path).toBe('/functions/v1/hello-world')
   })
 
   it('exposes edge function specific fields', () => {
-    const e = flattenOtelInspectionRow(fnEdgeRow) as Record<string, unknown>
+    const e = flattenOtelInspectionRow(fnEdgeRow) as unknown as Record<string, unknown>
     expect(e.execution_id).toBe('1221d106-cc1c-463a-a42a-3decf6c52884')
     expect(e.function_id).toBe('0a47f8f5-afce-485a-8705-6e1f71c6784a')
     expect(e.execution_time_ms).toBe('258')
@@ -95,7 +95,7 @@ describe('flattenOtelInspectionRow', () => {
   })
 
   it('maps postgres parsed.* attributes and derives level from severity', () => {
-    const e = flattenOtelInspectionRow(pgRow) as Record<string, unknown>
+    const e = flattenOtelInspectionRow(pgRow) as unknown as Record<string, unknown>
     expect(e.process_id).toBe('848')
     expect(e.session_id).toBe('69399f78.350')
     expect(e.transaction_id).toBe('0')
@@ -109,7 +109,9 @@ describe('flattenOtelInspectionRow', () => {
       ...edgeRow,
       log_attributes: { ...edgeRow.log_attributes, 'response.status_code': '503' },
     }
-    expect((flattenOtelInspectionRow(row) as Record<string, unknown>).level).toBe('error')
+    expect((flattenOtelInspectionRow(row) as unknown as Record<string, unknown>).level).toBe(
+      'error'
+    )
   })
 
   it('falls back gracefully when log_attributes is missing', () => {
@@ -119,7 +121,7 @@ describe('flattenOtelInspectionRow', () => {
       source: 'edge_logs',
       event_message: 'hi',
     }
-    const e = flattenOtelInspectionRow(row) as Record<string, unknown>
+    const e = flattenOtelInspectionRow(row) as unknown as Record<string, unknown>
     expect(e.id).toBe('x')
     expect(e.method).toBe('')
     expect(e.path).toBe('')
