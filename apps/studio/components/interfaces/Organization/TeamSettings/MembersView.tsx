@@ -93,7 +93,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
       )}
 
       {isSuccessMembers && (
-        <div className="rounded w-full overflow-hidden overflow-x-scroll">
+        <div className="rounded-sm w-full overflow-hidden overflow-x-scroll">
           <Card>
             <Loading active={!filteredMembers}>
               <Table>
@@ -111,7 +111,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                     ...(isSuccessRoles && isSuccessMembers && !isOrgScopedRole
                       ? [
                           <TableRow key="project-scope-notice">
-                            <TableCell colSpan={12} className="!p-0">
+                            <TableCell colSpan={12} className="p-0!">
                               <Admonition
                                 type="note"
                                 title="You have limited visibility in this organization"

@@ -60,6 +60,8 @@ vi.mock('./App/FeaturePreview/FeaturePreviewContext', () => ({
   }),
 }))
 
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
+
 vi.mock('ui', async () => {
   const React = await import('react')
 

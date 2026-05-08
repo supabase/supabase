@@ -1,4 +1,4 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { type SafeSqlFragment } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
@@ -12,6 +12,9 @@ export type DatabaseFunctionsVariables = {
 }
 
 export type DatabaseFunction = z.infer<typeof pgMeta.functions.pgFunctionZod>
+export type SavedDatabaseFunction = Omit<DatabaseFunction, 'complete_statement'> & {
+  complete_statement: SafeSqlFragment
+}
 
 const pgMetaFunctionsList = pgMeta.functions.list()
 
@@ -33,10 +36,10 @@ export async function getDatabaseFunctions(
     headers
   )
 
-  return result as DatabaseFunction[]
+  return result as SavedDatabaseFunction[]
 }
 
-export type DatabaseFunctionsData = z.infer<typeof pgMetaFunctionsList.zod>
+export type DatabaseFunctionsData = Awaited<ReturnType<typeof getDatabaseFunctions>>
 export type DatabaseFunctionsError = ResponseError
 
 export const useDatabaseFunctionsQuery = <TData = DatabaseFunctionsData>(

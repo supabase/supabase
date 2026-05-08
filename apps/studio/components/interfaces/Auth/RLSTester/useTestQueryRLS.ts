@@ -1,3 +1,4 @@
+import { type SafeSqlFragment, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -11,16 +12,16 @@ import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import {
-  getImpersonatedUser,
   isRoleImpersonationEnabled,
   useGetImpersonatedRoleState,
+  useImpersonatedUser,
   useRoleImpersonationStateSnapshot,
 } from '@/state/role-impersonation-state'
 
 const limit = 100
 
 /**
- * [Joshen] Testing a SQL query for it's RLS access involves 3 async steps
+ * [Joshen] Testing a SQL query for its RLS access involves 3 async steps
  * 0. (Optional) Inferring client library code to SQL query via the AI Assistant
  * 1. Parsing the provided SQL query to retrieve its operation type + tables involved
  * 2. Checking for tables involved if they've got RLS enabled
@@ -35,6 +36,7 @@ export const useTestQueryRLS = () => {
 
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const impersonatedRoleState = getImpersonatedRoleState()
+  const user = useImpersonatedUser()
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -47,9 +49,25 @@ export const useTestQueryRLS = () => {
     onError: () => {},
   })
 
-  const { mutateAsync: parseClientCode, error: parseClientCodeError } = useParseClientCodeMutation({
+  const {
+    mutateAsync: parseClientCode,
+    isPending: isInferring,
+    error: parseClientCodeError,
+  } = useParseClientCodeMutation({
     onError: () => {},
   })
+
+  const inferSQLFromLib = async (
+    value: string,
+    onInferSQL: (unchecked_sql: UntrustedSqlFragment) => void
+  ) => {
+    const { unchecked_sql, valid } = await parseClientCode({ code: value })
+    if (valid && unchecked_sql != null) {
+      onInferSQL(unchecked_sql)
+    } else {
+      toast.error('Client library code provided is not valid')
+    }
+  }
 
   const { mutateAsync: parseQuery, error: parseQueryError } = useParseSQLQueryMutation({
     onError: () => {},
@@ -61,17 +79,13 @@ export const useTestQueryRLS = () => {
     })
 
   const testQuery = async ({
-    option,
-    format,
     value,
-    onInferSQL,
+    option,
     onExecuteSQL,
     onParseQuery,
   }: {
+    value: SafeSqlFragment
     option: 'anon' | 'authenticated'
-    format: 'lib' | 'sql'
-    value: string
-    onInferSQL: (sql: string) => void
     onExecuteSQL: ({
       result,
       isAutoLimit,
@@ -82,7 +96,6 @@ export const useTestQueryRLS = () => {
     onParseQuery: (results?: ParseQueryResults) => void
   }) => {
     if (!project) return console.error('Project is required')
-    const user = getImpersonatedUser(impersonatedRoleState)
 
     if (option === 'authenticated' && !user) {
       return toast('Select which user to test as before running the query')
@@ -90,20 +103,9 @@ export const useTestQueryRLS = () => {
 
     try {
       setIsLoading(true)
-      let formattedValue = value
 
-      if (format === 'lib') {
-        const { sql, valid } = await parseClientCode({ code: value })
-        if (valid && !!sql) {
-          formattedValue = sql
-          onInferSQL(sql)
-        } else {
-          return toast.error('Client library code provided is not valid')
-        }
-      }
-
-      const { appendAutoLimit } = checkIfAppendLimitRequired(formattedValue, limit)
-      const formattedSql = suffixWithLimit(formattedValue, limit)
+      const { appendAutoLimit } = checkIfAppendLimitRequired(value, limit)
+      const formattedSql = suffixWithLimit(value, limit)
       const data = await parseQuery({ sql: formattedSql })
 
       if (data.operation !== 'SELECT') {
@@ -126,7 +128,8 @@ export const useTestQueryRLS = () => {
             (x) =>
               x.schema === schema &&
               x.table === table &&
-              x.roles.includes(role?.role ?? '') &&
+              (x.roles.includes(role?.role ?? '') ||
+                (x.roles.length === 1 && x.roles[0] === 'public')) &&
               x.command === data.operation
           )
           return {
@@ -175,7 +178,9 @@ export const useTestQueryRLS = () => {
   return {
     limit,
     testQuery,
+    inferSQLFromLib,
     isLoading,
+    isInferring,
     executeSqlError,
     parseQueryError,
     parseClientCodeError,

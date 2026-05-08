@@ -1,40 +1,61 @@
-'use client'
-
 import dayjs from 'dayjs'
 import { ChevronLeft } from 'lucide-react'
-import { MDXRemote } from 'next-mdx-remote'
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
-import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
-import type { ComponentType } from 'react'
+import ReactMarkdown from 'react-markdown'
 import type { PostReturnType, ProcessedBlogData, StaticAuthor, Tag } from 'types/post'
 import { Badge } from 'ui'
 
+import DraftModeBanner from '@/components/Blog/DraftModeBanner'
+import ShareArticleActions from '@/components/Blog/ShareArticleActions'
+import CTABanner from '@/components/CTABanner'
+import BlogLinks from '@/components/LaunchWeek/7/BlogLinks'
+import LW11Summary from '@/components/LaunchWeek/11/LW11Summary'
+import LW12Summary from '@/components/LaunchWeek/12/LWSummary'
+import LW13Summary from '@/components/LaunchWeek/13/Releases/LWSummary'
+import LW14Summary from '@/components/LaunchWeek/14/Releases/LWSummary'
+import LW15Summary from '@/components/LaunchWeek/15/LWSummary'
+import LWXSummary from '@/components/LaunchWeek/X/LWXSummary'
+import DefaultLayout from '@/components/Layouts/Default'
 import { BLOG_POST_HERO_IMAGE_SIZES, getBlogThumbnailImage } from '@/lib/blog-images'
+import { compileBlogMdx } from '@/lib/mdx/compileBlogMdx'
 import mdxComponents from '@/lib/mdx/mdxComponents'
 
-const ShareArticleActions = dynamic(() => import('@/components/Blog/ShareArticleActions'))
-const CTABanner = dynamic(() => import('@/components/CTABanner'))
-const LW11Summary = dynamic(() => import('@/components/LaunchWeek/11/LW11Summary'))
-const LW12Summary = dynamic(() => import('@/components/LaunchWeek/12/LWSummary'))
-const LW13Summary = dynamic(() => import('@/components/LaunchWeek/13/Releases/LWSummary'))
-const LW14Summary = dynamic(() => import('@/components/LaunchWeek/14/Releases/LWSummary'))
-const LW15Summary = dynamic(() => import('@/components/LaunchWeek/15/LWSummary'))
-const BlogLinks = dynamic(() => import('@/components/LaunchWeek/7/BlogLinks'))
-const LWXSummary = dynamic(() => import('@/components/LaunchWeek/X/LWXSummary'))
-const DefaultLayout = dynamic(() => import('@/components/Layouts/Default'))
-const DraftModeBanner = dynamic(() => import('@/components/Blog/DraftModeBanner'))
-const ReactMarkdown = dynamic<{ children: string }>(
-  () =>
-    import('react-markdown').then(
-      (m) => m.default as unknown as ComponentType<{ children: string }>
-    ),
-  { ssr: false }
-)
+type NextCardProps = {
+  post: { path: string; title: string; formattedDate: string }
+  label: string
+  className?: string
+}
 
-const BlogPostRenderer = ({
+const NextCard = (props: NextCardProps) => {
+  const { post, label, className } = props
+
+  return (
+    <Link href={`${post.path}`} as={`${post.path}`}>
+      <div className={className ?? ''}>
+        <div className="hover:bg-control cursor-pointer rounded-sm border p-6 transition">
+          <div className="space-y-4">
+            <div>
+              <p className="text-foreground-lighter text-sm">{label}</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {'title' in post && (
+                <h4 className="text-foreground text-lg text-balance">
+                  {(post as { title?: string }).title}
+                </h4>
+              )}
+              {'formattedDate' in post && (
+                <p className="small">{(post as { formattedDate?: string }).formattedDate}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+const BlogPostRenderer = async ({
   blog,
   blogMetaData,
   isDraftMode,
@@ -47,34 +68,9 @@ const BlogPostRenderer = ({
   isDraftMode: boolean
   prevPost?: PostReturnType | null
   nextPost?: PostReturnType | null
-  authors: StaticAuthor[]
+  authors: Array<StaticAuthor>
 }) => {
-  const [previewData] = useState<ProcessedBlogData>(blog)
-
-  // For LivePreview, we'll use the raw content directly with ReactMarkdown
-  // instead of trying to use MDXRemote which requires specific serialization
-  const isLivePreview = isDraftMode && previewData !== blog
-
-  // Extract raw content from data if available
-  const livePreviewContent = useMemo(() => {
-    // Priority 2: Use data from postMessage updates
-    if (isDraftMode && previewData !== blog) {
-      // If content is a string, use it directly
-      if (typeof (previewData as unknown as { content?: unknown }).content === 'string') {
-        return (previewData as unknown as { content?: string }).content as string
-      }
-
-      // If content is from source property
-      if (
-        (previewData as unknown as { source?: unknown }).source &&
-        typeof (previewData as unknown as { source?: unknown }).source === 'string'
-      ) {
-        return (previewData as unknown as { source?: string }).source as string
-      }
-    }
-
-    return blog.source || ''
-  }, [isDraftMode, previewData, blog])
+  const mdxRendered = await compileBlogMdx(blog.content as string, mdxComponents('blog'))
 
   const isLaunchWeek7 = blogMetaData.launchweek === '7'
   const isLaunchWeekX = blogMetaData.launchweek?.toString().toLocaleLowerCase() === 'x'
@@ -83,39 +79,6 @@ const BlogPostRenderer = ({
   const isLaunchWeek13 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '13'
   const isLaunchWeek14 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '14'
   const isLaunchWeek15 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '15'
-
-  type NextCardProps = {
-    post: { path: string; title: string; formattedDate: string }
-    label: string
-    className?: string
-  }
-  const NextCard = (props: NextCardProps) => {
-    const { post, label, className } = props
-
-    return (
-      <Link href={`${post.path}`} as={`${post.path}`}>
-        <div className={className ?? ''}>
-          <div className="hover:bg-control cursor-pointer rounded border p-6 transition">
-            <div className="space-y-4">
-              <div>
-                <p className="text-foreground-lighter text-sm">{label}</p>
-              </div>
-              <div className="flex flex-col gap-2">
-                {'title' in post && (
-                  <h4 className="text-foreground text-lg text-balance">
-                    {(post as { title?: string }).title}
-                  </h4>
-                )}
-                {'formattedDate' in post && (
-                  <p className="small">{(post as { formattedDate?: string }).formattedDate}</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </Link>
-    )
-  }
 
   const toc = blogMetaData.toc && (
     <div>
@@ -242,15 +205,7 @@ const BlogPostRenderer = ({
                           </div>
                         )
                       )}
-                      {/* Use ReactMarkdown for LivePreview mode, MDXRemote for normal mode */}
-                      {isLivePreview ? (
-                        <ReactMarkdown>{livePreviewContent}</ReactMarkdown>
-                      ) : (
-                        <MDXRemote
-                          {...(blog.content as MDXRemoteSerializeResult)}
-                          components={mdxComponents('blog')}
-                        />
-                      )}
+                      {mdxRendered}
                     </div>
                   </article>
                   {isLaunchWeek7 && <BlogLinks />}
@@ -301,7 +256,7 @@ const BlogPostRenderer = ({
                   <div className="space-y-6">
                     <div className="hidden lg:block">
                       <div className="flex flex-wrap gap-2">
-                        {(blogMetaData.tags as Tag[])?.map((tag) => {
+                        {(blogMetaData.tags as Array<Tag>)?.map((tag) => {
                           const tagName = typeof tag === 'string' ? tag : tag.name
                           const tagId = typeof tag === 'string' ? tag : tag.id.toString()
                           return (

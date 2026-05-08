@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 
 import PricingContent from './PricingContent'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 
 export const metadata: Metadata = {
   title: 'Pricing & Fees | Supabase',
@@ -25,5 +27,15 @@ export const metadata: Metadata = {
 }
 
 export default function PricingPage() {
-  return <PricingContent />
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.pricing)),
+        }}
+      />
+      <PricingContent />
+    </>
+  )
 }

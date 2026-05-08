@@ -1,9 +1,9 @@
 import { expect, Page } from '@playwright/test'
 
+import { createTableWithRLS, dropTable } from '../utils/db/queries.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { createApiResponseWaiter, waitForApiResponse } from '../utils/wait-for-response.js'
-import { createTableWithRLS, dropTable } from '../utils/db/queries.js'
 
 /**
  * Helper function to navigate to policies page and wait for it to load
@@ -232,7 +232,7 @@ test.describe('RLS Policies', () => {
       await expect(page.getByRole('radio', { name: 'SELECT' })).toBeChecked()
 
       // Fill in USING clause - allow all access
-      await page.locator('.view-lines').click()
+      await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.type('true')
 
       // Save policy
@@ -283,14 +283,14 @@ test.describe('RLS Policies', () => {
       await page.getByRole('radio', { name: 'INSERT' }).click()
 
       // Select target role - authenticated
-      await page.getByText('Defaults to all (public) roles if none selected').click()
+      await page.getByRole('combobox', { name: 'Target Roles' }).click()
       await page.getByRole('option', { name: 'authenticated' }).click()
 
       // Close the dropdown
       await page.keyboard.press('Escape')
 
       // Fill in WITH CHECK clause - allow all inserts
-      await page.locator('.view-lines').click()
+      await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.type('true')
 
       // Save policy
@@ -338,12 +338,20 @@ test.describe('RLS Policies', () => {
       await page.getByRole('radio', { name: 'UPDATE' }).click()
 
       // Select authenticated role
-      await page.getByText('Defaults to all (public) roles if none selected').click()
+      await page.getByRole('combobox', { name: 'Target Roles' }).click()
       await page.getByRole('option', { name: 'authenticated' }).click()
       await page.keyboard.press('Escape')
 
+      await page
+        .getByRole('textbox', { name: /Editor content/i })
+        .nth(0)
+        .focus()
+      await page.keyboard.type('true')
       // Fill in USING clause (UPDATE has both USING and WITH CHECK editors, so use first)
-      await page.locator('.view-lines').first().click()
+      await page
+        .getByRole('textbox', { name: /Editor content/i })
+        .nth(1)
+        .focus()
       await page.keyboard.type('true')
 
       // Save policy
@@ -390,12 +398,12 @@ test.describe('RLS Policies', () => {
       await page.getByRole('radio', { name: 'DELETE' }).click()
 
       // Select authenticated role
-      await page.getByText('Defaults to all (public) roles if none selected').click()
+      await page.getByRole('combobox', { name: 'Target Roles' }).click()
       await page.getByRole('option', { name: 'authenticated' }).click()
       await page.keyboard.press('Escape')
 
       // Fill in USING clause
-      await page.locator('.view-lines').click()
+      await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.type('true')
 
       // Save policy

@@ -29,7 +29,7 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
       props.className
     )}
   >
-    <SectionContainer className={cn('!py-0 grid grid-cols-12', props.sectionContainerClassName)}>
+    <SectionContainer className={cn('py-0! grid grid-cols-12', props.sectionContainerClassName)}>
       <div
         className={cn(
           'relative z-10 col-span-12 lg:col-span-5',
@@ -50,7 +50,7 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
             )}
           </div>
         )}
-        <h1 className="h1 text-3xl md:!text-4xl lg:!text-4xl 2xl:!text-6xl tracking-[-.15px]">
+        <h1 className="h1 text-3xl md:text-4xl! lg:text-4xl! 2xl:text-6xl! tracking-[-.15px]">
           {props.h1}
         </h1>
         {props.subheader && (

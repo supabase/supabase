@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { useTheme } from 'next-themes'
 import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
@@ -44,6 +43,7 @@ import {
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
+import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
 import { formatBytes } from '@/lib/helpers'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
@@ -155,7 +155,13 @@ export function ComposedChart({
 
   const { Container } = useChartSize(size)
 
-  const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
+  // When `displayDateInUtc` is set the chart explicitly wants UTC labels.
+  // Otherwise honour the user's selected timezone via the picker.
+  const formatPickerDate = useFormatDateTime()
+  const formatChartDate = (value: number | string) =>
+    displayDateInUtc
+      ? formatDateTime(value, { tz: 'UTC', format: customDateFormat })
+      : formatPickerDate(value, customDateFormat)
 
   const formatTimestamp = (ts: unknown) => {
     if (typeof ts !== 'number' && typeof ts !== 'string') {
@@ -163,10 +169,11 @@ export function ComposedChart({
     }
 
     if (typeof ts === 'number' && ts > 1e14) {
-      return day(ts / 1000).format(customDateFormat)
+      // Microsecond timestamp; convert to milliseconds before formatting.
+      return formatChartDate(ts / 1000)
     }
 
-    return day(ts).format(customDateFormat)
+    return formatChartDate(ts)
   }
 
   const _XAxisProps = XAxisProps || {

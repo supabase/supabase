@@ -1,7 +1,8 @@
+import { ident, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ScrollArea } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
@@ -17,11 +18,11 @@ interface ViewEntityAutofixSecurityModalProps {
   setIsAutofixViewSecurityModalOpen: (isAutofixViewSecurityModalOpen: boolean) => void
 }
 
-export default function ViewEntityAutofixSecurityModal({
+export const ViewEntityAutofixSecurityModal = ({
   table,
   isAutofixViewSecurityModalOpen,
   setIsAutofixViewSecurityModalOpen,
-}: ViewEntityAutofixSecurityModalProps) {
+}: ViewEntityAutofixSecurityModalProps) => {
   const { data: project } = useSelectedProjectQuery()
   const queryClient = useQueryClient()
   const {
@@ -51,9 +52,7 @@ export default function ViewEntityAutofixSecurityModal({
   })
 
   function handleConfirm() {
-    const sql = `
-	ALTER VIEW "${table.schema}"."${table.name}" SET (security_invoker = on);
-	`
+    const sql = safeSql`ALTER VIEW ${ident(table.schema)}.${ident(table.name)} SET (security_invoker = on);`
     execute({
       projectRef: project?.ref,
       connectionString: project?.connectionString,

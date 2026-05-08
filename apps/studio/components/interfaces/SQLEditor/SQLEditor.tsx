@@ -1,4 +1,11 @@
 import type { Monaco } from '@monaco-editor/react'
+import {
+  acceptUntrustedSql,
+  rawSql,
+  safeSql,
+  type SafeSqlFragment,
+  type UntrustedSqlFragment,
+} from '@supabase/pg-meta'
 import { wrapWithRollback } from '@supabase/pg-meta/src/query'
 import { useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
@@ -82,6 +89,8 @@ import {
   isRoleImpersonationEnabled,
   useGetImpersonatedRoleState,
 } from '@/state/role-impersonation-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
@@ -144,6 +153,22 @@ export const SQLEditor = () => {
       setTimeout(() => editorRef.current?.focus(), 0)
     })
   }, [])
+
+  useShortcut(SHORTCUT_IDS.SQL_EDITOR_FOCUS_EDITOR, refocusEditor, {
+    registerInCommandMenu: true,
+  })
+
+  const openNewSnippet = useCallback(() => {
+    if (!ref) return
+    // skip=true bypasses the "load last visited snippet" redirect on /sql/new.
+    // Without it, the effect in pages/project/[ref]/sql/[id].tsx bounces back
+    // to the previous snippet.
+    router.push(`/project/${ref}/sql/new?skip=true`)
+  }, [ref, router])
+
+  useShortcut(SHORTCUT_IDS.SQL_EDITOR_NEW_SNIPPET, openNewSnippet, {
+    registerInCommandMenu: true,
+  })
 
   const clearPendingRunRefocus = useCallback(() => {
     shouldRefocusAfterRunRef.current = false
@@ -293,7 +318,8 @@ export const SQLEditor = () => {
       const selection = editor.getSelection()
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
       const sql = snippet
-        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
+        ? ((selectedValue || editorRef.current?.getValue()) ??
+          snippet.snippet.content?.unchecked_sql)
         : selectedValue || editorRef.current?.getValue()
       const formattedSql = formatSql(sql)
 
@@ -310,8 +336,12 @@ export const SQLEditor = () => {
     }
   }, [id, isDiffOpen, project, snapV2])
 
+  useShortcut(SHORTCUT_IDS.SQL_EDITOR_FORMAT, prettifyQuery, {
+    registerInCommandMenu: true,
+  })
+
   const executeQuery = useCallback(
-    async (force: boolean = false, sqlOverride?: string) => {
+    async (force: boolean = false, sqlOverride?: SafeSqlFragment) => {
       if (isDiffOpen) {
         clearPendingRunRefocus()
         return
@@ -331,7 +361,8 @@ export const SQLEditor = () => {
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
       const editorSql = snippet
-        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
+        ? ((selectedValue || editorRef.current?.getValue()) ??
+          snippet.snippet.content?.unchecked_sql)
         : selectedValue || editorRef.current?.getValue()
       const sql = sqlOverride ?? editorSql
 
@@ -383,8 +414,9 @@ export const SQLEditor = () => {
         return toast.error('Unable to run query: Connection string is missing')
       }
 
-      const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
-      const formattedSql = suffixWithLimit(sql, limit)
+      const userSql = rawSql(sql)
+      const { appendAutoLimit } = checkIfAppendLimitRequired(userSql, limit)
+      const formattedSql = suffixWithLimit(userSql, limit)
 
       execute({
         projectRef: project.ref,
@@ -441,7 +473,8 @@ export const SQLEditor = () => {
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
       const sql = snippet
-        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
+        ? ((selectedValue || editorRef.current?.getValue()) ??
+          snippet.snippet.content?.unchecked_sql)
         : selectedValue || editorRef.current?.getValue()
 
       // Check for multiple statements - EXPLAIN only works on a single statement
@@ -469,7 +502,8 @@ export const SQLEditor = () => {
       }
 
       // Wrap the query with EXPLAIN ANALYZE only if it's not already an EXPLAIN query
-      const explainSql = isExplainSql(sql) ? sql : `EXPLAIN ANALYZE ${sql}`
+      const userSql = rawSql(sql ?? '')
+      const explainSql = isExplainSql(sql) ? userSql : safeSql`EXPLAIN ANALYZE ${userSql}`
 
       // Wrap EXPLAIN queries in a transaction with rollback to prevent data modifications
       // This ensures EXPLAIN ANALYZE INSERT/UPDATE/DELETE queries don't actually modify data
@@ -499,6 +533,10 @@ export const SQLEditor = () => {
     lineHighlights,
     snapV2,
   ])
+
+  useShortcut(SHORTCUT_IDS.SQL_EDITOR_EXPLAIN, executeExplainQuery, {
+    registerInCommandMenu: true,
+  })
 
   const handleNewQuery = useCallback(
     async (sql: string, name: string) => {
@@ -540,7 +578,9 @@ export const SQLEditor = () => {
   const buildDebugPrompt = useCallback(() => {
     const snippet = snapV2.snippets[id]
     const result = snapV2.results[id]?.[0]
-    const sql = (snippet?.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim()
+    const sql = (snippet?.snippet.content?.unchecked_sql ?? '')
+      .replace(sqlAiDisclaimerComment, '')
+      .trim()
     const errorMessage = result?.error?.message ?? 'Unknown error'
     const prompt = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
 
@@ -555,7 +595,7 @@ export const SQLEditor = () => {
       aiSnap.newChat({
         name: 'Debug SQL snippet',
         sqlSnippets: [
-          (snippet.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),
+          (snippet.snippet.content?.unchecked_sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),
         ],
         initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
       })
@@ -852,7 +892,7 @@ export const SQLEditor = () => {
           shouldRefocusAfterRunRef.current = true
           setPotentialIssues(undefined)
           refocusEditor()
-          void executeQuery(true, rewrittenSql)
+          void executeQuery(true, acceptUntrustedSql(rewrittenSql as UntrustedSqlFragment))
         }}
       />
 
@@ -911,7 +951,7 @@ export const SQLEditor = () => {
                       placeholder={
                         !promptState.isOpen && !editorRef.current?.getValue()
                           ? 'Hit ' +
-                            (os === 'macos' ? 'CMD+K' : `CTRL+K`) +
+                            (os === 'macos' ? 'CMD+SHIFT+K' : `CTRL+SHIFT+K`) +
                             ' to generate query or just start typing'
                           : ''
                       }
@@ -925,6 +965,8 @@ export const SQLEditor = () => {
                       editorRef={editorRef}
                       monacoRef={monacoRef}
                       executeQuery={executeQuery}
+                      executeExplainQuery={executeExplainQuery}
+                      prettifyQuery={prettifyQuery}
                       onHasSelection={setHasSelection}
                       onMount={onMount}
                       onPrompt={({

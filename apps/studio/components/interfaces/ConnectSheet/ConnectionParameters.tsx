@@ -35,7 +35,7 @@ export const ConnectionParameters = ({ parameters, onCopy }: ConnectionParameter
               className={cn(
                 'text-foreground-lighter',
                 'ml-2 opacity-0 group-hover/param:opacity-100',
-                'hover:text-foreground rounded-sm p-1',
+                'hover:text-foreground rounded-xs p-1',
                 copiedMap[param.key] && 'opacity-100',
                 'transition-all'
               )}

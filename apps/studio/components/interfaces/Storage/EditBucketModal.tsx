@@ -260,11 +260,11 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
                         {isMakingBucketPrivate && (
                           <>
-                            <p className="mb-2 !leading-normal">
+                            <p className="mb-2 leading-normal!">
                               All objects in your bucket will only accessible via signed URLs, or
                               downloaded with the right authorization headers.
                             </p>
-                            <p className="!leading-normal">
+                            <p className="leading-normal!">
                               Assets cached in the CDN may still be publicly accessible. You can
                               consider{' '}
                               <InlineLink

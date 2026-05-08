@@ -308,7 +308,7 @@ const CreateProject = () => {
                       <div className="flex gap-2">
                         <img
                           alt="region icon"
-                          className="w-5 rounded-sm"
+                          className="w-5 rounded-xs"
                           src={`${BASE_PATH}/img/regions/${Object.values(AWS_REGIONS)[i].code}.svg`}
                         />
                         <span>{label}</span>
@@ -356,11 +356,11 @@ const CreateProject = () => {
               htmlFor="dataApiDefaultPrivileges"
               className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Automatically expose new tables and functions
+              Automatically expose new tables
             </label>
             <p className="text-sm text-foreground-muted">
-              Grants privileges to Data API roles by default, exposing new tables and functions. We
-              recommend disabling this to control access manually.
+              Grants privileges to Data API roles by default, exposing new tables. We recommend
+              disabling this to control access manually.
             </p>
           </div>
         </div>

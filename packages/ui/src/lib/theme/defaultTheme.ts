@@ -23,11 +23,11 @@ const defaults = {
   },
   placeholder: 'placeholder-foreground-muted',
   focus: `
-    outline-none
+    outline-hidden
     focus:ring-current focus:ring-2
   `,
   'focus-visible': `
-    outline-none
+    outline-hidden
     transition-all
     outline-0
     focus-visible:outline-4
@@ -123,7 +123,7 @@ export default {
           text-left
           cursor-pointer
 
-          outline-none
+          outline-hidden
           focus-visible:ring-1
           focus-visible:z-10
           ring-foreground-light
@@ -161,7 +161,7 @@ export default {
           text-base
           bg-transparent
 
-          outline-none
+          outline-hidden
           focus-visible:ring-1
           focus-visible:z-10
           ring-foreground-light
@@ -256,7 +256,7 @@ export default {
       p-0 m-0
       text-foreground-muted
       cursor-pointer transition ease-in-out
-      bg-transparent border-transparent focus:outline-none
+      bg-transparent border-transparent focus:outline-hidden
       opacity-50 hover:opacity-100`,
   },
 
@@ -301,8 +301,8 @@ export default {
         space-x-2
         text-center
         transition
-        focus:outline-none
-        focus-visible:ring
+        focus:outline-hidden
+        focus-visible:ring-3
         focus-visible:ring-foreground-muted
         focus-visible:border-foreground-muted
       `,
@@ -324,11 +324,11 @@ export default {
         space-x-2
         text-center
         transition
-        shadow-sm
-        rounded
+        shadow-xs
+        rounded-sm
         border
-        focus:outline-none
-        focus-visible:ring
+        focus:outline-hidden
+        focus-visible:ring-3
         focus-visible:ring-foreground-muted
         focus-visible:border-foreground-muted
         `,
@@ -353,10 +353,10 @@ export default {
         space-x-2
         text-center
         transition
-        shadow-sm
+        shadow-xs
         rounded-full
-        focus:outline-none
-        focus-visible:ring
+        focus:outline-hidden
+        focus-visible:ring-3
         focus-visible:ring-foreground-muted
         focus-visible:border-foreground-muted
         `,
@@ -377,7 +377,7 @@ export default {
     },
     scrollable: `overflow-auto whitespace-nowrap no-scrollbar mask-fadeout-right`,
     wrappable: `flex-wrap`,
-    content: `focus:outline-none transition-height`,
+    content: `focus:outline-hidden transition-height`,
   },
 
   /*
@@ -390,7 +390,7 @@ export default {
       box-border
       w-full
       rounded-md
-      shadow-sm
+      shadow-xs
       transition-all
       text-foreground
       border
@@ -438,7 +438,7 @@ export default {
     header: `
       flex items-center
       space-y-1 py-4 px-4 bg-dash-sidebar sm:px-6
-      border-b h-[var(--header-height)]
+      border-b h-(--header-height)
     `,
     contents: `
       relative
@@ -495,60 +495,6 @@ export default {
     trigger: `
       border-none bg-transparent p-0 focus:ring-0
     `,
-  },
-
-  /*
-   *  Toggle
-   */
-
-  toggle: {
-    base: `
-      p-0 relative
-      inline-flex shrink-0
-      border-2 border-transparent
-      rounded-full
-      cursor-pointer
-      transition-colors ease-in-out duration-200
-      ${defaults.focus}
-      focus:!ring-border
-      bg-foreground-muted/40
-
-      hover:bg-foreground-muted/60
-    `,
-    active: `
-      !bg-brand
-      !hover:bg-brand
-    `,
-    handle_container: {
-      tiny: 'h-4 w-7',
-      small: 'h-6 w-11',
-      medium: 'h-6 w-11',
-      large: 'h-7 w-12',
-      xlarge: 'h-7 w-12',
-    },
-    handle: {
-      base: `
-        inline-block h-5 w-5
-        rounded-full
-        bg-white
-        shadow ring-0
-        transition
-        ease-in-out duration-200
-      `,
-      tiny: '!h-3 !w-3',
-      small: '!h-5 !w-5',
-      medium: '!h-5 !w-5',
-      large: '!h-6 !w-6',
-      xlarge: '!h-6 !w-6',
-    },
-    handle_active: {
-      tiny: ' translate-x-3 dark:bg-white',
-      small: 'translate-x-5 dark:bg-white',
-      medium: 'translate-x-5 dark:bg-white',
-      large: 'translate-x-5 dark:bg-white',
-      xlarge: 'translate-x-5 dark:bg-white',
-    },
-    disabled: 'opacity-75 cursor-not-allowed',
   },
 
   /*
@@ -647,10 +593,10 @@ export default {
     trigger: `
       flex
       border-none
-      rounded
+      rounded-sm
       bg-transparent
       p-0
-      outline-none
+      outline-hidden
       outline-offset-1
       transition-all
       focus:outline-4
@@ -660,7 +606,7 @@ export default {
       z-40
       bg-overlay
       border border-overlay
-      rounded
+      rounded-sm
       shadow-lg
       data-open:animate-dropdown-content-show
       data-closed:animate-dropdown-content-hide
@@ -709,7 +655,7 @@ export default {
       base: `
         cursor-pointer
         flex space-x-3 items-center
-        outline-none
+        outline-hidden
         focus-visible:ring-1 ring-foreground-muted focus-visible:z-10
         group
       `,
@@ -760,10 +706,11 @@ export default {
           rounded: `rounded-md`,
         },
         pills: {
-          base: `px-3 py-1`,
+          base: `my-px px-3 py-[3px] rounded-md transition-colors active:bg-sidebar-accent/50`,
           normal: `
             font-normal
             border-default
+            hover:bg-sidebar-accent/50
             group-hover:border-foreground-muted`,
           active: `
             font-semibold
@@ -862,7 +809,7 @@ export default {
       box-border
       w-full
       rounded-md
-      shadow-sm
+      shadow-xs
       text-foreground
       border
       focus-visible:shadow-md
@@ -931,7 +878,7 @@ export default {
       focus:bg-border-overlay
       focus:text-foreground
       border-none
-      focus:outline-none
+      focus:outline-hidden
     `,
     option_active: `text-foreground bg-selection`,
     option_disabled: `cursor-not-allowed opacity-60`,

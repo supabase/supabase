@@ -27,13 +27,13 @@ export default function TileGrid({
           <h2 className="h2">Featured</h2>
           <div className="grid grid-cols-1 gap-5 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
             {featuredPartners?.map((p) => (
-              <Link key={p.slug} href={`/partners/${p.slug}`}>
+              <Link key={p.slug} href={`/partners/integrations/${p.slug}`}>
                 <div
                   className="
                 bg-surface-100
                 hover:bg-surface-200
                 group flex h-full w-full flex-col rounded-xl border px-6
-                py-6 shadow
+                py-6 shadow-sm
                 transition-all
                 hover:shadow-lg"
                 >
@@ -70,13 +70,13 @@ export default function TileGrid({
           {!hideCategories && <h2 className="h2">{category}</h2>}
           <div className="grid  grid-cols-1 gap-5 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
             {partnersByCategory[category].map((p) => (
-              <Link key={p.slug} href={`/partners/${p.slug}`}>
+              <Link key={p.slug} href={`/partners/integrations/${p.slug}`}>
                 <div
                   className="
                 bg-surface-100
                 hover:bg-surface-200
                 group flex h-full w-full flex-col rounded-xl border px-6
-                py-6 shadow
+                py-6 shadow-sm
                 transition-all
                 hover:shadow-lg"
                 >

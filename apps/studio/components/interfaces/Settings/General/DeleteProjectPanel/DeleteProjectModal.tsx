@@ -2,7 +2,7 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Input } from 'ui'
+import { TextArea_Shadcn_ as TextArea } from 'ui'
 
 import { CANCELLATION_REASONS } from '@/components/interfaces/Billing/Billing.constants'
 import { LogicalBackupCliInstructions } from '@/components/layouts/ProjectLayout/LogicalBackupCliInstructions'
@@ -141,7 +141,7 @@ export const DeleteProjectModal = ({
     >
       <div className="space-y-6">
         <LogicalBackupCliInstructions enabled={visible} showResetPassword={false} />
-        {/* 
+        {/*
           [Joshen] This is basically ExitSurvey.tsx, ideally we have one shared component but the one
           in ExitSurvey has a Form wrapped around it already. Will probably need some effort to refactor
           but leaving that for the future.
@@ -160,7 +160,7 @@ export const DeleteProjectModal = ({
                       key={option.value}
                       className={[
                         'flex cursor-pointer items-center space-x-2 rounded-md py-1',
-                        'pl-2 pr-3 text-center text-sm shadow-sm transition-all duration-100',
+                        'pl-2 pr-3 text-center text-sm shadow-xs transition-all duration-100',
                         `${
                           active
                             ? ` bg-foreground text-background opacity-100 hover:bg-foreground/75`
@@ -182,8 +182,10 @@ export const DeleteProjectModal = ({
                 })}
               </div>
               <div className="text-area-text-sm flex flex-col gap-y-2">
-                <label className="text-sm whitespace-pre-line break-words">{textareaLabel}</label>
-                <Input.TextArea
+                <label htmlFor="message" className="text-sm whitespace-pre-line wrap-break-word">
+                  {textareaLabel}
+                </label>
+                <TextArea
                   name="message"
                   rows={3}
                   value={message}

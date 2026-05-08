@@ -1419,6 +1419,11 @@ export const examples: Registry = [
     files: ['example/multi-select-inline-search-input.tsx'],
   },
   {
+    name: 'multi-select-in-dialog',
+    type: 'components:example',
+    files: ['example/multi-select-in-dialog.tsx'],
+  },
+  {
     name: 'tree-view-demo',
     type: 'components:example',
     files: ['example/tree-view-demo.tsx'],

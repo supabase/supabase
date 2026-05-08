@@ -2,8 +2,9 @@ import { useHotkeySequence } from '@tanstack/react-hotkeys'
 import { Fragment, useCallback } from 'react'
 import { KeyboardShortcut } from 'ui'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import type { ICommand } from 'ui-patterns/CommandMenu/api/types'
 
-import { SHORTCUT_DEFINITIONS, type ShortcutId } from './registry'
+import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS, type ShortcutId } from './registry'
 import type { ShortcutOptions } from './types'
 import { useIsShortcutEnabled } from './useIsShortcutEnabled'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
@@ -11,6 +12,16 @@ import useLatest from '@/hooks/misc/useLatest'
 
 const hotkeyToKeys = (hotkey: string): string[] =>
   hotkey.split('+').map((part) => (part === 'Mod' ? 'Meta' : part))
+
+const orderShortcutCommands = (commands: ICommand[], commandsToInsert: ICommand[]): ICommand[] => {
+  const mergedCommands = [...commands, ...commandsToInsert]
+
+  return mergedCommands.sort((a, b) => {
+    if (a.id === SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE) return 1
+    if (b.id === SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE) return -1
+    return 0
+  })
+}
 
 /**
  * Subscribe to a registered keyboard shortcut.
@@ -59,6 +70,9 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
   const enabled = globallyEnabled && callerEnabled
   const timeout = options?.timeout ?? def.options?.timeout ?? undefined
   const ignoreInputs = options?.ignoreInputs ?? def.options?.ignoreInputs
+  const registerInCommandMenu =
+    options?.registerInCommandMenu ?? def.options?.registerInCommandMenu ?? false
+  const label = options?.label ?? def.label
 
   // Only include `ignoreInputs` when set. The library resolves it to a concrete
   // boolean at register time (false for Meta/Ctrl/Escape, true otherwise), but
@@ -72,8 +86,8 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
   })
 
   // Handle overrides for command menu
-  const enabledInCommandMenu = enabled && (options?.registerInCommandMenu ?? false)
-  const depsInCommandMenu = [enabled, def.label]
+  const enabledInCommandMenu = enabled && registerInCommandMenu
+  const depsInCommandMenu = [enabled, label]
   const callbackRef = useLatest(callback)
   const setCommandMenuOpen = useSetCommandMenuOpen()
   const stableAction = useCallback(() => {
@@ -86,7 +100,7 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
     [
       {
         id,
-        name: def.label,
+        name: label,
         action: stableAction,
         badge: () => (
           <div className="flex items-center gap-1">
@@ -103,6 +117,7 @@ export function useShortcut(id: ShortcutId, callback: () => void, options?: Shor
     {
       enabled: enabledInCommandMenu,
       deps: depsInCommandMenu,
+      orderCommands: orderShortcutCommands,
       sectionMeta: { priority: 1 },
     }
   )

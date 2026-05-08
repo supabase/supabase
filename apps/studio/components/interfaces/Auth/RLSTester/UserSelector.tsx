@@ -123,7 +123,7 @@ export const UserSelector = () => {
                           <div className="w-full flex items-center justify-between">
                             <p className="space-x-3">
                               <span className="text-foreground-light">{user.email}</span>
-                              <code className="text-code-inline !text-foreground-lighter">
+                              <code className="text-code-inline text-foreground-lighter!">
                                 {user.id?.slice(0, 8)}
                               </code>
                             </p>

@@ -33,7 +33,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-foreground text-background
+                  rounded-sm bg-foreground text-background
                 "
                 >
                   <Grid size={14} strokeWidth={2} />
@@ -51,7 +51,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-foreground text-background
+                  rounded-sm bg-foreground text-background
                 "
                 >
                   <Edit size={14} strokeWidth={2} />
