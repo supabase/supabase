@@ -89,7 +89,9 @@ for (const [key, { cssVariable }] of Object.entries(colorEntries)) {
     remainder === 'DEFAULT' ? 'default' : remainder.replace(/-DEFAULT$/, '').toLowerCase()
 
   if (CONFLICTING_STRIPPED_NAMES.has(stripped) || seenStripped.get(stripped) > 1) {
-    // Static utility scoped to one namespace.
+    // Static utility scoped to one namespace. The non-aliased form
+    // ({utility}-{themeKey}) is auto-generated from the --color-* token
+    // and is the preferred replacement.
     const fullAlias = `${nsInfo.utility}-${stripped}`
     aliasBlocks.push(`@utility ${fullAlias} {\n  ${nsInfo.property}: hsl(${cssVariable});\n}`)
 
@@ -188,7 +190,7 @@ const colorsCss = `/*
  * (semantic tokens) plus the Radix and scale aliases from radix-vars.css.
  */
 
-@theme {
+@theme inline {
 ${themeLines.join('\n')}
 
   /* misc theme tokens — typography, breakpoints, sizing, transform-origin */

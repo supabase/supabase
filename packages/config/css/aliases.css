@@ -21,7 +21,6 @@
 @utility bg-alternative {
   background-color: hsl(var(--background-alternative-default));
 }
-/* @deprecated use bg-background-control */
 @utility bg-control {
   background-color: hsl(var(--background-control));
 }
