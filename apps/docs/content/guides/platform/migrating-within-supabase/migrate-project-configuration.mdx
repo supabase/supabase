@@ -1,0 +1,24 @@
+---
+title: 'Migrate Project Configuration'
+subtitle: 'Learn how to migrate project configurations between projects'
+breadcrumb: 'Migrations'
+---
+
+[The Management API](/docs/reference/api/introduction) can be used to retrieve and update some configurations (Auth, Realtime, Storage, etc.) from a project. You can periodically retrieve a copy and save it for restoring when needed.
+
+[This script](/docs/guides/troubleshooting/restore-project-after-90-days-pause#step-5-copy-project-configurations) can be utilized auto sync some configurations.
+
+Proejct configuration and settings are found in several places such as the following listed below
+- [Storage settings](/dashboard/project/_/storage/files/settings) / [Storage S3 Configuration](/dashboard/project/_/storage/s3)
+- [Edge Function secrets](/dashboard/project/_/functions/secrets)
+- [Auth settings & API keys](/dashboard/project/_/auth/)
+- [Realtime settings](/dashboard/project/_/realtime/settings)
+- Database extensions and settings
+  - [Database Settings](/dashboard/project/_/database/settings)
+  - [Database Publications](/dashboard/project/_/database/publications): If replication for Supabase Realtime was used in the old database, enable publication on the Database > Publications section of the Dashboard on the tables necessary.
+- [Read replicas](/dashboard/project/_/database/replication)
+- [Add-ons](https://supabase.com/dashboard/project/_/settings/addons)
+- [Project Settings](/dashboard/project/_/settings/)
+   - [Compuete and Disk](/dashboard/project/_/settings/compute-and-disk)
+   - [Integrations](/dashboard/project/_/integrations)
+   - [Log Drains](/dashboard/project/_/settings/log-drains)

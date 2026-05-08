@@ -2573,6 +2573,18 @@ export const platform: NavMenuConstant = {
               name: 'Backup and restore using CLI',
               url: '/guides/platform/migrating-within-supabase/backup-restore' as `/${string}`,
             },
+            {
+              name: 'Migrate Storage',
+              url: '/guides/platform/migrating-within-supabase/migrate-storage' as `/${string}`,
+            },
+            {
+              name: 'Migrate Edge Functions',
+              url: '/guides/platform/migrating-within-supabase/migrate-edge-functions' as `/${string}`,
+            },
+            {
+              name: 'Migrate Project Configuration',
+              url: '/guides/platform/migrating-within-supabase/migrate-project-configuration' as `/${string}`,
+            },
           ],
         },
         {

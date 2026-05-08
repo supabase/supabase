@@ -1,0 +1,483 @@
+---
+title: 'Migrate Storage'
+subtitle: 'Learn how to migrate storage between projects'
+breadcrumb: 'Migrations'
+---
+
+Storage objects & settings are not migrated between projects. Only [storage metadata](/docs/guides/storage/schema/design) in the database is transferred. Below are several options to transfer / upload storage files to a project.
+
+
+## Migrate storage using a downloaded copy
+
+<Admonition type="note" label="Requirements">
+- A downloaded copy of all files each in each bucket
+</Admonition>
+
+Use the [Supabase CLI](/docs/reference/cli/introduction) to copy your downloaded storage files to the new project's buckets:
+
+```
+supabase login
+supabase link --project-ref [NEW_PROJECT_REF]
+supabase storage cp /path/to/downloaded/files ss:///bucket_name -r --experimental
+```
+Repeat for each bucket. See the [`supabase storage cp`](/docs/reference/cli/supabase-storage-cp) reference for all available flags.
+
+
+## Migrate storage using Google Colab
+
+<Admonition type="note" label="Requirements">
+- An active source project to migrate files from
+</Admonition>
+
+After restoring the backup, the buckets and files metadata will show up in the dashboard of the new project.
+However, the storage files stored in the S3 buckets would not be present.
+
+Use the following Google Colab script provided below to migrate your downloaded storage objects to your new project's S3 buckets.
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
+
+This method requires uploading to Google Colab and then to the S3 buckets. This could add significant upload time if there are large storage objects.
+
+## Migrate storage using code
+
+<Admonition type="note" label="Requirements">
+- An active source project to migrate files from
+</Admonition>
+
+<StepHikeCompact>
+  <StepHikeCompact.Step step={1}>
+        <StepHikeCompact.Details title="On your machine, create a javascript repository">
+          Using your preferred JavaScript package manager, create a new project with the `supabase` client package
+        </StepHikeCompact.Details>
+
+        <StepHikeCompact.Code>
+
+          <Tabs
+            scrollable
+            size="small"
+            type="underlined"
+            defaultActiveId="npm_initiate"
+            queryGroup="initiate"
+          >
+            <TabPanel id="npm_initiate" label="npm">
+              ```bash
+              npm init -y
+              npm install @supabase/supabase-js
+              ```
+            </TabPanel>
+            <TabPanel id="pnpm_initiate" label="pnpm">
+              ```bash
+              pnpm init -y
+              pnpm install @supabase/supabase-js
+              ```
+            </TabPanel>
+            <TabPanel id="yarn_initiate" label="yarn">
+              ```bash
+              yarn init -y
+              yarn add @supabase/supabase-js
+              ```
+            </TabPanel>
+            <TabPanel id="bun_initiate" label="bun">
+              ```bash
+              bun init -y
+              bun install @supabase/supabase-js
+              ```
+            </TabPanel>
+          </Tabs>
+        </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+        <StepHikeCompact.Details title="Create an index.js file in your Node.js project">
+           Add the example script to it.
+        </StepHikeCompact.Details>
+            <StepHikeCompact.Code>
+              ```js name=index.js
+              // npm install @supabase/supabase-js@2
+              const { createClient } = require('@supabase/supabase-js')
+
+              const OLD_PROJECT_URL = 'https://xxx.supabase.co'
+              const OLD_PROJECT_SERVICE_KEY = 'old-project-service-key-xxx'
+
+              const NEW_PROJECT_URL = 'https://yyy.supabase.co'
+              const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
+
+              const oldSupabase = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY)
+              const newSupabase = createClient(NEW_PROJECT_URL, NEW_PROJECT_SERVICE_KEY)
+
+              function createLoadingAnimation(message) {
+                const readline = require('readline')
+                const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
+                let i = 0
+                let timer
+                let stopped = false
+
+                const animate = () => {
+                  if (stopped) return
+                  process.stdout.write(`\r${frames[i]} ${message}`)
+                  i = (i + 1) % frames.length
+                  timer = setTimeout(animate, 80)
+                }
+
+                animate()
+
+                return {
+                  stop: (finalMessage = '') => {
+                    stopped = true
+                    clearTimeout(timer)
+                    readline.clearLine(process.stdout, 0)
+                    readline.cursorTo(process.stdout, 0)
+                    process.stdout.write(`✓ ${finalMessage || message}\n`)
+                  },
+                }
+              }
+
+              /**
+              * Lists all files in a bucket, handling nested folders recursively.
+              */
+              async function listAllFiles(bucket, path = '') {
+                const loader = createLoadingAnimation(`Listing files in '${bucket}${path ? '/' + path : ''}'...`)
+
+                try {
+                  const { data, error } = await oldSupabase.storage.from(bucket).list(path, { limit: 1000 })
+                  if (error) {
+                    loader.stop(`Error listing files in '${bucket}${path ? '/' + path : ''}'`)
+                    throw new Error(`❌ Error listing files in bucket '${bucket}': ${error.message}`)
+                  }
+
+                  if (!data || data.length === 0) {
+                    loader.stop(`No files found in '${bucket}${path ? '/' + path : ''}'`)
+                    return []
+                  }
+
+                  let files = []
+                  for (const item of data) {
+                    if (!item.metadata) {
+                      loader.stop(`Found folder '${item.name}' in '${bucket}${path ? '/' + path : ''}'`)
+                      const subFiles = await listAllFiles(bucket, `${path}${item.name}/`)
+                      files = files.concat(subFiles)
+                    } else {
+                      files.push({ fullPath: `${path}${item.name}`, metadata: item.metadata })
+                    }
+                  }
+
+                  loader.stop(`Found ${files.length} files in '${bucket}${path ? '/' + path : ''}'`)
+                  return files
+                } catch (error) {
+                  loader.stop()
+                  throw error
+                }
+              }
+
+              /**
+              * Creates a bucket in the new Supabase project if it doesn't exist.
+              */
+              async function ensureBucketExists(bucketName, options = {}) {
+                const { data: existingBucket, error: getBucketError } =
+                  await newSupabase.storage.getBucket(bucketName)
+
+                if (getBucketError && !getBucketError.message.includes('not found')) {
+                  throw new Error(`❌ Error checking if bucket '${bucketName}' exists: ${getBucketError.message}`)
+                }
+
+                if (!existingBucket) {
+                  console.log(`🪣 Creating bucket '${bucketName}' in new project...`)
+                  const { error } = await newSupabase.storage.createBucket(bucketName, options)
+                  if (error) throw new Error(`❌ Failed to create bucket '${bucketName}': ${error.message}`)
+                  console.log(`✅ Created bucket '${bucketName}'`)
+                } else {
+                  console.log(`ℹ️ Bucket '${bucketName}' already exists in new project`)
+                }
+              }
+
+              /**
+              * Migrates a single file from the old project to the new one.
+              */
+              async function migrateFile(sourceBucketName, targetBucketName, file) {
+                const loader = createLoadingAnimation(
+                  `Migrating ${file.fullPath} in bucket '${sourceBucketName}' to '${targetBucketName}'...`
+                )
+
+                try {
+                  const { data, error: downloadError } = await oldSupabase.storage
+                    .from(sourceBucketName)
+                    .download(file.fullPath)
+                  if (downloadError) {
+                    loader.stop(`Failed to migrate ${file.fullPath}: Download error`)
+                    throw new Error(`Download failed: ${downloadError.message}`)
+                  }
+
+                  // Preserve all available metadata from the original file
+                  const uploadOptions = {
+                    upsert: true,
+                    contentType: file.metadata?.mimetype,
+                    cacheControl: file.metadata?.cacheControl,
+                  }
+
+                  const { error: uploadError } = await newSupabase.storage
+                    .from(targetBucketName)
+                    .upload(file.fullPath, data, uploadOptions)
+                  if (uploadError) {
+                    loader.stop(`Failed to migrate ${file.fullPath}: Upload error`)
+                    throw new Error(`Upload failed: ${uploadError.message}`)
+                  }
+
+                  loader.stop(
+                    `Migrated ${file.fullPath} in bucket '${sourceBucketName}' to '${targetBucketName}'`
+                  )
+                  return { success: true, path: file.fullPath }
+                } catch (err) {
+                  console.error(
+                    `❌ Error migrating ${file.fullPath} in bucket '${targetBucketName}':`,
+                    err.message
+                  )
+                  return { success: false, path: file.fullPath, error: err.message }
+                }
+              }
+
+              function chunkArray(array, size) {
+                const chunks = []
+                for (let i = 0; i < array.length; i += size) {
+                  chunks.push(array.slice(i, i + size))
+                }
+                return chunks
+              }
+
+              /**
+              * Migrates all buckets and files from the old Supabase project to the new one.
+              * Processes files in parallel within batches for efficiency.
+              */
+              async function migrateBuckets() {
+                console.log('🔄 Starting Supabase Storage migration...')
+                console.log(`📦 Source project: ${OLD_PROJECT_URL}`)
+                console.log(`📦 Target project: ${NEW_PROJECT_URL}`)
+
+                const readline = require('readline').createInterface({
+                  input: process.stdin,
+                  output: process.stdout,
+                })
+
+                console.log(
+                  '\n⚠️ WARNING: This migration may overwrite files in the target project if they have the same paths.'
+                )
+                console.log('⚠️ It is recommended to back up your target project before proceeding.')
+
+                const answer = await new Promise((resolve) => {
+                  readline.question('Do you want to proceed with the migration? (yes/no): ', resolve)
+                })
+
+                readline.close()
+
+                if (answer.toLowerCase() !== 'yes') {
+                  console.log('Migration canceled by user.')
+                  return { canceled: true }
+                }
+
+                console.log('\n📦 Fetching all buckets from old project...')
+
+                const { data: oldBuckets, error: bucketListError } = await oldSupabase.storage.listBuckets()
+
+                if (bucketListError) throw new Error(`❌ Error fetching buckets: ${bucketListError.message}`)
+                console.log(`✅ Found ${oldBuckets.length} buckets to migrate.`)
+
+                const { data: existingBuckets, error: existingBucketsError } =
+                  await newSupabase.storage.listBuckets()
+                if (existingBucketsError)
+                  throw new Error(`❌ Error fetching existing buckets: ${existingBucketsError.message}`)
+
+                const existingBucketNames = existingBuckets.map((b) => b.name)
+                const conflictingBuckets = oldBuckets.filter((b) => existingBucketNames.includes(b.name))
+
+                let conflictStrategy = 2
+
+                if (conflictingBuckets.length > 0) {
+                  console.log('\n⚠️ The following buckets already exist in the target project:')
+                  conflictingBuckets.forEach((b) => console.log(`  - ${b.name}`))
+
+                  const conflictAnswer = await new Promise((resolve) => {
+                    const rl = require('readline').createInterface({
+                      input: process.stdin,
+                      output: process.stdout,
+                    })
+                    rl.question(
+                      '\nHow do you want to handle existing buckets?\n' +
+                        '1. Skip existing buckets\n' +
+                        '2. Merge files (may overwrite existing files)\n' +
+                        '3. Rename buckets in target (add suffix "_migrated")\n' +
+                        '4. Cancel migration\n' +
+                        'Enter your choice (1-4): ',
+                      (answer) => {
+                        rl.close()
+                        resolve(answer)
+                      }
+                    )
+                  })
+
+                  if (conflictAnswer === '4') {
+                    console.log('Migration canceled by user.')
+                    return { canceled: true }
+                  }
+
+                  conflictStrategy = parseInt(conflictAnswer)
+                  if (isNaN(conflictStrategy) || conflictStrategy < 1 || conflictStrategy > 3) {
+                    console.log('Invalid choice. Migration canceled.')
+                    return { canceled: true }
+                  }
+                }
+
+                const migrationStats = {
+                  totalBuckets: oldBuckets.length,
+                  processedBuckets: 0,
+                  skippedBuckets: 0,
+                  totalFiles: 0,
+                  successfulFiles: 0,
+                  failedFiles: 0,
+                  failedFilesList: [],
+                }
+
+                for (const bucket of oldBuckets) {
+                  const bucketName = bucket.name
+                  console.log(`\n📁 Processing bucket: ${bucketName}`)
+
+                  let targetBucketName = bucketName
+
+                  if (existingBucketNames.includes(bucketName)) {
+                    if (conflictStrategy === 1) {
+                      console.log(`⏩ Skipping bucket '${bucketName}' as it already exists in target project`)
+                      migrationStats.skippedBuckets++
+                      continue
+                    } else if (conflictStrategy === 3) {
+                      targetBucketName = `${bucketName}_migrated`
+                      console.log(`🔄 Renaming bucket to '${targetBucketName}' in target project`)
+                    } else {
+                      console.log(`🔄 Merging files into existing bucket '${bucketName}' in target project`)
+                    }
+                  }
+
+                  // Preserve bucket configuration when creating in the new project
+                  if (targetBucketName !== bucketName || !existingBucketNames.includes(bucketName)) {
+                    await ensureBucketExists(targetBucketName, {
+                      public: bucket.public,
+                      fileSizeLimit: bucket.file_size_limit,
+                      allowedMimeTypes: bucket.allowed_mime_types,
+                    })
+                  }
+
+                  const files = await listAllFiles(bucketName)
+                  console.log(`✅ Found ${files.length} files in bucket '${bucketName}'.`)
+                  migrationStats.totalFiles += files.length
+
+                  const batches = chunkArray(files, 10)
+
+                  for (let i = 0; i < batches.length; i++) {
+                    console.log(`\n🚀 Processing batch ${i + 1}/${batches.length} (${batches[i].length} files)`)
+
+                    const results = await Promise.all(
+                      batches[i].map((file) => migrateFile(bucketName, targetBucketName, file))
+                    )
+
+                    const batchSuccesses = results.filter((r) => r.success).length
+                    const batchFailures = results.filter((r) => !r.success)
+
+                    migrationStats.successfulFiles += batchSuccesses
+                    migrationStats.failedFiles += batchFailures.length
+                    migrationStats.failedFilesList.push(...batchFailures.map((f) => f.path))
+
+                    console.log(
+                      `✅ Completed batch ${i + 1}/${batches.length}: ${batchSuccesses} succeeded, ${batchFailures.length} failed`
+                    )
+                  }
+
+                  migrationStats.processedBuckets++
+                  console.log(`✅ Completed bucket '${bucketName}' migration`)
+                }
+
+                console.log('\n📊 Migration Summary:')
+                console.log(
+                  `Buckets: ${migrationStats.processedBuckets}/${migrationStats.totalBuckets} processed, ${migrationStats.skippedBuckets} skipped`
+                )
+                console.log(
+                  `Files: ${migrationStats.successfulFiles} succeeded, ${migrationStats.failedFiles} failed (${migrationStats.totalFiles} total)`
+                )
+
+                if (migrationStats.failedFiles > 0) {
+                  console.log('\n⚠️ Failed files:')
+                  migrationStats.failedFilesList.forEach((path) => console.log(`  - ${path}`))
+                  return migrationStats
+                }
+
+                return migrationStats
+              }
+
+              migrateBuckets()
+                .then((stats) => {
+                  if (stats.failedFiles > 0) {
+                    console.log(`\n⚠️ Migration completed with ${stats.failedFiles} failed files.`)
+                    process.exit(1)
+                  } else {
+                    console.log('\n🎉 Migration completed successfully!')
+                    process.exit(0)
+                  }
+                })
+                .catch((err) => {
+                  console.error('❌ Fatal error during migration:', err.message)
+                  process.exit(1)
+                })
+              ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Add the relevant project variables to the script">
+      Get the [secret keys](/dashboard/project/_/settings/api-keys) or [service_role keys](/dashboard/project/_/settings/api-keys/legacy) for both your new and old projects, then substitute them into the script.
+      From the [Data API settings](/dashboard/project/_/integrations/data_api/overview), copy your project URL and add it to the script as well.
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+        ```js name='index.js'
+        //rest of code
+        ...
+
+        // add relevant details for old project
+        const OLD_PROJECT_URL = 'https://xxx.supabase.co'
+        const OLD_PROJECT_SERVICE_KEY = 'old-project-service-key-xxx'
+
+        // add relevant details for new project
+        const NEW_PROJECT_URL = 'https://yyy.supabase.co'
+        const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
+
+        ...
+        //rest of code
+        ```
+      </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Run the script from your command line">
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+              <Tabs
+            scrollable
+            size="small"
+            type="underlined"
+            defaultActiveId="npm_run"
+            queryGroup="npm_run"
+          >
+            <TabPanel id="npm_run" label="node">
+              ```bash
+              node index.js
+              ```
+            </TabPanel>
+            <TabPanel id="bun_run" label="bun">
+              ```bash
+              bun index.js
+              ```
+            </TabPanel>
+          </Tabs>
+        </StepHikeCompact.Code>
+    </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
