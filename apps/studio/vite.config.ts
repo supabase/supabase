@@ -103,10 +103,25 @@ export default defineConfig(({ mode }) => {
   // Mirror Next's `basePath` via NEXT_PUBLIC_BASE_PATH. Unlike Next, TanStack
   // Start has no single knob — the prefix has to be declared in three places
   // (see BASE_PATH_REDIRECT_GUIDE.md):
-  //   - Vite `base`      — bakes the prefix into asset URLs in the built bundle
-  //   - Router `basepath` — makes client-side navigation match the prefix
-  // The router layer is set in router.tsx off the same env var (inlined via
-  // `define` above). Leaving the var empty keeps the app at `/` as today.
+  //   - Vite `base`               — bakes the prefix into asset URLs in the
+  //                                  built bundle.
+  //   - tanstackStart router.basepath — must be passed explicitly. If
+  //                                  omitted, the plugin's internal
+  //                                  `deriveRouterBasepath` derives a value
+  //                                  from `publicBase` and strips both
+  //                                  leading and trailing slashes
+  //                                  (`/dashboard` → `dashboard`), which then
+  //                                  surfaces in `useRouter().basePath`
+  //                                  consumers as relative URLs (e.g.
+  //                                  `${BASE_PATH}/img/...` becomes
+  //                                  `dashboard/img/...` and the browser
+  //                                  resolves it against the current path).
+  //                                  See planning.js:14 in
+  //                                  @tanstack/start-plugin-core.
+  //   - createRouter({ basepath }) — runtime navigation prefix; configured
+  //                                  in router.tsx off the same env var
+  //                                  (inlined via `define` above).
+  // Leaving the var empty keeps the app at `/` as today.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
 
   return {
@@ -196,6 +211,9 @@ export default defineConfig(({ mode }) => {
         spa: {
           enabled: true,
         },
+        // Set `configuredBasepath` so `deriveRouterBasepath` short-circuits
+        // its slash-stripping branch. See the basePath comment above.
+        ...(basePath && { router: { basepath: basePath } }),
       }),
       viteReact(),
     ],
