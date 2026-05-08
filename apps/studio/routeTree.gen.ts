@@ -44,6 +44,7 @@ import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as ProjectRefIndexRouteImport } from './routes/project/$ref/index'
 import { Route as ApiConnectIndexRouteImport } from './routes/api/connect/index'
 import { Route as AppOrgIndexRouteImport } from './routes/_app/org/index'
+import { Route as ProjectRefStorageRouteImport } from './routes/project/$ref/storage'
 import { Route as ProjectRefDatabaseRouteImport } from './routes/project/$ref/database'
 import { Route as ProjectRefAuthRouteImport } from './routes/project/$ref/auth'
 import { Route as ApiIntegrationsStripeSyncRouteImport } from './routes/api/integrations/stripe-sync'
@@ -59,6 +60,7 @@ import { Route as ApiPlatformProfileIndexRouteImport } from './routes/api/platfo
 import { Route as ApiPlatformOrganizationsIndexRouteImport } from './routes/api/platform/organizations/index'
 import { Route as AppOrgSlugIndexRouteImport } from './routes/_app/org/$slug/index'
 import { Route as AppAccountTokensIndexRouteImport } from './routes/_app/account/tokens/index'
+import { Route as ProjectRefStorageS3RouteImport } from './routes/project/$ref/storage/s3'
 import { Route as ProjectRefDatabaseTypesRouteImport } from './routes/project/$ref/database/types'
 import { Route as ProjectRefDatabaseTriggersRouteImport } from './routes/project/$ref/database/triggers'
 import { Route as ProjectRefDatabaseSettingsRouteImport } from './routes/project/$ref/database/settings'
@@ -109,6 +111,7 @@ import { Route as AppOrgSlugBillingRouteImport } from './routes/_app/org/$slug/b
 import { Route as AppOrgSlugAuditRouteImport } from './routes/_app/org/$slug/audit'
 import { Route as AppOrgSlugAppsRouteImport } from './routes/_app/org/$slug/apps'
 import { Route as AppAccountTokensScopedRouteImport } from './routes/_app/account/tokens/scoped'
+import { Route as ProjectRefStorageFilesIndexRouteImport } from './routes/project/$ref/storage/files/index'
 import { Route as ProjectRefDatabaseTriggersIndexRouteImport } from './routes/project/$ref/database/triggers/index'
 import { Route as ProjectRefDatabaseTablesIndexRouteImport } from './routes/project/$ref/database/tables/index'
 import { Route as ProjectRefDatabaseReplicationIndexRouteImport } from './routes/project/$ref/database/replication/index'
@@ -117,6 +120,8 @@ import { Route as ProjectRefAuthTemplatesIndexRouteImport } from './routes/proje
 import { Route as ApiPlatformProjectsRefIndexRouteImport } from './routes/api/platform/projects/$ref/index'
 import { Route as AppOrgSlugWebhooksIndexRouteImport } from './routes/_app/org/$slug/webhooks/index'
 import { Route as AppOrgSlugPrivateAppsIndexRouteImport } from './routes/_app/org/$slug/private-apps/index'
+import { Route as ProjectRefStorageFilesSettingsRouteImport } from './routes/project/$ref/storage/files/settings'
+import { Route as ProjectRefStorageFilesPoliciesRouteImport } from './routes/project/$ref/storage/files/policies'
 import { Route as ProjectRefDatabaseTriggersEventRouteImport } from './routes/project/$ref/database/triggers/event'
 import { Route as ProjectRefDatabaseTriggersDataRouteImport } from './routes/project/$ref/database/triggers/data'
 import { Route as ProjectRefDatabaseTablesIdRouteImport } from './routes/project/$ref/database/tables/$id'
@@ -365,6 +370,11 @@ const AppOrgIndexRoute = AppOrgIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppOrgRoute,
 } as any)
+const ProjectRefStorageRoute = ProjectRefStorageRouteImport.update({
+  id: '/storage',
+  path: '/storage',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
 const ProjectRefDatabaseRoute = ProjectRefDatabaseRouteImport.update({
   id: '/database',
   path: '/database',
@@ -442,6 +452,11 @@ const AppAccountTokensIndexRoute = AppAccountTokensIndexRouteImport.update({
   id: '/tokens/',
   path: '/tokens/',
   getParentRoute: () => AppAccountRoute,
+} as any)
+const ProjectRefStorageS3Route = ProjectRefStorageS3RouteImport.update({
+  id: '/s3',
+  path: '/s3',
+  getParentRoute: () => ProjectRefStorageRoute,
 } as any)
 const ProjectRefDatabaseTypesRoute = ProjectRefDatabaseTypesRouteImport.update({
   id: '/types',
@@ -709,6 +724,12 @@ const AppAccountTokensScopedRoute = AppAccountTokensScopedRouteImport.update({
   path: '/tokens/scoped',
   getParentRoute: () => AppAccountRoute,
 } as any)
+const ProjectRefStorageFilesIndexRoute =
+  ProjectRefStorageFilesIndexRouteImport.update({
+    id: '/files/',
+    path: '/files/',
+    getParentRoute: () => ProjectRefStorageRoute,
+  } as any)
 const ProjectRefDatabaseTriggersIndexRoute =
   ProjectRefDatabaseTriggersIndexRouteImport.update({
     id: '/',
@@ -755,6 +776,18 @@ const AppOrgSlugPrivateAppsIndexRoute =
     id: '/$slug/private-apps/',
     path: '/$slug/private-apps/',
     getParentRoute: () => AppOrgRoute,
+  } as any)
+const ProjectRefStorageFilesSettingsRoute =
+  ProjectRefStorageFilesSettingsRouteImport.update({
+    id: '/files/settings',
+    path: '/files/settings',
+    getParentRoute: () => ProjectRefStorageRoute,
+  } as any)
+const ProjectRefStorageFilesPoliciesRoute =
+  ProjectRefStorageFilesPoliciesRouteImport.update({
+    id: '/files/policies',
+    path: '/files/policies',
+    getParentRoute: () => ProjectRefStorageRoute,
   } as any)
 const ProjectRefDatabaseTriggersEventRoute =
   ProjectRefDatabaseTriggersEventRouteImport.update({
@@ -1221,6 +1254,7 @@ export interface FileRoutesByFullPath {
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
+  '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
   '/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
   '/project/$ref/': typeof ProjectRefIndexRoute
@@ -1274,6 +1308,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/settings': typeof ProjectRefDatabaseSettingsRoute
   '/project/$ref/database/triggers': typeof ProjectRefDatabaseTriggersRouteWithChildren
   '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
+  '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/account/tokens/': typeof AppAccountTokensIndexRoute
   '/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -1314,6 +1349,8 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/storage/files/policies': typeof ProjectRefStorageFilesPoliciesRoute
+  '/project/$ref/storage/files/settings': typeof ProjectRefStorageFilesSettingsRoute
   '/org/$slug/private-apps/': typeof AppOrgSlugPrivateAppsIndexRoute
   '/org/$slug/webhooks/': typeof AppOrgSlugWebhooksIndexRoute
   '/api/platform/projects/$ref/': typeof ApiPlatformProjectsRefIndexRoute
@@ -1322,6 +1359,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/replication/': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables/': typeof ProjectRefDatabaseTablesIndexRoute
   '/project/$ref/database/triggers/': typeof ProjectRefDatabaseTriggersIndexRoute
+  '/project/$ref/storage/files/': typeof ProjectRefStorageFilesIndexRoute
   '/api/platform/organizations/$slug/billing/subscription': typeof ApiPlatformOrganizationsSlugBillingSubscriptionRoute
   '/api/platform/projects/$ref/analytics/log-drains': typeof ApiPlatformProjectsRefAnalyticsLogDrainsRouteWithChildren
   '/api/platform/projects/$ref/api-keys/temporary': typeof ApiPlatformProjectsRefApiKeysTemporaryRoute
@@ -1398,6 +1436,7 @@ export interface FileRoutesByTo {
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
+  '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
   '/org': typeof AppOrgIndexRoute
   '/api/connect': typeof ApiConnectIndexRoute
   '/project/$ref': typeof ProjectRefIndexRoute
@@ -1450,6 +1489,7 @@ export interface FileRoutesByTo {
   '/project/$ref/database/schemas': typeof ProjectRefDatabaseSchemasRoute
   '/project/$ref/database/settings': typeof ProjectRefDatabaseSettingsRoute
   '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
+  '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/account/tokens': typeof AppAccountTokensIndexRoute
   '/org/$slug': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations': typeof ApiPlatformOrganizationsIndexRoute
@@ -1490,6 +1530,8 @@ export interface FileRoutesByTo {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/storage/files/policies': typeof ProjectRefStorageFilesPoliciesRoute
+  '/project/$ref/storage/files/settings': typeof ProjectRefStorageFilesSettingsRoute
   '/org/$slug/private-apps': typeof AppOrgSlugPrivateAppsIndexRoute
   '/org/$slug/webhooks': typeof AppOrgSlugWebhooksIndexRoute
   '/api/platform/projects/$ref': typeof ApiPlatformProjectsRefIndexRoute
@@ -1498,6 +1540,7 @@ export interface FileRoutesByTo {
   '/project/$ref/database/replication': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables': typeof ProjectRefDatabaseTablesIndexRoute
   '/project/$ref/database/triggers': typeof ProjectRefDatabaseTriggersIndexRoute
+  '/project/$ref/storage/files': typeof ProjectRefStorageFilesIndexRoute
   '/api/platform/organizations/$slug/billing/subscription': typeof ApiPlatformOrganizationsSlugBillingSubscriptionRoute
   '/api/platform/projects/$ref/analytics/log-drains': typeof ApiPlatformProjectsRefAnalyticsLogDrainsRouteWithChildren
   '/api/platform/projects/$ref/api-keys/temporary': typeof ApiPlatformProjectsRefApiKeysTemporaryRoute
@@ -1579,6 +1622,7 @@ export interface FileRoutesById {
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
+  '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
   '/_app/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
   '/project/$ref/': typeof ProjectRefIndexRoute
@@ -1632,6 +1676,7 @@ export interface FileRoutesById {
   '/project/$ref/database/settings': typeof ProjectRefDatabaseSettingsRoute
   '/project/$ref/database/triggers': typeof ProjectRefDatabaseTriggersRouteWithChildren
   '/project/$ref/database/types': typeof ProjectRefDatabaseTypesRoute
+  '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
   '/_app/account/tokens/': typeof AppAccountTokensIndexRoute
   '/_app/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -1672,6 +1717,8 @@ export interface FileRoutesById {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/storage/files/policies': typeof ProjectRefStorageFilesPoliciesRoute
+  '/project/$ref/storage/files/settings': typeof ProjectRefStorageFilesSettingsRoute
   '/_app/org/$slug/private-apps/': typeof AppOrgSlugPrivateAppsIndexRoute
   '/_app/org/$slug/webhooks/': typeof AppOrgSlugWebhooksIndexRoute
   '/api/platform/projects/$ref/': typeof ApiPlatformProjectsRefIndexRoute
@@ -1680,6 +1727,7 @@ export interface FileRoutesById {
   '/project/$ref/database/replication/': typeof ProjectRefDatabaseReplicationIndexRoute
   '/project/$ref/database/tables/': typeof ProjectRefDatabaseTablesIndexRoute
   '/project/$ref/database/triggers/': typeof ProjectRefDatabaseTriggersIndexRoute
+  '/project/$ref/storage/files/': typeof ProjectRefStorageFilesIndexRoute
   '/api/platform/organizations/$slug/billing/subscription': typeof ApiPlatformOrganizationsSlugBillingSubscriptionRoute
   '/api/platform/projects/$ref/analytics/log-drains': typeof ApiPlatformProjectsRefAnalyticsLogDrainsRouteWithChildren
   '/api/platform/projects/$ref/api-keys/temporary': typeof ApiPlatformProjectsRefApiKeysTemporaryRoute
@@ -1760,6 +1808,7 @@ export interface FileRouteTypes {
     | '/api/integrations/stripe-sync'
     | '/project/$ref/auth'
     | '/project/$ref/database'
+    | '/project/$ref/storage'
     | '/org/'
     | '/api/connect/'
     | '/project/$ref/'
@@ -1813,6 +1862,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/settings'
     | '/project/$ref/database/triggers'
     | '/project/$ref/database/types'
+    | '/project/$ref/storage/s3'
     | '/account/tokens/'
     | '/org/$slug/'
     | '/api/platform/organizations/'
@@ -1853,6 +1903,8 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/storage/files/policies'
+    | '/project/$ref/storage/files/settings'
     | '/org/$slug/private-apps/'
     | '/org/$slug/webhooks/'
     | '/api/platform/projects/$ref/'
@@ -1861,6 +1913,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/replication/'
     | '/project/$ref/database/tables/'
     | '/project/$ref/database/triggers/'
+    | '/project/$ref/storage/files/'
     | '/api/platform/organizations/$slug/billing/subscription'
     | '/api/platform/projects/$ref/analytics/log-drains'
     | '/api/platform/projects/$ref/api-keys/temporary'
@@ -1937,6 +1990,7 @@ export interface FileRouteTypes {
     | '/api/integrations/stripe-sync'
     | '/project/$ref/auth'
     | '/project/$ref/database'
+    | '/project/$ref/storage'
     | '/org'
     | '/api/connect'
     | '/project/$ref'
@@ -1989,6 +2043,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/schemas'
     | '/project/$ref/database/settings'
     | '/project/$ref/database/types'
+    | '/project/$ref/storage/s3'
     | '/account/tokens'
     | '/org/$slug'
     | '/api/platform/organizations'
@@ -2029,6 +2084,8 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/storage/files/policies'
+    | '/project/$ref/storage/files/settings'
     | '/org/$slug/private-apps'
     | '/org/$slug/webhooks'
     | '/api/platform/projects/$ref'
@@ -2037,6 +2094,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/replication'
     | '/project/$ref/database/tables'
     | '/project/$ref/database/triggers'
+    | '/project/$ref/storage/files'
     | '/api/platform/organizations/$slug/billing/subscription'
     | '/api/platform/projects/$ref/analytics/log-drains'
     | '/api/platform/projects/$ref/api-keys/temporary'
@@ -2117,6 +2175,7 @@ export interface FileRouteTypes {
     | '/api/integrations/stripe-sync'
     | '/project/$ref/auth'
     | '/project/$ref/database'
+    | '/project/$ref/storage'
     | '/_app/org/'
     | '/api/connect/'
     | '/project/$ref/'
@@ -2170,6 +2229,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/settings'
     | '/project/$ref/database/triggers'
     | '/project/$ref/database/types'
+    | '/project/$ref/storage/s3'
     | '/_app/account/tokens/'
     | '/_app/org/$slug/'
     | '/api/platform/organizations/'
@@ -2210,6 +2270,8 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/storage/files/policies'
+    | '/project/$ref/storage/files/settings'
     | '/_app/org/$slug/private-apps/'
     | '/_app/org/$slug/webhooks/'
     | '/api/platform/projects/$ref/'
@@ -2218,6 +2280,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/replication/'
     | '/project/$ref/database/tables/'
     | '/project/$ref/database/triggers/'
+    | '/project/$ref/storage/files/'
     | '/api/platform/organizations/$slug/billing/subscription'
     | '/api/platform/projects/$ref/analytics/log-drains'
     | '/api/platform/projects/$ref/api-keys/temporary'
@@ -2606,6 +2669,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOrgIndexRouteImport
       parentRoute: typeof AppOrgRoute
     }
+    '/project/$ref/storage': {
+      id: '/project/$ref/storage'
+      path: '/storage'
+      fullPath: '/project/$ref/storage'
+      preLoaderRoute: typeof ProjectRefStorageRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
     '/project/$ref/database': {
       id: '/project/$ref/database'
       path: '/database'
@@ -2710,6 +2780,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/tokens/'
       preLoaderRoute: typeof AppAccountTokensIndexRouteImport
       parentRoute: typeof AppAccountRoute
+    }
+    '/project/$ref/storage/s3': {
+      id: '/project/$ref/storage/s3'
+      path: '/s3'
+      fullPath: '/project/$ref/storage/s3'
+      preLoaderRoute: typeof ProjectRefStorageS3RouteImport
+      parentRoute: typeof ProjectRefStorageRoute
     }
     '/project/$ref/database/types': {
       id: '/project/$ref/database/types'
@@ -3061,6 +3138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAccountTokensScopedRouteImport
       parentRoute: typeof AppAccountRoute
     }
+    '/project/$ref/storage/files/': {
+      id: '/project/$ref/storage/files/'
+      path: '/files'
+      fullPath: '/project/$ref/storage/files/'
+      preLoaderRoute: typeof ProjectRefStorageFilesIndexRouteImport
+      parentRoute: typeof ProjectRefStorageRoute
+    }
     '/project/$ref/database/triggers/': {
       id: '/project/$ref/database/triggers/'
       path: '/'
@@ -3116,6 +3200,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/org/$slug/private-apps/'
       preLoaderRoute: typeof AppOrgSlugPrivateAppsIndexRouteImport
       parentRoute: typeof AppOrgRoute
+    }
+    '/project/$ref/storage/files/settings': {
+      id: '/project/$ref/storage/files/settings'
+      path: '/files/settings'
+      fullPath: '/project/$ref/storage/files/settings'
+      preLoaderRoute: typeof ProjectRefStorageFilesSettingsRouteImport
+      parentRoute: typeof ProjectRefStorageRoute
+    }
+    '/project/$ref/storage/files/policies': {
+      id: '/project/$ref/storage/files/policies'
+      path: '/files/policies'
+      fullPath: '/project/$ref/storage/files/policies'
+      preLoaderRoute: typeof ProjectRefStorageFilesPoliciesRouteImport
+      parentRoute: typeof ProjectRefStorageRoute
     }
     '/project/$ref/database/triggers/event': {
       id: '/project/$ref/database/triggers/event'
@@ -3841,15 +3939,34 @@ const ProjectRefDatabaseRouteChildren: ProjectRefDatabaseRouteChildren = {
 const ProjectRefDatabaseRouteWithChildren =
   ProjectRefDatabaseRoute._addFileChildren(ProjectRefDatabaseRouteChildren)
 
+interface ProjectRefStorageRouteChildren {
+  ProjectRefStorageS3Route: typeof ProjectRefStorageS3Route
+  ProjectRefStorageFilesPoliciesRoute: typeof ProjectRefStorageFilesPoliciesRoute
+  ProjectRefStorageFilesSettingsRoute: typeof ProjectRefStorageFilesSettingsRoute
+  ProjectRefStorageFilesIndexRoute: typeof ProjectRefStorageFilesIndexRoute
+}
+
+const ProjectRefStorageRouteChildren: ProjectRefStorageRouteChildren = {
+  ProjectRefStorageS3Route: ProjectRefStorageS3Route,
+  ProjectRefStorageFilesPoliciesRoute: ProjectRefStorageFilesPoliciesRoute,
+  ProjectRefStorageFilesSettingsRoute: ProjectRefStorageFilesSettingsRoute,
+  ProjectRefStorageFilesIndexRoute: ProjectRefStorageFilesIndexRoute,
+}
+
+const ProjectRefStorageRouteWithChildren =
+  ProjectRefStorageRoute._addFileChildren(ProjectRefStorageRouteChildren)
+
 interface ProjectRefRouteChildren {
   ProjectRefAuthRoute: typeof ProjectRefAuthRouteWithChildren
   ProjectRefDatabaseRoute: typeof ProjectRefDatabaseRouteWithChildren
+  ProjectRefStorageRoute: typeof ProjectRefStorageRouteWithChildren
   ProjectRefIndexRoute: typeof ProjectRefIndexRoute
 }
 
 const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefAuthRoute: ProjectRefAuthRouteWithChildren,
   ProjectRefDatabaseRoute: ProjectRefDatabaseRouteWithChildren,
+  ProjectRefStorageRoute: ProjectRefStorageRouteWithChildren,
   ProjectRefIndexRoute: ProjectRefIndexRoute,
 }
 
