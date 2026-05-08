@@ -1,5 +1,5 @@
 import { createMCPClient } from '@ai-sdk/mcp'
-import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory'
+import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 import { createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
 import { createSupabaseApiPlatform } from '@supabase/mcp-server-supabase/platform/api'
 

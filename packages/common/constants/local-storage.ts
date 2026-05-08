@@ -73,7 +73,7 @@ export const LOCAL_STORAGE_KEYS = {
   // Notice banner keys
   FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
-  MAINTENANCE_WINDOW_BANNER: 'maintenance-window-banner-2026-01-16',
+  TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-2026-06-06',
   REPORT_DATERANGE: 'supabase-report-daterange',
   PROJECT_PAUSING_STARTED_AT: (ref: string) => `supabase-project-pausing-started-at-${ref}`,
   PROJECT_RESTORING_STARTED_AT: (ref: string) => `supabase-project-restoring-started-at-${ref}`,
