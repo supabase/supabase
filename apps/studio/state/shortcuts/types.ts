@@ -35,6 +35,17 @@ export interface ShortcutOptions {
   timeout?: number
 
   /**
+   * When `true`, suppresses the shortcut while focus is inside an input-like
+   * element (text input, textarea, select, contenteditable). Button-type
+   * inputs (type=button/submit/reset) are not ignored.
+   *
+   * Defaults to `undefined`, which falls through to TanStack's per-hotkey
+   * default: `true` for single keys and Shift/Alt combos, `false` for
+   * Ctrl/Meta/Mod shortcuts and Escape. Set explicitly to override.
+   */
+  ignoreInputs?: boolean
+
+  /**
    * When `true`, the shortcut also appears as an entry in the Cmd+P command
    * menu (under the "Shortcuts" section) for as long as the hook is mounted.
    * The entry's label comes from `ShortcutDefinition.label` and the keybind
@@ -44,6 +55,16 @@ export interface ShortcutOptions {
    * context-specific shortcuts that only make sense in certain views.
    */
   registerInCommandMenu?: boolean
+
+  /**
+   * Override the registry's default `label` for the duration of this mount.
+   * Flows to the Cmd+K command-menu entry and the hover tooltip rendered via
+   * `<Shortcut>`. Use for shared shortcuts whose contextual label changes per
+   * page (e.g. `list-page.focus-search` rendering as "Search tables" on one
+   * page and "Search functions" on another). Leave `undefined` to use the
+   * registry default.
+   */
+  label?: string
 }
 
 /**
@@ -87,4 +108,12 @@ export interface ShortcutDefinition {
    * standalone user preference.
    */
   showInSettings?: boolean
+
+  /**
+   * Optional grouping override for the Keyboard shortcuts reference sheet.
+   * Falls back to the shortcut id prefix when omitted.
+   */
+  referenceGroup?: string
 }
+
+export type RegistryDefinations<T extends string> = Record<T, ShortcutDefinition>

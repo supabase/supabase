@@ -1,17 +1,17 @@
 'use client'
 
-import Link from 'next/link'
-import { useIsLoggedIn, useUser, logOut } from 'common'
-import { AuthenticatedDropdownMenu, type menuItem } from 'ui-patterns'
+import { logOut, useIsLoggedIn, useUser } from 'common'
 import { LogOut, Settings, UserIcon } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { AuthenticatedDropdownMenu, type menuItem } from 'ui-patterns'
 
+import { CommandMenu } from './command-menu'
+import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 import NavigationItem from '@/components/side-navigation-item'
 import { courses } from '@/config/docs'
 import { mergeInternalContentIntoSections } from '@/lib/merge-internal-content'
 import { SidebarNavItem } from '@/types/nav'
-import { CommandMenu } from './command-menu'
-import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 
 interface SideNavigationProps {
   internalPaths: string[]
@@ -59,7 +59,7 @@ function SideNavigation({ internalPaths }: SideNavigationProps) {
   return (
     <nav className="flex flex-col h-full min-w-[220px]">
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="p-6 flex-shrink-0">
+        <div className="p-6 shrink-0">
           <div className="flex items-start justify-between mb-4">
             <Link href="/">
               <svg
@@ -136,7 +136,7 @@ function SideNavigation({ internalPaths }: SideNavigationProps) {
         </div>
       </div>
 
-      <div className="border-t border-muted/50 p-4 flex-shrink-0">
+      <div className="border-t border-muted/50 p-4 shrink-0">
         {isLoggedIn ? (
           <div className="flex items-center gap-3">
             <AuthenticatedDropdownMenu menu={userMenu} user={user} site="docs" />

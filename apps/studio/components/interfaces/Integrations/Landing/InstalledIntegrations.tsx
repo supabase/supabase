@@ -23,7 +23,7 @@ export const InstalledIntegrations = () => {
         {isSuccess && (
           <>
             {installedIntegrations.length === 0 ? (
-              <div className="xl:col-span-3 2xl:col-span-4 w-full h-[110px] border rounded flex items-center justify-center">
+              <div className="xl:col-span-3 2xl:col-span-4 w-full h-[110px] border rounded-sm flex items-center justify-center">
                 {/* [Joshen] Not high priority imo - very low chance this state will be seen cause Vault is always installed */}
                 {/* Some placeholder image when no integrations are installed */}
                 <p className="text-sm text-foreground-light">No integrations installed yet</p>

@@ -1,11 +1,13 @@
 'use client'
 
-import * as Collapsible from '@radix-ui/react-collapsible'
-
+import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
+import { isElementInViewport } from '~/features/ui/helpers.dom'
+import { BASE_PATH } from '~/lib/constants'
 import { debounce } from 'lodash-es'
 import { ChevronUp } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Collapsible } from 'radix-ui'
 import type { HTMLAttributes, MouseEvent, PropsWithChildren } from 'react'
 import {
   createContext,
@@ -17,12 +19,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react'
-
 import { cn } from 'ui'
-
-import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
-import { isElementInViewport } from '~/features/ui/helpers.dom'
-import { BASE_PATH } from '~/lib/constants'
 
 export const ReferenceContentInitiallyScrolledContext = createContext<boolean>(false)
 

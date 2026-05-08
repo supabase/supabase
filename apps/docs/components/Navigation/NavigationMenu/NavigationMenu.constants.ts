@@ -328,6 +328,7 @@ export const gettingstarted: NavMenuConstant = {
   url: '/guides/getting-started',
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
+    { name: 'API Keys', url: '/guides/getting-started/api-keys' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
     {
       name: 'Framework Quickstarts',
@@ -499,6 +500,10 @@ export const gettingstarted: NavMenuConstant = {
       name: 'AI Tools',
       url: undefined,
       items: [
+        {
+          name: 'Supabase Agent Plugin',
+          url: '/guides/getting-started/plugins' as `/${string}`,
+        },
         {
           name: 'Prompts',
           url: '/guides/getting-started/ai-prompts' as `/${string}`,
@@ -1492,9 +1497,7 @@ export const api: NavMenuConstant = {
       name: 'Security',
       url: '/guides/api',
       items: [
-        { name: 'How API Keys work', url: '/guides/api/api-keys' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
-        { name: 'Data API', url: '/guides/database/data-api' },
         {
           name: 'Custom Claims & RBAC',
           url: '/guides/api/custom-claims-and-role-based-access-control-rbac',
@@ -2485,7 +2488,7 @@ export const security: NavMenuConstant = {
           url: '/guides/deployment/shared-responsibility-model' as `/${string}`,
         },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
-        { name: 'Data API', url: '/guides/database/data-api' },
+        { name: 'Securing your API', url: '/guides/api/securing-your-api' },
       ],
     },
   ],
@@ -2885,6 +2888,7 @@ export const self_hosting: NavMenuConstant = {
           name: 'Add Reverse Proxy with HTTPS',
           url: '/guides/self-hosting/self-hosted-proxy-https',
         },
+        { name: 'Envoy API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
         { name: 'Upgrade to Postgres 17', url: '/guides/self-hosting/postgres-upgrade-17' },
         {
           name: 'Restore Project from Platform',
@@ -2897,6 +2901,7 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
+        { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
       ],
     },
     {

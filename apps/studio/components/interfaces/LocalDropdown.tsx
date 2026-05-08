@@ -3,7 +3,6 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
-  Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +20,7 @@ import {
 import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 import { ProfileImage } from '@/components/ui/ProfileImage'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 export const LocalDropdown = ({
@@ -34,10 +34,15 @@ export const LocalDropdown = ({
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
+  const track = useTrack()
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className={cn('border flex-shrink-0 px-3', triggerClassName)} asChild>
+    <DropdownMenu
+      onOpenChange={(open) => {
+        if (open) track('header_local_dropdown_opened')
+      }}
+    >
+      <DropdownMenuTrigger className={cn('border shrink-0 px-3', triggerClassName)} asChild>
         <ButtonTooltip
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"

@@ -23,11 +23,13 @@ app.use(async (ctx) => {
     return
   }
 
+  const SUPABASE_PUBLISHABLE_KEYS = JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS')!)
+
   const supabaseClient = createClient(
     // Supabase API URL - env var exported by default.
     Deno.env.get('SUPABASE_URL')!,
-    // Supabase API ANON KEY - env var exported by default.
-    Deno.env.get('SUPABASE_ANON_KEY')!
+    // Supabase publishable key - env var exported by default.
+    Deno.env.get(SUPABASE_PUBLISHABLE_KEYS['default'])!
   )
 
   //upload image to Storage

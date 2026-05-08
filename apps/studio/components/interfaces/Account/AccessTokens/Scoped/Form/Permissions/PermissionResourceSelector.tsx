@@ -2,7 +2,7 @@ import { Key, Plus } from 'lucide-react'
 import { Path, PathValue } from 'react-hook-form'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -65,7 +65,7 @@ export const PermissionResourceSelector = <TFormValues extends PermissionsFormVa
                       className="text-foreground"
                     >
                       <div className="flex items-center gap-3 w-full">
-                        <Checkbox_Shadcn_
+                        <Checkbox
                           checked={isChecked}
                           onCheckedChange={() => handleToggleResource(resource)}
                           onClick={(e) => e.stopPropagation()}

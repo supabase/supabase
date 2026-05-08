@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
-import { Button, Form_Shadcn_ } from 'ui'
+import { Button, Form } from 'ui'
 
 import { KeyValueFieldArray, type KeyValueFieldArrayAction } from './KeyValueFieldArray'
 
@@ -65,7 +65,7 @@ const KeyValueForm = ({
   })
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <KeyValueFieldArray
           control={form.control}
@@ -81,7 +81,7 @@ const KeyValueForm = ({
         />
         <Button htmlType="submit">Submit</Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }
 
@@ -98,7 +98,7 @@ const NameValueForm = ({
   })
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <KeyValueFieldArray
           control={form.control}
@@ -113,7 +113,7 @@ const NameValueForm = ({
         />
         <Button htmlType="submit">Submit</Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }
 

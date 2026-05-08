@@ -82,8 +82,8 @@ import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase'
 import { OpenAIEmbeddings } from '@langchain/openai'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-if (!supabaseKey) throw new Error(`Expected SUPABASE_SERVICE_ROLE_KEY`)
+const supabaseKey = process.env.SUPABASE_SECRET_KEY
+if (!supabaseKey) throw new Error(`Expected SUPABASE_SECRET_KEY`)
 
 const url = process.env.SUPABASE_URL
 if (!url) throw new Error(`Expected env var SUPABASE_URL`)
@@ -119,8 +119,8 @@ import { createClient } from '@supabase/supabase-js'
 
 // First, follow set-up instructions above
 
-const privateKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-if (!privateKey) throw new Error(`Expected env var SUPABASE_SERVICE_ROLE_KEY`)
+const privateKey = process.env.SUPABASE_SECRET_KEY
+if (!privateKey) throw new Error(`Expected env var SUPABASE_SECRET_KEY`)
 
 const url = process.env.SUPABASE_URL
 if (!url) throw new Error(`Expected env var SUPABASE_URL`)
@@ -158,8 +158,8 @@ import { createClient } from '@supabase/supabase-js'
 
 // First, follow set-up instructions above
 
-const privateKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-if (!privateKey) throw new Error(`Expected env var SUPABASE_SERVICE_ROLE_KEY`)
+const privateKey = process.env.SUPABASE_SECRET_KEY
+if (!privateKey) throw new Error(`Expected env var SUPABASE_SECRET_KEY`)
 
 const url = process.env.SUPABASE_URL
 if (!url) throw new Error(`Expected env var SUPABASE_URL`)

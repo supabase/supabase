@@ -1,17 +1,25 @@
 import type { MouseEventHandler } from 'react'
 // End of third-party imports
 
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 
 interface SubmitButtonProps {
   isSubmitting: boolean
   userEmail: string
   onClick?: MouseEventHandler<HTMLButtonElement>
+  className?: string
+  descriptionClassName?: string
 }
 
-export function SubmitButton({ isSubmitting, userEmail, onClick }: SubmitButtonProps) {
+export function SubmitButton({
+  isSubmitting,
+  userEmail,
+  onClick,
+  className,
+  descriptionClassName,
+}: SubmitButtonProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className={cn('flex flex-col gap-3', className)}>
       <Button
         htmlType="submit"
         size="small"
@@ -22,7 +30,7 @@ export function SubmitButton({ isSubmitting, userEmail, onClick }: SubmitButtonP
       >
         Send support request
       </Button>
-      <p className="text-xs text-foreground-lighter text-balance pr-4">
+      <p className={cn('text-xs text-foreground-lighter text-balance pr-4', descriptionClassName)}>
         We will contact you at <span className="text-foreground font-medium">{userEmail}</span>.
         Please ensure emails from supabase.com are allowed.
       </p>

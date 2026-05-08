@@ -2,8 +2,13 @@ import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constan
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseTriggerKeys } from './keys'
+import type { PostgresTrigger } from '@/components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
+
+function markSavedTriggerSafe(trigger: DatabaseTriggersData[number]): PostgresTrigger {
+  return trigger as PostgresTrigger
+}
 
 export type DatabaseTriggersVariables = {
   projectRef?: string
@@ -61,16 +66,19 @@ export const useDatabaseHooksQuery = <TData = DatabaseTriggersData>(
     ...options,
   })
 
-export const useDatabaseTriggersQuery = <TData = DatabaseTriggersData>(
+export const useDatabaseTriggersQuery = <TData = PostgresTrigger[]>(
   { projectRef, connectionString }: DatabaseTriggersVariables,
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<DatabaseTriggersData, DatabaseTriggersError, TData> = {}
+  }: UseCustomQueryOptions<PostgresTrigger[], DatabaseTriggersError, TData> = {}
 ) =>
-  useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>({
+  useQuery<PostgresTrigger[], DatabaseTriggersError, TData>({
     queryKey: databaseTriggerKeys.list(projectRef),
-    queryFn: ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
+    queryFn: ({ signal }) =>
+      getDatabaseTriggers({ projectRef, connectionString }, signal).then((data) =>
+        data.map(markSavedTriggerSafe)
+      ),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })

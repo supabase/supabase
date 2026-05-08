@@ -11,16 +11,15 @@ import {
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react'
-import { toPng, toSvg } from 'html-to-image'
-import { Check, Copy, Download, Loader2, Plus } from 'lucide-react'
+import { Check, ChevronDown, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 import '@xyflow/react/dist/style.css'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { toast } from 'sonner'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,12 +44,17 @@ import { DefaultEdge } from './DefaultEdge'
 import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGraphContext'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { EdgeData, TableNodeData } from './Schemas.constants'
-import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
+import {
+  getGraphDataFromTables,
+  getLayoutedElementsViaDagre,
+  getSchemaAsMarkdown,
+} from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
 import { useExportSchemaToImage } from './useExportSchemaToImage'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import SchemaSelector from '@/components/ui/SchemaSelector'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -60,6 +64,8 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { tablesToSQL } from '@/lib/helpers'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
@@ -199,6 +205,39 @@ export const SchemaGraph = () => {
     exportSchemaToImage({ element: reactflowViewport, format, x, y, zoom, projectRef: ref })
   }
 
+  const copyAsSQL = () => {
+    if (!tables) return
+    copyToClipboard(tablesToSQL(tables))
+    setCopied(true)
+    toast.success('Successfully copied as SQL')
+  }
+
+  const copyAsMarkdown = () => {
+    const tableNodes = reactFlowInstance
+      .getNodes()
+      .filter((node) => node.type === 'table')
+      .map((node) => node.data as TableNodeData)
+    copyToClipboard(getSchemaAsMarkdown(selectedSchema, tableNodes))
+    setCopied(true)
+    toast.success('Successfully copied as Markdown')
+  }
+
+  const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const [autoLayoutDialogOpen, setAutoLayoutDialogOpen] = useState(false)
+
+  const shortcutsEnabled = isSuccessSchemas && !hasNoTables
+
+  useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_COPY_SQL, copyAsSQL, { enabled: shortcutsEnabled })
+  useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_COPY_MARKDOWN, copyAsMarkdown, {
+    enabled: shortcutsEnabled,
+  })
+  useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_DOWNLOAD_PNG, () => downloadImage('png'), {
+    enabled: shortcutsEnabled,
+  })
+  useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_DOWNLOAD_SVG, () => downloadImage('svg'), {
+    enabled: shortcutsEnabled,
+  })
+
   const isFirstLoad = useRef(true)
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
@@ -251,84 +290,114 @@ export const SchemaGraph = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between p-4 border-b border-muted h-[var(--header-height)]">
+      <div className="flex items-center justify-between p-4 border-b border-muted h-(--header-height)">
         {isLoadingSchemas && (
-          <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
+          <div className="h-[34px] w-[260px] bg-foreground-lighter rounded-sm shimmering-loader" />
         )}
 
         {isErrorSchemas && <AlertError error={errorSchemas} subject="Failed to retrieve schemas" />}
 
         {isSuccessSchemas && (
           <>
-            <SchemaSelector
-              className="w-[180px]"
-              size="tiny"
-              showError={false}
-              selectedSchemaName={selectedSchema}
-              onSelectSchema={setSelectedSchema}
-            />
+            <Shortcut
+              id={SHORTCUT_IDS.SCHEMA_VISUALIZER_FOCUS_SCHEMA}
+              onTrigger={() => setSchemaSelectorOpen(true)}
+              options={{ enabled: isSuccessSchemas }}
+              side="bottom"
+              tooltipOpen={schemaSelectorOpen ? false : undefined}
+            >
+              <SchemaSelector
+                className="w-[180px]"
+                size="tiny"
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
+                open={schemaSelectorOpen}
+                onOpenChange={setSchemaSelectorOpen}
+              />
+            </Shortcut>
             {!hasNoTables && (
               <div className="flex items-center gap-x-2">
-                <ButtonTooltip
-                  type="outline"
-                  icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
-                  onClick={() => {
-                    if (tables) {
-                      copyToClipboard(tablesToSQL(tables))
-                      setCopied(true)
-                    }
-                  }}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: (
-                        <div className="max-w-[180px] space-y-2 text-foreground-light">
-                          <p className="text-foreground">Note</p>
-                          <p>
-                            This schema is for context or debugging only. Table order and
-                            constraints may be invalid. Not meant to be run as-is.
-                          </p>
-                        </div>
-                      ),
-                    },
-                  }}
-                >
-                  Copy as SQL
-                </ButtonTooltip>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <ButtonTooltip
-                      aria-label="Download Schema"
-                      type="default"
-                      loading={isDownloading}
-                      className="px-1.5"
-                      icon={<Download />}
-                      tooltip={{ content: { side: 'bottom', text: 'Download current view' } }}
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-32">
-                    <DropdownMenuItem onClick={() => downloadImage('png')}>
-                      Download as PNG
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => downloadImage('svg')}>
-                      Download as SVG
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <ButtonTooltip
-                      type="default"
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: 'Automatically arrange the layout of all nodes',
-                        },
-                      }}
-                    >
-                      Auto layout
-                    </ButtonTooltip>
-                  </AlertDialogTrigger>
+                <div className="flex items-center gap-0">
+                  <ButtonTooltip
+                    type="default"
+                    className="rounded-r-none border-r-0"
+                    icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
+                    onClick={copyAsSQL}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: (
+                          <div className="max-w-[180px] space-y-2 text-foreground-light">
+                            <p className="text-foreground">Note</p>
+                            <p>
+                              This schema is for context or debugging only. Table order and
+                              constraints may be invalid. Not meant to be run as-is.
+                            </p>
+                          </div>
+                        ),
+                      },
+                    }}
+                  >
+                    Copy as SQL
+                  </ButtonTooltip>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="default"
+                        size="tiny"
+                        className="rounded-l-none pl-1 pr-0"
+                        icon={<ChevronDown size={12} />}
+                      >
+                        <span className="sr-only">Export options</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      <DropdownMenuItem
+                        className="flex items-center space-x-2 whitespace-nowrap"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          copyAsMarkdown()
+                        }}
+                      >
+                        <Copy size={12} />
+                        <span>Copy as Markdown</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="flex items-center space-x-2 whitespace-nowrap"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          downloadImage('png')
+                        }}
+                      >
+                        <Download size={12} />
+                        <span>Download as PNG</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="flex items-center space-x-2 whitespace-nowrap"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          downloadImage('svg')
+                        }}
+                      >
+                        <Download size={12} />
+                        <span>Download as SVG</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <AlertDialog open={autoLayoutDialogOpen} onOpenChange={setAutoLayoutDialogOpen}>
+                  <Shortcut
+                    id={SHORTCUT_IDS.SCHEMA_VISUALIZER_AUTO_LAYOUT}
+                    onTrigger={() => setAutoLayoutDialogOpen(true)}
+                    options={{ enabled: shortcutsEnabled }}
+                    side="bottom"
+                    tooltipOpen={autoLayoutDialogOpen ? false : undefined}
+                  >
+                    <AlertDialogTrigger asChild>
+                      <Button type="default">Auto layout</Button>
+                    </AlertDialogTrigger>
+                  </Shortcut>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>Confirm to rearrange all nodes</AlertDialogTitle>
@@ -406,7 +475,7 @@ export const SchemaGraph = () => {
                 >
                   <Background
                     gap={16}
-                    className="[&>*]:stroke-foreground-muted opacity-[25%]"
+                    className="*:stroke-foreground-muted opacity-25"
                     variant={BackgroundVariant.Dots}
                     color={'inherit'}
                   />
@@ -415,7 +484,7 @@ export const SchemaGraph = () => {
                     zoomable
                     nodeColor={miniMapNodeColor}
                     maskColor={miniMapMaskColor}
-                    className="border rounded-md shadow-sm"
+                    className="border rounded-md shadow-xs"
                   />
                   <SchemaGraphLegend />
                 </ReactFlow>

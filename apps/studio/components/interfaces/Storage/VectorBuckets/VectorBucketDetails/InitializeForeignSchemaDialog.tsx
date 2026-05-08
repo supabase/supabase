@@ -16,8 +16,8 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormField,
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -143,7 +143,7 @@ export const InitializeForeignSchemaDialog = () => {
         <Button type="default">Query from Postgres</Button>
       </DialogTrigger>
       <DialogContent size="medium" aria-describedby={undefined}>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
               <DialogTitle>Query this vector bucket from Postgres</DialogTitle>
@@ -155,7 +155,7 @@ export const InitializeForeignSchemaDialog = () => {
                 Create a Postgres schema to expose tables from the "{bucketId}" bucket as foreign
                 tables.
               </p>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="schema"
                 render={({ field }) => (
@@ -165,7 +165,7 @@ export const InitializeForeignSchemaDialog = () => {
                 )}
               />
             </DialogSection>
-            <DialogFooter className="!justify-between">
+            <DialogFooter className="justify-between!">
               <DocsButton href={`${DOCS_URL}/guides/storage/vector/querying-vectors`} />
               <div className="flex items-center gap-x-2">
                 <Button type="default" disabled={isCreating} onClick={() => setIsOpen(false)}>
@@ -177,7 +177,7 @@ export const InitializeForeignSchemaDialog = () => {
               </div>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

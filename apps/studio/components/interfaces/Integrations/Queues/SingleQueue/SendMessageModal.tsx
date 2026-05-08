@@ -3,7 +3,16 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input, Modal } from 'ui'
+import {
+  Form,
+  FormControl,
+  FormField,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  Modal,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -85,13 +94,13 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
       }}
     >
       <Modal.Content className="flex flex-col gap-y-4">
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             id={FORM_ID}
-            className="flex-grow overflow-auto gap-2 flex flex-col"
+            className="grow overflow-auto gap-2 flex flex-col"
             onSubmit={form.handleSubmit(onSubmit)}
           >
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="delay"
               render={({ field: { ref, ...rest } }) => (
@@ -101,38 +110,38 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
                   className="gap-1"
                   description="Time in seconds before the message becomes available for reading."
                 >
-                  <FormControl_Shadcn_>
-                    <Input
-                      {...rest}
-                      type="number"
-                      placeholder="1"
-                      actions={<p className="text-foreground-light pr-2">sec</p>}
-                    />
-                  </FormControl_Shadcn_>
+                  <FormControl>
+                    <InputGroup>
+                      <InputGroupInput {...rest} type="number" placeholder="1" />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>sec</InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="payload"
               render={({ field }) => (
                 <FormItemLayout label="Message payload" layout="vertical" className="gap-1">
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <CodeEditor
                       id="message-payload"
                       language="json"
                       autofocus={false}
-                      className="!mb-0 h-32 overflow-hidden rounded border"
+                      className="mb-0! h-32 overflow-hidden rounded-sm border"
                       onInputChange={(e: string | undefined) => field.onChange(e)}
                       options={{ wordWrap: 'off', contextmenu: false }}
                       value={field.value}
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
           </form>
-        </Form_Shadcn_>
+        </Form>
       </Modal.Content>
     </Modal>
   )

@@ -13,7 +13,7 @@ const LoadingOpacity = ({
     <div
       className={[
         className,
-        'flex h-full flex-grow transition-opacity ',
+        'flex h-full grow transition-opacity ',
         active ? 'opacity-30' : 'opacity-100',
       ].join(' ')}
     >

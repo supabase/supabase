@@ -222,7 +222,7 @@ Queries which are the most time consuming are not necessarily bad, you may have 
 
 Generally for most applications a small percentage of data is accessed more regularly than the rest. To make sure that your regularly accessed data is available, Postgres tracks your data access patterns and keeps this in its [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache.
 
-Applications with lower cache hit rates generally perform more poorly since they have to hit the disk to get results rather than serving them from memory. Very poor hit rates can also cause you to burst past your [Disk IO limits](./compute-add-ons#disk-io) causing significant performance issues.
+Applications with lower cache hit rates generally perform more poorly since they have to hit the disk to get results rather than serving them from memory. Very poor hit rates can also cause you to burst past your [Disk IO limits](/docs/guides/platform/compute-and-disk#disk) causing significant performance issues.
 
 You can view your cache and index hit rate by executing the following query:
 
@@ -240,7 +240,7 @@ from pg_statio_user_tables;
 
 This shows the ratio of data blocks fetched from the Postgres [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache against the data blocks that were read from disk/OS cache.
 
-If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](./compute-add-ons) is easy and can be done from your [project dashboard](/dashboard/project/_/settings/compute-and-disk).
+If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](/docs/guides/platform/compute-and-disk#compute) is easy and can be done from your [project dashboard](/dashboard/project/_/settings/compute-and-disk).
 
 ### Optimizing poor performing queries
 

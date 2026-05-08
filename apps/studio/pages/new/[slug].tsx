@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import Head from 'next/head'
@@ -9,7 +8,7 @@ import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
-import { Button, Form_Shadcn_, FormField_Shadcn_, useWatch_Shadcn_ } from 'ui'
+import { Button, Form, FormField, useWatch } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
@@ -18,11 +17,11 @@ import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Datab
 import { AdvancedConfiguration } from '@/components/interfaces/ProjectCreation/AdvancedConfiguration'
 import { CloudProviderSelector } from '@/components/interfaces/ProjectCreation/CloudProviderSelector'
 import { ComputeSizeSelector } from '@/components/interfaces/ProjectCreation/ComputeSizeSelector'
-import { CustomPostgresVersionInput } from '@/components/interfaces/ProjectCreation/CustomPostgresVersionInput'
 import { DatabasePasswordInput } from '@/components/interfaces/ProjectCreation/DatabasePasswordInput'
 import { DisabledWarningDueToIncident } from '@/components/interfaces/ProjectCreation/DisabledWarningDueToIncident'
 import { FreeProjectLimitWarning } from '@/components/interfaces/ProjectCreation/FreeProjectLimitWarning'
 import { HighAvailabilityInput } from '@/components/interfaces/ProjectCreation/HighAvailabilityInput'
+import { InternalOnlyConfiguration } from '@/components/interfaces/ProjectCreation/InternalOnlyConfiguration'
 import { OrganizationSelector } from '@/components/interfaces/ProjectCreation/OrganizationSelector'
 import {
   extractPostgresVersionDetails,
@@ -38,6 +37,10 @@ import { ProjectCreationFooter } from '@/components/interfaces/ProjectCreation/P
 import { ProjectNameInput } from '@/components/interfaces/ProjectCreation/ProjectNameInput'
 import { RegionSelector } from '@/components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from '@/components/interfaces/ProjectCreation/SecurityOptions'
+import {
+  GitHubRepositoryField,
+  useGitHubRepositoryOptions,
+} from '@/components/interfaces/Settings/Integrations/GithubIntegration/GitHubRepositoryField'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { WizardLayoutWithoutAuth } from '@/components/layouts/WizardLayout'
 import Panel from '@/components/ui/Panel'
@@ -58,6 +61,7 @@ import {
   useProjectCreateMutation,
 } from '@/data/projects/project-create-mutation'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDataApiRevokeOnCreateDefaultEnabled } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -94,7 +98,14 @@ const Wizard: NextPageWithLayout = () => {
     ''
   )
   const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'integrations.github_connections'
+  )
   const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
+  const { hasAccess: hasAccessToGitHubIntegration } = useCheckEntitlements(
+    'integrations.github_connections'
+  )
 
   const smartRegionEnabled = useFlag('enableSmartRegion')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -104,7 +115,6 @@ const Wizard: NextPageWithLayout = () => {
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
   // PostHog) so we only record true/false when the flag is resolved.
-  const tableEditorApiAccessToggleFlag = usePHFlag<boolean>('tableEditorApiAccessToggle')
   const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
   const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
 
@@ -132,11 +142,15 @@ const Wizard: NextPageWithLayout = () => {
       projectName: projectName || '',
       highAvailability: false,
       postgresVersion: '',
+      instanceType: '',
       cloudProvider: PROVIDERS[defaultProvider].id,
       dbPass: '',
       dbPassStrength: 0,
       dbPassStrengthMessage: '',
       dbRegion: undefined,
+      githubRepositoryId: '',
+      githubInstallationId: undefined,
+      githubRepositoryName: '',
       instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
       dataApi: true,
       dataApiDefaultPrivileges: !isDataApiRevokeOnCreateDefault,
@@ -150,9 +164,11 @@ const Wizard: NextPageWithLayout = () => {
     instanceSize: watchedInstanceSize,
     cloudProvider,
     dbRegion,
+    githubRepositoryName,
     organization,
+    projectName: watchedProjectName,
     highAvailability,
-  } = useWatch_Shadcn_({ control: form.control })
+  } = useWatch({ control: form.control })
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
@@ -239,6 +255,8 @@ const Wizard: NextPageWithLayout = () => {
         : _defaultRegion
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
+  const canConfigureGitHubOnCreate =
+    canCreateProject && hasAccessToGitHubIntegration && canCreateGitHubConnection
 
   const dbRegionExact = smartRegionToExactRegion(dbRegion ?? '')
 
@@ -258,6 +276,13 @@ const Wizard: NextPageWithLayout = () => {
       )
     : false
   const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan && !isUserAtFreeProjectLimit
+  const {
+    gitHubAuthorization,
+    githubRepos,
+    hasPartialResponseDueToSSO,
+    isLoading: isLoadingRepositoryOptions,
+    refetch: refetchRepositoryOptions,
+  } = useGitHubRepositoryOptions()
 
   const {
     mutate: createProject,
@@ -274,9 +299,6 @@ const Wizard: NextPageWithLayout = () => {
           dataApiEnabled: form.getValues('dataApi'),
           dataApiDefaultPrivilegesGranted: form.getValues('dataApiDefaultPrivileges'),
           useOrioleDb: form.getValues('useOrioleDb'),
-          ...(tableEditorApiAccessToggleFlag !== undefined && {
-            tableEditorApiAccessToggleEnabled: tableEditorApiAccessToggleFlag,
-          }),
           ...(dataApiRevokeOnCreateDefaultFlag !== undefined && {
             dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
           }),
@@ -315,12 +337,15 @@ const Wizard: NextPageWithLayout = () => {
       dbPass,
       dbRegion,
       postgresVersion,
+      instanceType,
       instanceSize,
       dataApi,
       dataApiDefaultPrivileges,
       enableRlsEventTrigger,
       postgresVersionSelection,
       useOrioleDb,
+      githubInstallationId,
+      githubRepositoryId,
     } = values
 
     if (useOrioleDb && !availableOrioleVersion) {
@@ -334,6 +359,10 @@ const Wizard: NextPageWithLayout = () => {
     const selectedRegion = smartRegionEnabled
       ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
       : undefined
+    const parsedGitHubRepositoryId =
+      githubRepositoryId.length > 0 ? Number(githubRepositoryId) : undefined
+    const shouldIncludeGitHubFields =
+      githubInstallationId !== undefined && Number.isFinite(parsedGitHubRepositoryId)
 
     const data: ProjectCreateVariables = {
       dbPass,
@@ -347,27 +376,33 @@ const Wizard: NextPageWithLayout = () => {
       dbInstanceSize: isFreePlan ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: false,
+      dataApiRevokeDefaultPrivileges: dataApi && !dataApiDefaultPrivileges,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
-      dbSql:
-        [
-          enableRlsEventTrigger && AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL,
-          dataApi && !dataApiDefaultPrivileges && buildDefaultPrivilegesSql('revoke'),
-        ]
-          .filter(Boolean)
-          .join('\n') || undefined,
+      dbSql: enableRlsEventTrigger ? AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL : undefined,
+      ...(shouldIncludeGitHubFields
+        ? {
+            githubInstallationId,
+            githubRepositoryId: parsedGitHubRepositoryId,
+          }
+        : {}),
     }
 
-    if (postgresVersion) {
-      if (!postgresVersion.match(/1[2-9]\..*/)) {
-        toast.error(
-          `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
-        )
-      }
+    if (postgresVersion && !postgresVersion.match(/1[2-9]\..*/)) {
+      toast.error(
+        `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
+      )
+    }
 
+    if (postgresVersion || instanceType) {
       data['customSupabaseRequest'] = {
-        ami: { search_tags: { 'tag:postgresVersion': postgresVersion } },
+        ami: {
+          ...(postgresVersion && {
+            search_tags: { 'tag:postgresVersion': postgresVersion },
+          }),
+          ...(instanceType && { instance_type: instanceType }),
+        },
       }
     }
 
@@ -432,6 +467,16 @@ const Wizard: NextPageWithLayout = () => {
     }
   }, [instanceSize, watchedInstanceSize, setValue])
 
+  useEffect(() => {
+    if (!githubRepositoryName) return
+    if ((watchedProjectName ?? '').trim().length > 0) return
+
+    const repoName = githubRepositoryName.split('/').at(-1) ?? githubRepositoryName
+    setValue('projectName', repoName.trim(), {
+      shouldValidate: true,
+    })
+  }, [githubRepositoryName, watchedProjectName, setValue])
+
   return (
     <>
       {/* Wizard layouts set the visual header but not the browser tab title. */}
@@ -439,7 +484,7 @@ const Wizard: NextPageWithLayout = () => {
         <title>{pageTitle}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation)}>
           <Panel
             loading={!isOrganizationsSuccess}
@@ -467,11 +512,43 @@ const Wizard: NextPageWithLayout = () => {
               {projectCreationDisabled ? (
                 <DisabledWarningDueToIncident title="Project creation is currently disabled" />
               ) : (
-                <div className="divide-y divide-border-muted">
+                <div className="divide-y divide-border-border">
                   <OrganizationSelector form={form} />
 
                   {canCreateProject && (
                     <>
+                      {canConfigureGitHubOnCreate && (
+                        <Panel.Content>
+                          <GitHubRepositoryField
+                            form={form}
+                            name="githubRepositoryId"
+                            installationIdField="githubInstallationId"
+                            repositoryNameField="githubRepositoryName"
+                            label="GitHub (optional)"
+                            description={
+                              <>
+                                Ideal for agent-first workflows: update your schema in code, push it
+                                to GitHub, and Supabase deploys the changes automatically.{' '}
+                                <a
+                                  href="https://supabase.com/docs/guides/deployment/branching/github-integration"
+                                  target="_blank"
+                                  rel="noreferrer noopener"
+                                  className="text-link"
+                                >
+                                  Learn more
+                                </a>
+                              </>
+                            }
+                            disabled={isCreatingNewProject}
+                            repositories={githubRepos}
+                            gitHubAuthorization={gitHubAuthorization}
+                            hasPartialResponseDueToSSO={hasPartialResponseDueToSSO}
+                            isLoading={isLoadingRepositoryOptions}
+                            refetch={refetchRepositoryOptions}
+                            onConnectClick={() => track('project_creation_github_connect_clicked')}
+                          />
+                        </Panel.Content>
+                      )}
                       <ProjectNameInput form={form} />
                       <HighAvailabilityInput form={form} />
 
@@ -490,7 +567,7 @@ const Wizard: NextPageWithLayout = () => {
 
                       {showPostgresVersionSelector && (
                         <Panel.Content>
-                          <FormField_Shadcn_
+                          <FormField
                             control={form.control}
                             name="postgresVersionSelection"
                             render={({ field }) => (
@@ -506,16 +583,17 @@ const Wizard: NextPageWithLayout = () => {
                         </Panel.Content>
                       )}
 
-                      {showNonProdFields && <CustomPostgresVersionInput form={form} />}
-
                       <SecurityOptions form={form} />
+
                       {showAdvancedConfig && !!availableOrioleVersion && (
                         <AdvancedConfiguration form={form} />
                       )}
 
+                      {showNonProdFields && <InternalOnlyConfiguration form={form} />}
+
                       {shouldShowFreeProjectInfo ? (
                         <Admonition
-                          className="rounded-none border-0 border-t"
+                          className="rounded-none border-0"
                           type="note"
                           title="Need a free project?"
                           description={
@@ -595,7 +673,7 @@ const Wizard: NextPageWithLayout = () => {
             </div>
           </ConfirmationModal>
         </form>
-      </Form_Shadcn_>
+      </Form>
     </>
   )
 }

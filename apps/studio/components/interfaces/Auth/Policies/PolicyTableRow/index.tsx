@@ -1,4 +1,3 @@
-import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import { memo, useMemo } from 'react'
@@ -19,6 +18,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { usePoliciesData } from '../PoliciesDataContext'
 import { PolicyRow } from './PolicyRow'
 import type { PolicyTable } from './PolicyTableRow.types'
+import type { Policy } from './PolicyTableRow.utils'
 import { getTableAdmonitionMessage, getTableDataApiStatus } from './PolicyTableRow.utils'
 import { PolicyTableRowHeader } from './PolicyTableRowHeader'
 import AlertError from '@/components/ui/AlertError'
@@ -31,8 +31,8 @@ export interface PolicyTableRowProps {
   isLocked: boolean
   onSelectToggleRLS: (table: PolicyTable) => void
   onSelectCreatePolicy: (table: PolicyTable) => void
-  onSelectEditPolicy: (policy: PostgresPolicy) => void
-  onSelectDeletePolicy: (policy: PostgresPolicy) => void
+  onSelectEditPolicy: (policy: Policy) => void
+  onSelectDeletePolicy: (policy: Policy) => void
 }
 
 const PolicyTableRowComponent = ({
