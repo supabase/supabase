@@ -104,7 +104,11 @@ export function useRouter() {
       route: pathPattern,
       query: { ...params, ...search },
       asPath: location.href,
-      basePath: router.basepath ?? '',
+      basePath: router.basepath
+        ? router.basepath.startsWith('/')
+          ? router.basepath
+          : `/${router.basepath}`
+        : '',
       // TanStack resolves params/search synchronously on render, so the
       // pages-router "is the dynamic param ready yet?" flag is always
       // true here. (In Next this can be false during the very first
