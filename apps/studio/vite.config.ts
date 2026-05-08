@@ -118,6 +118,23 @@ export default defineConfig(({ mode }) => {
     },
     ...(basePath && { base: basePath }),
     define: publicEnvDefines,
+    // Force `class-variance-authority` into its own chunk. Without this,
+    // Rolldown splits `TreeView` into a separate chunk that imports `cva`
+    // from the `ui` chunk while the `ui` chunk imports `TreeView` back —
+    // a circular dep in the bundle output (not in source) that leaves
+    // `cva` undefined when TreeView's top-level `cva(...)` initializer
+    // runs at SSR prerender time. Pinning cva to its own chunk breaks
+    // the cycle.
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: (id) =>
+            id.includes('node_modules/class-variance-authority/')
+              ? 'class-variance-authority'
+              : undefined,
+        },
+      },
+    },
     css: {
       // Disable PostCSS auto-discovery. Studio's postcss.config.cjs is kept
       // for the Next build (`build:next`) and uses `@tailwindcss/postcss`,
