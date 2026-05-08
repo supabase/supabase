@@ -46,7 +46,7 @@ const StorageVectorsPage: NextPageWithLayout = () => {
               icon={VectorBucket}
               title="Coming soon to your project's region"
               description={
-                <p>
+                <>
                   Vector buckets are currently only available for projects created in{' '}
                   <Tooltip>
                     <TooltipTrigger className={InlineLinkClassName}>some regions</TooltipTrigger>
@@ -62,7 +62,7 @@ const StorageVectorsPage: NextPageWithLayout = () => {
                     </TooltipContent>
                   </Tooltip>{' '}
                   and we're actively looking to expand that soon.
-                </p>
+                </>
               }
             />
           </PageSectionContent>
