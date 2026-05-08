@@ -633,6 +633,9 @@ functions:
     $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorBucketScope.index'
   - id: storagefile-exists
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.exists'
+    notes: |
+      - Returns `{ data: false, error: null }` when the file does not exist. Branch on `data === false` to detect a missing file — `error` is now reserved for genuine failures (auth, network, server errors).
+      - **Breaking change (v3)**: Previously returned `{ data: false, error: StorageError }` for a missing file. Callers that branched on `error` to detect "not found" must be updated to branch on `data === false` instead.
   - id: storagefile-info
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.info'
   - id: storagefile-list-v2
