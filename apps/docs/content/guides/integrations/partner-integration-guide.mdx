@@ -18,7 +18,43 @@ Pick the method that fits your security requirements, then follow the matching s
 
 In this method, you implement a single `GET` endpoint. Supabase redirects the user to this endpoint when they click **Install Integration**, and your endpoint kicks off the OAuth flow.
 
-{/* IMG? */}
+<Mermaid
+  chart={`sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Partner as Partner (OAuth Client)
+    participant Supabase as Supabase (OAuth Authorization Server/Protected Resource)
+
+    Note over Browser: Supabase Dashboard Open
+
+    User->>Browser: Clicks "Install Integration"
+
+    Browser->>Partner: "Connect to Partner" Click Handler Page
+    Partner->>Browser: Redirect to Supabase Authorization Page
+
+    Browser->>Supabase: Request Authorization
+    Supabase->>Browser: Redirect to Consent Screen
+
+    Browser->>User: Display Consent Screen
+    User->>Browser: Gives Consent
+
+    Browser->>Supabase: Submit User Consent
+    Supabase->>Browser: Redirect to Partner With Authorization Code
+
+    Browser->>Partner: Submit Authorization Code
+
+    Partner->>Supabase: Exchange Authorization Code for Token
+    Supabase->>Partner: Return Token
+
+    Partner->>Supabase: Request Management API Resources
+    Supabase->>Partner: Return Resources
+
+    Partner->>Browser: Ok 200, OAuth Flow Complete
+
+    Browser->>User: Display "Integration Installed" Message`}
+
+/>
 
 ### Step 1: Implement the redirect endpoint
 
@@ -52,7 +88,55 @@ You will implement two endpoints:
 1. A `POST` endpoint that validates the signed JWT and returns a unique redirect URL.
 2. A `GET` endpoint that handles the user once they are redirected to that URL.
 
-{/* IMG */}
+<Mermaid
+  chart={`sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Partner as Partner (OAuth Client)
+    participant Supabase as Supabase (OAuth Authorization Server/Protected Resource)
+
+    Note over Browser: Supabase Dashboard Open
+
+    User->>Browser: Clicks "Install Integration"
+
+    Browser->>Supabase: Request Redirect URL Generation
+    Supabase->>Partner: Send Signed JWT
+    Partner->>Partner: Validate JWT
+    Partner->>Partner: Generate Unique Redirect URL
+    Partner->>Supabase: Return Redirect URL
+    Supabase->>Browser: Redirect to the Redirect URL
+
+    Browser->>Partner: Visit Redirect URL
+    Partner->>Partner: Validate Redirect Record
+    Partner->>Browser: Optional User Actions
+    Browser->>User: User Performs Optional Actions
+    User->>Browser: User Optional Actions Complete
+    Browser->>Partner: User Optional Actions Complete
+    Partner->>Browser: Redirect to Supabase Authorization Page
+
+    Browser->>Supabase: Request Authorization
+    Supabase->>Browser: Redirect to Consent Screen
+
+    Browser->>User: Display Consent Screen
+    User->>Browser: Gives Consent
+
+    Browser->>Supabase: Submit User Consent
+    Supabase->>Browser: Redirect to Partner With Authorization Code
+
+    Browser->>Partner: Submit Authorization Code
+
+    Partner->>Supabase: Exchange Authorization Code for Token
+    Supabase->>Partner: Return Token
+
+    Partner->>Supabase: Request Management API Resources
+    Supabase->>Partner: Return Resources
+
+    Partner->>Browser: Ok 200, OAuth Flow Complete
+
+    Browser->>User: Display "Integration Installed" Message`}
+
+/>
 
 ### Step 1: Exchange public keys with Supabase
 
