@@ -47,7 +47,6 @@ import { useDatabaseFunctionUpdateMutation } from '@/data/database-functions/dat
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
-import type { FormSchema } from '@/types'
 
 const FORM_ID = 'create-function-sidepanel'
 
