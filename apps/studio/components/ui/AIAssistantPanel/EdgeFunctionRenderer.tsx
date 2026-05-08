@@ -65,13 +65,8 @@ export const EdgeFunctionRenderer = ({
     return `supabase functions download ${functionName}`
   }, [functionName])
 
-  const handleDeploy = () => {
+  const approveDeploy = () => {
     if (!code || isDeploying || !ref || !functionName) return
-
-    if (existingFunction && !showReplaceWarning) {
-      setShowReplaceWarning(true)
-      return
-    }
 
     setShowReplaceWarning(false)
     sendEvent({
@@ -83,6 +78,17 @@ export const EdgeFunctionRenderer = ({
       },
     })
     onApprove?.()
+  }
+
+  const handleDeploy = () => {
+    if (!code || isDeploying || !ref || !functionName) return
+
+    if (existingFunction) {
+      setShowReplaceWarning(true)
+      return
+    }
+
+    approveDeploy()
   }
 
   return (
@@ -100,7 +106,7 @@ export const EdgeFunctionRenderer = ({
         hideDeployButton={showConfirmFooter || initialIsDeployed}
         showReplaceWarning={showReplaceWarning}
         onCancelReplace={() => setShowReplaceWarning(false)}
-        onConfirmReplace={handleDeploy}
+        onConfirmReplace={approveDeploy}
       />
       {showConfirmFooter && (
         <div className="mx-4">
