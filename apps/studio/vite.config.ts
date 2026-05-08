@@ -124,6 +124,29 @@ export default defineConfig(({ mode }) => {
   // Leaving the var empty keeps the app at `/` as today.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
 
+  // Substitutions that have to apply to *both* our app source (via Vite's
+  // `define`) and any pre-bundled dependencies (via esbuild's optimizeDeps).
+  // The two pipelines don't share config — Vite's `define` only touches
+  // files going through Vite's transform, while optimizeDeps runs esbuild
+  // on `node_modules` deps with its own separate `define`.
+  //   - `global` → `globalThis`: makes Node-style libs (`randombytes` via
+  //     `generate-password-browser`, etc.) work in the browser. Surfaces
+  //     on /auth/hooks via `randombytes/browser.js:16`.
+  //   - `define.amd` → `false`: short-circuits the AMD branch in UMD
+  //     wrappers (papaparse, others). Monaco's CDN loader installs an
+  //     AMD-style `window.define` at runtime; without this substitution,
+  //     UMD libs evaluate after Monaco has loaded and call an anonymous
+  //     `define([], t)` that Monaco's queue rejects with "Can only have
+  //     one anonymous define call per script file". Surfaces concretely
+  //     on /functions/[slug] (papaparse pulled in by invocations).
+  //     Monaco's loader.js itself runs from a CDN script tag (not in our
+  //     bundle / not pre-bundled), so its own `define.amd = true` write
+  //     isn't affected by the substitution.
+  const sharedDefines = {
+    global: 'globalThis',
+    'define.amd': 'false',
+  }
+
   return {
     server: {
       port: 3000,
@@ -132,31 +155,16 @@ export default defineConfig(({ mode }) => {
       tsconfigPaths: true,
     },
     ...(basePath && { base: basePath }),
+    optimizeDeps: {
+      // Vite 8 uses Rolldown for dep pre-bundling; `esbuildOptions` is
+      // deprecated.
+      rolldownOptions: {
+        define: sharedDefines,
+      },
+    },
     define: {
       ...publicEnvDefines,
-      // Node-style libs (e.g. `randombytes` via `generate-password-browser`)
-      // reference `global`, which exists in Node but not in browsers. Webpack
-      // auto-polyfilled this; Vite doesn't. Map the identifier to `globalThis`
-      // (which is the same object in Node and the browser) at build time so
-      // these libs work without per-import patches. Surfaces concretely on
-      // /auth/hooks via `randombytes/browser.js:16`.
-      global: 'globalThis',
-      // Force papaparse's UMD wrapper down its non-AMD branch. Monaco's
-      // CDN loader installs an AMD-style `window.define` at runtime; when
-      // a chunk containing papaparse evaluates after Monaco has loaded,
-      // papaparse's `typeof define === "function" && define.amd` check
-      // hits the AMD path and calls an anonymous `define([], t)` that
-      // Monaco's loader queue rejects with "Can only have one anonymous
-      // define call per script file". Surfaces in prod builds when
-      // navigating from /projects into a project (the chunk-evaluation
-      // order lets Monaco register first); direct loads happen to load
-      // papaparse first and dodge the conflict.
-      //
-      // Substituting the bare identifier `define.amd` to `false` at
-      // build time short-circuits the AMD branch in our bundle. Monaco's
-      // loader.js is loaded as a runtime script (not in our bundle) so
-      // its own `define.amd = true` write isn't affected.
-      'define.amd': 'false',
+      ...sharedDefines,
     },
     // Circular-dep workaround: pin `class-variance-authority` to its own
     // chunk. Without this, Rolldown splits `TreeView` into a separate
