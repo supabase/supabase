@@ -369,9 +369,7 @@ export const DestinationForm = ({
 
     if (hasRequestError) {
       // If any request failed, surface the upstream message so users see why
-      const rejected = results.find(
-        (r): r is PromiseRejectedResult => r.status === 'rejected'
-      )
+      const rejected = results.find((r): r is PromiseRejectedResult => r.status === 'rejected')
       const reason =
         rejected?.reason instanceof Error ? rejected.reason.message : 'Please try again.'
       toast.error(`Failed to validate configuration: ${reason}`)

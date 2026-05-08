@@ -134,9 +134,7 @@ export const RowMenu = ({
     <div className="flex justify-end items-center space-x-2">
       {isLoading && <ShimmeringLoader />}
 
-      {isError && (
-        <AlertError error={error} subject="Failed to retrieve pipeline status" />
-      )}
+      {isError && <AlertError error={error} subject="Failed to retrieve pipeline status" />}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
