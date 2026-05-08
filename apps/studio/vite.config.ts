@@ -126,6 +126,22 @@ export default defineConfig(({ mode }) => {
       // these libs work without per-import patches. Surfaces concretely on
       // /auth/hooks via `randombytes/browser.js:16`.
       global: 'globalThis',
+      // Force papaparse's UMD wrapper down its non-AMD branch. Monaco's
+      // CDN loader installs an AMD-style `window.define` at runtime; when
+      // a chunk containing papaparse evaluates after Monaco has loaded,
+      // papaparse's `typeof define === "function" && define.amd` check
+      // hits the AMD path and calls an anonymous `define([], t)` that
+      // Monaco's loader queue rejects with "Can only have one anonymous
+      // define call per script file". Surfaces in prod builds when
+      // navigating from /projects into a project (the chunk-evaluation
+      // order lets Monaco register first); direct loads happen to load
+      // papaparse first and dodge the conflict.
+      //
+      // Substituting the bare identifier `define.amd` to `false` at
+      // build time short-circuits the AMD branch in our bundle. Monaco's
+      // loader.js is loaded as a runtime script (not in our bundle) so
+      // its own `define.amd = true` write isn't affected.
+      'define.amd': 'false',
     },
     // Circular-dep workaround: pin `class-variance-authority` to its own
     // chunk. Without this, Rolldown splits `TreeView` into a separate
