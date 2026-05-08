@@ -45,10 +45,11 @@ export async function retrieveUnifiedLogs({
   const resultData = data?.result ?? []
 
   const result = resultData.map((row: any) => {
-    const numericTs = Number(row.timestamp)
     const ts = String(row.timestamp ?? '')
-    const isoString = /Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`
-    const date = Number.isFinite(numericTs) ? new Date(numericTs / 1000) : new Date(isoString)
+    const looksLikeIso = /[T-]/.test(ts)
+    const date = looksLikeIso
+      ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`)
+      : new Date(Number(ts) / 1000)
     return {
       id: row.id,
       date,

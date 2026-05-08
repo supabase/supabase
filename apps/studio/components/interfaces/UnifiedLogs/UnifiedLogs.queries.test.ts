@@ -72,6 +72,17 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       // Bundled via UNION ALL — multiple occurrences expected
       expect(sql.match(/UNION ALL/g)?.length ?? 0).toBeGreaterThan(5)
     })
+
+    it('honours an active log_type filter in the total count branch', () => {
+      const sql = getLogsCountQuery({ ...baseSearch, log_type: ['edge'] } as any)
+      // The first branch is the total — its WHERE must include the edge
+      // log_type predicate, otherwise the total badge would over-count
+      // when a log_type filter is active.
+      const totalBranch = sql.split(/\bUNION ALL\b/)[0]
+      expect(totalBranch).toContain(`'total'`)
+      expect(totalBranch).toContain(`source = 'edge_logs'`)
+      expect(totalBranch).not.toContain(`source = 'postgres_logs'`)
+    })
   })
 
   describe('getLogsChartQuery', () => {

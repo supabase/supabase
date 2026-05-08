@@ -177,6 +177,14 @@ export async function getUnifiedLogInspection(
   // fetch the single row by id and flatten its attributes onto the response
   // so existing panel components that read `enrichedData['request.path']`
   // etc. keep working without per service flow SQL.
+  //
+  // logId comes from the row data we fetched (a uuid-shaped value), but it
+  // ultimately originates from a URL query parameter. Reject anything that
+  // isn't a plain uuid before interpolating it into SQL so a crafted id
+  // can't break out of the string literal.
+  if (!/^[0-9a-fA-F-]{1,64}$/.test(logId)) {
+    throw new Error('Invalid logId')
+  }
   const sql = `
 SELECT id, timestamp, source, event_message, severity_text, log_attributes
 FROM logs

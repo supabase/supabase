@@ -276,10 +276,13 @@ export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
   const baseFiltersFor = (excludeField?: string) =>
     buildBaseWhere(search, excludeField).join(' AND ')
 
+  // The "total" badge should reflect the user's *current* filter set,
+  // including any active log_type filter. Pass no excludeField so the
+  // log_type predicate is included.
   const totalSql = `
 SELECT 'total' AS dimension, 'all' AS value, count() AS count
 FROM logs
-WHERE ${baseFiltersFor('log_type')}
+WHERE ${baseFiltersFor()}
 `.trim()
 
   const logTypeBranches = Object.entries(LOG_TYPE_PREDICATE)

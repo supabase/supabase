@@ -121,12 +121,16 @@ export async function getUnifiedLogs(
   const resultData = data?.result ?? []
 
   const result = resultData.map((row: any) => {
-    // The OTEL endpoint may return timestamps as ISO strings or as numeric
-    // microseconds. Tolerate both.
-    const numericTs = Number(row.timestamp)
+    // Disambiguate timestamp shape by format, not by Number.isFinite — a
+    // numeric string of microseconds is always finite, so checking finite-
+    // ness can't tell us whether the value is microseconds or already-ms.
+    // ISO-like strings contain `T` or `-` and are parsed via Date; anything
+    // else is treated as numeric microseconds-since-epoch.
     const ts = String(row.timestamp ?? '')
-    const isoString = /Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`
-    const date = Number.isFinite(numericTs) ? new Date(numericTs / 1000) : new Date(isoString)
+    const looksLikeIso = /[T-]/.test(ts)
+    const date = looksLikeIso
+      ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`)
+      : new Date(Number(ts) / 1000)
 
     return {
       id: row.id,
