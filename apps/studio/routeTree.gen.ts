@@ -103,6 +103,9 @@ import { Route as ProjectRefDatabaseTriggersDataRouteImport } from './routes/pro
 import { Route as ProjectRefDatabaseTablesIdRouteImport } from './routes/project/$ref/database/tables/$id'
 import { Route as ProjectRefDatabaseReplicationPipelineIdRouteImport } from './routes/project/$ref/database/replication/$pipelineId'
 import { Route as ProjectRefDatabasePublicationsIdRouteImport } from './routes/project/$ref/database/publications/$id'
+import { Route as ProjectRefDatabaseBackupsScheduledRouteImport } from './routes/project/$ref/database/backups/scheduled'
+import { Route as ProjectRefDatabaseBackupsRestoreToNewProjectRouteImport } from './routes/project/$ref/database/backups/restore-to-new-project'
+import { Route as ProjectRefDatabaseBackupsPitrRouteImport } from './routes/project/$ref/database/backups/pitr'
 import { Route as ApiV1ProjectsRefApiKeysRouteImport } from './routes/api/v1/projects/$ref/api-keys'
 import { Route as ApiPlatformPropsOrgSlugRouteImport } from './routes/api/platform/props/org/$slug'
 import { Route as ApiPlatformProjectsRefSettingsRouteImport } from './routes/api/platform/projects/$ref/settings'
@@ -661,6 +664,24 @@ const ProjectRefDatabasePublicationsIdRoute =
     path: '/publications/$id',
     getParentRoute: () => ProjectRefDatabaseRoute,
   } as any)
+const ProjectRefDatabaseBackupsScheduledRoute =
+  ProjectRefDatabaseBackupsScheduledRouteImport.update({
+    id: '/backups/scheduled',
+    path: '/backups/scheduled',
+    getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
+const ProjectRefDatabaseBackupsRestoreToNewProjectRoute =
+  ProjectRefDatabaseBackupsRestoreToNewProjectRouteImport.update({
+    id: '/backups/restore-to-new-project',
+    path: '/backups/restore-to-new-project',
+    getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
+const ProjectRefDatabaseBackupsPitrRoute =
+  ProjectRefDatabaseBackupsPitrRouteImport.update({
+    id: '/backups/pitr',
+    path: '/backups/pitr',
+    getParentRoute: () => ProjectRefDatabaseRoute,
+  } as any)
 const ApiV1ProjectsRefApiKeysRoute = ApiV1ProjectsRefApiKeysRouteImport.update({
   id: '/api/v1/projects/$ref/api-keys',
   path: '/api/v1/projects/$ref/api-keys',
@@ -1138,6 +1159,9 @@ export interface FileRoutesByFullPath {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/project/$ref/database/backups/pitr': typeof ProjectRefDatabaseBackupsPitrRoute
+  '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
+  '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/replication/$pipelineId': typeof ProjectRefDatabaseReplicationPipelineIdRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
@@ -1291,6 +1315,9 @@ export interface FileRoutesByTo {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/project/$ref/database/backups/pitr': typeof ProjectRefDatabaseBackupsPitrRoute
+  '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
+  '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/replication/$pipelineId': typeof ProjectRefDatabaseReplicationPipelineIdRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
@@ -1450,6 +1477,9 @@ export interface FileRoutesById {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/project/$ref/database/backups/pitr': typeof ProjectRefDatabaseBackupsPitrRoute
+  '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
+  '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/replication/$pipelineId': typeof ProjectRefDatabaseReplicationPipelineIdRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
@@ -1608,6 +1638,9 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/project/$ref/database/backups/pitr'
+    | '/project/$ref/database/backups/restore-to-new-project'
+    | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/replication/$pipelineId'
     | '/project/$ref/database/tables/$id'
@@ -1761,6 +1794,9 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/project/$ref/database/backups/pitr'
+    | '/project/$ref/database/backups/restore-to-new-project'
+    | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/replication/$pipelineId'
     | '/project/$ref/database/tables/$id'
@@ -1919,6 +1955,9 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/project/$ref/database/backups/pitr'
+    | '/project/$ref/database/backups/restore-to-new-project'
+    | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/replication/$pipelineId'
     | '/project/$ref/database/tables/$id'
@@ -2732,6 +2771,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefDatabasePublicationsIdRouteImport
       parentRoute: typeof ProjectRefDatabaseRoute
     }
+    '/project/$ref/database/backups/scheduled': {
+      id: '/project/$ref/database/backups/scheduled'
+      path: '/backups/scheduled'
+      fullPath: '/project/$ref/database/backups/scheduled'
+      preLoaderRoute: typeof ProjectRefDatabaseBackupsScheduledRouteImport
+      parentRoute: typeof ProjectRefDatabaseRoute
+    }
+    '/project/$ref/database/backups/restore-to-new-project': {
+      id: '/project/$ref/database/backups/restore-to-new-project'
+      path: '/backups/restore-to-new-project'
+      fullPath: '/project/$ref/database/backups/restore-to-new-project'
+      preLoaderRoute: typeof ProjectRefDatabaseBackupsRestoreToNewProjectRouteImport
+      parentRoute: typeof ProjectRefDatabaseRoute
+    }
+    '/project/$ref/database/backups/pitr': {
+      id: '/project/$ref/database/backups/pitr'
+      path: '/backups/pitr'
+      fullPath: '/project/$ref/database/backups/pitr'
+      preLoaderRoute: typeof ProjectRefDatabaseBackupsPitrRouteImport
+      parentRoute: typeof ProjectRefDatabaseRoute
+    }
     '/api/v1/projects/$ref/api-keys': {
       id: '/api/v1/projects/$ref/api-keys'
       path: '/api/v1/projects/$ref/api-keys'
@@ -3299,6 +3359,9 @@ interface ProjectRefDatabaseRouteChildren {
   ProjectRefDatabaseSettingsRoute: typeof ProjectRefDatabaseSettingsRoute
   ProjectRefDatabaseTriggersRoute: typeof ProjectRefDatabaseTriggersRouteWithChildren
   ProjectRefDatabaseTypesRoute: typeof ProjectRefDatabaseTypesRoute
+  ProjectRefDatabaseBackupsPitrRoute: typeof ProjectRefDatabaseBackupsPitrRoute
+  ProjectRefDatabaseBackupsRestoreToNewProjectRoute: typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
+  ProjectRefDatabaseBackupsScheduledRoute: typeof ProjectRefDatabaseBackupsScheduledRoute
   ProjectRefDatabasePublicationsIdRoute: typeof ProjectRefDatabasePublicationsIdRoute
   ProjectRefDatabaseReplicationPipelineIdRoute: typeof ProjectRefDatabaseReplicationPipelineIdRoute
   ProjectRefDatabaseTablesIdRoute: typeof ProjectRefDatabaseTablesIdRoute
@@ -3320,6 +3383,11 @@ const ProjectRefDatabaseRouteChildren: ProjectRefDatabaseRouteChildren = {
   ProjectRefDatabaseSettingsRoute: ProjectRefDatabaseSettingsRoute,
   ProjectRefDatabaseTriggersRoute: ProjectRefDatabaseTriggersRouteWithChildren,
   ProjectRefDatabaseTypesRoute: ProjectRefDatabaseTypesRoute,
+  ProjectRefDatabaseBackupsPitrRoute: ProjectRefDatabaseBackupsPitrRoute,
+  ProjectRefDatabaseBackupsRestoreToNewProjectRoute:
+    ProjectRefDatabaseBackupsRestoreToNewProjectRoute,
+  ProjectRefDatabaseBackupsScheduledRoute:
+    ProjectRefDatabaseBackupsScheduledRoute,
   ProjectRefDatabasePublicationsIdRoute: ProjectRefDatabasePublicationsIdRoute,
   ProjectRefDatabaseReplicationPipelineIdRoute:
     ProjectRefDatabaseReplicationPipelineIdRoute,
