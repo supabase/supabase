@@ -70,14 +70,20 @@ import { Route as ProjectRefDatabaseFunctionsRouteImport } from './routes/projec
 import { Route as ProjectRefDatabaseExtensionsRouteImport } from './routes/project/$ref/database/extensions'
 import { Route as ProjectRefDatabaseColumnPrivilegesRouteImport } from './routes/project/$ref/database/column-privileges'
 import { Route as ProjectRefAuthUsersRouteImport } from './routes/project/$ref/auth/users'
+import { Route as ProjectRefAuthUrlConfigurationRouteImport } from './routes/project/$ref/auth/url-configuration'
+import { Route as ProjectRefAuthThirdPartyRouteImport } from './routes/project/$ref/auth/third-party'
 import { Route as ProjectRefAuthSessionsRouteImport } from './routes/project/$ref/auth/sessions'
+import { Route as ProjectRefAuthRateLimitsRouteImport } from './routes/project/$ref/auth/rate-limits'
+import { Route as ProjectRefAuthProtectionRouteImport } from './routes/project/$ref/auth/protection'
 import { Route as ProjectRefAuthPoliciesRouteImport } from './routes/project/$ref/auth/policies'
+import { Route as ProjectRefAuthPerformanceRouteImport } from './routes/project/$ref/auth/performance'
 import { Route as ProjectRefAuthPasskeysRouteImport } from './routes/project/$ref/auth/passkeys'
 import { Route as ProjectRefAuthOverviewRouteImport } from './routes/project/$ref/auth/overview'
 import { Route as ProjectRefAuthOauthServerRouteImport } from './routes/project/$ref/auth/oauth-server'
 import { Route as ProjectRefAuthOauthAppsRouteImport } from './routes/project/$ref/auth/oauth-apps'
 import { Route as ProjectRefAuthMfaRouteImport } from './routes/project/$ref/auth/mfa'
 import { Route as ProjectRefAuthHooksRouteImport } from './routes/project/$ref/auth/hooks'
+import { Route as ProjectRefAuthAuditLogsRouteImport } from './routes/project/$ref/auth/audit-logs'
 import { Route as ApiPlatformTelemetryEventRouteImport } from './routes/api/platform/telemetry/event'
 import { Route as ApiPlatformIntegrationsSlugRouteImport } from './routes/api/platform/integrations/$slug'
 import { Route as ApiAiSqlTitleV2RouteImport } from './routes/api/ai/sql/title-v2'
@@ -496,16 +502,46 @@ const ProjectRefAuthUsersRoute = ProjectRefAuthUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => ProjectRefAuthRoute,
 } as any)
+const ProjectRefAuthUrlConfigurationRoute =
+  ProjectRefAuthUrlConfigurationRouteImport.update({
+    id: '/url-configuration',
+    path: '/url-configuration',
+    getParentRoute: () => ProjectRefAuthRoute,
+  } as any)
+const ProjectRefAuthThirdPartyRoute =
+  ProjectRefAuthThirdPartyRouteImport.update({
+    id: '/third-party',
+    path: '/third-party',
+    getParentRoute: () => ProjectRefAuthRoute,
+  } as any)
 const ProjectRefAuthSessionsRoute = ProjectRefAuthSessionsRouteImport.update({
   id: '/sessions',
   path: '/sessions',
   getParentRoute: () => ProjectRefAuthRoute,
 } as any)
+const ProjectRefAuthRateLimitsRoute =
+  ProjectRefAuthRateLimitsRouteImport.update({
+    id: '/rate-limits',
+    path: '/rate-limits',
+    getParentRoute: () => ProjectRefAuthRoute,
+  } as any)
+const ProjectRefAuthProtectionRoute =
+  ProjectRefAuthProtectionRouteImport.update({
+    id: '/protection',
+    path: '/protection',
+    getParentRoute: () => ProjectRefAuthRoute,
+  } as any)
 const ProjectRefAuthPoliciesRoute = ProjectRefAuthPoliciesRouteImport.update({
   id: '/policies',
   path: '/policies',
   getParentRoute: () => ProjectRefAuthRoute,
 } as any)
+const ProjectRefAuthPerformanceRoute =
+  ProjectRefAuthPerformanceRouteImport.update({
+    id: '/performance',
+    path: '/performance',
+    getParentRoute: () => ProjectRefAuthRoute,
+  } as any)
 const ProjectRefAuthPasskeysRoute = ProjectRefAuthPasskeysRouteImport.update({
   id: '/passkeys',
   path: '/passkeys',
@@ -535,6 +571,11 @@ const ProjectRefAuthMfaRoute = ProjectRefAuthMfaRouteImport.update({
 const ProjectRefAuthHooksRoute = ProjectRefAuthHooksRouteImport.update({
   id: '/hooks',
   path: '/hooks',
+  getParentRoute: () => ProjectRefAuthRoute,
+} as any)
+const ProjectRefAuthAuditLogsRoute = ProjectRefAuthAuditLogsRouteImport.update({
+  id: '/audit-logs',
+  path: '/audit-logs',
   getParentRoute: () => ProjectRefAuthRoute,
 } as any)
 const ApiPlatformTelemetryEventRoute =
@@ -1180,14 +1221,20 @@ export interface FileRoutesByFullPath {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/auth/audit-logs': typeof ProjectRefAuthAuditLogsRoute
   '/project/$ref/auth/hooks': typeof ProjectRefAuthHooksRoute
   '/project/$ref/auth/mfa': typeof ProjectRefAuthMfaRoute
   '/project/$ref/auth/oauth-apps': typeof ProjectRefAuthOauthAppsRoute
   '/project/$ref/auth/oauth-server': typeof ProjectRefAuthOauthServerRoute
   '/project/$ref/auth/overview': typeof ProjectRefAuthOverviewRoute
   '/project/$ref/auth/passkeys': typeof ProjectRefAuthPasskeysRoute
+  '/project/$ref/auth/performance': typeof ProjectRefAuthPerformanceRoute
   '/project/$ref/auth/policies': typeof ProjectRefAuthPoliciesRoute
+  '/project/$ref/auth/protection': typeof ProjectRefAuthProtectionRoute
+  '/project/$ref/auth/rate-limits': typeof ProjectRefAuthRateLimitsRoute
   '/project/$ref/auth/sessions': typeof ProjectRefAuthSessionsRoute
+  '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
+  '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
@@ -1347,14 +1394,20 @@ export interface FileRoutesByTo {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/auth/audit-logs': typeof ProjectRefAuthAuditLogsRoute
   '/project/$ref/auth/hooks': typeof ProjectRefAuthHooksRoute
   '/project/$ref/auth/mfa': typeof ProjectRefAuthMfaRoute
   '/project/$ref/auth/oauth-apps': typeof ProjectRefAuthOauthAppsRoute
   '/project/$ref/auth/oauth-server': typeof ProjectRefAuthOauthServerRoute
   '/project/$ref/auth/overview': typeof ProjectRefAuthOverviewRoute
   '/project/$ref/auth/passkeys': typeof ProjectRefAuthPasskeysRoute
+  '/project/$ref/auth/performance': typeof ProjectRefAuthPerformanceRoute
   '/project/$ref/auth/policies': typeof ProjectRefAuthPoliciesRoute
+  '/project/$ref/auth/protection': typeof ProjectRefAuthProtectionRoute
+  '/project/$ref/auth/rate-limits': typeof ProjectRefAuthRateLimitsRoute
   '/project/$ref/auth/sessions': typeof ProjectRefAuthSessionsRoute
+  '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
+  '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
@@ -1518,14 +1571,20 @@ export interface FileRoutesById {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/auth/audit-logs': typeof ProjectRefAuthAuditLogsRoute
   '/project/$ref/auth/hooks': typeof ProjectRefAuthHooksRoute
   '/project/$ref/auth/mfa': typeof ProjectRefAuthMfaRoute
   '/project/$ref/auth/oauth-apps': typeof ProjectRefAuthOauthAppsRoute
   '/project/$ref/auth/oauth-server': typeof ProjectRefAuthOauthServerRoute
   '/project/$ref/auth/overview': typeof ProjectRefAuthOverviewRoute
   '/project/$ref/auth/passkeys': typeof ProjectRefAuthPasskeysRoute
+  '/project/$ref/auth/performance': typeof ProjectRefAuthPerformanceRoute
   '/project/$ref/auth/policies': typeof ProjectRefAuthPoliciesRoute
+  '/project/$ref/auth/protection': typeof ProjectRefAuthProtectionRoute
+  '/project/$ref/auth/rate-limits': typeof ProjectRefAuthRateLimitsRoute
   '/project/$ref/auth/sessions': typeof ProjectRefAuthSessionsRoute
+  '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
+  '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
@@ -1689,14 +1748,20 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/auth/audit-logs'
     | '/project/$ref/auth/hooks'
     | '/project/$ref/auth/mfa'
     | '/project/$ref/auth/oauth-apps'
     | '/project/$ref/auth/oauth-server'
     | '/project/$ref/auth/overview'
     | '/project/$ref/auth/passkeys'
+    | '/project/$ref/auth/performance'
     | '/project/$ref/auth/policies'
+    | '/project/$ref/auth/protection'
+    | '/project/$ref/auth/rate-limits'
     | '/project/$ref/auth/sessions'
+    | '/project/$ref/auth/third-party'
+    | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
@@ -1856,14 +1921,20 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/auth/audit-logs'
     | '/project/$ref/auth/hooks'
     | '/project/$ref/auth/mfa'
     | '/project/$ref/auth/oauth-apps'
     | '/project/$ref/auth/oauth-server'
     | '/project/$ref/auth/overview'
     | '/project/$ref/auth/passkeys'
+    | '/project/$ref/auth/performance'
     | '/project/$ref/auth/policies'
+    | '/project/$ref/auth/protection'
+    | '/project/$ref/auth/rate-limits'
     | '/project/$ref/auth/sessions'
+    | '/project/$ref/auth/third-party'
+    | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
@@ -2026,14 +2097,20 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/auth/audit-logs'
     | '/project/$ref/auth/hooks'
     | '/project/$ref/auth/mfa'
     | '/project/$ref/auth/oauth-apps'
     | '/project/$ref/auth/oauth-server'
     | '/project/$ref/auth/overview'
     | '/project/$ref/auth/passkeys'
+    | '/project/$ref/auth/performance'
     | '/project/$ref/auth/policies'
+    | '/project/$ref/auth/protection'
+    | '/project/$ref/auth/rate-limits'
     | '/project/$ref/auth/sessions'
+    | '/project/$ref/auth/third-party'
+    | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
@@ -2661,6 +2738,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefAuthUsersRouteImport
       parentRoute: typeof ProjectRefAuthRoute
     }
+    '/project/$ref/auth/url-configuration': {
+      id: '/project/$ref/auth/url-configuration'
+      path: '/url-configuration'
+      fullPath: '/project/$ref/auth/url-configuration'
+      preLoaderRoute: typeof ProjectRefAuthUrlConfigurationRouteImport
+      parentRoute: typeof ProjectRefAuthRoute
+    }
+    '/project/$ref/auth/third-party': {
+      id: '/project/$ref/auth/third-party'
+      path: '/third-party'
+      fullPath: '/project/$ref/auth/third-party'
+      preLoaderRoute: typeof ProjectRefAuthThirdPartyRouteImport
+      parentRoute: typeof ProjectRefAuthRoute
+    }
     '/project/$ref/auth/sessions': {
       id: '/project/$ref/auth/sessions'
       path: '/sessions'
@@ -2668,11 +2759,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefAuthSessionsRouteImport
       parentRoute: typeof ProjectRefAuthRoute
     }
+    '/project/$ref/auth/rate-limits': {
+      id: '/project/$ref/auth/rate-limits'
+      path: '/rate-limits'
+      fullPath: '/project/$ref/auth/rate-limits'
+      preLoaderRoute: typeof ProjectRefAuthRateLimitsRouteImport
+      parentRoute: typeof ProjectRefAuthRoute
+    }
+    '/project/$ref/auth/protection': {
+      id: '/project/$ref/auth/protection'
+      path: '/protection'
+      fullPath: '/project/$ref/auth/protection'
+      preLoaderRoute: typeof ProjectRefAuthProtectionRouteImport
+      parentRoute: typeof ProjectRefAuthRoute
+    }
     '/project/$ref/auth/policies': {
       id: '/project/$ref/auth/policies'
       path: '/policies'
       fullPath: '/project/$ref/auth/policies'
       preLoaderRoute: typeof ProjectRefAuthPoliciesRouteImport
+      parentRoute: typeof ProjectRefAuthRoute
+    }
+    '/project/$ref/auth/performance': {
+      id: '/project/$ref/auth/performance'
+      path: '/performance'
+      fullPath: '/project/$ref/auth/performance'
+      preLoaderRoute: typeof ProjectRefAuthPerformanceRouteImport
       parentRoute: typeof ProjectRefAuthRoute
     }
     '/project/$ref/auth/passkeys': {
@@ -2715,6 +2827,13 @@ declare module '@tanstack/react-router' {
       path: '/hooks'
       fullPath: '/project/$ref/auth/hooks'
       preLoaderRoute: typeof ProjectRefAuthHooksRouteImport
+      parentRoute: typeof ProjectRefAuthRoute
+    }
+    '/project/$ref/auth/audit-logs': {
+      id: '/project/$ref/auth/audit-logs'
+      path: '/audit-logs'
+      fullPath: '/project/$ref/auth/audit-logs'
+      preLoaderRoute: typeof ProjectRefAuthAuditLogsRouteImport
       parentRoute: typeof ProjectRefAuthRoute
     }
     '/api/platform/telemetry/event': {
@@ -3522,26 +3641,38 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ProjectRefAuthRouteChildren {
+  ProjectRefAuthAuditLogsRoute: typeof ProjectRefAuthAuditLogsRoute
   ProjectRefAuthHooksRoute: typeof ProjectRefAuthHooksRoute
   ProjectRefAuthMfaRoute: typeof ProjectRefAuthMfaRoute
   ProjectRefAuthOauthAppsRoute: typeof ProjectRefAuthOauthAppsRoute
   ProjectRefAuthOauthServerRoute: typeof ProjectRefAuthOauthServerRoute
   ProjectRefAuthOverviewRoute: typeof ProjectRefAuthOverviewRoute
   ProjectRefAuthPasskeysRoute: typeof ProjectRefAuthPasskeysRoute
+  ProjectRefAuthPerformanceRoute: typeof ProjectRefAuthPerformanceRoute
   ProjectRefAuthPoliciesRoute: typeof ProjectRefAuthPoliciesRoute
+  ProjectRefAuthProtectionRoute: typeof ProjectRefAuthProtectionRoute
+  ProjectRefAuthRateLimitsRoute: typeof ProjectRefAuthRateLimitsRoute
   ProjectRefAuthSessionsRoute: typeof ProjectRefAuthSessionsRoute
+  ProjectRefAuthThirdPartyRoute: typeof ProjectRefAuthThirdPartyRoute
+  ProjectRefAuthUrlConfigurationRoute: typeof ProjectRefAuthUrlConfigurationRoute
   ProjectRefAuthUsersRoute: typeof ProjectRefAuthUsersRoute
 }
 
 const ProjectRefAuthRouteChildren: ProjectRefAuthRouteChildren = {
+  ProjectRefAuthAuditLogsRoute: ProjectRefAuthAuditLogsRoute,
   ProjectRefAuthHooksRoute: ProjectRefAuthHooksRoute,
   ProjectRefAuthMfaRoute: ProjectRefAuthMfaRoute,
   ProjectRefAuthOauthAppsRoute: ProjectRefAuthOauthAppsRoute,
   ProjectRefAuthOauthServerRoute: ProjectRefAuthOauthServerRoute,
   ProjectRefAuthOverviewRoute: ProjectRefAuthOverviewRoute,
   ProjectRefAuthPasskeysRoute: ProjectRefAuthPasskeysRoute,
+  ProjectRefAuthPerformanceRoute: ProjectRefAuthPerformanceRoute,
   ProjectRefAuthPoliciesRoute: ProjectRefAuthPoliciesRoute,
+  ProjectRefAuthProtectionRoute: ProjectRefAuthProtectionRoute,
+  ProjectRefAuthRateLimitsRoute: ProjectRefAuthRateLimitsRoute,
   ProjectRefAuthSessionsRoute: ProjectRefAuthSessionsRoute,
+  ProjectRefAuthThirdPartyRoute: ProjectRefAuthThirdPartyRoute,
+  ProjectRefAuthUrlConfigurationRoute: ProjectRefAuthUrlConfigurationRoute,
   ProjectRefAuthUsersRoute: ProjectRefAuthUsersRoute,
 }
 
