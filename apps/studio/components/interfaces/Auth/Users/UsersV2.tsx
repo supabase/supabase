@@ -197,6 +197,7 @@ export const UsersV2 = () => {
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
   const [showFreeformWarning, setShowFreeformWarning] = useState(false)
   const [showCreateIndexesModal, setShowCreateIndexesModal] = useState(false)
+  const [search, setSearch] = useState(filterKeywords)
 
   const { data: totalUsersCountData, isSuccess: isCountLoaded } = useUsersCountQuery(
     {
@@ -472,6 +473,7 @@ export const UsersV2 = () => {
     users,
     selectedUsers,
     setSelectedUsers,
+    setSearch,
     onRefresh: handleRefresh,
   })
 
@@ -601,6 +603,8 @@ export const UsersV2 = () => {
               <div className="flex flex-wrap items-center gap-2">
                 <UsersSearch
                   ref={searchInputRef}
+                  search={search}
+                  setSearch={setSearch}
                   improvedSearchEnabled={improvedSearchEnabled}
                   telemetryProps={telemetryProps}
                   telemetryGroups={telemetryGroups}

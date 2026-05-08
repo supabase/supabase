@@ -22,6 +22,7 @@ interface UseAuthUsersShortcutsParams {
   users: User[]
   selectedUsers: Set<unknown>
   setSelectedUsers: Dispatch<SetStateAction<Set<unknown>>>
+  setSearch: Dispatch<SetStateAction<string>>
   onRefresh: () => void
 }
 
@@ -43,6 +44,7 @@ export function useAuthUsersShortcuts({
   users,
   selectedUsers,
   setSelectedUsers,
+  setSearch,
   onRefresh,
 }: UseAuthUsersShortcutsParams): UseAuthUsersShortcutsResult {
   const [hasCellSelected, setHasCellSelected] = useState(false)
@@ -110,6 +112,7 @@ export function useAuthUsersShortcuts({
   )
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setSearch('')
     setFilterKeywords('')
     setFilterUserType('all')
     setSelectedProviders([])
