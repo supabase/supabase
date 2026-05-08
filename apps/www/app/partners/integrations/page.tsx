@@ -27,7 +27,6 @@ export default async function IntegrationPartnersPage() {
     .select('*')
     .eq('approved', true)
     .eq('type', 'technology')
-    .order('category')
     .order('title')
 
   return (

@@ -34,12 +34,7 @@ export default function IntegrationsContent({
     const searchPartners = async () => {
       setIsSearching(true)
 
-      let query = supabase
-        .from('partners')
-        .select('*')
-        .eq('approved', true)
-        .order('category')
-        .order('title')
+      let query = supabase.from('partners').select('*').eq('approved', true).order('title')
 
       if (search.trim()) {
         query = query.textSearch('tsv', `${search.trim()}`, {
