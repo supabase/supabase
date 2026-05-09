@@ -14,7 +14,7 @@ interface GitHubStatus {
   node_id: string
   state: 'success' | 'pending' | 'failure' | 'error'
   description: string
-  target_url: string
+  target_url: string | null
   context: string
   created_at: string
   updated_at: string
@@ -35,15 +35,42 @@ const jobInfoSchema = z.object({
 type JobInfo = z.infer<typeof jobInfoSchema>
 
 async function fetchGitHubStatuses(sha: string): Promise<GitHubStatus[]> {
-  const url = `https://api.github.com/repos/supabase/supabase/statuses/${sha}`
+  const repository = process.env.GITHUB_REPOSITORY || 'supabase/supabase'
+
+  const url = `https://api.github.com/repos/${repository}/statuses/${sha}`
+
   console.log(`Fetching GitHub statuses for SHA: ${sha}`)
 
-  const response = await fetch(url)
-  if (!response.ok) {
-    throw new Error(`Failed to fetch GitHub statuses: ${response.status} ${response.statusText}`)
+  const githubToken = process.env.GITHUB_TOKEN
+
+  const headers: HeadersInit = {
+    Accept: 'application/vnd.github+json',
   }
 
-  return response.json()
+  if (githubToken) {
+    headers.Authorization = `Bearer ${githubToken}`
+  }
+
+  const controller = new AbortController()
+
+  const timeout = setTimeout(() => {
+    controller.abort()
+  }, 10000)
+
+  try {
+    const response = await fetch(url, {
+      headers,
+      signal: controller.signal,
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch GitHub statuses: ${response.status} ${response.statusText}`)
+    }
+
+    return response.json()
+  } finally {
+    clearTimeout(timeout)
+  }
 }
 
 function extractJobInfoFromTargetUrl(targetUrl: string): JobInfo {
@@ -71,24 +98,36 @@ function extractJobInfoFromTargetUrl(targetUrl: string): JobInfo {
 async function authorizeVercelJob(jobInfo: JobInfo, vercelToken: string): Promise<void> {
   const url = 'https://vercel.com/api/v1/integrations/authorize-job'
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Accept: '*/*',
-      'Content-Type': 'application/json; charset=utf-8',
-      Authorization: `Bearer ${vercelToken}`,
-    },
-    body: JSON.stringify(jobInfo),
-  })
+  const controller = new AbortController()
 
-  if (!response.ok) {
-    const errorText = await response.text()
-    throw new Error(
-      `Failed to authorize Vercel job: ${response.status} ${response.statusText}\n${errorText}`
-    )
+  const timeout = setTimeout(() => {
+    controller.abort()
+  }, 10000)
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: '*/*',
+        'Content-Type': 'application/json; charset=utf-8',
+        Authorization: `Bearer ${vercelToken}`,
+      },
+      body: JSON.stringify(jobInfo),
+      signal: controller.signal,
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+
+      throw new Error(
+        `Failed to authorize Vercel job: ${response.status} ${response.statusText}\n${errorText}`
+      )
+    }
+
+    console.log('✓ Vercel job authorized successfully!')
+  } finally {
+    clearTimeout(timeout)
   }
-
-  console.log('✓ Vercel job authorized successfully!')
 }
 
 async function main() {
@@ -120,10 +159,18 @@ async function main() {
 
   console.log(`Found ${authRequiredStatuses.length} authorization-required status(es)`)
 
+  let failedCount = 0
+
   // Process each authorization-required status
   for (const status of authRequiredStatuses) {
     try {
       console.log(`\nProcessing status: ${status.context}`)
+
+      if (!status.target_url) {
+        console.warn(`Skipping status ${status.context}: target_url is null`)
+        continue
+      }
+
       console.log(`Target URL: ${status.target_url}`)
 
       // Extract job info from target URL
@@ -132,9 +179,13 @@ async function main() {
       // Authorize the job
       await authorizeVercelJob(jobInfo, vercelToken)
     } catch (error) {
+      failedCount++
       console.error(`Failed to process status ${status.context}:`, error)
-      // Continue with other statuses even if one fails
     }
+  }
+
+  if (failedCount > 0) {
+    process.exit(1)
   }
 
   console.log('\n✓ Authorization process completed!')
