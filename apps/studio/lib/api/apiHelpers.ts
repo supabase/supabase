@@ -138,5 +138,5 @@ export class InternalServerError extends Error {
  * any configuration.
  */
 export function normalizeRefParam(ref: string | string[] | undefined): string {
-  return Array.isArray(ref) ? ref[0] : (ref ?? 'default')
+  return (Array.isArray(ref) ? ref[0] : ref) ?? 'default'
 }
