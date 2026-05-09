@@ -27,6 +27,7 @@ export const SHORTCUT_IDS = {
   RESULTS_COPY_JSON: 'results.copy-json',
   RESULTS_COPY_CSV: 'results.copy-csv',
   RESULTS_DOWNLOAD_CSV: 'results.download-csv',
+  RESULTS_DOWNLOAD_JSON: 'results.download-json',
   DATA_TABLE_TOGGLE_FILTERS: 'data-table.toggle-filters',
   DATA_TABLE_RESET_FILTERS: 'data-table.reset-filters',
   DATA_TABLE_RESET_COLUMNS: 'data-table.reset-columns',
@@ -139,6 +140,11 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     id: SHORTCUT_IDS.RESULTS_DOWNLOAD_CSV,
     label: 'Download results as CSV',
     sequence: ['Mod+Shift+D'],
+  },
+  [SHORTCUT_IDS.RESULTS_DOWNLOAD_JSON]: {
+    id: SHORTCUT_IDS.RESULTS_DOWNLOAD_JSON,
+    label: 'Download results as JSON',
+    sequence: ['Mod+Shift+O'],
   },
   [SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT]: {
     id: SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT,
