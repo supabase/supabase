@@ -190,8 +190,11 @@ function loadProjects(): SelfHostedProject[] {
         return projects
       }
     } catch {
-      // File missing or invalid — fall through to legacy.
-      if (_fileCache) return _fileCache.projects // use stale cache rather than fail
+      // File missing, unreadable, or invalid JSON.
+      // Deliberately return stale cached data rather than failing completely:
+      // this gives operators time to fix the file without causing a full outage.
+      if (_fileCache) return _fileCache.projects
+      // No stale data available — fall through to the legacy env-var defaults.
     }
   }
 
