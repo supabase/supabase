@@ -8,12 +8,12 @@ const page: GoPageInput = {
   metadata: {
     title: "You're confirmed | Supabase Executive Dinner",
     description:
-      'Your RSVP for the Supabase executive dinner at DASH 2026 has been confirmed. Venue and date to be announced.',
+      'Your RSVP for the Supabase executive dinner at DASH 2026 has been confirmed. Join us at Manhatta Restaurant with cocktails at 6:30 PM and dinner at 7:00 PM.',
   },
   hero: {
     title: "You're confirmed",
     description:
-      "We'll send details including venue, date, and directions closer to the event. We look forward to seeing you.",
+      "We'll see you at Manhatta Restaurant. Cocktails begin at 6:30 PM and dinner starts at 7:00 PM. We look forward to seeing you.",
   },
   sections: [
     {

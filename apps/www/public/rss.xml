@@ -4,9 +4,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 06 May 2026 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Fri, 08 May 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-is-now-an-official-chatgpt-app</guid>
+  <title>Supabase Is Now an Official ChatGPT App</title>
+  <link>https://supabase.com/blog/supabase-is-now-an-official-chatgpt-app</link>
+  <description>Connect your Supabase projects to ChatGPT and manage your database infrastructure by telling ChatGPT what you need.</description>
+  <pubDate>Fri, 08 May 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/introducing-supabase-server</guid>
   <title>Introducing @supabase/server</title>
   <link>https://supabase.com/blog/introducing-supabase-server</link>
