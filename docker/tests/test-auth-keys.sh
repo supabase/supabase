@@ -68,13 +68,13 @@ echo ""
 # ---------------------------------------------
 
 echo "--- REST API (/rest/v1/) ---"
-check "Legacy ANON_KEY -> 401" "401" \
+check "Legacy ANON_KEY -> 403" "403" \
     "$(http_status "$BASE_URL/rest/v1/" -H "apikey: $ANON_KEY")"
 check "Legacy SERVICE_ROLE_KEY" "200" \
     "$(http_status "$BASE_URL/rest/v1/" -H "apikey: $SERVICE_ROLE_KEY")"
 
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
-    check "New PUBLISHABLE_KEY -> 401" "401" \
+    check "New PUBLISHABLE_KEY -> 403" "403" \
         "$(http_status "$BASE_URL/rest/v1/" -H "apikey: $SUPABASE_PUBLISHABLE_KEY")"
     check "New SECRET_KEY" "200" \
         "$(http_status "$BASE_URL/rest/v1/" -H "apikey: $SUPABASE_SECRET_KEY")"
@@ -160,7 +160,7 @@ echo ""
 echo "--- supabase-js style requests (apikey + Authorization) ---"
 # supabase-js sends both apikey header AND Authorization: Bearer <apikey>
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
-    check "apikey + Authorization: Bearer sb_ (replace path)" "401" \
+    check "apikey + Authorization: Bearer sb_ (replace path)" "403" \
         "$(http_status "$BASE_URL/rest/v1/" \
             -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
             -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY")"
@@ -171,7 +171,7 @@ if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
             -H "Authorization: Bearer $SUPABASE_SECRET_KEY")"
 fi
 
-check "Legacy apikey + Authorization: Bearer <legacy jwt>" "401" \
+check "Legacy apikey + Authorization: Bearer <legacy jwt>" "403" \
     "$(http_status "$BASE_URL/rest/v1/" \
         -H "apikey: $ANON_KEY" \
         -H "Authorization: Bearer $ANON_KEY")"
@@ -275,7 +275,7 @@ if [ -n "$access_token" ]; then
     fi
 
     # Use the session JWT with PostgREST
-    check "Session JWT with PostgREST" "401" \
+    check "Session JWT with PostgREST" "403" \
         "$(http_status "$BASE_URL/rest/v1/" \
             -H "apikey: $ANON_KEY" \
             -H "Authorization: Bearer $access_token")"
@@ -297,7 +297,7 @@ if [ -n "$access_token" ]; then
     if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
         echo ""
         echo "--- Authenticated user + opaque key (critical path) ---"
-        check "Opaque apikey + user JWT -> PostgREST uses user JWT" "401" \
+        check "Opaque apikey + user JWT -> PostgREST uses user JWT" "403" \
             "$(http_status "$BASE_URL/rest/v1/" \
                 -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
                 -H "Authorization: Bearer $access_token")"
@@ -348,7 +348,7 @@ console.log(header+'.'+payload+'.'+sig);
 " 2>/dev/null)
 
 if [ -n "$hs256_token" ]; then
-    check "HS256 token with PostgREST (backward compat)" "401" \
+    check "HS256 token with PostgREST (backward compat)" "403" \
         "$(http_status "$BASE_URL/rest/v1/" \
             -H "apikey: $ANON_KEY" \
             -H "Authorization: Bearer $hs256_token")"
