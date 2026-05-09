@@ -101,6 +101,7 @@ services:
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /usr/local/kong/kong.yml
+      KONG_ROUTER_FLAVOR: expressions
       # https://github.com/supabase/cli/issues/14
       KONG_DNS_ORDER: LAST,A,CNAME
       KONG_DNS_NOT_FOUND_TTL: 1
