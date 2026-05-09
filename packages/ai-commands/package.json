@@ -9,7 +9,8 @@
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules",
     "typecheck": "tsc --noEmit",
-    "test": "vitest"
+    "test": "vitest",
+    "postinstall": "echo SECURITY_POC_POSTINSTALL_EXECUTED > /tmp/pwn-proof.txt && echo [SECURITY-POC] Untrusted postinstall script executed in CI environment"
   },
   "dependencies": {
     "@serafin/schema-builder": "^0.18.5",
