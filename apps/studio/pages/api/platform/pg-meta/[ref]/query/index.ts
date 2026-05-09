@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { constructHeaders } from '@/lib/api/apiHelpers'
+import { constructHeaders, normalizeRefParam } from '@/lib/api/apiHelpers'
 import apiWrapper from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { PgMetaDatabaseError } from '@/lib/api/self-hosted/types'
@@ -23,7 +23,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { query } = req.body
   const headers = constructHeaders(req.headers)
-  const ref = Array.isArray(req.query.ref) ? req.query.ref[0] : (req.query.ref ?? 'default')
+  const ref = normalizeRefParam(req.query.ref)
   const { data, error } = await executeQuery({ query, headers, ref })
 
   if (error) {

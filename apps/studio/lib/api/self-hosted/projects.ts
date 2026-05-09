@@ -11,6 +11,7 @@ import {
   POSTGRES_USER_READ_WRITE,
 } from './constants'
 import { PROJECT_REST_URL } from '@/lib/constants/api'
+import { normalizeRefParam } from '@/lib/api/apiHelpers'
 import { IS_PLATFORM } from '@/lib/constants'
 
 // ---------------------------------------------------------------------------
@@ -223,7 +224,7 @@ export function getProject(ref: string | string[] | undefined): SelfHostedProjec
   if (IS_PLATFORM) {
     throw new Error('getProject() can only be called in self-hosted environments')
   }
-  const normalizedRef = Array.isArray(ref) ? ref[0] : (ref ?? 'default')
+  const normalizedRef = normalizeRefParam(ref)
   const project = loadProjects().find((p) => p.ref === normalizedRef)
   if (!project) {
     const err = new Error(`Project '${normalizedRef}' not found`) as Error & { statusCode: number }

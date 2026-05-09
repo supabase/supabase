@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { constructHeaders } from '@/lib/api/apiHelpers'
-import apiWrapper from '@/lib/api/apiWrapper'
+import { constructHeaders, normalizeRefParam } from '@/lib/api/apiHelpers'
 import { DEFAULT_EXPOSED_SCHEMAS } from '@/lib/api/self-hosted/constants'
 import { getLints } from '@/lib/api/self-hosted/lints'
 
@@ -12,7 +11,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case 'GET':
-      const ref = Array.isArray(req.query.ref) ? req.query.ref[0] : (req.query.ref ?? 'default')
+      const ref = normalizeRefParam(req.query.ref)
       const { data, error } = await getLints({
         headers: constructHeaders(req.headers),
         exposedSchemas: DEFAULT_EXPOSED_SCHEMAS,

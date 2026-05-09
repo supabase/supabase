@@ -110,7 +110,13 @@ function ProjectDropdownNonPlatformView({
           className="flex items-center gap-1"
           iconRight={<ChevronsUpDown size={14} className="opacity-50 shrink-0" />}
         >
-          <span className="text-sm max-w-32 lg:max-w-64 truncate">{projectName}</span>
+          <span
+            title={projectName}
+            aria-label={projectName}
+            className="text-sm max-w-32 lg:max-w-64 truncate"
+          >
+            {projectName}
+          </span>
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-1 w-56" side="bottom" align="start">
