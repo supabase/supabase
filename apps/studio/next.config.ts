@@ -112,73 +112,19 @@ const nextConfig = {
               permanent: false,
             },
           ]
-        : (() => {
-            // Determine the first project ref from SUPABASE_PROJECTS (runtime env).
-            // Falls back to 'default' so existing single-project deployments
-            // continue to work without any config changes.
-            let defaultProjectRef = 'default'
-            try {
-              const raw = process.env.SUPABASE_PROJECTS
-              if (raw) {
-                const entries: { ref?: string }[] = JSON.parse(raw)
-                if (Array.isArray(entries) && entries.length > 0 && entries[0].ref) {
-                  defaultProjectRef = entries[0].ref
-                }
-              } else {
-                // Fall back to file-based config when SUPABASE_PROJECTS is absent.
-                const filePath = process.env.SUPABASE_PROJECTS_FILE
-                if (filePath) {
-                  // eslint-disable-next-line @typescript-eslint/no-require-imports
-                  const fileContent = (require('fs') as typeof import('fs')).readFileSync(filePath, 'utf-8')
-                  const fileEntries: { ref?: string }[] = JSON.parse(fileContent)
-                  if (Array.isArray(fileEntries) && fileEntries.length > 0 && fileEntries[0].ref) {
-                    defaultProjectRef = fileEntries[0].ref
-                  }
-                }
-              }
-            } catch {
-              // Malformed JSON or file unreadable — keep the fallback.
-            }
-
-            const defaultProjectPath = `/project/${defaultProjectRef}`
-            return [
-              {
-                source: '/',
-                destination: defaultProjectPath,
-                permanent: false,
-              },
-              {
-                source: '/register',
-                destination: defaultProjectPath,
-                permanent: false,
-              },
-              {
-                source: '/signup',
-                destination: defaultProjectPath,
-                permanent: false,
-              },
-              {
-                source: '/signin',
-                destination: defaultProjectPath,
-                permanent: false,
-              },
-              {
-                source: '/login',
-                destination: defaultProjectPath,
-                permanent: false,
-              },
-              {
-                source: '/log-in',
-                destination: defaultProjectPath,
-                permanent: false,
-              },
-              {
-                source: '/project/:ref/building',
-                destination: '/project/:ref',
-                permanent: false,
-              },
-            ]
-          })()
+        : [
+            // Static fallback redirects for self-hosted mode.
+            // The runtime project-ref detection (SUPABASE_PROJECTS / SUPABASE_PROJECTS_FILE)
+            // is handled at request time by middleware.ts, which runs before these
+            // static rules and issues the correct redirect based on the live env var.
+            { source: '/', destination: '/project/default', permanent: false },
+            { source: '/register', destination: '/project/default', permanent: false },
+            { source: '/signup', destination: '/project/default', permanent: false },
+            { source: '/signin', destination: '/project/default', permanent: false },
+            { source: '/login', destination: '/project/default', permanent: false },
+            { source: '/log-in', destination: '/project/default', permanent: false },
+            { source: '/project/:ref/building', destination: '/project/:ref', permanent: false },
+          ]
       ),
       {
         source: '/project/:ref/auth',

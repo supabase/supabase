@@ -30,7 +30,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
     throw err
   }
 
-  const response = await fetch(`${project.supabaseUrl}/rest/v1/`, {
+  const response = await fetch(project.supabaseRestUrl, {
     method: 'GET',
     headers: {
       apikey: project.serviceKey,

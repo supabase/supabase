@@ -22,7 +22,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const headers = constructHeaders(req.headers)
-  const pgMetaUrl = getPgMetaUrlByRef(req.query.ref)
+  let pgMetaUrl: string
+  try {
+    pgMetaUrl = getPgMetaUrlByRef(req.query.ref)
+  } catch (err: any) {
+    if (err?.statusCode === 404) {
+      return res.status(404).json({ error: { message: err.message } })
+    }
+    throw err
+  }
   const response = await fetchGet(`${pgMetaUrl}/types`, { headers })
 
   if (response.error) {
