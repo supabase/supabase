@@ -124,9 +124,20 @@ const nextConfig = {
                 if (Array.isArray(entries) && entries.length > 0 && entries[0].ref) {
                   defaultProjectRef = entries[0].ref
                 }
+              } else {
+                // Fall back to file-based config when SUPABASE_PROJECTS is absent.
+                const filePath = process.env.SUPABASE_PROJECTS_FILE
+                if (filePath) {
+                  // eslint-disable-next-line @typescript-eslint/no-require-imports
+                  const fileContent = (require('fs') as typeof import('fs')).readFileSync(filePath, 'utf-8')
+                  const fileEntries: { ref?: string }[] = JSON.parse(fileContent)
+                  if (Array.isArray(fileEntries) && fileEntries.length > 0 && fileEntries[0].ref) {
+                    defaultProjectRef = fileEntries[0].ref
+                  }
+                }
               }
             } catch {
-              // Malformed JSON — keep the fallback.
+              // Malformed JSON or file unreadable — keep the fallback.
             }
 
             const defaultProjectPath = `/project/${defaultProjectRef}`
@@ -167,7 +178,8 @@ const nextConfig = {
                 permanent: false,
               },
             ]
-          })(),
+          })()
+      ),
       {
         source: '/project/:ref/auth',
         destination: '/project/:ref/auth/users',

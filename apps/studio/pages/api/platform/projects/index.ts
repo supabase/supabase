@@ -19,8 +19,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
+  // In platform mode this endpoint is handled by the real API; the client-side
+  // query has `enabled: !IS_PLATFORM` so this guard should never fire in
+  // practice. Returning an empty array instead of 404 avoids a confusing error
+  // if the query is ever enabled accidentally in platform mode.
   if (IS_PLATFORM) {
-    return res.status(404).json({ error: { message: 'Not found' } })
+    return res.status(200).json([])
   }
 
   const projects = getProjects()

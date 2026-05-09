@@ -67,6 +67,15 @@ type ProjectSettings = components['schemas']['ProjectSettingsResponse'] & {
 
 const FILE_CACHE_TTL_MS = 30_000 // 30 seconds
 
+/**
+ * Module-level cache for SUPABASE_PROJECTS_FILE contents.
+ *
+ * NOTE: This TTL cache works correctly in long-running Node.js / Docker
+ * deployments. In serverless or edge environments each invocation gets a
+ * fresh module scope, so the stale-cache fallback path below will never fire
+ * — the file will be re-read (or the error re-thrown) on every cold start.
+ * That is expected and safe for the target self-hosted Docker use case.
+ */
 let _fileCache: { projects: SelfHostedProject[]; loadedAt: number } | null = null
 
 // ---------------------------------------------------------------------------
@@ -153,6 +162,17 @@ function buildLegacyProject(): SelfHostedProject {
   }
 }
 
+/** Emits a startup warning when multiple projects share the same ref. */
+function warnOnDuplicateRefs(projects: SelfHostedProject[]): void {
+  const refs = projects.map((p) => p.ref)
+  const duplicates = refs.filter((r, i) => refs.indexOf(r) !== i)
+  if (duplicates.length > 0) {
+    console.warn(
+      `[supabase-studio] Duplicate project refs detected: ${[...new Set(duplicates)].join(', ')}. Only the first occurrence of each ref will be matched by getProject().`
+    )
+  }
+}
+
 /**
  * Loads projects from the SUPABASE_PROJECTS JSON env var or from
  * SUPABASE_PROJECTS_FILE (with a 30-second TTL cache). Falls back to
@@ -166,7 +186,9 @@ function loadProjects(): SelfHostedProject[] {
       const entries: Record<string, unknown>[] = JSON.parse(raw)
       if (Array.isArray(entries) && entries.length > 0) {
         const orgIdByName = new Map<string, number>()
-        return entries.map((entry, idx) => parseProjectEntry(entry, idx, orgIdByName))
+        const projects = entries.map((entry, idx) => parseProjectEntry(entry, idx, orgIdByName))
+        warnOnDuplicateRefs(projects)
+        return projects
       }
     } catch {
       // Malformed JSON — fall through to file or legacy config.
@@ -186,6 +208,7 @@ function loadProjects(): SelfHostedProject[] {
       if (Array.isArray(entries) && entries.length > 0) {
         const orgIdByName = new Map<string, number>()
         const projects = entries.map((entry, idx) => parseProjectEntry(entry, idx, orgIdByName))
+        warnOnDuplicateRefs(projects)
         _fileCache = { projects, loadedAt: now }
         return projects
       }

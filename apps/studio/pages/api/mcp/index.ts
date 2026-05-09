@@ -59,6 +59,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const headers = fromNodeHeaders(req.headers)
 
   // Use the first configured project as the default for MCP.
+  // TODO: Support per-request project selection once the MCP protocol or a
+  // custom header can carry the desired project ref. For now this is a known
+  // limitation: all MCP tool calls always operate against projects[0].
   const projects = getProjects()
   const defaultProjectRef = projects[0]?.ref ?? 'default'
 
