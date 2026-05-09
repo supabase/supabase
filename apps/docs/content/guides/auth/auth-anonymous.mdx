@@ -313,8 +313,13 @@ Depending on your application requirements, data conflicts can arise when an ano
 In some cases, you may need to link an anonymous user to an existing account rather than creating a new permanent account. This process requires manual handling of potential conflicts. Here's a general approach:
 
 ```javascript
-// 1. Sign in anonymously (assuming the user is already signed in anonymously)
+// 1. Get the current session and verify the user is anonymous
 const { data: anonData, error: anonError } = await supabase.auth.getSession()
+
+if (!anonData.session?.user?.is_anonymous) {
+  console.log('User is not anonymous. This flow only applies to anonymous users.')
+  return
+}
 
 // 2. Attempt to update the user with the existing email
 const { data: updateData, error: updateError } = await supabase.auth.updateUser({

@@ -1,11 +1,21 @@
-@import 'tailwindcss';
-
-@import './../../../packages/ui/build/css/source/global.css';
-@import './../../../packages/ui/build/css/themes/dark.css';
+@import 'config/tailwind.config.css';
 @import './../../../packages/ui/build/css/themes/faux-classic-dark.css';
-@import './../../../packages/ui/build/css/themes/light.css';
 
-@config '../tailwind.config.cjs';
+@source '../app/**/*.{ts,tsx,mdx}';
+@source '../components/**/*.tsx';
+@source '../content/**/*.{ts,tsx,mdx}';
+@source '../docs/**/*.{tsx,mdx}';
+@source '../features/**/*.{ts,tsx,mdx}';
+@source '../layouts/**/*.tsx';
+@source '../pages/**/*.{tsx,mdx}';
+@source './../../../packages/ui/src/**/*.{tsx,ts,js}';
+@source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+
+@layer utilities {
+  .prose--remove-p-margin p {
+    margin: 0;
+  }
+}
 
 @layer base {
   *,
@@ -260,10 +270,8 @@ article p code {
 }
 
 /*
-* sets the image in @Next/Image components
-* to respect the height of the content
-*
-*/
+ * sets the image in @Next/Image components to respect the height of the content
+ */
 .next-image--dynamic-fill {
   width: 100%;
   grid-column: 1 / -1;

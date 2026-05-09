@@ -1,11 +1,107 @@
-@import 'tailwindcss';
-
-@import './../../../packages/ui/build/css/source/global.css';
-@import './../../../packages/ui/build/css/themes/dark.css';
+@import 'config/tailwind.config.css';
 @import './../../../packages/ui/build/css/themes/faux-classic-dark.css';
-@import './../../../packages/ui/build/css/themes/light.css';
 
-@config '../tailwind.config.js';
+@source '../_blog/*.mdx';
+@source '../components/**/*.tsx';
+@source '../data/**/*.tsx';
+@source '../layouts/**/*.tsx';
+@source '../lib/mdx/mdxComponents.tsx';
+@source '../pages/**/*.{tsx,mdx}';
+@source '../app/**/*.{tsx,ts,js}';
+@source './../../../packages/ui/src/**/*.{tsx,ts,js}';
+@source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+@source './../../../packages/marketing/src/**/*.{tsx,ts,js}';
+
+@theme {
+  --color-purple-sos-100: hsl(293 80% 97%);
+  --color-purple-sos-200: hsl(293 85% 91%);
+  --color-purple-sos-300: hsl(293 90% 80%);
+  --color-purple-sos-400: hsl(293 95% 67%);
+  --color-purple-sos-500: hsl(293 100% 54%);
+  --color-purple-sos-600: hsl(293 100% 44%);
+  --color-purple-sos-700: hsl(293 100% 34%);
+  --color-purple-sos-800: hsl(293 95% 22%);
+  --color-purple-sos-900: hsl(293 90% 12%);
+
+  --animate-flash-code: flash-code 1s forwards;
+  --animate-flash-code-slow: flash-code 2s forwards;
+  --animate-spinner: spinner 1s both infinite;
+  --animate-marquee: marquee 35s linear infinite;
+  --animate-marquee-vertical: marquee-vertical 180s linear infinite both;
+  --animate-pulse-radar: pulse-radar 3s linear infinite;
+  --animate-slide-in: slideIn 250ms ease-in both;
+
+  --delay-1200: 1200ms;
+  --delay-1500: 1500ms;
+}
+
+@keyframes flash-code {
+  0% {
+    background-color: rgba(63, 207, 142, 0.1);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translate3d(0, -100%, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes marquee-reverse {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes marquee-vertical {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes pulse-radar {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(100%);
+    opacity: 0;
+  }
+}
 
 @layer base {
   *,
@@ -62,16 +158,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* h1,
-h2,
-h3,
-h4,
-h5,
-h6 { */
 /*
-  Typography
-*/
-
+ * Typography
+ */
 .h1:not(.prose *):not(.overwrite),
 .h2:not(.prose *):not(.overwrite),
 .h3:not(.prose *):not(.overwrite),
@@ -271,10 +360,8 @@ table {
 }
 
 /*
-* sets the image in @Next/Image components
-* to respect the height of the content
-*
-*/
+ * sets the image in @Next/Image components to respect the height of the content
+ */
 .next-image--dynamic-fill {
   display: block;
   width: 100%;
