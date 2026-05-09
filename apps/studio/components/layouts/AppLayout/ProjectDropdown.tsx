@@ -1,10 +1,17 @@
 import { useParams } from 'common'
-import { Box, Plus } from 'lucide-react'
+import { Box, Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import type { ComponentProps } from 'react'
-import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
+import {
+  Button,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+} from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 
 import { AppLayoutDropdownTriggerButton } from './AppLayoutDropdown'
@@ -16,6 +23,7 @@ import PartnerIcon from '@/components/ui/PartnerIcon'
 import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useSelfHostedProjectsQuery } from '@/data/projects/self-hosted-projects-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -73,11 +81,70 @@ function ProjectDropdownNewProjectActions({
   )
 }
 
-function ProjectDropdownNonPlatformView({ projectName }: { projectName: string }) {
+/** Non-platform view: shows a dropdown when multiple projects exist, plain text for single project. */
+function ProjectDropdownNonPlatformView({
+  projectRef,
+  projectName,
+}: {
+  projectRef: string | undefined
+  projectName: string
+}) {
+  const router = useRouter()
+  const [open, setOpen] = useState(false)
+  const { data: projects = [], isLoading } = useSelfHostedProjectsQuery()
+
+  // Single project — keep the original plain-text button (no dropdown noise).
+  if (!isLoading && projects.length <= 1) {
+    return (
+      <Button type="text">
+        <span className="text-sm">{projectName}</span>
+      </Button>
+    )
+  }
+
   return (
-    <Button type="text">
-      <span className="text-sm">{projectName}</span>
-    </Button>
+    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
+      <PopoverTrigger_Shadcn_ asChild>
+        <Button
+          type="text"
+          className="flex items-center gap-1"
+          iconRight={<ChevronsUpDown size={14} className="opacity-50 shrink-0" />}
+        >
+          <span className="text-sm max-w-32 lg:max-w-64 truncate">{projectName}</span>
+        </Button>
+      </PopoverTrigger_Shadcn_>
+      <PopoverContent_Shadcn_ className="p-1 w-56" side="bottom" align="start">
+        {isLoading ? (
+          <div className="px-2 py-1">
+            <ShimmeringLoader className="py-2" />
+          </div>
+        ) : (
+          projects.map((p) => {
+            const isSelected = p.ref === projectRef
+            const sanitizedRoute = sanitizeRoute(router.route, router.query)
+            const href = sanitizedRoute?.replace('[ref]', p.ref) ?? `/project/${p.ref}`
+
+            return (
+              <button
+                key={p.ref}
+                className="flex items-center w-full gap-2 px-2 py-1.5 text-sm rounded hover:bg-overlay-hover cursor-pointer"
+                onClick={() => {
+                  setOpen(false)
+                  router.push(href)
+                }}
+              >
+                <Check
+                  size={14}
+                  className={isSelected ? 'text-foreground' : 'text-transparent'}
+                  aria-hidden={!isSelected}
+                />
+                <span className="truncate">{p.name}</span>
+              </button>
+            )
+          })
+        )}
+      </PopoverContent_Shadcn_>
+    </Popover_Shadcn_>
   )
 }
 
@@ -204,6 +271,9 @@ export const ProjectDropdown = ({
       selectorProps={selectorProps}
     />
   ) : (
-    <ProjectDropdownNonPlatformView projectName={selectedProject?.name ?? ''} />
+    <ProjectDropdownNonPlatformView
+      projectRef={project?.ref}
+      projectName={selectedProject?.name ?? ''}
+    />
   )
 }

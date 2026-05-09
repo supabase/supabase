@@ -1,15 +1,7 @@
-import { components } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from '@/lib/api/apiWrapper'
 import { getProjectSettings } from '@/lib/api/self-hosted/settings'
-
-type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
-  protocol?: string
-}
-export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] & {
-  app_config?: ProjectAppConfig
-}
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -25,8 +17,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
-  const response = getProjectSettings()
+const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
+  let response
+  try {
+    response = getProjectSettings(req.query.ref)
+  } catch (err: any) {
+    if (err?.statusCode === 404) {
+      return res.status(404).json({ error: { message: err.message } })
+    }
+    throw err
+  }
 
   return res.status(200).json(response)
 }

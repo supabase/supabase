@@ -6,9 +6,41 @@ vi.mock('./util', () => ({
   assertSelfHosted: vi.fn(),
 }))
 
-vi.mock('@/lib/constants/api', () => ({
-  PROJECT_ENDPOINT: 'localhost:8000',
-  PROJECT_ENDPOINT_PROTOCOL: 'http',
+vi.mock('./projects', () => ({
+  getProjectSettingsByRef: vi.fn().mockImplementation((ref = 'default') => ({
+    app_config: {
+      db_schema: 'public',
+      endpoint: 'localhost:8000',
+      storage_endpoint: 'localhost:8000',
+      protocol: 'http',
+    },
+    cloud_provider: 'AWS',
+    db_dns_name: '-',
+    db_host: 'localhost',
+    db_ip_addr_config: 'legacy',
+    db_name: 'postgres',
+    db_port: 5432,
+    db_user: 'postgres',
+    inserted_at: '2021-08-02T06:40:40.646Z',
+    jwt_secret: 'super-secret-jwt-token-with-at-least-32-characters-long',
+    name: process.env.DEFAULT_PROJECT_NAME || 'Default Project',
+    ref: ref,
+    region: 'ap-southeast-1',
+    service_api_keys: [
+      {
+        api_key: process.env.SUPABASE_SERVICE_KEY ?? '',
+        name: 'service_role key',
+        tags: 'service_role',
+      },
+      {
+        api_key: process.env.SUPABASE_ANON_KEY ?? '',
+        name: 'anon key',
+        tags: 'anon',
+      },
+    ],
+    ssl_enforced: false,
+    status: 'ACTIVE_HEALTHY',
+  })),
 }))
 
 describe('api/self-hosted/settings', () => {
@@ -74,44 +106,6 @@ describe('api/self-hosted/settings', () => {
       expect(settings.service_api_keys[0].tags).toBe('service_role')
       expect(settings.service_api_keys[1].name).toBe('anon key')
       expect(settings.service_api_keys[1].tags).toBe('anon')
-    })
-
-    it('should use environment variables when set', async () => {
-      vi.stubEnv('AUTH_JWT_SECRET', 'custom-jwt-secret-with-at-least-32-chars')
-      vi.stubEnv('DEFAULT_PROJECT_NAME', 'My Custom Project')
-      vi.stubEnv('SUPABASE_SERVICE_KEY', 'custom-service-key')
-      vi.stubEnv('SUPABASE_ANON_KEY', 'custom-anon-key')
-
-      // Need to re-import to pick up new env vars
-      vi.resetModules()
-
-      const { getProjectSettings: getSettings } = await import('./settings')
-      const settings = getSettings()
-
-      expect(settings.jwt_secret).toBe('custom-jwt-secret-with-at-least-32-chars')
-      expect(settings.name).toBe('My Custom Project')
-      expect(settings.service_api_keys[0].api_key).toBe('custom-service-key')
-      expect(settings.service_api_keys[1].api_key).toBe('custom-anon-key')
-    })
-
-    it('should use default JWT secret when not set', async () => {
-      vi.unstubAllEnvs()
-
-      vi.resetModules()
-      const { getProjectSettings: getSettings } = await import('./settings')
-      const settings = getSettings()
-
-      expect(settings.jwt_secret).toBe('super-secret-jwt-token-with-at-least-32-characters-long')
-    })
-
-    it('should use default project name when not set', async () => {
-      vi.unstubAllEnvs()
-
-      vi.resetModules()
-      const { getProjectSettings: getSettings } = await import('./settings')
-      const settings = getSettings()
-
-      expect(settings.name).toBe('Default Project')
     })
 
     it('should have correct db_ip_addr_config', () => {

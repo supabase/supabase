@@ -112,43 +112,62 @@ const nextConfig = {
               permanent: false,
             },
           ]
-        : [
-            {
-              source: '/',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/register',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/signup',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/signin',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/login',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/log-in',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/project/:ref/building',
-              destination: '/project/:ref',
-              permanent: false,
-            },
-          ]),
+        : (() => {
+            // Determine the first project ref from SUPABASE_PROJECTS (runtime env).
+            // Falls back to 'default' so existing single-project deployments
+            // continue to work without any config changes.
+            let defaultProjectRef = 'default'
+            try {
+              const raw = process.env.SUPABASE_PROJECTS
+              if (raw) {
+                const entries: { ref?: string }[] = JSON.parse(raw)
+                if (Array.isArray(entries) && entries.length > 0 && entries[0].ref) {
+                  defaultProjectRef = entries[0].ref
+                }
+              }
+            } catch {
+              // Malformed JSON — keep the fallback.
+            }
+
+            const defaultProjectPath = `/project/${defaultProjectRef}`
+            return [
+              {
+                source: '/',
+                destination: defaultProjectPath,
+                permanent: false,
+              },
+              {
+                source: '/register',
+                destination: defaultProjectPath,
+                permanent: false,
+              },
+              {
+                source: '/signup',
+                destination: defaultProjectPath,
+                permanent: false,
+              },
+              {
+                source: '/signin',
+                destination: defaultProjectPath,
+                permanent: false,
+              },
+              {
+                source: '/login',
+                destination: defaultProjectPath,
+                permanent: false,
+              },
+              {
+                source: '/log-in',
+                destination: defaultProjectPath,
+                permanent: false,
+              },
+              {
+                source: '/project/:ref/building',
+                destination: '/project/:ref',
+                permanent: false,
+              },
+            ]
+          })(),
       {
         source: '/project/:ref/auth',
         destination: '/project/:ref/auth/users',

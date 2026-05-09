@@ -2,14 +2,17 @@ import * as Sentry from '@sentry/nextjs'
 
 import { constructHeaders } from '../apiHelpers'
 import { databaseErrorSchema, PgMetaDatabaseError, WrappedResult } from './types'
+import { getPgMetaUrlByRef } from './projects'
 import { assertSelfHosted, encryptString, getConnectionString } from './util'
-import { PG_META_URL } from '@/lib/constants/index'
 
 export type QueryOptions = {
   query: string
   parameters?: unknown[]
   readOnly?: boolean
   headers?: HeadersInit
+  /** Project ref used to select the correct pg-meta URL and Postgres connection.
+   *  Defaults to `'default'` to maintain backward compatibility. */
+  ref?: string
 }
 
 /**
@@ -22,10 +25,12 @@ export async function executeQuery<T = unknown>({
   parameters,
   readOnly = false,
   headers,
+  ref = 'default',
 }: QueryOptions): Promise<WrappedResult<T[]>> {
   assertSelfHosted()
 
-  const connectionString = getConnectionString({ readOnly })
+  const pgMetaUrl = getPgMetaUrlByRef(ref)
+  const connectionString = getConnectionString({ readOnly, ref })
   const connectionStringEncrypted = encryptString(connectionString)
 
   const requestBody: { query: string; parameters?: unknown[] } = { query }
@@ -34,7 +39,7 @@ export async function executeQuery<T = unknown>({
   }
 
   return await Sentry.startSpan({ name: 'pg-meta.query', op: 'db.query' }, async (span) => {
-    const response = await fetch(`${PG_META_URL}/query`, {
+    const response = await fetch(`${pgMetaUrl}/query`, {
       method: 'POST',
       headers: constructHeaders({
         ...headers,

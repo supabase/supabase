@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { fetchGet } from '@/data/fetchers'
 import { constructHeaders } from '@/lib/api/apiHelpers'
 import apiWrapper from '@/lib/api/apiWrapper'
-import { PG_META_URL } from '@/lib/constants'
+import { getPgMetaUrlByRef } from '@/lib/api/self-hosted/projects'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>
   apiWrapper(req, res, handler, { withAuth: true })
@@ -22,7 +22,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const headers = constructHeaders(req.headers)
-  const response = await fetchGet(`${PG_META_URL}/publications`, { headers })
+  const pgMetaUrl = getPgMetaUrlByRef(req.query.ref)
+  const response = await fetchGet(`${pgMetaUrl}/publications`, { headers })
 
   if (response.error) {
     const { code, message } = response.error

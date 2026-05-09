@@ -12,9 +12,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case 'GET':
+      const ref = Array.isArray(req.query.ref) ? req.query.ref[0] : (req.query.ref ?? 'default')
       const { data, error } = await getLints({
         headers: constructHeaders(req.headers),
         exposedSchemas: DEFAULT_EXPOSED_SCHEMAS,
+        ref,
       })
 
       if (error) {

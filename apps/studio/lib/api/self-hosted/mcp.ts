@@ -20,24 +20,31 @@ import { ResponseError } from '@/types'
 
 export type GetDatabaseOperationsOptions = {
   headers?: HeadersInit
+  /** Project ref — defaults to `'default'` for backward compatibility. */
+  ref?: string
 }
 
 export type GetDevelopmentOperationsOptions = {
   headers?: HeadersInit
+  /** Project ref — defaults to `'default'` for backward compatibility. */
+  ref?: string
 }
 
 export type GetDebuggingOperationsOptions = {
   headers?: HeadersInit
+  /** Project ref — defaults to `'default'` for backward compatibility. */
+  ref?: string
 }
 
 export function getDatabaseOperations({
   headers,
+  ref = 'default',
 }: GetDatabaseOperationsOptions): DatabaseOperations {
   return {
     async executeSql<T>(_projectRef: string, options: ExecuteSqlOptions) {
       const { query, parameters, read_only: readOnly } = options
 
-      const { data, error } = await executeQuery<T>({ query, parameters, headers, readOnly })
+      const { data, error } = await executeQuery<T>({ query, parameters, headers, readOnly, ref })
 
       if (error) {
         throw error
@@ -46,7 +53,7 @@ export function getDatabaseOperations({
       return data
     },
     async listMigrations() {
-      const { data, error } = await listMigrationVersions({ headers })
+      const { data, error } = await listMigrationVersions({ headers, ref })
 
       if (error) {
         throw error
@@ -56,7 +63,7 @@ export function getDatabaseOperations({
     },
     async applyMigration(_projectRef: string, options: ApplyMigrationOptions) {
       const { query, name } = options
-      const { error } = await applyAndTrackMigrations({ query, name, headers })
+      const { error } = await applyAndTrackMigrations({ query, name, headers, ref })
 
       if (error) {
         throw error
@@ -67,14 +74,15 @@ export function getDatabaseOperations({
 
 export function getDevelopmentOperations({
   headers,
+  ref = 'default',
 }: GetDevelopmentOperationsOptions): DevelopmentOperations {
   return {
     async getProjectUrl(_projectRef) {
-      const settings = getProjectSettings()
+      const settings = getProjectSettings(ref)
       return `${settings.app_config.protocol}://${settings.app_config.endpoint}`
     },
     async getPublishableKeys(_projectRef) {
-      const settings = getProjectSettings()
+      const settings = getProjectSettings(ref)
       const anonKey = settings.service_api_keys.find((key) => key.name === 'anon key')
 
       if (!anonKey) {
@@ -95,7 +103,7 @@ export function getDevelopmentOperations({
       return publishableKeysArray
     },
     async generateTypescriptTypes(_projectRef) {
-      const response = await generateTypescriptTypes({ headers })
+      const response = await generateTypescriptTypes({ headers, ref })
 
       if (response instanceof ResponseError) {
         throw response
@@ -108,6 +116,7 @@ export function getDevelopmentOperations({
 
 export function getDebuggingOperations({
   headers,
+  ref = 'default',
 }: GetDebuggingOperationsOptions): DebuggingOperations {
   return {
     async getLogs(projectRef: string, options: GetLogsOptions) {
@@ -133,6 +142,7 @@ export function getDebuggingOperations({
       const { data, error } = await getLints({
         headers,
         exposedSchemas: DEFAULT_EXPOSED_SCHEMAS,
+        ref,
       })
 
       if (error) {
@@ -145,6 +155,7 @@ export function getDebuggingOperations({
       const { data, error } = await getLints({
         headers,
         exposedSchemas: DEFAULT_EXPOSED_SCHEMAS,
+        ref,
       })
 
       if (error) {

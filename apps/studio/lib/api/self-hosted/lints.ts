@@ -7,13 +7,16 @@ import { DOCS_URL } from '@/lib/constants'
 interface GetLintsOptions {
   headers?: HeadersInit
   exposedSchemas?: string
+  /** Project ref — defaults to `'default'` for backward compatibility. */
+  ref?: string
 }
 
-export async function getLints({ headers, exposedSchemas }: GetLintsOptions) {
+export async function getLints({ headers, exposedSchemas, ref = 'default' }: GetLintsOptions) {
   const sql = getLintsSQL({ docsUrl: DOCS_URL })
   return await executeQuery<ResponseData[number]>({
     query: enrichLintsQuery(sql, exposedSchemas),
     headers,
+    ref,
   })
 }
 

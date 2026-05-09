@@ -1,10 +1,12 @@
+import { getPgMetaUrlByRef } from './projects'
 import { assertSelfHosted } from './util'
 import { fetchGet } from '@/data/fetchers'
-import { PG_META_URL } from '@/lib/constants'
 import type { ResponseError } from '@/types'
 
 export type GenerateTypescriptTypesOptions = {
   headers?: HeadersInit
+  /** Project ref — defaults to `'default'` for backward compatibility. */
+  ref?: string
 }
 
 type GenerateTypescriptTypesResult = {
@@ -18,9 +20,11 @@ type GenerateTypescriptTypesResult = {
  */
 export async function generateTypescriptTypes({
   headers,
+  ref = 'default',
 }: GenerateTypescriptTypesOptions): Promise<GenerateTypescriptTypesResult | ResponseError> {
   assertSelfHosted()
 
+  const pgMetaUrl = getPgMetaUrlByRef(ref)
   const includedSchema = ['public', 'graphql_public', 'storage'].join(',')
 
   const excludedSchema = [
@@ -40,7 +44,7 @@ export async function generateTypescriptTypes({
   ].join(',')
 
   const response = await fetchGet<GenerateTypescriptTypesResult>(
-    `${PG_META_URL}/generators/typescript?included_schema=${includedSchema}&excluded_schemas=${excludedSchema}`,
+    `${pgMetaUrl}/generators/typescript?included_schema=${includedSchema}&excluded_schemas=${excludedSchema}`,
     { headers }
   )
 

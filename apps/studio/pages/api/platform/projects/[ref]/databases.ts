@@ -2,7 +2,7 @@ import { paths } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from '@/lib/api/apiWrapper'
-import { PROJECT_REST_URL } from '@/lib/constants/api'
+import { getProject } from '@/lib/api/self-hosted/projects'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -21,7 +21,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 type ResponseData =
   paths['/platform/projects/{ref}/databases']['get']['responses']['200']['content']['application/json']
 
-const handleGet = async (_req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
+const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
+  let project
+  try {
+    project = getProject(req.query.ref)
+  } catch (err: any) {
+    if (err?.statusCode === 404) {
+      return res.status(404).json({ error: { message: err.message } } as any)
+    }
+    throw err
+  }
+
   return res.status(200).json([
     {
       cloud_provider: 'localhost' as any,
@@ -31,10 +41,10 @@ const handleGet = async (_req: NextApiRequest, res: NextApiResponse<ResponseData
       db_name: 'postgres',
       db_port: 5432,
       db_user: 'postgres',
-      identifier: 'default',
+      identifier: project.ref,
       inserted_at: '',
       region: 'local',
-      restUrl: PROJECT_REST_URL,
+      restUrl: project.supabaseRestUrl,
       size: '',
       status: 'ACTIVE_HEALTHY',
     },

@@ -23,7 +23,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { query } = req.body
   const headers = constructHeaders(req.headers)
-  const { data, error } = await executeQuery({ query, headers })
+  const ref = Array.isArray(req.query.ref) ? req.query.ref[0] : (req.query.ref ?? 'default')
+  const { data, error } = await executeQuery({ query, headers, ref })
 
   if (error) {
     if (error instanceof PgMetaDatabaseError) {
