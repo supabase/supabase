@@ -132,6 +132,11 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     ),
     Admonition,
     Mermaid,
+    table: (props: any) => (
+      <div className="w-full overflow-x-auto">
+        <table {...props} />
+      </div>
+    ),
   }
 
   return components as any
