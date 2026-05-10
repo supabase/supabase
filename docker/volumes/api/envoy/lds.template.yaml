@@ -956,8 +956,8 @@ resources:
                         if route_name == "rest-v1-protected" and not is_admin_apikey(headers:get("apikey")) and is_rest_openapi_root(headers:get(":path")) then
                           request_handle:respond({
                             [":status"] = "401",
-                            ["content-type"] = "application/json",
-                          }, '{"message":"Secret API key required"}')
+                            ["content-type"] = "text/plain",
+                          }, "Unauthorized")
                           return
                         end
 
