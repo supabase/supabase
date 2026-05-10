@@ -15,6 +15,9 @@ See per-service updates below for details.
 
 ⚠️ **Upcoming default changes:** In a future release, several defaults will change: Postgres 15 → 17, Kong → Envoy, MinIO → RustFS, Analytics/Vector removed from the default stack, and the new API keys and authentication replacing the "legacy" architecture. Most of these are already available as optional configurations.
 
+### API gateway
+⚠️ Restricted access to the PostgREST OpenAPI schema root (`/rest/v1/`) to admin keys (`service_role` / `sb_secret_*`). Non-admin callers now receive `403 Forbidden`. The Data API itself (`/rest/v1/<table>`, `/rest/v1/rpc/...`) is unchanged. See [discussion #42949](https://github.com/orgs/supabase/discussions/42949).
+
 ---
 
 ## [2026-04-27]
