@@ -116,7 +116,7 @@ const PricingComputeSection = () => {
       </div>
       <hr className="border-0 border-t" />
       <div className="flex flex-col">
-        <div className="flex gap-2 p-6 justify-between items-center mt-2">
+        <div className="flex max-[444px]:flex-wrap gap-2 p-6 justify-between items-center mt-2">
           <div className="grid gap-2">
             <p>
               <span className="border bg-alternative px-3 py-0.5 text-foreground text-sm rounded-full">
