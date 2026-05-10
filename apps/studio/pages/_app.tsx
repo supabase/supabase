@@ -155,8 +155,8 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   )
 
   return (
-    <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
         <NuqsAdapter>
           <HydrationBoundary state={pageProps.dehydratedState}>
             <AuthProvider>
@@ -227,9 +227,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
             </AuthProvider>
           </HydrationBoundary>
         </NuqsAdapter>
-      </QueryClientProvider>
-      <TelemetryTagManager />
-    </ErrorBoundary>
+        <TelemetryTagManager />
+      </ErrorBoundary>
+    </QueryClientProvider>
   )
 }
 
