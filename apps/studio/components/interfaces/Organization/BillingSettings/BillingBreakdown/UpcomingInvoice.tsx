@@ -12,6 +12,7 @@ import {
   UpcomingInvoiceResponse,
   useOrgUpcomingInvoiceQuery,
 } from '@/data/invoices/org-invoice-upcoming-query'
+import { useOrganizationQuery } from '@/data/organizations/organization-query'
 import { DOCS_URL } from '@/lib/constants'
 import { formatCurrency } from '@/lib/helpers'
 
@@ -57,6 +58,8 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
     isError,
     isSuccess,
   } = useOrgUpcomingInvoiceQuery({ orgSlug: slug })
+
+  const { data: organization } = useOrganizationQuery({ slug })
 
   // For non-platform customers, compute is broken down per project and contains a breakdown array
   const computeItems =
@@ -117,19 +120,21 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
           <div>
             <Table className="w-full text-sm">
               <TableBody>
-                <TableRow>
-                  <TableCell className="py-2! px-0">{planItem?.description}</TableCell>
-                  <TableCell className="text-right py-2 px-0">
-                    {planItem == null ? (
-                      '-'
-                    ) : (
-                      <InvoiceLineItemAmount
-                        amount={planItem.amount}
-                        amountBeforeDiscount={planItem.amount_before_discount}
-                      />
-                    )}
-                  </TableCell>
-                </TableRow>
+                {!(planItem == null && upcomingInvoice.plan_fee_paid_in_advance) && (
+                  <TableRow>
+                    <TableCell className="py-2! px-0">{planItem?.description}</TableCell>
+                    <TableCell className="text-right py-2 px-0">
+                      {planItem == null ? (
+                        '-'
+                      ) : (
+                        <InvoiceLineItemAmount
+                          amount={planItem.amount}
+                          amountBeforeDiscount={planItem.amount_before_discount}
+                        />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                )}
 
                 {/* Compute section */}
                 <ComputeLineItem
@@ -366,6 +371,19 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                           ? upcomingInvoice.tax!.total_amount_including_tax
                           : upcomingInvoice.amount_projected
                       ) ?? '-'}
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {planItem == null && upcomingInvoice.plan_fee_paid_in_advance && (
+                  <TableRow className="border-0 hover:bg-transparent">
+                    <TableCell
+                      className="pt-2! pb-0! px-0 text-foreground-light text-xs text-right"
+                      colSpan={2}
+                    >
+                      Your {organization?.plan?.name ? `${organization.plan.name} Plan` : 'Plan'}{' '}
+                      fee for this period has already been paid. This invoice will only reflect
+                      usage charges.
                     </TableCell>
                   </TableRow>
                 )}

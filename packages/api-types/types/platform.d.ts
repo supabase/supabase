@@ -5444,6 +5444,33 @@ export interface components {
       cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
       custom_supabase_internal_requests?: {
         ami: {
+          /**
+           * @description Exact AWS instance type to provision (e.g. `t3.nano`, `t4g.nano`). When omitted the default for `desired_instance_size` is used. Only for internal use; rejected for user-facing requests in production.
+           * @enum {string}
+           */
+          instance_type?:
+            | 't4g.nano'
+            | 't3.nano'
+            | 't3a.nano'
+            | 't4g.micro'
+            | 't4g.small'
+            | 't4g.medium'
+            | 'm6g.medium'
+            | 'm6g.large'
+            | 'm6g.xlarge'
+            | 'm6g.2xlarge'
+            | 'm6g.4xlarge'
+            | 'm6g.8xlarge'
+            | 'm6g.12xlarge'
+            | 'm6g.16xlarge'
+            | 'm8g.24xlarge'
+            | 'c8g.24xlarge'
+            | 'r8g.24xlarge'
+            | 'x8g.24xlarge'
+            | 'm8g.48xlarge'
+            | 'c8g.48xlarge'
+            | 'r8g.48xlarge'
+            | 'x8g.48xlarge'
           search_tags?: {
             [key: string]: string
           }
@@ -9914,6 +9941,7 @@ export interface components {
     }
     RestorePhysicalBackupBody: {
       id: number
+      recovery_time_target?: string
     }
     RevokeAuthorizedOAuthAppResponse: {
       authorized_at?: string
@@ -10508,6 +10536,7 @@ export interface components {
           | 'ACTIVE_COMPUTE_HOURS'
         usage_original?: number
       }[]
+      plan_fee_paid_in_advance: boolean
       subscription_id: string
       tax: {
         currency: string
@@ -15222,7 +15251,6 @@ export interface operations {
   OrgAuditLogsController_getAuditLogs: {
     parameters: {
       query: {
-        format?: 'legacy' | 'v2'
         /** @description End timestamp */
         iso_timestamp_end: string
         /** @description Start timestamp */
@@ -19446,7 +19474,6 @@ export interface operations {
   UserAuditLogsController_getAuditLogs: {
     parameters: {
       query: {
-        format?: 'legacy' | 'v2'
         /** @description End timestamp */
         iso_timestamp_end: string
         /** @description Start timestamp */
