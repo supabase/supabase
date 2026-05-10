@@ -4,11 +4,11 @@ import { Button } from 'ui'
 
 const page: GoPageInput = {
   template: 'thank-you',
-  slug: 'dash-2026/exec-dinner/thank-you',
+  slug: 'nyc-2026/exec-dinner/thank-you',
   metadata: {
     title: "You're confirmed | Supabase Executive Dinner",
     description:
-      'Your RSVP for the Supabase executive dinner at DASH 2026 has been confirmed. Join us at Manhatta Restaurant with cocktails at 6:30 PM and dinner at 7:00 PM.',
+      'Your RSVP for the Supabase executive dinner has been confirmed. Join us at Manhatta Restaurant with cocktails at 6:30 PM and dinner at 7:00 PM.',
   },
   hero: {
     title: "You're confirmed",

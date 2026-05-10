@@ -7,9 +7,9 @@ const sugu = authors.find((a) => a.author_id === 'sugu_sougoumarane')
 
 const page: GoPageInput = {
   template: 'lead-gen',
-  slug: 'dash-2026/exec-dinner',
+  slug: 'nyc-2026/exec-dinner',
   metadata: {
-    title: 'Executive Dinner | Supabase at DASH 2026',
+    title: 'Executive Dinner | Supabase',
     description:
       'Join Supabase leaders for an intimate dinner at Manhatta Restaurant. Cocktails at 6:30 PM, dinner at 7:00 PM.',
   },
@@ -124,7 +124,7 @@ const page: GoPageInput = {
         },
       ],
       submitLabel: 'Confirm RSVP',
-      successRedirect: '/go/dash-2026/exec-dinner/thank-you',
+      successRedirect: '/go/nyc-2026/exec-dinner/thank-you',
       disclaimer:
         'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy).',
       crm: {
