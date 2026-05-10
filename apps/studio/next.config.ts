@@ -113,16 +113,14 @@ const nextConfig = {
             },
           ]
         : [
-            // Static fallback redirects for self-hosted mode.
-            // The runtime project-ref detection (SUPABASE_PROJECTS / SUPABASE_PROJECTS_FILE)
-            // is handled at request time by middleware.ts, which runs before these
-            // static rules and issues the correct redirect based on the live env var.
-            { source: '/', destination: '/project/default', permanent: false },
-            { source: '/register', destination: '/project/default', permanent: false },
-            { source: '/signup', destination: '/project/default', permanent: false },
-            { source: '/signin', destination: '/project/default', permanent: false },
-            { source: '/login', destination: '/project/default', permanent: false },
-            { source: '/log-in', destination: '/project/default', permanent: false },
+            // In self-hosted mode, auth paths redirect to `/` which resolves
+            // the correct project ref at request time via getServerSideProps
+            // (Node.js runtime, which can read env vars and SUPABASE_PROJECTS_FILE).
+            { source: '/register', destination: '/', permanent: false },
+            { source: '/signup', destination: '/', permanent: false },
+            { source: '/signin', destination: '/', permanent: false },
+            { source: '/login', destination: '/', permanent: false },
+            { source: '/log-in', destination: '/', permanent: false },
             { source: '/project/:ref/building', destination: '/project/:ref', permanent: false },
           ]
       ),
