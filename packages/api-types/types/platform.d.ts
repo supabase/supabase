@@ -10418,6 +10418,8 @@ export interface components {
       billing_cycle_start: string
       currency: string
       customer_balance: number
+      /** @enum {string} */
+      fixed_fees_billing_mode: 'in_advance' | 'in_arrears'
       lines: {
         amount: number
         amount_before_discount: number
@@ -10536,7 +10538,6 @@ export interface components {
           | 'ACTIVE_COMPUTE_HOURS'
         usage_original?: number
       }[]
-      plan_fee_paid_in_advance: boolean
       subscription_id: string
       tax: {
         currency: string

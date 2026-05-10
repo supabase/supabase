@@ -103,6 +103,9 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
     upcomingInvoice?.tax_status === 'calculated' && (upcomingInvoice?.tax?.tax_amount ?? 0) > 0
   const taxFailed = upcomingInvoice?.tax_status === 'failed'
 
+  const planFeePaidInAdvance =
+    planItem == null && upcomingInvoice?.fixed_fees_billing_mode === 'in_advance'
+
   return (
     <>
       {isLoading && (
@@ -120,7 +123,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
           <div>
             <Table className="w-full text-sm">
               <TableBody>
-                {!(planItem == null && upcomingInvoice.plan_fee_paid_in_advance) && (
+                {!planFeePaidInAdvance && (
                   <TableRow>
                     <TableCell className="py-2! px-0">{planItem?.description}</TableCell>
                     <TableCell className="text-right py-2 px-0">
@@ -375,7 +378,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   </TableRow>
                 )}
 
-                {planItem == null && upcomingInvoice.plan_fee_paid_in_advance && (
+                {planFeePaidInAdvance && (
                   <TableRow className="border-0 hover:bg-transparent">
                     <TableCell
                       className="pt-2! pb-0! px-0 text-foreground-light text-xs text-right"
