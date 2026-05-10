@@ -333,6 +333,41 @@ resources:
                               type.googleapis.com/envoy.config.route.v3.FilterConfig
                             disabled: true
                             
+                      - name: rest-v1-openapi-protected
+                        match:
+                          path: /rest/v1/
+                        route:
+                          cluster: rest
+                          prefix_rewrite: /
+                          timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /rest/v1/
+                            append_action: ADD_IF_ABSENT
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                          envoy.filters.http.rbac:
+                            '@type': type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: ALLOW
+                                policies:
+                                  admin:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - header:
+                                          name: apikey
+                                          string_match:
+                                            exact: '${SERVICE_ROLE_KEY}'
+                                      - header:
+                                          name: apikey
+                                          string_match:
+                                            exact: '${SERVICE_ROLE_KEY_ASYMMETRIC}'
+
                       - name: rest-v1-protected
                         match:
                           prefix: /rest/v1/
@@ -882,6 +917,7 @@ resources:
                         ["realtime-v1-api-protected"] = true,
                         ["realtime-v1-ws-protected"] = true,
                         ["pg-protected"] = true,
+                        ["rest-v1-openapi-protected"] = true,
                       }
 
                       local function is_protected_route(route_name)
