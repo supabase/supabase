@@ -785,7 +785,7 @@
     "@std/toml": "jsr:^1.0.11",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
-    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-table": "catalog:",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

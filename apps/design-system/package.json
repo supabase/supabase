@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
-    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-table": "catalog:",
     "contentlayer2": "0.4.6",
     "common": "workspace:*",
     "date-fns": "^2.30.0",
