@@ -43,7 +43,9 @@ describe('lib/api/self-hosted/projects', () => {
     // Reset module registry on each test so _fileCache is wiped and fresh
     // imports pick up the latest env stubs.
     vi.resetModules()
-    vi.clearAllMocks()
+    // restoreAllMocks restores any vi.spyOn overrides (e.g. IS_PLATFORM getter)
+    // in addition to clearing call counts. clearAllMocks alone is insufficient.
+    vi.restoreAllMocks()
     vi.unstubAllEnvs()
   })
 
