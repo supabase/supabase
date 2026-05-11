@@ -19,7 +19,9 @@ import { Route as AuthorizeRouteImport } from './routes/authorize'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProjectChar91_Char93RouteImport } from './routes/project.[_]'
 import { Route as ProjectRefRouteImport } from './routes/project/$ref'
+import { Route as OrgChar91_Char93RouteImport } from './routes/org.[_]'
 import { Route as NewSlugRouteImport } from './routes/new/$slug'
 import { Route as IntegrationsVercelRouteImport } from './routes/integrations/vercel'
 import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
@@ -47,6 +49,7 @@ import { Route as ProjectRefIndexRouteImport } from './routes/project/$ref/index
 import { Route as ApiConnectIndexRouteImport } from './routes/api/connect/index'
 import { Route as AppOrgIndexRouteImport } from './routes/_app/org/index'
 import { Route as AppNewIndexRouteImport } from './routes/_app/new/index'
+import { Route as ProjectChar91_Char93SplatRouteImport } from './routes/project.[_].$'
 import { Route as ProjectRefStorageRouteImport } from './routes/project/$ref/storage'
 import { Route as ProjectRefSqlRouteImport } from './routes/project/$ref/sql'
 import { Route as ProjectRefSettingsRouteImport } from './routes/project/$ref/settings'
@@ -61,6 +64,7 @@ import { Route as ProjectRefDatabaseRouteImport } from './routes/project/$ref/da
 import { Route as ProjectRefBranchesRouteImport } from './routes/project/$ref/branches'
 import { Route as ProjectRefAuthRouteImport } from './routes/project/$ref/auth'
 import { Route as ProjectRefAdvisorsRouteImport } from './routes/project/$ref/advisors'
+import { Route as OrgChar91_Char93SplatRouteImport } from './routes/org.[_].$'
 import { Route as IntegrationsVercelInstallRouteImport } from './routes/integrations/vercel/install'
 import { Route as IntegrationsGithubAuthorizeRouteImport } from './routes/integrations/github/authorize'
 import { Route as ApiIntegrationsStripeSyncRouteImport } from './routes/api/integrations/stripe-sync'
@@ -344,9 +348,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectChar91_Char93Route = ProjectChar91_Char93RouteImport.update({
+  id: '/project/_',
+  path: '/project/_',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectRefRoute = ProjectRefRouteImport.update({
   id: '/project/$ref',
   path: '/project/$ref',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrgChar91_Char93Route = OrgChar91_Char93RouteImport.update({
+  id: '/org/_',
+  path: '/org/_',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NewSlugRoute = NewSlugRouteImport.update({
@@ -486,6 +500,12 @@ const AppNewIndexRoute = AppNewIndexRouteImport.update({
   path: '/new/',
   getParentRoute: () => AppRoute,
 } as any)
+const ProjectChar91_Char93SplatRoute =
+  ProjectChar91_Char93SplatRouteImport.update({
+    id: '/$',
+    path: '/$',
+    getParentRoute: () => ProjectChar91_Char93Route,
+  } as any)
 const ProjectRefStorageRoute = ProjectRefStorageRouteImport.update({
   id: '/storage',
   path: '/storage',
@@ -555,6 +575,11 @@ const ProjectRefAdvisorsRoute = ProjectRefAdvisorsRouteImport.update({
   id: '/advisors',
   path: '/advisors',
   getParentRoute: () => ProjectRefRoute,
+} as any)
+const OrgChar91_Char93SplatRoute = OrgChar91_Char93SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => OrgChar91_Char93Route,
 } as any)
 const IntegrationsVercelInstallRoute =
   IntegrationsVercelInstallRouteImport.update({
@@ -1921,7 +1946,9 @@ export interface FileRoutesByFullPath {
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
+  '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
+  '/project/_': typeof ProjectChar91_Char93RouteWithChildren
   '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
   '/account/security': typeof AppAccountSecurityRoute
@@ -1934,6 +1961,7 @@ export interface FileRoutesByFullPath {
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
   '/integrations/github/authorize': typeof IntegrationsGithubAuthorizeRoute
   '/integrations/vercel/install': typeof IntegrationsVercelInstallRoute
+  '/org/_/$': typeof OrgChar91_Char93SplatRoute
   '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
@@ -1948,6 +1976,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
   '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
+  '/project/_/$': typeof ProjectChar91_Char93SplatRoute
   '/new/': typeof AppNewIndexRoute
   '/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
@@ -2205,6 +2234,8 @@ export interface FileRoutesByTo {
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
+  '/org/_': typeof OrgChar91_Char93RouteWithChildren
+  '/project/_': typeof ProjectChar91_Char93RouteWithChildren
   '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
   '/account/security': typeof AppAccountSecurityRoute
@@ -2217,6 +2248,7 @@ export interface FileRoutesByTo {
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
   '/integrations/github/authorize': typeof IntegrationsGithubAuthorizeRoute
   '/integrations/vercel/install': typeof IntegrationsVercelInstallRoute
+  '/org/_/$': typeof OrgChar91_Char93SplatRoute
   '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
@@ -2224,6 +2256,7 @@ export interface FileRoutesByTo {
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
+  '/project/_/$': typeof ProjectChar91_Char93SplatRoute
   '/new': typeof AppNewIndexRoute
   '/org': typeof AppOrgIndexRoute
   '/api/connect': typeof ApiConnectIndexRoute
@@ -2482,7 +2515,9 @@ export interface FileRoutesById {
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
+  '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
+  '/project/_': typeof ProjectChar91_Char93RouteWithChildren
   '/_app/account/audit': typeof AppAccountAuditRoute
   '/_app/account/me': typeof AppAccountMeRoute
   '/_app/account/security': typeof AppAccountSecurityRoute
@@ -2495,6 +2530,7 @@ export interface FileRoutesById {
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
   '/integrations/github/authorize': typeof IntegrationsGithubAuthorizeRoute
   '/integrations/vercel/install': typeof IntegrationsVercelInstallRoute
+  '/org/_/$': typeof OrgChar91_Char93SplatRoute
   '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
@@ -2509,6 +2545,7 @@ export interface FileRoutesById {
   '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
   '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
+  '/project/_/$': typeof ProjectChar91_Char93SplatRoute
   '/_app/new/': typeof AppNewIndexRoute
   '/_app/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
@@ -2769,7 +2806,9 @@ export interface FileRouteTypes {
     | '/api/status-override'
     | '/integrations/vercel'
     | '/new/$slug'
+    | '/org/_'
     | '/project/$ref'
+    | '/project/_'
     | '/account/audit'
     | '/account/me'
     | '/account/security'
@@ -2782,6 +2821,7 @@ export interface FileRouteTypes {
     | '/api/integrations/stripe-sync'
     | '/integrations/github/authorize'
     | '/integrations/vercel/install'
+    | '/org/_/$'
     | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/branches'
@@ -2796,6 +2836,7 @@ export interface FileRouteTypes {
     | '/project/$ref/settings'
     | '/project/$ref/sql'
     | '/project/$ref/storage'
+    | '/project/_/$'
     | '/new/'
     | '/org/'
     | '/api/connect/'
@@ -3053,6 +3094,8 @@ export interface FileRouteTypes {
     | '/api/status-override'
     | '/integrations/vercel'
     | '/new/$slug'
+    | '/org/_'
+    | '/project/_'
     | '/account/audit'
     | '/account/me'
     | '/account/security'
@@ -3065,6 +3108,7 @@ export interface FileRouteTypes {
     | '/api/integrations/stripe-sync'
     | '/integrations/github/authorize'
     | '/integrations/vercel/install'
+    | '/org/_/$'
     | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/database'
@@ -3072,6 +3116,7 @@ export interface FileRouteTypes {
     | '/project/$ref/realtime'
     | '/project/$ref/settings'
     | '/project/$ref/storage'
+    | '/project/_/$'
     | '/new'
     | '/org'
     | '/api/connect'
@@ -3329,7 +3374,9 @@ export interface FileRouteTypes {
     | '/api/status-override'
     | '/integrations/vercel'
     | '/new/$slug'
+    | '/org/_'
     | '/project/$ref'
+    | '/project/_'
     | '/_app/account/audit'
     | '/_app/account/me'
     | '/_app/account/security'
@@ -3342,6 +3389,7 @@ export interface FileRouteTypes {
     | '/api/integrations/stripe-sync'
     | '/integrations/github/authorize'
     | '/integrations/vercel/install'
+    | '/org/_/$'
     | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/branches'
@@ -3356,6 +3404,7 @@ export interface FileRouteTypes {
     | '/project/$ref/settings'
     | '/project/$ref/sql'
     | '/project/$ref/storage'
+    | '/project/_/$'
     | '/_app/new/'
     | '/_app/org/'
     | '/api/connect/'
@@ -3606,7 +3655,9 @@ export interface RootRouteChildren {
   ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
   IntegrationsVercelRoute: typeof IntegrationsVercelRouteWithChildren
   NewSlugRoute: typeof NewSlugRoute
+  OrgChar91_Char93Route: typeof OrgChar91_Char93RouteWithChildren
   ProjectRefRoute: typeof ProjectRefRouteWithChildren
+  ProjectChar91_Char93Route: typeof ProjectChar91_Char93RouteWithChildren
   ApiAiDocsRoute: typeof ApiAiDocsRoute
   ApiContentGraphqlRoute: typeof ApiContentGraphqlRoute
   ApiEdgeFunctionsTestRoute: typeof ApiEdgeFunctionsTestRoute
@@ -3761,11 +3812,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/project/_': {
+      id: '/project/_'
+      path: '/project/_'
+      fullPath: '/project/_'
+      preLoaderRoute: typeof ProjectChar91_Char93RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/project/$ref': {
       id: '/project/$ref'
       path: '/project/$ref'
       fullPath: '/project/$ref'
       preLoaderRoute: typeof ProjectRefRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/org/_': {
+      id: '/org/_'
+      path: '/org/_'
+      fullPath: '/org/_'
+      preLoaderRoute: typeof OrgChar91_Char93RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/new/$slug': {
@@ -3957,6 +4022,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppNewIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/project/_/$': {
+      id: '/project/_/$'
+      path: '/$'
+      fullPath: '/project/_/$'
+      preLoaderRoute: typeof ProjectChar91_Char93SplatRouteImport
+      parentRoute: typeof ProjectChar91_Char93Route
+    }
     '/project/$ref/storage': {
       id: '/project/$ref/storage'
       path: '/storage'
@@ -4054,6 +4126,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/advisors'
       preLoaderRoute: typeof ProjectRefAdvisorsRouteImport
       parentRoute: typeof ProjectRefRoute
+    }
+    '/org/_/$': {
+      id: '/org/_/$'
+      path: '/$'
+      fullPath: '/org/_/$'
+      preLoaderRoute: typeof OrgChar91_Char93SplatRouteImport
+      parentRoute: typeof OrgChar91_Char93Route
     }
     '/integrations/vercel/install': {
       id: '/integrations/vercel/install'
@@ -5813,6 +5892,17 @@ const IntegrationsVercelRouteChildren: IntegrationsVercelRouteChildren = {
 const IntegrationsVercelRouteWithChildren =
   IntegrationsVercelRoute._addFileChildren(IntegrationsVercelRouteChildren)
 
+interface OrgChar91_Char93RouteChildren {
+  OrgChar91_Char93SplatRoute: typeof OrgChar91_Char93SplatRoute
+}
+
+const OrgChar91_Char93RouteChildren: OrgChar91_Char93RouteChildren = {
+  OrgChar91_Char93SplatRoute: OrgChar91_Char93SplatRoute,
+}
+
+const OrgChar91_Char93RouteWithChildren =
+  OrgChar91_Char93Route._addFileChildren(OrgChar91_Char93RouteChildren)
+
 interface ProjectRefAdvisorsRulesRouteChildren {
   ProjectRefAdvisorsRulesPerformanceRoute: typeof ProjectRefAdvisorsRulesPerformanceRoute
   ProjectRefAdvisorsRulesSecurityRoute: typeof ProjectRefAdvisorsRulesSecurityRoute
@@ -6308,6 +6398,17 @@ const ProjectRefRouteWithChildren = ProjectRefRoute._addFileChildren(
   ProjectRefRouteChildren,
 )
 
+interface ProjectChar91_Char93RouteChildren {
+  ProjectChar91_Char93SplatRoute: typeof ProjectChar91_Char93SplatRoute
+}
+
+const ProjectChar91_Char93RouteChildren: ProjectChar91_Char93RouteChildren = {
+  ProjectChar91_Char93SplatRoute: ProjectChar91_Char93SplatRoute,
+}
+
+const ProjectChar91_Char93RouteWithChildren =
+  ProjectChar91_Char93Route._addFileChildren(ProjectChar91_Char93RouteChildren)
+
 interface ApiPlatformProjectsRefAnalyticsLogDrainsRouteChildren {
   ApiPlatformProjectsRefAnalyticsLogDrainsUuidRoute: typeof ApiPlatformProjectsRefAnalyticsLogDrainsUuidRoute
 }
@@ -6346,7 +6447,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiStatusOverrideRoute: ApiStatusOverrideRoute,
   IntegrationsVercelRoute: IntegrationsVercelRouteWithChildren,
   NewSlugRoute: NewSlugRoute,
+  OrgChar91_Char93Route: OrgChar91_Char93RouteWithChildren,
   ProjectRefRoute: ProjectRefRouteWithChildren,
+  ProjectChar91_Char93Route: ProjectChar91_Char93RouteWithChildren,
   ApiAiDocsRoute: ApiAiDocsRoute,
   ApiContentGraphqlRoute: ApiContentGraphqlRoute,
   ApiEdgeFunctionsTestRoute: ApiEdgeFunctionsTestRoute,

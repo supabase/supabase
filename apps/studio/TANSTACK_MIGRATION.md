@@ -383,8 +383,8 @@ per-file items only when a subtree has special cases.
 
 ## Deferred / revisit
 
-- `pages/org/_/[[...routeSlug]].tsx` — catch-all placeholder; revisit after all `/org/*` pages are migrated
-- `pages/project/_/[[...routeSlug]].tsx` — catch-all placeholder; revisit after all `/project/*` pages are migrated
+- ~~`pages/org/_/[[...routeSlug]].tsx`~~ landed as `routes/org.[_].tsx` + `routes/org.[_].$.tsx`. **Naming delta:** path-as-filename form (not `routes/org/[_]/index.tsx`) because the index-file form trips a router-generator bug at `getRouteNodes.js:132` — when an `index.tsx` has a bracket-escaped _parent_ segment, `originalRoutePath` gets wiped wholesale and the escape info is lost, so `_` gets stripped as pathless. The path-as-filename form keeps the last segment non-index and avoids the bug branch entirely. Next page accepts either Next-style `routeSlug` (string[]) or TanStack-style `_splat` (string) and normalises to the array shape.
+- ~~`pages/project/_/[[...routeSlug]].tsx`~~ landed as `routes/project.[_].tsx` + `routes/project.[_].$.tsx`. Same naming-delta rationale as the org catch-alls above.
 - Remove `RouteValidationWrapper` + `next/router` compat shim once no page under `pages/` remains
 - Remove `compat/next/` directory entirely once all Next imports are gone from workspace source
 - Delete this file

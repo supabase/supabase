@@ -35,7 +35,16 @@ import { withAuth } from '@/hooks/misc/withAuth'
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
   const { slug } = useParams()
-  const { routeSlug, ...queryParams } = router.query
+  // Under TanStack this page is mounted via `routes/project/[_]/$.tsx`,
+  // which surfaces the trailing path as `_splat` (string), not as Next's
+  // `routeSlug` (string[]). Normalise both shapes to an array so
+  // downstream URL building (urlRewriterFactory) keeps working.
+  const { routeSlug: rawRouteSlug, _splat, ...queryParams } = router.query
+  const routeSlug: string[] | undefined = Array.isArray(rawRouteSlug)
+    ? rawRouteSlug
+    : typeof _splat === 'string' && _splat
+      ? _splat.split('/')
+      : undefined
 
   const [lastVisitedOrgSlug] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
