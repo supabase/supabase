@@ -13,8 +13,17 @@ import { getRouterEventsProxy } from './_router-events'
 // (e.g. `/project/[ref]/sql/[id]`), not the resolved URL. TanStack's
 // route id uses `$param` — convert so legacy code that does
 // `router.pathname.endsWith('/sql/[id]')` keeps working.
+//
+// Also strip the trailing slash TanStack appends to index-route ids
+// (`/project/$ref/`). Next's pages-router never includes a trailing
+// slash, so consumers like `router.pathname.split('/')[3]` (used in
+// the project sidebar's active-route check) silently see an empty
+// string for index pages instead of `undefined`, and the home icon
+// stops highlighting. The root path stays `/` either way.
 function toNextPathPattern(routeId: string) {
-  return routeId.replace(/\$([a-zA-Z0-9_]+)/g, '[$1]')
+  const withBracketParams = routeId.replace(/\$([a-zA-Z0-9_]+)/g, '[$1]')
+  if (withBracketParams === '/') return withBracketParams
+  return withBracketParams.replace(/\/$/, '')
 }
 
 // Normalise TanStack's `router.basepath` to Next's `router.basePath`
