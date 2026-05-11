@@ -25,7 +25,7 @@ import {
 } from '@/hooks/misc/useFlyDeprecationProjects'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
-const BANNER_EXPIRES_AT = new Date('2026-06-15T00:00:00Z')
+const BANNER_EXPIRES_AT = new Date('2026-06-01T00:00:00Z')
 const MIGRATION_GUIDE_URL =
   'https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore'
 const SUPPORT_URL = 'https://supabase.com/dashboard/support/new'
