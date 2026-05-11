@@ -1,4 +1,3 @@
-import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
@@ -176,15 +175,12 @@ const CreateProject = () => {
 
     snapshot.setLoading(true)
 
-    let dbSqlParts: string[] = []
+    let dbSql: string | undefined
     if (shouldRunMigrations) {
       const id = toast(`Fetching initial migrations from GitHub repo`)
       const migrationSql = await getInitialMigrationSQLFromGitHubRepo(externalId)
-      if (migrationSql) dbSqlParts.push(migrationSql)
+      if (migrationSql) dbSql = migrationSql
       toast.success(`Done fetching initial migrations`, { id })
-    }
-    if (!dataApiDefaultPrivileges) {
-      dbSqlParts.push(buildDefaultPrivilegesSql('revoke'))
     }
 
     createProject({
@@ -192,7 +188,8 @@ const CreateProject = () => {
       name: projectName,
       dbPass,
       dbRegion,
-      dbSql: dbSqlParts.length > 0 ? dbSqlParts.join('\n') : undefined,
+      dbSql,
+      dataApiRevokeDefaultPrivileges: !dataApiDefaultPrivileges,
     })
   }
 

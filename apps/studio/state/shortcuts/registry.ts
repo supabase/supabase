@@ -1,4 +1,6 @@
 import { SHORTCUT_REFERENCE_GROUPS } from './referenceGroups'
+import { AUTH_NAV_SHORTCUT_IDS, authNavRegistry } from './registry/auth-nav'
+import { AUTH_USERS_SHORTCUT_IDS, authUsersRegistry } from './registry/auth-users'
 import { DATABASE_NAV_SHORTCUT_IDS, databaseNavRegistry } from './registry/database-nav'
 import { LIST_PAGE_SHORTCUT_IDS, listPageRegistry } from './registry/list-page'
 import {
@@ -69,6 +71,11 @@ export const SHORTCUT_IDS = {
 
   // Database sub-page navigation chords
   ...DATABASE_NAV_SHORTCUT_IDS,
+
+  // Auth users page shortcuts
+  ...AUTH_USERS_SHORTCUT_IDS,
+  // Auth sub-page navigation chords
+  ...AUTH_NAV_SHORTCUT_IDS,
 } as const
 
 /**
@@ -348,4 +355,9 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
 
   // Database sub-page navigation chord registration
   ...databaseNavRegistry,
+
+  // Auth users page shortcut registration
+  ...authUsersRegistry,
+  // Auth sub-page navigation chord registration
+  ...authNavRegistry,
 }

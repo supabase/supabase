@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import Head from 'next/head'
@@ -377,16 +376,11 @@ const Wizard: NextPageWithLayout = () => {
       dbInstanceSize: isFreePlan ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: false,
+      dataApiRevokeDefaultPrivileges: dataApi && !dataApiDefaultPrivileges,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
-      dbSql:
-        [
-          enableRlsEventTrigger && AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL,
-          dataApi && !dataApiDefaultPrivileges && buildDefaultPrivilegesSql('revoke'),
-        ]
-          .filter(Boolean)
-          .join('\n') || undefined,
+      dbSql: enableRlsEventTrigger ? AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL : undefined,
       ...(shouldIncludeGitHubFields
         ? {
             githubInstallationId,

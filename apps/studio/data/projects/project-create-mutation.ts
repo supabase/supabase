@@ -26,6 +26,7 @@ export type ProjectCreateVariables = {
   dbInstanceSize?: DesiredInstanceSize
   dataApiExposedSchemas?: string[]
   dataApiUseApiSchema?: boolean
+  dataApiRevokeDefaultPrivileges?: boolean
   postgresEngine?: PostgresEngine
   releaseChannel?: ReleaseChannel
   highAvailability?: boolean
@@ -46,6 +47,7 @@ export async function createProject({
   dbInstanceSize,
   dataApiExposedSchemas,
   dataApiUseApiSchema,
+  dataApiRevokeDefaultPrivileges,
   postgresEngine,
   releaseChannel,
   highAvailability,
@@ -67,6 +69,7 @@ export async function createProject({
     desired_instance_size: dbInstanceSize,
     data_api_exposed_schemas: dataApiExposedSchemas,
     data_api_use_api_schema: dataApiUseApiSchema,
+    data_api_revoke_default_privileges: dataApiRevokeDefaultPrivileges,
     postgres_engine: postgresEngine,
     release_channel: releaseChannel,
     high_availability: highAvailability,

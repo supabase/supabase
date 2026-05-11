@@ -2740,6 +2740,7 @@ export type AiAssistantSource =
   | 'log_explorer'
   | 'error_code'
   | 'advisor_signal_detail'
+  | 'rls_tester'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.

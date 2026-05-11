@@ -1,11 +1,13 @@
 export const SHORTCUT_REFERENCE_GROUPS = {
   NAVIGATION_GLOBAL: 'navigation.global',
   NAVIGATION_DATABASE: 'navigation.database',
+  NAVIGATION_AUTH: 'navigation.auth',
 } as const
 
 export const SHORTCUT_REFERENCE_GROUP_LABELS: Record<string, string> = {
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL]: 'Global Navigation',
   [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_DATABASE]: 'Database Navigation',
+  [SHORTCUT_REFERENCE_GROUPS.NAVIGATION_AUTH]: 'Auth Navigation',
 }
 
 export const SHORTCUT_REFERENCE_GROUP_ORDER = [
@@ -13,6 +15,7 @@ export const SHORTCUT_REFERENCE_GROUP_ORDER = [
   'shortcuts',
   SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,
   SHORTCUT_REFERENCE_GROUPS.NAVIGATION_DATABASE,
+  SHORTCUT_REFERENCE_GROUPS.NAVIGATION_AUTH,
   'nav',
   'ai-assistant',
   'inline-editor',
