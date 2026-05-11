@@ -1,4 +1,4 @@
-import { Input } from 'ui'
+import { TextArea_Shadcn_ as TextArea } from 'ui'
 
 interface SpreadSheetTextInputProps {
   input: string
@@ -18,14 +18,7 @@ const SpreadSheetTextInput = ({ input, onInputChange }: SpreadSheetTextInputProp
         Tip: Datetime columns should be formatted as YYYY-MM-DD HH:mm:ss
       </p>
     </div>
-    <Input.TextArea
-      size="tiny"
-      className="font-mono"
-      rows={15}
-      style={{ resize: 'none' }}
-      value={input}
-      onChange={onInputChange}
-    />
+    <TextArea className="font-mono" rows={15} value={input} onChange={onInputChange} />
   </div>
 )
 

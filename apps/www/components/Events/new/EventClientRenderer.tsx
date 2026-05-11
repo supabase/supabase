@@ -19,9 +19,15 @@ function EventBannerSection() {
   )
 }
 
-export function EventClientRenderer({ notionEvents }: { notionEvents: SupabaseEvent[] }) {
+export function EventClientRenderer({
+  notionEvents,
+  mdxEvents,
+}: {
+  notionEvents: SupabaseEvent[]
+  mdxEvents: SupabaseEvent[]
+}) {
   return (
-    <EventsProvider notionEvents={notionEvents}>
+    <EventsProvider notionEvents={notionEvents} mdxEvents={mdxEvents}>
       <DefaultLayout className="flex flex-col">
         <EventsContainer className="border-x border-b py-8">
           <h1 className="h3 p-0! m-0!">

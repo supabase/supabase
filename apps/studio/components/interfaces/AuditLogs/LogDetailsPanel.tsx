@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
-import { Input, SidePanel } from 'ui'
+import { Input_Shadcn_ as Input, SidePanel, TextArea_Shadcn_ as TextArea } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import {
   FormSection,
@@ -34,28 +35,29 @@ export const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) 
     >
       <FormSection header={<FormSectionLabel>General</FormSectionLabel>}>
         <FormSectionContent loading={false}>
-          <Input
-            readOnly
-            size="small"
-            label="Occurred at"
-            value={
-              selectedLog
-                ? dayjs(selectedLog.timestamp / TIMESTAMP_MICROS_PER_MS).toISOString()
-                : ''
-            }
-            descriptionText={timestampWithTz}
-          />
-          <Input readOnly size="small" label="Request ID" value={selectedLog?.request_id ?? ''} />
-          {selectedLog?.organization_slug && (
+          <FormItemLayout label="Occurred at" description={timestampWithTz} isReactForm={false}>
             <Input
               readOnly
               size="small"
-              label="Organization"
-              value={selectedLog.organization_slug}
+              value={
+                selectedLog
+                  ? dayjs(selectedLog.timestamp / TIMESTAMP_MICROS_PER_MS).toISOString()
+                  : ''
+              }
             />
+          </FormItemLayout>
+          <FormItemLayout label="Request ID" isReactForm={false}>
+            <Input readOnly size="small" value={selectedLog?.request_id ?? ''} />
+          </FormItemLayout>
+          {selectedLog?.organization_slug && (
+            <FormItemLayout label="Organization" isReactForm={false}>
+              <Input readOnly size="small" value={selectedLog.organization_slug} />
+            </FormItemLayout>
           )}
           {selectedLog?.project_ref && (
-            <Input readOnly size="small" label="Project ref" value={selectedLog.project_ref} />
+            <FormItemLayout label="Project ref" isReactForm={false}>
+              <Input readOnly size="small" value={selectedLog.project_ref} />
+            </FormItemLayout>
           )}
         </FormSectionContent>
       </FormSection>
@@ -64,31 +66,33 @@ export const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) 
 
       <FormSection header={<FormSectionLabel>Actor</FormSectionLabel>}>
         <FormSectionContent loading={false}>
-          <Input
-            readOnly
-            size="small"
-            label="Token type"
-            value={selectedLog?.actor.token_type ?? ''}
-          />
+          <FormItemLayout label="Token type" isReactForm={false}>
+            <Input readOnly size="small" value={selectedLog?.actor.token_type ?? ''} />
+          </FormItemLayout>
           {selectedLog?.actor.email && (
-            <Input readOnly size="small" label="Email" value={selectedLog.actor.email} />
+            <FormItemLayout label="Email" isReactForm={false}>
+              <Input readOnly size="small" value={selectedLog?.actor.email ?? ''} />
+            </FormItemLayout>
           )}
           {selectedLog?.actor.user_id && (
-            <Input readOnly size="small" label="User ID" value={selectedLog.actor.user_id} />
+            <FormItemLayout label="User ID" isReactForm={false}>
+              <Input readOnly size="small" value={selectedLog?.actor.user_id ?? ''} />
+            </FormItemLayout>
           )}
           {selectedLog?.actor.ip && (
-            <Input readOnly size="small" label="IP address" value={selectedLog.actor.ip} />
+            <FormItemLayout label="IP address" isReactForm={false}>
+              <Input readOnly size="small" value={selectedLog?.actor.ip ?? ''} />
+            </FormItemLayout>
           )}
           {selectedLog?.actor.oauth_app_name && (
-            <Input
-              readOnly
-              size="small"
-              label="OAuth app"
-              value={selectedLog.actor.oauth_app_name}
-            />
+            <FormItemLayout label="OAuth app" isReactForm={false}>
+              <Input readOnly size="small" value={selectedLog?.actor.oauth_app_name ?? ''} />
+            </FormItemLayout>
           )}
           {selectedLog?.actor.app_name && (
-            <Input readOnly size="small" label="App" value={selectedLog.actor.app_name} />
+            <FormItemLayout label="App" isReactForm={false}>
+              <Input readOnly size="small" value={selectedLog?.actor.app_name ?? ''} />
+            </FormItemLayout>
           )}
         </FormSectionContent>
       </FormSection>
@@ -97,24 +101,27 @@ export const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) 
 
       <FormSection header={<FormSectionLabel>Action</FormSectionLabel>}>
         <FormSectionContent loading={false}>
-          <Input readOnly size="small" label="Name" value={selectedLog?.action.name ?? ''} />
-          <Input readOnly size="small" label="Method" value={selectedLog?.action.method ?? ''} />
-          <Input readOnly size="small" label="Route" value={selectedLog?.action.route ?? ''} />
-          <Input
-            readOnly
-            size="small"
-            label="Status"
-            value={String(selectedLog?.action.status ?? '')}
-          />
+          <FormItemLayout label="Name" isReactForm={false}>
+            <Input readOnly size="small" value={selectedLog?.action.name ?? ''} />
+          </FormItemLayout>
+          <FormItemLayout label="Method" isReactForm={false}>
+            <Input readOnly size="small" value={selectedLog?.action.method ?? ''} />
+          </FormItemLayout>
+          <FormItemLayout label="Route" isReactForm={false}>
+            <Input readOnly size="small" value={selectedLog?.action.route ?? ''} />
+          </FormItemLayout>
+          <FormItemLayout label="Status" isReactForm={false}>
+            <Input readOnly size="small" value={String(selectedLog?.action.status ?? '')} />
+          </FormItemLayout>
           {selectedLog?.action.metadata && (
-            <Input.TextArea
-              readOnly
-              size="small"
-              label="Metadata"
-              rows={5}
-              className="input-mono input-xs"
-              value={JSON.stringify(selectedLog.action.metadata, null, 2)}
-            />
+            <FormItemLayout label="Metadata" isReactForm={false}>
+              <TextArea
+                readOnly
+                rows={5}
+                className="font-mono input-xs"
+                value={JSON.stringify(selectedLog.action.metadata, null, 2)}
+              />
+            </FormItemLayout>
           )}
         </FormSectionContent>
       </FormSection>

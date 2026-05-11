@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 export function useStateTransition<
   State extends { type: string },
@@ -14,14 +14,17 @@ export function useStateTransition<
   ) => void
 ): void {
   const prevState = useRef(state)
-  const savedPrevState = prevState.current
-  const shouldRunCallback = savedPrevState.type === prevTest && state.type === newTest
-  prevState.current = state
 
-  if (shouldRunCallback) {
-    cb(
-      savedPrevState as Extract<State, { type: PrevType }>,
-      state as Extract<State, { type: NewType }>
-    )
-  }
+  useEffect(() => {
+    const savedPrevState = prevState.current
+
+    if (savedPrevState.type === prevTest && state.type === newTest) {
+      cb(
+        savedPrevState as Extract<State, { type: PrevType }>,
+        state as Extract<State, { type: NewType }>
+      )
+    }
+
+    prevState.current = state
+  }, [cb, newTest, prevTest, state])
 }

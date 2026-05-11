@@ -40,10 +40,14 @@ import { UserSelector } from './UserSelector'
 import { UserSqlEditor } from './UserSqlEditor'
 import { useTestQueryRLS } from './useTestQueryRLS'
 import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { PostgresSandboxProvider, usePostgresSandbox } from '@/state/postgres-sandbox/sandbox'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface RLSTesterSheetProps {
   handleSelectEditPolicy: (policy: Policy) => void
@@ -59,6 +63,8 @@ export const RLSTesterSheet = (props: RLSTesterSheetProps) => {
 
 const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps) => {
   const { status, startSandbox } = usePostgresSandbox()
+  const aiSnap = useAiAssistantStateSnapshot()
+  const { openSidebar } = useSidebarManagerSnapshot()
   const { setRole } = useRoleImpersonationStateSnapshot()
 
   const [open, setOpen] = useState(false)
@@ -112,6 +118,25 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
     } else {
       await testQuery({ value, ...executionCallbacks })
     }
+  }
+
+  const assistantSql = format === 'lib' && inferredSQL ? acceptUntrustedSql(inferredSQL) : value
+
+  const getDebugPrompt = ({ includeSql = false }: { includeSql?: boolean } = {}) => {
+    const prompt = `Help me fix my RLS policy based on the attached SQL snippet that gave the following error: \n\n${executeSqlError?.message}\n\nEvaluate if the problem might be query first, before checking my RLS policies.`
+
+    return includeSql ? `${prompt}\n\nSQL Query:\n\`\`\`sql\n${assistantSql}\n\`\`\`` : prompt
+  }
+
+  const onDebugWithAssistant = () => {
+    const prompt = getDebugPrompt()
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    aiSnap.newChat({
+      name: 'Debug RLS policies',
+      sqlSnippets: [assistantSql],
+      initialInput: prompt,
+    })
+    setOpen(false)
   }
 
   useEffect(() => {
@@ -281,7 +306,7 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
 
             <DialogSectionSeparator />
 
-            {parseQueryError && (
+            {parseQueryError ? (
               <div className="p-4">
                 <Admonition
                   type="warning"
@@ -289,9 +314,7 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
                   description={parseQueryError.message}
                 />
               </div>
-            )}
-
-            {parseClientCodeError && (
+            ) : parseClientCodeError ? (
               <div className="p-4">
                 <Admonition
                   type="warning"
@@ -299,20 +322,31 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
                   description={parseClientCodeError.message}
                 />
               </div>
-            )}
-
-            {executeSqlError && (
-              <div className="p-4">
-                <Admonition
-                  type="warning"
-                  title="Error running SQL query"
-                  description={executeSqlError.message}
-                />
-              </div>
+            ) : (
+              executeSqlError && (
+                <div className="p-4">
+                  <Admonition
+                    type="warning"
+                    title="Error running SQL query"
+                    description={executeSqlError.message}
+                    actions={[
+                      <AiAssistantDropdown
+                        key="ai-assistant"
+                        label="Ask Assistant"
+                        telemetrySource="rls_tester"
+                        buildPrompt={() => getDebugPrompt({ includeSql: true })}
+                        onOpenAssistant={onDebugWithAssistant}
+                      />,
+                    ]}
+                  />
+                </div>
+              )
             )}
 
             {results === null ? (
-              <RLSTesterEmptyState />
+              !parseQueryError &&
+              !parseClientCodeError &&
+              !executeSqlError && <RLSTesterEmptyState />
             ) : !!parseQueryResults ? (
               <RLSTesterResults
                 results={results}
