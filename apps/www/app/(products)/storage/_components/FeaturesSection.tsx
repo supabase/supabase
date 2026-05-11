@@ -223,13 +223,13 @@ function BucketsSkeleton() {
       name: 'Analytics',
       label: 'Iceberg, time-series',
       icon: 'chart' as const,
-      colorClass: 'text-blue-800 dark:text-blue-900',
+      colorClass: 'text-blue-700 dark:text-blue-400',
     },
     {
       name: 'Vectors',
       label: 'embeddings, RAG',
       icon: 'sparkles' as const,
-      colorClass: 'text-purple-800 dark:text-purple-900',
+      colorClass: 'text-purple-700 dark:text-purple-400',
     },
   ]
 

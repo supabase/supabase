@@ -430,7 +430,7 @@ export function VisualDemo() {
   return (
     <div ref={containerRef} className="border-t border-border relative">
       <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 pb-16 md:pb-24">
-        <div className="-translate-y-16 relative w-full aspect-[16/9]">
+        <div className="-translate-y-16 relative w-full h-[620px]">
           {/* Gradient blob behind card */}
           <div
             className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[105%] w-[102%] rounded-[300px] blur-[50px] dark:blur-[24px] dark:saturate-[0.4] dark:brightness-50"
@@ -470,9 +470,9 @@ export function VisualDemo() {
             <div
               className="overflow-hidden"
               style={{
-                maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.85) 60%, transparent 100%)',
+                maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.85) 80%, transparent 100%)',
                 WebkitMaskImage:
-                  'linear-gradient(to bottom, rgba(0,0,0,0.85) 60%, transparent 100%)',
+                  'linear-gradient(to bottom, rgba(0,0,0,0.85) 80%, transparent 100%)',
               }}
             >
               <div className="overflow-hidden">
