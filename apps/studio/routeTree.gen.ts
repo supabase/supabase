@@ -52,6 +52,7 @@ import { Route as ProjectRefEditorRouteImport } from './routes/project/$ref/edit
 import { Route as ProjectRefDatabaseRouteImport } from './routes/project/$ref/database'
 import { Route as ProjectRefBranchesRouteImport } from './routes/project/$ref/branches'
 import { Route as ProjectRefAuthRouteImport } from './routes/project/$ref/auth'
+import { Route as ProjectRefAdvisorsRouteImport } from './routes/project/$ref/advisors'
 import { Route as ApiIntegrationsStripeSyncRouteImport } from './routes/api/integrations/stripe-sync'
 import { Route as ApiEdgeFunctionsTestRouteImport } from './routes/api/edge-functions/test'
 import { Route as ApiContentGraphqlRouteImport } from './routes/api/content/graphql'
@@ -109,6 +110,9 @@ import { Route as ProjectRefAuthOauthAppsRouteImport } from './routes/project/$r
 import { Route as ProjectRefAuthMfaRouteImport } from './routes/project/$ref/auth/mfa'
 import { Route as ProjectRefAuthHooksRouteImport } from './routes/project/$ref/auth/hooks'
 import { Route as ProjectRefAuthAuditLogsRouteImport } from './routes/project/$ref/auth/audit-logs'
+import { Route as ProjectRefAdvisorsSecurityRouteImport } from './routes/project/$ref/advisors/security'
+import { Route as ProjectRefAdvisorsRulesRouteImport } from './routes/project/$ref/advisors/rules'
+import { Route as ProjectRefAdvisorsPerformanceRouteImport } from './routes/project/$ref/advisors/performance'
 import { Route as ApiPlatformTelemetryEventRouteImport } from './routes/api/platform/telemetry/event'
 import { Route as ApiPlatformIntegrationsSlugRouteImport } from './routes/api/platform/integrations/$slug'
 import { Route as ApiAiSqlTitleV2RouteImport } from './routes/api/ai/sql/title-v2'
@@ -159,6 +163,8 @@ import { Route as ProjectRefDatabaseBackupsScheduledRouteImport } from './routes
 import { Route as ProjectRefDatabaseBackupsRestoreToNewProjectRouteImport } from './routes/project/$ref/database/backups/restore-to-new-project'
 import { Route as ProjectRefDatabaseBackupsPitrRouteImport } from './routes/project/$ref/database/backups/pitr'
 import { Route as ProjectRefAuthTemplatesTemplateIdRouteImport } from './routes/project/$ref/auth/templates/$templateId'
+import { Route as ProjectRefAdvisorsRulesSecurityRouteImport } from './routes/project/$ref/advisors/rules/security'
+import { Route as ProjectRefAdvisorsRulesPerformanceRouteImport } from './routes/project/$ref/advisors/rules/performance'
 import { Route as ApiV1ProjectsRefApiKeysRouteImport } from './routes/api/v1/projects/$ref/api-keys'
 import { Route as ApiPlatformPropsOrgSlugRouteImport } from './routes/api/platform/props/org/$slug'
 import { Route as ApiPlatformProjectsRefSettingsRouteImport } from './routes/api/platform/projects/$ref/settings'
@@ -439,6 +445,11 @@ const ProjectRefBranchesRoute = ProjectRefBranchesRouteImport.update({
 const ProjectRefAuthRoute = ProjectRefAuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
+const ProjectRefAdvisorsRoute = ProjectRefAdvisorsRouteImport.update({
+  id: '/advisors',
+  path: '/advisors',
   getParentRoute: () => ProjectRefRoute,
 } as any)
 const ApiIntegrationsStripeSyncRoute =
@@ -751,6 +762,23 @@ const ProjectRefAuthAuditLogsRoute = ProjectRefAuthAuditLogsRouteImport.update({
   path: '/audit-logs',
   getParentRoute: () => ProjectRefAuthRoute,
 } as any)
+const ProjectRefAdvisorsSecurityRoute =
+  ProjectRefAdvisorsSecurityRouteImport.update({
+    id: '/security',
+    path: '/security',
+    getParentRoute: () => ProjectRefAdvisorsRoute,
+  } as any)
+const ProjectRefAdvisorsRulesRoute = ProjectRefAdvisorsRulesRouteImport.update({
+  id: '/rules',
+  path: '/rules',
+  getParentRoute: () => ProjectRefAdvisorsRoute,
+} as any)
+const ProjectRefAdvisorsPerformanceRoute =
+  ProjectRefAdvisorsPerformanceRouteImport.update({
+    id: '/performance',
+    path: '/performance',
+    getParentRoute: () => ProjectRefAdvisorsRoute,
+  } as any)
 const ApiPlatformTelemetryEventRoute =
   ApiPlatformTelemetryEventRouteImport.update({
     id: '/api/platform/telemetry/event',
@@ -1028,6 +1056,18 @@ const ProjectRefAuthTemplatesTemplateIdRoute =
     id: '/templates/$templateId',
     path: '/templates/$templateId',
     getParentRoute: () => ProjectRefAuthRoute,
+  } as any)
+const ProjectRefAdvisorsRulesSecurityRoute =
+  ProjectRefAdvisorsRulesSecurityRouteImport.update({
+    id: '/security',
+    path: '/security',
+    getParentRoute: () => ProjectRefAdvisorsRulesRoute,
+  } as any)
+const ProjectRefAdvisorsRulesPerformanceRoute =
+  ProjectRefAdvisorsRulesPerformanceRouteImport.update({
+    id: '/performance',
+    path: '/performance',
+    getParentRoute: () => ProjectRefAdvisorsRulesRoute,
   } as any)
 const ApiV1ProjectsRefApiKeysRoute = ApiV1ProjectsRefApiKeysRouteImport.update({
   id: '/api/v1/projects/$ref/api-keys',
@@ -1456,6 +1496,7 @@ export interface FileRoutesByFullPath {
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
@@ -1490,6 +1531,9 @@ export interface FileRoutesByFullPath {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/advisors/performance': typeof ProjectRefAdvisorsPerformanceRoute
+  '/project/$ref/advisors/rules': typeof ProjectRefAdvisorsRulesRouteWithChildren
+  '/project/$ref/advisors/security': typeof ProjectRefAdvisorsSecurityRoute
   '/project/$ref/auth/audit-logs': typeof ProjectRefAuthAuditLogsRoute
   '/project/$ref/auth/hooks': typeof ProjectRefAuthHooksRoute
   '/project/$ref/auth/mfa': typeof ProjectRefAuthMfaRoute
@@ -1565,6 +1609,8 @@ export interface FileRoutesByFullPath {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/project/$ref/advisors/rules/performance': typeof ProjectRefAdvisorsRulesPerformanceRoute
+  '/project/$ref/advisors/rules/security': typeof ProjectRefAdvisorsRulesSecurityRoute
   '/project/$ref/auth/templates/$templateId': typeof ProjectRefAuthTemplatesTemplateIdRoute
   '/project/$ref/database/backups/pitr': typeof ProjectRefDatabaseBackupsPitrRoute
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
@@ -1669,6 +1715,7 @@ export interface FileRoutesByTo {
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
@@ -1699,6 +1746,9 @@ export interface FileRoutesByTo {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/advisors/performance': typeof ProjectRefAdvisorsPerformanceRoute
+  '/project/$ref/advisors/rules': typeof ProjectRefAdvisorsRulesRouteWithChildren
+  '/project/$ref/advisors/security': typeof ProjectRefAdvisorsSecurityRoute
   '/project/$ref/auth/audit-logs': typeof ProjectRefAuthAuditLogsRoute
   '/project/$ref/auth/hooks': typeof ProjectRefAuthHooksRoute
   '/project/$ref/auth/mfa': typeof ProjectRefAuthMfaRoute
@@ -1772,6 +1822,8 @@ export interface FileRoutesByTo {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/project/$ref/advisors/rules/performance': typeof ProjectRefAdvisorsRulesPerformanceRoute
+  '/project/$ref/advisors/rules/security': typeof ProjectRefAdvisorsRulesSecurityRoute
   '/project/$ref/auth/templates/$templateId': typeof ProjectRefAuthTemplatesTemplateIdRoute
   '/project/$ref/database/backups/pitr': typeof ProjectRefDatabaseBackupsPitrRoute
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
@@ -1881,6 +1933,7 @@ export interface FileRoutesById {
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
@@ -1915,6 +1968,9 @@ export interface FileRoutesById {
   '/api/ai/sql/title-v2': typeof ApiAiSqlTitleV2Route
   '/api/platform/integrations/$slug': typeof ApiPlatformIntegrationsSlugRoute
   '/api/platform/telemetry/event': typeof ApiPlatformTelemetryEventRoute
+  '/project/$ref/advisors/performance': typeof ProjectRefAdvisorsPerformanceRoute
+  '/project/$ref/advisors/rules': typeof ProjectRefAdvisorsRulesRouteWithChildren
+  '/project/$ref/advisors/security': typeof ProjectRefAdvisorsSecurityRoute
   '/project/$ref/auth/audit-logs': typeof ProjectRefAuthAuditLogsRoute
   '/project/$ref/auth/hooks': typeof ProjectRefAuthHooksRoute
   '/project/$ref/auth/mfa': typeof ProjectRefAuthMfaRoute
@@ -1990,6 +2046,8 @@ export interface FileRoutesById {
   '/api/platform/projects/$ref/settings': typeof ApiPlatformProjectsRefSettingsRoute
   '/api/platform/props/org/$slug': typeof ApiPlatformPropsOrgSlugRoute
   '/api/v1/projects/$ref/api-keys': typeof ApiV1ProjectsRefApiKeysRoute
+  '/project/$ref/advisors/rules/performance': typeof ProjectRefAdvisorsRulesPerformanceRoute
+  '/project/$ref/advisors/rules/security': typeof ProjectRefAdvisorsRulesSecurityRoute
   '/project/$ref/auth/templates/$templateId': typeof ProjectRefAuthTemplatesTemplateIdRoute
   '/project/$ref/database/backups/pitr': typeof ProjectRefDatabaseBackupsPitrRoute
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
@@ -2098,6 +2156,7 @@ export interface FileRouteTypes {
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/branches'
     | '/project/$ref/database'
@@ -2132,6 +2191,9 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/advisors/performance'
+    | '/project/$ref/advisors/rules'
+    | '/project/$ref/advisors/security'
     | '/project/$ref/auth/audit-logs'
     | '/project/$ref/auth/hooks'
     | '/project/$ref/auth/mfa'
@@ -2207,6 +2269,8 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/project/$ref/advisors/rules/performance'
+    | '/project/$ref/advisors/rules/security'
     | '/project/$ref/auth/templates/$templateId'
     | '/project/$ref/database/backups/pitr'
     | '/project/$ref/database/backups/restore-to-new-project'
@@ -2311,6 +2375,7 @@ export interface FileRouteTypes {
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/database'
     | '/project/$ref/realtime'
@@ -2341,6 +2406,9 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/advisors/performance'
+    | '/project/$ref/advisors/rules'
+    | '/project/$ref/advisors/security'
     | '/project/$ref/auth/audit-logs'
     | '/project/$ref/auth/hooks'
     | '/project/$ref/auth/mfa'
@@ -2414,6 +2482,8 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/project/$ref/advisors/rules/performance'
+    | '/project/$ref/advisors/rules/security'
     | '/project/$ref/auth/templates/$templateId'
     | '/project/$ref/database/backups/pitr'
     | '/project/$ref/database/backups/restore-to-new-project'
@@ -2522,6 +2592,7 @@ export interface FileRouteTypes {
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/branches'
     | '/project/$ref/database'
@@ -2556,6 +2627,9 @@ export interface FileRouteTypes {
     | '/api/ai/sql/title-v2'
     | '/api/platform/integrations/$slug'
     | '/api/platform/telemetry/event'
+    | '/project/$ref/advisors/performance'
+    | '/project/$ref/advisors/rules'
+    | '/project/$ref/advisors/security'
     | '/project/$ref/auth/audit-logs'
     | '/project/$ref/auth/hooks'
     | '/project/$ref/auth/mfa'
@@ -2631,6 +2705,8 @@ export interface FileRouteTypes {
     | '/api/platform/projects/$ref/settings'
     | '/api/platform/props/org/$slug'
     | '/api/v1/projects/$ref/api-keys'
+    | '/project/$ref/advisors/rules/performance'
+    | '/project/$ref/advisors/rules/security'
     | '/project/$ref/auth/templates/$templateId'
     | '/project/$ref/database/backups/pitr'
     | '/project/$ref/database/backups/restore-to-new-project'
@@ -3105,6 +3181,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefAuthRouteImport
       parentRoute: typeof ProjectRefRoute
     }
+    '/project/$ref/advisors': {
+      id: '/project/$ref/advisors'
+      path: '/advisors'
+      fullPath: '/project/$ref/advisors'
+      preLoaderRoute: typeof ProjectRefAdvisorsRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
     '/api/integrations/stripe-sync': {
       id: '/api/integrations/stripe-sync'
       path: '/api/integrations/stripe-sync'
@@ -3504,6 +3587,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefAuthAuditLogsRouteImport
       parentRoute: typeof ProjectRefAuthRoute
     }
+    '/project/$ref/advisors/security': {
+      id: '/project/$ref/advisors/security'
+      path: '/security'
+      fullPath: '/project/$ref/advisors/security'
+      preLoaderRoute: typeof ProjectRefAdvisorsSecurityRouteImport
+      parentRoute: typeof ProjectRefAdvisorsRoute
+    }
+    '/project/$ref/advisors/rules': {
+      id: '/project/$ref/advisors/rules'
+      path: '/rules'
+      fullPath: '/project/$ref/advisors/rules'
+      preLoaderRoute: typeof ProjectRefAdvisorsRulesRouteImport
+      parentRoute: typeof ProjectRefAdvisorsRoute
+    }
+    '/project/$ref/advisors/performance': {
+      id: '/project/$ref/advisors/performance'
+      path: '/performance'
+      fullPath: '/project/$ref/advisors/performance'
+      preLoaderRoute: typeof ProjectRefAdvisorsPerformanceRouteImport
+      parentRoute: typeof ProjectRefAdvisorsRoute
+    }
     '/api/platform/telemetry/event': {
       id: '/api/platform/telemetry/event'
       path: '/api/platform/telemetry/event'
@@ -3853,6 +3957,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/auth/templates/$templateId'
       preLoaderRoute: typeof ProjectRefAuthTemplatesTemplateIdRouteImport
       parentRoute: typeof ProjectRefAuthRoute
+    }
+    '/project/$ref/advisors/rules/security': {
+      id: '/project/$ref/advisors/rules/security'
+      path: '/security'
+      fullPath: '/project/$ref/advisors/rules/security'
+      preLoaderRoute: typeof ProjectRefAdvisorsRulesSecurityRouteImport
+      parentRoute: typeof ProjectRefAdvisorsRulesRoute
+    }
+    '/project/$ref/advisors/rules/performance': {
+      id: '/project/$ref/advisors/rules/performance'
+      path: '/performance'
+      fullPath: '/project/$ref/advisors/rules/performance'
+      preLoaderRoute: typeof ProjectRefAdvisorsRulesPerformanceRouteImport
+      parentRoute: typeof ProjectRefAdvisorsRulesRoute
     }
     '/api/v1/projects/$ref/api-keys': {
       id: '/api/v1/projects/$ref/api-keys'
@@ -4413,6 +4531,38 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface ProjectRefAdvisorsRulesRouteChildren {
+  ProjectRefAdvisorsRulesPerformanceRoute: typeof ProjectRefAdvisorsRulesPerformanceRoute
+  ProjectRefAdvisorsRulesSecurityRoute: typeof ProjectRefAdvisorsRulesSecurityRoute
+}
+
+const ProjectRefAdvisorsRulesRouteChildren: ProjectRefAdvisorsRulesRouteChildren =
+  {
+    ProjectRefAdvisorsRulesPerformanceRoute:
+      ProjectRefAdvisorsRulesPerformanceRoute,
+    ProjectRefAdvisorsRulesSecurityRoute: ProjectRefAdvisorsRulesSecurityRoute,
+  }
+
+const ProjectRefAdvisorsRulesRouteWithChildren =
+  ProjectRefAdvisorsRulesRoute._addFileChildren(
+    ProjectRefAdvisorsRulesRouteChildren,
+  )
+
+interface ProjectRefAdvisorsRouteChildren {
+  ProjectRefAdvisorsPerformanceRoute: typeof ProjectRefAdvisorsPerformanceRoute
+  ProjectRefAdvisorsRulesRoute: typeof ProjectRefAdvisorsRulesRouteWithChildren
+  ProjectRefAdvisorsSecurityRoute: typeof ProjectRefAdvisorsSecurityRoute
+}
+
+const ProjectRefAdvisorsRouteChildren: ProjectRefAdvisorsRouteChildren = {
+  ProjectRefAdvisorsPerformanceRoute: ProjectRefAdvisorsPerformanceRoute,
+  ProjectRefAdvisorsRulesRoute: ProjectRefAdvisorsRulesRouteWithChildren,
+  ProjectRefAdvisorsSecurityRoute: ProjectRefAdvisorsSecurityRoute,
+}
+
+const ProjectRefAdvisorsRouteWithChildren =
+  ProjectRefAdvisorsRoute._addFileChildren(ProjectRefAdvisorsRouteChildren)
+
 interface ProjectRefAuthRouteChildren {
   ProjectRefAuthAuditLogsRoute: typeof ProjectRefAuthAuditLogsRoute
   ProjectRefAuthHooksRoute: typeof ProjectRefAuthHooksRoute
@@ -4673,6 +4823,7 @@ const ProjectRefStorageRouteWithChildren =
   ProjectRefStorageRoute._addFileChildren(ProjectRefStorageRouteChildren)
 
 interface ProjectRefRouteChildren {
+  ProjectRefAdvisorsRoute: typeof ProjectRefAdvisorsRouteWithChildren
   ProjectRefAuthRoute: typeof ProjectRefAuthRouteWithChildren
   ProjectRefBranchesRoute: typeof ProjectRefBranchesRouteWithChildren
   ProjectRefDatabaseRoute: typeof ProjectRefDatabaseRouteWithChildren
@@ -4685,6 +4836,7 @@ interface ProjectRefRouteChildren {
 }
 
 const ProjectRefRouteChildren: ProjectRefRouteChildren = {
+  ProjectRefAdvisorsRoute: ProjectRefAdvisorsRouteWithChildren,
   ProjectRefAuthRoute: ProjectRefAuthRouteWithChildren,
   ProjectRefBranchesRoute: ProjectRefBranchesRouteWithChildren,
   ProjectRefDatabaseRoute: ProjectRefDatabaseRouteWithChildren,

@@ -80,8 +80,8 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/project/$ref/branches.tsx` — BranchLayout only. **Delta vs plan:** the per-page `PageLayout` (with different titles + primary/secondary actions) stays in each leaf. Hoisted `BranchesPageWrapper` and `MergeRequestsPageWrapper` to top-level exports in their respective `pages/...` files so the route files can import + re-use the same wrapping.
 - [ ] `routes/project/$ref/logs.tsx` — LogsLayout
 - [ ] `routes/project/$ref/observability.tsx` — ObservabilityLayout
-- [ ] `routes/project/$ref/advisors.tsx` — AdvisorsLayout
-- [ ] `routes/project/$ref/advisors/rules.tsx` — AdvisorRulesLayout (standalone, not nested under AdvisorsLayout)
+- [x] `routes/project/$ref/advisors.tsx` — AdvisorsLayout (reads `advisorsLayoutTitle` from leaf staticData). Honours `skipAdvisorsLayout: true` opt-out for the rules sub-shell, which provides its own AdvisorsLayout-less-DefaultLayout wrap. Scans whole match chain (same pattern as functions.tsx).
+- [x] `routes/project/$ref/advisors/rules.tsx` — sub-shell that inlines the inner body of `AdvisorRulesLayout` (AdvisorsLayout + PageLayout with title/tabs/feature-preview badge), minus the outer DefaultLayout (already provided by the parent project shell). Sets `skipAdvisorsLayout: true` on its own staticData. **Delta vs plan:** the existing `AdvisorRulesLayout` component wraps in DefaultLayout + AdvisorsLayout internally, so reusing it as-is would double-wrap both. Inlined the inner part; the Next-side component is untouched.
 - [ ] `routes/project/$ref/settings.tsx` — SettingsLayout
 - [ ] `routes/project/$ref/integrations.tsx` — ProjectIntegrationsLayout
 - [x] `routes/project/$ref/sql.tsx` — EditorBaseLayout + SQLEditorLayout. Twin of editor.tsx; all four leaves share identical layout props so the shell hardcodes them (no `staticData` overrides). EditorBaseLayout wraps in ProjectLayoutWithAuth; SQLEditorLayout adds its own `withAuth` HOC but no extra ProjectLayout — same shape as the table editor (auth check runs twice but no double render).
@@ -266,10 +266,10 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/advisors/*`
 
-- [ ] `routes/project/$ref/advisors/performance.tsx` ← `pages/project/[ref]/advisors/performance.tsx`
-- [ ] `routes/project/$ref/advisors/security.tsx` ← `pages/project/[ref]/advisors/security.tsx`
-- [ ] `routes/project/$ref/advisors/rules/performance.tsx` ← `pages/project/[ref]/advisors/rules/performance.tsx`
-- [ ] `routes/project/$ref/advisors/rules/security.tsx` ← `pages/project/[ref]/advisors/rules/security.tsx`
+- [x] A `routes/project/$ref/advisors/performance.tsx` ← `pages/project/[ref]/advisors/performance.tsx`
+- [x] A `routes/project/$ref/advisors/security.tsx` ← `pages/project/[ref]/advisors/security.tsx`
+- [x] A `routes/project/$ref/advisors/rules/performance.tsx` ← `pages/project/[ref]/advisors/rules/performance.tsx`
+- [x] A `routes/project/$ref/advisors/rules/security.tsx` ← `pages/project/[ref]/advisors/rules/security.tsx`
 
 ### Project shell — `/settings/*`
 
