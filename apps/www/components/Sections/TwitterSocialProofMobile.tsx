@@ -1,6 +1,6 @@
 import 'swiper/css'
 
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import React, { FC } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { cn } from 'ui'
@@ -21,7 +21,8 @@ interface Props {
 }
 
 const TwitterSocialProofMobile: FC<Props> = ({ tweets, className }: any) => {
-  const { basePath } = useRouter()
+  const router = useRouter()
+  const basePath = router?.basePath ?? ''
 
   return (
     <div className={className}>

@@ -128,24 +128,14 @@
   }
 }
 
-@font-face {
-  font-family: 'custom-font';
-  src:
-    url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
-    url(../../../packages/common/assets/fonts/CustomFont-Book.woff) format('woff');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'custom-font';
-  src:
-    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff2) format('woff2'),
-    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff) format('woff');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
+:root {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, Menlo, monospace;
+  --heading-tracking: -0.02em;
+  --body-tracking: -0.01em;
+  --heading-leading: 1.1;
+  --body-leading: 1.6;
 }
 
 html {
@@ -154,8 +144,41 @@ html {
 
 body {
   @apply bg-default text-foreground;
+  letter-spacing: var(--body-tracking);
+  line-height: var(--body-leading);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  letter-spacing: var(--heading-tracking);
+  line-height: var(--heading-leading);
+}
+
+.h1:not(.prose *):not(.overwrite),
+.h2:not(.prose *):not(.overwrite),
+.h3:not(.prose *):not(.overwrite),
+.h4:not(.prose *):not(.overwrite),
+.h5:not(.prose *):not(.overwrite),
+.h6:not(.prose *):not(.overwrite) {
+  font-family: var(--font-heading);
+}
+
+pre,
+code,
+kbd,
+samp,
+pre *,
+code *,
+kbd *,
+samp * {
+  font-family: var(--font-mono) !important;
 }
 
 /*
@@ -218,11 +241,22 @@ h6:not(.overwrite) {
 }
 
 .toc-animate {
-  @apply translate-x-1! text-brand!;
+  @apply !text-foreground;
+}
+
+.toc-passed {
+  @apply !text-foreground;
 }
 
 .prose-toc a {
   transition: all 0.07s ease-in-out;
+  color: hsl(var(--foreground-light)) !important;
+  font-weight: 400 !important;
+}
+
+.prose-toc a.toc-passed,
+.prose-toc a.toc-animate {
+  color: hsl(var(--foreground-default)) !important;
 }
 
 @media only screen and (max-width: 960px) {

@@ -271,7 +271,7 @@ const uiConfig = ui({
             },
             figcaption: {
               color: 'hsl(var(--foreground-muted))',
-              fontFamily: 'Office Code Pro, monospace',
+              fontFamily: 'var(--font-mono)',
             },
             'figure.quote-figure p:first-child': {
               marginTop: '0 !important',
@@ -372,8 +372,8 @@ const uiConfig = ui({
         xs: '480px',
       },
       fontFamily: {
-        sans: 'var(--font-custom, Circular, custom-font, Helvetica Neue, Helvetica, Arial, sans-serif)',
-        mono: 'var(--font-source-code-pro, Source Code Pro, Office Code Pro, Menlo, monospace)',
+        sans: 'var(--font-sans)',
+        mono: 'var(--font-mono)',
       },
 
       // shadcn defaults START

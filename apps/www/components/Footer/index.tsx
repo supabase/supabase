@@ -1,6 +1,5 @@
 'use client'
 
-import { CheckIcon } from '@heroicons/react/outline'
 import { REALTIME_CHANNEL_STATES } from '@supabase/supabase-js'
 import SupabaseWordmark from '~/components/Nav/SupabaseWordmark'
 import supabase from '~/lib/supabase'
@@ -24,6 +23,84 @@ import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
 import SectionContainer from '../Layouts/SectionContainer'
+
+function Soc2Seal({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <circle cx="50" cy="50" r="48" stroke="currentColor" strokeWidth="2" />
+      <circle cx="50" cy="50" r="42" stroke="currentColor" strokeWidth="1" />
+      <text
+        x="50"
+        y="34"
+        textAnchor="middle"
+        fill="currentColor"
+        fontSize="10"
+        fontWeight="500"
+        fontFamily="system-ui, sans-serif"
+        letterSpacing="3"
+      >
+        AICPA
+      </text>
+      <text
+        x="50"
+        y="58"
+        textAnchor="middle"
+        fill="currentColor"
+        fontSize="24"
+        fontWeight="800"
+        fontFamily="system-ui, sans-serif"
+      >
+        SOC2
+      </text>
+      <text
+        x="50"
+        y="72"
+        textAnchor="middle"
+        fill="currentColor"
+        fontSize="10"
+        fontWeight="500"
+        fontFamily="system-ui, sans-serif"
+        letterSpacing="3"
+      >
+        TYPE 2
+      </text>
+    </svg>
+  )
+}
+
+function HipaaSeal({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <circle cx="50" cy="50" r="48" stroke="currentColor" strokeWidth="2" />
+      <circle cx="50" cy="50" r="42" stroke="currentColor" strokeWidth="1" />
+
+      <text
+        x="50"
+        y="50"
+        textAnchor="middle"
+        fill="currentColor"
+        fontSize="16"
+        fontWeight="700"
+        fontFamily="system-ui, sans-serif"
+        letterSpacing="1"
+      >
+        HIPAA
+      </text>
+      <text
+        x="50"
+        y="64"
+        textAnchor="middle"
+        fill="currentColor"
+        fontSize="7.5"
+        fontWeight="500"
+        fontFamily="system-ui, sans-serif"
+        letterSpacing="1"
+      >
+        COMPLIANT
+      </text>
+    </svg>
+  )
+}
 
 interface Props {
   className?: string
@@ -85,31 +162,6 @@ const Footer = (props: Props) => {
       <h2 id="footerHeading" className="sr-only">
         Footer
       </h2>
-      <div className="w-full py-0!">
-        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between text-foreground md:justify-center gap-8 md:gap-16 xl:gap-28 py-6! md:py-10! text-sm">
-          <div className="flex flex-col md:flex-row gap-2 md:items-center">
-            We protect your data.
-            <Link href="/security" className="text-brand-link hover:underline">
-              More on Security
-            </Link>
-          </div>
-          <ul className="flex flex-col md:flex-row gap-2 md:gap-8 justify-center md:items-center">
-            <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
-              <CheckIcon className="w-4 h-4" /> SOC2 Type 2{' '}
-              <span className="text-foreground-lighter hidden sm:inline">Certified</span>
-            </li>
-            <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
-              <CheckIcon className="w-4 h-4" /> HIPAA{' '}
-              <span className="text-foreground-lighter hidden sm:inline">Compliant</span>
-            </li>
-            <li className="flex items-center gap-2 whitespace-nowrap flex-nowrap">
-              <CheckIcon className="w-4 h-4" /> ISO 27001{' '}
-              <span className="text-foreground-lighter hidden sm:inline">Certified</span>
-            </li>
-          </ul>
-        </SectionContainer>
-        <div className="w-full h-px bg-linear-to-r from-transparent via-border to-transparent" />
-      </div>
       <SectionContainer className="py-8">
         <div className="xl:grid xl:grid-cols-7 xl:gap-4">
           <div className="xl:col-span-2 flex flex-col gap-8">
@@ -249,8 +301,20 @@ const Footer = (props: Props) => {
             </div>
           </div>
         </div>
-        <div className="border-default mt-32 flex justify-between border-t pt-8">
-          <small className="small">&copy; Supabase Inc</small>
+        <div className="border-muted mt-32 flex flex-wrap items-center justify-between gap-4 border-t pt-8">
+          <div className="flex flex-wrap items-center gap-3">
+            <small className="small">&copy; Supabase Inc</small>
+            <span className="text-foreground-muted text-xs">·</span>
+            <span className="flex items-center gap-1.5 text-foreground-muted text-xs">
+              <Soc2Seal className="w-5 h-5 shrink-0" />
+              SOC2 Type 2
+            </span>
+            <span className="text-foreground-muted text-xs">·</span>
+            <span className="flex items-center gap-1.5 text-foreground-muted text-xs">
+              <HipaaSeal className="w-5 h-5 shrink-0" />
+              HIPAA Compliant
+            </span>
+          </div>
           <div className={cn(forceDark && 'hidden')}>
             <ThemeToggle forceDark={forceDark} />
           </div>

@@ -1,10 +1,9 @@
-import { Button, cn, IconGitHubSolid } from 'ui'
-import Link from 'next/link'
-
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import ExampleCard from '../ExampleCard'
-
 import Examples from 'data/Examples'
+import Link from 'next/link'
+import { Button, cn, IconGitHubSolid } from 'ui'
+
+import ExampleCard from '../ExampleCard'
 import ExamplesMobile from './ExamplesMobile'
 
 const BuiltWithSupabase = () => {
@@ -33,7 +32,7 @@ const BuiltWithSupabase = () => {
           </div>
         </div>
       </SectionContainer>
-      <SectionContainer className="relative w-full px-0! lg:px-16! xl:px-20! pb-0! mb-16 md:mb-12 lg:mb-12 pt-6! max-w-[1400px]">
+      <SectionContainer className="relative w-full !px-6 !pb-0 mb-16 md:mb-12 lg:mb-12 !pt-6 !max-w-[var(--container-max-w,75rem)]">
         <ExamplesMobile examples={Examples.slice(0, 6)} className="lg:hidden" />
         <div className="hidden lg:grid grid-cols-12 gap-5 mt-4">
           {Examples.slice(0, 6).map((example, i) => {
