@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Book } from 'lucide-react'
+import { Book, BookOpen } from 'lucide-react'
 import type { editor } from 'monaco-editor'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -295,7 +295,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
                         asChild
                         type="text"
                         className="w-7"
-                        icon={<Book />}
+                        icon={<BookOpen />}
                         tooltip={{
                           content: {
                             side: 'right',
