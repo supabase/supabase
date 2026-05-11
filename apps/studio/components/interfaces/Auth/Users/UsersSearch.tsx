@@ -1,7 +1,7 @@
 import { AuthUsersSearchSubmittedEvent } from 'common/telemetry-constants'
 import { Search, X } from 'lucide-react'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { Dispatch, forwardRef, SetStateAction } from 'react'
 import {
   Button,
   cn,
@@ -24,6 +24,7 @@ import {
   UUIDV4_LEFT_PREFIX_REGEX,
 } from './Users.constants'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { onSearchInputEscape } from '@/lib/keyboard'
 
 const getSearchPlaceholder = (column: SpecificFilterColumn): string => {
   switch (column) {
@@ -43,23 +44,30 @@ const getSearchPlaceholder = (column: SpecificFilterColumn): string => {
 }
 
 interface UsersSearchProps {
+  search: string
+  setSearch: Dispatch<SetStateAction<string>>
   improvedSearchEnabled?: boolean
   telemetryProps: Omit<AuthUsersSearchSubmittedEvent['properties'], 'trigger'>
   telemetryGroups: AuthUsersSearchSubmittedEvent['groups']
   onSelectFilterColumn: (value: SpecificFilterColumn) => void
 }
 
-export const UsersSearch = ({
-  improvedSearchEnabled = false,
-  telemetryProps,
-  telemetryGroups,
-  onSelectFilterColumn,
-}: UsersSearchProps) => {
+export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(function UsersSearch(
+  {
+    search,
+    setSearch,
+    improvedSearchEnabled = false,
+    telemetryProps,
+    telemetryGroups,
+    onSelectFilterColumn,
+  },
+  ref
+) {
   const [, setSelectedId] = useQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [filterKeywords, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
+  const [, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
   const [specificFilterColumn] = useQueryState<SpecificFilterColumn>(
     'filter',
     parseAsStringEnum<SpecificFilterColumn>([
@@ -71,7 +79,6 @@ export const UsersSearch = ({
     ]).withDefault('email')
   )
 
-  const [search, setSearch] = useState(filterKeywords)
   const { mutate: sendEvent } = useSendEventMutation()
 
   const searchInvalid =
@@ -155,6 +162,7 @@ export const UsersSearch = ({
       </Select_Shadcn_>
 
       <Input
+        ref={ref}
         size="tiny"
         containerClassName="w-[245px] rounded-l-none -ml-px"
         className={cn(
@@ -168,7 +176,12 @@ export const UsersSearch = ({
         onKeyDown={(e) => {
           if (e.code === 'Enter' || e.code === 'NumpadEnter') {
             if (!searchInvalid) onSubmitSearch()
+            return
           }
+          onSearchInputEscape(search, () => {
+            setSearch('')
+            setFilterKeywords('')
+          })(e)
         }}
         actions={
           search ? (
@@ -187,4 +200,4 @@ export const UsersSearch = ({
       />
     </div>
   )
-}
+})

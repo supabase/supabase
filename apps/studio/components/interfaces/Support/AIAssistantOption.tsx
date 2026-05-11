@@ -10,9 +10,14 @@ import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 interface AIAssistantOptionProps {
   projectRef?: string | null
   organizationSlug?: string | null
+  onClick?: () => void
 }
 
-export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantOptionProps) => {
+export const AIAssistantOption = ({
+  projectRef,
+  organizationSlug,
+  onClick,
+}: AIAssistantOptionProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
   const [isVisible, setIsVisible] = useState(false)
 
@@ -32,7 +37,9 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
             : organizationSlug,
       },
     })
-  }, [projectRef, organizationSlug, sendEvent])
+
+    onClick?.()
+  }, [onClick, projectRef, organizationSlug, sendEvent])
 
   // If no specific project selected, use the wildcard route
   const aiLink = `/project/${projectRef !== NO_PROJECT_MARKER ? projectRef : '_'}?sidebar=ai-assistant&slug=${organizationSlug}`
@@ -57,11 +64,22 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
                 </p>
               </div>
               <div>
-                <Link href={aiLink} onClick={onAiAssistantClicked}>
-                  <Button size="tiny" type="default" icon={<AiIconAnimation size={14} />}>
+                {onClick ? (
+                  <Button
+                    size="tiny"
+                    type="default"
+                    icon={<AiIconAnimation size={14} />}
+                    onClick={onAiAssistantClicked}
+                  >
                     Ask the Assistant
                   </Button>
-                </Link>
+                ) : (
+                  <Link href={aiLink} onClick={onAiAssistantClicked}>
+                    <Button size="tiny" type="default" icon={<AiIconAnimation size={14} />}>
+                      Ask the Assistant
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
             {/* Decorative background */}
