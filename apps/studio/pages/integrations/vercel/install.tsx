@@ -519,7 +519,7 @@ export const VercelInstallScreen = ({
           </Button>
         </div>
 
-        <div className="flex flex-col items-center gap-1 text-center text-xs text-foreground-muted text-balance">
+        <div className="flex flex-col items-center gap-1 text-center text-xs text-foreground-lighter text-balance">
           {selectedOrganization && (
             <p>You can remove this integration at any time from Vercel or Supabase.</p>
           )}

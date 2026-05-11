@@ -499,7 +499,7 @@ export const AwsMarketplaceOnboardingScreen = ({
               />
             )}
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-5">
               <Button
                 type="primary"
                 block
@@ -509,7 +509,7 @@ export const AwsMarketplaceOnboardingScreen = ({
               >
                 {primaryLabel}
               </Button>
-              <p className="text-center text-xs text-foreground-muted text-balance">
+              <p className="text-center text-xs text-foreground-lighter text-balance">
                 <InlineLink href={`${DOCS_URL}/guides/platform/aws-marketplace`}>
                   Learn more
                 </InlineLink>{' '}

@@ -111,7 +111,7 @@ const VercelIntegration: NextPageWithLayout = () => {
         <div className="flex flex-col gap-5 px-6 pb-6">
           <InterstitialAccountRow displayName={displayName} />
           <CreateProject />
-          <div className="text-center text-xs text-foreground-muted text-balance">
+          <div className="text-center text-xs text-foreground-lighter text-balance">
             <p>You can remove this integration at any time from Vercel or Supabase.</p>
           </div>
         </div>
@@ -150,7 +150,7 @@ const VercelProjectCreationMockScreen = ({
       <div className="flex flex-col gap-5 px-6 pb-6">
         <InterstitialAccountRow displayName={displayName ?? 'test@example.com'} />
         <MockCreateProject isCreating={mock === 'creating'} />
-        <div className="text-center text-xs text-foreground-muted text-balance">
+        <div className="text-center text-xs text-foreground-lighter text-balance">
           <p>You can remove this integration at any time from Vercel or Supabase.</p>
         </div>
       </div>
