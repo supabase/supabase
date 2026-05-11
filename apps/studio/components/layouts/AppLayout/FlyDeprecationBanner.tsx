@@ -129,7 +129,7 @@ const FlyDeprecationDialog = ({
         <ProjectList
           label="Projects on Fly.io"
           items={primaries}
-          note={
+          instructions={
             <>
               <p>
                 To preserve your data, migrate each project to Supabase's general infrastructure:
@@ -150,7 +150,7 @@ const FlyDeprecationDialog = ({
         <ProjectList
           label="Branches on Fly.io"
           items={branches}
-          note={
+          instructions={
             <>
               <p>Merge preview branches before May 31. For persistent branches:</p>
               <ol className="list-decimal pl-5 space-y-1">
@@ -172,8 +172,6 @@ const FlyDeprecationDialog = ({
             </>
           }
         />
-
-        <DialogSectionSeparator />
 
         <DialogSection className="text-sm">
           <p>
@@ -198,32 +196,34 @@ const FlyDeprecationDialog = ({
 const ProjectList = ({
   label,
   items,
-  note,
+  instructions,
 }: {
   label: string
   items: FlyDeprecationProject[]
-  note: ReactNode
+  instructions: ReactNode
 }) => {
   if (items.length === 0) return null
   return (
-    <DialogSection className="text-sm flex flex-col gap-y-2">
-      <p className="font-medium">
-        {label} ({items.length})
-      </p>
-      {items.length === 1 ? (
-        <p>
-          {items[0].name} <span className="text-foreground-muted">({items[0].orgName})</span>
+    <>
+      <DialogSection className="text-sm flex flex-col gap-y-2">
+        <p className="font-medium">
+          {label} ({items.length})
         </p>
-      ) : (
-        <ul className="list-disc pl-5 space-y-1">
-          {items.map((p) => (
-            <li key={p.ref}>
-              {p.name} <span className="text-foreground-muted">({p.orgName})</span>
-            </li>
-          ))}
-        </ul>
-      )}
-      {note}
-    </DialogSection>
+        {items.length === 1 ? (
+          <p>
+            {items[0].name} <span className="text-foreground-muted">({items[0].orgName})</span>
+          </p>
+        ) : (
+          <ul className="list-disc pl-5 space-y-1">
+            {items.map((p) => (
+              <li key={p.ref}>
+                {p.name} <span className="text-foreground-muted">({p.orgName})</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </DialogSection>
+      <DialogSection className="text-sm flex flex-col gap-y-2">{instructions}</DialogSection>
+    </>
   )
 }
