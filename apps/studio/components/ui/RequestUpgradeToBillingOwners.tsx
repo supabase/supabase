@@ -74,7 +74,8 @@ export const RequestUpgradeToBillingOwners = ({
   const isFreePlan = currentPlan === 'free'
 
   const requestedPlanId = plan.toLowerCase() as PlanId
-  const planChange = !addon ? getPlanChangeType(currentPlan, requestedPlanId) : 'upgrade'
+  const planChange =
+    !addon && currentPlan ? getPlanChangeType(currentPlan, requestedPlanId) : 'upgrade'
   const isInvalidDirection = planChange === 'downgrade' || planChange === 'none'
 
   const { data: members = [] } = useOrganizationMembersQuery({ slug: organization?.slug })
@@ -153,7 +154,8 @@ export const RequestUpgradeToBillingOwners = ({
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!slug) return console.error('Slug is required')
-    sendUpgradeRequest({ slug, plan: plan as PlanRequest, note: values.note })
+    if (plan === 'Free') return console.error('Cannot request a downgrade to the Free plan')
+    sendUpgradeRequest({ slug, plan, note: values.note })
   }
 
   const handleOpenChange = (isOpen: boolean) => {
