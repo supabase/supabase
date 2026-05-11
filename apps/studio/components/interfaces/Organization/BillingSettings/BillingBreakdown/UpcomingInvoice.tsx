@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import React from 'react'
 import { Table, TableBody, TableCell, TableFooter, TableRow } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -104,7 +103,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const taxFailed = upcomingInvoice?.tax_status === 'failed'
 
   const planFeePaidInAdvance =
-    planItem == null && upcomingInvoice?.fixed_fees_billing_mode === 'in_advance'
+    !planItem && upcomingInvoice?.fixed_fees_billing_mode === 'in_advance'
 
   return (
     <>
@@ -127,7 +126,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   <TableRow>
                     <TableCell className="py-2! px-0">{planItem?.description}</TableCell>
                     <TableCell className="text-right py-2 px-0">
-                      {planItem == null ? (
+                      {!planItem ? (
                         '-'
                       ) : (
                         <InvoiceLineItemAmount
@@ -149,12 +148,9 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       The first project is covered by Compute Credits. Additional projects incur
                       compute costs starting at <span translate="no">$10</span>/month, independent
                       of activity. See{' '}
-                      <Link
-                        href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
-                        target="_blank"
-                      >
+                      <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}>
                         docs
-                      </Link>
+                      </InlineLink>
                       .
                     </p>
                   }
@@ -169,12 +165,11 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       Each Read Replica is a dedicated database. You are charged for its resources:
                       Compute, Disk Size, provisioned Disk IOPS, provisioned Disk Throughput, and
                       IPv4. See{' '}
-                      <Link
+                      <InlineLink
                         href={`${DOCS_URL}/guides/platform/manage-your-usage/read-replicas`}
-                        target="_blank"
                       >
                         docs
-                      </Link>
+                      </InlineLink>
                       .
                     </p>
                   }
@@ -384,9 +379,9 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       className="pt-2! pb-0! px-0 text-foreground-light text-xs text-right"
                       colSpan={2}
                     >
-                      Your {organization?.plan?.name ? `${organization.plan.name} Plan` : 'Plan'}{' '}
-                      fee for this period has already been paid. This invoice will only reflect
-                      usage charges.
+                      Your {organization?.plan?.name && `${organization.plan.name} `}Plan fee for
+                      this period has already been paid. This invoice will only reflect usage
+                      charges.
                     </TableCell>
                   </TableRow>
                 )}
