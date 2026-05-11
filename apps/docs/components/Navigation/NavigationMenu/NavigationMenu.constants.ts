@@ -154,6 +154,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'ai-tools',
             href: '/guides/ai-tools' as `/${string}`,
             level: 'ai_tools',
+            enabled: aiToolsEnabled,
           },
           {
             label: 'Local Development & CLI',
