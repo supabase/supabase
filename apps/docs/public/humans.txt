@@ -38,6 +38,7 @@ Bobbie Soedirgo
 Brad Gyger
 Brendan Stephens
 Brent Newson
+Brent Schroeter
 Carel de Waal
 Cameron Blackwood
 Cameron Michie
@@ -183,6 +184,7 @@ Matthias Luft
 Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
+Michelle Jubrey
 Miles Thomas
 Monica Khoury
 Mykhailo Mischa Lieibenson
@@ -260,6 +262,7 @@ Tyler Shukert
 TzeYiing L
 Utkarash Singh
 Victor Farazdagi
+Warwick Mitchell
 Wen Bo Xie
 Yorvi Arias
 Yuliya Marinova

@@ -1,6 +1,6 @@
 import '@code-hike/mdx/styles.css'
 import 'config/code-hike.css'
-import '../styles/index.css'
+import '../styles/globals.css'
 import '../pages/launch-week/launchWeek.css'
 
 import { APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
