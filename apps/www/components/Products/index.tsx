@@ -119,8 +119,8 @@ const Products: React.FC<Props> = (props) => {
         image={<RealtimeVisual className="hidden sm:block" />}
         className="
           col-span-6 pointer-events-none xl:col-span-3
-          hover:!cursor-[url('/images/index/products/realtime-cursor-light.svg'),_auto]
-          dark:hover:!cursor-[url('/images/index/products/realtime-cursor-dark.svg'),_auto]
+          hover:cursor-[url('/images/index/products/realtime-cursor-light.svg'),auto]!
+          dark:hover:cursor-[url('/images/index/products/realtime-cursor-dark.svg'),auto]!
         "
       />
       <ProductCard

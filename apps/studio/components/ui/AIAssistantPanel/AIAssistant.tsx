@@ -35,7 +35,6 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useHotKey } from '@/hooks/ui/useHotKey'
 import {
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
   defaultAssistantModelId,
@@ -47,6 +46,8 @@ import { uuidv4 } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 import type { AssistantModel } from '@/state/ai-assistant-state'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
@@ -57,14 +58,14 @@ interface AIAssistantProps {
 
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
-  const { ref, id: entityId } = useParams()
+  const { id: entityId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const searchParams = useSearchParamsShallow()
 
   const { data: selectedOrganization, isPending: isLoadingOrganization } =
     useSelectedOrganizationQuery()
 
-  useHotKey(() => cancelEdit(), 'Escape')
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT, () => cancelEdit())
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
@@ -126,7 +127,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const isInSQLEditor = router.pathname.includes('/sql/[id]')
   const snippet = snippets[entityId ?? '']
-  const snippetContent = snippet?.snippet?.content?.sql
+  const snippetContent = snippet?.snippet?.content?.unchecked_sql
 
   const { data: tables } = useTablesQuery(
     {
@@ -391,7 +392,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         },
       ]}
     >
-      <div className={cn('flex flex-col h-full w-full md:h-full max-h-[100dvh]', className)}>
+      <div className={cn('flex flex-col h-full w-full md:h-full max-h-dvh', className)}>
         <AIAssistantHeader
           isChatLoading={isChatLoading}
           onNewChat={snap.newChat}
@@ -461,6 +462,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
                 />
               )}
+              <p className="text-center text-xs text-foreground-muted mt-6">
+                Supabase AI may not always produce correct answers. Double check responses.
+              </p>
             </ConversationContent>
             <ConversationScrollButton />
           </Conversation>
@@ -485,7 +489,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               exit={{ opacity: 0 }}
               className="pointer-events-none z-10 -mt-24"
             >
-              <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
+              <div className="h-24 w-full bg-linear-to-t from-background to-transparent relative">
                 <motion.div
                   className="absolute left-1/2 z-20 bottom-8 pointer-events-auto"
                   variants={{
@@ -548,7 +552,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
-              'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border-1 [&>form>textarea]:rounded-md [&>form>textarea]:!outline-none [&>form>textarea]:!ring-offset-0 [&>form>textarea]:!ring-0'
+              'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border [&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden! [&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Separator } from 'ui'
+import { Button, Form, FormControl, FormField, Separator } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
@@ -28,9 +28,9 @@ export default function FormItemLayoutDemo() {
     // action('form form.handleSubmit(onSubmit)')(values)
   }
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form className="w-[520px] flex flex-col gap-8" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField_Shadcn_
+        <FormField
           name="username"
           control={form.control}
           render={({ field }) => (
@@ -40,9 +40,9 @@ export default function FormItemLayoutDemo() {
               description="This is your public display name"
               labelOptional="optional"
             >
-              <FormControl_Shadcn_>
+              <FormControl>
                 <Input placeholder="mildtomato" {...field} />
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />
@@ -53,6 +53,6 @@ export default function FormItemLayoutDemo() {
           </Button>
         </div>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

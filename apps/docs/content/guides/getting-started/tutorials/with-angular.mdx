@@ -9,7 +9,7 @@ description: 'Learn how to use Supabase in your Angular App.'
 
 <Admonition type="note">
 
-If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/angular-user-management).
+If you get stuck while working through this guide, you can find the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/angular-user-management).
 
 </Admonition>
 
@@ -21,24 +21,22 @@ Start with building the Angular app from scratch.
 
 ### Initialize an Angular app
 
-You can use the [Angular CLI](https://angular.io/cli) to initialize an app called `supabase-angular`.
-The command sets some defaults, that you change to suit your needs:
+Use the [Angular CLI](https://angular.io/cli) to initialize an app called `supabase-angular` setting some defaults that you can change to suit your needs:
 
 ```bash
 npx ng new supabase-angular --routing false --style css --standalone false --ssr false
 cd supabase-angular
 ```
 
-Then, install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
+Install [supabase-js](https://github.com/supabase/supabase-js):
 
 ```bash
 npm install @supabase/supabase-js
 ```
 
-Finally, save the environment variables in a new `src/environments/environment.ts` file.
-You need to create the `src/environments` directory first.
-All you need are the API URL and the key that you copied [earlier](#get-api-details).
-The application exposes these variables in the browser, and that's fine as you have [Row Level Security](/docs/guides/auth#row-level-security) enabled on the Database.
+Create a `src/environments` directory and save API URL and key that you copied [earlier](#get-api-details) as environment variables in a new `src/environments/environment.ts` file.
+
+The application exposes these variables in the browser, and that's fine as Supabase enables [Row Level Security](/docs/guides/database/postgres/row-level-security) by default on all tables.
 
 <$CodeSample
 path="/user-management/angular-user-management/src/environments/environment.ts"
@@ -47,8 +45,6 @@ meta="name=src/environments/environment.ts"
 />
 
 With the API credentials in place, create a `SupabaseService` with `ng g s supabase` and add the following code to initialize the Supabase client and implement functions to communicate with the Supabase API.
-
-This uses the [`getUser`](/docs/reference/javascript/auth-getuser) method to get the current user details if there is an existing session. This method performs a network request to the Supabase Auth server.
 
 <$CodeSample
 path="/user-management/angular-user-management/src/app/supabase.service.ts"
@@ -60,7 +56,13 @@ Optionally, update `src/styles.css` to style the app. You can find the full cont
 
 ### Set up a login component
 
-Next, set up an Angular component to manage logins and sign ups. The component uses [Magic Links](/docs/guides/auth/auth-email-passwordless#with-magic-link), so users can sign in with their email without using passwords.
+You need an Angular component to manage logins and sign ups. The component uses [Magic Links](/docs/guides/auth/auth-email-passwordless#with-magic-link), so users can sign in with their email without using passwords.
+
+<Admonition type="tip" label="Did you know?">
+
+You can customize other emails sent out to new users, including the email's looks, content, and query parameters from [the **Authentication > Email**](/dashboard/project/_/auth/templates) section of the Dashboard.
+
+</Admonition>
 
 Create an `AuthComponent` with the `ng g c auth` Angular CLI command and add the following code.
 
@@ -82,20 +84,19 @@ meta="name=src/app/auth/auth.component.html"
 
 ### Account page
 
-Users also need a way to edit their profile details and manage their accounts after signing in.
-Create an `AccountComponent` with the `ng g c account` Angular CLI command and add the following code.
+Users also need a way to edit their profile details and manage their accounts after signing in. Create an `AccountComponent` with the `ng g c account` Angular CLI command and add the following code.
 
 <$CodeTabs>
 
 <$CodeSample
 path="/user-management/angular-user-management/src/app/account/account.component.ts"
-lines={[[1, -1]]}
+lines={[[1, 16], [27, -1]]}
 meta="name=src/app/account/account.component.ts"
 />
 
 <$CodeSample
 path="/user-management/angular-user-management/src/app/account/account.component.html"
-lines={[[1, -1]]}
+lines={[[1, 1], [3, -1]]}
 meta="name=src/app/account/account.component.html"
 />
 
@@ -103,12 +104,11 @@ meta="name=src/app/account/account.component.html"
 
 ## Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Add a way for users to upload a profile photo. Supabase configures every project with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 
-Create an avatar for the user so that they can upload a profile photo.
-Create an `AvatarComponent` with `ng g c avatar` Angular CLI command and add the following code.
+Create an `AvatarComponent` with the `ng g c avatar` Angular CLI command and add the following code.
 
 <$CodeTabs>
 
@@ -126,9 +126,39 @@ meta="name=src/app/avatar/avatar.component.html"
 
 </$CodeTabs>
 
+### Update the Account component
+
+With the Avatar component created, update `AccountComponent` to include it:
+
+<$CodeTabs>
+
+<$CodeSample
+path="/user-management/angular-user-management/src/app/account/account.component.ts"
+lines={[[1, -1]]}
+meta="name=src/app/account/account.component.ts"
+/>
+
+<$CodeSample
+path="/user-management/angular-user-management/src/app/account/account.component.html"
+lines={[[1, -1]]}
+meta="name=src/app/account/account.component.html"
+/>
+
+</$CodeTabs>
+
+You also need to change `app.module.ts` to include the `ReactiveFormsModule` from the `@angular/forms` package.
+
+<$CodeSample
+path="/user-management/angular-user-management/src/app/app.module.ts"
+lines={[[1, -1]]}
+meta="name=src/app/app.module.ts"
+/>
+
 ### Launch!
 
-Now you have all the components in place, update `AppComponent`:
+With all the components in place, change the contents of `AppComponent` to include the new components and Auth logic:
+
+<$Partial path="auth_methods.mdx" />
 
 <$CodeTabs>
 
@@ -146,15 +176,7 @@ meta="name=src/app/app.component.html"
 
 </$CodeTabs>
 
-You also need to change `app.module.ts` to include the `ReactiveFormsModule` from the `@angular/forms` package.
-
-<$CodeSample
-path="/user-management/angular-user-management/src/app/app.module.ts"
-lines={[[1, -1]]}
-meta="name=src/app/app.module.ts"
-/>
-
-Once that's done, run the application in a terminal:
+Now run the application in a terminal:
 
 ```bash
 npm run start

@@ -29,11 +29,13 @@ Ariuna K
 Arshdeep Singh
 Artur Zakirov
 Artyom Borissov
+Aziz Quadri
 Barco Fourie
 Beng Eu
 Benjamin Coenen
 Bo Lu
 Bobbie Soedirgo
+Brad Gyger
 Brendan Stephens
 Brent Newson
 Carel de Waal
@@ -52,11 +54,13 @@ Chris Martin
 Chris Stockton
 Chris Ward
 Clayton Kast
+Colin Goodheart-Smithe
 Colin Murray
 Colum Ferry
 Craig Cannon
 Cuong Do
 Dane Harrigan
+Daniel Mitterdorfer
 Daniel Velázquez Lara
 Danny White
 Dave Wilson
@@ -65,6 +69,7 @@ David Alvarez
 David Birdsong
 David Camacho Cateura
 David Weitzman
+David Whittington
 Davide Pellegatta
 Deepthi Sigireddi
 Deji I
@@ -75,7 +80,6 @@ Divit D
 Douglas Hunley
 Dustin Keib
 Eduardo Gurgel
-Egor Romanov
 Eleftheria Trivyzaki
 Eliot Whalan
 Emmett Folger
@@ -90,11 +94,13 @@ Felipe Stival
 Ferhat Elmas
 Firas El Rachidi
 Francesco Sansalvadore
+Gabriel Claudino
 Garrett Crowell
 Gerardo Estaba
 Gildas Garcia
 Giuseppe Mandato
 Greg Kress
+Greg Marzouka
 Greg P
 Greg Richardson
 Gregor Vand
@@ -102,6 +108,7 @@ Guilherme Souza
 Hannah Bowers
 Hardik Maheshwari
 Haritabh Gupta
+Harold Giménez
 Haydn Maley
 Hieu Pham
 Hunter Luckow
@@ -136,6 +143,7 @@ Jordi Enric
 José Luis Ledesma
 Joshen Lim
 Julien Goux
+Kai M
 Kalleby Santos
 Kanishk Dudeja
 Kamil Ogórek
@@ -143,6 +151,7 @@ Kang Ming Tay
 Karan S
 Karlo Ison
 Katerina Skroumpelou
+Keith Fiske
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
@@ -158,15 +167,16 @@ Lenny Urbanowski
 Leonardo Santiago
 Liam Cloud Hogan
 Lindsay Moss
-Long Hoang
 Lukas Bernert
 Łukasz Niemier
 Maksym Ionutsa
+Manuel Mendez
 Manan Gupta
 Marcus Weiner
 Margarita Sandomirskaia
 Mark Burggraf
 Matthew Hambright
+Matt Hudson
 Matt Johnston
 Matt Rossman
 Matthias Luft
@@ -180,9 +190,11 @@ Natalie Roberge
 Nick B
 Nick Littman
 Nick Nowlan
+Nicolas Nosenzo
 Nyannyacha
 Oli R
 Pamela Chia
+Patricia Szasz
 Patrick Crane
 Paul Caselton
 Paul Cioanca
@@ -198,17 +210,22 @@ Rafael Chacón
 Raminder Singh
 Raúl Barroso
 Riccardo Busetti
+Rob Shields
 Rodrigo Esteves
 Rodrigo Mansueli
+Roman Hernandez
 Ronan Lehane
 Rory Wilding
 Ryan Goulet
+Ryan Senior
 Ruan Maia
+Saba Pochkhua
 Sam Meech-Ward
 Sam Rome
 Sam Rose
 Samir Ketema
 Sana Cordeaux
+Sasi Kanumuri
 Sara Read
 Sean Oliver
 Sean Romberg
@@ -241,6 +258,7 @@ Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
+Utkarash Singh
 Victor Farazdagi
 Wen Bo Xie
 Yorvi Arias

@@ -1,3 +1,4 @@
+import { acceptUntrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
@@ -22,7 +23,7 @@ interface DisplayBlockRendererProps {
   messageId: string
   toolCallId: string
   initialArgs: {
-    sql: string
+    sql: UntrustedSqlFragment
     label?: string
     isWriteQuery?: boolean
     view?: 'table' | 'chart'
@@ -163,7 +164,7 @@ export const DisplayBlockRenderer = ({
       setIsWriteQuery(true)
     }
     executeSql(
-      { projectRef: ref, connectionString, sql: sqlQuery },
+      { projectRef: ref, connectionString, sql: acceptUntrustedSql(sqlQuery) },
       {
         onSuccess: (data) => {
           setRows(Array.isArray(data.result) ? data.result : undefined)

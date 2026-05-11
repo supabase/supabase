@@ -1,15 +1,14 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
+import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
+import BlogFilters from 'components/Blog/BlogFilters'
 import BlogGridItem from 'components/Blog/BlogGridItem'
 import BlogListItem from 'components/Blog/BlogListItem'
-import BlogFilters from 'components/Blog/BlogFilters'
 import FeaturedThumb from 'components/Blog/FeaturedThumb'
-import { LOCAL_STORAGE_KEYS, isBrowser } from 'common'
 import { useInfiniteScrollWithFetch } from 'hooks/useInfiniteScroll'
-
+import Image from 'next/image'
+import Link from 'next/link'
+import { Suspense, useCallback, useState } from 'react'
 import type PostTypes from 'types/post'
 
 function SecondarySpotlight({ post }: { post: PostTypes }) {
@@ -23,11 +22,7 @@ function SecondarySpotlight({ post }: { post: PostTypes }) {
     '/images/blog/blog-placeholder.png'
 
   return (
-    <Link
-      href={post.path}
-      prefetch={false}
-      className="group flex gap-4 items-start"
-    >
+    <Link href={post.path} prefetch={false} className="group flex gap-4 items-start">
       <div className="relative shrink-0 w-36 aspect-video overflow-hidden rounded-md border border-foreground/10">
         <Image
           src={imageUrl}
@@ -59,7 +54,7 @@ function BlogListItemSkeleton() {
   return (
     <div className="flex flex-col lg:grid lg:grid-cols-10 xl:grid-cols-12 w-full py-2 sm:py-4 h-full">
       <div className="flex w-full lg:col-span-8 xl:col-span-8">
-        <div className="h-6 bg-foreground-muted/20 rounded animate-pulse w-3/4" />
+        <div className="h-6 bg-foreground-muted/20 rounded-sm animate-pulse w-3/4" />
       </div>
       <div className="lg:col-span-2 xl:col-span-4 flex justify-start items-center lg:grid grid-cols-2 xl:grid-cols-3 gap-2 text-sm mt-2 lg:mt-0">
         <div className="hidden lg:flex items-center -space-x-2">
@@ -70,7 +65,7 @@ function BlogListItemSkeleton() {
           <div className="h-5 w-16 bg-foreground-muted/20 rounded-full animate-pulse" />
         </div>
         <div className="flex-1 lg:text-right">
-          <div className="h-4 w-24 bg-foreground-muted/20 rounded animate-pulse ml-auto" />
+          <div className="h-4 w-24 bg-foreground-muted/20 rounded-sm animate-pulse ml-auto" />
         </div>
       </div>
     </div>
@@ -108,14 +103,20 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
   const [filteredTotal, setFilteredTotal] = useState<number | null>(null)
   const isList = view === 'list'
 
-  // Determine which posts and total to use based on filter state
   const currentPosts = filteredPosts ?? initialBlogs
   const currentTotal = filteredTotal ?? totalPosts
 
   const fetchMorePosts = useCallback(
     async (offset: number, limit: number) => {
+      const isFiltered =
+        (filterParams.category && filterParams.category !== 'all') || Boolean(filterParams.search)
+      // The featured post is rendered above the list (not in `items`), so the
+      // API offset has to skip past it for unfiltered fetches. Filtered
+      // results come from a separate query and don't share that hero slot.
+      const apiOffset = isFiltered ? offset : offset + 1
+
       const params = new URLSearchParams({
-        offset: offset.toString(),
+        offset: apiOffset.toString(),
         limit: limit.toString(),
       })
 
@@ -140,9 +141,7 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
 
   const {
     items: blogs,
-    setItems: setBlogs,
     hasMore,
-    isLoading,
     loadMoreRef,
   } = useInfiniteScrollWithFetch({
     initialItems: currentPosts,
@@ -152,9 +151,7 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
     rootMargin: '1000px',
   })
 
-  // Handle filter changes - fetch filtered results from API
   const handleFilterChange = useCallback(async (category?: string, search?: string) => {
-    // If no filters, reset to initial state
     if ((!category || category === 'all') && !search) {
       setFilterParams({})
       setFilteredPosts(null)
@@ -224,7 +221,9 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
       <div className="sticky top-[65px] z-10 bg-background/80 backdrop-blur-sm border-b border-border">
         <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6">
           <div className="py-3">
-            <BlogFilters onFilterChange={handleFilterChange} view={view} setView={setView} />
+            <Suspense fallback={null}>
+              <BlogFilters onFilterChange={handleFilterChange} view={view} setView={setView} />
+            </Suspense>
           </div>
         </div>
       </div>
@@ -268,11 +267,7 @@ export default function BlogClient({ initialBlogs, totalPosts }: BlogClientProps
         )}
 
         {hasMore && !isFiltering && (
-          <div
-            ref={loadMoreRef}
-            className="flex justify-center py-8"
-            aria-hidden="true"
-          >
+          <div ref={loadMoreRef} className="flex justify-center py-8" aria-hidden="true">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-foreground-muted border-t-foreground" />
           </div>
         )}

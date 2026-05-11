@@ -126,5 +126,4 @@ const CI = ({ isHovered = false }: { isHovered?: boolean }) => {
     </div>
   )
 }
-
 export default CI

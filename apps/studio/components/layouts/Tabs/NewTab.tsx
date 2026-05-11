@@ -6,7 +6,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 import {
+  Badge,
   Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   cn,
   SQL_ICON,
   Tabs_Shadcn_,
@@ -27,9 +32,17 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { useProfile } from '@/lib/profile'
+import {
+  useImpersonatedAAL,
+  useImpersonatedExternalAuth,
+  useImpersonatedUser,
+  useIsImpersonatingAnon,
+  useRoleImpersonationStateSnapshot,
+} from '@/state/role-impersonation-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+import { type ResponseError } from '@/types'
 
 export function NewTab() {
   const router = useRouter()
@@ -46,6 +59,12 @@ export function NewTab() {
   const tabs = useTabsStateSnapshot()
   const [templates] = partition(SQL_TEMPLATES, { type: 'template' })
   const [quickstarts] = partition(SQL_TEMPLATES, { type: 'quickstart' })
+
+  const roleState = useRoleImpersonationStateSnapshot()
+  const impersonatingAnon = useIsImpersonatingAnon()
+  const impersonatedUser = useImpersonatedUser()
+  const impersonatedExternalUser = useImpersonatedExternalAuth()
+  const impersonatedAAL = useImpersonatedAAL()
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
@@ -112,21 +131,54 @@ export function NewTab() {
       })
 
       router.push(`/project/${ref}/sql/${snippet.id}`)
-    } catch (error: any) {
-      toast.error(`Failed to create new query: ${error.message}`)
+    } catch (error) {
+      toast.error(`Failed to create new query: ${(error as ResponseError).message}`)
     }
   }
 
   return (
     <div className="bg-surface-100 h-full overflow-y-auto py-12">
       <div className="mx-auto max-w-2xl flex flex-col gap-10 px-10">
+        {(!!impersonatedUser || !!impersonatedExternalUser || impersonatingAnon) && (
+          <Card>
+            <CardHeader className="py-2 px-3 flex-row items-center justify-between w-full space-y-0">
+              <CardTitle className="text-foreground-light">Currently impersonating as</CardTitle>
+              <Button
+                type="default"
+                className="font-sans"
+                onClick={() => roleState.setRole(undefined)}
+              >
+                Stop
+              </Button>
+            </CardHeader>
+            <CardContent className="py-2 px-3 text-sm flex items-center justify-between">
+              <div className="flex items-center gap-x-2">
+                {impersonatingAnon ? (
+                  <p>Anonymous</p>
+                ) : (
+                  <p>{impersonatedUser?.email ?? impersonatedExternalUser}</p>
+                )}
+                {impersonatedAAL && <Badge>{impersonatedAAL.toUpperCase()}</Badge>}
+              </div>
+              {impersonatingAnon && <p className="text-foreground-lighter">Not logged-in</p>}
+              {!!impersonatedUser && (
+                <p>
+                  ID: <code className="text-code-inline">{impersonatedUser.id}</code>
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         <div className="grid grid-cols-2 gap-4">
           {actions.map((item, i) => (
             <ActionCard key={`action-card-${i}`} {...item} />
           ))}
         </div>
+
         <RecentItems />
       </div>
+
       {editor === 'sql' && (
         <div className="flex flex-col gap-4 mx-auto py-10">
           <Tabs_Shadcn_ defaultValue="templates">

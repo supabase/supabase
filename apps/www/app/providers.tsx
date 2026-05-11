@@ -15,7 +15,7 @@ import { DevToolbar, DevToolbarProvider } from 'dev-tools'
 import { API_URL, IS_PROD } from 'lib/constants'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { Suspense } from 'react'
-import { SonnerToaster, themes, TooltipProvider } from 'ui'
+import { themes, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsentToast } from 'ui-patterns/consent'
 

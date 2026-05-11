@@ -111,7 +111,7 @@ const DatabaseReadReplicaPage: NextPageWithLayout = () => {
         isLoadingDatabases ? (
           <ShimmeringLoader className="py-[11px]" />
         ) : (
-          <div className="flex items-center gap-x-2 !mt-0">
+          <div className="flex items-center gap-x-2 mt-0!">
             <ScaffoldDescription>ID: {identifier}</ScaffoldDescription>
             <CopyButton iconOnly type="default" text={identifier ?? ''} />
           </div>

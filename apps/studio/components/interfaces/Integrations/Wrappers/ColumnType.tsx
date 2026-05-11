@@ -25,10 +25,10 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   CriticalIcon,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
   Input_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
@@ -107,7 +107,7 @@ export const ColumnType = ({
   }
 
   return (
-    <FormField_Shadcn_
+    <FormField
       control={control}
       name={name}
       render={({ field }) => {
@@ -123,17 +123,17 @@ export const ColumnType = ({
               description={unsupportedDataTypeText}
               className={className}
             >
-              <FormControl_Shadcn_>
+              <FormControl>
                 <Input_Shadcn_ {...field} id={name} disabled readOnly />
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )
         }
         return (
-          <FormItem_Shadcn_ className={cn('flex flex-col space-y-2', className)}>
-            <FormLabel_Shadcn_ className="text-foreground flex gap-2 items-center break-words">
+          <FormItem className={cn('flex flex-col space-y-2', className)}>
+            <FormLabel className="text-foreground flex gap-2 items-center wrap-break-word">
               Type
-            </FormLabel_Shadcn_>
+            </FormLabel>
             <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
               <PopoverTrigger_Shadcn_ asChild>
                 <Button
@@ -169,7 +169,7 @@ export const ColumnType = ({
                     placeholder="Search types..."
                     // [Joshen] Addresses style issues when this component is being used in the old Form component
                     // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
-                    className="!bg-transparent focus:!shadow-none focus:!ring-0 text-xs"
+                    className="bg-transparent! focus:shadow-none! focus:ring-0! text-xs"
                   />
                   <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
 
@@ -291,7 +291,7 @@ export const ColumnType = ({
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             )}
-          </FormItem_Shadcn_>
+          </FormItem>
         )
       }}
     />

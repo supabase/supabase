@@ -1,5 +1,5 @@
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
+import { MoreHorizontal, TrashIcon } from 'lucide-react'
 import { cloneElement, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -32,7 +32,7 @@ import { useTrack } from '@/lib/telemetry/track'
 
 export function LogDrains({
   onNewDrainClick,
-  onUpdateDrainClick,
+  onUpdateDrainClick: _onUpdateDrainClick,
 }: {
   onNewDrainClick: (src: LogDrainType) => void
   onUpdateDrainClick: (drain: LogDrainData) => void
@@ -46,7 +46,6 @@ export function LogDrains({
   const {
     data: logDrains,
     isPending: isLoading,
-    refetch,
     error,
     isError,
   } = useLogDrainsQuery(
@@ -171,7 +170,7 @@ export function LogDrains({
                       <DropdownMenuTrigger asChild>
                         <Button
                           type="text"
-                          className="px-1 opacity-50 hover:opacity-100 !bg-transparent flex-shrink-0"
+                          className="px-1 opacity-50 hover:opacity-100 bg-transparent! shrink-0"
                           icon={<MoreHorizontal />}
                         />
                       </DropdownMenuTrigger>

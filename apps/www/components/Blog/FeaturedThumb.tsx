@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import AuthorAvatars from './AuthorAvatars'
 import authors from '@/lib/authors.json'
 import {
   BLOG_FEATURED_IMAGE_SIZES,
@@ -8,7 +9,6 @@ import {
   getBlogThumbnailImage,
 } from '@/lib/blog-images'
 import type PostTypes from '@/types/post'
-import AuthorAvatars from './AuthorAvatars'
 
 function FeaturedThumb(blog: PostTypes) {
   const authorArray = blog.author?.split(',').map((a) => a.trim()) || []
@@ -53,7 +53,9 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
       <div className="flex flex-col lg:col-span-6 px-6 pb-8">
         <div>
           <Link href={`${blog.path}`} prefetch={false} className="group">
-            <h2 className="h2 lg:!text-xl xl:!text-2xl !mb-2 group-hover:underline">{blog.title}</h2>
+            <h2 className="h2 lg:!text-xl xl:!text-2xl !mb-2 group-hover:underline">
+              {blog.title}
+            </h2>
           </Link>
           <p className="p">{blog.description}</p>
         </div>

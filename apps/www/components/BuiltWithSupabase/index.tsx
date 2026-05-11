@@ -1,16 +1,15 @@
-import { Button, cn, IconGitHubSolid } from 'ui'
-import Link from 'next/link'
-
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import ExampleCard from '../ExampleCard'
-
 import Examples from 'data/Examples'
+import Link from 'next/link'
+import { Button, cn, IconGitHubSolid } from 'ui'
+
+import ExampleCard from '../ExampleCard'
 import ExamplesMobile from './ExamplesMobile'
 
 const BuiltWithSupabase = () => {
   return (
     <>
-      <SectionContainer id="examples" className="xl:pt-32 !pb-0">
+      <SectionContainer id="examples" className="xl:pt-32 pb-0!">
         <div className="text-center flex flex-col items-center">
           <h3 className="h2">Start building in seconds</h3>
           <p className="p max-w-[300px] md:max-w-none">
@@ -23,7 +22,7 @@ const BuiltWithSupabase = () => {
             <Button
               asChild
               type="default"
-              icon={<IconGitHubSolid size="tiny" className="!w-full !h-full" />}
+              icon={<IconGitHubSolid size="tiny" className="w-full! h-full!" />}
               size="small"
             >
               <Link href="https://github.com/supabase/supabase/tree/master/examples">

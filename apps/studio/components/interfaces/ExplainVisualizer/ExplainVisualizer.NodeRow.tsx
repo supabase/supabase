@@ -52,7 +52,7 @@ export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps
               onClick={() => canExpand && setIsExpanded(!isExpanded)}
               disabled={!canExpand}
               className={cn(
-                'flex items-center justify-center w-5 h-5 rounded border border-border-muted shrink-0',
+                'flex items-center justify-center w-5 h-5 rounded-sm border border-border-muted shrink-0',
                 canExpand ? 'hover:bg-surface-200 cursor-pointer' : 'opacity-30 cursor-default'
               )}
               aria-label={isExpanded ? 'Collapse details' : 'Expand details'}

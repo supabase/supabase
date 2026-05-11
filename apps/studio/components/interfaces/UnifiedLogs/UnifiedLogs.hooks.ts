@@ -2,17 +2,18 @@ import { useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
 
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
-import { useHotKey } from '@/hooks/ui/useHotKey'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const useResetFocus = () => {
-  useHotKey(() => {
+  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_RESET_FOCUS, () => {
     // FIXME: some dedicated div[tabindex="0"] do not auto-unblur (e.g. the DataTableFilterResetButton)
     // REMINDER: we cannot just document.activeElement?.blur(); as the next tab will focus the next element in line,
     // which is not what we want. We want to reset entirely.
     document.body.setAttribute('tabindex', '0')
     document.body.focus()
     document.body.removeAttribute('tabindex')
-  }, '.')
+  })
 }
 
 export const useLiveMode = <TData extends { date: Date }>(data: TData[]) => {

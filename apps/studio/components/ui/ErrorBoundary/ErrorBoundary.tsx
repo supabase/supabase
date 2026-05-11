@@ -16,7 +16,7 @@ interface ErrorFallbackProps {
 }
 
 const ErrorFallback = ({
-  error,
+  error: _error,
   resetErrorBoundary,
   message = 'Something went wrong',
   actions = [],

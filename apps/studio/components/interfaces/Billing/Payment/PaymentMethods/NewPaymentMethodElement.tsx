@@ -18,7 +18,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   Command_Shadcn_ as Command,
   CommandEmpty_Shadcn_ as CommandEmpty,
@@ -26,10 +26,10 @@ import {
   CommandInput_Shadcn_ as CommandInput,
   CommandItem_Shadcn_ as CommandItem,
   CommandList_Shadcn_ as CommandList,
-  FormControl_Shadcn_ as FormControl,
-  FormField_Shadcn_ as FormField,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_ as FormMessage,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
   Input_Shadcn_ as Input,
   Popover_Shadcn_ as Popover,
   PopoverContent_Shadcn_ as PopoverContent,
@@ -337,7 +337,7 @@ export const NewPaymentMethodElement = forwardRef(
 
         {fullyLoaded && (
           <div className="flex items-center space-x-2 py-4">
-            <Checkbox_Shadcn_
+            <Checkbox
               id="business"
               checked={purchasingAsBusiness}
               onCheckedChange={() => setPurchasingAsBusiness(!purchasingAsBusiness)}
@@ -372,7 +372,7 @@ export const NewPaymentMethodElement = forwardRef(
               <FormField
                 name="tax_id_name"
                 control={form.control}
-                render={({ field }) => (
+                render={() => (
                   <FormItemLayout hideMessage layout="vertical">
                     <Popover open={showTaxIDsPopover} onOpenChange={setShowTaxIDsPopover}>
                       <PopoverTrigger asChild>
@@ -446,12 +446,12 @@ export const NewPaymentMethodElement = forwardRef(
                   name="tax_id_value"
                   control={form.control}
                   render={({ field }) => (
-                    <FormItem_Shadcn_>
+                    <FormItem>
                       <FormControl>
                         <Input {...field} placeholder={selectedTaxId?.placeholder} />
                       </FormControl>
                       <FormMessage />
-                    </FormItem_Shadcn_>
+                    </FormItem>
                   )}
                 />
               )}

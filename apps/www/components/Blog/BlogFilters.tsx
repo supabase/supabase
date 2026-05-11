@@ -1,24 +1,24 @@
 'use client'
 
-import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
-import { startCase } from 'lib/helpers'
-import { useSearchParams, useRouter } from 'next/navigation'
-import { useEffect, useState, useCallback } from 'react'
-import { motion } from 'framer-motion'
 import type { BlogView } from 'app/blog/BlogClient'
-
-import { AlignJustify, ChevronDown, Grid, Search, X as CloseIcon } from 'lucide-react'
+import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
+import { motion } from 'framer-motion'
+import { startCase } from 'lib/helpers'
+import { AlignJustify, ChevronDown, X as CloseIcon, Grid, Search } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input,
-  cn,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
 } from 'ui'
-
-import { ToggleGroup, ToggleGroupItem } from 'ui/src/components/shadcn/ui/toggle-group'
 
 interface Props {
   onFilterChange: (category?: string, search?: string) => void
@@ -179,8 +179,7 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
       )}
       <div className="hidden lg:flex flex-wrap items-center flex-grow gap-1">
         {allCategories.map((cat: string) => {
-          const isActive =
-            (cat === 'all' && !searchTerm && category === 'all') || cat === category
+          const isActive = (cat === 'all' && !searchTerm && category === 'all') || cat === category
           return (
             <button
               key={cat}
@@ -221,38 +220,41 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
 
       {showSearchInput && (
         <div className="w-full h-auto flex justify-end gap-2 items-stretch lg:max-w-[240px] xl:max-w-[280px]">
-          <Input
-            icon={<Search size="14" />}
-            size="small"
-            layout="vertical"
-            autoComplete="off"
-            type="search"
-            placeholder="Search blog"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="w-full"
-            actions={
-              isMobile && (
-                <Button
-                  type="link"
+          <InputGroup className="w-full">
+            <InputGroupInput
+              size="small"
+              autoComplete="off"
+              type="search"
+              placeholder="Search blog"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+            {isMobile && (
+              <InputGroupAddon align="inline-end">
+                <InputGroupButton
                   onClick={() => {
                     setSearchTerm('')
                     setShowSearchInput(false)
                   }}
-                  className="text-foreground-light hover:text-foreground hover:bg-selection"
                 >
                   <CloseIcon size="14" />
-                </Button>
-              )
-            }
-          />
+                </InputGroupButton>
+              </InputGroupAddon>
+            )}
+          </InputGroup>
         </div>
       )}
       <div className="flex items-center border border-border rounded-full p-0.5 gap-0.5 bg-surface-100">
         {(['list', 'grid'] as BlogView[]).map((v) => (
           <button
             key={v}
-            onClick={() => { setView(v); localStorage.setItem(BLOG_VIEW, v) }}
+            onClick={() => {
+              setView(v)
+              localStorage.setItem(BLOG_VIEW, v)
+            }}
             className={cn(
               'relative flex items-center justify-center w-7 h-7 rounded-full transition-colors',
               view === v ? 'text-foreground' : 'text-foreground-light hover:text-foreground'
@@ -266,7 +268,11 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
               />
             )}
             <span className="relative z-10">
-              {v === 'list' ? <AlignJustify className="w-3.5 h-3.5" /> : <Grid className="w-3.5 h-3.5" />}
+              {v === 'list' ? (
+                <AlignJustify className="w-3.5 h-3.5" />
+              ) : (
+                <Grid className="w-3.5 h-3.5" />
+              )}
             </span>
           </button>
         ))}

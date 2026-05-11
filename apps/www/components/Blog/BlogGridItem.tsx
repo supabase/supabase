@@ -2,15 +2,11 @@ import dayjs from 'dayjs'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import AuthorAvatars from './AuthorAvatars'
 import authors from '@/lib/authors.json'
-import {
-  BLOG_GRID_IMAGE_SIZES,
-  BLOG_PLACEHOLDER_IMAGE,
-  getBlogThumbnailImage,
-} from '@/lib/blog-images'
+import { BLOG_PLACEHOLDER_IMAGE, getBlogThumbnailImage } from '@/lib/blog-images'
 import type Author from '@/types/author'
 import type PostTypes from '@/types/post'
-import AuthorAvatars from './AuthorAvatars'
 
 interface Props {
   post: PostTypes
@@ -33,11 +29,7 @@ const BlogGridItem = ({ post }: Props) => {
   const imageUrl = getBlogThumbnailImage(post) ?? BLOG_PLACEHOLDER_IMAGE
 
   return (
-    <Link
-      href={post.path}
-      prefetch={false}
-      className="group flex flex-col h-full p-6"
-    >
+    <Link href={post.path} prefetch={false} className="group flex flex-col h-full p-6">
       <div className="relative w-full aspect-[16/10] overflow-hidden rounded-md border border-foreground/10">
         <Image
           fill

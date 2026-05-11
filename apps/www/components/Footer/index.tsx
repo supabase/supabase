@@ -1,6 +1,8 @@
 'use client'
 
 import { REALTIME_CHANNEL_STATES } from '@supabase/supabase-js'
+import SupabaseWordmark from '~/components/Nav/SupabaseWordmark'
+import supabase from '~/lib/supabase'
 import footerData from 'data/Footer'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -18,8 +20,7 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
-import SupabaseWordmark from '~/components/Nav/SupabaseWordmark'
-import supabase from '~/lib/supabase'
+
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
 import SectionContainer from '../Layouts/SectionContainer'
 
@@ -163,7 +164,7 @@ const Footer = (props: Props) => {
       </h2>
       <SectionContainer className="py-8">
         <div className="xl:grid xl:grid-cols-7 xl:gap-4">
-          <div className="space-y-8 xl:col-span-2">
+          <div className="xl:col-span-2 flex flex-col gap-8">
             <Link href="#" as="/" className="w-40">
               <SupabaseWordmark className="w-40 h-[30px]" />
             </Link>
@@ -216,7 +217,7 @@ const Footer = (props: Props) => {
                 <IconInstagram size={22} />
               </a>
             </div>
-            <div className="mt-8">
+            <div>
               {newsletterStatus === 'success' ? (
                 <div className="flex flex-col gap-1">
                   <p className="text-brand-link text-sm">Thanks for subscribing!</p>
@@ -236,7 +237,7 @@ const Footer = (props: Props) => {
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     required
-                    className="flex-1 md:max-w-72 xl:max-w-[80%] !h-6 text-xs px-2"
+                    className="flex-1 md:max-w-72 xl:max-w-[80%] h-6! text-xs px-2"
                   />
                   <Button
                     type="primary"

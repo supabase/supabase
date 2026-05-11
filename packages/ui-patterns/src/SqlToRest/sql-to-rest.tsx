@@ -315,7 +315,7 @@ export default function SqlToRest({
             </div>
             <div className="prose text-sm mt-2">
               PostgREST doesn't support this query. If you're sure the syntax is correct and are
-              unable to modify it, wrap it in a stored procedure and call it using the{' '}
+              unable to modify it, wrap it in a database function and call it using the{' '}
               <a href="https://postgrest.org/en/v12/references/api/stored_procedures.html#stored-procedures">
                 RPC
               </a>{' '}
@@ -429,7 +429,7 @@ export default function SqlToRest({
               {relevantFaqs.map((faq) => (
                 <Collapsible
                   key={faq.id}
-                  className="flex flex-col items-stretch justify-start bg-surface-100 rounded border border-default px-4"
+                  className="flex flex-col items-stretch justify-start bg-surface-100 rounded-sm border border-default px-4"
                 >
                   <Collapsible.Trigger asChild>
                     <button
