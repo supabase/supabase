@@ -175,7 +175,7 @@ const IntegrationPage: NextPageWithLayout = () => {
   return (
     <>
       <PageHeader size="full">
-        <PageHeaderBreadcrumb>
+        <PageHeaderBreadcrumb className="mx-auto w-full max-w-6xl">
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
@@ -190,7 +190,7 @@ const IntegrationPage: NextPageWithLayout = () => {
         </PageHeaderBreadcrumb>
 
         {isAvailableIntegrationsLoading ? (
-          <PageHeaderMeta>
+          <PageHeaderMeta className="mx-auto w-full max-w-6xl">
             <PageHeaderSummary>
               <PageHeaderTitle>
                 <ShimmeringLoader className="w-64 py-4" />
@@ -201,11 +201,11 @@ const IntegrationPage: NextPageWithLayout = () => {
             </PageHeaderSummary>
           </PageHeaderMeta>
         ) : (
-          <PageHeaderMeta>
+          <PageHeaderMeta className="mx-auto w-full max-w-6xl">
             {pageIcon && <PageHeaderIcon>{pageIcon}</PageHeaderIcon>}
-            <PageHeaderSummary className="truncate gap-y-0.5">
+            <PageHeaderSummary className="gap-y-0.5">
               <PageHeaderTitle>{pageTitle}</PageHeaderTitle>
-              <PageHeaderDescription className="truncate">{pageSubTitle}</PageHeaderDescription>
+              <PageHeaderDescription className="">{pageSubTitle}</PageHeaderDescription>
             </PageHeaderSummary>
 
             {integration?.type === 'oauth' ? (
@@ -221,7 +221,7 @@ const IntegrationPage: NextPageWithLayout = () => {
         )}
 
         {navigationItems.length > 0 && (
-          <PageHeaderNavigationTabs>
+          <PageHeaderNavigationTabs className="mx-auto w-full max-w-6xl">
             <NavMenu>
               {navigationItems.map((nav) => (
                 <NavMenuItem key={nav.href} active={nav.active ?? false}>
@@ -233,7 +233,7 @@ const IntegrationPage: NextPageWithLayout = () => {
         )}
       </PageHeader>
 
-      {content}
+      <div className="mx-auto w-full max-w-6xl">{content}</div>
     </>
   )
 }

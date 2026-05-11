@@ -71,7 +71,7 @@ export const IntegrationCard = ({
           <CardContent className="p-6 px-4">
             <div className="flex-col justify-start items-center text-center gap-y-0.5 flex">
               <h3>{name}</h3>
-              <p className="text-foreground-light text-sm">{description}</p>
+              <p className="text-foreground-light text-sm line-clamp-3">{description} sdf</p>
               <div className="flex items-center gap-x-1 mt-4">
                 {status && <Badge variant="warning">{status}</Badge>}
                 {shouldShowOfficialBadge && <Badge>Official</Badge>}

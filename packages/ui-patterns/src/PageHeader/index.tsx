@@ -31,10 +31,12 @@ const pageHeaderVariants = cva(['flex flex-col gap-4 w-full'], {
 
 type PageHeaderContextValue = {
   size: 'default' | 'small' | 'large' | 'full'
+  fullWidthNav: boolean
 }
 
 const PageHeaderContext = createContext<PageHeaderContextValue>({
   size: 'default',
+  fullWidthNav: false,
 })
 
 const usePageHeaderContext = () => useContext(PageHeaderContext)
@@ -44,16 +46,30 @@ const usePageHeaderContext = () => useContext(PageHeaderContext)
 // ============================================================================
 
 export type PageHeaderRootProps = React.ComponentProps<'div'> &
-  VariantProps<typeof pageHeaderVariants>
+  VariantProps<typeof pageHeaderVariants> & {
+    /**
+     * When true, the navigation tabs row spans the full viewport width (with
+     * its border-b stretching edge-to-edge) while the inner NavMenu remains
+     * constrained to the page `size`. No-op when `size="full"`, which already
+     * spans full width.
+     */
+    fullWidthNav?: boolean
+  }
 
 /**
  * Root component for page header.
  * Renders children in order without searching for specific components.
  */
-const PageHeaderRoot = ({ className, size, children, ...props }: PageHeaderRootProps) => {
+const PageHeaderRoot = ({
+  className,
+  size,
+  fullWidthNav = false,
+  children,
+  ...props
+}: PageHeaderRootProps) => {
   const contextSize: 'default' | 'small' | 'large' | 'full' = size ?? 'default'
   return (
-    <PageHeaderContext.Provider value={{ size: contextSize }}>
+    <PageHeaderContext.Provider value={{ size: contextSize, fullWidthNav }}>
       <div
         data-slot="page-header"
         data-size={contextSize}
@@ -245,15 +261,19 @@ export type PageHeaderNavigationTabsProps = React.ComponentProps<'div'>
  * Should be placed as the last child of PageHeader.
  */
 const PageHeaderNavigationTabs = ({ className, ...props }: PageHeaderNavigationTabsProps) => {
-  const { size } = usePageHeaderContext()
+  const { size, fullWidthNav } = usePageHeaderContext()
+  const outerIsFull = size === 'full' || fullWidthNav
+
   return (
-    <PageContainer size={size} className={cn(size === 'full' && 'border-b')}>
-      <div
-        data-slot="page-header-footer"
-        className={cn('w-full [&>nav]:border-b-0', size !== 'full' && 'border-b', className)}
-        {...props}
-      />
-    </PageContainer>
+    <div data-slot="page-header-nav-row" className={cn('w-full', outerIsFull && 'border-b')}>
+      <PageContainer size={size}>
+        <div
+          data-slot="page-header-footer"
+          className={cn('w-full [&>nav]:border-b-0', !outerIsFull && 'border-b', className)}
+          {...props}
+        />
+      </PageContainer>
+    </div>
   )
 }
 PageHeaderNavigationTabs.displayName = 'PageHeaderNavigationTabs'
