@@ -116,7 +116,9 @@ export const Extensions = () => {
                     Version
                   </TableHead>
                   <TableHead key="schema">Schema</TableHead>
-                  <TableHead key="description">Description</TableHead>
+                  <TableHead key="description" className="min-w-80">
+                    Description
+                  </TableHead>
                   <TableHead key="used-by">Used by</TableHead>
                   <TableHead key="links">Links</TableHead>
                   {/*

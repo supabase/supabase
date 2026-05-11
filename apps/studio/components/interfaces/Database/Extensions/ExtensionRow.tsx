@@ -39,7 +39,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
   const extensionMeta = extensions.find((item) => item.name === extension.name)
   const docsUrl = extensionMeta?.link.startsWith('/guides')
     ? `${DOCS_URL}${extensionMeta?.link}`
-    : (extensionMeta?.link ?? undefined)
+    : extensionMeta?.link ?? undefined
 
   const { mutate: disableExtension, isPending: isDisabling } = useDatabaseExtensionDisableMutation({
     onSuccess: () => {
@@ -90,7 +90,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
         <TableCell className="truncate">{isOn ? extension.schema : '-'}</TableCell>
 
         <TableCell className="text-foreground-light">
-          <p className="block max-w-96" title={extension.comment ?? undefined}>
+          <p className="block" title={extension.comment ?? undefined}>
             {extension.comment}
           </p>
         </TableCell>
