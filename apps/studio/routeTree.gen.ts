@@ -20,6 +20,7 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectRefRouteImport } from './routes/project/$ref'
+import { Route as NewSlugRouteImport } from './routes/new/$slug'
 import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
 import { Route as ApiIncidentStatusRouteImport } from './routes/api/incident-status'
 import { Route as ApiIncidentBannerRouteImport } from './routes/api/incident-banner'
@@ -44,11 +45,13 @@ import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as ProjectRefIndexRouteImport } from './routes/project/$ref/index'
 import { Route as ApiConnectIndexRouteImport } from './routes/api/connect/index'
 import { Route as AppOrgIndexRouteImport } from './routes/_app/org/index'
+import { Route as AppNewIndexRouteImport } from './routes/_app/new/index'
 import { Route as ProjectRefStorageRouteImport } from './routes/project/$ref/storage'
 import { Route as ProjectRefSqlRouteImport } from './routes/project/$ref/sql'
 import { Route as ProjectRefSettingsRouteImport } from './routes/project/$ref/settings'
 import { Route as ProjectRefRealtimeRouteImport } from './routes/project/$ref/realtime'
 import { Route as ProjectRefObservabilityRouteImport } from './routes/project/$ref/observability'
+import { Route as ProjectRefMergeRouteImport } from './routes/project/$ref/merge'
 import { Route as ProjectRefLogsRouteImport } from './routes/project/$ref/logs'
 import { Route as ProjectRefIntegrationsRouteImport } from './routes/project/$ref/integrations'
 import { Route as ProjectRefFunctionsRouteImport } from './routes/project/$ref/functions'
@@ -57,11 +60,14 @@ import { Route as ProjectRefDatabaseRouteImport } from './routes/project/$ref/da
 import { Route as ProjectRefBranchesRouteImport } from './routes/project/$ref/branches'
 import { Route as ProjectRefAuthRouteImport } from './routes/project/$ref/auth'
 import { Route as ProjectRefAdvisorsRouteImport } from './routes/project/$ref/advisors'
+import { Route as IntegrationsGithubAuthorizeRouteImport } from './routes/integrations/github/authorize'
 import { Route as ApiIntegrationsStripeSyncRouteImport } from './routes/api/integrations/stripe-sync'
 import { Route as ApiEdgeFunctionsTestRouteImport } from './routes/api/edge-functions/test'
 import { Route as ApiContentGraphqlRouteImport } from './routes/api/content/graphql'
 import { Route as ApiAiDocsRouteImport } from './routes/api/ai/docs'
 import { Route as AuthCliLoginRouteImport } from './routes/_auth/cli/login'
+import { Route as AppSupportNewRouteImport } from './routes/_app/support/new'
+import { Route as AppSupportLinkRouteImport } from './routes/_app/support/link'
 import { Route as AppAccountSecurityRouteImport } from './routes/_app/account/security'
 import { Route as AppAccountMeRouteImport } from './routes/_app/account/me'
 import { Route as AppAccountAuditRouteImport } from './routes/_app/account/audit'
@@ -72,6 +78,7 @@ import { Route as ProjectRefIntegrationsIndexRouteImport } from './routes/projec
 import { Route as ProjectRefFunctionsIndexRouteImport } from './routes/project/$ref/functions/index'
 import { Route as ProjectRefEditorIndexRouteImport } from './routes/project/$ref/editor/index'
 import { Route as ProjectRefBranchesIndexRouteImport } from './routes/project/$ref/branches/index'
+import { Route as ProjectRefApiIndexRouteImport } from './routes/project/$ref/api/index'
 import { Route as ApiPlatformProjectsIndexRouteImport } from './routes/api/platform/projects/index'
 import { Route as ApiPlatformProfileIndexRouteImport } from './routes/api/platform/profile/index'
 import { Route as ApiPlatformOrganizationsIndexRouteImport } from './routes/api/platform/organizations/index'
@@ -338,6 +345,11 @@ const ProjectRefRoute = ProjectRefRouteImport.update({
   path: '/project/$ref',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NewSlugRoute = NewSlugRouteImport.update({
+  id: '/new/$slug',
+  path: '/new/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiStatusOverrideRoute = ApiStatusOverrideRouteImport.update({
   id: '/api/status-override',
   path: '/api/status-override',
@@ -460,6 +472,11 @@ const AppOrgIndexRoute = AppOrgIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppOrgRoute,
 } as any)
+const AppNewIndexRoute = AppNewIndexRouteImport.update({
+  id: '/new/',
+  path: '/new/',
+  getParentRoute: () => AppRoute,
+} as any)
 const ProjectRefStorageRoute = ProjectRefStorageRouteImport.update({
   id: '/storage',
   path: '/storage',
@@ -483,6 +500,11 @@ const ProjectRefRealtimeRoute = ProjectRefRealtimeRouteImport.update({
 const ProjectRefObservabilityRoute = ProjectRefObservabilityRouteImport.update({
   id: '/observability',
   path: '/observability',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
+const ProjectRefMergeRoute = ProjectRefMergeRouteImport.update({
+  id: '/merge',
+  path: '/merge',
   getParentRoute: () => ProjectRefRoute,
 } as any)
 const ProjectRefLogsRoute = ProjectRefLogsRouteImport.update({
@@ -525,6 +547,12 @@ const ProjectRefAdvisorsRoute = ProjectRefAdvisorsRouteImport.update({
   path: '/advisors',
   getParentRoute: () => ProjectRefRoute,
 } as any)
+const IntegrationsGithubAuthorizeRoute =
+  IntegrationsGithubAuthorizeRouteImport.update({
+    id: '/integrations/github/authorize',
+    path: '/integrations/github/authorize',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiIntegrationsStripeSyncRoute =
   ApiIntegrationsStripeSyncRouteImport.update({
     id: '/api/integrations/stripe-sync',
@@ -550,6 +578,16 @@ const AuthCliLoginRoute = AuthCliLoginRouteImport.update({
   id: '/cli/login',
   path: '/cli/login',
   getParentRoute: () => AuthRoute,
+} as any)
+const AppSupportNewRoute = AppSupportNewRouteImport.update({
+  id: '/support/new',
+  path: '/support/new',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSupportLinkRoute = AppSupportLinkRouteImport.update({
+  id: '/support/link',
+  path: '/support/link',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppAccountSecurityRoute = AppAccountSecurityRouteImport.update({
   id: '/security',
@@ -603,6 +641,11 @@ const ProjectRefBranchesIndexRoute = ProjectRefBranchesIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ProjectRefBranchesRoute,
+} as any)
+const ProjectRefApiIndexRoute = ProjectRefApiIndexRouteImport.update({
+  id: '/api/',
+  path: '/api/',
+  getParentRoute: () => ProjectRefRoute,
 } as any)
 const ApiPlatformProjectsIndexRoute =
   ApiPlatformProjectsIndexRouteImport.update({
@@ -1849,15 +1892,19 @@ export interface FileRoutesByFullPath {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/new/$slug': typeof NewSlugRoute
   '/project/$ref': typeof ProjectRefRouteWithChildren
   '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
   '/account/security': typeof AppAccountSecurityRoute
+  '/support/link': typeof AppSupportLinkRoute
+  '/support/new': typeof AppSupportNewRoute
   '/cli/login': typeof AuthCliLoginRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/integrations/github/authorize': typeof IntegrationsGithubAuthorizeRoute
   '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
@@ -1866,11 +1913,13 @@ export interface FileRoutesByFullPath {
   '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
   '/project/$ref/integrations': typeof ProjectRefIntegrationsRouteWithChildren
   '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
+  '/project/$ref/merge': typeof ProjectRefMergeRoute
   '/project/$ref/observability': typeof ProjectRefObservabilityRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
   '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
+  '/new/': typeof AppNewIndexRoute
   '/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
   '/project/$ref/': typeof ProjectRefIndexRoute
@@ -1977,6 +2026,7 @@ export interface FileRoutesByFullPath {
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile/': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
+  '/project/$ref/api/': typeof ProjectRefApiIndexRoute
   '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
   '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
@@ -2122,20 +2172,26 @@ export interface FileRoutesByTo {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/new/$slug': typeof NewSlugRoute
   '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
   '/account/security': typeof AppAccountSecurityRoute
+  '/support/link': typeof AppSupportLinkRoute
+  '/support/new': typeof AppSupportNewRoute
   '/cli/login': typeof AuthCliLoginRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/integrations/github/authorize': typeof IntegrationsGithubAuthorizeRoute
   '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
+  '/project/$ref/merge': typeof ProjectRefMergeRoute
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
+  '/new': typeof AppNewIndexRoute
   '/org': typeof AppOrgIndexRoute
   '/api/connect': typeof ApiConnectIndexRoute
   '/project/$ref': typeof ProjectRefIndexRoute
@@ -2239,6 +2295,7 @@ export interface FileRoutesByTo {
   '/api/platform/organizations': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects': typeof ApiPlatformProjectsIndexRoute
+  '/project/$ref/api': typeof ProjectRefApiIndexRoute
   '/project/$ref/branches': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor': typeof ProjectRefEditorIndexRoute
   '/project/$ref/functions': typeof ProjectRefFunctionsIndexRoute
@@ -2388,15 +2445,19 @@ export interface FileRoutesById {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
+  '/new/$slug': typeof NewSlugRoute
   '/project/$ref': typeof ProjectRefRouteWithChildren
   '/_app/account/audit': typeof AppAccountAuditRoute
   '/_app/account/me': typeof AppAccountMeRoute
   '/_app/account/security': typeof AppAccountSecurityRoute
+  '/_app/support/link': typeof AppSupportLinkRoute
+  '/_app/support/new': typeof AppSupportNewRoute
   '/_auth/cli/login': typeof AuthCliLoginRoute
   '/api/ai/docs': typeof ApiAiDocsRoute
   '/api/content/graphql': typeof ApiContentGraphqlRoute
   '/api/edge-functions/test': typeof ApiEdgeFunctionsTestRoute
   '/api/integrations/stripe-sync': typeof ApiIntegrationsStripeSyncRoute
+  '/integrations/github/authorize': typeof IntegrationsGithubAuthorizeRoute
   '/project/$ref/advisors': typeof ProjectRefAdvisorsRouteWithChildren
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
@@ -2405,11 +2466,13 @@ export interface FileRoutesById {
   '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
   '/project/$ref/integrations': typeof ProjectRefIntegrationsRouteWithChildren
   '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
+  '/project/$ref/merge': typeof ProjectRefMergeRoute
   '/project/$ref/observability': typeof ProjectRefObservabilityRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
   '/project/$ref/sql': typeof ProjectRefSqlRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
+  '/_app/new/': typeof AppNewIndexRoute
   '/_app/org/': typeof AppOrgIndexRoute
   '/api/connect/': typeof ApiConnectIndexRoute
   '/project/$ref/': typeof ProjectRefIndexRoute
@@ -2516,6 +2579,7 @@ export interface FileRoutesById {
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
   '/api/platform/profile/': typeof ApiPlatformProfileIndexRoute
   '/api/platform/projects/': typeof ApiPlatformProjectsIndexRoute
+  '/project/$ref/api/': typeof ProjectRefApiIndexRoute
   '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
   '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
@@ -2664,15 +2728,19 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/status-override'
+    | '/new/$slug'
     | '/project/$ref'
     | '/account/audit'
     | '/account/me'
     | '/account/security'
+    | '/support/link'
+    | '/support/new'
     | '/cli/login'
     | '/api/ai/docs'
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/integrations/github/authorize'
     | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/branches'
@@ -2681,11 +2749,13 @@ export interface FileRouteTypes {
     | '/project/$ref/functions'
     | '/project/$ref/integrations'
     | '/project/$ref/logs'
+    | '/project/$ref/merge'
     | '/project/$ref/observability'
     | '/project/$ref/realtime'
     | '/project/$ref/settings'
     | '/project/$ref/sql'
     | '/project/$ref/storage'
+    | '/new/'
     | '/org/'
     | '/api/connect/'
     | '/project/$ref/'
@@ -2792,6 +2862,7 @@ export interface FileRouteTypes {
     | '/api/platform/organizations/'
     | '/api/platform/profile/'
     | '/api/platform/projects/'
+    | '/project/$ref/api/'
     | '/project/$ref/branches/'
     | '/project/$ref/editor/'
     | '/project/$ref/functions/'
@@ -2937,20 +3008,26 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/status-override'
+    | '/new/$slug'
     | '/account/audit'
     | '/account/me'
     | '/account/security'
+    | '/support/link'
+    | '/support/new'
     | '/cli/login'
     | '/api/ai/docs'
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/integrations/github/authorize'
     | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/database'
+    | '/project/$ref/merge'
     | '/project/$ref/realtime'
     | '/project/$ref/settings'
     | '/project/$ref/storage'
+    | '/new'
     | '/org'
     | '/api/connect'
     | '/project/$ref'
@@ -3054,6 +3131,7 @@ export interface FileRouteTypes {
     | '/api/platform/organizations'
     | '/api/platform/profile'
     | '/api/platform/projects'
+    | '/project/$ref/api'
     | '/project/$ref/branches'
     | '/project/$ref/editor'
     | '/project/$ref/functions'
@@ -3202,15 +3280,19 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/status-override'
+    | '/new/$slug'
     | '/project/$ref'
     | '/_app/account/audit'
     | '/_app/account/me'
     | '/_app/account/security'
+    | '/_app/support/link'
+    | '/_app/support/new'
     | '/_auth/cli/login'
     | '/api/ai/docs'
     | '/api/content/graphql'
     | '/api/edge-functions/test'
     | '/api/integrations/stripe-sync'
+    | '/integrations/github/authorize'
     | '/project/$ref/advisors'
     | '/project/$ref/auth'
     | '/project/$ref/branches'
@@ -3219,11 +3301,13 @@ export interface FileRouteTypes {
     | '/project/$ref/functions'
     | '/project/$ref/integrations'
     | '/project/$ref/logs'
+    | '/project/$ref/merge'
     | '/project/$ref/observability'
     | '/project/$ref/realtime'
     | '/project/$ref/settings'
     | '/project/$ref/sql'
     | '/project/$ref/storage'
+    | '/_app/new/'
     | '/_app/org/'
     | '/api/connect/'
     | '/project/$ref/'
@@ -3330,6 +3414,7 @@ export interface FileRouteTypes {
     | '/api/platform/organizations/'
     | '/api/platform/profile/'
     | '/api/platform/projects/'
+    | '/project/$ref/api/'
     | '/project/$ref/branches/'
     | '/project/$ref/editor/'
     | '/project/$ref/functions/'
@@ -3468,11 +3553,13 @@ export interface RootRouteChildren {
   ApiIncidentBannerRoute: typeof ApiIncidentBannerRoute
   ApiIncidentStatusRoute: typeof ApiIncidentStatusRoute
   ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
+  NewSlugRoute: typeof NewSlugRoute
   ProjectRefRoute: typeof ProjectRefRouteWithChildren
   ApiAiDocsRoute: typeof ApiAiDocsRoute
   ApiContentGraphqlRoute: typeof ApiContentGraphqlRoute
   ApiEdgeFunctionsTestRoute: typeof ApiEdgeFunctionsTestRoute
   ApiIntegrationsStripeSyncRoute: typeof ApiIntegrationsStripeSyncRoute
+  IntegrationsGithubAuthorizeRoute: typeof IntegrationsGithubAuthorizeRoute
   ApiConnectIndexRoute: typeof ApiConnectIndexRoute
   ApiAiCodeCompleteRoute: typeof ApiAiCodeCompleteRoute
   ApiAiFeedbackClassifyRoute: typeof ApiAiFeedbackClassifyRoute
@@ -3627,6 +3714,13 @@ declare module '@tanstack/react-router' {
       path: '/project/$ref'
       fullPath: '/project/$ref'
       preLoaderRoute: typeof ProjectRefRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/new/$slug': {
+      id: '/new/$slug'
+      path: '/new/$slug'
+      fullPath: '/new/$slug'
+      preLoaderRoute: typeof NewSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/status-override': {
@@ -3797,6 +3891,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOrgIndexRouteImport
       parentRoute: typeof AppOrgRoute
     }
+    '/_app/new/': {
+      id: '/_app/new/'
+      path: '/new'
+      fullPath: '/new/'
+      preLoaderRoute: typeof AppNewIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/project/$ref/storage': {
       id: '/project/$ref/storage'
       path: '/storage'
@@ -3830,6 +3931,13 @@ declare module '@tanstack/react-router' {
       path: '/observability'
       fullPath: '/project/$ref/observability'
       preLoaderRoute: typeof ProjectRefObservabilityRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
+    '/project/$ref/merge': {
+      id: '/project/$ref/merge'
+      path: '/merge'
+      fullPath: '/project/$ref/merge'
+      preLoaderRoute: typeof ProjectRefMergeRouteImport
       parentRoute: typeof ProjectRefRoute
     }
     '/project/$ref/logs': {
@@ -3888,6 +3996,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefAdvisorsRouteImport
       parentRoute: typeof ProjectRefRoute
     }
+    '/integrations/github/authorize': {
+      id: '/integrations/github/authorize'
+      path: '/integrations/github/authorize'
+      fullPath: '/integrations/github/authorize'
+      preLoaderRoute: typeof IntegrationsGithubAuthorizeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/integrations/stripe-sync': {
       id: '/api/integrations/stripe-sync'
       path: '/api/integrations/stripe-sync'
@@ -3922,6 +4037,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/cli/login'
       preLoaderRoute: typeof AuthCliLoginRouteImport
       parentRoute: typeof AuthRoute
+    }
+    '/_app/support/new': {
+      id: '/_app/support/new'
+      path: '/support/new'
+      fullPath: '/support/new'
+      preLoaderRoute: typeof AppSupportNewRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/support/link': {
+      id: '/_app/support/link'
+      path: '/support/link'
+      fullPath: '/support/link'
+      preLoaderRoute: typeof AppSupportLinkRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/account/security': {
       id: '/_app/account/security'
@@ -3992,6 +4121,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/branches/'
       preLoaderRoute: typeof ProjectRefBranchesIndexRouteImport
       parentRoute: typeof ProjectRefBranchesRoute
+    }
+    '/project/$ref/api/': {
+      id: '/project/$ref/api/'
+      path: '/api'
+      fullPath: '/project/$ref/api/'
+      preLoaderRoute: typeof ProjectRefApiIndexRouteImport
+      parentRoute: typeof ProjectRefRoute
     }
     '/api/platform/projects/': {
       id: '/api/platform/projects/'
@@ -5536,12 +5672,18 @@ interface AppRouteChildren {
   AppAccountRoute: typeof AppAccountRouteWithChildren
   AppOrgRoute: typeof AppOrgRouteWithChildren
   AppOrganizationsRoute: typeof AppOrganizationsRoute
+  AppSupportLinkRoute: typeof AppSupportLinkRoute
+  AppSupportNewRoute: typeof AppSupportNewRoute
+  AppNewIndexRoute: typeof AppNewIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAccountRoute: AppAccountRouteWithChildren,
   AppOrgRoute: AppOrgRouteWithChildren,
   AppOrganizationsRoute: AppOrganizationsRoute,
+  AppSupportLinkRoute: AppSupportLinkRoute,
+  AppSupportNewRoute: AppSupportNewRoute,
+  AppNewIndexRoute: AppNewIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -6036,12 +6178,14 @@ interface ProjectRefRouteChildren {
   ProjectRefFunctionsRoute: typeof ProjectRefFunctionsRouteWithChildren
   ProjectRefIntegrationsRoute: typeof ProjectRefIntegrationsRouteWithChildren
   ProjectRefLogsRoute: typeof ProjectRefLogsRouteWithChildren
+  ProjectRefMergeRoute: typeof ProjectRefMergeRoute
   ProjectRefObservabilityRoute: typeof ProjectRefObservabilityRouteWithChildren
   ProjectRefRealtimeRoute: typeof ProjectRefRealtimeRouteWithChildren
   ProjectRefSettingsRoute: typeof ProjectRefSettingsRouteWithChildren
   ProjectRefSqlRoute: typeof ProjectRefSqlRouteWithChildren
   ProjectRefStorageRoute: typeof ProjectRefStorageRouteWithChildren
   ProjectRefIndexRoute: typeof ProjectRefIndexRoute
+  ProjectRefApiIndexRoute: typeof ProjectRefApiIndexRoute
 }
 
 const ProjectRefRouteChildren: ProjectRefRouteChildren = {
@@ -6053,12 +6197,14 @@ const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefFunctionsRoute: ProjectRefFunctionsRouteWithChildren,
   ProjectRefIntegrationsRoute: ProjectRefIntegrationsRouteWithChildren,
   ProjectRefLogsRoute: ProjectRefLogsRouteWithChildren,
+  ProjectRefMergeRoute: ProjectRefMergeRoute,
   ProjectRefObservabilityRoute: ProjectRefObservabilityRouteWithChildren,
   ProjectRefRealtimeRoute: ProjectRefRealtimeRouteWithChildren,
   ProjectRefSettingsRoute: ProjectRefSettingsRouteWithChildren,
   ProjectRefSqlRoute: ProjectRefSqlRouteWithChildren,
   ProjectRefStorageRoute: ProjectRefStorageRouteWithChildren,
   ProjectRefIndexRoute: ProjectRefIndexRoute,
+  ProjectRefApiIndexRoute: ProjectRefApiIndexRoute,
 }
 
 const ProjectRefRouteWithChildren = ProjectRefRoute._addFileChildren(
@@ -6101,11 +6247,13 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIncidentBannerRoute: ApiIncidentBannerRoute,
   ApiIncidentStatusRoute: ApiIncidentStatusRoute,
   ApiStatusOverrideRoute: ApiStatusOverrideRoute,
+  NewSlugRoute: NewSlugRoute,
   ProjectRefRoute: ProjectRefRouteWithChildren,
   ApiAiDocsRoute: ApiAiDocsRoute,
   ApiContentGraphqlRoute: ApiContentGraphqlRoute,
   ApiEdgeFunctionsTestRoute: ApiEdgeFunctionsTestRoute,
   ApiIntegrationsStripeSyncRoute: ApiIntegrationsStripeSyncRoute,
+  IntegrationsGithubAuthorizeRoute: IntegrationsGithubAuthorizeRoute,
   ApiConnectIndexRoute: ApiConnectIndexRoute,
   ApiAiCodeCompleteRoute: ApiAiCodeCompleteRoute,
   ApiAiFeedbackClassifyRoute: ApiAiFeedbackClassifyRoute,

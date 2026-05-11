@@ -181,3 +181,54 @@ export function useRouter() {
     }
   }, [router, location.href, location.pathname, matches, params, search])
 }
+
+// Module-scope singleton — Next exposes the same proxy via
+// `import router from 'next/router'`. We have one consumer
+// (Support/DiscordCTACard) that reads `router.basePath` at render time
+// outside of a hook context, so we surface the env-derived basePath
+// directly. Push/replace/etc. fall through to `window.location` to keep
+// future module-scope navigations safe; nothing in studio uses them
+// today.
+const singletonBasePath = toNextBasePath(
+  // Read both the TanStack and Next env names — TanStack also reads
+  // VITE_BASE_URL but the studio config writes NEXT_PUBLIC_BASE_PATH.
+  process.env.NEXT_PUBLIC_BASE_PATH
+)
+
+const singletonRouter = {
+  basePath: singletonBasePath,
+  pathname: '',
+  route: '',
+  query: {} as Record<string, string | string[] | undefined>,
+  asPath: '',
+  isReady: true,
+  isFallback: false,
+  isPreview: false,
+  isLocaleDomain: false,
+  push: async (url: string | UrlObject): Promise<boolean> => {
+    if (typeof window !== 'undefined') window.location.assign(resolveUrl(url))
+    return true
+  },
+  replace: async (url: string | UrlObject): Promise<boolean> => {
+    if (typeof window !== 'undefined') window.location.replace(resolveUrl(url))
+    return true
+  },
+  reload: () => {
+    if (typeof window !== 'undefined') window.location.reload()
+  },
+  back: () => {
+    if (typeof window !== 'undefined') window.history.back()
+  },
+  forward: () => {
+    if (typeof window !== 'undefined') window.history.forward()
+  },
+  prefetch: async () => {},
+  beforePopState: (_cb: (state: unknown) => boolean) => {},
+  events: {
+    on: () => {},
+    off: () => {},
+    emit: () => {},
+  },
+}
+
+export default singletonRouter

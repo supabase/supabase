@@ -124,29 +124,29 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 ### App shell — top-level pages
 
 - [x] A `routes/_app/organizations.tsx` ← `pages/organizations.tsx` (page default already withAuth-wrapped; PageLayout wraps body)
-- [ ] `routes/_app/new/index.tsx` ← `pages/new/index.tsx`
-- [ ] `routes/_app/new/$slug.tsx` ← `pages/new/[slug].tsx`
+- [x] `routes/_app/new/index.tsx` ← `pages/new/index.tsx` (inlines WizardLayout; sets `defaultLayoutHeaderTitle: 'New organization'` + `hideMobileMenu: true` on staticData). **Delta vs plan:** no `_app/new.tsx` sub-shell — `new/$slug` doesn't fit under \_app and uses a different inner wrapper (PageLayout), so a shared shell wouldn't share anything.
+- [x] A `routes/new/$slug.tsx` ← `pages/new/[slug].tsx` **Delta vs plan:** placed at top-level rather than under `_app/` — Next getLayout omits AppLayout and uses PageLayout (not WizardLayout) inside DefaultLayout, so leaf inlines the full DefaultLayout + PageLayout wrap itself.
 - [x] A `routes/aws-marketplace-onboarding.tsx` ← `pages/aws-marketplace-onboarding.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses its own `LinkAwsMarketplaceLayout` and doesn't want `AppLayout` + `DefaultLayout` wrapping.
 - [x] A `routes/claim-project.tsx` ← `pages/claim-project.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses its own `<Head>` + `<main>` layout and doesn't want `AppLayout` + `DefaultLayout` wrapping.
 - [x] A `routes/join.tsx` ← `pages/join.tsx` **Delta vs plan:** placed at root rather than under `_app/` — page uses a centered-div layout and doesn't want `AppLayout` + `DefaultLayout` wrapping.
-- [ ] `routes/_app/support/new.tsx` ← `pages/support/new.tsx` (+ withAuth → beforeLoad)
-- [ ] `routes/_app/support/link.tsx` ← `pages/support/link.tsx`
+- [x] `routes/_app/support/new.tsx` ← `pages/support/new.tsx` (sets `hideMobileMenu: true` staticData; existing page is `withAuth`-wrapped so no beforeLoad migration needed yet)
+- [x] `routes/_app/support/link.tsx` ← `pages/support/link.tsx`
 
 ### App shell — integrations
 
 - [ ] `routes/_app/integrations/vercel/install.tsx` ← `pages/integrations/vercel/install.tsx`
 - [ ] `routes/_app/integrations/vercel/$slug/marketplace/choose-project.tsx` ← `pages/integrations/vercel/[slug]/marketplace/choose-project.tsx`
 - [ ] `routes/_app/integrations/vercel/$slug/deploy-button/new-project.tsx` ← `pages/integrations/vercel/[slug]/deploy-button/new-project.tsx`
-- [ ] `routes/_app/integrations/github/authorize.tsx` ← `pages/integrations/github/authorize.tsx`
+- [x] A `routes/integrations/github/authorize.tsx` ← `pages/integrations/github/authorize.tsx` **Delta vs plan:** placed at top-level rather than under `_app/` — Next page has no getLayout (renders bare), so adding AppLayout/DefaultLayout via \_app would be a behaviour change.
 
 ### Project shell — home
 
 - [x] A `routes/project/$ref/index.tsx` ← `pages/project/[ref]/index.tsx` (route wraps in `ProjectLayoutWithAuth` itself — see shell delta above)
-- [ ] `routes/project/$ref/merge.tsx` ← `pages/project/[ref]/merge.tsx`
+- [x] `routes/project/$ref/merge.tsx` ← `pages/project/[ref]/merge.tsx` (leaf wraps body in `ProjectLayoutWithAuth`; parent `project/$ref.tsx` shell provides DefaultLayout)
 
 ### Project shell — `/api/*`
 
-- [ ] `routes/project/$ref/api/index.tsx` ← `pages/project/[ref]/api/index.tsx`
+- [x] `routes/project/$ref/api/index.tsx` ← `pages/project/[ref]/api/index.tsx` (redirect-only page; no extra wrap needed beyond the parent DefaultLayout shell)
 
 ### Project shell — `/database/*`
 
