@@ -238,6 +238,32 @@ supabase start
 
 This takes time on your first run because the CLI needs to download the Docker images to your local machine. The CLI includes the entire Supabase toolset, and a few additional images that are useful for local development (like a local SMTP server and a database diff tool).
 
+## Service versions
+
+The CLI release includes a default set of service versions for local development. When your project is linked to a hosted Supabase project, the CLI can also cache the remote versions it can detect and use those versions when creating or updating a local stack.
+
+Run `supabase link` to connect the local checkout to a hosted project and cache the remote service versions. For an existing local stack, run:
+
+```bash
+supabase status
+supabase stack update
+```
+
+`supabase status` shows whether newer linked or default service versions are available. `supabase stack update` updates the pinned local stack versions without starting the stack. If the stack is already running, stop and start it again to apply the updated versions.
+
+For Postgres, keep the local major version aligned with your hosted database by committing `supabase/config.toml`:
+
+```toml
+[db]
+major_version = 17
+```
+
+The exact Postgres Docker image patch version, and the versions for services like Auth, PostgREST, Storage, Realtime, and Studio, are resolved from the linked project when available and from the CLI defaults otherwise. To make those defaults consistent across a team, pin the Supabase CLI version in your package manager or tool-version manager. For one-off local testing, override a service version for a single run:
+
+```bash
+supabase start --service-version auth=v2.180.0
+```
+
 ## Access your project's services
 
 Once all of the Supabase services are running, you'll see output containing your local Supabase credentials. It should look like this, with urls and keys that you'll use in your local project:
