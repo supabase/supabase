@@ -44,11 +44,9 @@ export function Hero() {
             </Button>
           </div>
         </div>
-        <p className="text-foreground-lighter text-sm">
-          Start your project with a Postgres database.
-          <br />
-          Add Authentication, Data APIs, Edge Functions, Realtime Data, Storage, and Vector
-          embeddings.
+        <p className="text-foreground-lighter text-sm text-balance">
+          Start your project with a Postgres database. Add Authentication, Data APIs, Edge
+          Functions, Realtime Data, Storage, and Vector embeddings.
         </p>
       </div>
     </div>

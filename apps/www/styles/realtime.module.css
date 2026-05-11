@@ -104,7 +104,7 @@
   88.1%,
   100% {
     opacity: 1;
-    font-family: var(--font-ktf-prima), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
     background-color: transparent;
   }
 }

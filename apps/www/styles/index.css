@@ -33,7 +33,8 @@
 }
 
 :root {
-  --font-sans: var(--font-ktf-prima), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, Menlo, monospace;
   --heading-tracking: -0.02em;
   --body-tracking: -0.01em;
@@ -59,8 +60,18 @@ h3,
 h4,
 h5,
 h6 {
+  font-family: var(--font-heading);
   letter-spacing: var(--heading-tracking);
   line-height: var(--heading-leading);
+}
+
+.h1:not(.prose *):not(.overwrite),
+.h2:not(.prose *):not(.overwrite),
+.h3:not(.prose *):not(.overwrite),
+.h4:not(.prose *):not(.overwrite),
+.h5:not(.prose *):not(.overwrite),
+.h6:not(.prose *):not(.overwrite) {
+  font-family: var(--font-heading);
 }
 
 pre,

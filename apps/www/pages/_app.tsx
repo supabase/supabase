@@ -3,6 +3,7 @@ import 'config/code-hike.css'
 import '../styles/index.css'
 import './launch-week/launchWeek.css'
 
+import { geistMono, inter, manrope } from '~/lib/fonts'
 import {
   AuthProvider,
   FeatureFlagProvider,
@@ -20,19 +21,17 @@ import { DevToolbar, DevToolbarProvider } from 'dev-tools'
 import { DefaultSeo } from 'next-seo'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
-import { geistMono, ktfPrima } from '~/lib/fonts'
 import { useRouter } from 'next/router'
 import { TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsentToast } from 'ui-patterns/consent'
 
-import { FontDevtools } from '~/components/FontDevtools'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 import { useWwwCommandMenuTelemetry } from '../hooks/useWwwCommandMenuTelemetry'
 import { MD_PAGES } from '@/app/api-v2/md/content.generated'
 import { Toaster } from '@/app/toaster'
 import { WwwCommandMenu } from '@/components/CommandMenu'
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION, IS_PROD } from '@/lib/constants'
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '@/lib/constants'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -67,7 +66,7 @@ export default function App({ Component, pageProps }: AppProps) {
     : null
 
   return (
-    <main className={`${ktfPrima.variable} ${geistMono.variable}`}>
+    <main className={`${manrope.variable} ${inter.variable} ${geistMono.variable}`}>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         {mdAlternateHref && <link rel="alternate" type="text/markdown" href={mdAlternateHref} />}
@@ -119,7 +118,6 @@ export default function App({ Component, pageProps }: AppProps) {
                     enabled={IS_PLATFORM}
                   />
                   <DevToolbar />
-                  {!IS_PROD && <FontDevtools />}
                 </CommandProvider>
               </TooltipProvider>
             </ThemeProvider>
