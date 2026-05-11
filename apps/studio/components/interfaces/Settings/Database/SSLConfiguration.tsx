@@ -22,15 +22,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import {
-  Admonition,
   PageSection,
   PageSectionContent,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
-import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+} from 'ui-patterns/PageSection'
 
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'

@@ -1,7 +1,7 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { SupportLink } from '../Support/SupportLink'
 import type { ResponseError } from '@/types'

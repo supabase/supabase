@@ -1,5 +1,5 @@
 import { AlertOctagon, Lock, ShieldOff } from 'lucide-react'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'

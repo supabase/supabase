@@ -2,7 +2,7 @@ import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/
 import { useFlag, useParams } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
